@@ -142,3 +142,17 @@ select pxp.f_insert_tprocedimiento_gui ('CONTA_CTC_ELI', 'CTIP', 'no');
 select pxp.f_insert_tprocedimiento_gui ('CONTA_CTC_SEL', 'CTIP', 'no');
 
 /***********************************F-DAT-GSS-CONTA-81-26/03/2013*****************************************/
+
+
+
+/***********************************I-DAT-RAC-CONTA-05-29/05/2013*****************************************/
+
+select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'CCBT', 'si', 6, 'sis_contabilidad/vista/clase_comprobante/ClaseComprobante.php', 2, '', 'ClaseComprobante', 'CONTA');
+select pxp.f_insert_testructura_gui ('CCBT', 'CONTA');
+
+SELECT * FROM param.f_inserta_documento('CONTA', 'CDIR', 'Comprobante de Diario', 'periodo', NULL, 'depto', NULL);
+
+SELECT * FROM param.f_inserta_documento('CONTA', 'CPAG', 'Comprobante de Pago', 'periodo', NULL, 'depto', NULL);
+
+/***********************************F-DAT-RAC-CONTA-05-29/05/2013*****************************************/
+

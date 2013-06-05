@@ -73,3 +73,23 @@ WITHOUT OIDS;
 ALTER TABLE conta.tauxiliar OWNER TO postgres;
 
 /***********************************F-SCP-GSS-CONTA-48-20/02/2013****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-05-29/05/2013****************************************/
+
+CREATE TABLE conta.tclase_comprobante(
+    id_clase_comprobante SERIAL NOT NULL,
+    id_documento int4,
+    descripcion varchar(300),
+    tipo_comprobante varchar(300),
+    PRIMARY KEY (id_clase_comprobante))
+    INHERITS (pxp.tbase);
+    
+ 
+    
+/***********************************F-SCP-RAC-CONTA-05-29/05/2013****************************************/
+
+
+   
