@@ -145,6 +145,7 @@ select pxp.f_insert_tprocedimiento_gui ('CONTA_CTC_SEL', 'CTIP', 'no');
 
 
 
+
 /***********************************I-DAT-RAC-CONTA-05-29/05/2013*****************************************/
 
 select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'CCBT', 'si', 6, 'sis_contabilidad/vista/clase_comprobante/ClaseComprobante.php', 2, '', 'ClaseComprobante', 'CONTA');
@@ -155,4 +156,22 @@ SELECT * FROM param.f_inserta_documento('CONTA', 'CDIR', 'Comprobante de Diario'
 SELECT * FROM param.f_inserta_documento('CONTA', 'CPAG', 'Comprobante de Pago', 'periodo', NULL, 'depto', NULL);
 
 /***********************************F-DAT-RAC-CONTA-05-29/05/2013*****************************************/
+
+
+/****************************************I-DAT-JRR-CONTA-0-15/05/2013************************************************/
+
+select pxp.f_insert_tgui ('Relaciones Contables por Tabla', 'Relaciones Contables por Tabla', 'RELCON', 'si', 1, 'sis_contabilidad/vista/tabla_relacion_contable/TablaRelacionContable.php', 2, '', 'TablaRelacionContable', 'CONTA');
+select pxp.f_insert_tgui ('Relaciones Contables', 'Relaciones Contables', 'RELACON', 'si', 4, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Proveedor', 'Proveedor', 'PROVCUEN', 'si', 1, 'sis_contabilidad/vista/proveedor_cuenta/Proveedor.php', 3, '', 'ProveedorCuenta', 'CONTA');
+select pxp.f_insert_tgui ('Definición de Relaciones Contables', 'Definición de Relaciones Contables', 'DEFRECONCAR', 'si', 1, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Relaciones Contables Generales', 'Relaciones Contables Generales', 'RELCONGEN', 'si', 2, 'sis_contabilidad/vista/tipo_relacion_contable/TipoRelacionContableGeneral.php', 3, '', 'TipoRelacionContableGeneral', 'CONTA');
+select pxp.f_insert_tgui ('Concepto de Gasto', 'Concepto de Gasto', 'CONGASCUE', 'si', 2, 'sis_contabilidad/vista/concepto_ingas_cta/ConceptoIngas.php', 3, '', 'ConceptoIngasCuenta', 'CONTA');
+select pxp.f_insert_testructura_gui ('RELCON', 'DEFRECONCAR');
+select pxp.f_insert_testructura_gui ('RELACON', 'CONTA');
+select pxp.f_insert_testructura_gui ('PROVCUEN', 'RELACON');
+select pxp.f_insert_testructura_gui ('DEFRECONCAR', 'CONTA');
+select pxp.f_insert_testructura_gui ('RELCONGEN', 'RELACON');
+select pxp.f_insert_testructura_gui ('CONGASCUE', 'RELACON');
+
+/****************************************F-DAT-JRR-CONTA-0-15/05/2013************************************************/
 
