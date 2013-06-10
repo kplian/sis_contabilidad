@@ -78,3 +78,14 @@ ALTER TABLE conta.relacion_contable
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
 /****************************************F-DEP-JRR-CONTA-0-15/05/2013************************************************/
+
+/***********************************I-DEP-GSS-CONTA-9-07/06/2013*****************************************/
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD CONSTRAINT fk_tdetalle_plantilla_comprobante__id_plantilla_comprobante FOREIGN KEY (id_plantilla_comprobante)
+    REFERENCES conta.tplantilla_comprobante(id_plantilla_comprobante)
+	ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/***********************************F-DEP-GSS-CONTA-9-07/06/2013*****************************************/

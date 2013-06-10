@@ -143,9 +143,6 @@ select pxp.f_insert_tprocedimiento_gui ('CONTA_CTC_SEL', 'CTIP', 'no');
 
 /***********************************F-DAT-GSS-CONTA-81-26/03/2013*****************************************/
 
-
-
-
 /***********************************I-DAT-RAC-CONTA-05-29/05/2013*****************************************/
 
 select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'CCBT', 'si', 6, 'sis_contabilidad/vista/clase_comprobante/ClaseComprobante.php', 2, '', 'ClaseComprobante', 'CONTA');
@@ -175,3 +172,40 @@ select pxp.f_insert_testructura_gui ('CONGASCUE', 'RELACON');
 
 /****************************************F-DAT-JRR-CONTA-0-15/05/2013************************************************/
 
+=======
+/***********************************I-DAT-GSS-CONTA-9-10/06/2013*****************************************/
+
+select pxp.f_insert_tgui ('Plantilla Comprobante', 'comprobante', 'CMPB', 'si', 5, 'sis_contabilidad/vista/plantilla_comprobante/PlantillaComprobante.php', 2, '', 'PlantillaComprobante', 'CONTA');
+select pxp.f_insert_tgui ('Detalle de Comprobante', 'Detalle de Comprobante', 'CMPB.1', 'no', 0, 'sis_contabilidad/vista/detalle_plantilla_comprobante/DetallePlantillaComprobante.php', 3, '', '50%', 'CONTA');
+
+select pxp.f_insert_testructura_gui ('CMPB', 'CONTA');
+select pxp.f_insert_testructura_gui ('CMPB.1', 'CMPB');
+
+select pxp.f_insert_tfuncion ('conta.ft_plantilla_comprobante_ime', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.ft_plantilla_comprobante_sel', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.ft_detalle_plantilla_comprobante_ime', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.ft_detalle_plantilla_comprobante_sel', 'Funcion para tabla     ', 'CONTA');
+
+select pxp.f_insert_tprocedimiento ('CONTA_CMPB_INS', 'Insercion de registros', 'si', '', '', 'conta.ft_plantilla_comprobante_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPB_MOD', 'Modificacion de registros', 'si', '', '', 'conta.ft_plantilla_comprobante_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPB_ELI', 'Eliminacion de registros', 'si', '', '', 'conta.ft_plantilla_comprobante_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPB_SEL', 'Consulta de datos', 'si', '', '', 'conta.ft_plantilla_comprobante_sel');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPB_CONT', 'Conteo de registros', 'si', '', '', 'conta.ft_plantilla_comprobante_sel');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPBDET_INS', 'Insercion de registros', 'si', '', '', 'conta.ft_detalle_plantilla_comprobante_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPBDET_MOD', 'Modificacion de registros', 'si', '', '', 'conta.ft_detalle_plantilla_comprobante_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPBDET_ELI', 'Eliminacion de registros', 'si', '', '', 'conta.ft_detalle_plantilla_comprobante_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPBDET_SEL', 'Consulta de datos', 'si', '', '', 'conta.ft_detalle_plantilla_comprobante_sel');
+select pxp.f_insert_tprocedimiento ('CONTA_CMPBDET_CONT', 'Conteo de registros', 'si', '', '', 'conta.ft_detalle_plantilla_comprobante_sel');
+
+select pxp.f_insert_tprocedimiento_gui ('PM_GES_SEL', 'CTA', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_MONEDA_SEL', 'CTA', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_CMPB_INS', 'CMPB', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_CMPB_MOD', 'CMPB', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_CMPB_ELI', 'CMPB', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_CMPB_SEL', 'CMPB', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_CMPBDET_INS', 'CMPB.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_CMPBDET_MOD', 'CMPB.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_CMPBDET_ELI', 'CMPB.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_CMPBDET_SEL', 'CMPB.1', 'no');
+
+/***********************************F-DAT-GSS-CONTA-9-10/06/2013*****************************************/
