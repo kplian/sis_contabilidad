@@ -131,7 +131,7 @@ WITHOUT OIDS;
 
 
 /****************************************F-SCP-JRR-CONTA-0-15/05/2013************************************************/
-=======
+
 /***********************************I-SCP-GSS-CONTA-9-07/06/2013****************************************/
 
 CREATE TABLE conta.tplantilla_comprobante (
@@ -140,15 +140,15 @@ CREATE TABLE conta.tplantilla_comprobante (
   momento_presupuestario VARCHAR(255), 
   tabla_origen VARCHAR(255), 
   id_tabla VARCHAR(255),
-  descripcion TEXT, 
-  subistema TEXT, 
-  fecha TEXT,
-  moneda TEXT, 
-  acreedor TEXT, 
-  fk_comprobante TEXT, 
-  comprobante_controlado TEXT, 
-  comprobante_eliminado TEXT,
-  depto TEXT,
+  campo_descripcion TEXT, 
+  campo_subsistema TEXT, 
+  campo_fecha TEXT,
+  campo_moneda TEXT, 
+  campo_acreedor TEXT, 
+  campo_fk_comprobante TEXT, 
+  funcion_comprobante_controlado TEXT, 
+  funcion_comprobante_eliminado TEXT,
+  campo_depto TEXT,
   CONSTRAINT pk_tplantilla_comprobante__id_plantilla_comprobante PRIMARY KEY (id_plantilla_comprobante)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -157,21 +157,21 @@ WITHOUT OIDS;
 CREATE TABLE conta.tdetalle_plantilla_comprobante (
   id_detalle_plantilla_comprobante SERIAL, 
   id_plantilla_comprobante INTEGER, 
-  tabla_detalle VARCHAR, 
-  debe_haber VARCHAR, 
-  monto TEXT, 
+  tabla_detalle VARCHAR(255), 
+  debe_haber VARCHAR(255), 
+  campo_monto TEXT, 
   agrupar VARCHAR(255), 
-  cuenta TEXT, 
-  auxiliar TEXT, 
-  partida TEXT, 
-  centro_costo TEXT, 
+  campo_cuenta TEXT, 
+  campo_auxiliar TEXT, 
+  campo_partida TEXT, 
+  campo_centro_costo TEXT, 
   es_relacion_contable VARCHAR(255), 
   tipo_relacion_contable VARCHAR(255), 
-  relacion_contable TEXT, 
+  campo_relacion_contable TEXT, 
   aplicar_documento INTEGER, 
-  documento TEXT, 
-  fecha TEXT, 
-  concepto_transaccion TEXT,
+  campo_documento TEXT, 
+  campo_fecha TEXT, 
+  campo_concepto_transaccion TEXT,
   CONSTRAINT pk_tdetalle_plantilla_comprobante__id_detalle_plantilla_comprob PRIMARY KEY(id_detalle_plantilla_comprobante), 
   CONSTRAINT chk_tdetalle_plantilla_comprobante__debe_haber CHECK ((debe_haber)::text = ANY (ARRAY['debe'::text, 'haber'::text])),
   CONSTRAINT chk_tdetalle_plantilla_comprobante__agrupar CHECK ((agrupar)::text = ANY (ARRAY['si'::text, 'no'::text])), 

@@ -109,7 +109,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'partida',
+				name: 'campo_partida',
 				fieldLabel: 'Partida',
 				allowBlank: true,
 				anchor: '80%',
@@ -117,14 +117,14 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.partida',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_partida',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
 		{
 			config:{
-				name: 'concepto_transaccion',
+				name: 'campo_concepto_transaccion',
 				fieldLabel: 'Concepto Transaccion',
 				allowBlank: true,
 				anchor: '80%',
@@ -132,7 +132,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.concepto_transaccion',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_concepto_transaccion',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -154,7 +154,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'cuenta',
+				name: 'campo_cuenta',
 				fieldLabel: 'Cuenta',
 				allowBlank: true,
 				anchor: '80%',
@@ -162,14 +162,14 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.cuenta',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_cuenta',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
 		{
 			config:{
-				name: 'monto',
+				name: 'campo_monto',
 				fieldLabel: 'Monto',
 				allowBlank: true,
 				anchor: '80%',
@@ -177,14 +177,14 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.monto',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_monto',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
 		{
 			config:{
-				name: 'relacion_contable',
+				name: 'campo_relacion_contable',
 				fieldLabel: 'Relacion Contable',
 				allowBlank: true,
 				anchor: '80%',
@@ -192,14 +192,14 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.relacion_contable',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_relacion_contable',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
 		{
 			config:{
-				name: 'documento',
+				name: 'campo_documento',
 				fieldLabel: 'Documento',
 				allowBlank: true,
 				anchor: '80%',
@@ -207,7 +207,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.documento',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_documento',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -229,7 +229,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'centro_costo',
+				name: 'campo_centro_costo',
 				fieldLabel: 'Centro Costo',
 				allowBlank: true,
 				anchor: '80%',
@@ -237,14 +237,14 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.centro_costo',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_centro_costo',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
 		{
 			config:{
-				name: 'auxiliar',
+				name: 'campo_auxiliar',
 				fieldLabel: 'Auxiliar',
 				allowBlank: true,
 				anchor: '80%',
@@ -252,14 +252,14 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.auxiliar',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_auxiliar',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
 		{
 			config:{
-				name: 'fecha',
+				name: 'campo_fecha',
 				fieldLabel: 'Fecha',
 				allowBlank: true,
 				anchor: '80%',
@@ -267,7 +267,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.fecha',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_fecha',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -363,17 +363,17 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'agrupar', type: 'string'},
 		{name:'es_relacion_contable', type: 'string'},
 		{name:'tabla_detalle', type: 'string'},
-		{name:'partida', type: 'string'},
-		{name:'concepto_transaccion', type: 'string'},
+		{name:'campo_partida', type: 'string'},
+		{name:'campo_concepto_transaccion', type: 'string'},
 		{name:'tipo_relacion_contable', type: 'string'},
-		{name:'cuenta', type: 'string'},
-		{name:'monto', type: 'string'},
-		{name:'relacion_contable', type: 'string'},
-		{name:'documento', type: 'string'},
+		{name:'campo_cuenta', type: 'string'},
+		{name:'campo_monto', type: 'string'},
+		{name:'campo_relacion_contable', type: 'string'},
+		{name:'campo_documento', type: 'string'},
 		{name:'aplicar_documento', type: 'numeric'},
-		{name:'centro_costo', type: 'string'},
-		{name:'auxiliar', type: 'string'},
-		{name:'fecha', type: 'string'},
+		{name:'campo_centro_costo', type: 'string'},
+		{name:'campo_auxiliar', type: 'string'},
+		{name:'campo_fecha', type: 'string'},
 		{name:'estado_reg', type: 'string'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_reg', type: 'numeric'},
