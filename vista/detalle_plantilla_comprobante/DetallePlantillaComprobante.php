@@ -59,6 +59,21 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
    form:true
   },
   {
+			config:{
+				name: 'aplicar_documento',
+				fieldLabel: 'Aplicar Documento',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:4
+			},
+			type:'NumberField',
+			filters:{pfiltro:'cmpbdet.aplicar_documento',type:'numeric'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+  {
    config:{
     	name:'agrupar',
     	fieldLabel: 'Agrupar',
@@ -92,6 +107,21 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
    grid:true,
    form:true
   },
+  {
+			config:{
+				name: 'tipo_relacion_contable',
+				fieldLabel: 'Tipo Relacion Contable',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+			type:'TextField',
+			filters:{pfiltro:'cmpbdet.tipo_relacion_contable',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
 		{
 			config:{
 				name: 'tabla_detalle',
@@ -109,8 +139,23 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'campo_centro_costo',
+				fieldLabel: 'Campo Centro Costo',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_centro_costo',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
 				name: 'campo_partida',
-				fieldLabel: 'Partida',
+				fieldLabel: 'Campo Partida',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -121,41 +166,11 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
-		},
-		{
-			config:{
-				name: 'campo_concepto_transaccion',
-				fieldLabel: 'Concepto Transaccion',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.campo_concepto_transaccion',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'tipo_relacion_contable',
-				fieldLabel: 'Tipo Relacion Contable',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:255
-			},
-			type:'TextField',
-			filters:{pfiltro:'cmpbdet.tipo_relacion_contable',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
+		},		
 		{
 			config:{
 				name: 'campo_cuenta',
-				fieldLabel: 'Cuenta',
+				fieldLabel: 'Campo Cuenta',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -169,15 +184,15 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'campo_monto',
-				fieldLabel: 'Monto',
+				name: 'campo_auxiliar',
+				fieldLabel: 'Campo Auxiliar',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.campo_monto',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_auxiliar',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -185,7 +200,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'campo_relacion_contable',
-				fieldLabel: 'Relacion Contable',
+				fieldLabel: 'Campo Relacion Contable',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -200,7 +215,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'campo_documento',
-				fieldLabel: 'Documento',
+				fieldLabel: 'Campo Documento',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -214,45 +229,30 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'aplicar_documento',
-				fieldLabel: 'Aplicar Documento',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:4
-			},
-			type:'NumberField',
-			filters:{pfiltro:'cmpbdet.aplicar_documento',type:'numeric'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'campo_centro_costo',
-				fieldLabel: 'Centro Costo',
+				name: 'campo_concepto_transaccion',
+				fieldLabel: 'Campo Concepto Transaccion',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.campo_centro_costo',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_concepto_transaccion',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
 		{
 			config:{
-				name: 'campo_auxiliar',
-				fieldLabel: 'Auxiliar',
+				name: 'campo_monto',
+				fieldLabel: 'Campo Monto',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cmpbdet.campo_auxiliar',type:'string'},
+			filters:{pfiltro:'cmpbdet.campo_monto',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -260,7 +260,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'campo_fecha',
-				fieldLabel: 'Fecha',
+				fieldLabel: 'Campo Fecha',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,

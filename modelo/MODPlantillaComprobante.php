@@ -9,7 +9,7 @@
 
 class MODPlantillaComprobante extends MODbase{
 	
-	function __construct(CTParametro $pParam){
+	function __construct(CTParametro $pParam){ 
 		parent::__construct($pParam);
 	}
 			
@@ -25,7 +25,7 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('id_tabla','varchar');
 		$this->captura('campo_subsistema','text');
 		$this->captura('campo_descripcion','text');
-		$this->captura('funcion_comprobante_controlado','text');
+		$this->captura('funcion_comprobante_validado','text');
 		$this->captura('campo_fecha','text');
 		$this->captura('estado_reg','varchar');
 		$this->captura('campo_acreedor','text');
@@ -59,18 +59,18 @@ class MODPlantillaComprobante extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('funcion_comprobante_eliminado','funcion_comprobante_eliminado','text');
 		$this->setParametro('id_tabla','id_tabla','varchar');
-		$this->setParametro('campo_subsistema','campo_subsistema','text');
-		$this->setParametro('campo_descripcion','campo_descripcion','text');
-		$this->setParametro('funcion_comprobante_controlado','funcion_comprobante_controlado','text');
-		$this->setParametro('campo_fecha','campo_fecha','text');
+		$this->setParametro('campo_subsistema','campo_subsistema','consulta_select');
+		$this->setParametro('campo_descripcion','campo_descripcion','consulta_select');
+		$this->setParametro('funcion_comprobante_validado','funcion_comprobante_validado','consulta_select');
+		$this->setParametro('campo_fecha','campo_fecha','consulta_select');
 		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('campo_acreedor','campo_acreedor','text');
-		$this->setParametro('campo_depto','campo_depto','text');
+		$this->setParametro('campo_acreedor','campo_acreedor','consulta_select');
+		$this->setParametro('campo_depto','campo_depto','consulta_select');
 		$this->setParametro('momento_presupuestario','momento_presupuestario','varchar');
-		$this->setParametro('campo_fk_comprobante','campo_fk_comprobante','text');
+		$this->setParametro('campo_fk_comprobante','campo_fk_comprobante','consulta_select');
 		$this->setParametro('tabla_origen','tabla_origen','text');
 		$this->setParametro('clase_comprobante','clase_comprobante','varchar');
-		$this->setParametro('campo_moneda','campo_moneda','text');
+		$this->setParametro('campo_moneda','campo_moneda','consulta_select');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -88,20 +88,20 @@ class MODPlantillaComprobante extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_plantilla_comprobante','id_plantilla_comprobante','int4');
-		$this->setParametro('funcion_comprobante_eliminado','funcion_comprobante_eliminado','text');
+		$this->setParametro('funcion_comprobante_eliminado','funcion_comprobante_eliminado','consulta_select');
 		$this->setParametro('id_tabla','id_tabla','varchar');
-		$this->setParametro('campo_subsistema','campo_subsistema','text');
-		$this->setParametro('campo_descripcion','campo_descripcion','text');
-		$this->setParametro('funcion_comprobante_controlado','funcion_comprobante_controlado','text');
-		$this->setParametro('campo_fecha','campo_fecha','text');
+		$this->setParametro('campo_subsistema','campo_subsistema','consulta_select');
+		$this->setParametro('campo_descripcion','campo_descripcion','consulta_select');
+		$this->setParametro('funcion_comprobante_validado','funcion_comprobante_validado','consulta_select');
+		$this->setParametro('campo_fecha','campo_fecha','consulta_select');
 		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('campo_acreedor','campo_acreedor','text');
+		$this->setParametro('campo_acreedor','campo_acreedor','consulta_select');
 		$this->setParametro('campo_depto','campo_depto','consulta_select');
 		$this->setParametro('momento_presupuestario','momento_presupuestario','varchar');
-		$this->setParametro('campo_fk_comprobante','campo_fk_comprobante','text');
+		$this->setParametro('campo_fk_comprobante','campo_fk_comprobante','consulta_select');
 		$this->setParametro('tabla_origen','tabla_origen','varchar');
 		$this->setParametro('clase_comprobante','clase_comprobante','varchar');
-		$this->setParametro('campo_moneda','campo_moneda','text');
+		$this->setParametro('campo_moneda','campo_moneda','consulta_select');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

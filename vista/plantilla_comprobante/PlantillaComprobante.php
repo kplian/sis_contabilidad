@@ -34,126 +34,6 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'funcion_comprobante_eliminado',
-				fieldLabel: 'Comprobante Eliminado',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpb.funcion_comprobante_eliminado',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'id_tabla',
-				fieldLabel: 'id_tabla',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:255
-			},
-			type:'TextField',
-			filters:{pfiltro:'cmpb.id_tabla',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'campo_subsistema',
-				fieldLabel: 'Subsistema',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpb.campo_subsistema',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'campo_descripcion',
-				fieldLabel: 'Descripcion',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpb.campo_descripcion',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'funcion_comprobante_controlado',
-				fieldLabel: 'Comprobante Controlado',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpb.funcion_comprobante_controlado',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'campo_fecha',
-				fieldLabel: 'Fecha',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpb.campo_fecha',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'campo_acreedor',
-				fieldLabel: 'Acreedor',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpb.campo_acreedor',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'campo_depto',
-				fieldLabel: 'Depto',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpb.campo_depto',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
 				name: 'momento_presupuestario',
 				fieldLabel: 'Momento Presupuestario',
 				allowBlank: true,
@@ -163,36 +43,6 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'cmpb.momento_presupuestario',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'campo_fk_comprobante',
-				fieldLabel: 'Campo fk Comprobante',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-			type:'TextArea',
-			filters:{pfiltro:'cmpb.campo_fk_comprobante',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'tabla_origen',
-				fieldLabel: 'Tabla Origen',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:255
-			},
-			type:'TextField',
-			filters:{pfiltro:'cmpb.tabla_origen',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -214,8 +64,113 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'tabla_origen',
+				fieldLabel: 'Tabla Origen',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+			type:'TextField',
+			filters:{pfiltro:'cmpb.tabla_origen',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'id_tabla',
+				fieldLabel: 'Id Tabla',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+			type:'TextField',
+			filters:{pfiltro:'cmpb.id_tabla',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_subsistema',
+				fieldLabel: 'Campo Subsistema',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_subsistema',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_depto',
+				fieldLabel: 'Campo Depto',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_depto',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_acreedor',
+				fieldLabel: 'Campo Acreedor',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_acreedor',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_descripcion',
+				fieldLabel: 'Campo Descripcion',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_descripcion',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_fk_comprobante',
+				fieldLabel: 'Campo fk Comprobante',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_fk_comprobante',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
 				name: 'campo_moneda',
-				fieldLabel: 'Moneda',
+				fieldLabel: 'Campo Moneda',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -223,6 +178,51 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.campo_moneda',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_fecha',
+				fieldLabel: 'Campo Fecha',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_fecha',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},				
+		{
+			config:{
+				name: 'funcion_comprobante_validado',
+				fieldLabel: 'Funcion Comprobante Validado',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.funcion_comprobante_validado',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},				
+		{
+			config:{
+				name: 'funcion_comprobante_eliminado',
+				fieldLabel: 'Funcion Comprobante Eliminado',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.funcion_comprobante_eliminado',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -317,7 +317,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_tabla', type: 'string'},
 		{name:'campo_subsistema', type: 'string'},
 		{name:'campo_descripcion', type: 'string'},
-		{name:'funcion_comprobante_controlado', type: 'string'},
+		{name:'funcion_comprobante_validado', type: 'string'},
 		{name:'campo_fecha', type: 'string'},
 		{name:'estado_reg', type: 'string'},
 		{name:'campo_acreedor', type: 'string'},

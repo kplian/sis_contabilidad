@@ -66,17 +66,17 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('agrupar','agrupar','varchar');
 		$this->setParametro('es_relacion_contable','es_relacion_contable','varchar');
 		$this->setParametro('tabla_detalle','tabla_detalle','varchar');
-		$this->setParametro('campo_partida','campo_partida','text');
-		$this->setParametro('campo_concepto_transaccion','campo_concepto_transaccion','text');
+		$this->setParametro('campo_partida','campo_partida','consulta_select');
+		$this->setParametro('campo_concepto_transaccion','campo_concepto_transaccion','consulta_select');
 		$this->setParametro('tipo_relacion_contable','tipo_relacion_contable','varchar');
-		$this->setParametro('campo_cuenta','campo_cuenta','text');
-		$this->setParametro('campo_monto','campo_monto','text');
-		$this->setParametro('campo_relacion_contable','campo_relacion_contable','text');
-		$this->setParametro('campo_documento','campo_documento','text');
+		$this->setParametro('campo_cuenta','campo_cuenta','consulta_select');
+		$this->setParametro('campo_monto','campo_monto','consulta_select');
+		$this->setParametro('campo_relacion_contable','campo_relacion_contable','consulta_select');
+		$this->setParametro('campo_documento','campo_documento','consulta_select');
 		$this->setParametro('aplicar_documento','aplicar_documento','int4');
-		$this->setParametro('campo_centro_costo','campo_centro_costo','text');
-		$this->setParametro('campo_auxiliar','campo_auxiliar','text');
-		$this->setParametro('campo_fecha','campo_fecha','text');
+		$this->setParametro('campo_centro_costo','campo_centro_costo','consulta_select');
+		$this->setParametro('campo_auxiliar','campo_auxiliar','consulta_select');
+		$this->setParametro('campo_fecha','campo_fecha','consulta_select');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 
 		//Ejecuta la instruccion
@@ -100,17 +100,17 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('agrupar','agrupar','varchar');
 		$this->setParametro('es_relacion_contable','es_relacion_contable','varchar');
 		$this->setParametro('tabla_detalle','tabla_detalle','varchar');
-		$this->setParametro('campo_partida','campo_partida','text');
-		$this->setParametro('campo_concepto_transaccion','campo_concepto_transaccion','text');
+		$this->setParametro('campo_partida','campo_partida','consulta_select');
+		$this->setParametro('campo_concepto_transaccion','campo_concepto_transaccion','consulta_select');
 		$this->setParametro('tipo_relacion_contable','tipo_relacion_contable','varchar');
-		$this->setParametro('campo_cuenta','campo_cuenta','text');
-		$this->setParametro('campo_monto','campo_monto','text');
-		$this->setParametro('campo_relacion_contable','campo_relacion_contable','text');
-		$this->setParametro('campo_documento','campo_documento','text');
+		$this->setParametro('campo_cuenta','campo_cuenta','consulta_select');
+		$this->setParametro('campo_monto','campo_monto','consulta_select');
+		$this->setParametro('campo_relacion_contable','campo_relacion_contable','consulta_select');
+		$this->setParametro('campo_documento','campo_documento','consulta_select');
 		$this->setParametro('aplicar_documento','aplicar_documento','int4');
-		$this->setParametro('campo_centro_costo','campo_centro_costo','text');
-		$this->setParametro('campo_auxiliar','campo_auxiliar','text');
-		$this->setParametro('campo_fecha','campo_fecha','text');
+		$this->setParametro('campo_centro_costo','campo_centro_costo','consulta_select');
+		$this->setParametro('campo_auxiliar','campo_auxiliar','consulta_select');
+		$this->setParametro('campo_fecha','campo_fecha','consulta_select');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 
 		//Ejecuta la instruccion

@@ -46,7 +46,7 @@ BEGIN
 						cmpb.id_tabla,
 						cmpb.campo_subsistema,
 						cmpb.campo_descripcion,
-						cmpb.funcion_comprobante_controlado,
+						cmpb.funcion_comprobante_validado,
 						cmpb.campo_fecha,
 						cmpb.estado_reg,
 						cmpb.campo_acreedor,

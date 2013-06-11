@@ -146,7 +146,7 @@ CREATE TABLE conta.tplantilla_comprobante (
   campo_moneda TEXT, 
   campo_acreedor TEXT, 
   campo_fk_comprobante TEXT, 
-  funcion_comprobante_controlado TEXT, 
+  funcion_comprobante_validado TEXT, 
   funcion_comprobante_eliminado TEXT,
   campo_depto TEXT,
   CONSTRAINT pk_tplantilla_comprobante__id_plantilla_comprobante PRIMARY KEY (id_plantilla_comprobante)
