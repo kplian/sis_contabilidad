@@ -34,6 +34,21 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'codigo',
+				fieldLabel: 'Codigo',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+			type:'TextField',
+			filters:{pfiltro:'cmpb.codigo',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
 				name: 'momento_presupuestario',
 				fieldLabel: 'Momento Presupuestario',
 				allowBlank: true,
@@ -79,7 +94,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'id_tabla',
+				name: 'idtabla',
 				fieldLabel: 'Id Tabla',
 				allowBlank: true,
 				anchor: '80%',
@@ -99,7 +114,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:200
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.campo_subsistema',type:'string'},
@@ -114,7 +129,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:200
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.campo_depto',type:'string'},
@@ -129,7 +144,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:200
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.campo_acreedor',type:'string'},
@@ -144,7 +159,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:200
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.campo_descripcion',type:'string'},
@@ -159,7 +174,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:200
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.campo_fk_comprobante',type:'string'},
@@ -174,7 +189,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:200
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.campo_moneda',type:'string'},
@@ -189,7 +204,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:200
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.campo_fecha',type:'string'},
@@ -313,8 +328,9 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 	id_store:'id_plantilla_comprobante',
 	fields: [
 		{name:'id_plantilla_comprobante', type: 'numeric'},
+		{name:'codigo', type:'string'},
 		{name:'funcion_comprobante_eliminado', type: 'string'},
-		{name:'id_tabla', type: 'string'},
+		{name:'idtabla', type: 'string'},
 		{name:'campo_subsistema', type: 'string'},
 		{name:'campo_descripcion', type: 'string'},
 		{name:'funcion_comprobante_validado', type: 'string'},

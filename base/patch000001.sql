@@ -135,7 +135,8 @@ WITHOUT OIDS;
 /***********************************I-SCP-GSS-CONTA-9-07/06/2013****************************************/
 
 CREATE TABLE conta.tplantilla_comprobante (
-  id_plantilla_comprobante SERIAL, 
+  id_plantilla_comprobante SERIAL,  
+  codigo VARCHAR(20),  
   clase_comprobante VARCHAR(255), 
   momento_presupuestario VARCHAR(255), 
   tabla_origen VARCHAR(255), 
@@ -180,3 +181,18 @@ CREATE TABLE conta.tdetalle_plantilla_comprobante (
 WITHOUT OIDS;
 
 /***********************************F-SCP-GSS-CONTA-9-07/06/2013****************************************/
+
+
+/***********************************I-SCP-GSS-CONTA-9-17/06/2013****************************************/
+
+CREATE TYPE conta.maestro_comprobante AS (
+  columna_descripcion VARCHAR(255),
+  columna_subsistema INTEGER,
+  columna_fecha DATE,
+  columna_moneda INTEGER,
+  columna_acreedor INTEGER,
+  columna_fk_comprobante INTEGER,
+  columna_depto VARCHAR(255)
+);
+
+/***********************************F-SCP-GSS-CONTA-9-17/06/2013****************************************/

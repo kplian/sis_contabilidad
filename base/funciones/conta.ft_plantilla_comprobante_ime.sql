@@ -45,6 +45,7 @@ BEGIN
         begin
         	--Sentencia de la insercion
         	insert into conta.tplantilla_comprobante(
+        	codigo,
 			funcion_comprobante_eliminado,
 			id_tabla,
 			campo_subsistema,
@@ -64,6 +65,7 @@ BEGIN
 			id_usuario_mod,
 			fecha_mod
           	) values(
+          	v_parametros.codigo,
 			v_parametros.funcion_comprobante_eliminado,
 			v_parametros.id_tabla,
 			v_parametros.campo_subsistema,
@@ -106,13 +108,14 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update conta.tplantilla_comprobante set
+			codigo=v_parametros.codigo,
 			funcion_comprobante_eliminado = v_parametros.funcion_comprobante_eliminado,
 			id_tabla = v_parametros.id_tabla,
 			campo_subsistema = v_parametros.campo_subsistema,
 			campo_descripcion = v_parametros.campo_descripcion,
 			funcion_comprobante_validado = v_parametros.funcion_comprobante_validado,
 			campo_fecha = v_parametros.campo_fecha,
-			campo_acreedor = v_parametros.acreedor,
+			campo_acreedor = v_parametros.campo_acreedor,
 			campo_depto = v_parametros.campo_depto,
 			momento_presupuestario = v_parametros.momento_presupuestario,
 			campo_fk_comprobante = v_parametros.campo_fk_comprobante,

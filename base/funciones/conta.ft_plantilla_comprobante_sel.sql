@@ -42,6 +42,7 @@ BEGIN
     		--Sentencia de la consulta
 			v_consulta:='select
 						cmpb.id_plantilla_comprobante,
+						cmpb.codigo,
 						cmpb.funcion_comprobante_eliminado,
 						cmpb.id_tabla,
 						cmpb.campo_subsistema,

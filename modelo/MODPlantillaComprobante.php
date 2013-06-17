@@ -21,8 +21,9 @@ class MODPlantillaComprobante extends MODbase{
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_plantilla_comprobante','int4');
+		$this->captura('codigo','varchar');
 		$this->captura('funcion_comprobante_eliminado','text');
-		$this->captura('id_tabla','varchar');
+		$this->captura('idtabla','varchar');
 		$this->captura('campo_subsistema','text');
 		$this->captura('campo_descripcion','text');
 		$this->captura('funcion_comprobante_validado','text');
@@ -57,8 +58,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
+		$this->setParametro('codigo','codigo','varchar');
 		$this->setParametro('funcion_comprobante_eliminado','funcion_comprobante_eliminado','text');
-		$this->setParametro('id_tabla','id_tabla','varchar');
+		$this->setParametro('id_tabla','idtabla','varchar');
 		$this->setParametro('campo_subsistema','campo_subsistema','consulta_select');
 		$this->setParametro('campo_descripcion','campo_descripcion','consulta_select');
 		$this->setParametro('funcion_comprobante_validado','funcion_comprobante_validado','consulta_select');
@@ -87,9 +89,10 @@ class MODPlantillaComprobante extends MODbase{
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
+		$this->setParametro('codigo','codigo','varchar');
 		$this->setParametro('id_plantilla_comprobante','id_plantilla_comprobante','int4');
 		$this->setParametro('funcion_comprobante_eliminado','funcion_comprobante_eliminado','consulta_select');
-		$this->setParametro('id_tabla','id_tabla','varchar');
+		$this->setParametro('id_tabla','idtabla','varchar');
 		$this->setParametro('campo_subsistema','campo_subsistema','consulta_select');
 		$this->setParametro('campo_descripcion','campo_descripcion','consulta_select');
 		$this->setParametro('funcion_comprobante_validado','funcion_comprobante_validado','consulta_select');
