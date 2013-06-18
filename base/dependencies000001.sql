@@ -89,3 +89,56 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
     NOT DEFERRABLE;
 
 /***********************************F-DEP-GSS-CONTA-9-07/06/2013*****************************************/
+
+/***********************************I-DEP-GSS-CONTA-9-18/06/2013*****************************************/
+
+ALTER TABLE conta.tinter_comprobante
+  ADD CONSTRAINT fk_tinter_comprobante__id_depto FOREIGN KEY (id_depto)
+    REFERENCES param.tdepto(id_depto)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tinter_comprobante
+  ADD CONSTRAINT fk_tinter_comprobante__id_clase_cbte FOREIGN KEY (id_clase_cbte)
+    REFERENCES conta.tclase_comprobante(id_clase_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE conta.tinter_comprobante
+  ADD CONSTRAINT fk_tinter_comprobante__fk_comprobante FOREIGN KEY (fk_comprobante)
+    REFERENCES conta.tinter_comprobante(id_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE conta.tinter_comprobante
+  ADD CONSTRAINT fk_tinter_comprobante__id_periodo_subsis FOREIGN KEY (id_periodo_subsis)
+    REFERENCES param.tperiodo_subsistema(id_periodo_subsistema)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE conta.tinter_comprobante
+  ADD CONSTRAINT fk_tinter_comprobante__id_subsistema FOREIGN KEY (id_subsistema)
+    REFERENCES segu.tsubsistema(id_subsistema)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE conta.tinter_comprobante
+  ADD CONSTRAINT fk_tinter_comprobante__id_usuario FOREIGN KEY (id_usuario)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tinter_comprobante
+  ADD CONSTRAINT fk_tinter_comprobante__id_moneda FOREIGN KEY (id_moneda)
+    REFERENCES param.tmoneda(id_moneda)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+/***********************************F-DEP-GSS-CONTA-9-18/06/2013*****************************************/

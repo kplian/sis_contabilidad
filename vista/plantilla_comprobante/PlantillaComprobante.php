@@ -111,7 +111,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_subsistema',
 				fieldLabel: 'Campo Subsistema',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:200
@@ -126,7 +126,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_depto',
 				fieldLabel: 'Campo Depto',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:200
@@ -156,7 +156,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_descripcion',
 				fieldLabel: 'Campo Descripcion',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:200
@@ -186,7 +186,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_moneda',
 				fieldLabel: 'Campo Moneda',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:200
@@ -201,7 +201,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_fecha',
 				fieldLabel: 'Campo Fecha',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:200
