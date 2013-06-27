@@ -128,7 +128,7 @@ CREATE TABLE conta.relacion_contable (
   CONSTRAINT relacion_contable_pkey PRIMARY KEY(id_relacion_contable)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
-
+  
 
 /****************************************F-SCP-JRR-CONTA-0-15/05/2013************************************************/
 
@@ -182,20 +182,6 @@ WITHOUT OIDS;
 
 /***********************************F-SCP-GSS-CONTA-9-07/06/2013****************************************/
 
-
-/***********************************I-SCP-GSS-CONTA-9-17/06/2013****************************************/
-
-CREATE TYPE conta.maestro_comprobante AS (
-  columna_descripcion VARCHAR(255),
-  columna_subsistema INTEGER,
-  columna_fecha DATE,
-  columna_moneda INTEGER,
-  columna_acreedor INTEGER,
-  columna_fk_comprobante INTEGER,
-  columna_depto VARCHAR(255)
-);
-
-/***********************************F-SCP-GSS-CONTA-9-17/06/2013****************************************/
 
 /***********************************I-SCP-GSS-CONTA-9-18/06/2013****************************************/
 
