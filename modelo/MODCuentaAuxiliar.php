@@ -1,38 +1,37 @@
 <?php
 /**
 *@package pXP
-*@file MODAuxiliar.php
-*@author  Gonzalo Sarmiento Sejas
-*@date 21-02-2013 20:44:52
+*@file gen-MODCuentaAuxiliar.php
+*@author  (admin)
+*@date 11-07-2013 20:37:00
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
 
-class MODAuxiliar extends MODbase{
+class MODCuentaAuxiliar extends MODbase{
 	
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
 			
-	function listarAuxiliar(){
+	function listarCuentaAuxiliar(){
 		//Definicion de variables para ejecucion del procedimientp
-		$this->procedimiento='conta.f_auxiliar_sel';
-		$this->transaccion='CONTA_AUXCTA_SEL';
+		$this->procedimiento='conta.ft_cuenta_auxiliar_sel';
+		$this->transaccion='CONTA_CAX_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
 		//Definicion de la lista del resultado del query
-		$this->captura('id_auxiliar','int4');
-		$this->captura('id_empresa','int4');
-		$this->captura('nombre','varchar');
+		$this->captura('id_cuenta_auxiliar','int4');
 		$this->captura('estado_reg','varchar');
-		$this->captura('codigo_auxiliar','varchar');
-		$this->captura('nombre_auxiliar','varchar');
-		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_auxiliar','int4');
+		$this->captura('id_cuenta','int4');
 		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','timestamp');
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		
+		$this->captura('codigo_auxiliar','varchar');
+        $this->captura('nombre_auxiliar','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -42,17 +41,16 @@ class MODAuxiliar extends MODbase{
 		return $this->respuesta;
 	}
 			
-	function insertarAuxiliar(){
+	function insertarCuentaAuxiliar(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.f_auxiliar_ime';
-		$this->transaccion='CONTA_AUXCTA_INS';
+		$this->procedimiento='conta.ft_cuenta_auxiliar_ime';
+		$this->transaccion='CONTA_CAX_INS';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_empresa','id_empresa','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('codigo_auxiliar','codigo_auxiliar','varchar');
-		$this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
+		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		$this->setParametro('id_cuenta','id_cuenta','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -62,18 +60,17 @@ class MODAuxiliar extends MODbase{
 		return $this->respuesta;
 	}
 			
-	function modificarAuxiliar(){
+	function modificarCuentaAuxiliar(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.f_auxiliar_ime';
-		$this->transaccion='CONTA_AUXCTA_MOD';
+		$this->procedimiento='conta.ft_cuenta_auxiliar_ime';
+		$this->transaccion='CONTA_CAX_MOD';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_auxiliar','id_auxiliar','int4');
-		$this->setParametro('id_empresa','id_empresa','int4');
+		$this->setParametro('id_cuenta_auxiliar','id_cuenta_auxiliar','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('codigo_auxiliar','codigo_auxiliar','varchar');
-		$this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
+		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		$this->setParametro('id_cuenta','id_cuenta','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -83,14 +80,14 @@ class MODAuxiliar extends MODbase{
 		return $this->respuesta;
 	}
 			
-	function eliminarAuxiliar(){
+	function eliminarCuentaAuxiliar(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.f_auxiliar_ime';
-		$this->transaccion='CONTA_AUXCTA_ELI';
+		$this->procedimiento='conta.ft_cuenta_auxiliar_ime';
+		$this->transaccion='CONTA_CAX_ELI';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		$this->setParametro('id_cuenta_auxiliar','id_cuenta_auxiliar','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

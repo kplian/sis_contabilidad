@@ -10,7 +10,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.CtaCuentaBancaria = {
-    require:'../../../sis_tesoreria/vista/CuentaBancaria/CuentaBancaria.php',
+    require:'../../../sis_tesoreria/vista/cuenta_bancaria/CuentaBancaria.php',
     requireclase:'Phx.vista.CuentaBancaria',
     title:'Cuenta Bancaria',
     constructor: function(config) {

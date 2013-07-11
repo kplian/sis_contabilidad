@@ -271,3 +271,22 @@ COMMENT ON COLUMN conta.tinter_comprobante.id_documento_firma
 IS '''referencia a las firmas autorizadas que corresponden al momento de la validación del comprobante'';';
 
 /***********************************F-SCP-GSS-CONTA-9-18/06/2013****************************************/
+
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-16/07/2013****************************************/
+
+
+CREATE TABLE conta.tcuenta_auxiliar(
+    id_cuenta_auxiliar SERIAL NOT NULL,
+    id_auxiliar int4 NOT NULL,
+    id_cuenta int4 NOT NULL,
+    PRIMARY KEY (id_cuenta_auxiliar))
+INHERITS (pxp.tbase);
+
+/***********************************F-SCP-RAC-CONTA-0-16/07/2013****************************************/
+
+
+

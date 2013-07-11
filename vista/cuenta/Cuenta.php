@@ -21,6 +21,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbInterfaz,{
 		this.iniciarEventos();
 		
 		this.cmbGestion.on('select',this.capturaFiltros,this);
+		this.addButton('bAux',{text:'Interfaces',iconCls: 'blist',disabled:true,handler:this.onButonAux,tooltip: '<b>Iauxiliares de la cuenta</b><br/>Se habilita si esta cuenta tiene permitido el rgistro de auxiliares '});
+        
 		
 	},
 	capturaFiltros:function(combo, record, index){
@@ -46,7 +48,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbInterfaz,{
 				inputType:'hidden'
 			},
 			type:'Field',
-			form:true
+			form:true,
+			grid:false
 		},
 		{
 			config:{
@@ -308,9 +311,27 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbInterfaz,{
         else {
             this.tbar.items.get('b-new-'+this.idContenedor).disable()
         }
+        
+        if(n.attributes.sw_auxiliar == 'si'){
+            this.getBoton('bAux').enable();
+        }
+        else{
+           this.getBoton('bAux').disable(); 
+        }
+        
         // llamada funcion clase padre
             Phx.vista.Cuenta.superclass.preparaMenu.call(this,n);
     },
+    
+    liberaMenu:function(n){
+        this.getBoton('bAux').disable(); 
+        // llamada funcion clase padre
+        Phx.vista.Cuenta.superclass.liberaMenu.call(this,n);
+    },
+    
+    
+    
+    
     loadValoresIniciales:function()
 	{
 		Phx.vista.Cuenta.superclass.loadValoresIniciales.call(this);
@@ -375,6 +396,16 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbInterfaz,{
 	     	
 	     }   
     },
+    
+    onButonAux:function(){
+        var nodo = this.sm.getSelectedNode();
+        Phx.CP.loadWindows('../../../sis_contabilidad/vista/cuenta_auxiliar/CuentaAuxiliar.php',
+                    'Interfaces',
+                    {
+                        width:900,
+                        height:400
+                    },nodo.attributes,this.idContenedor,'CuentaAuxiliar')
+       },
     iniciarEventos:function(){
     	
     	
