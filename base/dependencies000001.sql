@@ -29,51 +29,51 @@ ALTER TABLE conta.tauxiliar
 /***********************************F-DEP-GSS-CONTA-48-20/02/2013*****************************************/
 
 /****************************************I-DEP-JRR-CONTA-0-15/05/2013************************************************/
-ALTER TABLE conta.tipo_relacion_contable
-  ADD CONSTRAINT fk_tipo_relacion_contable__id_tabla_relacion_contable FOREIGN KEY (id_tabla_relacion_contable)
-    REFERENCES conta.tabla_relacion_contable(id_tabla_relacion_contable)
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD CONSTRAINT fk_ttipo_relacion_contable__id_tabla_relacion_contable FOREIGN KEY (id_tabla_relacion_contable)
+    REFERENCES conta.ttabla_relacion_contable(id_tabla_relacion_contable)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
 
-ALTER TABLE conta.relacion_contable
-  ADD CONSTRAINT fk_relacion_contable__id_auxiliar FOREIGN KEY (id_auxiliar)
+ALTER TABLE conta.trelacion_contable
+  ADD CONSTRAINT fk_trelacion_contable__id_auxiliar FOREIGN KEY (id_auxiliar)
     REFERENCES conta.tauxiliar(id_auxiliar)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
 
-ALTER TABLE conta.relacion_contable
-  ADD CONSTRAINT fk_relacion_contable__id_centro_costo FOREIGN KEY (id_centro_costo)
+ALTER TABLE conta.trelacion_contable
+  ADD CONSTRAINT fk_trelacion_contable__id_centro_costo FOREIGN KEY (id_centro_costo)
     REFERENCES param.tcentro_costo(id_centro_costo)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
     
-ALTER TABLE conta.relacion_contable
-  ADD CONSTRAINT fk_relacion_contable__id_cuenta FOREIGN KEY (id_cuenta)
+ALTER TABLE conta.trelacion_contable
+  ADD CONSTRAINT fk_trelacion_contable__id_cuenta FOREIGN KEY (id_cuenta)
     REFERENCES conta.tcuenta(id_cuenta)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
     
-ALTER TABLE conta.relacion_contable
-  ADD CONSTRAINT fk_relacion_contable__id_gestion FOREIGN KEY (id_gestion)
+ALTER TABLE conta.trelacion_contable
+  ADD CONSTRAINT fk_trelacion_contable__id_gestion FOREIGN KEY (id_gestion)
     REFERENCES param.tgestion(id_gestion)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
     
-ALTER TABLE conta.relacion_contable
-  ADD CONSTRAINT fk_relacion_contable__id_partida FOREIGN KEY (id_partida)
+ALTER TABLE conta.trelacion_contable
+  ADD CONSTRAINT fk_trelacion_contable__id_partida FOREIGN KEY (id_partida)
     REFERENCES pre.tpartida(id_partida)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
     
-ALTER TABLE conta.relacion_contable
-  ADD CONSTRAINT fk_relacion_contable__id_tipo_relacion_contable FOREIGN KEY (id_tipo_relacion_contable)
-    REFERENCES conta.tipo_relacion_contable(id_tipo_relacion_contable)
+ALTER TABLE conta.trelacion_contable
+  ADD CONSTRAINT fk_trelacion_contable__id_tipo_relacion_contable FOREIGN KEY (id_tipo_relacion_contable)
+    REFERENCES conta.ttipo_relacion_contable(id_tipo_relacion_contable)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;

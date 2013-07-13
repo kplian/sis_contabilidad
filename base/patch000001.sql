@@ -92,16 +92,16 @@ CREATE TABLE conta.tclase_comprobante(
 
 /****************************************I-SCP-JRR-CONTA-0-15/05/2013************************************************/
 
-CREATE TABLE conta.tabla_relacion_contable (
+CREATE TABLE conta.ttabla_relacion_contable (
   id_tabla_relacion_contable SERIAL, 
   tabla VARCHAR(100), 
   esquema VARCHAR(15),
   tabla_id VARCHAR(100),
-  CONSTRAINT tabla_relacion_contable_pkey PRIMARY KEY(id_tabla_relacion_contable)
+  CONSTRAINT ttabla_relacion_contable_pkey PRIMARY KEY(id_tabla_relacion_contable)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
 
-CREATE TABLE conta.tipo_relacion_contable (
+CREATE TABLE conta.ttipo_relacion_contable (
   id_tipo_relacion_contable SERIAL, 
   nombre_tipo_relacion VARCHAR(200) NOT NULL, 
   codigo_tipo_relacion VARCHAR(15) NOT NULL,
@@ -109,14 +109,14 @@ CREATE TABLE conta.tipo_relacion_contable (
   tiene_partida VARCHAR(2) DEFAULT 'si'::character varying NOT NULL,
   tiene_auxiliar VARCHAR(2) DEFAULT 'si'::character varying NOT NULL,
   id_tabla_relacion_contable INTEGER,
-  CONSTRAINT tipo_relacion_contable_pkey PRIMARY KEY(id_tipo_relacion_contable)
+  CONSTRAINT ttipo_relacion_contable_pkey PRIMARY KEY(id_tipo_relacion_contable)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
 
-COMMENT ON COLUMN conta.tipo_relacion_contable.tiene_centro_costo
+COMMENT ON COLUMN conta.ttipo_relacion_contable.tiene_centro_costo
 IS 'si|no|si-general (Esta opción permite registrar el centro de costo pero habilita para que pueda estar vacio en caso de configuraciones generales';
 
-CREATE TABLE conta.relacion_contable (
+CREATE TABLE conta.trelacion_contable (
   id_relacion_contable SERIAL, 
   id_tipo_relacion_contable INTEGER NOT NULL,
   id_centro_costo INTEGER,
@@ -125,7 +125,7 @@ CREATE TABLE conta.relacion_contable (
   id_partida INTEGER,
   id_gestion INTEGER NOT NULL,
   id_tabla INTEGER,
-  CONSTRAINT relacion_contable_pkey PRIMARY KEY(id_relacion_contable)
+  CONSTRAINT trelacion_contable_pkey PRIMARY KEY(id_relacion_contable)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
   
