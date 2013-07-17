@@ -272,10 +272,6 @@ IS '''referencia a las firmas autorizadas que corresponden al momento de la vali
 
 /***********************************F-SCP-GSS-CONTA-9-18/06/2013****************************************/
 
-
-
-
-
 /***********************************I-SCP-RAC-CONTA-0-16/07/2013****************************************/
 
 
@@ -288,5 +284,28 @@ INHERITS (pxp.tbase);
 
 /***********************************F-SCP-RAC-CONTA-0-16/07/2013****************************************/
 
+/***********************************I-SCP-RCM-CONTA-0-15/07/2013****************************************/
+CREATE TABLE conta.tcomprobante(
+	id_comprobante SERIAL NOT NULL,
+	id_clase_comprobante int4 NOT NULL,
+	id_comprobante_fk int4 NOT NULL,
+	id_subsistema int4,
+	id_depto int4,
+	id_moneda int4,
+	id_periodo int4,
+	nro_cbte varchar(30),
+	momento varchar(30),
+	glosa1 varchar(1500),
+	glosa2 varchar(400),
+	beneficiario varchar(100),
+	tipo_cambio numeric(18, 2),
+	id_funcionario_firma1 int4,
+	id_funcionario_firma2 int4,
+	id_funcionario_firma3 int4,
+	fecha date,
+	CONSTRAINT pk_tcomprobante__id_comprobante PRIMARY KEY (id_comprobante)
+) INHERITS (pxp.tbase) WITHOUT OIDS;
 
+ALTER TABLE conta.tcomprobante OWNER TO postgres;
 
+/***********************************F-SCP-RCM-CONTA-0-15/07/2013****************************************/

@@ -172,7 +172,7 @@ select pxp.f_insert_testructura_gui ('CONGASCUE', 'RELACON');
 
 /****************************************F-DAT-JRR-CONTA-0-15/05/2013************************************************/
 
-=======
+
 /***********************************I-DAT-GSS-CONTA-9-10/06/2013*****************************************/
 
 select pxp.f_insert_tgui ('Plantilla Comprobante', 'comprobante', 'CMPB', 'si', 5, 'sis_contabilidad/vista/plantilla_comprobante/PlantillaComprobante.php', 2, '', 'PlantillaComprobante', 'CONTA');
@@ -234,7 +234,7 @@ VALUES (1, NULL, E'2013-07-10 17:40:17.829', NULL, E'activo', 2, E'Cuentas Banca
 
 --menu de cuentas contable por cuenta bancaria
 select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'CCBT', 'si', 6, 'sis_contabilidad/vista/clase_comprobante/ClaseComprobante.php', 2, '', 'ClaseComprobante', 'CONTA');
-select pxp.f_insert_tgui ('Cuentas Bancarias', 'relacion de cuentas bancarias y cuenaas contables', 'RELCCCB', 'si', 4, 'sis_contabilidad/vista/cta_cuenta_bancaria/CtaCuentaBancaria.php', 3, '', 'CtaCuentaBancaria', 'CONTA');
+select pxp.f_insert_tgui ('Cuentas Bancarias', 'relacion de cuentas bancarias y cuentas contables', 'RELCCCB', 'si', 4, 'sis_contabilidad/vista/cta_cuenta_bancaria/CtaCuentaBancaria.php', 3, '', 'CtaCuentaBancaria', 'CONTA');
 select pxp.f_insert_testructura_gui ('CCBT', 'CONTA');
 select pxp.f_insert_testructura_gui ('RELCCCB', 'RELACON');
 
@@ -242,8 +242,10 @@ select pxp.f_insert_testructura_gui ('RELCCCB', 'RELACON');
 
 /***********************************F-DAT-RAC-CONTA-0-10/07/2013*****************************************/
 
+/***********************************I-DAT-RCM-CONTA-0-15/07/2013*****************************************/
+select pxp.f_insert_tgui ('Comprobantes', 'Comprobantes', 'CBTE.1', 'si', 3, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Registro de Comprobantes', 'Registro de Comprobantes', 'CBTE.1.1', 'si', 1, 'sis_contabilidad/vista/comprobante/Comprobante.php', 3, '', 'Comprobante', 'CONTA');
 
-
-
-
-
+select pxp.f_insert_testructura_gui ('CBTE.1', 'CONTA');
+select pxp.f_insert_testructura_gui ('CBTE.1.1', 'CBTE.1');
+/***********************************F-DAT-RCM-CONTA-0-15/07/2013*****************************************/
