@@ -35,291 +35,51 @@ BEGIN
     
 	--guardo subsistema
     if (v_plantilla.campo_subsistema!='' AND v_plantilla.campo_subsistema is not null) then
-        if(position('$tabla.' in v_plantilla.campo_subsistema)=1)then
-        	v_columna_requerida=substring(v_plantilla.campo_subsistema,8);
-            FOR r IN SELECT (each(hstore(v_tabla))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP; 
-            v_this.columna_subsistema=v_valor;
-            
-          else
-          	v_posicion=position('$tabla.' in v_plantilla.campo_subsistema);
-			v_columna_requerida=substring(v_plantilla.campo_subsistema,v_posicion+7);
-            v_consulta=substring(v_plantilla.campo_subsistema,1,v_posicion-1);            
-            v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-            FOR r IN SELECT (each(hstore(v_tabla))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP;
-            v_consulta:=concat(v_consulta,v_valor);
-            execute v_consulta into v_this.columna_subsistema;
-        end if;
+    	v_this.campo_subsistema = conta.f_get_columna('maestro', 
+           											v_plantilla.campo_subsistema::text, 
+                                                    hstore(v_this), 
+                                                    hstore(v_tabla));
 	end if;    
     
     --guardo depto
     if (v_plantilla.campo_depto!='' AND v_plantilla.campo_depto is not null) then
-      if(position('$tabla.' in v_plantilla.campo_depto)=1)then
-        v_columna_requerida=substring(v_plantilla.campo_depto,8);
-        FOR r IN SELECT (each(hstore(v_tabla))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP; 
-        v_this.columna_depto=v_valor;
-        
-      elsif(position('$this.' in v_plantilla.campo_depto)=1)then
-      	v_columna_requerida=substring(v_plantilla.campo_depto,7);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP;
-        	v_this.columna_depto=v_valor;
-      
-      elsif(position('$tabla.' in v_plantilla.campo_depto)!=0)then
-        v_posicion=position('$tabla.' in v_plantilla.campo_depto);
-        v_columna_requerida=substring(v_plantilla.campo_depto,v_posicion+7);
-        v_consulta=substring(v_plantilla.campo_depto,1,v_posicion-1);            
-        v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-        FOR r IN SELECT (each(hstore(v_tabla))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP;
-        v_consulta:=concat(v_consulta,v_valor);
-          execute v_consulta into v_this.columna_depto;
-      elsif(v_posicion=position('$this.' in v_plantilla.campo_depto)!=0) then
-        v_posicion=position('$this.' in v_plantilla.campo_depto);
-        v_columna_requerida=substring(v_plantilla.campo_depto,v_posicion+6);
-        v_consulta=substring(v_plantilla.campo_depto,1,v_posicion-1);            
-        v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP;
-        v_consulta:=concat(v_consulta,v_valor);
-        execute v_consulta into v_this.columna_depto;
-      end if;
+    	v_this.campo_depto = conta.f_get_columna(	'maestro', 
+        										v_plantilla.campo_depto::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla));
 	end if;
     
     --guardo acreedor
     if (v_plantilla.campo_acreedor!='' AND v_plantilla.campo_acreedor is not null) then
-        if(position('$tabla.' in v_plantilla.campo_acreedor)=1)then
-        	v_columna_requerida=substring(v_plantilla.campo_acreedor,8);
-            FOR r IN SELECT (each(hstore(v_tabla))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP; 
-            v_this.columna_acreedor=v_valor;
-            
-        elsif(position('$this.' in v_plantilla.campo_acreedor)=1)then
-      	v_columna_requerida=substring(v_plantilla.campo_acreedor,7);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP;
-        	v_this.columna_acreedor=v_valor;   
-            
-        elsif(position('$tabla.' in v_plantilla.campo_acreedor)!=0)then
-          	v_posicion=position('$tabla.' in v_plantilla.campo_acreedor);
-			v_columna_requerida=substring(v_plantilla.campo_acreedor,v_posicion+7);
-            v_consulta=substring(v_plantilla.campo_acreedor,1,v_posicion-1);            
-            v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-            FOR r IN SELECT (each(hstore(v_tabla))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP;
-            v_consulta:=concat(v_consulta,v_valor);
-            execute v_consulta into v_this.columna_acreedor;
-        
-        elsif(v_posicion=position('$this.' in v_plantilla.campo_acreedor)!=0) then
-            v_posicion=position('$this.' in v_plantilla.campo_acreedor);
-            v_columna_requerida=substring(v_plantilla.campo_acreedor,v_posicion+6);
-            v_consulta=substring(v_plantilla.campo_acreedor,1,v_posicion-1);            
-            v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-            FOR r IN SELECT (each(hstore(v_this))).* 
-            LOOP
-                if r.key=v_columna_requerida then
-                    v_valor=r.value;
-                end if; 
-            END LOOP;
-            v_consulta:=concat(v_consulta,v_valor);
-            execute v_consulta into v_this.columna_acreedor;
-        end if;                
+    	v_this.campo_acreedor = conta.f_get_columna(	'maestro', 
+        										v_plantilla.campo_acreedor::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla));           
 	end if;
     
     --guardo descripcion--
     if (v_plantilla.campo_descripcion!='' AND v_plantilla.campo_descripcion is not null) then
-      if(position('$tabla.' in v_plantilla.campo_descripcion)=1)then
-        	v_columna_requerida=substring(v_plantilla.campo_descripcion,8);
-            FOR r IN SELECT (each(hstore(v_tabla))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP; 
-            v_this.columna_descripcion=v_valor;
-            
-      elsif(position('$this.' in v_plantilla.campo_descripcion)=1)then
-      	v_columna_requerida=substring(v_plantilla.campo_descripcion,7);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP;
-        	v_this.columna_descripcion=v_valor;   
-            
-      elsif(position('$tabla.' in v_plantilla.campo_descripcion)!=0)then
-        v_posicion=position('$tabla.' in v_plantilla.campo_descripcion);
-        v_columna_requerida=substring(v_plantilla.campo_descripcion,v_posicion+7);
-        v_consulta=substring(v_plantilla.campo_descripcion,1,v_posicion-1);            
-        v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-        FOR r IN SELECT (each(hstore(v_tabla))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP;
-        v_consulta:=concat(v_consulta,v_valor);
-        execute v_consulta into v_this.columna_descripcion;
-        
-      elsif(v_posicion=position('$this.' in v_plantilla.campo_descripcion)!=0) then
-        v_posicion=position('$this.' in v_plantilla.campo_descripcion);
-        v_columna_requerida=substring(v_plantilla.campo_descripcion,v_posicion+6);
-        v_consulta=substring(v_plantilla.campo_descripcion,1,v_posicion-1);            
-        v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP;
-        v_consulta:=concat(v_consulta,v_valor);
-        execute v_consulta into v_this.columna_descripcion;
-      end if;   
+    	v_this.campo_descripcion = conta.f_get_columna(	'maestro', 
+        										v_plantilla.campo_descripcion::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla)); 
+      
 	end if;    
 
     --guardo moneda--
     if (v_plantilla.campo_moneda!='' AND v_plantilla.campo_moneda is not null) then
-      if(position('$tabla.' in v_plantilla.campo_moneda)=1)then
-        	v_columna_requerida=substring(v_plantilla.campo_moneda,8);
-            FOR r IN SELECT (each(hstore(v_tabla))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP; 
-            v_this.columna_moneda=v_valor;
-            
-      elsif(position('$this.' in v_plantilla.campo_moneda)=1)then
-      	v_columna_requerida=substring(v_plantilla.campo_moneda,7);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP;
-        	v_this.columna_moneda=v_valor; 
-                  
-      elsif(position('$tabla.' in v_plantilla.campo_moneda)!=0)then
-        v_posicion=position('$tabla.' in v_plantilla.campo_moneda);
-        v_columna_requerida=substring(v_plantilla.campo_moneda,v_posicion+7);
-        v_consulta=substring(v_plantilla.campo_moneda,1,v_posicion-1);            
-        v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-        FOR r IN SELECT (each(hstore(v_tabla))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP;
-        v_consulta:=concat(v_consulta,v_valor);
-        execute v_consulta into v_this.columna_moneda;
-        
-      elsif(v_posicion=position('$this.' in v_plantilla.campo_moneda)!=0) then
-        v_posicion=position('$this.' in v_plantilla.campo_moneda);
-        v_columna_requerida=substring(v_plantilla.campo_moneda,v_posicion+6);
-        v_consulta=substring(v_plantilla.campo_moneda,1,v_posicion-1);            
-        v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP;
-        v_consulta:=concat(v_consulta,v_valor);
-        execute v_consulta into v_this.columna_moneda;
-      
-      end if; 
+    	v_this.campo_moneda = conta.f_get_columna(	'maestro', 
+        										v_plantilla.campo_moneda::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla)); 
 	end if;    
     
     --guardo fecha
     if (v_plantilla.campo_fecha!='' AND v_plantilla.campo_fecha is not null) then
-      if(position('$tabla.' in v_plantilla.campo_fecha)=1)then
-        	v_columna_requerida=substring(v_plantilla.campo_fecha,8);
-            FOR r IN SELECT (each(hstore(v_tabla))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP; 
-            v_this.columna_fecha=v_valor;
-            
-      elsif(position('$this.' in v_plantilla.campo_fecha)=1)then
-      	v_columna_requerida=substring(v_plantilla.campo_fecha,7);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-            LOOP
-            	if r.key=v_columna_requerida then
-                	v_valor=r.value;
-                end if; 
-            END LOOP;
-        	v_this.columna_fecha=v_valor;      
-            
-      elsif(position('$tabla.' in v_plantilla.campo_fecha)!=0)then
-        v_posicion=position('$tabla.' in v_plantilla.campo_fecha);
-        v_columna_requerida=substring(v_plantilla.campo_fecha,v_posicion+7);
-        v_consulta=substring(v_plantilla.campo_fecha,1,v_posicion-1);            
-        v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-        FOR r IN SELECT (each(hstore(v_tabla))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP;
-        v_consulta:=concat(v_consulta,v_valor);
-        execute v_consulta into v_this.columna_fecha;
-      
-      elsif(v_posicion=position('$this.' in v_plantilla.campo_fecha)!=0) then
-        v_posicion=position('$this.' in v_plantilla.campo_fecha);
-        v_columna_requerida=substring(v_plantilla.campo_fecha,v_posicion+6);
-        v_consulta=substring(v_plantilla.campo_fecha,1,v_posicion-1);            
-        v_consulta:=replace(v_consulta,'$tabla',v_plantilla.tabla_origen);
-        FOR r IN SELECT (each(hstore(v_this))).* 
-        LOOP
-            if r.key=v_columna_requerida then
-                v_valor=r.value;
-            end if; 
-        END LOOP;
-        v_consulta:=concat(v_consulta,v_valor);
-        execute v_consulta into v_this.columna_fecha;
-        
-      end if; 
+    	v_this.campo_fecha = conta.f_get_columna(	'maestro', 
+        										v_plantilla.campo_fecha::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla));   
 	end if;    
 
 	v_resp:=v_this;
