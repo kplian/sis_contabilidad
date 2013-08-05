@@ -11,6 +11,28 @@ CREATE OR REPLACE FUNCTION conta.f_get_config_relacion_contable (
 )
 RETURNS SETOF record AS
 $body$
+/*
+Autor Rensi Arteaga Copari
+Fecha 01/07/2013
+Descripcion: recupera la la parametrizacion de la relacion contable indicada
+
+ejmplo
+
+
+ SELECT 
+              ps_id_partida ,
+              ps_id_cuenta,
+              ps_id_auxiliar
+            into 
+              v_id_partida,
+              v_id_cuenta, 
+              v_id_auxiliar
+          FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo);
+          
+        
+
+
+*/
 DECLARE
 v_nombre_funcion varchar;
 v_resp varchar;

@@ -1,123 +1,178 @@
---------------- SQL ---------------
+<?php
+/**
+*@package pXP
+*@file gen-CuentaAuxiliar.php
+*@author  (admin)
+*@date 05-08-2013 00:42:28
+*@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+*/
 
-CREATE OR REPLACE FUNCTION conta.ft_cuenta_auxiliar_sel (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
+header("content-type: text/javascript; charset=UTF-8");
+?>
+<script>
+Phx.vista.CuentaAuxiliar=Ext.extend(Phx.gridInterfaz,{
+
+	constructor:function(config){
+		this.maestro=config.maestro;
+    	//llama al constructor de la clase padre
+		Phx.vista.CuentaAuxiliar.superclass.constructor.call(this,config);
+		this.init();
+		this.load({params:{start:0, limit:this.tam_pag, id_cuenta: this.id_cuenta}})
+	},
+	tam_pag:50,
+			
+	Atributos:[
+		{
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_cuenta_auxiliar'
+			},
+			type:'Field',
+			form:true 
+		},
+        {
+            config:{
+                name: 'id_cuenta',
+                inputType:'hidden'
+            }, 
+            type:'Field',          
+            form:true
+        },
+        {
+                config:{
+                    sysorigen:'sis_contabilidad',
+                    name:'id_auxiliar',
+                    origen:'AUXILIAR',
+                    allowBlank:false,
+                    fieldLabel:'Auxiliar',
+                    gdisplayField:'nombre_auxiliar',//mapea al store del grid
+                    gwidth:200,
+                     renderer:function (value, p, record){return String.format('{0}',record.data['codigo_auxiliar'] + '-' + record.data['nombre_auxiliar']);}
+                 },
+                type:'ComboRec',
+                id_grupo:0,
+                filters:{   
+                    pfiltro:'au.codigo_auxiliar#au.nombre_auxiliar',
+                    type:'string'
+                },
+               
+                grid:true,
+                form:true
+        },
+		
+        {
+            config:{
+                name: 'estado_reg',
+                fieldLabel: 'Estado Reg.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:10
+            },
+            type:'TextField',
+            filters:{pfiltro:'cax.estado_reg',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+		{
+			config:{
+				name: 'usr_reg',
+				fieldLabel: 'Creado por',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:4
+			},
+			type:'NumberField',
+			filters:{pfiltro:'usu1.cuenta',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'fecha_reg',
+				fieldLabel: 'Fecha creación',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'cax.fecha_reg',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'usr_mod',
+				fieldLabel: 'Modificado por',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:4
+			},
+			type:'NumberField',
+			filters:{pfiltro:'usu2.cuenta',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'fecha_mod',
+				fieldLabel: 'Fecha Modif.',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'cax.fecha_mod',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		}
+	],
+	
+	title:'Cuenta - Auxiliar',
+	ActSave:'../../sis_contabilidad/control/CuentaAuxiliar/insertarCuentaAuxiliar',
+	ActDel:'../../sis_contabilidad/control/CuentaAuxiliar/eliminarCuentaAuxiliar',
+	ActList:'../../sis_contabilidad/control/CuentaAuxiliar/listarCuentaAuxiliar',
+	id_store:'id_cuenta_auxiliar',
+	fields: [
+		{name:'id_cuenta_auxiliar', type: 'numeric'},
+		{name:'estado_reg', type: 'string'},
+		{name:'id_auxiliar', type: 'numeric'},
+		{name:'id_cuenta', type: 'numeric'},
+		{name:'id_usuario_reg', type: 'numeric'},
+		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{name:'id_usuario_mod', type: 'numeric'},
+		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{name:'usr_reg', type: 'string'},
+		{name:'usr_mod', type: 'string'},'nombre_auxiliar','codigo_auxiliar'
+		
+	],
+	sortInfo:{
+		field: 'id_cuenta_auxiliar',
+		direction: 'ASC'
+	},
+    onButtonNew:function(){
+
+        Phx.vista.CuentaAuxiliar.superclass.onButtonNew.call(this);
+        this.getComponente('id_cuenta').setValue(this.id_cuenta);
+        
+    },
+	bdel:true,
+	bsave:true
+	}
 )
-RETURNS varchar AS
-$body$
-/**************************************************************************
- SISTEMA:       Sistema de Contabilidad
- FUNCION:       conta.ft_cuenta_auxiliar_sel
- DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tcuenta_auxiliar'
- AUTOR:          (admin)
- FECHA:         11-07-2013 20:37:00
- COMENTARIOS:   
-***************************************************************************
- HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:   
- AUTOR:         
- FECHA:     
-***************************************************************************/
-
-DECLARE
-
-    v_consulta          varchar;
-    v_parametros        record;
-    v_nombre_funcion    text;
-    v_resp              varchar;
-                
-BEGIN
-
-    v_nombre_funcion = 'conta.ft_cuenta_auxiliar_sel';
-    v_parametros = pxp.f_get_record(p_tabla);
-
-    /*********************************    
-    #TRANSACCION:  'CONTA_CAX_SEL'
-    #DESCRIPCION:   Consulta de datos
-    #AUTOR:     admin   
-    #FECHA:     11-07-2013 20:37:00
-    ***********************************/
-
-    if(p_transaccion='CONTA_CAX_SEL')then
-                    
-        begin
-            --Sentencia de la consulta
-            v_consulta:='select
-                        cax.id_cuenta_auxiliar,
-                        cax.estado_reg,
-                        cax.id_auxiliar,
-                        cax.id_cuenta,
-                        cax.id_usuario_reg,
-                        cax.fecha_reg,
-                        cax.id_usuario_mod,
-                        cax.fecha_mod,
-                        usu1.cuenta as usr_reg,
-                        usu2.cuenta as usr_mod,
-                        aux.codigo_auxiliar,
-                        aux.nombre_auxiliar
-                        from conta.tcuenta_auxiliar cax
-                        inner join segu.tusuario usu1 on usu1.id_usuario = cax.id_usuario_reg
-                        inner join conta.tauxiliar aux on cax.id_auxiliar = aux.id_auxiliar
-                        left join segu.tusuario usu2 on usu2.id_usuario = cax.id_usuario_mod
-                        where  ';
-            
-            --Definicion de la respuesta
-            v_consulta:=v_consulta||v_parametros.filtro;
-            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
-            --Devuelve la respuesta
-            return v_consulta;
-                        
-        end;
-
-    /*********************************    
-    #TRANSACCION:  'CONTA_CAX_CONT'
-    #DESCRIPCION:   Conteo de registros
-    #AUTOR:     admin   
-    #FECHA:     11-07-2013 20:37:00
-    ***********************************/
-
-    elsif(p_transaccion='CONTA_CAX_CONT')then
-
-        begin
-            --Sentencia de la consulta de conteo de registros
-            v_consulta:='select count(id_cuenta_auxiliar)
-                        from conta.tcuenta_auxiliar cax
-                        inner join segu.tusuario usu1 on usu1.id_usuario = cax.id_usuario_reg
-                        inner join conta.tauxiliar aux on cax.id_auxiliar = aux.id_auxiliar
-                        left join segu.tusuario usu2 on usu2.id_usuario = cax.id_usuario_mod
-                        where ';
-            
-            --Definicion de la respuesta            
-            v_consulta:=v_consulta||v_parametros.filtro;
-
-            --Devuelve la respuesta
-            return v_consulta;
-
-        end;
-                    
-    else
-                         
-        raise exception 'Transaccion inexistente';
-                             
-    end if;
-                    
-EXCEPTION
-                    
-    WHEN OTHERS THEN
-            v_resp='';
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-            v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-            v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-            raise exception '%',v_resp;
-END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;
+</script>
+		
+		
