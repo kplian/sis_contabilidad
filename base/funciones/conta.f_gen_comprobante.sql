@@ -1,9 +1,29 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_tabla integer,
   p_codigo varchar
 )
 RETURNS varchar AS
 $body$
+/*
+Autor inicial GAYME RIMERA ROJAS (No sabe porner comentarios)
+Fecha 28/06/2013
+Descripcion: nose por que el gayme no puso comentarios
+
+
+Autor:  Rensi Arteaga Copari
+Fecha 21/08/2013
+Descripcion:   Esta funciona inicia la generacion de comprobantes contables,  
+               apartir de una plantilla predefinida
+
+
+
+
+
+*/
+
+
 DECLARE
 	v_this					conta.maestro_comprobante;
     v_tabla					record;
@@ -14,10 +34,11 @@ DECLARE
     v_posicion				integer;
     v_columnas				varchar;
     v_columna_requerida		varchar;
-    r 						record;
+    r 						record;  --  esta variable no se usa
     v_valor					varchar;
 BEGIN
-	v_nombre_funcion:='conta.f_gen_comprobante';
+	
+    v_nombre_funcion:='conta.f_gen_comprobante';
     
     --recupero el record de la plantilla con el codigo (parametro) dado
     
@@ -25,25 +46,44 @@ BEGIN
 	from conta.tplantilla_comprobante cbte
 	where cbte.codigo=p_codigo;
 
-	v_columnas=conta.f_obtener_columnas(p_codigo)::varchar;
+
+	--obtener la columnas que se consultaran  para la tabla  ( los nombre de variables con prefijo $tabla)
+    
+    v_columnas=conta.f_obtener_columnas(p_codigo)::varchar;
 	v_columnas=replace(v_columnas,'{','');
 	v_columnas=replace(v_columnas,'}','');
+    
+    
+    raise notice 'COLUMNAS   %',v_columnas;
     
     execute	'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla||'' into v_tabla;
     
-	--guardo subsistema
-    if (v_plantilla.campo_subsistema!='' AND v_plantilla.campo_subsistema is not null) then
-    	v_this.columna_subsistema = conta.f_get_columna('maestro', 
-           											v_plantilla.campo_subsistema::text, 
-                                                    hstore(v_this), 
-                                                    hstore(v_tabla));
+    
+    ----------------------------------------------------------
+    --  OBTIENE LOS VALORES,  THIS   (tipo de dato agrupador)     
+    ----------------------------------------------------------
+    
+	--  guardo subsistema  
+    
+    
+    if ( v_plantilla.campo_subsistema != ''  AND  v_plantilla.campo_subsistema is not null ) then
+    	
+        v_this.columna_subsistema = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_subsistema::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla));
 	end if;    
     
     --guardo depto
+    
+    raise notice 'v_plantilla.campo_depto  %',v_plantilla.campo_depto;
+    
+   
     if (v_plantilla.campo_depto!='' AND v_plantilla.campo_depto is not null) then
-    	v_this.columna_depto = conta.f_get_columna(	'maestro', 
+    	
+        v_this.columna_depto = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_depto::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla));

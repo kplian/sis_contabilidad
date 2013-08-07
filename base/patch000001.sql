@@ -309,3 +309,10 @@ CREATE TABLE conta.tcomprobante(
 ALTER TABLE conta.tcomprobante OWNER TO postgres;
 
 /***********************************F-SCP-RCM-CONTA-0-15/07/2013****************************************/
+
+
+
+
+
+
+
