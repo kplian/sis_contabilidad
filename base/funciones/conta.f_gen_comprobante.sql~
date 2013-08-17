@@ -35,7 +35,7 @@ BEGIN
     
 	--guardo subsistema
     if (v_plantilla.campo_subsistema!='' AND v_plantilla.campo_subsistema is not null) then
-    	v_this.columna_subsistema = conta.f_get_columna('maestro', 
+    	v_this.campo_subsistema = conta.f_get_columna('maestro', 
            											v_plantilla.campo_subsistema::text, 
                                                     hstore(v_this), 
                                                     hstore(v_tabla));
@@ -43,7 +43,7 @@ BEGIN
     
     --guardo depto
     if (v_plantilla.campo_depto!='' AND v_plantilla.campo_depto is not null) then
-    	v_this.columna_depto = conta.f_get_columna(	'maestro', 
+    	v_this.campo_depto = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_depto::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla));
@@ -51,7 +51,7 @@ BEGIN
     
     --guardo acreedor
     if (v_plantilla.campo_acreedor!='' AND v_plantilla.campo_acreedor is not null) then
-    	v_this.columna_acreedor = conta.f_get_columna(	'maestro', 
+    	v_this.campo_acreedor = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_acreedor::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla));           
@@ -59,7 +59,7 @@ BEGIN
     
     --guardo descripcion--
     if (v_plantilla.campo_descripcion!='' AND v_plantilla.campo_descripcion is not null) then
-    	v_this.columna_descripcion = conta.f_get_columna(	'maestro', 
+    	v_this.campo_descripcion = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_descripcion::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla)); 
@@ -68,7 +68,7 @@ BEGIN
 
     --guardo moneda--
     if (v_plantilla.campo_moneda!='' AND v_plantilla.campo_moneda is not null) then
-    	v_this.columna_moneda = conta.f_get_columna(	'maestro', 
+    	v_this.campo_moneda = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_moneda::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla)); 
@@ -76,7 +76,7 @@ BEGIN
     
     --guardo fecha
     if (v_plantilla.campo_fecha!='' AND v_plantilla.campo_fecha is not null) then
-    	v_this.columna_fecha = conta.f_get_columna(	'maestro', 
+    	v_this.campo_fecha = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_fecha::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla));   
