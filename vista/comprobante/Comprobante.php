@@ -506,7 +506,13 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+	south: {
+			url : '../../../sis_contabilidad/vista/transaccion/Transaccion.php',
+			title : 'Transacciones',
+			height : '50%',
+			cls : 'Transaccion'
+		},
 	}
 )
 </script>
