@@ -183,94 +183,6 @@ WITHOUT OIDS;
 /***********************************F-SCP-GSS-CONTA-9-07/06/2013****************************************/
 
 
-/***********************************I-SCP-GSS-CONTA-9-18/06/2013****************************************/
-
-CREATE TABLE conta.tinter_comprobante (
-  id_comprobante SERIAL, 
-  id_parametro INTEGER, 
-  nro_cbte INTEGER, 
-  momento_cbte NUMERIC(1,0), 
-  fecha_cbte DATE NOT NULL, 
-  concepto_cbte VARCHAR(1500), 
-  glosa_cbte VARCHAR(1500), 
-  acreedor VARCHAR, 
-  aprobacion VARCHAR(550), 
-  conformidad VARCHAR(1500), 
-  pedido VARCHAR(550), 
-  id_periodo_subsis INTEGER, 
-  id_usuario INTEGER, 
-  id_subsistema INTEGER NOT NULL, 
-  id_clase_cbte INTEGER, 
-  fk_comprobante INTEGER, 
-  id_depto INTEGER NOT NULL, 
-  nro_cbte_siscon INTEGER, 
-  origen VARCHAR, 
-  id_moneda INTEGER, 
-  nro_cheque TEXT, 
-  tipo_cambio NUMERIC(18,6), 
-  tipo_relacion VARCHAR(30), 
-  sw_activo_fijo VARCHAR(2), 
-  sw_actualizacion VARCHAR DEFAULT 'si-no'::character varying, 
-  id_documento_firma INTEGER, 
-  tipo VARCHAR(20), 
-  sw_comprobante_apertura VARCHAR(2) DEFAULT 'no'::character varying, 
-  CONSTRAINT pk_tinter_comprobante__id_comprobante PRIMARY KEY(id_comprobante), 
-  CONSTRAINT chk_tinter_comprobante__origen CHECK (((((((((((((((((((((((((((origen)::text = 'alta_activo_fijo'::text) OR ((origen)::text = 'depreciacion_activo_fijo'::text)) OR ((origen)::text = 'devengado_diario'::text)) OR ((origen)::text = 'fv_facturacion_mesual'::text)) OR ((origen)::text = 'devengado_pago'::text)) OR ((origen)::text = 'devengado_reg'::text)) OR ((origen)::text = 'duplicado'::text)) OR ((origen)::text = 'finalizacion'::text)) OR ((origen)::text = 'planilla_devengado'::text)) OR ((origen)::text = 'planilla_pago'::text)) OR ((origen)::text = 'plan_pago_anticipo'::text)) OR ((origen)::text = 'plan_pago_devengado'::text)) OR ((origen)::text = 'plan_pago_pago'::text)) OR ((origen)::text = 'rendicion'::text)) OR ((origen)::text = 'reposicion'::text)) OR ((origen)::text = 'solicitud'::text)) OR ((origen)::text = 'sucursal'::text)) OR ((origen)::text = 'kp_planilla_diario_pre'::text)) OR ((origen)::text = 'actualizacion'::text)) OR ((origen)::text = 'kp_planilla_anticipo'::text)) OR ((origen)::text = 'activo_fijo'::text)) OR ((origen)::text = 'kp_planilla_diario_costo'::text)) OR (origen IS NULL)) OR ((origen)::text = 'cierre_apertura'::text)) OR ((origen)::text = 'kp_planilla_obligacion'::text)) OR ((origen)::text = 'comprobante_apertura'::text))
-) INHERITS (pxp.tbase)
-WITHOUT OIDS;
-
-COMMENT ON COLUMN conta.tinter_comprobante.id_comprobante
-IS 'nombre=id_comprobante&label=id_comprobante&grid_visible=no&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=id_comprobante''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.id_parametro
-IS 'nombre=id_parametro&label=id_parametro&grid_visible=no&grid_editable=no&disabled=si&width_grid=100&width=100%&filtro=si&defecto=&desc=id_parametro''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.nro_cbte
-IS 'nombre=nro_cbte&label=Número&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=nro_cbte''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.momento_cbte
-IS '''nombre=momento_cbte&label=Momento&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=momento_cbte''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.fecha_cbte
-IS '''nombre=fecha_cbte&label=Fecha&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=fecha_cbte''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.concepto_cbte
-IS '''nombre=concepto_cbte&label=Concepto&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=concepto_cbte''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.glosa_cbte
-IS '''nombre=glosa_cbte&label=Glosa&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=glosa_cbte''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.acreedor
-IS '''nombre=acreedor&label=Acreedor&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=acreedor''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.aprobacion
-IS '''nombre=aprobacion&label=Aprobación&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=aprobacion''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.conformidad
-IS '''nombre=conformidad&label=Conformidad&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=conformidad''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.pedido
-IS '''nombre=pedido&label=Pedido&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=pedido''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.id_periodo_subsis
-IS '''nombre=id_periodo_subsis&label=Periodo Subsisteam&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=id_periodo_subsis''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.id_usuario
-IS '''nombre=id_usuario&label=Usuario&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=id_usuario''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.id_subsistema
-IS '''nombre=id_subsistema&label=Subsistema&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=id_subsistema''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.id_clase_cbte
-IS '''nombre=id_clase_cbte&label=Documento&grid_visible=si&grid_editable=no&disabled=no&width_grid=100&width=100%&filtro=si&defecto=&desc=id_documento_nro''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.origen
-IS '''origen = ''''alta_activo_fijo'''' OR origen = ''''depreciacion_activo_fijo'''' OR origen = ''''devengado_diario'''' OR origen=''''fv_facturacion_mesual'''' or origen = ''''devengado_pago'''' OR origen = ''''devengado_reg'''' OR origen = ''''duplicado'''' OR origen = ''''finalizacion'''' OR origen = ''''planilla_devengado'''' OR origen = ''''planilla_pago'''' OR origen = ''''plan_pago_anticipo'''' OR origen = ''''plan_pago_devengado'''' OR origen = ''''plan_pago_pago'''' OR origen = ''''rendicion'''' OR origen = ''''reposicion'''' OR origen = ''''solicitud'''' OR origen = ''''sucursal'''' OR origen = ''''kp_planilla_diario_pre'''' OR origen = ''''actualizacion'''' OR origen = ''''kp_planilla_anticipo'''' OR origen=''''activo_fijo'''' or origen=''''kp_planilla_diario_costo'''' or origen is NULL or origen =''''cierre_apertura'''' or origen =''''kp_planilla_obligacion''''''';
-
-COMMENT ON COLUMN conta.tinter_comprobante.id_documento_firma
-IS '''referencia a las firmas autorizadas que corresponden al momento de la validación del comprobante'';';
-
-/***********************************F-SCP-GSS-CONTA-9-18/06/2013****************************************/
 
 /***********************************I-SCP-RAC-CONTA-0-16/07/2013****************************************/
 
@@ -312,7 +224,47 @@ ALTER TABLE conta.tcomprobante OWNER TO postgres;
 
 
 
+/***********************************I-SCP-RAC-CONTA-0-15/07/2013****************************************/
 
+CREATE TABLE conta.tint_comprobante(
+	id_int_comprobante SERIAL NOT NULL,
+	id_clase_comprobante int4 NOT NULL,
+	id_int_comprobante_fk int4 NOT NULL,
+	id_subsistema int4,
+	id_depto int4,
+	id_moneda int4,
+	id_periodo int4,
+	nro_cbte varchar(30),
+	momento varchar(30),
+	glosa1 varchar(1500),
+	glosa2 varchar(400),
+	beneficiario varchar(100),
+	tipo_cambio numeric(18, 2),
+	id_funcionario_firma1 int4,
+	id_funcionario_firma2 int4,
+	id_funcionario_firma3 int4,
+	fecha date,
+	CONSTRAINT pk_tcomprobante__id_int_comprobante PRIMARY KEY (id_int_comprobante)
+) INHERITS (pxp.tbase) WITHOUT OIDS;
 
+ALTER TABLE conta.tcomprobante OWNER TO postgres;
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN id_clase_comprobante INTEGER;
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN id_subsistema INTEGER;
+
+ALTER TABLE conta.tint_comprobante
+  ALTER COLUMN id_clase_comprobante DROP NOT NULL;
+ 
+ ALTER TABLE conta.tint_comprobante
+  ALTER COLUMN id_int_comprobante_fk DROP NOT NULL;
+ 
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN primaria VARCHAR(4) DEFAULT 'si' NOT NULL;
+ 
+  
+/***********************************I-SCP-RAC-CONTA-0-15/07/2013****************************************/
 
 

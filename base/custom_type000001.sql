@@ -9,7 +9,7 @@ CREATE TYPE conta.maestro_comprobante AS (
   columna_acreedor VARCHAR(255),
   columna_fk_comprobante INTEGER,
   columna_depto INTEGER,
-  columna_prueba VARCHAR(255)
+  columna_glosa TEXT
 );
 
 

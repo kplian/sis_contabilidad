@@ -1,8 +1,9 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
-  p_id_tabla integer,
-  p_codigo varchar
+  p_id_tabla_valor integer,
+  p_codigo varchar,
+  p_id_usuario integer = NULL::integer
 )
 RETURNS varchar AS
 $body$
@@ -36,6 +37,9 @@ DECLARE
     v_columna_requerida		varchar;
     r 						record;  --  esta variable no se usa
     v_valor					varchar;
+    
+    v_id_int_comprobante    integer;
+    resp_det varchar;
 BEGIN
 	
     v_nombre_funcion:='conta.f_gen_comprobante';
@@ -58,7 +62,7 @@ BEGIN
     
     execute	'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
-            ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla||'' into v_tabla;
+            ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'' into v_tabla;
     
     
     ----------------------------------------------------------
@@ -122,7 +126,70 @@ BEGIN
                                                 hstore(v_tabla));   
 	end if;    
 
-	v_resp:=v_this;
+    v_resp:=v_this;
+    
+    
+    --  genera tabla intermedia de comrobante
+    
+   INSERT INTO 
+      conta.tint_comprobante
+    (
+      id_usuario_reg,
+    
+      fecha_reg,
+     
+      estado_reg,
+     
+      id_clase_comprobante,
+      id_int_comprobante_fk,
+      id_subsistema,
+      id_depto,
+      id_moneda,
+      --id_periodo,
+      --nro_cbte,
+      --momento,
+      glosa1,
+      --glosa2,
+      beneficiario
+      --tipo_cambio,
+      --id_funcionario_firma1,
+      --id_funcionario_firma2,
+      --id_funcionario_firma3,
+      --fecha
+    ) 
+    VALUES (
+      p_id_usuario,
+      now(),
+     'activo',
+      v_plantilla.id_clase_comprobante, --TODO agregar a la interface de plantilla
+      NULL,
+      v_plantilla.id_subsistema, --TODO agregar a la interface de plantilla,
+      v_this.columna_depto::integer,
+      v_this.columna_moneda::integer,
+      --:id_periodo,
+      --:nro_cbte,
+      --:momento,
+      v_this.columna_descripcion,
+      --:glosa2,
+      v_this.columna_acreedor
+      --:tipo_cambio,
+      --:id_funcionario_firma1,
+      --:id_funcionario_firma2,
+      --:id_funcionario_firma3,
+      --:fecha
+    )RETURNING id_int_comprobante into v_id_int_comprobante;
+    
+    
+    
+    -- genera transacciones del comprobante
+    
+   resp_det =  conta.f_gen_transaccion(hstore(v_this), 
+                            hstore(v_tabla),
+                            hstore(v_plantilla),
+                            p_id_tabla_valor,
+                            p_id_usuario);
+    
+    
     
     return v_resp;
     
