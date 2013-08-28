@@ -268,3 +268,48 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
 /***********************************I-SCP-RAC-CONTA-0-15/07/2013****************************************/
 
 
+/***********************************I-SCP-RCM-CONTA-18-29/08/2013*****************************************/
+CREATE TABLE conta.ttransaccion(
+  id_transaccion  SERIAL NOT NULL,
+  id_comprobante int4 NOT NULL, 
+  id_cuenta int4 NOT NULL,
+  id_auxiliar int4 NOT NULL, 
+  id_centro_costo int4 NOT NULL, 
+  id_partida int4, 
+  id_partida_ejecucion int4, 
+  id_transaccion_fk int4 NOT NULL, 
+  glosa text,
+  CONSTRAINT pk_ttransaccion__id_transaccion PRIMARY KEY (id_transaccion)
+) INHERITS (pxp.tbase)
+WITH OIDS;
+
+CREATE TABLE conta.ttrans_val(
+  id_trans_val  SERIAL NOT NULL,
+  id_transaccion int4 NOT NULL, 
+  id_moneda int4, 
+  importe_debe numeric(19, 2), 
+  importe_haber numeric(19, 2), 
+  importe_recurso numeric(19, 2), 
+  importe_gasto numeric(19, 2), 
+  CONSTRAINT pk_ttrans_val__id_trans_val PRIMARY KEY (id_trans_val)
+) INHERITS(pxp.tbase)
+WITH OIDS;
+
+
+CREATE TABLE conta.tplantilla_calculo (
+  id_plantilla_calculo SERIAL, 
+  id_plantilla INTEGER NOT NULL, 
+  codigo_tipo_relacion VARCHAR(10),
+  prioridad integer NOT NULL, 
+  debe_haber varchar(5) NOT NULL, 
+  importe NUMERIC(18,2) NOT NULL, 
+  descripcion VARCHAR(50), 
+  tipo_importe VARCHAR(15) NOT NULL, 
+  CONSTRAINT tplantilla_calculo__id_plantilla_calculo PRIMARY KEY(id_plantilla_calculo), 
+  CONSTRAINT chk_tplantilla_calculo__prioridad CHECK (prioridad between 1 and 3), 
+  CONSTRAINT chk_tplantilla_calculo__debe_haber CHECK (debe_haber in ('debe','haber')),
+  CONSTRAINT chk_tplantilla_calculo__tipo_importe CHECK (tipo_importe in ('porcentaje','importe'))
+) INHERITS(pxp.tbase) 
+WITHOUT OIDS;
+
+/***********************************F-SCP-RCM-CONTA-18-29/08/2013*****************************************/

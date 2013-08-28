@@ -204,17 +204,90 @@ ALTER TABLE conta.ttransaccion
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
     
-ALTER TABLE conta.ttransaccion_valor
-  ADD CONSTRAINT fk_ttransaccion_valor__id_transaccion FOREIGN KEY (id_transaccion)
+ALTER TABLE conta.ttrans_val
+  ADD CONSTRAINT fk_ttrans_val__id_transaccion FOREIGN KEY (id_transaccion)
     REFERENCES conta.ttransaccion(id_transaccion)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
 
-ALTER TABLE conta.ttransaccion_valor
-  ADD CONSTRAINT fk_ttransaccion_valor__id_moneda FOREIGN KEY (id_moneda)
+ALTER TABLE conta.ttrans_val
+  ADD CONSTRAINT fk_ttrans_val__id_moneda FOREIGN KEY (id_moneda)
     REFERENCES param.tmoneda(id_moneda)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
 /***********************************F-DEP-RCM-CONTA-0-21/07/2013*****************************************/
+
+/***********************************I-DEP-RCM-CONTA-18-29/08/2013*****************************************/
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_clase_comprobante FOREIGN KEY (id_clase_comprobante)
+    REFERENCES conta.tclase_comprobante(id_clase_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_int_comprobante_fk FOREIGN KEY (id_int_comprobante_fk)
+    REFERENCES conta.tint_comprobante(id_int_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_subsistema FOREIGN KEY (id_subsistema)
+    REFERENCES segu.tsubsistema(id_subsistema)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_depto FOREIGN KEY (id_depto)
+    REFERENCES param.tdepto(id_depto)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_moneda FOREIGN KEY (id_moneda)
+    REFERENCES param.tmoneda(id_moneda)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_periodo FOREIGN KEY (id_periodo)
+    REFERENCES param.tperiodo(id_periodo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_funcionario_firma1 FOREIGN KEY (id_funcionario_firma1)
+    REFERENCES orga.tfuncionario(id_funcionario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_funcionario_firma2 FOREIGN KEY (id_funcionario_firma2)
+    REFERENCES orga.tfuncionario(id_funcionario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT fk_tcomprobante__id_funcionario_firma3 FOREIGN KEY (id_funcionario_firma3)
+    REFERENCES orga.tfuncionario(id_funcionario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tplantilla_calculo
+  ADD CONSTRAINT fk_tplantilla_calculo__id_plantilla FOREIGN KEY (id_plantilla)
+    REFERENCES param.tplantilla(id_plantilla)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/***********************************F-DEP-RCM-CONTA-18-29/08/2013*****************************************/

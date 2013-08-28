@@ -237,7 +237,7 @@ select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'C
 select pxp.f_insert_tgui ('Cuentas Bancarias', 'relacion de cuentas bancarias y cuentas contables', 'RELCCCB', 'si', 4, 'sis_contabilidad/vista/cta_cuenta_bancaria/CtaCuentaBancaria.php', 3, '', 'CtaCuentaBancaria', 'CONTA');
 select pxp.f_insert_testructura_gui ('CCBT', 'CONTA');
 select pxp.f_insert_testructura_gui ('RELCCCB', 'RELACON');
-
+          
 
 
 /***********************************F-DAT-RAC-CONTA-0-10/07/2013*****************************************/
@@ -249,3 +249,20 @@ select pxp.f_insert_tgui ('Registro de Comprobantes', 'Registro de Comprobantes'
 select pxp.f_insert_testructura_gui ('CBTE.1', 'CONTA');
 select pxp.f_insert_testructura_gui ('CBTE.1.1', 'CBTE.1');
 /***********************************F-DAT-RCM-CONTA-0-15/07/2013*****************************************/
+   
+/***********************************I-DAT-RCM-CONTA-18-29/08/2013*****************************************/
+select pxp.f_insert_tgui ('Registro de Comprobantes', 'Registro de Comprobantes', 'CBTE.1.1', 'si', 1, 'sis_contabilidad/vista/int_comprobante/IntComprobante.php', 3, '', 'IntComprobante', 'CONTA');
+
+select pxp.f_insert_tgui ('Plantilla de Documentos', 'Plantilla de Documentos', 'PLADOC', 'si', 1, 'sis_contabilidad/vista/plantilla/Plantilla.php', 2, '', 'PlantillaConta', 'CONTA');
+select pxp.f_insert_testructura_gui ('PLADOC', 'DEFRECONCAR');
+
+select pxp.f_add_catalog('CONTA','tplantilla_calculo__prioridad','1');
+select pxp.f_add_catalog('CONTA','tplantilla_calculo__prioridad','2');
+select pxp.f_add_catalog('CONTA','tplantilla_calculo__prioridad','3');
+
+select pxp.f_add_catalog('CONTA','tplantilla_calculo__debe_haber','debe');
+select pxp.f_add_catalog('CONTA','tplantilla_calculo__debe_haber','haber');
+
+select pxp.f_add_catalog('CONTA','tplantilla_calculo__tipo_importe','porcentaje');
+select pxp.f_add_catalog('CONTA','tplantilla_calculo__tipo_importe','importe');
+/***********************************F-DAT-RCM-CONTA-0-29/08/2013*****************************************/
