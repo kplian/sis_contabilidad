@@ -61,7 +61,14 @@ BEGIN
       and trc.estado_reg = 'activo'; 
     
     
-    raise notice '%, % ,%', v_registros.tiene_centro_costo,v_registros.id_tabla_relacion_contable,v_registros.id_tipo_relacion_contable;
+       
+      IF   v_registros.id_tipo_relacion_contable is null THEN
+      
+        raise exception 'El codigo: %, no existe',p_codigo;
+      
+      END IF;
+    
+    
     
      IF p_id_centro_costo is NULL THEN
                 
@@ -113,7 +120,7 @@ BEGIN
           
           ELSEIF v_registros.tiene_centro_costo = 'si-general' THEN
           
-             raise notice 'si-general';
+     
             
             -- es caso de ser si general primero buscamos una configuracion con centro de costos
             -- si no la encontramos buscamos una general, sin centro de costo (la especifica prevalece sobre la general)
@@ -155,13 +162,13 @@ BEGIN
                 END IF;
            ELSE
           
-             raise exception 'valor para la variable  "tiene_centro_costo" desconocido';
+             raise exception 'valor para la variable  "tiene_centro_costo" desconocido %',v_registros.tiene_centro_costo;
           
           END IF; 
    ELSE
          
          --si necesita tabla de configuracion el parametros p_tabla y p_id_tabla no pueden ser nulos
-          raise notice 'la tabla de la relacion  contable es no nulo';
+        
           IF p_id_tabla is NULL THEN
             raise exception 'Este tipo de relacion contable necesita indicar la tabla y el id para busquedas';
           END IF;
@@ -209,7 +216,7 @@ BEGIN
           ELSEIF v_registros.tiene_centro_costo = 'si-general' THEN
             -- es caso de ser si general primero buscamos una configuracion con centro de costos
             -- si no la encontramos buscamos una general, sin centro de costo (la especifica prevalece sobre la general)
-            raise notice 'si-general';
+           
             
                select
                   rc.id_cuenta,
@@ -231,7 +238,7 @@ BEGIN
      
                IF ps_id_cuenta is NULL THEN
                --buscamos una configuracion general sin centro de costo
-               raise notice 'no hay una configuracion con centro de costo';
+            
                      select
                         rc.id_cuenta,
                         rc.id_auxiliar,
@@ -254,8 +261,7 @@ BEGIN
    
    END IF;
    
-   raise notice 'ps_id_cuenta %,  ps_id_auxiliar %,  ps_id_partida %', ps_id_cuenta,ps_id_auxiliar, ps_id_partida;
-
+  
 return NEXT;
 return;
 

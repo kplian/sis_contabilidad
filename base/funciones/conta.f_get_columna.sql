@@ -70,7 +70,8 @@ BEGIN
   
   if (v_variables is null and v_es_select != 1) then
   	
-    -- si no es select  y no hay variables de devuelve directamente el valor de la cedena , que es un valor constante
+    -- si no es select  y no hay variables devuelve directamente el valor de la cedena , que es un valor constante
+   
     return p_cadena;
   
   end if;
@@ -79,23 +80,23 @@ BEGIN
   --Si no es  consulta (select)  devolver el valor directamente
   IF (v_es_select != 1)then
   
-  	 v_variable = replace(split_part(v_variables[1], '.', 2), '$', '');
+  	   v_variable = replace(split_part(v_variables[1], '.', 2), '$', '');
   	
     if (position('$this' in v_variables[1]) = 1)then
     	
         return p_this-> v_variable::varchar;
     
-    elsif (position('$tabla' in v_variables[1]) = 1) then
+    elsif (position('$tabla_padre' in v_variables[1]) = 1) then
     	
-        return p_tabla-> v_variable::varchar;
+        return p_tabla_padre-> v_variable::varchar;
     
     elsif (position('$super' in v_variables[1]) = 1) then
     	
         return p_super-> v_variable::varchar;
     
     else
-    	
-        return p_tabla_padre-> v_variable::varchar;
+    	return p_tabla-> v_variable::varchar;
+       
     
     end if;
   
@@ -115,9 +116,9 @@ BEGIN
         	
             v_cadena = replace(v_cadena,'{'||v_variables[v_i]||'}', p_this-> v_variable);
         
-        elsif (position('$tabla' in v_variables[v_i]) = 1)then
+        elsif (position('$tabla_padre' in v_variables[v_i]) = 1)then
         	
-            v_cadena = replace(v_cadena, '{'||v_variables[v_i]||'}', p_tabla-> v_variable);
+           v_cadena = replace(v_cadena, '{'||v_variables[v_i]||'}', p_tabla_padre-> v_variable);
         
         elsif (position('$super' in v_variables[v_i]) = 1)then
         	
@@ -125,7 +126,7 @@ BEGIN
         
         else
         	
-            v_cadena = replace(v_cadena, '{'||v_variables[v_i]||'}', p_tabla_padre-> v_variable);
+              v_cadena = replace(v_cadena, '{'||v_variables[v_i]||'}', p_tabla-> v_variable);
        
         end if;
         
