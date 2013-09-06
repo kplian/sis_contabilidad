@@ -289,5 +289,19 @@ ALTER TABLE conta.tplantilla_calculo
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
+    
+ALTER TABLE conta.tcomprobante
+  ADD CONSTRAINT fk_tcomprobante__id_int_comprobante FOREIGN KEY (id_int_comprobante)
+    REFERENCES conta.tint_comprobante(id_int_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.ttransaccion
+  ADD CONSTRAINT fk_ttransaccion__id_int_transaccion FOREIGN KEY (id_int_transaccion)
+    REFERENCES conta.tint_transaccion(id_int_transaccion)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
 
 /***********************************F-DEP-RCM-CONTA-18-29/08/2013*****************************************/

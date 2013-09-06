@@ -1,28 +1,28 @@
 <?php
 /**
 *@package pXP
-*@file gen-MODComprobante.php
+*@file gen-MODIntComprobante.php
 *@author  (admin)
 *@date 29-08-2013 00:28:30
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
 
-class MODComprobante extends MODbase{
+class MODIntComprobante extends MODbase{
 	
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
 			
-	function listarComprobante(){
+	function listarIntComprobante(){
 		//Definicion de variables para ejecucion del procedimientp
-		$this->procedimiento='conta.ft_comprobante_sel';
-		$this->transaccion='CONTA_CBTE_SEL';
+		$this->procedimiento='conta.ft_int_comprobante_sel';
+		$this->transaccion='CONTA_INCBTE_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
 		//Definicion de la lista del resultado del query
-		$this->captura('id_comprobante','int4');
+		$this->captura('id_int_comprobante','int4');
 		$this->captura('id_clase_comprobante','int4');
-		$this->captura('id_comprobante_fk','int4');
+		$this->captura('id_int_comprobante_fk','int4');
 		$this->captura('id_subsistema','int4');
 		$this->captura('id_depto','int4');
 		$this->captura('id_moneda','int4');
@@ -61,15 +61,15 @@ class MODComprobante extends MODbase{
 		return $this->respuesta;
 	}
 			
-	function insertarComprobante(){
+	function insertarIntComprobante(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.ft_comprobante_ime';
-		$this->transaccion='CONTA_CBTE_INS';
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_INCBTE_INS';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_clase_comprobante','id_clase_comprobante','int4');
-		$this->setParametro('id_comprobante_fk','id_comprobante_fk','int4');
+		$this->setParametro('id_int_comprobante_fk','id_int_comprobante_fk','int4');
 		$this->setParametro('id_subsistema','id_subsistema','int4');
 		$this->setParametro('id_depto','id_depto','int4');
 		$this->setParametro('id_moneda','id_moneda','int4');
@@ -95,16 +95,16 @@ class MODComprobante extends MODbase{
 		return $this->respuesta;
 	}
 			
-	function modificarComprobante(){
+	function modificarIntComprobante(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.ft_comprobante_ime';
-		$this->transaccion='CONTA_CBTE_MOD';
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_INCBTE_MOD';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_comprobante','id_comprobante','int4');
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 		$this->setParametro('id_clase_comprobante','id_clase_comprobante','int4');
-		$this->setParametro('id_comprobante_fk','id_comprobante_fk','int4');
+		$this->setParametro('id_int_comprobante_fk','id_int_comprobante_fk','int4');
 		$this->setParametro('id_subsistema','id_subsistema','int4');
 		$this->setParametro('id_depto','id_depto','int4');
 		$this->setParametro('id_moneda','id_moneda','int4');
@@ -130,14 +130,14 @@ class MODComprobante extends MODbase{
 		return $this->respuesta;
 	}
 			
-	function eliminarComprobante(){
+	function eliminarIntComprobante(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.ft_comprobante_ime';
-		$this->transaccion='CONTA_CBTE_ELI';
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_INCBTE_ELI';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_comprobante','id_comprobante','int4');
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -147,14 +147,14 @@ class MODComprobante extends MODbase{
 		return $this->respuesta;
 	}
 	
-	function validarComprobante(){
+	function validarIntComprobante(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.ft_comprobante_ime';
-		$this->transaccion='CONTA_CBTE_VAL';
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_INCBTE_VAL';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_comprobante','id_comprobante','int4');
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 		$this->setParametro('igualar','igualar','varchar');
 
 		//Ejecuta la instruccion

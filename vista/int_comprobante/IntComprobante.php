@@ -1,7 +1,7 @@
 <?php
 /**
 *@package pXP
-*@file gen-Comprobante.php
+*@file gen-IntComprobante.php
 *@author  (admin)
 *@date 29-08-2013 00:28:30
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
@@ -10,23 +10,23 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
+Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
-		Phx.vista.Comprobante.superclass.constructor.call(this,config);
+		Phx.vista.IntComprobante.superclass.constructor.call(this,config);
 		this.init();
 		this.load({params:{start:0, limit:this.tam_pag}})
 		
 		//Botón para Validación del Comprobante
-		this.addButton('btnImprimir',
+		this.addButton('btnValidar',
 			{
-				text: 'Imprimir',
-				iconCls: 'bprint',
+				text: 'Validación',
+				iconCls: 'bchecklist',
 				disabled: true,
-				handler: this.imprimirCbte,
-				tooltip: '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
+				handler: this.validarCbte,
+				tooltip: '<b>Validación</b><br/>Validación del Comprobante'
 			}
 		);
 		
@@ -44,7 +44,7 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
-					name: 'id_comprobante'
+					name: 'id_int_comprobante'
 			},
 			type:'Field',
 			form:true 
@@ -502,8 +502,8 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 		
 		{
 			config: {
-				name: 'id_comprobante_fk',
-				fieldLabel: 'id_comprobante_fk',
+				name: 'id_int_comprobante_fk',
+				fieldLabel: 'id_int_comprobante_fk',
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
@@ -522,7 +522,7 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 				valueField: 'id_',
 				displayField: 'nombre',
 				gdisplayField: 'desc_',
-				hiddenName: 'id_comprobante_fk',
+				hiddenName: 'id_int_comprobante_fk',
 				forceSelection: true,
 				typeAhead: false,
 				triggerAction: 'all',
@@ -558,6 +558,8 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
+		
+		
 		{
 			config: {
 				name: 'id_periodo',
@@ -628,11 +630,11 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 				format: 'd/m/Y', 
 				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
-			type:'DateField',
-			filters:{pfiltro:'incbte.fecha_reg',type:'date'},
-			id_grupo:0,
-			grid:true,
-			form:false
+				type:'DateField',
+				filters:{pfiltro:'incbte.fecha_reg',type:'date'},
+				id_grupo:0,
+				grid:true,
+				form:false
 		},
 		{
 			config:{
@@ -643,11 +645,11 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:4
 			},
-			type:'NumberField',
-			filters:{pfiltro:'usu2.cuenta',type:'string'},
-			id_grupo:0,
-			grid:true,
-			form:false
+				type:'NumberField',
+				filters:{pfiltro:'usu2.cuenta',type:'string'},
+				id_grupo:0,
+				grid:true,
+				form:false
 		},
 		{
 			config:{
@@ -659,23 +661,23 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 				format: 'd/m/Y', 
 				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
-			type:'DateField',
-			filters:{pfiltro:'incbte.fecha_mod',type:'date'},
-			id_grupo:0,
-			grid:true,
-			form:false
+				type:'DateField',
+				filters:{pfiltro:'incbte.fecha_mod',type:'date'},
+				id_grupo:0,
+				grid:true,
+				form:false
 		}
 	],
 	tam_pag:50,	
 	title:'Comprobante',
-	ActSave:'../../sis_contabilidad/control/Comprobante/insertarComprobante',
-	ActDel:'../../sis_contabilidad/control/Comprobante/eliminarComprobante',
-	ActList:'../../sis_contabilidad/control/Comprobante/listarComprobante',
-	id_store:'id_comprobante',
+	ActSave:'../../sis_contabilidad/control/IntComprobante/insertarIntComprobante',
+	ActDel:'../../sis_contabilidad/control/IntComprobante/eliminarIntComprobante',
+	ActList:'../../sis_contabilidad/control/IntComprobante/listarIntComprobante',
+	id_store:'id_int_comprobante',
 	fields: [
-		{name:'id_comprobante', type: 'numeric'},
+		{name:'id_int_comprobante', type: 'numeric'},
 		{name:'id_clase_comprobante', type: 'numeric'},
-		{name:'id_comprobante_fk', type: 'numeric'},
+		{name:'id_int_comprobante_fk', type: 'numeric'},
 		{name:'id_subsistema', type: 'numeric'},
 		{name:'id_depto', type: 'numeric'},
 		{name:'id_moneda', type: 'numeric'},
@@ -710,6 +712,8 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 		field: 'fecha',
 		direction: 'desc'
 	},
+	bdel:true,
+	bsave:true,
 	Grupos: [
             {
                 //layout: 'hbox',
@@ -791,30 +795,73 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
             }
         ],
     south:{
-	  url:'../../../sis_contabilidad/vista/transaccion/Transaccion.php',
+	  url:'../../../sis_contabilidad/vista/int_transaccion/IntTransaccion.php',
 	  title:'Transacciones', 
 	  height:'50%',	//altura de la ventana hijo
-	  cls:'Transaccion'
+	  cls:'IntTransaccion'
 	},
-	imprimirCbte: function(){
-		Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
-			alert('Imprimiendo')
+	validarCbte: function(){
+		Ext.Msg.confirm('Confirmación','¿Está seguro de Validar el Comprobante?',function(btn){
+			var rec=this.sm.getSelected();
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/IntComprobante/validarIntComprobante',
+				params:{
+					id_int_comprobante: rec.data.id_int_comprobante,
+					igualar: 'no'
+				},
+				success: function(resp){
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error','Validación no realizada: '+reg.ROOT.error)
+					} else {
+						this.reload();
+						Ext.Msg.alert('Mensaje','Proceso ejecutado con éxito')
+					}
+				},
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope:this
+			});
 		}, this)
 	},
 	preparaMenu: function(n) {
-		var tb = Phx.vista.Comprobante.superclass.preparaMenu.call(this);
-	   	this.getBoton('btnImprimir').setDisabled(false);
+		var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
+	   	this.getBoton('btnValidar').setDisabled(false);
   		return tb;
 	},
 	liberaMenu: function() {
-		var tb = Phx.vista.Comprobante.superclass.liberaMenu.call(this);
-		this.getBoton('btnImprimir').setDisabled(true);
+		var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
+		this.getBoton('btnValidar').setDisabled(true);
 		return tb;
 	},
-	bnew:false,
-	bedit:false,
-	bdel:false,
-	bsave:false
+	getTipoCambio: function(){
+		//Verifica que la fecha y la moneda hayan sido elegidos
+		if(this.Cmp.fecha.getValue()&&this.Cmp.id_moneda.getValue()){
+			Ext.Ajax.request({
+				url:'../../sis_parametros/control/TipoCambio/obtenerTipoCambio',
+				params:{
+					fecha: this.Cmp.fecha.getValue(),
+					id_moneda: this.Cmp.id_moneda.getValue(),
+					tipo: 'O'
+				},
+				success: function(resp){
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error','Validación no realizada: '+reg.ROOT.error)
+					} else {
+						this.Cmp.tipo_cambio.setValue(reg.ROOT.datos.tipo_cambio);
+					}
+				},
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope:this
+			});
+		}
+		
+	}
 	
 })
 </script>

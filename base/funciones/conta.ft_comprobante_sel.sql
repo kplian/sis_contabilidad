@@ -7,7 +7,7 @@ $BODY$
  FUNCION: 		conta.ft_comprobante_sel
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tcomprobante'
  AUTOR: 		 (admin)
- FECHA:	        13-07-2013 01:56:48
+ FECHA:	        29-08-2013 00:28:30
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
@@ -33,7 +33,7 @@ BEGIN
  	#TRANSACCION:  'CONTA_CBTE_SEL'
  	#DESCRIPCION:	Consulta de datos
  	#AUTOR:		admin	
- 	#FECHA:		13-07-2013 01:56:48
+ 	#FECHA:		29-08-2013 00:28:30
 	***********************************/
 
 	if(p_transaccion='CONTA_CBTE_SEL')then
@@ -42,32 +42,47 @@ BEGIN
     		--Sentencia de la consulta
 			v_consulta:='select
 						cbte.id_comprobante,
-						cbte.estado_reg,
-						cbte.id_funcionario_firma2,
-						cbte.id_periodo,
-						cbte.momento,
-						cbte.tipo_cambio,
-						cbte.id_funcionario_firma1,
-						cbte.beneficiario,
-						cbte.id_depto,
-						cbte.glosa2,
-						cbte.id_moneda,
-						cbte.id_funcionario_firma3,
-						cbte.glosa1,
 						cbte.id_clase_comprobante,
-						cbte.id_subsistema,
-						cbte.nro_cbte,
 						cbte.id_comprobante_fk,
+						cbte.id_subsistema,
+						cbte.id_depto,
+						cbte.id_moneda,
+						cbte.id_periodo,
+						cbte.id_funcionario_firma1,
+						cbte.id_funcionario_firma2,
+						cbte.id_funcionario_firma3,
+						cbte.tipo_cambio,
+						cbte.beneficiario,
+						cbte.nro_cbte,
+						cbte.estado_reg,
+						cbte.glosa1,
+						cbte.fecha,
+						cbte.glosa2,
+						cbte.nro_tramite,
+						cbte.momento,
 						cbte.id_usuario_reg,
 						cbte.fecha_reg,
 						cbte.id_usuario_mod,
 						cbte.fecha_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	,
-						cbte.fecha
+						usu2.cuenta as usr_mod,
+						ccbte.descripcion as desc_clase_comprobante,
+						sis.nombre as desc_subsistema,
+						dpto.codigo || '' - '' || dpto.nombre as desc_depto,	
+						mon.codigo || '' - '' || mon.moneda as desc_moneda,
+						fir1.desc_funcionario2 as desc_firma1,
+						fir2.desc_funcionario2 as desc_firma2,
+						fir3.desc_funcionario2 as desc_firma3
 						from conta.tcomprobante cbte
 						inner join segu.tusuario usu1 on usu1.id_usuario = cbte.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cbte.id_usuario_mod
+						inner join conta.tclase_comprobante ccbte on ccbte.id_clase_comprobante = cbte.id_clase_comprobante
+						inner join segu.tsubsistema sis on sis.id_subsistema = cbte.id_subsistema
+						inner join param.tdepto dpto on dpto.id_depto = cbte.id_depto
+						inner join param.tmoneda mon on mon.id_moneda = cbte.id_moneda
+						left join orga.vfuncionario fir1 on fir1.id_funcionario = cbte.id_funcionario_firma1
+						left join orga.vfuncionario fir2 on fir2.id_funcionario = cbte.id_funcionario_firma2
+						left join orga.vfuncionario fir3 on fir3.id_funcionario = cbte.id_funcionario_firma3
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -83,7 +98,7 @@ BEGIN
  	#TRANSACCION:  'CONTA_CBTE_CONT'
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:		admin	
- 	#FECHA:		13-07-2013 01:56:48
+ 	#FECHA:		29-08-2013 00:28:30
 	***********************************/
 
 	elsif(p_transaccion='CONTA_CBTE_CONT')then
@@ -94,6 +109,13 @@ BEGIN
 					    from conta.tcomprobante cbte
 					    inner join segu.tusuario usu1 on usu1.id_usuario = cbte.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cbte.id_usuario_mod
+						inner join conta.tclase_comprobante ccbte on ccbte.id_clase_comprobante = cbte.id_clase_comprobante
+						inner join segu.tsubsistema sis on sis.id_subsistema = cbte.id_subsistema
+						inner join param.tdepto dpto on dpto.id_depto = cbte.id_depto
+						inner join param.tmoneda mon on mon.id_moneda = cbte.id_moneda
+						left join orga.vfuncionario fir1 on fir1.id_funcionario = cbte.id_funcionario_firma1
+						left join orga.vfuncionario fir2 on fir2.id_funcionario = cbte.id_funcionario_firma2
+						left join orga.vfuncionario fir3 on fir3.id_funcionario = cbte.id_funcionario_firma3
 					    where ';
 			
 			--Definicion de la respuesta		    
