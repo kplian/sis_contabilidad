@@ -1,7 +1,7 @@
 <?php
 /**
 *@package pXP
-*@file gen-Transaccion.php
+*@file gen-IntTransaccion.php
 *@author  (admin)
 *@date 01-09-2013 18:10:12
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
@@ -10,15 +10,12 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
+Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
-		 
-		 //Agrega combo de moneda
-		this.initButtons=[this.cmbMoneda];
     	//llama al constructor de la clase padre
-		Phx.vista.Transaccion.superclass.constructor.call(this,config);
+		Phx.vista.IntTransaccion.superclass.constructor.call(this,config);
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
 		this.init();
@@ -72,11 +69,6 @@ Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
 				this.Cmp.importe_recurso.setValue(this.Cmp.importe_haber.getValue());
 			}
 		},this);
-		
-		this.cmbMoneda.on('select',function(cmb,rec,index){
-			Ext.apply(this.store.baseParams,{id_moneda:rec.data.id_moneda});
-			this.reload();
-		},this);
 	},
 			
 	Atributos:[
@@ -85,7 +77,7 @@ Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
-					name: 'id_transaccion'
+					name: 'id_int_transaccion'
 			},
 			type:'Field',
 			form:true 
@@ -95,7 +87,7 @@ Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
-					name: 'id_comprobante'
+					name: 'id_int_comprobante'
 			},
 			type:'Field',
 			form:true 
@@ -385,8 +377,8 @@ Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config: {
-				name: 'id_transaccion_fk',
-				fieldLabel: 'id_transaccion_fk',
+				name: 'id_int_transaccion_fk',
+				fieldLabel: 'id_int_transaccion_fk',
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
@@ -405,7 +397,7 @@ Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
 				valueField: 'id_',
 				displayField: 'nombre',
 				gdisplayField: 'desc_',
-				hiddenName: 'id_transaccion_fk',
+				hiddenName: 'id_int_transaccion_fk',
 				forceSelection: true,
 				typeAhead: false,
 				triggerAction: 'all',
@@ -492,20 +484,20 @@ Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Transacción',
-	ActSave:'../../sis_contabilidad/control/Transaccion/insertarTransaccion',
-	ActDel:'../../sis_contabilidad/control/Transaccion/eliminarTransaccion',
-	ActList:'../../sis_contabilidad/control/Transaccion/listarTransaccion',
-	id_store:'id_transaccion',
+	ActSave:'../../sis_contabilidad/control/IntTransaccion/insertarIntTransaccion',
+	ActDel:'../../sis_contabilidad/control/IntTransaccion/eliminarIntTransaccion',
+	ActList:'../../sis_contabilidad/control/IntTransaccion/listarIntTransaccion',
+	id_store:'id_int_transaccion',
 	fields: [
-		{name:'id_transaccion', type: 'numeric'},
+		{name:'id_int_transaccion', type: 'numeric'},
 		{name:'id_partida', type: 'numeric'},
 		{name:'id_centro_costo', type: 'numeric'},
 		{name:'id_partida_ejecucion', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
-		{name:'id_transaccion_fk', type: 'numeric'},
+		{name:'id_int_transaccion_fk', type: 'numeric'},
 		{name:'id_cuenta', type: 'numeric'},
 		{name:'glosa', type: 'string'},
-		{name:'id_comprobante', type: 'numeric'},
+		{name:'id_int_comprobante', type: 'numeric'},
 		{name:'id_auxiliar', type: 'numeric'},
 		{name:'id_usuario_reg', type: 'numeric'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
@@ -517,34 +509,34 @@ Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'importe_haber', type: 'numeric'},
 		{name:'importe_gasto', type: 'numeric'},
 		{name:'importe_recurso', type: 'numeric'},
+		{name:'importe_debe_mb', type: 'numeric'},
+		{name:'importe_haber_mb', type: 'numeric'},
+		{name:'importe_gasto_mb', type: 'numeric'},
+		{name:'importe_recurso_mb', type: 'numeric'},
 		{name:'desc_cuenta', type: 'string'},
 		{name:'desc_auxiliar', type: 'string'},
 		{name:'desc_partida', type: 'string'},
-		{name:'desc_centro_costo', type: 'string'},
-		{name:'id_trans_val', type: 'numeric'},
-		{name:'id_moneda', type: 'numeric'},
+		{name:'desc_centro_costo', type: 'string'}
 		
 	],
 	sortInfo:{
-		field: 'id_transaccion',
+		field: 'id_int_transaccion',
 		direction: 'ASC'
 	},
+	bdel:true,
+	bsave:true,
 	loadValoresIniciales:function(){
-		Phx.vista.Transaccion.superclass.loadValoresIniciales.call(this);
-		this.getComponente('id_comprobante').setValue(this.maestro.id_comprobante);		
+		Phx.vista.IntTransaccion.superclass.loadValoresIniciales.call(this);
+		this.getComponente('id_int_comprobante').setValue(this.maestro.id_int_comprobante);		
 	},
 	onReloadPage:function(m){
 		this.maestro=m;						
-		this.store.baseParams={id_comprobante:this.maestro.id_comprobante, id_moneda:this.maestro.id_moneda};
+		this.store.baseParams={id_int_comprobante:this.maestro.id_int_comprobante, id_moneda:this.maestro.id_moneda};
 		this.load({params:{start:0, limit:this.tam_pag}});
 		
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var fecha=new Date(this.maestro.fecha);
 		this.maestro.id_gestion = this.getGestion(fecha);
-		
-		//Se setea el combo de moneda con el valor del padre
-		this.cmbMoneda.store.load({params:{start:0, limit:this.tam_pag}});
-		this.cmbMoneda.setRawValue(this.maestro.desc_moneda)
 	},
 	getGestion:function(x){
 		if(Ext.isDate(x)){
@@ -572,41 +564,7 @@ Phx.vista.Transaccion=Ext.extend(Phx.gridInterfaz,{
         } else{
             alert('Error al obtener la gestión. Cierre y vuelva a intentarlo')
         } 
-	},
-	bnew:false,
-	bedit:false,
-	bdel:false,
-	bsave:false,
-	cmbMoneda:new Ext.form.ComboBox({
-		fieldLabel: 'Moneda',
-		allowBlank: true,
-		emptyText:'Moneda...',
-		store:new Ext.data.JsonStore(
-		{
-			url: '../../sis_parametros/control/Moneda/listarMoneda',
-			id: 'id_moneda',
-			root: 'datos',
-			sortInfo:{
-				field: 'moneda',
-				direction: 'ASC'
-			},
-			totalProperty: 'total',
-			fields: ['id_moneda','moneda','codigo','tipo_moneda'],
-			// turn on remote sorting
-			remoteSort: true,
-			baseParams:{par_filtro:'moneda#codigo'}
-		}),
-		valueField: 'id_moneda',
-		tpl:'<tpl for="."><div class="x-combo-list-item"><p>Moneda:{moneda}</p><p>Codigo:{codigo}</p> </div></tpl>',
-		triggerAction: 'all',
-		displayField: 'moneda',
-	    hiddenName: 'id_moneda',
-		mode:'remote',
-		pageSize:50,
-		queryDelay:500,
-		listWidth:280,
-		width:170
-	})
+	}
 })
 </script>
 		

@@ -295,7 +295,7 @@ CREATE TABLE conta.ttransaccion(
   id_partida int4, 
   id_partida_ejecucion int4, 
   id_transaccion_fk int4 NOT NULL, 
-  glosa text,
+  glosa varchar(1000),
   CONSTRAINT pk_ttransaccion__id_transaccion PRIMARY KEY (id_transaccion)
 ) INHERITS (pxp.tbase)
 WITH OIDS;
@@ -329,7 +329,49 @@ CREATE TABLE conta.tplantilla_calculo (
 ) INHERITS(pxp.tbase) 
 WITHOUT OIDS;
 
+
+alter table conta.tcomprobante
+add column nro_tramite varchar(70);
+
+alter table conta.tint_comprobante
+add column nro_tramite varchar(70);
+
+CREATE TABLE conta.tint_transaccion(
+  id_int_transaccion  SERIAL NOT NULL,
+  id_int_comprobante int4 NOT NULL, 
+  id_cuenta int4 NOT NULL,
+  id_auxiliar int4 NOT NULL, 
+  id_centro_costo int4 NOT NULL, 
+  id_partida int4, 
+  id_partida_ejecucion int4, 
+  id_int_transaccion_fk int4, 
+  glosa varchar(1000),
+  importe_debe numeric(18, 2), 
+  importe_haber numeric(18, 2), 
+  importe_recurso numeric(18, 2), 
+  importe_gasto numeric(18, 2),
+  importe_debe_mb numeric(18, 2), 
+  importe_haber_mb numeric(18, 2), 
+  importe_recurso_mb numeric(18, 2), 
+  importe_gasto_mb numeric(18, 2),
+  CONSTRAINT pk_tint_transaccion__id_int_transaccion PRIMARY KEY (id_int_transaccion)
+) INHERITS (pxp.tbase)
+WITH OIDS;
+
+alter table conta.tcomprobante
+add column id_int_comprobante integer not null;
+
+alter table conta.ttransaccion
+add column id_int_transaccion integer not null;
+
+ALTER TABLE conta.tcomprobante
+  ALTER COLUMN id_comprobante_fk DROP NOT NULL;
+  
+ALTER TABLE conta.ttransaccion
+  ALTER COLUMN id_transaccion_fk DROP NOT NULL;
+
 /***********************************F-SCP-RCM-CONTA-18-29/08/2013*****************************************/
+
 
 
 /***********************************I-SCP-RAC-CONTA-0-03/09/2013****************************************/
@@ -406,3 +448,4 @@ IS 'rsta columna sirve para identificar el registro como valor por defecto para 
 
 /***********************************F-SCP-RAC-CONTA-0-04/09/2013****************************************/
   
+

@@ -296,5 +296,15 @@ select pxp.f_add_catalog('CONTA','tplantilla_calculo__debe_haber','haber');
 
 select pxp.f_add_catalog('CONTA','tplantilla_calculo__tipo_importe','porcentaje');
 select pxp.f_add_catalog('CONTA','tplantilla_calculo__tipo_importe','importe');
-/***********************************F-DAT-RCM-CONTA-0-29/08/2013*****************************************/
 
+select pxp.f_add_catalog('CONTA','tcomprobante__accion','contable');
+select pxp.f_add_catalog('CONTA','tcomprobante__accion','ejecucion');
+
+select pxp.f_insert_tgui ('Gestión de Períodos', 'Gestión de Períodos', 'CONPER', 'si', 3, 'sis_contabilidad/vista/periodo_subsistema/PeriodoConta.php', 2, '', 'PeriodoConta', 'CONTA');
+select pxp.f_insert_testructura_gui ('CONPER', 'CONTA');
+
+select pxp.f_insert_tgui ('Libros Contables', 'Libros Contables', 'CBTE.1.3', 'si', 3, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Libro Diario', 'Libro Diario', 'CBTE.1.3.1', 'si', 1, 'sis_contabilidad/vista/comprobante/Comprobante.php', 3, '', 'Comprobante', 'CONTA');
+select pxp.f_insert_testructura_gui ('CBTE.1.3', 'CONTA');
+select pxp.f_insert_testructura_gui ('CBTE.1.3.1', 'CBTE.1.3');
+/***********************************F-DAT-RCM-CONTA-0-29/08/2013*****************************************/

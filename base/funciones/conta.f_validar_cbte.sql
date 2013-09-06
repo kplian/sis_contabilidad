@@ -1,0 +1,119 @@
+CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
+  p_id_usuario integer,
+  p_id_int_comprobante integer,
+  p_igualar varchar = 'no'
+)
+RETURNS varchar AS
+$body$
+/*
+	Autor: RCM
+    Fecha: 05-09-2013
+    Descripción: Función que se encarga de verificar la integridad del comprobante para posteriormente validarlo.
+*/
+DECLARE
+
+	v_debe			numeric;
+    v_haber			numeric;
+    v_errores 		varchar;
+    v_rec_cbte 		record;
+    v_doc			varchar;
+    v_nro_cbte		varchar;
+    v_id_periodo 	integer;
+    v_filas			bigint;
+    v_resp			varchar;
+
+BEGIN
+	
+	v_errores = '';
+
+	--1. Verificar existencia del comprobante
+    if not exists(select 1 from conta.tint_comprobante
+    			where id_int_comprobante = p_id_int_comprobante
+                and estado_reg in ('borrador')) then
+    	raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';
+    end if;
+    
+    --2. Obtención de datos del comprobante
+    select * 
+	into v_rec_cbte
+    from conta.tint_comprobante
+    where id_int_comprobante = p_id_int_comprobante;
+    
+    --Verificación de existencia de al menos 2 transacciones
+    select coalesce(count(id_int_transaccion),0)
+    into v_filas
+    from conta.tint_transaccion
+    where id_int_comprobante = p_id_int_comprobante;
+    
+    if v_filas < 2 then
+    	raise exception 'Validación no realizada: el comprobante debe tener al menos dos transacciones';
+    end if;
+    
+    --3. Verifica igualdad del debe y del haber
+    select sum(tra.importe_debe), sum(tra.importe_haber)
+    into v_debe, v_haber
+    from conta.tint_transaccion tra
+    where tra.id_int_comprobante = p_id_int_comprobante;
+    
+    if v_debe < v_haber then
+    	v_errores = 'El comprobante no iguala: el Haber supera al Debe por '||v_haber-v_debe;
+    elsif v_debe > v_haber then
+    	v_errores = 'El comprobante no iguala: el Debe supera al Haber por '||v_debe-v_haber;
+    end if;
+    
+    
+    --4. Verificación de igualdad del gasto y recurso
+    
+    
+    --5. Ejecución del presupuesto si corresponde
+    
+   
+    --6. Numeración del comprobante
+    if v_errores = '' then
+    	--Obtiene el documento para la numeración
+        select doc.codigo
+        into v_doc
+        from conta.tclase_comprobante ccbte
+        inner join param.tdocumento doc
+        on doc.id_documento = ccbte.id_documento
+        where ccbte.id_clase_comprobante = v_rec_cbte.id_clase_comprobante;
+        
+        --Se obtiene el periodo
+        select po_id_periodo 
+        into v_id_periodo
+        from param.f_get_periodo_gestion(v_rec_cbte.fecha);
+        
+        --Obtención del número de comprobante
+        v_nro_cbte =  param.f_obtener_correlativo(
+                   v_doc, 
+                   v_id_periodo,-- par_id, 
+                   NULL, --id_uo 
+                   v_rec_cbte.id_depto,    -- id_depto
+                   p_id_usuario, 
+                   'CONTA', 
+                   NULL);
+
+        --Se guarda el número del comprobante y se cambia el estado a validado
+        update conta.tint_comprobante set
+        nro_cbte = v_nro_cbte,
+        estado_reg = 'validado'
+        where id_int_comprobante = p_id_int_comprobante;
+        
+        --7. Replicación del comprobante hacia las estructuras destino
+        v_resp = conta.f_replicar_cbte(p_id_usuario,p_id_int_comprobante);
+        
+       
+        
+    else
+    	raise exception 'Validación no realizada: %', v_errores;
+    end if;
+    
+    --8. Respuesta
+    return 'Comprobante validado';
+
+END;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER;
