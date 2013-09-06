@@ -40,20 +40,21 @@ BEGIN
     
     --  FOR leer la plantillas de transaccion primarias
     
-    
+   
     FOR v_plantilla_det in (Select * 
                             from conta.tdetalle_plantilla_comprobante dpc 
-                            where  dpc.id_plantilla_comprobante = p_id_plantilla_comprobante and
+                            where  dpc.id_plantilla_comprobante =  
+                                   (p_plantilla_comprobante->'id_plantilla_comprobante')::integer  and
                                    dpc.primaria = 'si') LOOP
     
      --       generar trasaccion unitaria 
      
      
          v_resp = conta.f_gen_transaccion_unitaria(
-                                              hstore(p_super), 
-                                              hstore(p_tabla_padre),
+                                              p_super, 
+                                              p_tabla_padre,
                                               hstore(v_plantilla_det),
-                                              hstore(p_plantilla_comprobante),
+                                              p_plantilla_comprobante,
                                               p_id_tabla_padre_valor,
                                               p_id_usuario
                                               );

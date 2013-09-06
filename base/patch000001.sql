@@ -264,9 +264,24 @@ ALTER TABLE conta.tint_comprobante
 ALTER TABLE conta.tdetalle_plantilla_comprobante
   ADD COLUMN primaria VARCHAR(4) DEFAULT 'si' NOT NULL;
  
-  
-/***********************************I-SCP-RAC-CONTA-0-15/07/2013****************************************/
 
+ 
+  
+/***********************************F-SCP-RAC-CONTA-0-15/07/2013****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-02/08/2013****************************************/
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN otros_campos VARCHAR(250); 
+  
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN otros_campos VARCHAR(250); 
+  
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_gestion_relacion VARCHAR(255);
+  
+/***********************************F-SCP-RAC-CONTA-0-02/08/2013****************************************/
 
 /***********************************I-SCP-RCM-CONTA-18-29/08/2013*****************************************/
 CREATE TABLE conta.ttransaccion(
@@ -311,6 +326,7 @@ CREATE TABLE conta.tplantilla_calculo (
   CONSTRAINT chk_tplantilla_calculo__tipo_importe CHECK (tipo_importe in ('porcentaje','importe'))
 ) INHERITS(pxp.tbase) 
 WITHOUT OIDS;
+
 
 alter table conta.tcomprobante
 add column nro_tramite varchar(70);

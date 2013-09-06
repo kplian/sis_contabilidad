@@ -12,5 +12,7 @@ CREATE TYPE conta.maestro_comprobante AS (
   columna_glosa TEXT
 );
 
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_gestion INTEGER;
 
 /***********************************F-TYP-RAC-CONTA-0-21/08/2013****************************************/

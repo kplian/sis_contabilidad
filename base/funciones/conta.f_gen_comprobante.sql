@@ -40,6 +40,15 @@ DECLARE
     
     v_id_int_comprobante    integer;
     resp_det varchar;
+    
+    
+    ------------
+    
+    v_def_campos      varchar[];
+    v_campo_tempo     varchar;
+    v_i integer;
+    v_tamano integer;
+  
 BEGIN
 	
     v_nombre_funcion:='conta.f_gen_comprobante';
@@ -49,20 +58,30 @@ BEGIN
     select * into v_plantilla
 	from conta.tplantilla_comprobante cbte
 	where cbte.codigo=p_codigo;
-
-
+    
+    
+    v_def_campos = ARRAY['campo_depto','campo_acreedor','campo_descripcion','campo_gestion_relacion','campo_fk_comprobante','campo_moneda','campo_fecha','otros_campos'];
+    
+    v_tamano:=array_upper(v_def_campos,1);
+    
+   
 	--obtener la columnas que se consultaran  para la tabla  ( los nombre de variables con prefijo $tabla)
     
-    v_columnas=conta.f_obtener_columnas(p_codigo)::varchar;
+    --v_columnas=conta.f_obtener_columnas(p_codigo)::varchar;
+    
+    v_columnas=conta.f_obtener_columnas_detalle(hstore(v_plantilla),v_def_campos)::varchar;
 	v_columnas=replace(v_columnas,'{','');
 	v_columnas=replace(v_columnas,'}','');
     
     
-    raise notice 'COLUMNAS   %',v_columnas;
+   
     
     execute	'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'' into v_tabla;
+            
+            
+            
     
     
     ----------------------------------------------------------
@@ -82,7 +101,7 @@ BEGIN
     
     --guardo depto
     
-    raise notice 'v_plantilla.campo_depto  %',v_plantilla.campo_depto;
+  
     
    
     if (v_plantilla.campo_depto!='' AND v_plantilla.campo_depto is not null) then
@@ -115,7 +134,7 @@ BEGIN
     	v_this.columna_moneda = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_moneda::text, 
                                                 hstore(v_this), 
-                                                hstore(v_tabla)); 
+                                                hstore(v_tabla))::integer; 
 	end if;    
     
     --guardo fecha
@@ -124,7 +143,23 @@ BEGIN
         										v_plantilla.campo_fecha::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla));   
-	end if;    
+	end if; 
+    
+    
+      --guardo fecha
+    if (v_plantilla.campo_gestion_relacion!='' AND v_plantilla.campo_gestion_relacion is not null) then
+    	
+       /*raise notice '??????  %, %',v_plantilla.campo_gestion_relacion,
+                                                conta.f_get_columna('maestro', 
+        										v_plantilla.campo_gestion_relacion::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla));*/
+        
+        v_this.columna_gestion = conta.f_get_columna('maestro', 
+        										v_plantilla.campo_gestion_relacion::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla))::integer;   
+	end if;   
 
     v_resp:=v_this;
     
