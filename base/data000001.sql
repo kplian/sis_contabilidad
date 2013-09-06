@@ -252,7 +252,7 @@ select pxp.f_insert_testructura_gui ('CBTE.1.1', 'CBTE.1');
 
 
 
-/***********************************I-DAT-RAC-CONTA-0-3/09/2013*****************************************/
+/***********************************I-DAT-RAC-CONTA-0-03/09/2013*****************************************/
 
 
 INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
@@ -274,8 +274,10 @@ VALUES (1, NULL, E'2013-08-27 20:12:31.331', NULL, E'activo', 4, E'Cuenta  Deven
 INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tipo_relacion_contable", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
 VALUES (1, NULL, E'2013-08-28 06:23:24.403', NULL, E'activo', 5, E'Centro de Costo Depto Conta', E'CCDEPCON', E'si', E'no', E'no', 4);
 
+select pxp.f_insert_tgui ('Departamentos', 'Cuntas por Deptos Contables', 'DEPTCON', 'si', 5, 'sis_contabilidad/vista/cta_relacion_contable/CtaDepto.php', 3, '', 'CtaDepto', 'CONTA');
+select pxp.f_insert_testructura_gui ('DEPTCON', 'RELACON');
 
-/***********************************F-DAT-RAC-CONTA-0-3/09/2013*****************************************/
+/***********************************F-DAT-RAC-CONTA-0-03/09/2013*****************************************/
 
 
    

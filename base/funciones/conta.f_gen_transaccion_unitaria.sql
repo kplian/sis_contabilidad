@@ -6,6 +6,7 @@ CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_unitaria (
   p_reg_det_plantilla public.hstore,
   p_plantilla_comprobante public.hstore,
   p_id_tabla_padre_valor integer,
+  p_id_int_comprobante integer,
   p_id_usuario integer = NULL::integer
 )
 RETURNS varchar AS
@@ -25,6 +26,7 @@ Descripcion:
 DECLARE
 	v_this					conta.tdetalle_plantilla_comprobante;
     v_this_hstore		    hstore;
+    v_record_int_tran       conta.tint_transaccion;
     v_tabla					record;
     v_nombre_funcion        text;
     v_plantilla_det				record;        
@@ -47,6 +49,8 @@ DECLARE
      
      
      v_record_rel_con record;
+     v_reg_id_int_transaccion integer;
+     v_resp_doc boolean;
 BEGIN
 	
     v_nombre_funcion:='conta.f_gen_transaccion_unitaria';
@@ -67,7 +71,7 @@ BEGIN
    --------------------------------------------------------- 
     
    
-    v_def_campos = ARRAY['campo_monto','campo_cuenta','campo_auxiliar','campo_partida','campo_centro_costo','campo_relacion_contable','campo_documento','otros_campos'];
+    v_def_campos = ARRAY['campo_monto','campo_cuenta','campo_auxiliar','campo_partida','campo_centro_costo','campo_partida_ejecucion','campo_relacion_contable','campo_documento','otros_campos','campo_monto_pres'];
     v_tamano:=array_upper(v_def_campos,1);
          
    
@@ -99,126 +103,47 @@ BEGIN
         --   obtner los valores para cada registro que satisfaga la consulta de la tabla detalle
         FOR v_tabla in EXECUTE(v_consulta_tab) LOOP
        
-           --      obtener la definicion de las variablles y los valores
-           
-           
-             v_this_hstore = hstore(v_this);
-             
-             FOR v_i in 1..(v_tamano) loop
-    
-                  --evalua la columna
-                 if (p_reg_det_plantilla->v_def_campos[v_i] !='' AND p_reg_det_plantilla->v_def_campos[v_i]!='NULL' AND (p_reg_det_plantilla->v_def_campos[v_i]) is not NULL) then
-      	
-                       v_campo_tempo = conta.f_get_columna('datalle', 
-                                                              p_reg_det_plantilla->v_def_campos[v_i]::text, 
-                                                              hstore(v_this), 
-                                                              hstore(v_tabla),
-                                                              p_super,
-                                                              p_tabla_padre
-                                                              );
-                                                              
-                      v_this_hstore = v_this_hstore || (v_def_campos[v_i] => v_campo_tempo);
-                  
-                  end if;
-           
-             END LOOP;
-             
-           --      IF procesar relacion contable si existe
-           
-           IF p_reg_det_plantilla -> 'es_relacion_contable'  = 'si' THEN
-           
-                SELECT 
-                  * 
-                 into 
-                   v_record_rel_con 
-               FROM conta.f_get_config_relacion_contable((p_reg_det_plantilla -> 'tipo_relacion_contable')::varchar, 
-                                                          (p_super->'columna_gestion')::integer, 
-                                                          (v_this_hstore -> 'campo_relacion_contable')::integer, 
-                                                          (v_this_hstore -> 'campo_centro_costo')::integer);
-                                                              
-              
-                raise notice '*****  REL CON % , %', v_record_rel_con, v_this_hstore ->'campo_cuenta';
-                
-                -- los utiliza solo si no remplaza los valores de los campos del detalle de plantilla 
-                
-                IF v_this_hstore ->'campo_cuenta' ='' or v_this_hstore ->'campo_cuenta'='NULL' or (v_this_hstore ->'campo_cuenta') is NULL THEN 
-                     
-                     v_this_hstore = v_this_hstore || ('campo_cuenta' => v_record_rel_con.ps_id_cuenta::varchar);
-                
-                END IF;
-                
-                IF v_this_hstore ->'campo_partida' ='' or v_this_hstore ->'campo_partida'='NULL' or (v_this_hstore ->'campo_partida') is NULL THEN 
-                     
-                     v_this_hstore = v_this_hstore || ('campo_partida' => v_record_rel_con.ps_id_partida::varchar);
-                
-                END IF;
-                
-                IF v_this_hstore ->'campo_auxiliar' ='' or v_this_hstore ->'campo_auxiliar'='NULL' or (v_this_hstore ->'campo_auxiliar') is NULL THEN 
-                     
-                     v_this_hstore = v_this_hstore || ('campo_auxiliar' => v_record_rel_con.ps_id_auxiliar::varchar);
-                
-                END IF;
-                
-                
-           
-           
-           END IF;
-           
-           
-           --validar si existe cuenta, partida y auxiliar
-           
-           
-            IF v_this_hstore ->'campo_cuenta' ='' or v_this_hstore ->'campo_cuenta'='NULL' or (v_this_hstore ->'campo_cuenta') is NULL THEN 
-                
-                  raise exception 'No se encontro una contable para la plantilla detalle del comprobante';
-                    
-            END IF;
-           
-             raise notice '&===========> %',v_this_hstore;
+              v_resp = conta.f_gen_transaccion_from_plantilla(
+                                              p_super,    --p_super
+                                              p_tabla_padre, --p_tabla_padre
+                                              p_reg_det_plantilla,--p_reg_det_plantilla
+                                              p_plantilla_comprobante, --p_plantilla_comprobante
+                                              p_id_tabla_padre_valor,
+                                              p_id_int_comprobante,
+                                              p_id_usuario,
+                                              hstore(v_tabla),
+                                              v_def_campos,
+                                              v_tamano
+                                              );
           
-           
-                      
-           --      IF procesar documento
-                   --TODO analizar la plantilla de endesis
-                   
-                   
-          
-           --      IF procesar la transaccion secundaria si existe
-                   -- obtiene el record de la transaccion secundaria
-                   -- llamada recursica  a esta misma funcion con la bnadera activada        
-                   
-           
-        
-        
-        END LOOP;
-  
+       END LOOP;
 
 
+
+ --IF si el registro tiene la tabla detalle distinto de NULL y la bandera secundaria esta desactivada
 
  ELSE
  
         --  Si el campo tabla detalle es igual null,  se genera una sola transaccion 
         
-        --  si existe una columna que haga referencia a la tabla da error
+         v_resp = conta.f_gen_transaccion_from_plantilla(
+                                              p_super,    --p_super
+                                              p_tabla_padre, --p_tabla_padre
+                                              p_reg_det_plantilla,--p_reg_det_plantilla
+                                              p_plantilla_comprobante, --p_plantilla_comprobante
+                                              p_id_tabla_padre_valor,
+                                              p_id_int_comprobante,
+                                              p_id_usuario,
+                                              NULL,--v_tabla
+                                              v_def_campos,
+                                              v_tamano
+                                              );
         
-        --  inserta los valores en la tabla intermedia de transaccion
- 
- 
- 
+
  
  END IF;
      
- 
-  
-   --IF si el registro tiene la tabla detalle distinto de NULL y la bandera secundaria esta desactivada
-      
-      
-                   
-                   
-                   
-   
-  -- ELSE
-        
+
   
    
        

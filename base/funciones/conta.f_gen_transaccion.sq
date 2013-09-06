@@ -5,6 +5,7 @@ CREATE OR REPLACE FUNCTION conta.f_gen_transaccion (
   p_tabla_padre public.hstore,
   p_plantilla_comprobante public.hstore,
   p_id_tabla_padre_valor integer,
+  p_id_int_comprobante integer,
   p_id_usuario integer = NULL::integer
 )
 RETURNS varchar AS
@@ -49,13 +50,14 @@ BEGIN
     
      --       generar trasaccion unitaria 
      
-     
+        raise notice '=====> AL GEN TRAN   v_id_int_comprobante= %',  p_id_int_comprobante;
          v_resp = conta.f_gen_transaccion_unitaria(
                                               p_super, 
                                               p_tabla_padre,
                                               hstore(v_plantilla_det),
                                               p_plantilla_comprobante,
                                               p_id_tabla_padre_valor,
+                                              p_id_int_comprobante,
                                               p_id_usuario
                                               );
      --          obtener la definicion de las variablles y los valores

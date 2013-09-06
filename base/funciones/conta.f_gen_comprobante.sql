@@ -215,14 +215,16 @@ BEGIN
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
     
-    
+    raise notice '=====> AL INSERTAR  v_id_int_comprobante= %',  v_id_int_comprobante;
     -- genera transacciones del comprobante
     
    resp_det =  conta.f_gen_transaccion(hstore(v_this), 
                             hstore(v_tabla),
                             hstore(v_plantilla),
                             p_id_tabla_valor,
-                            p_id_usuario);
+                            v_id_int_comprobante,
+                            p_id_usuario
+                           );
     
     
     
