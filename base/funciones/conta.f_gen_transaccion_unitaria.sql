@@ -100,7 +100,7 @@ BEGIN
        
         
         --  FOR, para todos los cada registro que satisfaga la consulta de la tabla detalle
-        --   obtner los valores para cada registro que satisfaga la consulta de la tabla detalle
+        --   procesamos los valores
         FOR v_tabla in EXECUTE(v_consulta_tab) LOOP
        
               v_resp = conta.f_gen_transaccion_from_plantilla(

@@ -449,3 +449,24 @@ IS 'rsta columna sirve para identificar el registro como valor por defecto para 
 /***********************************F-SCP-RAC-CONTA-0-04/09/2013****************************************/
   
 
+/***********************************I-SCP-RAC-CONTA-0-11/09/2013****************************************/
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN codigo VARCHAR(50);
+ 
+ALTER TABLE conta.tclase_comprobante
+  ALTER COLUMN codigo SET NOT NULL;
+
+ALTER TABLE conta.tclase_comprobante
+  ADD UNIQUE (codigo); 
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN funcion_comprobante_eliminado VARCHAR(200);  
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN funcion_comprobante_validado VARCHAR(200);  
+  
+ 
+  
+/***********************************F-SCP-RAC-CONTA-0-11/09/2013****************************************/
+

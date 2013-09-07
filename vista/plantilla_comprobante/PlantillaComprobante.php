@@ -211,7 +211,37 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
-		},				
+		},
+        {
+            config:{
+                name: 'campo_gestion_relacion',
+                fieldLabel: 'Gestion Rel Contable',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpb.campo_gestion_relacion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'otros_campos',
+                fieldLabel: 'Otros Campos',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpb.otros_campos',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },				
 		{
 			config:{
 				name: 'funcion_comprobante_validado',
@@ -349,6 +379,9 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		{name:'campo_gestion_relacion', type: 'string'},
+		{name:'otros_campos', type: 'string'}
+        
 		
 	],
 	sortInfo:{

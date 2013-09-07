@@ -273,7 +273,8 @@ BEGIN
                 END IF;
                 
            END IF;
-                      
+           
+           /*           
            -------------------------------------------------------
            --   IF procesar la transacciones secundarias si existen
            ------------------------------------------------------
@@ -301,7 +302,7 @@ BEGIN
                                            
            
            
-           END LOOP;
+           END LOOP;*/
                    
    
        

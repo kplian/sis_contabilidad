@@ -34,7 +34,7 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('campo_monto','text');
 		$this->captura('campo_relacion_contable','text');
 		$this->captura('campo_documento','text');
-		$this->captura('aplicar_documento','int4');
+		$this->captura('aplicar_documento','varchar');
 		$this->captura('campo_centro_costo','text');
 		$this->captura('campo_auxiliar','text');
 		$this->captura('campo_fecha','text');

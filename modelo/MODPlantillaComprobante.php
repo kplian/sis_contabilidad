@@ -42,6 +42,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('campo_gestion_relacion','varchar');
+		$this->captura('otros_campos','varchar');
+        
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -73,6 +76,10 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('tabla_origen','tabla_origen','text');
 		$this->setParametro('clase_comprobante','clase_comprobante','varchar');
 		$this->setParametro('campo_moneda','campo_moneda','consulta_select');
+		$this->setParametro('campo_gestion_relacion','campo_gestion_relacion','varchar');
+		$this->setParametro('otros_campos','otros_campos','varchar');
+		
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -105,6 +112,8 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('tabla_origen','tabla_origen','varchar');
 		$this->setParametro('clase_comprobante','clase_comprobante','varchar');
 		$this->setParametro('campo_moneda','campo_moneda','consulta_select');
+		$this->setParametro('campo_gestion_relacion','campo_gestion_relacion','varchar');
+        $this->setParametro('otros_campos','otros_campos','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

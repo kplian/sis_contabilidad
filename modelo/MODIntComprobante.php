@@ -55,6 +55,7 @@ class MODIntComprobante extends MODbase{
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+		        
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta
@@ -89,6 +90,7 @@ class MODIntComprobante extends MODbase{
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+		
 		$this->ejecutarConsulta();
 
 		//Devuelve la respuesta

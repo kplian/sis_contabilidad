@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_plantilla_comprobante_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_plantilla_comprobante_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_plantilla_comprobante_ime
@@ -63,7 +68,9 @@ BEGIN
 			id_usuario_reg,
 			fecha_reg,
 			id_usuario_mod,
-			fecha_mod
+			fecha_mod,
+            cmpb.campo_gestion_relacion	,
+            cmpb.otros_campos
           	) values(
           	v_parametros.codigo,
 			v_parametros.funcion_comprobante_eliminado,
@@ -83,7 +90,9 @@ BEGIN
 			p_id_usuario,
 			now(),
 			null,
-			null
+			null,
+            v_parametros.campo_gestion_relacion,
+            v_parametros.otros_campos
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -123,7 +132,9 @@ BEGIN
 			clase_comprobante = v_parametros.clase_comprobante,
 			campo_moneda = v_parametros.campo_moneda,
 			id_usuario_mod = p_id_usuario,
-			fecha_mod = now()
+			fecha_mod = now(),
+            campo_gestion_relacion=v_parametros.campo_gestion_relacion,
+            otros_campos=v_parametros.otros_campos
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta
@@ -174,7 +185,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_plantilla_comprobante_ime"(integer, integer, character varying, character varying) OWNER TO postgres;
