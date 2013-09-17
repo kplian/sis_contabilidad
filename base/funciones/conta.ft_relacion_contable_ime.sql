@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_relacion_contable_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_relacion_contable_ime
@@ -27,6 +32,8 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_relacion_contable	integer;
+    
+    v_tipo_rel  record;
 			    
 BEGIN
 
@@ -43,6 +50,59 @@ BEGIN
 	if(p_transaccion='CONTA_RELCON_INS')then
 					
         begin
+        
+            -- sies una relacion contable unica buscamos que para la misma tabla no exista otrao
+            select 
+              * 
+            into 
+              v_tipo_rel 
+            from conta.ttipo_relacion_contable trc 
+            where trc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable;
+            
+            
+            IF v_tipo_rel.tiene_centro_costo = 'si-unico' THEN
+            
+            
+               IF  EXISTS(select  1 
+                   from conta.trelacion_contable  rc 
+                   where rc.id_gestion = v_parametros.id_gestion 
+                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
+                     and rc.estado_reg = 'activo'  
+                     and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null )  ) THEN
+                     
+                     raise exception 'Ya existe una relacion contable paes este elemento';
+                     
+               END IF;   
+            
+            END IF;
+            
+            
+            
+            IF  v_parametros.defecto = 'si'   THEN
+             --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
+               v_parametros.id_tabla = NULL;
+               
+             --validamos que solo exista un parametro por defecto activo para la gestion 
+             
+             
+                IF   exists (select 1 
+                             from conta.trelacion_contable rc 
+                             where rc.defecto='si'  
+                               and rc.id_tabla is NULL 
+                               and (rc.id_centro_costo = v_parametros.id_centro_costo or rc.id_centro_costo is NULL)
+                               and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
+                               and rc.id_gestion = v_parametros.id_gestion
+                               and rc.estado_reg='activo')     THEN
+                
+                   
+                      raise exception 'Ya existe un valor po defecto para este tipo de relacion contable'; 
+                    
+                END IF;  
+               
+            
+            END IF;
+            
+        
         	--Sentencia de la insercion
         	insert into conta.trelacion_contable(
 			estado_reg,
@@ -56,7 +116,8 @@ BEGIN
 			id_usuario_reg,
 			fecha_mod,
 			id_usuario_mod,
-			id_tabla
+			id_tabla,
+            defecto
           	) values(
 			'activo',
 			v_parametros.id_tipo_relacion_contable,
@@ -69,7 +130,8 @@ BEGIN
 			p_id_usuario,
 			null,
 			null,
-			v_parametros.id_tabla
+			v_parametros.id_tabla,
+            v_parametros.defecto
 							
 			)RETURNING id_relacion_contable into v_id_relacion_contable;
 			
@@ -92,6 +154,59 @@ BEGIN
 	elsif(p_transaccion='CONTA_RELCON_MOD')then
 
 		begin
+        
+        -- sies una relacion contable unica buscamos que para la misma tabla no exista otrao
+            select 
+              * 
+            into 
+              v_tipo_rel 
+            from conta.ttipo_relacion_contable trc 
+            where trc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable;
+           
+            IF v_tipo_rel.tiene_centro_costo = 'si-unico' THEN
+            
+            
+               IF  EXISTS(select  1 
+                   from conta.trelacion_contable  rc 
+                   where rc.id_gestion = v_parametros.id_gestion 
+                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
+                     and rc.estado_reg = 'activo'  
+                     and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null ) 
+                     and id_relacion_contable!=v_parametros.id_relacion_contable ) THEN
+                     
+                     raise exception 'Ya existe una relacion contable paes este elemento';
+                     
+               END IF;   
+            
+            END IF;
+            
+            
+            IF  v_parametros.defecto = 'si'   THEN
+             --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
+               v_parametros.id_tabla = NULL;
+               
+             --validamos que solo exista un parametro por defecto activo para la gestion 
+             
+             
+                IF   exists (select 1 
+                             from conta.trelacion_contable rc 
+                             where rc.defecto='si'  
+                               and rc.id_tabla is NULL 
+                                and (rc.id_centro_costo = v_parametros.id_centro_costo or rc.id_centro_costo is NULL)
+                               and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
+                               and rc.id_gestion = v_parametros.id_gestion
+                               and rc.estado_reg='activo'
+                               and rc.id_relacion_contable != v_parametros.id_relacion_contable)     THEN
+                
+                   
+                      raise exception 'Ya existe un valor por defecto para este tipo de relacion contable'; 
+                    
+                END IF;  
+               
+            
+            END IF;
+        
+        
 			--Sentencia de la modificacion
 			update conta.trelacion_contable set
 			id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable,
@@ -102,7 +217,8 @@ BEGIN
 			id_centro_costo = v_parametros.id_centro_costo,
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario,
-			id_tabla = v_parametros.id_tabla
+			id_tabla = v_parametros.id_tabla,
+            defecto = v_parametros.defecto
 			where id_relacion_contable=v_parametros.id_relacion_contable;
                
 			--Definicion de la respuesta
@@ -153,7 +269,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_relacion_contable_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

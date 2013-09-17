@@ -270,6 +270,7 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
 /***********************************F-SCP-RAC-CONTA-0-15/07/2013****************************************/
 
 
+
 /***********************************I-SCP-RAC-CONTA-0-02/08/2013****************************************/
 
 ALTER TABLE conta.tdetalle_plantilla_comprobante
@@ -282,6 +283,7 @@ ALTER TABLE conta.tplantilla_comprobante
   ADD COLUMN campo_gestion_relacion VARCHAR(255);
   
 /***********************************F-SCP-RAC-CONTA-0-02/08/2013****************************************/
+
 
 /***********************************I-SCP-RCM-CONTA-18-29/08/2013*****************************************/
 CREATE TABLE conta.ttransaccion(
@@ -369,3 +371,102 @@ ALTER TABLE conta.ttransaccion
   ALTER COLUMN id_transaccion_fk DROP NOT NULL;
 
 /***********************************F-SCP-RCM-CONTA-18-29/08/2013*****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-03/09/2013****************************************/
+
+ALTER TABLE conta.trelacion_contable
+  ALTER COLUMN id_cuenta DROP NOT NULL;
+  
+/***********************************F-SCP-RAC-CONTA-0-03/09/2013****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-04/09/2013****************************************/
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ALTER COLUMN aplicar_documento TYPE VARCHAR(3);
+  
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ALTER COLUMN aplicar_documento SET DEFAULT 'no';
+  
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_partida_ejecucion TEXT; 
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_detalle_plantilla_comprobante INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_detalle_plantilla_comprobante
+IS 'Hace referencia a la a la plantilla que origino esta transaccion, tambien sirve para agrupar transacciones de la misma clase';  
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_calculo
+  ADD COLUMN importe_presupuesto NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN mensaje_error VARCHAR(250);
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN descripcion SET DEFAULT 'Transaccion de plantilla';
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ALTER COLUMN descripcion SET NOT NULL;
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_monto_pres VARCHAR(255);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_monto_pres
+IS '''sirve para configurar el origen del monsto que figura como ejecucion para trasaccion''';
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN id_detalle_plantilla_fk INTEGER;
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN forma_calculo_monto VARCHAR(50);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.forma_calculo_monto
+IS 'define la forma en que se calcula el monto de la trasaccion
+
+simple ->  directo valor por defecto usado en primarias
+diferencia ->  solo para secunadaria calcula la diferencia entre debe y haber
+descuento -> solo para trasaccion secundaria o superior,  aplica en el monto, y los decuenta a la trasaccion padre';
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ALTER COLUMN forma_calculo_monto SET DEFAULT 'simple';
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ALTER COLUMN forma_calculo_monto SET NOT NULL;
+
+ALTER TABLE conta.trelacion_contable
+  ADD COLUMN defecto VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.trelacion_contable.defecto
+IS 'rsta columna sirve para identificar el registro como valor por defecto para el tipo de relacion contable y la gestion. Esto permite resumir la cantidad de parametrizaciones';
+
+/***********************************F-SCP-RAC-CONTA-0-04/09/2013****************************************/
+  
+
+/***********************************I-SCP-RAC-CONTA-0-11/09/2013****************************************/
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN codigo VARCHAR(50);
+ 
+ALTER TABLE conta.tclase_comprobante
+  ALTER COLUMN codigo SET NOT NULL;
+
+ALTER TABLE conta.tclase_comprobante
+  ADD UNIQUE (codigo); 
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN funcion_comprobante_eliminado VARCHAR(200);  
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN funcion_comprobante_validado VARCHAR(200);  
+  
+ 
+  
+/***********************************F-SCP-RAC-CONTA-0-11/09/2013****************************************/
+

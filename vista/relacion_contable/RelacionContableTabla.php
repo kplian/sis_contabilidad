@@ -60,6 +60,25 @@ Phx.vista.RelacionContableTabla = {
 			form:true
 		});
 		
+		this.Atributos.splice(4, 0, {
+                config:{
+                    name:'defecto',
+                    fieldLabel:'Defecto',
+                    allowBlank:false,
+                    emptyText:'Defecto',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode: 'local',
+                    gwidth: 100,
+                    store:['si','no']
+                },
+                type:'ComboBox',
+                id_grupo:1,
+                grid:true,
+                form:true
+            });
+		
     	//llama al constructor de la clase padre
 		Phx.vista.RelacionContableTabla.superclass.constructor.call(this,config);
 		this.bloquearMenus();		
@@ -125,15 +144,23 @@ Phx.vista.RelacionContableTabla = {
 			if (r.data.tiene_centro_costo == 'si') {
 				this.mostrarComponente(this.Cmp.id_centro_costo);
 				this.setAllowBlank(this.Cmp.id_centro_costo, false);
+				this.setAllowBlank(this.Cmp.id_cuenta, false);
 				this.Cmp.id_centro_costo.enable();
 			} else if (r.data.tiene_centro_costo == 'si-general') {
 				this.mostrarComponente(this.Cmp.id_centro_costo);
 				this.setAllowBlank(this.Cmp.id_centro_costo, true);
+				this.setAllowBlank(this.Cmp.id_cuenta, false);
 				this.Cmp.id_centro_costo.enable();
-			} else {
+			} else if (r.data.tiene_centro_costo == 'si-unico') {
+                this.mostrarComponente(this.Cmp.id_centro_costo);
+                this.setAllowBlank(this.Cmp.id_centro_costo, false);
+                this.setAllowBlank(this.Cmp.id_cuenta, true);
+                this.Cmp.id_centro_costo.enable();
+            } else {
 				this.Cmp.id_centro_costo.reset();
 				this.ocultarComponente(this.Cmp.id_centro_costo);
 				this.setAllowBlank(this.Cmp.id_centro_costo, true);
+				this.setAllowBlank(this.Cmp.id_cuenta, false);
 			}
 			//partida
 			if (r.data.tiene_partida == 'si') {
@@ -160,7 +187,7 @@ Phx.vista.RelacionContableTabla = {
 	},
 	onButtonNew : function () {
 		Phx.vista.RelacionContableTabla.superclass.onButtonNew.call(this);		
-				
+		this.setAllowBlank(this.Cmp.id_cuenta, true);		
 		this.Cmp.id_tabla.setValue(this.maestro[this.tabla_id]);
 		this.Cmp.nombre_tabla.setValue(this.maestro.nombre_tabla);	
 		this.Cmp.id_centro_costo.disable(); 
@@ -171,15 +198,21 @@ Phx.vista.RelacionContableTabla = {
 	onButtonEdit : function () {
 		Phx.vista.RelacionContableTabla.superclass.onButtonEdit.call(this);
 		var selected = this.sm.getSelected().data;
+		this.setAllowBlank(this.Cmp.id_cuenta, true);
 		//centro de costo
 		if (selected.tiene_centro_costo == 'si') {
 			this.mostrarComponente(this.Cmp.id_centro_costo);
 			this.setAllowBlank(this.Cmp.id_centro_costo, false);
+			
 		
 		} else if (r.data.tiene_centro_costo == 'si-general') {
 				this.mostrarComponente(this.Cmp.id_centro_costo);
 				this.setAllowBlank(this.Cmp.id_centro_costo, true);				
-		} else {
+		} else if (r.data.tiene_centro_costo == 'si-unico') {
+                this.mostrarComponente(this.Cmp.id_centro_costo);
+                this.setAllowBlank(this.Cmp.id_cuenta, false);
+                this.setAllowBlank(this.Cmp.id_centro_costo, true);             
+        } else {
 			this.Cmp.id_centro_costo.reset();
 			this.ocultarComponente(this.Cmp.id_centro_costo);
 			this.setAllowBlank(this.Cmp.id_centro_costo, true);

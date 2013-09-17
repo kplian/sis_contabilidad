@@ -7,7 +7,8 @@ CREATE OR REPLACE FUNCTION conta.f_get_config_relacion_contable (
   p_id_centro_costo integer = NULL::integer,
   out ps_id_cuenta integer,
   out ps_id_auxiliar integer,
-  out ps_id_partida integer
+  out ps_id_partida integer,
+  out ps_id_centro_costo integer
 )
 RETURNS SETOF record AS
 $body$
@@ -70,7 +71,7 @@ BEGIN
     
     
     
-     IF p_id_centro_costo is NULL THEN
+     IF p_id_centro_costo is NULL  and v_registros.tiene_centro_costo != 'si-unico' THEN
                 
         raise exception 'El tipo de relacion relacion contable indica que necesita  centro de costo';
               
@@ -86,11 +87,13 @@ BEGIN
            select
               rc.id_cuenta,
               rc.id_auxiliar,
-              rc.id_partida
+              rc.id_partida,
+              rc.id_centro_costo
            into
               ps_id_cuenta,
               ps_id_auxiliar,
-              ps_id_partida
+              ps_id_partida,
+              ps_id_centro_costo
            from conta.trelacion_contable rc 
            where  
               rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
@@ -104,11 +107,13 @@ BEGIN
                select
                   rc.id_cuenta,
                   rc.id_auxiliar,
-                  rc.id_partida
+                  rc.id_partida,
+                  rc.id_centro_costo
                into
                   ps_id_cuenta,
                   ps_id_auxiliar,
-                  ps_id_partida
+                  ps_id_partida,
+                  ps_id_centro_costo
                from conta.trelacion_contable rc 
                where  
                   rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
@@ -128,11 +133,13 @@ BEGIN
                select
                   rc.id_cuenta,
                   rc.id_auxiliar,
-                  rc.id_partida
+                  rc.id_partida,
+                  rc.id_centro_costo
                into
                   ps_id_cuenta,
                   ps_id_auxiliar,
-                  ps_id_partida
+                  ps_id_partida,
+                  ps_id_centro_costo
                from conta.trelacion_contable rc 
                where  
                   rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
@@ -147,11 +154,13 @@ BEGIN
                      select
                         rc.id_cuenta,
                         rc.id_auxiliar,
-                        rc.id_partida
+                        rc.id_partida,
+                        rc.id_centro_costo
                      into
                         ps_id_cuenta,
                         ps_id_auxiliar,
-                        ps_id_partida
+                        ps_id_partida,
+                        ps_id_centro_costo
                      from conta.trelacion_contable rc 
                      where  
                         rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
@@ -160,57 +169,139 @@ BEGIN
                         and rc.id_centro_costo is NULL
                         LIMIT 1  OFFSET 0;
                 END IF;
+                
+           ELSEIF v_registros.tiene_centro_costo = 'si-unico' THEN 
+           
+              select
+                  rc.id_cuenta,
+                  rc.id_auxiliar,
+                  rc.id_partida,
+                  rc.id_centro_costo
+               into
+                  ps_id_cuenta,
+                  ps_id_auxiliar,
+                  ps_id_partida,
+                  ps_id_centro_costo
+               from conta.trelacion_contable rc 
+               where  
+                  rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
+                  and rc.id_gestion = p_id_gestion
+                  and rc.estado_reg = 'activo'
+                  LIMIT 1  OFFSET 0;  
+          
+            
+                
            ELSE
           
              raise exception 'valor para la variable  "tiene_centro_costo" desconocido %',v_registros.tiene_centro_costo;
           
           END IF; 
+   
+  -- si la tabla de relacion contable es no nula 
    ELSE
          
          --si necesita tabla de configuracion el parametros p_tabla y p_id_tabla no pueden ser nulos
         
           IF p_id_tabla is NULL THEN
-            raise exception 'Este tipo de relacion contable necesita indicar la tabla y el id para busquedas';
+            raise exception 'Para este tipo de relacion contable se necesita indicar la tabla y el id para busquedas';
           END IF;
           
           
           IF   v_registros.tiene_centro_costo = 'no' THEN 
-           
-               select
-                  rc.id_cuenta,
-                  rc.id_auxiliar,
-                  rc.id_partida
-               into
-                  ps_id_cuenta,
-                  ps_id_auxiliar,
-                  ps_id_partida
-               from conta.trelacion_contable rc 
-               where  
-                  rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
-                  and rc.id_gestion = p_id_gestion
-                  and rc.estado_reg = 'activo'
-                  and rc.id_centro_costo is NULL
-                  and rc.id_tabla = p_id_tabla
-                  LIMIT 1  OFFSET 0;
+               
+                   select
+                      rc.id_cuenta,
+                      rc.id_auxiliar,
+                      rc.id_partida,
+                      rc.id_centro_costo
+                   into
+                      ps_id_cuenta,
+                      ps_id_auxiliar,
+                      ps_id_partida,
+                      ps_id_centro_costo
+                   from conta.trelacion_contable rc 
+                   where  
+                      rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
+                      and rc.id_gestion = p_id_gestion
+                      and rc.estado_reg = 'activo'
+                      and rc.id_centro_costo is NULL
+                      and rc.id_tabla = p_id_tabla
+                      LIMIT 1  OFFSET 0;
+                      
+               
+               IF ps_id_cuenta is NULL THEN
+               --buscamos una configuracion por defecto
+            
+                     select
+                        rc.id_cuenta,
+                        rc.id_auxiliar,
+                        rc.id_partida,
+                        rc.id_centro_costo
+                     into
+                        ps_id_cuenta,
+                        ps_id_auxiliar,
+                        ps_id_partida,
+                        ps_id_centro_costo
+                     from conta.trelacion_contable rc 
+                     where  
+                        rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
+                        and rc.id_gestion = p_id_gestion
+                        and rc.estado_reg = 'activo'
+                        and rc.id_centro_costo is NULL
+                        and rc.id_tabla is NULL  and rc.defecto = 'si'
+                        LIMIT 1  OFFSET 0;
+                        
+                END IF;
+                      
+                  
+                  
+                  
           
           ELSEIF v_registros.tiene_centro_costo = 'si' THEN
                 
-                 select
-                    rc.id_cuenta,
-                    rc.id_auxiliar,
-                    rc.id_partida
-                 into
-                    ps_id_cuenta,
-                    ps_id_auxiliar,
-                    ps_id_partida
-                 from conta.trelacion_contable rc 
-                 where  
-                    rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
-                    and rc.id_gestion = p_id_gestion
-                    and rc.estado_reg = 'activo'
-                    and rc.id_centro_costo = p_id_centro_costo
-                    and rc.id_tabla = p_id_tabla
-                    LIMIT 1  OFFSET 0;
+                   select
+                      rc.id_cuenta,
+                      rc.id_auxiliar,
+                      rc.id_partida,
+                      rc.id_centro_costo
+                   into
+                      ps_id_cuenta,
+                      ps_id_auxiliar,
+                      ps_id_partida,
+                      ps_id_centro_costo
+                   from conta.trelacion_contable rc 
+                   where  
+                      rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
+                      and rc.id_gestion = p_id_gestion
+                      and rc.estado_reg = 'activo'
+                      and rc.id_centro_costo = p_id_centro_costo
+                      and rc.id_tabla = p_id_tabla
+                      LIMIT 1  OFFSET 0;
+                      
+                 
+                 IF ps_id_cuenta is NULL THEN
+               --buscamos una configuracion por defecto
+            
+                     select
+                        rc.id_cuenta,
+                        rc.id_auxiliar,
+                        rc.id_partida,
+                        rc.id_centro_costo
+                     into
+                        ps_id_cuenta,
+                        ps_id_auxiliar,
+                        ps_id_partida,
+                        ps_id_centro_costo
+                     from conta.trelacion_contable rc 
+                     where  
+                        rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
+                        and rc.id_gestion = p_id_gestion
+                        and rc.estado_reg = 'activo'
+                         and rc.id_centro_costo = p_id_centro_costo
+                        and rc.id_tabla is NULL  and rc.defecto = 'si'
+                        LIMIT 1  OFFSET 0;
+                        
+                END IF;     
           
           
           ELSEIF v_registros.tiene_centro_costo = 'si-general' THEN
@@ -221,11 +312,13 @@ BEGIN
                select
                   rc.id_cuenta,
                   rc.id_auxiliar,
-                  rc.id_partida
+                  rc.id_partida,
+                  rc.id_centro_costo
                into
                   ps_id_cuenta,
                   ps_id_auxiliar,
-                  ps_id_partida
+                  ps_id_partida,
+                  ps_id_centro_costo
                from conta.trelacion_contable rc 
                where  
                   rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
@@ -237,16 +330,18 @@ BEGIN
             
      
                IF ps_id_cuenta is NULL THEN
-               --buscamos una configuracion general sin centro de costo
+               --si no hay resultado, buscamos una configuracion general sin centro de costo
             
                      select
                         rc.id_cuenta,
                         rc.id_auxiliar,
-                        rc.id_partida
+                        rc.id_partida,
+                        rc.id_centro_costo
                      into
                         ps_id_cuenta,
                         ps_id_auxiliar,
-                        ps_id_partida
+                        ps_id_partida,
+                        ps_id_centro_costo
                      from conta.trelacion_contable rc 
                      where  
                         rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
@@ -257,6 +352,77 @@ BEGIN
                         LIMIT 1  OFFSET 0;
                         
                 END IF;
+                
+                IF ps_id_cuenta is NULL THEN
+               --si no hay resultados, buscamos una configuracion por defecto con centro de costo
+            
+                     select
+                        rc.id_cuenta,
+                        rc.id_auxiliar,
+                        rc.id_partida,
+                        rc.id_centro_costo
+                     into
+                        ps_id_cuenta,
+                        ps_id_auxiliar,
+                        ps_id_partida,
+                        ps_id_centro_costo
+                     from conta.trelacion_contable rc 
+                     where  
+                        rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
+                        and rc.id_gestion = p_id_gestion
+                        and rc.estado_reg = 'activo'
+                         and rc.id_centro_costo = p_id_centro_costo
+                        --and rc.id_centro_costo is NULL
+                        and rc.id_tabla  is NULL  and rc.defecto = 'si'
+                        LIMIT 1  OFFSET 0;
+                        
+                END IF;
+                
+                 IF ps_id_cuenta is NULL THEN
+               --si no hay resultados, buscamos una configuracion por defecto sin  centro de costo
+            
+                     select
+                        rc.id_cuenta,
+                        rc.id_auxiliar,
+                        rc.id_partida,
+                        rc.id_centro_costo
+                     into
+                        ps_id_cuenta,
+                        ps_id_auxiliar,
+                        ps_id_partida,
+                        ps_id_centro_costo
+                     from conta.trelacion_contable rc 
+                     where  
+                        rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
+                        and rc.id_gestion = p_id_gestion
+                        and rc.estado_reg = 'activo'
+                        and rc.id_centro_costo is NULL
+                        and rc.id_tabla  is NULL  and rc.defecto = 'si'
+                        LIMIT 1  OFFSET 0;
+                        
+                END IF;
+                
+         
+         ELSEIF v_registros.tiene_centro_costo = 'si-unico' THEN
+                
+                 select
+                    rc.id_cuenta,
+                    rc.id_auxiliar,
+                    rc.id_partida,
+                    rc.id_centro_costo
+                 into
+                    ps_id_cuenta,
+                    ps_id_auxiliar,
+                    ps_id_partida,
+                    ps_id_centro_costo
+                 from conta.trelacion_contable rc 
+                 where  
+                    rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
+                    and rc.id_gestion = p_id_gestion
+                    and rc.estado_reg = 'activo'
+                    and rc.id_tabla = p_id_tabla
+                    LIMIT 1  OFFSET 0; 
+         
          END IF;
    
    END IF;

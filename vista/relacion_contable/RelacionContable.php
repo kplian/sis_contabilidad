@@ -268,7 +268,7 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'tiene_centro_costo', type: 'string'},
 		{name:'tiene_partida', type: 'string'},
 		{name:'tiene_auxiliar', type: 'string'},
-		{name:'nombre_partida', type: 'string'}
+		{name:'nombre_partida', type: 'string'},'defecto'
 		
 	],
 	sortInfo:{

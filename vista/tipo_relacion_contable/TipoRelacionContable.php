@@ -90,6 +90,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		        	fields: ['ID', 'valor'],
 		        	data :	[['si','Si'],	
 		        			['no','No'],
+		        			['si-unico','Si, solo permite centro de costo'],
 		        			['si-general','Si, permitir configuración general cuando el centor de costo es vacio']]
 		        				
 		    		}),

@@ -48,6 +48,9 @@ class MODRelacionContable extends MODbase{
 		$this->captura('tiene_centro_costo','varchar');
 		$this->captura('tiene_partida','varchar');
 		$this->captura('tiene_auxiliar','varchar');
+		$this->captura('codigo_cc','text');
+		$this->captura('defecto','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -72,6 +75,7 @@ class MODRelacionContable extends MODbase{
 		$this->setParametro('id_auxiliar','id_auxiliar','int4');
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_tabla','id_tabla','int4');
+		$this->setParametro('defecto','defecto','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -97,6 +101,7 @@ class MODRelacionContable extends MODbase{
 		$this->setParametro('id_auxiliar','id_auxiliar','int4');
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_tabla','id_tabla','int4');
+		$this->setParametro('defecto','defecto','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

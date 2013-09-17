@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_codigo varchar,
   p_id_usuario integer = NULL::integer
 )
-RETURNS varchar AS
+RETURNS integer AS
 $body$
 /*
 Autor inicial GAYME RIMERA ROJAS (No sabe porner comentarios)
@@ -48,6 +48,9 @@ DECLARE
     v_campo_tempo     varchar;
     v_i integer;
     v_tamano integer;
+    v_rec_periodo record;
+    v_id_subsistema integer;
+    v_id_clase_comprobante integer;
   
 BEGIN
 	
@@ -100,6 +103,8 @@ BEGIN
 	end if;    
     
     --guardo depto
+    
+    
     
   
     
@@ -164,6 +169,43 @@ BEGIN
     v_resp:=v_this;
     
     
+    
+    --obtener el periodo a partir de la fecha
+    
+      v_rec_periodo = param.f_get_periodo_gestion(v_this.columna_fecha);
+    
+    
+    --  obtener id_subsistema
+    
+         Select  id_subsistema  into   v_id_subsistema 
+         from  segu.tsubsistema sub 
+         where sub.estado_reg = 'activo' 
+            and sub.codigo =  v_this.columna_subsistema;
+            
+          IF v_id_subsistema is null THEN
+          
+               raise exception 'No existe un subsistema con el codigo %',v_this.columna_subsistema;   
+          
+          END IF;  
+    
+    --  obtener id clase comprobante
+    
+  
+    
+         Select  id_clase_comprobante  into   v_id_clase_comprobante 
+         from  conta.tclase_comprobante cl 
+         where cl.estado_reg = 'activo' 
+            and cl.codigo =  v_plantilla.clase_comprobante::varchar;
+            
+          IF v_id_clase_comprobante is null THEN
+          
+               raise exception 'No existe un comprobante de la clase codigo : %',v_plantilla.clase_comprobante;   
+          
+          END IF;
+    
+    
+    
+    
     --  genera tabla intermedia de comrobante
     
    INSERT INTO 
@@ -180,53 +222,60 @@ BEGIN
       id_subsistema,
       id_depto,
       id_moneda,
-      --id_periodo,
+      id_periodo,
       --nro_cbte,
       --momento,
       glosa1,
       --glosa2,
-      beneficiario
+      beneficiario,
       --tipo_cambio,
       --id_funcionario_firma1,
       --id_funcionario_firma2,
       --id_funcionario_firma3,
-      --fecha
+      fecha,
+      funcion_comprobante_validado,
+      funcion_comprobante_eliminado
+      
     ) 
     VALUES (
       p_id_usuario,
       now(),
      'activo',
-      v_plantilla.id_clase_comprobante, --TODO agregar a la interface de plantilla
+      v_id_clase_comprobante, --TODO agregar a la interface de plantilla
       NULL,
-      v_plantilla.id_subsistema, --TODO agregar a la interface de plantilla,
+      v_id_subsistema, --TODO agregar a la interface de plantilla,
       v_this.columna_depto::integer,
       v_this.columna_moneda::integer,
-      --:id_periodo,
+      v_rec_periodo.po_id_periodo,
       --:nro_cbte,
       --:momento,
       v_this.columna_descripcion,
       --:glosa2,
-      v_this.columna_acreedor
+      v_this.columna_acreedor,
       --:tipo_cambio,
       --:id_funcionario_firma1,
       --:id_funcionario_firma2,
       --:id_funcionario_firma3,
-      --:fecha
+      v_this.columna_fecha,
+      v_plantilla.funcion_comprobante_validado,
+      v_plantilla.funcion_comprobante_eliminado
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
     
-    
+    raise notice '=====> AL INSERTAR  v_id_int_comprobante= %',  v_id_int_comprobante;
     -- genera transacciones del comprobante
     
    resp_det =  conta.f_gen_transaccion(hstore(v_this), 
                             hstore(v_tabla),
                             hstore(v_plantilla),
                             p_id_tabla_valor,
-                            p_id_usuario);
+                            v_id_int_comprobante,
+                            p_id_usuario
+                           );
     
     
     
-    return v_resp;
+    return v_id_int_comprobante;
     
 EXCEPTION
 WHEN OTHERS THEN
