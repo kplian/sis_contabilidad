@@ -30,6 +30,19 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 			}
 		);
 		
+		//Botón para Imprimir el Comprobante
+		this.addButton('btnImprimir',
+			{
+				text: 'Imprimir',
+				iconCls: 'bprint',
+				disabled: true,
+				handler: this.imprimirCbte,
+				tooltip: '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
+			}
+		);
+		
+		
+		
 		//Esconde el id_subsistema
 		this.Cmp.id_subsistema.hide();
 		
@@ -829,11 +842,13 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 	preparaMenu: function(n) {
 		var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
 	   	this.getBoton('btnValidar').setDisabled(false);
+	   	this.getBoton('btnImprimir').setDisabled(false);
   		return tb;
 	},
 	liberaMenu: function() {
 		var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
 		this.getBoton('btnValidar').setDisabled(true);
+		this.getBoton('btnImprimir').setDisabled(true);
 		return tb;
 	},
 	getTipoCambio: function(){
@@ -861,7 +876,25 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 			});
 		}
 		
-	}
+	},
+	imprimirCbte: function(){
+		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
+			var rec = this.sm.getSelected();
+			var data = rec.data;
+			if (data) {
+				Ext.Ajax.request({
+						url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
+						params : {
+							'id_int_comprobante' : data.id_int_comprobante
+						},
+						success : this.successExport,
+						failure : this.conexionFailure,
+						timeout : this.timeout,
+						scope : this
+					});
+			}
+		//}, this)
+	},
 	
 })
 </script>
