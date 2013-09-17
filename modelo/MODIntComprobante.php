@@ -166,6 +166,65 @@ class MODIntComprobante extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function listarCbteCabecera(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_comprobante_sel';
+		$this->transaccion='CONTA_CABCBT_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('cod_depto','varchar');
+		$this->captura('nro_cbte','varchar');
+		$this->captura('fecha','date');
+		$this->captura('beneficiario','varchar');
+		$this->captura('glosa1','varchar');
+		$this->captura('glosa2','varchar');
+		$this->captura('tipo_cambio','numeric');
+		$this->captura('firma1','text');
+		$this->captura('firma2','inttext');
+		$this->captura('firma3','text');
+		$this->captura('firma1_cargo','varchar');
+		$this->captura('firma2_cargo','varchar');
+		$this->captura('firma3_cargo','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarCbteDetalle(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_comprobante_sel';
+		$this->transaccion='CONTA_DETCBT_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('cod_depto','varchar');
+		
+		$this->captura('cuenta','text');
+		$this->captura('auxiliar','text');
+		$this->captura('cc','varchar');
+		$this->captura('partida','text');
+		$this->captura('importe_debe','numeric');
+		$this->captura('importe_haber','numeric');
+		$this->captura('importe_debe1','numeric');
+		$this->captura('importe_gasto1','numeric');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>
