@@ -1,6 +1,4 @@
-
-/***********************************I-TYP-RAC-CONTA-0-21/08/2013****************************************/
-
+/***********************************I-TYP-GSS-CONTA-9-17/06/2013****************************************/
 CREATE TYPE conta.maestro_comprobante AS (
   columna_descripcion VARCHAR(255),
   columna_subsistema VARCHAR(40),
@@ -15,4 +13,4 @@ CREATE TYPE conta.maestro_comprobante AS (
 ALTER TYPE conta.maestro_comprobante
   ADD ATTRIBUTE columna_gestion INTEGER;
 
-/***********************************F-TYP-RAC-CONTA-0-21/08/2013****************************************/
+/***********************************F-TYP-GSS-CONTA-9-17/06/2013****************************************/
