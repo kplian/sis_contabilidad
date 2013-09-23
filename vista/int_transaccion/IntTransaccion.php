@@ -98,10 +98,14 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
        		    name:'id_cuenta',
    				origen:'CUENTA',
    				allowBlank:false,
-   				fieldLabel:'Cuenta',
+   				fieldLabel:'Transaccion',
    				gdisplayField:'desc_cuenta',//mapea al store del grid
-   				gwidth:200,
-	   			 renderer:function (value, p, record){return String.format('{0}',record.data['desc_cuenta']);}
+   				gwidth:500,
+	   			renderer:function (value, p, record){
+	   				return String.format('{0}','<b>CC:</b> '+record.data['desc_centro_costo']+', <b>Ptda.:</b> '+record.data['desc_partida']+'<br>'+
+	   					'<b>Cta.:</b> '+record.data['desc_cuenta']+'<br>'+
+	   					'<b>Aux.:</b> '+record.data['desc_auxiliar']);
+	   			}
        	     },
    			type:'ComboRec',
    			id_grupo:0,
@@ -130,7 +134,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				type:'string'
 			},
    		   
-   			grid:true,
+   			grid:false,
    			form:true
 	   	},
 	   	{
@@ -151,7 +155,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				type:'string'
 			},
    		   
-   			grid:true,
+   			grid:false,
    			form:true
 	   	},
 	   	{
@@ -169,24 +173,9 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
             type:'ComboRec',
             filters:{pfiltro:'cc.codigo_cc',type:'string'},
             id_grupo:1,
-            grid:true,
+            grid:false,
             form:true
         },
-	   	{
-			config:{
-				name: 'glosa',
-				fieldLabel: 'Glosa',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:1000
-			},
-			type:'TextArea',
-			filters:{pfiltro:'transa.glosa',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
 		{
 			config: {
 				name: 'importe_debe',
@@ -250,6 +239,21 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			id_grupo: 1,
 			grid: true,
 			form: true
+		},
+		{
+			config:{
+				name: 'glosa',
+				fieldLabel: 'Glosa',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:1000
+			},
+			type:'TextArea',
+			filters:{pfiltro:'transa.glosa',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
 		},
 		{
 			config: {

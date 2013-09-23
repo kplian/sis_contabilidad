@@ -19,7 +19,7 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 		this.init();
 		this.load({params:{start:0, limit:this.tam_pag}})
 		
-		//Botón para Validación del Comprobante
+		//Botón para Imprimir el Comprobante
 		this.addButton('btnImprimir',
 			{
 				text: 'Imprimir',
@@ -798,7 +798,16 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 	},
 	imprimirCbte: function(){
 		Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
-			alert('Imprimiendo')
+			Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/Comprobante/reporteComprobante',
+					params : {
+						'id_uni_cons' : data.id_uni_cons
+					},
+					success : this.successExport,
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
 		}, this)
 	},
 	preparaMenu: function(n) {

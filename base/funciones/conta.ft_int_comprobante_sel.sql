@@ -133,6 +133,66 @@ BEGIN
 			return v_consulta;
 
 		end;
+		
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_CABCBT_SEL'
+ 	#DESCRIPCION:	Cabecera para el reporte de Comprobante
+ 	#AUTOR:			RCM	
+ 	#FECHA:			10/09/2013
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CABCBT_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+						depto.codigo as cod_depto, incbte.nro_cbte, incbte.fecha, incbte.beneficiario,
+						incbte.glosa1, incbte.glosa2, incbte.tipo_cambio,
+						fun1.desc_funcionario1 as firma1, fun2.desc_funcionario1 as firma2, fun3.desc_funcionario1 as firma3,
+						fun1.nombre_cargo as firma1_cargo, fun2.nombre_cargo as firma2_cargo, fun3.nombre_cargo as firma3_cargo
+						from conta.tint_comprobante incbte
+						inner join param.tdepto depto on depto.id_depto = incbte.id_depto
+						left join orga.vfuncionario_cargo fun1 on fun1.id_funcionario = incbte.id_funcionario_firma1
+						left join orga.vfuncionario_cargo fun2 on fun2.id_funcionario = incbte.id_funcionario_firma2
+						left join orga.vfuncionario_cargo fun3 on fun3.id_funcionario = incbte.id_funcionario_firma3
+						where incbte.id_int_comprobante = '||v_parametros.id_int_comprobante;
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+		
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_DETCBT_SEL'
+ 	#DESCRIPCION:	Cabecera para el reporte de Comprobante
+ 	#AUTOR:			RCM	
+ 	#FECHA:			10/09/2013
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DETCBT_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+						cue.nro_cuenta || '' - '' || cue.nombre_cuenta as cuenta,
+						aux.codigo_auxiliar || '' '' || aux.nombre_auxiliar as auxiliar,
+						cc.codigo_cc as cc,
+						par.codigo || '' -'' || par.nombre_partida as partida,
+						tra.importe_debe, tra.importe_haber,
+						param.f_convertir_moneda(cbte.id_moneda,2,tra.importe_debe,cbte.fecha,''O'',2) as importe_debe1,
+						param.f_convertir_moneda(cbte.id_moneda,2,tra.importe_haber,cbte.fecha,''O'',2) as importe_gasto1
+						from conta.tint_transaccion tra
+						inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
+						inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta
+						left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
+						inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
+						inner join pre.tpartida par on par.id_partida = tra.id_partida
+						where tra.id_int_comprobante = '||v_parametros.id_int_comprobante;
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
 					
 	else
 					     
