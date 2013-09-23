@@ -34,6 +34,7 @@ DECLARE
 	v_id_relacion_contable	integer;
     
     v_tipo_rel  record;
+    v_defecto varchar;
 			    
 BEGIN
 
@@ -77,8 +78,19 @@ BEGIN
             END IF;
             
             
+            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
             
-            IF  v_parametros.defecto = 'si'   THEN
+               v_defecto =  v_parametros.defecto;
+        
+            ELSE
+            
+               v_defecto = 'no';
+            
+            
+            END IF;
+       
+            
+            IF  v_defecto = 'si'   THEN
              --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
                v_parametros.id_tabla = NULL;
                
@@ -131,7 +143,7 @@ BEGIN
 			null,
 			null,
 			v_parametros.id_tabla,
-            v_parametros.defecto
+            v_defecto
 							
 			)RETURNING id_relacion_contable into v_id_relacion_contable;
 			
@@ -180,8 +192,19 @@ BEGIN
             
             END IF;
             
+            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
             
-            IF  v_parametros.defecto = 'si'   THEN
+               v_defecto =  v_parametros.defecto;
+        
+            ELSE
+            
+               v_defecto = 'no';
+            
+            
+            END IF;
+            
+            
+            IF  v_defecto = 'si'   THEN
              --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
                v_parametros.id_tabla = NULL;
                
@@ -218,7 +241,7 @@ BEGIN
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario,
 			id_tabla = v_parametros.id_tabla,
-            defecto = v_parametros.defecto
+            defecto = v_defecto
 			where id_relacion_contable=v_parametros.id_relacion_contable;
                
 			--Definicion de la respuesta

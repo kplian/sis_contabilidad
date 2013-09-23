@@ -96,7 +96,7 @@ class MODPlantillaCalculo extends MODbase{
 	function eliminarPlantillaCalculo(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='conta.ft_plantilla_calculo_ime';
-		$this->transaccion='CONTA_PLACAL_ELI';
+		$this->transaccion='CONTA_GETDEC_IME';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
@@ -109,6 +109,24 @@ class MODPlantillaCalculo extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function recuperarDescuentosPlantillaCalculo(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='conta.ft_plantilla_calculo_ime';
+        $this->transaccion='CONTA_GETDEC_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_plantilla','id_plantilla','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+	
 			
 }
 ?>

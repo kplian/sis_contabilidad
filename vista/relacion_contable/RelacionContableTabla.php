@@ -196,6 +196,7 @@ Phx.vista.RelacionContableTabla = {
 		this.Cmp.id_partida.disable(); 
 	} ,
 	onButtonEdit : function () {
+	   
 		Phx.vista.RelacionContableTabla.superclass.onButtonEdit.call(this);
 		var selected = this.sm.getSelected().data;
 		this.setAllowBlank(this.Cmp.id_cuenta, true);
@@ -205,10 +206,10 @@ Phx.vista.RelacionContableTabla = {
 			this.setAllowBlank(this.Cmp.id_centro_costo, false);
 			
 		
-		} else if (r.data.tiene_centro_costo == 'si-general') {
+		} else if (selected.tiene_centro_costo == 'si-general') {
 				this.mostrarComponente(this.Cmp.id_centro_costo);
 				this.setAllowBlank(this.Cmp.id_centro_costo, true);				
-		} else if (r.data.tiene_centro_costo == 'si-unico') {
+		} else if (selected.tiene_centro_costo == 'si-unico') {
                 this.mostrarComponente(this.Cmp.id_centro_costo);
                 this.setAllowBlank(this.Cmp.id_cuenta, false);
                 this.setAllowBlank(this.Cmp.id_centro_costo, true);             
@@ -236,6 +237,8 @@ Phx.vista.RelacionContableTabla = {
 			this.ocultarComponente(this.Cmp.id_auxiliar);
 			this.setAllowBlank(this.Cmp.id_auxiliar, false);
 		}
+		
+		this.Cmp.id_tabla.setValue(this.maestro[this.tabla_id]);
 		
 		this.Cmp.id_centro_costo.store.setBaseParam('id_gestion',selected.id_gestion);
 		this.Cmp.id_cuenta.store.setBaseParam('id_gestion',selected.id_gestion);

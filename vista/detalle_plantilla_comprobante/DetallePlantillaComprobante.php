@@ -42,87 +42,116 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		{
-   config:{
-    	name:'debe_haber',
-    	fieldLabel: 'Debe Haber',
-     allowBlank: false,
-     anchor: '80%',
-			  typeAhead: true,
-    	triggerAction: 'all',
-    	lazyRender:true,
-    	mode: 'local',
-    	store:['debe','haber']
-   },
-   type:'ComboBox',
-   id_grupo:0,
-   grid:true,
-   form:true
-  },
-  {
-			config:{
-				name: 'aplicar_documento',
-				fieldLabel: 'Aplicar Documento',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:4
-			},
-			type:'NumberField',
-			filters:{pfiltro:'cmpbdet.aplicar_documento',type:'numeric'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-  {
-   config:{
-    	name:'agrupar',
-    	fieldLabel: 'Agrupar',
-     allowBlank: false,
-     anchor: '80%',
-			  typeAhead: true,
-    	triggerAction: 'all',
-    	lazyRender:true,
-    	mode: 'local',
-    	store:['si','no']
-   },
-   type:'ComboBox',
-   id_grupo:0,
-   grid:true,
-   form:true
-  },		
-		{
-   config:{
-    	name:'es_relacion_contable',
-    	fieldLabel: 'Relacion Contable',
-     allowBlank: false,
-     anchor: '80%',
-			  typeAhead: true,
-    	triggerAction: 'all',
-    	lazyRender:true,
-    	mode: 'local',
-    	store:['si','no']
-   },
-   type:'ComboBox',
-   id_grupo:0,
-   grid:true,
-   form:true
-  },
-  {
-			config:{
-				name: 'tipo_relacion_contable',
-				fieldLabel: 'Tipo Relacion Contable',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:255
-			},
-			type:'TextField',
-			filters:{pfiltro:'cmpbdet.tipo_relacion_contable',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
+           config:{
+            	name:'debe_haber',
+            	fieldLabel: 'Debe Haber',
+                allowBlank: false,
+                anchor: '80%',
+        		typeAhead: true,
+            	triggerAction: 'all',
+            	lazyRender:true,
+            	mode: 'local',
+            	store:['debe','haber']
+           },
+           type:'ComboBox',
+           id_grupo:0,
+           grid:true,
+           form:true
+          },
+          {
+           config:{
+                name:'aplicar_documento',
+                fieldLabel: 'Aplicar Documento',
+                allowBlank: false,
+                anchor: '80%',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+           },
+           type:'ComboBox',
+           id_grupo:0,
+           grid:true,
+           form:true
+          },
+          {
+           config:{
+            	name:'agrupar',
+            	fieldLabel: 'Agrupar',
+                allowBlank: false,
+                anchor: '80%',
+        		typeAhead: true,
+            	triggerAction: 'all',
+            	lazyRender:true,
+            	mode: 'local',
+            	store:['si','no']
+           },
+           type:'ComboBox',
+           id_grupo:0,
+           grid:true,
+           form:true
+          },		
+           {
+           config:{
+            	name:'es_relacion_contable',
+            	fieldLabel: 'Relacion Contable',
+                allowBlank: false,
+                anchor: '80%',
+        		typeAhead: true,
+            	triggerAction: 'all',
+            	lazyRender:true,
+            	mode: 'local',
+            	store:['si','no']
+           },
+           type:'ComboBox',
+           id_grupo:0,
+           grid:true,
+           form:true
+          },
+          
+        {
+            config: {
+                name: 'tipo_relacion_contable',
+                fieldLabel: 'Relación Contable',
+                allowBlank: true,
+                emptyText: 'Elija Relación Contable...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_contabilidad/control/TipoRelacionContable/listarTipoRelacionContable',
+                    id: 'id_tipo_relacion_contable',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'codigo_tipo_relacion',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_tipo_relacion_contable','codigo_tipo_relacion','nombre_tipo_relacion'],
+                    remoteSort: true,
+                    baseParams: {par_filtro:'tiprelco.codigo_tipo_relacion#tiprelco.nombre_tipo_relacion'}
+                }),
+                valueField: 'codigo_tipo_relacion',
+                displayField: 'codigo_tipo_relacion',
+                gdisplayField: 'codigo_tipo_relacion',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>Código: {codigo_tipo_relacion}</p><p>Nombre: {nombre_tipo_relacion}</p></div></tpl>',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 20,
+                queryDelay: 100,
+                anchor: '100%',
+                gwidth: 120,
+                minChars: 2
+            },
+            type: 'ComboBox',
+            filters:{pfiltro:'cmpbdet.tipo_relacion_contable',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        
+        {
 			config:{
 				name: 'tabla_detalle',
 				fieldLabel: 'Tabla Detalle',
@@ -273,6 +302,219 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		{
+           config:{
+                name: 'primaria',
+                fieldLabel: 'Trans Primaria',
+                allowBlank: false,
+                anchor: '80%',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+           },
+           type:'ComboBox',
+           filters:{pfiltro:'cmpbdet.primaria',type:'string'},
+           id_grupo:0,
+           grid:true,
+           form:true
+          },
+          
+          {
+            config: {
+                name: 'id_detalle_plantilla_fk',
+                fieldLabel: 'Plantilla base',
+                allowBlank: true,
+              
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_contabilidad/control/DetallePlantillaComprobante/listarDetallePlantillaComprobante',
+                    id: 'id_detalle_plantilla_comprobante',
+                    root: 'datos',
+                    totalProperty: 'total',
+                    fields: ['id_detalle_plantilla_comprobante','descripcion'],
+                    remoteSort: true,
+                    baseParams: {par_filtro:'tiprelco.descripcion'}
+                }),
+                valueField: 'id_detalle_plantilla_comprobante',
+                displayField: 'descripcion',
+                gdisplayField: 'descripcion_base',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 20,
+                queryDelay: 100,
+                anchor: '100%',
+                gwidth: 120,
+                minChars: 2
+            },
+            type: 'ComboBox',
+            filters:{pfiltro:'cmpbdetb.descripcion_base',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+          
+      
+		{
+            config:{
+                name: 'otros_campos',
+                fieldLabel: 'Otros Campos',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.otros_campos',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'nom_fk_tabla_maestro',
+                fieldLabel: 'Fk Tabla Maestro',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextField',
+            filters:{pfiltro:'cmpbdet.nom_fk_tabla_maestro',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'campo_partida_ejecucion',
+                fieldLabel: 'Campo Partida Ejecucion',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.campo_partida_ejecucion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'descripcion',
+                fieldLabel: 'Desc. Trans.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.descripcion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'campo_monto_pres',
+                fieldLabel: 'Campo Monto Presu.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.campo_monto_pres',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+           config:{
+                name: 'rel_dev_pago',
+                fieldLabel: 'Es plant. presu.',
+                allowBlank: false,
+                anchor: '80%',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+           },
+           type:'ComboBox',
+           filters:{pfiltro:'cmpbdet.rel_dev_pago',type:'string'},
+           id_grupo:0,
+           grid:true,
+           form:true
+          },
+        {
+            config:{
+                name: 'campo_trasaccion_dev',
+                fieldLabel: 'Campo Trans Devengado.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.campo_trasaccion_dev',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'campo_id_tabla_detalle',
+                fieldLabel: 'Campo id tabla det.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextField',
+            filters:{pfiltro:'cmpbdet.campo_id_tabla_detalle',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+           config:{
+                name: 'forma_calculo_monto',
+                fieldLabel: 'Forma de Calculo',
+                allowBlank: false,
+                anchor: '80%',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['simple','descuento','diferencia']
+           },
+           type:'ComboBox',
+           filters:{pfiltro:'cmpbdet.forma_calculo_monto',type:'string'},
+           id_grupo:0,
+           grid:true,
+           form:true
+          },
+          {
+            config:{
+                name: 'func_act_transaccion',
+                fieldLabel: 'Fun act transaccion.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextField',
+            filters:{pfiltro:'cmpbdet.func_act_transaccion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+          },
+        
+		{
 			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
@@ -381,13 +623,25 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		'primaria', 
+        'otros_campos', 
+        'nom_fk_tabla_maestro', 
+        'campo_partida_ejecucion' , 
+        'descripcion' , 
+        'campo_monto_pres' , 
+        'id_detalle_plantilla_fk', 
+        'forma_calculo_monto', 
+        'func_act_transaccion', 
+        'campo_id_tabla_detalle', 
+        'rel_dev_pago', 
+        'campo_trasaccion_dev'
 		
 	],
 	sortInfo:{
 		field: 'id_detalle_plantilla_comprobante',
 		direction: 'ASC'
 	},
-		onReloadPage:function(m){
+	onReloadPage:function(m){
        
         this.maestro=m;
 
@@ -400,13 +654,22 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
          this.grid.getBottomToolbar().disable(); 
          this.store.removeAll();
        }
+       
+       this.Cmp.id_detalle_plantilla_fk.store.baseParams.id_plantilla_comprobante=this.maestro.id_plantilla_comprobante
+                
    },
    
    loadValoresIniciales : function() {
 					Phx.vista.DetallePlantillaComprobante.superclass.loadValoresIniciales.call(this);
 					if (this.maestro.id_plantilla_comprobante != undefined) {
 						this.getComponente('id_plantilla_comprobante').setValue(this.maestro.id_plantilla_comprobante);
+					    
+					
 					}
+					
+					
+					
+					
 				},
     
 	bdel:true,

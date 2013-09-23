@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_plantilla_calculo_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_plantilla_calculo_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_plantilla_calculo_ime
@@ -27,6 +32,7 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_plantilla_calculo	integer;
+    v_registros  record;
 			    
 BEGIN
 
@@ -136,7 +142,40 @@ BEGIN
             return v_resp;
 
 		end;
-         
+     
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_GETDEC_IME'
+ 	#DESCRIPCION:	Recuperar decuetnos de la plantilla de calculo indicada
+ 	#AUTOR:		admin	
+ 	#FECHA:		28-08-2013 19:01:20
+	***********************************/
+
+	elsif(p_transaccion='CONTA_GETDEC_IME')then
+
+		begin
+			
+            -- llamada a la funcion de recuperacion de descuento
+             select  
+               ps_descuento_porc,
+               ps_descuento,
+               ps_observaciones
+             into
+              v_registros
+             FROM  conta.f_get_descuento_plantilla_calculo(v_parametros.id_plantilla);
+        
+            --Definicion de la respuesta
+             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de decuentos recuperados con exito'); 
+             v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla',v_parametros.id_plantilla::varchar);
+             
+             v_resp = pxp.f_agrega_clave(v_resp,'descuento_porc',v_registros.ps_descuento_porc::varchar);
+             v_resp = pxp.f_agrega_clave(v_resp,'descuento',v_registros.ps_descuento::varchar);
+             v_resp = pxp.f_agrega_clave(v_resp,'observaciones',v_registros.ps_observaciones::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+        
 	else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;
@@ -153,7 +192,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_plantilla_calculo_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

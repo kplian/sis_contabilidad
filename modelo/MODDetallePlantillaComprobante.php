@@ -46,6 +46,28 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		
+		$this->captura('primaria','varchar');
+		$this->captura('otros_campos','varchar');
+		$this->captura('nom_fk_tabla_maestro','varchar');
+		$this->captura('campo_partida_ejecucion','text');
+		$this->captura('descripcion','varchar');
+		$this->captura('campo_monto_pres','varchar');
+		$this->captura('id_detalle_plantilla_fk','integer');
+		$this->captura('forma_calculo_monto','varchar');
+		$this->captura('func_act_transaccion','varchar');
+		$this->captura('campo_id_tabla_detalle','varchar');
+		$this->captura('rel_dev_pago','varchar');
+		$this->captura('campo_trasaccion_dev','TEXT');
+		$this->captura('descripcion_base','varchar');
+		
+        
+		
+
+  
+
+
+	
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

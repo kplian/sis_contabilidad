@@ -240,7 +240,7 @@ BEGIN
     VALUES (
       p_id_usuario,
       now(),
-     'activo',
+     'borrador',
       v_id_clase_comprobante, --TODO agregar a la interface de plantilla
       NULL,
       v_id_subsistema, --TODO agregar a la interface de plantilla,

@@ -470,3 +470,71 @@ ALTER TABLE conta.tint_comprobante
   
 /***********************************F-SCP-RAC-CONTA-0-11/09/2013****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-0-18/09/2013****************************************/
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN func_act_transaccion VARCHAR(100);
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_id_tabla_detalle VARCHAR(100);
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ALTER COLUMN campo_id_tabla_detalle SET DEFAULT '';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_calculo
+  ADD COLUMN descuento VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tplantilla_calculo.descuento
+IS 'este campo es util para que sistema como e de tesoreria sepan si aplica un decuento o no a las oclicitudes de pago en funcion del tipo de documento escogido';
+
+ALTER TABLE conta.tplantilla_calculo
+  ALTER COLUMN codigo_tipo_relacion TYPE VARCHAR(20) COLLATE pg_catalog."default";
+
+ALTER TABLE conta.tplantilla_calculo
+  ALTER COLUMN descripcion TYPE VARCHAR(200) COLLATE pg_catalog."default";
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tint_rel_devengado (
+  id_int_rel_devengado SERIAL NOT NULL, 
+  id_int_transaccion_dev INTEGER, 
+  id_int_transaccion_pag INTEGER, 
+  monto_pago NUMERIC(18,2), 
+  id_partida_ejecucion_pag INTEGER, 
+  PRIMARY KEY(id_int_rel_devengado)
+) INHERITS (pxp.tbase)
+WITHOUT OIDS;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_partida_ejecucion_dev INTEGER;
+
+----------------------------------------
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN rel_dev_pago VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.rel_dev_pago
+IS 'si el campo es igual a si, indica que la plantilla es para registrar la relacion entre devengado  y pago';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_trasaccion_dev TEXT;
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_trasaccion_dev
+IS 'xste campo siver par aalmacenar la referencia temporal, para tabla de relacion devengado paga';
+
+/***********************************F-SCP-RAC-CONTA-0-18/09/2013****************************************/
+
+
+

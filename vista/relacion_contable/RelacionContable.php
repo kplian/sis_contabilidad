@@ -60,6 +60,7 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 	   				origen : 'GESTION',
 	   				fieldLabel : 'Gestion',
 	   				allowBlank : false,
+	   				resizable:true,
 	   				gdisplayField : 'gestion',//mapea al store del grid
 	   				gwidth : 100,
 		   			renderer : function (value, p, record){return String.format('{0}', record.data['gestion']);}
@@ -81,6 +82,7 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Centro Costo',
                 allowBlank: false,
                 tinit:false,
+                resizable:true,
                 origen:'CENTROCOSTO',
                 gdisplayField: 'codigo_cc',
                 anchor: '80%',

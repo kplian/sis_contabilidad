@@ -43,6 +43,13 @@ class ACTPlantillaCalculo extends ACTbase{
 		$this->res=$this->objFunc->eliminarPlantillaCalculo($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function recuperarDescuentosPlantillaCalculo(){
+        $this->objFunc=$this->create('MODPlantillaCalculo');    
+        $this->res=$this->objFunc->recuperarDescuentosPlantillaCalculo($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+        
 			
 }
 

@@ -27,6 +27,8 @@ Phx.vista.RelacionContableGeneral = {
 			form:true 
 		});
 		
+		
+		
     	//llama al constructor de la clase padre
 		Phx.vista.RelacionContableGeneral.superclass.constructor.call(this,config);
 		this.bloquearMenus();		

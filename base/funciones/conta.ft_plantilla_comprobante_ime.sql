@@ -69,8 +69,8 @@ BEGIN
 			fecha_reg,
 			id_usuario_mod,
 			fecha_mod,
-            cmpb.campo_gestion_relacion	,
-            cmpb.otros_campos
+            campo_gestion_relacion	,
+            otros_campos
           	) values(
           	v_parametros.codigo,
 			v_parametros.funcion_comprobante_eliminado,

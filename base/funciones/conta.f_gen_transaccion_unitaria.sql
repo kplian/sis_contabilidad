@@ -71,11 +71,14 @@ BEGIN
    --------------------------------------------------------- 
     
    
-    v_def_campos = ARRAY['campo_monto','campo_cuenta','campo_auxiliar','campo_partida','campo_centro_costo','campo_partida_ejecucion','campo_relacion_contable','campo_documento','otros_campos','campo_monto_pres'];
+    v_def_campos = ARRAY['campo_monto','campo_cuenta','campo_auxiliar','campo_partida','campo_centro_costo','campo_partida_ejecucion','campo_relacion_contable','campo_documento','otros_campos','campo_monto_pres','nom_id_tabla_detalle','campo_trasaccion_dev'];
     v_tamano:=array_upper(v_def_campos,1);
          
+  
    
    IF p_reg_det_plantilla->'tabla_detalle'!=''  and p_reg_det_plantilla->'tabla_detalle' !='NULL' THEN
+   
+    
     
           -- obtener la columnas que se consultaran  para la tabla  ( los nombre de variables con prefijo $tabla)
           
@@ -90,11 +93,13 @@ BEGIN
            raise exception 'En el detalle de plantilla el campo nom_fk_tabla_maestro no puede ser vacio si hace referencia a una tabla_detalle';
            
          END IF;
+         
+         
           
         --prepara la consulta de la tabla detalle
         
          v_consulta_tab ='select '||v_columnas ||
-                        ' from '|| (p_reg_det_plantilla->'tabla_detalle')|| ' where '
+                        ' from '|| (p_reg_det_plantilla->'tabla_detalle')||' where '
                         ||(p_reg_det_plantilla->'tabla_detalle')||'.'||(p_reg_det_plantilla->'nom_fk_tabla_maestro')||'='||COALESCE(p_id_tabla_padre_valor,0);
          
        
@@ -124,6 +129,7 @@ BEGIN
 
  ELSE
  
+ 
         --  Si el campo tabla detalle es igual null,  se genera una sola transaccion 
         
          v_resp = conta.f_gen_transaccion_from_plantilla(
@@ -146,8 +152,7 @@ BEGIN
 
   
    
-       
-    
+      
     return v_resp;
     
 EXCEPTION
