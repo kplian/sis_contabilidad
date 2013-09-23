@@ -6,9 +6,9 @@
 *@date 29-08-2013 00:28:30
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
-require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
-require_once(dirname(__FILE__).'/../../lib/lib_reporte/PlantillasHTML.php');
-require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
+//require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
+//require_once(dirname(__FILE__).'/../../lib/lib_reporte/PlantillasHTML.php');
+//require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
 
 class ACTIntComprobante extends ACTbase{
 	

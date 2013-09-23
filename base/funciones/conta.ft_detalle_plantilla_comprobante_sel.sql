@@ -70,10 +70,26 @@ BEGIN
 						cmpbdet.fecha_mod,
 						cmpbdet.id_usuario_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	
+						usu2.cuenta as usr_mod	,
+                        cmpbdet.primaria, 
+                        cmpbdet.otros_campos, 
+                        cmpbdet.nom_fk_tabla_maestro, 
+                        cmpbdet.campo_partida_ejecucion , 
+                        cmpbdet.descripcion , 
+                        cmpbdet.campo_monto_pres , 
+                        cmpbdet.id_detalle_plantilla_fk , 
+                        cmpbdet.forma_calculo_monto, 
+                        cmpbdet.func_act_transaccion, 
+                        cmpbdet.campo_id_tabla_detalle, 
+                        cmpbdet.rel_dev_pago, 
+                        cmpbdet.campo_trasaccion_dev ,
+                        cmpbdetb.descripcion as descripcion_base
+                        
+                        
 						from conta.tdetalle_plantilla_comprobante cmpbdet
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpbdet.id_usuario_mod
+                        left join conta.tdetalle_plantilla_comprobante cmpbdetb on cmpbdetb.id_detalle_plantilla_comprobante = cmpbdet.id_detalle_plantilla_fk
 				        where cmpbdet.id_plantilla_comprobante='||v_parametros.id_plantilla_comprobante|| ' and ';
 			
 			--Definicion de la respuesta
@@ -96,11 +112,12 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_detalle_plantilla_comprobante)
+			v_consulta:='select count(cmpbdet.id_detalle_plantilla_comprobante)
 					    from conta.tdetalle_plantilla_comprobante cmpbdet
-					    inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg
+						inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpbdet.id_usuario_mod
-					    where cmpbdet.id_plantilla_comprobante='||v_parametros.id_plantilla_comprobante|| ' and ';
+                        left join conta.tdetalle_plantilla_comprobante cmpbdetb on cmpbdetb.id_detalle_plantilla_comprobante = cmpbdet.id_detalle_plantilla_fk
+				        where cmpbdet.id_plantilla_comprobante='||v_parametros.id_plantilla_comprobante|| ' and ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

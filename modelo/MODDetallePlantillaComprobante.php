@@ -95,11 +95,27 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_monto','campo_monto','consulta_select');
 		$this->setParametro('campo_relacion_contable','campo_relacion_contable','consulta_select');
 		$this->setParametro('campo_documento','campo_documento','consulta_select');
-		$this->setParametro('aplicar_documento','aplicar_documento','int4');
+		$this->setParametro('aplicar_documento','aplicar_documento','varchar');
 		$this->setParametro('campo_centro_costo','campo_centro_costo','consulta_select');
 		$this->setParametro('campo_auxiliar','campo_auxiliar','consulta_select');
 		$this->setParametro('campo_fecha','campo_fecha','consulta_select');
 		$this->setParametro('estado_reg','estado_reg','varchar');
+		
+		
+		$this->setParametro('primaria','primaria','consulta_select');
+		$this->setParametro('otros_campos','otros_campos','consulta_select');
+		$this->setParametro('nom_fk_tabla_maestro','nom_fk_tabla_maestro','consulta_select');
+		$this->setParametro('campo_partida_ejecucion','campo_partida_ejecucion','consulta_select');
+		$this->setParametro('descripcion','descripcion','consulta_select');
+		$this->setParametro('campo_monto_pres','campo_monto_pres','consulta_select');
+		$this->setParametro('id_detalle_plantilla_fk','id_detalle_plantilla_fk','int4');
+		$this->setParametro('forma_calculo_monto','forma_calculo_monto','consulta_select');
+		$this->setParametro('func_act_transaccion','func_act_transaccion','consulta_select');
+		$this->setParametro('campo_id_tabla_detalle','campo_id_tabla_detalle','consulta_select');
+		$this->setParametro('rel_dev_pago','rel_dev_pago','consulta_select');
+		$this->setParametro('campo_trasaccion_dev','campo_trasaccion_dev','consulta_select');
+		
+		 
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -129,11 +145,26 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_monto','campo_monto','consulta_select');
 		$this->setParametro('campo_relacion_contable','campo_relacion_contable','consulta_select');
 		$this->setParametro('campo_documento','campo_documento','consulta_select');
-		$this->setParametro('aplicar_documento','aplicar_documento','int4');
+		$this->setParametro('aplicar_documento','aplicar_documento','varchar');
 		$this->setParametro('campo_centro_costo','campo_centro_costo','consulta_select');
 		$this->setParametro('campo_auxiliar','campo_auxiliar','consulta_select');
 		$this->setParametro('campo_fecha','campo_fecha','consulta_select');
 		$this->setParametro('estado_reg','estado_reg','varchar');
+		
+		$this->setParametro('primaria','primaria','consulta_select');
+        $this->setParametro('otros_campos','otros_campos','consulta_select');
+        $this->setParametro('nom_fk_tabla_maestro','nom_fk_tabla_maestro','consulta_select');
+        $this->setParametro('campo_partida_ejecucion','campo_partida_ejecucion','consulta_select');
+        $this->setParametro('descripcion','descripcion','consulta_select');
+        $this->setParametro('campo_monto_pres','campo_monto_pres','consulta_select');
+        $this->setParametro('id_detalle_plantilla_fk','id_detalle_plantilla_fk','int4');
+        $this->setParametro('forma_calculo_monto','forma_calculo_monto','consulta_select');
+        $this->setParametro('func_act_transaccion','func_act_transaccion','consulta_select');
+        $this->setParametro('campo_id_tabla_detalle','campo_id_tabla_detalle','consulta_select');
+        $this->setParametro('rel_dev_pago','rel_dev_pago','consulta_select');
+        $this->setParametro('campo_trasaccion_dev','campo_trasaccion_dev','consulta_select');
+        
+         
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

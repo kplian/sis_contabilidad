@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_detalle_plantilla_comprobante_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_detalle_plantilla_comprobante_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_detalle_plantilla_comprobante_ime
@@ -65,7 +70,21 @@ BEGIN
 			fecha_reg,
 			id_usuario_reg,
 			fecha_mod,
-			id_usuario_mod
+			id_usuario_mod,
+           
+            primaria, 
+            otros_campos, 
+            nom_fk_tabla_maestro, 
+            campo_partida_ejecucion , 
+            descripcion , 
+            campo_monto_pres , 
+            id_detalle_plantilla_fk , 
+            forma_calculo_monto, 
+            func_act_transaccion, 
+            campo_id_tabla_detalle, 
+            rel_dev_pago, 
+            campo_trasaccion_dev 
+            
           	) values(
 			v_parametros.id_plantilla_comprobante,
 			v_parametros.debe_haber,
@@ -87,7 +106,20 @@ BEGIN
 			now(),
 			p_id_usuario,
 			null,
-			null
+			null,
+            
+            v_parametros.primaria, 
+            v_parametros.otros_campos, 
+            v_parametros.nom_fk_tabla_maestro, 
+            v_parametros.campo_partida_ejecucion , 
+            v_parametros.descripcion , 
+            v_parametros.campo_monto_pres , 
+            v_parametros.id_detalle_plantilla_fk , 
+            v_parametros.forma_calculo_monto, 
+            v_parametros.func_act_transaccion, 
+            v_parametros.campo_id_tabla_detalle, 
+            v_parametros.rel_dev_pago, 
+            v_parametros.campo_trasaccion_dev 
 							
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 			
@@ -129,7 +161,20 @@ BEGIN
 			campo_auxiliar = v_parametros.campo_auxiliar,
 			campo_fecha = v_parametros.campo_fecha,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+            
+            primaria=v_parametros.primaria, 
+            otros_campos=v_parametros.otros_campos, 
+            nom_fk_tabla_maestro=v_parametros.nom_fk_tabla_maestro, 
+            campo_partida_ejecucion=v_parametros.campo_partida_ejecucion , 
+            descripcion=v_parametros.descripcion , 
+            campo_monto_pres=v_parametros.campo_monto_pres , 
+            id_detalle_plantilla_fk=v_parametros.id_detalle_plantilla_fk , 
+            forma_calculo_monto=v_parametros.forma_calculo_monto, 
+            func_act_transaccion=v_parametros.func_act_transaccion, 
+            campo_id_tabla_detalle=v_parametros.campo_id_tabla_detalle, 
+            rel_dev_pago=v_parametros.rel_dev_pago, 
+            campo_trasaccion_dev=v_parametros.campo_trasaccion_dev 
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta
@@ -180,7 +225,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_detalle_plantilla_comprobante_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

@@ -490,7 +490,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender:true,
                 mode: 'local',
-                store:['simple','descuento','diferencia']
+                store:['simple','descuento','incremento','diferencia']
            },
            type:'ComboBox',
            filters:{pfiltro:'cmpbdet.forma_calculo_monto',type:'string'},
@@ -634,7 +634,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'func_act_transaccion', 
         'campo_id_tabla_detalle', 
         'rel_dev_pago', 
-        'campo_trasaccion_dev'
+        'campo_trasaccion_dev','descripcion_base'
 		
 	],
 	sortInfo:{

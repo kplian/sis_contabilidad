@@ -286,6 +286,13 @@ BEGIN
                    --------------------------
                    --  CALCULO DIFERENCIA
                    -----------------------------
+                   
+                      IF (p_reg_det_plantilla -> 'id_detalle_plantilla_fk') is NULL  THEN
+                      
+                        raise exception 'Es tipo de calculo "diferencia" necesita una columna base de referencia';
+                      
+                      END IF;
+                   
                       
                       -- analizar la forma de calculo de los montos
                       
@@ -318,12 +325,18 @@ BEGIN
                       END IF;
               
              
-            ELSEIF (p_reg_det_plantilla -> 'forma_calculo_monto') = 'descuento' THEN
+            ELSEIF (p_reg_det_plantilla -> 'forma_calculo_monto') = 'descuento' or (p_reg_det_plantilla -> 'forma_calculo_monto') = 'incremento'THEN
               
                  
                    --------------------------
                    --  CALCULO DESCUENTO
                    -----------------------------
+                   
+                   IF (p_reg_det_plantilla -> 'id_detalle_plantilla_fk') is NULL  THEN
+                      
+                        raise exception 'Es tipo de calculo "descuento" necesita una columna base de referencia';
+                      
+                      END IF;
                    
                    --el decuento solo se aplica si el monto a descontar es mayor a cero
                    
@@ -342,7 +355,7 @@ BEGIN
                         
                         IF v_sum_debe > 0 and v_sum_haber > 0   THEN
                         
-                           raise exception 'La plantilla de decuento solo puede afectar a debe o al haber pero no ambos';
+                           raise exception 'La plantilla de "%" solo puede afectar a debe o al haber pero no ambos',(p_reg_det_plantilla -> 'forma_calculo_monto');
                         
                         END IF;
                         
@@ -372,17 +385,34 @@ BEGIN
                       
                         FOR v_registros_aux in execute(v_consulta_aux) LOOP
                             
+                        
                             --calcula descuento
                             v_descuento_debe = COALESCE(v_registros_aux.importe_debe,0) * v_factor_aux;
                             v_descuento_haber = COALESCE(v_registros_aux.importe_haber,0) * v_factor_aux;
                             
+                            
+                            IF (p_reg_det_plantilla -> 'forma_calculo_monto') = 'descuento' THEN
                             --
-                            update   conta.tint_transaccion it  set
-                               importe_gasto = importe_debe - v_descuento_debe,
-                               importe_debe = importe_debe - v_descuento_debe,
-                               importe_recurso = importe_haber - v_descuento_haber,
-                               importe_haber = importe_haber - v_descuento_haber 
-                            where it.id_int_transaccion = v_registros_aux.id_int_transaccion;
+                                update   conta.tint_transaccion it  set
+                                   importe_gasto = importe_debe - v_descuento_debe,
+                                   importe_debe = importe_debe - v_descuento_debe,
+                                   importe_recurso = importe_haber - v_descuento_haber,
+                                   importe_haber = importe_haber - v_descuento_haber 
+                                where it.id_int_transaccion = v_registros_aux.id_int_transaccion;
+                                
+                                
+                           ELSEIF (p_reg_det_plantilla -> 'forma_calculo_monto') = 'incremento' THEN
+                           
+                               update   conta.tint_transaccion it  set
+                                   importe_gasto = importe_debe + v_descuento_debe,
+                                   importe_debe = importe_debe + v_descuento_debe,
+                                   importe_recurso = importe_haber + v_descuento_haber,
+                                   importe_haber = importe_haber + v_descuento_haber 
+                                where it.id_int_transaccion = v_registros_aux.id_int_transaccion;
+                           
+                           
+                           
+                           END IF;
                             
                             
                             
@@ -446,7 +476,7 @@ BEGIN
                           
                           raise notice '>>>  % , %',(p_reg_det_plantilla -> 'func_act_transaccion'),v_resp_doc[1] ;
                             
-                                EXECUTE ( 'select ' || (p_reg_det_plantilla -> 'func_act_transaccion')  ||'('||v_resp_doc[1]::varchar||' ,'||(v_this_hstore -> 'nom_id_tabla_detalle') ||' )');
+                                EXECUTE ( 'select ' || (p_reg_det_plantilla -> 'func_act_transaccion')  ||'('||v_resp_doc[1]::varchar||' ,'||(v_this_hstore -> 'campo_id_tabla_detalle') ||' )');
                              
                           END If;
                    
@@ -465,7 +495,7 @@ BEGIN
                           
                              IF (p_reg_det_plantilla -> 'func_act_transaccion') != ''  THEN
                             
-                                EXECUTE  'select ' || p_reg_det_plantilla -> 'func_act_transaccion'  ||'('||v_reg_id_int_transaccion::varchar||' ,'||(v_this_hstore -> 'nom_id_tabla_detalle') ||' )';
+                                EXECUTE  'select ' || p_reg_det_plantilla -> 'func_act_transaccion'  ||'('||v_reg_id_int_transaccion::varchar||' ,'||(v_this_hstore -> 'campo_id_tabla_detalle') ||' )';
                              
                              END If;
                             
