@@ -184,7 +184,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('glosa2','varchar');
 		$this->captura('tipo_cambio','numeric');
 		$this->captura('firma1','text');
-		$this->captura('firma2','inttext');
+		$this->captura('firma2','text');
 		$this->captura('firma3','text');
 		$this->captura('firma1_cargo','varchar');
 		$this->captura('firma2_cargo','varchar');
@@ -207,19 +207,18 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 				
 		//Definicion de la lista del resultado del query
-		$this->captura('cod_depto','varchar');
-		
 		$this->captura('cuenta','text');
 		$this->captura('auxiliar','text');
-		$this->captura('cc','varchar');
+		$this->captura('cc','text');
 		$this->captura('partida','text');
 		$this->captura('importe_debe','numeric');
 		$this->captura('importe_haber','numeric');
 		$this->captura('importe_debe1','numeric');
-		$this->captura('importe_gasto1','numeric');
+		$this->captura('importe_haber1','numeric');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+		//echo $this->consulta;exit;
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta

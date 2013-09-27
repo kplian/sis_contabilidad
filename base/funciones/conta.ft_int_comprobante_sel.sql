@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -94,9 +92,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-            
-            raise notice '%',v_consulta;  
-            
+
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -180,7 +176,7 @@ BEGIN
 						par.codigo || '' -'' || par.nombre_partida as partida,
 						tra.importe_debe, tra.importe_haber,
 						param.f_convertir_moneda(cbte.id_moneda,2,tra.importe_debe,cbte.fecha,''O'',2) as importe_debe1,
-						param.f_convertir_moneda(cbte.id_moneda,2,tra.importe_haber,cbte.fecha,''O'',2) as importe_gasto1
+						param.f_convertir_moneda(cbte.id_moneda,2,tra.importe_haber,cbte.fecha,''O'',2) as importe_haber1
 						from conta.tint_transaccion tra
 						inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
 						inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta
