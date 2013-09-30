@@ -1,14 +1,14 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla (
-  p_super public.hstore,
-  p_tabla_padre public.hstore,
-  p_reg_det_plantilla public.hstore,
-  p_plantilla_comprobante public.hstore,
+  p_super hstore,
+  p_tabla_padre hstore,
+  p_reg_det_plantilla hstore,
+  p_plantilla_comprobante hstore,
   p_id_tabla_padre_valor integer,
   p_id_int_comprobante integer,
   p_id_usuario integer,
-  p_reg_tabla public.hstore,
+  p_reg_tabla hstore,
   p_def_campos varchar [],
   p_tamano integer
 )

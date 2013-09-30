@@ -410,10 +410,14 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
   ADD COLUMN mensaje_error VARCHAR(250);
 
 ALTER TABLE conta.tdetalle_plantilla_comprobante
-  ADD COLUMN descripcion SET DEFAULT 'Transaccion de plantilla';
-
+  ADD COLUMN descripcion varchar(250) DEFAULT 'Transaccion de plantilla';   
+  
 ALTER TABLE conta.tdetalle_plantilla_comprobante
-  ALTER COLUMN descripcion SET NOT NULL;
+  ALTER COLUMN descripcion SET NOT NULL;  
+
+
+  
+ 
 
 ALTER TABLE conta.tdetalle_plantilla_comprobante
   ADD COLUMN campo_monto_pres VARCHAR(255);
@@ -445,6 +449,7 @@ ALTER TABLE conta.trelacion_contable
 
 COMMENT ON COLUMN conta.trelacion_contable.defecto
 IS 'rsta columna sirve para identificar el registro como valor por defecto para el tipo de relacion contable y la gestion. Esto permite resumir la cantidad de parametrizaciones';
+
 
 /***********************************F-SCP-RAC-CONTA-0-04/09/2013****************************************/
   
@@ -536,5 +541,11 @@ IS 'xste campo siver par aalmacenar la referencia temporal, para tabla de relaci
 
 /***********************************F-SCP-RAC-CONTA-0-18/09/2013****************************************/
 
+/***********************************I-SCP-RAC-CONTA-0-27/09/2013****************************************/
 
 
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN nom_fk_tabla_maestro VARCHAR(80);
+
+
+/***********************************F-SCP-RAC-CONTA-0-27/09/2013****************************************/

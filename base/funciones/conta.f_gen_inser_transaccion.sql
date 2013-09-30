@@ -1,7 +1,7 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_gen_inser_transaccion (
-  p_hstore_transaccion public.hstore,
+  p_hstore_transaccion hstore,
   p_id_usuario integer
 )
 RETURNS integer AS

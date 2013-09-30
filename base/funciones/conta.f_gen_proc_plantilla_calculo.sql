@@ -1,7 +1,7 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
-  p_hstore_transaccion public.hstore,
+  p_hstore_transaccion hstore,
   p_id_plantilla integer,
   p_monto numeric,
   p_id_usuario integer,
