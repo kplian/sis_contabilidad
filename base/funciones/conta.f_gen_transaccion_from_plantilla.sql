@@ -1,14 +1,14 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla (
-  p_super hstore,
-  p_tabla_padre hstore,
-  p_reg_det_plantilla hstore,
-  p_plantilla_comprobante hstore,
+  p_super public.hstore,
+  p_tabla_padre public.hstore,
+  p_reg_det_plantilla public.hstore,
+  p_plantilla_comprobante public.hstore,
   p_id_tabla_padre_valor integer,
   p_id_int_comprobante integer,
   p_id_usuario integer,
-  p_reg_tabla hstore,
+  p_reg_tabla public.hstore,
   p_def_campos varchar [],
   p_tamano integer
 )
@@ -26,6 +26,7 @@ Descripcion:
 */
 
 
+  
 DECLARE
 	v_this					conta.tdetalle_plantilla_comprobante;
     v_this_hstore		    hstore;
@@ -67,6 +68,9 @@ BEGIN
 	
     v_nombre_funcion:='conta.f_gen_transaccion_from_plantilla';
     
+    
+  
+    
      /*******************************************************************************************
      --      obtener la definicion de las variablles y los valores segun la plantilla del detalle
      *********************************************************************************************/      
@@ -91,7 +95,7 @@ BEGIN
            
              END LOOP;
              
-             
+         
      /********************************************************
      *  Si la plantilla es del tipo relacion devengado pago
      * 
@@ -160,7 +164,7 @@ BEGIN
       
       ELSE
       -- si no es una relacion devengado pago procesa la plantilla normalmente
-             
+           
                  
               /******************************************************************  
                -- si no tiene centro_costo lo obtiene a partir del depto de conta---
@@ -217,7 +221,7 @@ BEGIN
                         END IF;          
                     
               END IF;
-               
+           
               
               /********************************
               --Validaciones de cuenta y partida 
@@ -250,7 +254,7 @@ BEGIN
               v_record_int_tran.id_usuario_reg = p_id_usuario;
               v_record_int_tran.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_comprobante')::integer;
               
-             
+          
               
               /****************************************************************
               --Proceso el monto y lo ubica en el debe o haber, gasto o recurso
@@ -263,6 +267,7 @@ BEGIN
                
                
                IF (p_reg_det_plantilla -> 'forma_calculo_monto') = 'simple' THEN
+               
                   
                     
                       IF (p_reg_det_plantilla -> 'debe_haber') = 'debe' THEN
@@ -280,6 +285,7 @@ BEGIN
                          v_record_int_tran.importe_recurso = (v_this_hstore -> 'campo_monto_pres')::numeric;
                       
                       END IF;
+                    
               
               ELSEIF (p_reg_det_plantilla -> 'forma_calculo_monto') = 'diferencia' THEN
               
@@ -324,6 +330,7 @@ BEGIN
                       
                       END IF;
               
+           
              
             ELSEIF (p_reg_det_plantilla -> 'forma_calculo_monto') = 'descuento' or (p_reg_det_plantilla -> 'forma_calculo_monto') = 'incremento'THEN
               
@@ -337,6 +344,8 @@ BEGIN
                         raise exception 'Es tipo de calculo "descuento" necesita una columna base de referencia';
                       
                       END IF;
+                      
+                    
                    
                    --el decuento solo se aplica si el monto a descontar es mayor a cero
                    
@@ -449,6 +458,10 @@ BEGIN
                 raise exception 'Forma de calculo de monto no reconocida,  %', (p_reg_det_plantilla -> 'forma_calculo_monto'); 
               
           END IF;  --FIN FOMRA DE CALCULO DEL MONTO
+          
+         
+      
+        
              
               /**********************************************
               -- IF , se  aplica el documento si esta activo --
@@ -456,11 +469,14 @@ BEGIN
                
                IF (p_reg_det_plantilla -> 'aplicar_documento') = 'si' THEN
                
+              
+               
                    --TODO, validar que exista una plantilla de documento     
                  
                       --inserta las trasaccion asociadas al documento
                    IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN
-                        v_resp_doc =  conta.f_gen_proc_plantilla_calculo(
+                       
+                         v_resp_doc =  conta.f_gen_proc_plantilla_calculo(
                                                     hstore(v_record_int_tran), 
                                                     (v_this_hstore->'campo_documento')::integer,--p_id_plantilla, 
                                                     (v_this_hstore -> 'campo_monto')::numeric, 
@@ -472,18 +488,35 @@ BEGIN
                      
                           --si tiene funcion de actualizacion,  envia el id de la trasaccion generada para que se almacene 
                           
-                          IF (p_reg_det_plantilla -> 'func_act_transaccion') != ''  THEN
                           
-                          raise notice '>>>  % , %',(p_reg_det_plantilla -> 'func_act_transaccion'),v_resp_doc[1] ;
-                            
+                        
+                          
+                          IF (p_reg_det_plantilla -> 'func_act_transaccion') != ''  THEN
+                               
+                                
+                                IF ((v_this_hstore -> 'campo_id_tabla_detalle') is NULL) or (v_this_hstore -> 'campo_id_tabla_detalle')= ''   THEN
+                                
+                                   raise exception 'El para la funcion de actualizacion no puede ser nulo ni vacio (%)',(p_reg_det_plantilla -> 'func_act_transaccion');
+                                
+                                
+                                END IF;
+                                
+                                raise notice  ' >>> actualiza transaccion .. %,%',p_reg_det_plantilla -> 'func_act_transaccion',(v_this_hstore -> 'campo_id_tabla_detalle');
+                       
+                                
                                 EXECUTE ( 'select ' || (p_reg_det_plantilla -> 'func_act_transaccion')  ||'('||v_resp_doc[1]::varchar||' ,'||(v_this_hstore -> 'campo_id_tabla_detalle') ||' )');
                              
                           END If;
+                          
+                           
                    
                    
                    
                    END IF;
                ELSE
+               
+                  raise notice  ' >>> gen inserta transaccion ..';
+              
                    --inserta transaccion en tabla solo si tiene un monto maor a cero y dintinto de NULL
                    
                       IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN

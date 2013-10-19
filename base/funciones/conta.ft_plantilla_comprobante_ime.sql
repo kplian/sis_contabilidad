@@ -70,7 +70,11 @@ BEGIN
 			id_usuario_mod,
 			fecha_mod,
             campo_gestion_relacion	,
-            otros_campos
+            otros_campos, 
+            momento_comprometido,
+            momento_ejecutado,
+            momento_pagado
+             
           	) values(
           	v_parametros.codigo,
 			v_parametros.funcion_comprobante_eliminado,
@@ -92,7 +96,10 @@ BEGIN
 			null,
 			null,
             v_parametros.campo_gestion_relacion,
-            v_parametros.otros_campos
+            v_parametros.otros_campos ,
+            v_parametros.momento_comprometido,
+            v_parametros.momento_ejecutado,
+            v_parametros.momento_pagado
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -134,7 +141,10 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
             campo_gestion_relacion=v_parametros.campo_gestion_relacion,
-            otros_campos=v_parametros.otros_campos
+            otros_campos=v_parametros.otros_campos,
+            momento_comprometido=v_parametros.momento_comprometido,
+            momento_ejecutado=v_parametros.momento_ejecutado,
+            momento_pagado=v_parametros.momento_pagado
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta

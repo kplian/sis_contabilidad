@@ -1,7 +1,7 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_gen_inser_transaccion (
-  p_hstore_transaccion hstore,
+  p_hstore_transaccion public.hstore,
   p_id_usuario integer
 )
 RETURNS integer AS
@@ -57,7 +57,9 @@ BEGIN
           importe_haber_mb,
           importe_recurso_mb,
           importe_gasto_mb,
-          id_detalle_plantilla_comprobante
+          id_detalle_plantilla_comprobante,
+          importe_reversion,
+          factor_reversion
         ) 
         VALUES (
           (p_hstore_transaccion->'id_usuario_reg')::integer,
@@ -79,8 +81,10 @@ BEGIN
           (p_hstore_transaccion->'importe_haber_mb')::numeric,
           (p_hstore_transaccion->'importe_recurso_mb')::numeric,
           (p_hstore_transaccion->'importe_gasto_mb')::numeric,
-          (p_hstore_transaccion->'id_detalle_plantilla_comprobante')::integer
-        ) RETURNING id_int_comprobante into v_id_transaccion;
+          (p_hstore_transaccion->'id_detalle_plantilla_comprobante')::integer,
+          COALESCE((p_hstore_transaccion->'importe_reversion')::numeric,0),
+          COALESCE((p_hstore_transaccion->'factor_reversion')::numeric,0)
+        ) RETURNING id_int_transaccion into v_id_transaccion;
 			
 			
             --Devuelve la respuesta

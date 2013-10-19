@@ -48,20 +48,77 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		{
-			config:{
-				name: 'momento_presupuestario',
-				fieldLabel: 'Momento Presupuestario',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:255
-			},
-			type:'TextField',
-			filters:{pfiltro:'cmpb.momento_presupuestario',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
+           config:{
+                name:'momento_presupuestario',
+                fieldLabel: 'Momento',
+                allowBlank: false,
+                anchor: '80%',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['contable','presupuestario']
+           },
+           type:'ComboBox',
+           filters:{pfiltro:'cmpb.momento_presupuestario',type:'string'},
+           id_grupo:0,
+           grid:true,
+           form:true
+          },
+         {
+           config:{
+                name:'momento_comprometido',
+                fieldLabel: 'Compromete',
+                allowBlank: false,
+                anchor: '80%',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+           },
+           type:'ComboBox',
+           filters:{pfiltro:'cmpb.momento_comprometido',type:'string'},
+           id_grupo:0,
+           grid:true,
+           form:true
+          } ,
+         {
+           config:{
+                name:'momento_ejecutado',
+                fieldLabel: 'Ejecuta',
+                allowBlank: false,
+                anchor: '80%',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+           },
+           type:'ComboBox',
+           filters:{pfiltro:'cmpb.momento_ejecutado',type:'string'},
+           id_grupo:0,
+           grid:true,
+           form:true
+          },
+         {
+           config:{
+                name:'momento_pagado',
+                fieldLabel: 'Paga',
+                allowBlank: false,
+                anchor: '80%',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+           },
+           type:'ComboBox',
+           filters:{pfiltro:'cmpb.momento_pagado',type:'string'},
+           id_grupo:0,
+           grid:true,
+           form:true
+          }, 
 		{
 			config:{
 				name: 'clase_comprobante',
@@ -380,7 +437,10 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		{name:'campo_gestion_relacion', type: 'string'},
-		{name:'otros_campos', type: 'string'}
+		{name:'otros_campos', type: 'string'},
+		{name:'momento_comprometido', type: 'string'},
+		{name:'momento_ejecutado', type: 'string'},
+		{name:'momento_pagado', type: 'string'}
         
 		
 	],

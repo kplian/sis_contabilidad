@@ -51,9 +51,11 @@ DECLARE
     v_rec_periodo record;
     v_id_subsistema integer;
     v_id_clase_comprobante integer;
+     v_sincronizar varchar;
+     v_resp_int_endesis varchar;
   
 BEGIN
-	
+
     v_nombre_funcion:='conta.f_gen_comprobante';
     
     --recupero el record de la plantilla con el codigo (parametro) dado
@@ -224,7 +226,11 @@ BEGIN
       id_moneda,
       id_periodo,
       --nro_cbte,
-      --momento,
+      momento,
+      momento_comprometido,
+      momento_ejecutado,
+      momento_pagado,
+      id_plantilla_comprobante,
       glosa1,
       --glosa2,
       beneficiario,
@@ -248,7 +254,11 @@ BEGIN
       v_this.columna_moneda::integer,
       v_rec_periodo.po_id_periodo,
       --:nro_cbte,
-      --:momento,
+      v_plantilla.momento_presupuestario, -- contable, o presupuestario
+      v_plantilla.momento_comprometido,
+      v_plantilla.momento_ejecutado,
+      v_plantilla.momento_pagado,
+      v_plantilla.id_plantilla_comprobante,
       v_this.columna_descripcion,
       --:glosa2,
       v_this.columna_acreedor,
@@ -265,6 +275,8 @@ BEGIN
     raise notice '=====> AL INSERTAR  v_id_int_comprobante= %',  v_id_int_comprobante;
     -- genera transacciones del comprobante
     
+    
+  
    resp_det =  conta.f_gen_transaccion(hstore(v_this), 
                             hstore(v_tabla),
                             hstore(v_plantilla),
@@ -274,6 +286,18 @@ BEGIN
                            );
     
     
+    -- migraciond e comprobante endesis  DBLINK
+    
+    v_sincronizar=pxp.f_get_variable_global('sincronizar');
+    
+        
+   
+    IF(v_sincronizar='true')THEN
+  	
+     v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante);
+    
+    END IF;
+   
     
     return v_id_int_comprobante;
     

@@ -54,7 +54,8 @@ BEGIN
     SELECT 
       trc.id_tipo_relacion_contable,
       trc.id_tabla_relacion_contable,
-      trc.tiene_centro_costo
+      trc.tiene_centro_costo,
+      trc.nombre_tipo_relacion
     into 
       v_registros  
     from conta.ttipo_relacion_contable trc 
@@ -73,7 +74,9 @@ BEGIN
     
      IF p_id_centro_costo is NULL  and v_registros.tiene_centro_costo != 'si-unico' THEN
                 
-        raise exception 'El tipo de relacion relacion contable indica que necesita  centro de costo';
+        
+        
+        raise exception 'El tipo de relacion relacion contable indica que necesita  centro de costo: % (%)',v_registros.nombre_tipo_relacion,p_codigo;
               
      END IF;
     

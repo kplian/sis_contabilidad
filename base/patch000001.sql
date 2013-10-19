@@ -549,3 +549,89 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
 
 
 /***********************************F-SCP-RAC-CONTA-0-27/09/2013****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-18/10/2013****************************************/
+
+ALTER TABLE conta.tint_comprobante
+  ALTER COLUMN momento SET DEFAULT 'contable';
+
+ALTER TABLE conta.tint_comprobante
+  ALTER COLUMN momento SET NOT NULL;
+
+
+COMMENT ON COLUMN conta.tint_comprobante.momento
+IS 'contable o presupuestario';
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN momento_comprometido VARCHAR(4) DEFAULT 'no' NOT NULL;
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN momento_ejecutado VARCHAR(4) DEFAULT 'no' NOT NULL;  
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN momento_pagado VARCHAR(4) DEFAULT 'no' NOT NULL;
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN momento_comprometido VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN momento_ejecutado VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN momento_pagado VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ALTER COLUMN momento_presupuestario SET DEFAULT 'contable';
+
+ALTER TABLE conta.tplantilla_comprobante
+  ALTER COLUMN momento_presupuestario SET NOT NULL;
+ 
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_reversion NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.importe_reversion
+IS 'este importe se revierte del comprometido si es mayor a 0, por ejm. util para facturas que solo ejecutan 87 %';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN factor_reversion NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.factor_reversion
+IS 'porcentaje de reversion con repecto al comprometido, sirve para prorratear las cotas de pago con referencian al monto devengado';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN monto_pagado_revertido NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.monto_pagado_revertido
+IS 'Este campo  acumula el monto que falta por descontar en el momento pagado, nuca debe ser mayor que el importe_reversion';
+
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_partida_ejecucion_rev INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_partida_ejecucion_rev
+IS 'elmacena la partida ejecucion del monto revertido';
+
+/***********************************F-SCP-RAC-CONTA-0-18/10/2013****************************************/
+
+
+
+
+

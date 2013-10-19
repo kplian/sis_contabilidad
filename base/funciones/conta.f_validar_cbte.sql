@@ -1,7 +1,9 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer,
-  p_igualar varchar = 'no'
+  p_igualar varchar = 'no'::character varying
 )
 RETURNS varchar AS
 $body$
@@ -21,8 +23,13 @@ DECLARE
     v_id_periodo 	integer;
     v_filas			bigint;
     v_resp			varchar;
+    v_nombre_funcion   varchar;
+    v_funcion_comprobante_validado  varchar;
+     
 
 BEGIN
+
+     v_nombre_funcion:='conta.f_validar_cbte';
 	
 	v_errores = '';
 
@@ -102,7 +109,33 @@ BEGIN
         --7. Replicación del comprobante hacia las estructuras destino
         v_resp = conta.f_replicar_cbte(p_id_usuario,p_id_int_comprobante);
         
+        
        
+        
+       -- 8 si viene de una plantilla de comprobante busca la funcion de validacion configurada
+       
+       IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+       
+          select 
+           pc.funcion_comprobante_validado
+          into v_funcion_comprobante_validado 
+          from conta.tplantilla_comprobante pc  
+          where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+          
+          
+          EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','|| p_id_int_comprobante::varchar||')');
+                             
+          
+       
+       
+       END IF;
+       
+        --9. Valifacion presupuestaria del comprobante
+      
+        v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante);
+       
+    
+    
         
     else
     	raise exception 'Validación no realizada: %', v_errores;
@@ -111,9 +144,17 @@ BEGIN
     --8. Respuesta
     return 'Comprobante validado';
 
+EXCEPTION
+WHEN OTHERS THEN
+			v_resp='';
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+			raise exception '%',v_resp;
 END;
 $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
-SECURITY INVOKER;
+SECURITY INVOKER
+COST 100;

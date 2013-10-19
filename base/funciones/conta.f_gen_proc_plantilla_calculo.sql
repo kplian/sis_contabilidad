@@ -1,7 +1,7 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
-  p_hstore_transaccion hstore,
+  p_hstore_transaccion public.hstore,
   p_id_plantilla integer,
   p_monto numeric,
   p_id_usuario integer,
@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
   p_id_gestion integer,
   p_proc_terci varchar = 'no'::character varying
 )
-RETURNS boolean AS
+RETURNS integer [] AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
@@ -44,12 +44,20 @@ DECLARE
     v_monto_x_aplicar_pre  numeric;
     v_reg_id_int_transaccion integer;
     v_resp_doc boolean;
+    v_int_resp INTEGER[];
+    v_cont integer;
+    v_monto_revertir numeric;
+    v_factor_reversion numeric;
 			    
 BEGIN
 
     v_nombre_funcion = 'conta.f_gen_proc_plantilla_calculo';
+    
+    v_monto_revertir = 0;
+    v_factor_reversion = 0;
   
-      
+     
+    v_cont = 1;
      -- FOR obtener las plantillas calculos del documento(id_plantlla)
      FOR v_registros in ( 
                           SELECT  pc.id_plantilla_calculo,
@@ -62,7 +70,8 @@ BEGIN
                                   pc.importe_presupuesto
                           FROM  conta.tplantilla_calculo pc 
                           WHERE pc.estado_reg = 'activo' and
-                                pc.id_plantilla = p_id_plantilla ) LOOP
+                                pc.id_plantilla = p_id_plantilla
+                           order by pc.prioridad ) LOOP
       
         --IF es registro primario o secundario
             IF  p_proc_terci = 'si' or (v_registros.prioridad <= 2 )   THEN
@@ -77,11 +86,16 @@ BEGIN
                   v_monto_x_aplicar = (p_monto * v_registros.importe)::numeric;
                   v_monto_x_aplicar_pre = (p_monto * v_registros.importe_presupuesto)::numeric;
                   
+                  v_monto_revertir = p_monto - v_monto_x_aplicar_pre;
+                  v_factor_reversion  = 1 - v_registros.importe_presupuesto; 
+                  
                
                ELSE
                
                   v_monto_x_aplicar = v_registros.importe::numeric;
                   v_monto_x_aplicar_pre = v_registros.importe_presupuesto::numeric;
+                  
+                 
                
                END IF;
                
@@ -104,6 +118,9 @@ BEGIN
                   v_record_int_tran.importe_recurso = v_monto_x_aplicar_pre;
                
                END IF;
+               
+               v_record_int_tran.importe_reversion = v_monto_revertir;
+               v_record_int_tran.factor_reversion = v_factor_reversion;
                
                
                -- si no es una trasaccion primaria obtener centro de costo del departamento
@@ -157,13 +174,17 @@ BEGIN
               
                --inserta transaccion en tabla
                v_reg_id_int_transaccion = conta.f_gen_inser_transaccion(hstore(v_record_int_tran), p_id_usuario);
+               
+                v_int_resp[v_cont] = v_reg_id_int_transaccion;
+                v_cont = v_cont + 1;
+            
             
            END IF;
     
 		   
         
         END LOOP;    
-            return TRUE;
+            return v_int_resp;
 
 	
 	 --Devuelve la respuesta

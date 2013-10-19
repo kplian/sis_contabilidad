@@ -44,6 +44,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('campo_gestion_relacion','varchar');
 		$this->captura('otros_campos','varchar');
+		$this->captura('momento_comprometido','varchar');
+        $this->captura('momento_ejecutado','varchar');
+        $this->captura('momento_pagado','varchar');
         
 		
 		//Ejecuta la instruccion
@@ -78,6 +81,10 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_moneda','campo_moneda','consulta_select');
 		$this->setParametro('campo_gestion_relacion','campo_gestion_relacion','varchar');
 		$this->setParametro('otros_campos','otros_campos','varchar');
+		
+		$this->setParametro('momento_comprometido','momento_comprometido','varchar');
+        $this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
+        $this->setParametro('momento_pagado','momento_pagado','varchar');
 		
 		
 
@@ -115,6 +122,10 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_gestion_relacion','campo_gestion_relacion','varchar');
         $this->setParametro('otros_campos','otros_campos','varchar');
 
+        $this->setParametro('momento_comprometido','momento_comprometido','varchar');
+        $this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
+        $this->setParametro('momento_pagado','momento_pagado','varchar');
+        
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
