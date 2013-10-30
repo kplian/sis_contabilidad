@@ -1,7 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_int_transaccion_sel"(	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
+
+CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_int_transaccion_sel
@@ -65,10 +71,18 @@ BEGIN
 						transa.importe_haber_mb,
 						transa.importe_gasto_mb,
 						transa.importe_recurso_mb,
-						par.codigo || '' - '' || par.nombre_partida as desc_partida,
+						
+                         CASE par.sw_movimiento
+                        	WHEN ''flujo'' THEN
+								''(F) ''||par.codigo || '' - '' || par.nombre_partida 
+                            ELSE
+                            	par.codigo || '' - '' || par.nombre_partida 
+                        	END  as desc_partida,
+                        
 						cc.codigo_cc as desc_centro_costo,
 						cue.nro_cuenta || '' - '' || cue.nombre_cuenta as desc_cuenta,
-						aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar
+						aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar,
+                        par.sw_movimiento as tipo_partida
 						from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
@@ -131,7 +145,9 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_int_transaccion_sel"(integer, integer, character varying, character varying) OWNER TO postgres;

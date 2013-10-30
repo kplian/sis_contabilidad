@@ -29,6 +29,7 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
+    v_inner 			varchar;
 			    
 BEGIN
 
@@ -45,6 +46,17 @@ BEGIN
 	if(p_transaccion='CONTA_AUXCTA_SEL')then
      				
     	begin
+        
+            v_inner = '';   
+        
+            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN
+            
+            
+               v_inner = 'inner join conta.tcuenta_auxiliar c on  c.id_auxiliar = auxcta.id_auxiliar and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
+            
+            END IF;
+        
+        
     		--Sentencia de la consulta
 			v_consulta:='select
 						auxcta.id_auxiliar,
@@ -62,7 +74,8 @@ BEGIN
 						from conta.tauxiliar auxcta
 						inner join segu.tusuario usu1 on usu1.id_usuario = auxcta.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = auxcta.id_usuario_mod
-				        left join param.tempresa emp on emp.id_empresa=auxcta.id_empresa
+				        left join param.tempresa emp on emp.id_empresa=auxcta.id_empresa '||
+                        v_inner || '
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -84,11 +97,21 @@ BEGIN
 	elsif(p_transaccion='CONTA_AUXCTA_CONT')then
 
 		begin
+            v_inner = ''; 
+        
+            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN
+            
+            
+               v_inner = 'inner join conta.tcuenta_auxiliar c on  c.id_auxiliar = auxcta.id_auxiliar and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
+            
+            END IF;
+        
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_auxiliar)
+			v_consulta:='select count(auxcta.id_auxiliar)
 					    from conta.tauxiliar auxcta
 					    inner join segu.tusuario usu1 on usu1.id_usuario = auxcta.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = auxcta.id_usuario_mod
+						left join segu.tusuario usu2 on usu2.id_usuario = auxcta.id_usuario_mod '||
+                        v_inner || '
 					    where ';
 			
 			--Definicion de la respuesta		    

@@ -102,7 +102,13 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				gdisplayField:'desc_cuenta',//mapea al store del grid
    				gwidth:500,
 	   			renderer:function (value, p, record){
-	   				return String.format('{0}','<b>CC:</b> '+record.data['desc_centro_costo']+', <b>Ptda.:</b> '+record.data['desc_partida']+'<br>'+
+	   			    var color = 'green';
+	   			    
+	   			    if(record.data["tipo_partida"] == 'flujo'){
+	   			        color = 'red';
+	   			    }
+	   			    
+	   				return String.format('{0}','<b>CC:</b> '+record.data['desc_centro_costo']+', <b>Ptda.:</b> <font color="'+color+'">'+record.data['desc_partida']+'</font><br>'+
 	   					'<b>Cta.:</b> '+record.data['desc_cuenta']+'<br>'+
 	   					'<b>Aux.:</b> '+record.data['desc_auxiliar']);
 	   			}
@@ -520,7 +526,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_cuenta', type: 'string'},
 		{name:'desc_auxiliar', type: 'string'},
 		{name:'desc_partida', type: 'string'},
-		{name:'desc_centro_costo', type: 'string'}
+		{name:'desc_centro_costo', type: 'string'},'tipo_partida'
 		
 	],
 	sortInfo:{
