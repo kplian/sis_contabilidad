@@ -340,7 +340,6 @@ VALUES (1, 1, E'2013-08-04 23:57:53', E'2013-08-27 20:19:55', E'activo', 3, 1, E
 /***********************************F-DAT-RAC-CONTA-0-17/09/2013*****************************************/
 
 
-
 /***********************************I-DAT-RAC-CONTA-0-16/10/2013*****************************************/
 
 
@@ -405,4 +404,14 @@ VALUES (1, NULL, E'2013-09-18 17:54:57.881', NULL, E'activo', 8, E'Cuenta para e
 
 /***********************************F-DAT-RAC-CONTA-0-16/10/2013*****************************************/
 
+/***********************************I-DAT-RCM-CONTA-0-19/10/2013*****************************************/
+select pxp.f_insert_tgui ('Cuentas por Almacenes', 'Cuentas por Almacenes', 'ALMCUE', 'si', 5, 'sis_contabilidad/vista/cta_relacion_contable/CtaAlmacen.php', 3, '', 'CtaAlmacen', 'CONTA');
+select pxp.f_insert_testructura_gui ('ALMCUE', 'RELACON');
+
+select pxp.f_insert_tgui ('Cuentas por Clasificación', 'Cuentas por Clasificación', 'CLACUE', 'si', 5, 'sis_contabilidad/vista/cta_relacion_contable/CtaClasificacion.php', 3, '', 'CtaClasificacion', 'CONTA');
+select pxp.f_insert_testructura_gui ('CLACUE', 'RELACON');
+
+select pxp.f_add_catalog('PARAM','tgral__direc','asc');
+select pxp.f_add_catalog('PARAM','tgral__direc','desc');
+/***********************************F-DAT-RCM-CONTA-0-19/10/2013*****************************************/
 

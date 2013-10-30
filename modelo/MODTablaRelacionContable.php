@@ -31,6 +31,8 @@ class MODTablaRelacionContable extends MODbase{
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('tabla_id_fk','varchar');
+		$this->captura('recorrido_arbol','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -51,6 +53,8 @@ class MODTablaRelacionContable extends MODbase{
 		$this->setParametro('tabla','tabla','varchar');
 		$this->setParametro('esquema','esquema','varchar');
 		$this->setParametro('tabla_id','tabla_id','varchar');
+		$this->setParametro('tabla_id_fk','tabla_id_fk','varchar');
+		$this->setParametro('recorrido_arbol','recorrido_arbol','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -72,6 +76,8 @@ class MODTablaRelacionContable extends MODbase{
 		$this->setParametro('tabla','tabla','varchar');
 		$this->setParametro('esquema','esquema','varchar');
 		$this->setParametro('tabla_id','tabla_id','varchar');
+		$this->setParametro('tabla_id_fk','tabla_id_fk','varchar');
+		$this->setParametro('recorrido_arbol','recorrido_arbol','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
