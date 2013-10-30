@@ -1,8 +1,8 @@
 <?php
 /**
 *@package pXP
-*@file gen-SistemaDist.php
-*@author  (fprudencio)
+*@file ConceptoIngas.php
+*@author  RCM
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
@@ -29,7 +29,7 @@ Phx.vista.ConceptoIngasCuenta = {
    bsave:false,
    EnableSelect : function (n, extra) {
    		var selected = this.sm.getSelected().data;
-   		var miExtra = {codigos_tipo_relacion:'', filtro_partida : {propiedad: 'id_concepto_ingas', valor : selected.id_concepto_ingas}};
+   		var miExtra = {codigos_tipo_relacion:''};//, filtro_partida : {propiedad: 'id_concepto_ingas', valor : selected.id_concepto_ingas}};
    		
    		if (extra != null && typeof extra === 'object') {
    			miExtra = Ext.apply(extra, miExtra) 

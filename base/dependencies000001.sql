@@ -305,3 +305,48 @@ ALTER TABLE conta.ttransaccion
     NOT DEFERRABLE;
 
 /***********************************F-DEP-RCM-CONTA-18-29/08/2013*****************************************/
+
+/***********************************I-DEP-RCM-CONTA-0-21/10/2013*****************************************/
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT fk_tint_transaccion__id_int_comprobante FOREIGN KEY (id_int_comprobante)
+    REFERENCES conta.tint_comprobante(id_int_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT fk_tint_transaccion__id_cuenta FOREIGN KEY (id_cuenta)
+    REFERENCES conta.tcuenta(id_cuenta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT fk_tint_transaccion__id_auxiliar FOREIGN KEY (id_auxiliar)
+    REFERENCES conta.tauxiliar(id_auxiliar)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT fk_tint_transaccion__id_centro_costo FOREIGN KEY (id_centro_costo)
+    REFERENCES param.tcentro_costo(id_centro_costo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT fk_tint_transaccion__id_partida FOREIGN KEY (id_partida)
+    REFERENCES pre.tpartida(id_partida)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT fk_tint_transaccion__id_int_transaccion_fk FOREIGN KEY (id_int_transaccion_fk)
+    REFERENCES conta.tint_transaccion(id_int_transaccion)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/***********************************F-DEP-RCM-CONTA-0-21/10/2013*****************************************/

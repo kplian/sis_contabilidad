@@ -632,6 +632,13 @@ IS 'elmacena la partida ejecucion del monto revertido';
 /***********************************F-SCP-RAC-CONTA-0-18/10/2013****************************************/
 
 
+/***********************************I-SCP-RCM-CONTA-0-25/10/2013****************************************/
+alter table conta.ttabla_relacion_contable
+add column tabla_id_fk VARCHAR(100);
+
+alter table conta.ttabla_relacion_contable
+add column recorrido_arbol VARCHAR(20);
+/***********************************F-SCP-RCM-CONTA-0-25/10/2013****************************************/
 
 /***********************************I-SCP-RAC-CONTA-0-30/10/2013****************************************/
 

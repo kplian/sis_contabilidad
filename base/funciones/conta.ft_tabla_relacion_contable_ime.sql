@@ -55,7 +55,9 @@ BEGIN
 			fecha_reg,
 			id_usuario_reg,
 			fecha_mod,
-			id_usuario_mod
+			id_usuario_mod,
+			tabla_id_fk,
+			recorrido_arbol
           	) values(
 			'activo',
 			v_parametros.tabla,
@@ -64,8 +66,9 @@ BEGIN
 			now(),
 			p_id_usuario,
 			null,
-			null
-							
+			null,
+			v_parametros.tabla_id_fk,
+			v_parametros.recorrido_arbol			
 			)RETURNING id_tabla_relacion_contable into v_id_tabla_relacion_contable;
 			
 			--Definicion de la respuesta
@@ -93,7 +96,9 @@ BEGIN
 			esquema = v_parametros.esquema,
             tabla_id = v_parametros.tabla_id,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+			tabla_id_fk = v_parametros.tabla_id_fk,
+			recorrido_arbol = v_parametros.recorrido_arbol
 			where id_tabla_relacion_contable=v_parametros.id_tabla_relacion_contable;
                
 			--Definicion de la respuesta

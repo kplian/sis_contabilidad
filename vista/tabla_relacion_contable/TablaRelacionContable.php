@@ -112,10 +112,47 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 				maxLength:200
 			},
 			type:'TextField',
-			filters:{pfiltro:'tabrecon.id_tabla',type:'string'},
+			filters:{pfiltro:'tabrecon.tabla_id',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
+		},
+		{
+			config:{
+				name: 'tabla_id_fk',
+				fieldLabel: 'Id Padre (árbol)',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 150,
+				maxLength:200
+			},
+			type:'TextField',
+			filters:{pfiltro:'tabrecon.tabla_id_fk',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config: {
+				name: 'recorrido_arbol',
+				fieldLabel: 'Recorrido árbol',
+				anchor: '100%',
+				tinit: false,
+				allowBlank: false,
+				origen: 'CATALOGO',
+				gdisplayField: 'recorrido_arbol',
+				gwidth: 100,
+				baseParams:{
+						cod_subsistema:'PARAM',
+						catalogo_tipo:'tgral__direc'
+				},
+				renderer:function (value, p, record){return String.format('{0}', record.data['recorrido_arbol']);}
+			},
+			type: 'ComboRec',
+			id_grupo: 0,
+			filters:{pfiltro:'tabrecon.recorrido_arbol',type:'string'},
+			grid: true,
+			form: true
 		},
 		
 		{
@@ -213,8 +250,8 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'}
-		
+		{name:'usr_mod', type: 'string'},
+		{name:'recorrido_arbol', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_tabla_relacion_contable',
