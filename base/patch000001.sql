@@ -633,5 +633,18 @@ IS 'elmacena la partida ejecucion del monto revertido';
 
 
 
+/***********************************I-SCP-RAC-CONTA-0-30/10/2013****************************************/
+
+CREATE TABLE conta.tcuenta_ids (
+  id_cuenta_uno INTEGER NOT NULL, 
+  id_cuenta_dos INTEGER NOT NULL, 
+  sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion'::character varying, 
+  CONSTRAINT tcuenta_ids_pkey PRIMARY KEY(id_cuenta_uno)
+) WITHOUT OIDS;
+
+CREATE INDEX tcuenta_ids_idx ON conta.tcuenta_ids
+  USING btree (id_cuenta_dos);
+  
+/***********************************F-SCP-RAC-CONTA-0-30/10/2013****************************************/
 
 
