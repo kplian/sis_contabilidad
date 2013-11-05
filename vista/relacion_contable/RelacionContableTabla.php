@@ -139,6 +139,16 @@ Phx.vista.RelacionContableTabla = {
 			
 		}, this);
 		
+		this.Cmp.id_cuenta.on('select', function (c, r, i) {
+          
+            this.Cmp.id_auxiliar.store.setBaseParam('id_cuenta',r.data.id_cuenta);
+            this.Cmp.id_auxiliar.modificado = true;
+            this.Cmp.id_auxiliar.reset();
+            
+            
+        }, this);
+		
+		
 		this.Cmp.id_tipo_relacion_contable.on('select', function (c, r, i) {
 			//centro de costo
 			if (r.data.tiene_centro_costo == 'si') {
@@ -242,7 +252,12 @@ Phx.vista.RelacionContableTabla = {
 		
 		this.Cmp.id_centro_costo.store.setBaseParam('id_gestion',selected.id_gestion);
 		this.Cmp.id_cuenta.store.setBaseParam('id_gestion',selected.id_gestion);
+		
+		
 		this.Cmp.id_auxiliar.store.setBaseParam('id_gestion',selected.id_gestion);
+		
+		
+		
 		this.Cmp.id_partida.store.setBaseParam('id_gestion',selected.id_gestion);
 		
 		this.Cmp.id_tipo_relacion_contable.enable(); 

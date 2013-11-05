@@ -50,6 +50,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('desc_centro_costo','text');
 		$this->captura('desc_cuenta','text');
 		$this->captura('desc_auxiliar','text');
+		$this->captura('tipo_partida','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
