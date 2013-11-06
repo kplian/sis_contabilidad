@@ -655,3 +655,27 @@ CREATE INDEX tcuenta_ids_idx ON conta.tcuenta_ids
 /***********************************F-SCP-RAC-CONTA-0-30/10/2013****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-14/11/2013****************************************/
+
+CREATE TABLE conta.tcuenta_partida (
+  id_cuenta_partida SERIAL, 
+  id_cuenta INTEGER, 
+  id_partida INTEGER, 
+  sw_deha VARCHAR(10) NOT NULL, 
+  se_rega VARCHAR(10) NOT NULL, 
+  CONSTRAINT tcuenta_partida_pkey PRIMARY KEY(id_cuenta_partida)
+) INHERITS (pxp.tbase)
+WITHOUT OIDS;
+
+COMMENT ON COLUMN conta.tcuenta_partida.sw_deha
+IS 'debe, haber';
+
+COMMENT ON COLUMN conta.tcuenta_partida.se_rega
+IS 'recurso, gasto';
+
+--------------- SQL ---------------
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-14/11/2013****************************************/
+
