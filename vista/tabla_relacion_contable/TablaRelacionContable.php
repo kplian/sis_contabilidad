@@ -138,7 +138,7 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Recorrido árbol',
 				anchor: '100%',
 				tinit: false,
-				allowBlank: false,
+				allowBlank: true,
 				origen: 'CATALOGO',
 				gdisplayField: 'recorrido_arbol',
 				gwidth: 100,
