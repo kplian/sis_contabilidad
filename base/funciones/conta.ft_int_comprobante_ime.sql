@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_int_comprobante_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_int_comprobante_ime
@@ -30,6 +35,8 @@ DECLARE
 	v_id_subsistema			integer;
 	v_rec					record;
 	v_result				varchar;
+    v_rec_cbte record;
+    v_funcion_comprobante_eliminado varchar;
 			    
 BEGIN
 
@@ -205,9 +212,37 @@ BEGIN
 	elsif(p_transaccion='CONTA_INCBTE_ELI')then
 
 		begin
+			
+            
+            
+            
+            select * 
+            into v_rec_cbte
+            from conta.tint_comprobante
+            where id_int_comprobante = v_parametros.id_int_comprobante;
+        
 			--Sentencia de la eliminacion
 			delete from conta.tint_comprobante
             where id_int_comprobante=v_parametros.id_int_comprobante;
+            
+            
+            -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
+       
+             IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+             
+                select 
+                 pc.funcion_comprobante_eliminado
+                into v_funcion_comprobante_eliminado
+                from conta.tplantilla_comprobante pc  
+                where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+                
+                
+                EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','|| v_parametros.id_int_comprobante::varchar||')');
+                                   
+                
+             
+             
+             END IF;
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante eliminado(a)'); 
@@ -256,7 +291,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_int_comprobante_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

@@ -3,10 +3,10 @@
 CREATE OR REPLACE FUNCTION conta.f_get_columna (
   p_tipo varchar,
   p_cadena text,
-  p_this hstore,
-  p_tabla hstore,
-  p_super hstore = NULL::hstore,
-  p_tabla_padre hstore = NULL::hstore
+  p_this public.hstore,
+  p_tabla public.hstore,
+  p_super public.hstore = NULL::hstore,
+  p_tabla_padre public.hstore = NULL::hstore
 )
 RETURNS varchar AS
 $body$

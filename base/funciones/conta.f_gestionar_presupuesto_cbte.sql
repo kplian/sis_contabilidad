@@ -185,7 +185,7 @@ BEGIN
                      
                         
                         IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
-                           -- si solo ejecutamos el presupuesto o (compromentemos y ejecutamos) o (cmprometemeos eecutamos y pagamos)     
+                           -- si solo ejecutamos el presupuesto o (compromentemos y ejecutamos) o (compromentemos, ejecutamos y pagamos)     
                                 
                                  -- si  el comprobante tiene que comprometer
                                 IF v_registros_comprobante.momento_comprometido = 'si'  then
@@ -237,8 +237,8 @@ BEGIN
                                         --  armamos los array para enviar a presupuestos          
                                        va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                                        va_id_partida[v_i]= v_registros.id_partida;
-                                       va_momento[v_i]	= 2;
-                                       va_monto[v_i]  = (v_registros.importe_reversion)*-1;
+                                       va_momento[v_i]	= 2;  --momento revertido
+                                       va_monto[v_i]  = (v_registros.importe_reversion)*-1; --signo negativo para revertir
                                        va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
                                        va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
                                        va_columna_relacion[v_i]= 'id_int_transaccion';
@@ -259,7 +259,7 @@ BEGIN
                           
                           ELSIF   v_momento_aux='solo pagar'  THEN
                            
-                          --si es solo pagar debemos identificar las transacciones del vengado 
+                          --si es solo pagar debemos identificar las transacciones del devengado 
                            
                           
                            v_aux = v_aux || ','||v_registros.id_int_transaccion;
@@ -322,7 +322,7 @@ BEGIN
                                                
                                                --obtener el factor de reversion de la transaccion de devengado
                                                
-                                               --si el factor es mamor a cero reducrie el monto a pagar en esa proporcion
+                                               --si el factor es mayor a cero reducrie el monto a pagar en esa proporcion
                                                
                                                v_i = v_i + 1;         
                                                --armamos los array para enviar a presupuestos          
@@ -394,9 +394,11 @@ BEGIN
                       FOR v_cont IN 1..v_i LOOP
                          
                           IF v_momento_aux='solo ejecutar' THEN
+                          
+                          --raise exception 'v_marca_reversion %',v_marca_reversion;
                           	 
                                   --verificamos que no sea un trasaccion de reversion
-                                  IF  v_cont  !=  ANY(v_marca_reversion) THEN
+                                  IF  NOT (v_cont  =  ANY(v_marca_reversion)) THEN
                                 
                                       update conta.tint_transaccion it set
                                          id_partida_ejecucion_dev = va_resp_ges[v_cont],
