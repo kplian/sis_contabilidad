@@ -3,7 +3,8 @@
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer,
-  p_igualar varchar = 'no'::character varying
+  p_igualar varchar = 'no'::character varying,
+  p_origen varchar = 'pxp'::character varying
 )
 RETURNS varchar AS
 $body$
@@ -30,6 +31,8 @@ DECLARE
 BEGIN
 
      v_nombre_funcion:='conta.f_validar_cbte';
+     
+    -- raise exception 'LLEGA AL PXP';
 	
 	v_errores = '';
 

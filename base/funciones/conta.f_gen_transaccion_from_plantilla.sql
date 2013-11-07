@@ -244,17 +244,18 @@ BEGIN
               /************************************************  
               --tranforma el hstore a record de int_transaccion
               *************************************************/
+              
               v_record_int_tran.id_cuenta =   (v_this_hstore -> 'campo_cuenta')::integer;
               v_record_int_tran.id_partida =   (v_this_hstore -> 'campo_partida')::integer;
               v_record_int_tran.id_auxiliar =   (v_this_hstore -> 'campo_auxiliar')::integer;
               v_record_int_tran.id_centro_costo =   (v_this_hstore -> 'campo_centro_costo')::integer;
               v_record_int_tran.id_partida_ejecucion = (v_this_hstore -> 'campo_partida_ejecucion')::integer;
-              v_record_int_tran.glosa = (v_this_hstore -> 'descripcion')::varchar;
+              v_record_int_tran.glosa = (v_this_hstore -> 'campo_concepto_transaccion')::varchar;
               v_record_int_tran.id_int_comprobante = p_id_int_comprobante;
               v_record_int_tran.id_usuario_reg = p_id_usuario;
               v_record_int_tran.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_comprobante')::integer;
               
-          
+             raise notice '>>>>>>>>>>>>>>>>>>   glosa %',v_this_hstore -> 'campo_concepto_transaccion';
               
               /****************************************************************
               --Proceso el monto y lo ubica en el debe o haber, gasto o recurso

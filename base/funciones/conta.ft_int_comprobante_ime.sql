@@ -213,39 +213,10 @@ BEGIN
 
 		begin
 			
-            
-            
-            
-            select * 
-            into v_rec_cbte
-            from conta.tint_comprobante
-            where id_int_comprobante = v_parametros.id_int_comprobante;
-        
-			--Sentencia de la eliminacion
-			delete from conta.tint_comprobante
-            where id_int_comprobante=v_parametros.id_int_comprobante;
-            
-            
-            -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
-       
-             IF v_rec_cbte.id_plantilla_comprobante is not null THEN
-             
-                select 
-                 pc.funcion_comprobante_eliminado
-                into v_funcion_comprobante_eliminado
-                from conta.tplantilla_comprobante pc  
-                where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
-                
-                
-                EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','|| v_parametros.id_int_comprobante::varchar||')');
-                                   
-                
-             
-             
-             END IF;
+            v_result = conta.f_eliminar_int_comprobante(p_id_usuario,v_parametros.id_int_comprobante);
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
               
             --Devuelve la respuesta
