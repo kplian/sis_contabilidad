@@ -82,6 +82,8 @@ BEGIN
     -- revisar el tipo de comrpobante y su estado
     
      raise notice ' >>>> yyyyyyyyyyyyy';
+    
+    
     select    
       ic.momento,
       ic.id_clase_comprobante,
@@ -185,9 +187,12 @@ BEGIN
                      
                         
                         IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
-                           -- si solo ejecutamos el presupuesto o (compromentemos y ejecutamos) o (compromentemos, ejecutamos y pagamos)     
+                          
+                            -- si solo ejecutamos el presupuesto 
+                            --  o (compromentemos y ejecutamos) 
+                            --  o (compromentemos, ejecutamos y pagamos)     
                                 
-                                 -- si  el comprobante tiene que comprometer
+                                -- si  el comprobante tiene que comprometer
                                 IF v_registros_comprobante.momento_comprometido = 'si'  then
                                   
                                       -- validamos que si tiene que comprometer la id_partida_ejecucion tiene que ser nulo
@@ -204,8 +209,9 @@ BEGIN
                                 --si es una partida de presupuesto y no de flujo, la guardamos para comprometer
                                         
                                 IF v_registros.sw_movimiento = 'presupuestaria' THEN
+                                     
                                      v_monto_cmp = 0;
-                                      v_i = v_i + 1;
+                                     v_i = v_i + 1;
                                      -- determinamos el monto a comprometer
                                      IF v_registros.tipo = 'gasto'  THEN
                                          v_monto_cmp  = v_registros.importe_debe;
@@ -215,6 +221,7 @@ BEGIN
                                            
                                       
                                      --  armamos los array para enviar a presupuestos          
+                                    
                                      va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                                      va_id_partida[v_i]= v_registros.id_partida;
                                      va_momento[v_i]	= v_momento_presupeustario;
@@ -224,7 +231,7 @@ BEGIN
                                      va_columna_relacion[v_i]= 'id_int_transaccion';
                                      va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                      va_id_transaccion[v_i]= v_registros.id_int_transaccion;
-                                     va_fecha[v_i]=now()::date;
+                                     va_fecha[v_i]=now()::date;  --OJO, talves sea necesario utilizar la fecha del comprobante
                                      
                                    -------------------------------------------------------  
                                    --   si existe monto a revertir y tenememos el id_partida_ejecucion, revertimos
@@ -398,21 +405,24 @@ BEGIN
                           --raise exception 'v_marca_reversion %',v_marca_reversion;
                           	 
                                   --verificamos que no sea un trasaccion de reversion
-                                  IF  NOT (v_cont  =  ANY(v_marca_reversion)) THEN
+                                  IF  (v_cont  =  ANY(v_marca_reversion)) THEN
+                                  
+                                  
+                                       update conta.tint_transaccion it set
+                                         id_partida_ejecucion_rev = va_resp_ges[v_cont],
+                                         fecha_mod = now(),
+                                         id_usuario_mod = p_id_usuario
+                                      where it.id_int_transaccion  =  va_id_transaccion[v_cont];
                                 
+                                  ELSE
+                                  
                                       update conta.tint_transaccion it set
                                          id_partida_ejecucion_dev = va_resp_ges[v_cont],
                                          fecha_mod = now(),
                                          id_usuario_mod = p_id_usuario
-                                      where it.id_int_transaccion  =  va_id_transaccion[v_cont];    
-                                  
-                                  ELSE
-                                  
-                                    update conta.tint_transaccion it set
-                                         id_partida_ejecucion_rev = va_resp_ges[v_cont],
-                                         fecha_mod = now(),
-                                         id_usuario_mod = p_id_usuario
                                       where it.id_int_transaccion  =  va_id_transaccion[v_cont]; 
+                                  
+                                    
                                     
                                   END IF;
                           ELSE    
