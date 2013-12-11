@@ -35,6 +35,7 @@ DECLARE
     
     v_tipo_rel  record;
     v_defecto varchar;
+    v_resp_rep			varchar;
 			    
 BEGIN
 
@@ -270,6 +271,28 @@ BEGIN
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Relación Contable eliminado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_relacion_contable',v_parametros.id_relacion_contable::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+		
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_REPRELCON_REP'
+ 	#DESCRIPCION:	Replicación de parametrización de Relaciones Contables
+ 	#AUTOR:			RCM	
+ 	#FECHA:			10/12/2013
+	***********************************/
+
+	elsif(p_transaccion='CONTA_REPRELCON_REP')then
+
+		begin
+			--Llamada a la función de replicación
+			v_resp_rep = conta.f_replicar_relacion_contable_cambio_gestion(v_parametros.id_gestion_ori,v_parametros.id_gestion);
+            
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Replicacion realizada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'observaciones',v_resp_rep); 
               
             --Devuelve la respuesta
             return v_resp;

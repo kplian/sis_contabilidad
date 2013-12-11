@@ -62,7 +62,9 @@ BEGIN
 			id_usuario_reg,
 			fecha_reg,
 			fecha_mod,
-			id_usuario_mod
+			id_usuario_mod,
+			importe_presupuesto,
+			descuento
           	) values(
 			v_parametros.prioridad,
 			v_parametros.debe_haber,
@@ -75,8 +77,9 @@ BEGIN
 			p_id_usuario,
 			now(),
 			null,
-			null
-							
+			null,
+			v_parametros.importe_presupuesto,
+			v_parametros.descuento				
 			)RETURNING id_plantilla_calculo into v_id_plantilla_calculo;
 			
 			--Definicion de la respuesta
@@ -108,7 +111,9 @@ BEGIN
 			importe = v_parametros.importe,
 			descripcion = v_parametros.descripcion,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+			importe_presupuesto = v_parametros.importe_presupuesto,
+			descuento = v_parametros.descuento
 			where id_plantilla_calculo=v_parametros.id_plantilla_calculo;
                
 			--Definicion de la respuesta

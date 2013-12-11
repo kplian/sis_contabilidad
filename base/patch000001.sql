@@ -679,3 +679,16 @@ IS 'recurso, gasto';
 
 /***********************************F-SCP-RAC-CONTA-0-14/11/2013****************************************/
 
+/***********************************I-SCP-RCM-CONTA-0-21/11/2013****************************************/
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD COLUMN partida_tipo VARCHAR(25);
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ALTER COLUMN partida_tipo SET DEFAULT 'flujo_presupuestaria';
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD COLUMN partida_rubro VARCHAR(15);
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ALTER COLUMN partida_rubro SET DEFAULT 'ingreso_gasto';
+/***********************************F-SCP-RCM-CONTA-0-21/11/2013****************************************/

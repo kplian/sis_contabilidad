@@ -34,6 +34,8 @@ class MODTipoRelacionContable extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('tiene_partida','varchar');
 		$this->captura('tiene_auxiliar','varchar');
+		$this->captura('partida_tipo','varchar');
+		$this->captura('partida_rubro','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -57,6 +59,8 @@ class MODTipoRelacionContable extends MODbase{
 		$this->setParametro('id_tabla_relacion_contable','id_tabla_relacion_contable','int4');
 		$this->setParametro('tiene_partida','tiene_partida','varchar');
 		$this->setParametro('tiene_auxiliar','tiene_auxiliar','varchar');
+		$this->setParametro('partida_tipo','partida_tipo','varchar');
+		$this->setParametro('partida_rubro','partida_rubro','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -81,6 +85,8 @@ class MODTipoRelacionContable extends MODbase{
 		$this->setParametro('id_tabla_relacion_contable','id_tabla_relacion_contable','int4');
 		$this->setParametro('tiene_partida','tiene_partida','varchar');
 		$this->setParametro('tiene_auxiliar','tiene_auxiliar','varchar');
+		$this->setParametro('partida_tipo','partida_tipo','varchar');
+		$this->setParametro('partida_rubro','partida_rubro','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

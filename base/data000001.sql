@@ -415,3 +415,20 @@ select pxp.f_add_catalog('PARAM','tgral__direc','asc');
 select pxp.f_add_catalog('PARAM','tgral__direc','desc');
 /***********************************F-DAT-RCM-CONTA-0-19/10/2013*****************************************/
 
+
+/***********************************I-DAT-RCM-CONTA-0-21/11/2013*****************************************/
+
+select pxp.f_add_catalog('CONTA','tttipo_relacion_contable__partida_tipo','flujo');
+select pxp.f_add_catalog('CONTA','tttipo_relacion_contable__partida_tipo','presupuestaria');
+select pxp.f_add_catalog('CONTA','tttipo_relacion_contable__partida_tipo','flujo_presupuestaria');
+
+select pxp.f_add_catalog('CONTA','tttipo_relacion_contable__partida_rubro','recurso');
+select pxp.f_add_catalog('CONTA','tttipo_relacion_contable__partida_rubro','gasto');
+select pxp.f_add_catalog('CONTA','tttipo_relacion_contable__partida_rubro','recurso_gasto');
+
+/***********************************F-DAT-RCM-CONTA-0-21/11/2013*****************************************/
+
+/***********************************I-DAT-RCM-CONTA-0-10/12/2013*****************************************/
+select pxp.f_insert_tgui ('Replicación Relaciones Contables', 'Replicación Relaciones Contables', 'RERELCON', 'si', 1, 'sis_contabilidad/vista/gestion/GestionConta.php', 2, '', 'GestionConta', 'CONTA');
+select pxp.f_insert_testructura_gui ('RERELCON', 'CONTA');
+/***********************************F-DAT-RCM-CONTA-0-10/12/2013*****************************************/

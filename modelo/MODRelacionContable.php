@@ -50,6 +50,8 @@ class MODRelacionContable extends MODbase{
 		$this->captura('tiene_auxiliar','varchar');
 		$this->captura('codigo_cc','text');
 		$this->captura('defecto','varchar');
+		$this->captura('partida_tipo','varchar');
+		$this->captura('partida_rubro','varchar');
 		
 		
 		//Ejecuta la instruccion

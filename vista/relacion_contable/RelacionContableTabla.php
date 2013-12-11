@@ -33,7 +33,7 @@ Phx.vista.RelacionContableTabla = {
 	    					},
 	    					totalProperty: 'total',
 	    					fields: ['id_tipo_relacion_contable','codigo_tipo_relacion','nombre_tipo_relacion',
-	    							'tiene_centro_costo','tiene_partida','tiene_auxiliar'],
+	    							'tiene_centro_costo','tiene_partida','tiene_auxiliar','partida_tipo','partida_rubro'],
 	    					// turn on remote sorting
 	    					remoteSort: true,
 	    					baseParams:{par_filtro:'codigo_tipo_relacion#nombre_tipo_relacion'}
@@ -181,6 +181,10 @@ Phx.vista.RelacionContableTabla = {
 				this.mostrarComponente(this.Cmp.id_partida);
 				this.setAllowBlank(this.Cmp.id_partida, false);
 				this.Cmp.id_partida.enable(); 
+				//Seteo del store del combo de partida
+				Ext.apply(this.Cmp.id_partida.store.baseParams,{
+					partida_tipo:r.data.partida_tipo,
+					partida_rubro:r.data.partida_rubro});
 			} else {
 				this.Cmp.id_partida.reset();
 				this.ocultarComponente(this.Cmp.id_partida);
