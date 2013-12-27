@@ -1,7 +1,7 @@
-CREATE OR REPLACE FUNCTION conta.f_tri_trelacion_contable ()
+CREATE OR REPLACE FUNCTION conta.f_tri_trelacion_contable (
+)
 RETURNS trigger AS
-$BODY$
-
+$body$
 DECLARE
 		 
 	g_registros record;
@@ -9,140 +9,105 @@ DECLARE
 	v_res_cone  varchar;
 	v_cadena_cnx varchar;
 	v_cadena_con varchar;
-	resp boolean;
-	
+	v_resp varchar;
+
 	v_tabla varchar;
-	v_usr varchar;
 	v_id_uo integer;
+	v_nro_cuenta varchar;
+	v_codigo_trel varchar;
 		
 BEGIN
 
+	--funcion para obtener cadena de conexion
+	v_cadena_cnx =  migra.f_obtener_cadena_conexion();
+
 	--Verificar si la relacion contable corresponde a: tconcepto_ingas, tcuenta_bancaria
-	select tbl.tabla
-	into v_tabla
-	from conta.trelacion_contable rc
-	inner join conta.ttipo_relacion_contable trc on trc.id_tipo_relacion_contable = rc.id_tipo_relacion_contable
+	select tbl.tabla, trc.codigo_tipo_relacion
+	into v_tabla, v_codigo_trel
+	from conta.ttipo_relacion_contable trc
 	inner join conta.ttabla_relacion_contable tbl on tbl.id_tabla_relacion_contable = trc.id_tabla_relacion_contable
-	where rc.id_relacion_contable = COALESCE(NEW.id_relacion_contable,OLD.id_relacion_contable)
+	where trc.id_tipo_relacion_contable = NEW.id_tipo_relacion_contable
 	and tbl.tabla in ('tconcepto_ingas','tcuenta_bancaria');
 	
 	if v_tabla is not null then
 	
-		--Obtener unidad organizacional
-		select id_uo into v_id_uo
-		from param.tcentro_costo
-		where id_centro_costo = NEW.id_centro_costo;
+		if TG_OP IN ('INSERT','UPDATE') then
+
+			if v_tabla = 'tconcepto_ingas' and v_codigo_trel = 'CUECOMP' then
+			
+				--Obtener unidad organizacional
+				select id_uo into v_id_uo
+				from param.tcentro_costo
+				where id_centro_costo = NEW.id_centro_costo;
+				
+				v_consulta = 'select migracion.f_mig_tcuenta_bancaria__tts_cuenta_bancaria('''||
+								TG_OP ||''',' ||
+                                COALESCE(NEW.id_relacion_contable::varchar,'NULL')||','||
+                                COALESCE(NEW.id_tabla::varchar,'NULL')||','||
+                                COALESCE(NEW.id_cuenta::varchar,'NULL')||','||
+                                COALESCE(v_id_uo::varchar,'NULL')||','||
+                                COALESCE(NEW.id_auxiliar::varchar,'NULL')||','||
+                                COALESCE(NEW.id_centro_costo::varchar,'NULL')||')';
+				
+			elsif v_tabla = 'tcuenta_bancaria' and v_codigo_trel = 'CUEBANCEGRE' then
+			
+				--Obtener nro cuenta bancaria
+				select nro_cuenta
+				into v_nro_cuenta
+				from tes.tcuenta_bancaria
+				where id_cuenta_bancaria = NEW.id_tabla; 
+			
+				v_consulta = 'select migracion.f_mig_tcuenta_bancaria__tts_cuenta_bancaria('''||
+								TG_OP ||''',' ||
+                                COALESCE(NEW.id_relacion_contable::varchar,'NULL')||','||
+                                COALESCE(NEW.id_tabla::varchar,'NULL')||','||
+                                COALESCE(NEW.id_cuenta::varchar,'NULL')||','||
+                                COALESCE(NEW.id_auxiliar::varchar,'NULL')||','||
+                                COALESCE(NEW.id_centro_costo::varchar,'NULL')||','||
+                                COALESCE(NEW.id_gestion::varchar,'NULL')||')';
+
+			end if;
 	
-		IF TG_OP = 'INSERT' THEN
 		
-			--Obtener usuario
-			select cuenta into v_usr
-			from segu.tusuario
-			where id_usuario = NEW.id_usuario_reg;
+		else  --DELETE
 		
-			if v_tabla = 'tconcepto_ingas' then
-				
-				v_consulta = 'INSERT INTO presto.tpr_concepto_cta (
-							  id_concepto_cta,
-							  id_concepto_ingas,
-							  id_cuenta,
-							  id_unidad_organizacional,
-							  id_auxiliar,
-							  id_presupuesto,
-							  usuario_reg,
-							  fecha_reg
-							) VALUES ('||
-							  NEW.id_relacion_contable||','||
-							  NEW.id_tabla||','||
-							  NEW.id_cuenta||','||
-							  v_id_uo||','||
-							  NEW.id_auxiliar||','||
-							  NEW.id_centro_costo||','''||
-							  v_usr||''','''||
-							  now()||'')';
-				
-			elsif v_tabla = 'tcuenta_bancaria' then
+			if v_tabla = 'tconcepto_ingas' and v_codigo_trel = 'CUECOMP' then
 			
-				v_consulta = 'INSERT INTO tesoro.tts_cuenta_bancaria_cuenta(
-							  id_cuenta_bancaria_cuenta,
-							  id_cuenta_bancaria,
-							  id_cuenta,
-							  id_auxiliar,
-							  id_parametro,
-							  id_usuario_reg,
-							  fecha_reg
-							) 
-							VALUES (
-							  NEW.id_relacion_contable||','||
-							  NEW.id_tabla||','||
-							  NEW.id_cuenta||','||
-							  NEW.id_auxiliar||','||
-							  :id_parametro,
-							  :id_usuario_reg,
-							  :fecha_reg
-							);';
-							
-			end if;
-		
-		   
-			v_consulta = 'SELECT migracion.f_trans_tts_cuenta_bancaria_tts_cuenta_bancaria (
-			  				'''||TG_OP::varchar||''','||COALESCE(NEW.id_cuenta_bancaria::varchar,'NULL')||','||COALESCE(NEW.id_auxiliar::varchar,'NULL')||','||COALESCE(NEW.id_cuenta::varchar,'NULL')||','||COALESCE(NEW.id_institucion::varchar,'NULL')||','||COALESCE(NEW.id_parametro::varchar,'NULL')||','||COALESCE(NEW.estado_cuenta::varchar,'NULL')||','||COALESCE(NEW.nro_cheque::varchar,'NULL')||','||COALESCE(''''||NEW.nro_cuenta_banco::varchar||'''','NULL')||') as res';				  
-		
-		ELSIF TG_OP ='UPDATE' THEN
-		
-			--Obtener usuario
-			select cuenta into v_usr
-			from segu.tusuario
-			where id_usuario = NEW.id_usuario_mod;
-		
-			if v_tabla = 'tconcepto_ingas' then
+				v_consulta = 'select migracion.f_mig_relacion_contable__tpr_concepto_cta('''||
+								TG_OP ||''',' ||
+								OLD.id_relacion_contable||',NULL,NULL,NULL,NULL,NULL)';
 			
-			elsif v_tabla = 'tcuenta_bancaria' then
+			elsif v_tabla = 'tcuenta_bancaria' and v_codigo_trel = 'CUEBANCEGRE' then
+			
+				v_consulta = 'select migracion.f_mig_relacion_contable__tts_cuenta_bancaria_cuenta('''||
+								TG_OP ||''',' ||
+								OLD.id_relacion_contable||',NULL,NULL,NULL,NULL,NULL)';
 			
 			end if;
 		
-		ELSE 
-		
-			if v_tabla = 'tconcepto_ingas' then
-			
-			elsif v_tabla = 'tcuenta_bancaria' then
-			
-			end if;
-		
-		
-		
-			v_consulta = ' SELECT migracion.f_trans_tts_cuenta_bancaria_tts_cuenta_bancaria (
-			             '''||TG_OP::varchar||''','||OLD.id_cuenta_bancaria||',NULL,NULL,NULL,NULL,NULL,NULL,NULL) as res';
+
 			       
 		END IF;
-			   --------------------------------------
-			   -- PARA PROBAR SI FUNCIONA LA FUNCION DE TRANFROMACION, HABILITAR EXECUTE
-			   ------------------------------------------
-			     --EXECUTE (v_consulta);
-			   
-			   
-			    INSERT INTO 
-			                      migracion.tmig_migracion
-			                    (
-			                      verificado,
-			                      consulta,
-			                      operacion
-			                    ) 
-			                    VALUES (
-			                      'no',
-			                       v_consulta,
-			                       TG_OP::varchar
-			                       
-			                    );
-	
+
+		--Abre una conexion con dblink para ejecutar la consulta
+        v_resp =  (SELECT dblink_connect(v_cadena_cnx));
+			            
+		if (v_resp!='OK') THEN
+			--Error al abrir la conexión  
+			raise exception 'FALLA CONEXION A LA BASE DE DATOS CON DBLINK';
+		else
+			PERFORM * FROM dblink(v_consulta,true) AS (resp varchar);
+		    v_res_cone=(select dblink_disconnect());
+		end if;
+
 	end if; 
 		
-	
-		
-		  RETURN NULL;
-		
-		END;
-		$BODY$LANGUAGE 'plpgsql'
-		VOLATILE
-		CALLED ON NULL INPUT
-		SECURITY INVOKER;
+  RETURN NULL;
+
+END;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;
