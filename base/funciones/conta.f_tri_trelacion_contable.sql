@@ -15,6 +15,7 @@ DECLARE
 	v_id_uo integer;
 	v_nro_cuenta varchar;
 	v_codigo_trel varchar;
+
 		
 BEGIN
 
@@ -39,8 +40,8 @@ BEGIN
 				select id_uo into v_id_uo
 				from param.tcentro_costo
 				where id_centro_costo = NEW.id_centro_costo;
-				
-				v_consulta = 'select migracion.f_mig_tcuenta_bancaria__tts_cuenta_bancaria('''||
+
+				v_consulta = 'select migracion.f_mig_relacion_contable__tpr_concepto_cta('''||
 								TG_OP ||''',' ||
                                 COALESCE(NEW.id_relacion_contable::varchar,'NULL')||','||
                                 COALESCE(NEW.id_tabla::varchar,'NULL')||','||
@@ -55,16 +56,17 @@ BEGIN
 				select nro_cuenta
 				into v_nro_cuenta
 				from tes.tcuenta_bancaria
-				where id_cuenta_bancaria = NEW.id_tabla; 
-			
-				v_consulta = 'select migracion.f_mig_tcuenta_bancaria__tts_cuenta_bancaria('''||
+				where id_cuenta_bancaria = NEW.id_tabla;
+				
+				v_consulta = 'select migracion.f_mig_relacion_contable__tts_cuenta_bancaria('''||
 								TG_OP ||''',' ||
-                                COALESCE(NEW.id_relacion_contable::varchar,'NULL')||','||
-                                COALESCE(NEW.id_tabla::varchar,'NULL')||','||
-                                COALESCE(NEW.id_cuenta::varchar,'NULL')||','||
-                                COALESCE(NEW.id_auxiliar::varchar,'NULL')||','||
-                                COALESCE(NEW.id_centro_costo::varchar,'NULL')||','||
-                                COALESCE(NEW.id_gestion::varchar,'NULL')||')';
+								COALESCE(NEW.id_relacion_contable::varchar,'NULL')||','||  
+								COALESCE(NEW.id_tabla::varchar,'NULL')||','||
+								COALESCE(NEW.id_cuenta::varchar,'NULL')||','||
+								COALESCE(NEW.id_auxiliar::varchar,'NULL')||','||
+								COALESCE(NEW.id_centro_costo::varchar,'NULL')||','||
+								COALESCE(NEW.id_gestion::varchar,'NULL')||','||
+								COALESCE(''''||v_nro_cuenta::varchar||'''','NULL')||')';
 
 			end if;
 	
@@ -81,7 +83,7 @@ BEGIN
 			
 				v_consulta = 'select migracion.f_mig_relacion_contable__tts_cuenta_bancaria_cuenta('''||
 								TG_OP ||''',' ||
-								OLD.id_relacion_contable||',NULL,NULL,NULL,NULL,NULL)';
+								OLD.id_relacion_contable||',NULL,NULL,NULL,NULL,NULL,NULL)';
 			
 			end if;
 		
