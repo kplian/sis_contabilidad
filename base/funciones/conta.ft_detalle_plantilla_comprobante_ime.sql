@@ -83,8 +83,10 @@ BEGIN
             func_act_transaccion, 
             campo_id_tabla_detalle, 
             rel_dev_pago, 
-            campo_trasaccion_dev 
-            
+            campo_trasaccion_dev,
+            campo_id_cuenta_bancaria,
+            campo_id_cuenta_bancaria_mov,
+            campo_nro_cheque
           	) values(
 			v_parametros.id_plantilla_comprobante,
 			v_parametros.debe_haber,
@@ -119,7 +121,10 @@ BEGIN
             v_parametros.func_act_transaccion, 
             v_parametros.campo_id_tabla_detalle, 
             v_parametros.rel_dev_pago, 
-            v_parametros.campo_trasaccion_dev 
+            v_parametros.campo_trasaccion_dev,
+            v_parametros.campo_id_cuenta_bancaria,
+            v_parametros.campo_id_cuenta_bancaria_mov,
+            v_parametros.campo_nro_cheque 
 							
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 			
@@ -174,7 +179,10 @@ BEGIN
             func_act_transaccion=v_parametros.func_act_transaccion, 
             campo_id_tabla_detalle=v_parametros.campo_id_tabla_detalle, 
             rel_dev_pago=v_parametros.rel_dev_pago, 
-            campo_trasaccion_dev=v_parametros.campo_trasaccion_dev 
+            campo_trasaccion_dev=v_parametros.campo_trasaccion_dev,
+            campo_id_cuenta_bancaria = v_parametros.campo_id_cuenta_bancaria,
+            campo_id_cuenta_bancaria_mov = v_parametros.campo_id_cuenta_bancaria_mov,
+            campo_nro_cheque = v_parametros.campo_nro_cheque
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta

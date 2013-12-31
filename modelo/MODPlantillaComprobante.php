@@ -47,6 +47,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('momento_comprometido','varchar');
         $this->captura('momento_ejecutado','varchar');
         $this->captura('momento_pagado','varchar');
+		$this->captura('campo_id_cuenta_bancaria','varchar');
+		$this->captura('campo_id_cuenta_bancaria_mov','varchar');
+		$this->captura('campo_nro_cheque','varchar');
         
 		
 		//Ejecuta la instruccion
@@ -85,6 +88,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('momento_comprometido','momento_comprometido','varchar');
         $this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
         $this->setParametro('momento_pagado','momento_pagado','varchar');
+		$this->setParametro('campo_id_cuenta_bancaria','campo_id_cuenta_bancaria','varchar');
+		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','varchar');
+		$this->setParametro('campo_nro_cheque','campo_nro_cheque','varchar');
 		
 		
 
@@ -125,6 +131,9 @@ class MODPlantillaComprobante extends MODbase{
         $this->setParametro('momento_comprometido','momento_comprometido','varchar');
         $this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
         $this->setParametro('momento_pagado','momento_pagado','varchar');
+		$this->setParametro('campo_id_cuenta_bancaria','campo_id_cuenta_bancaria','varchar');
+		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','varchar');
+		$this->setParametro('campo_nro_cheque','campo_nro_cheque','varchar');
         
 		//Ejecuta la instruccion
 		$this->armarConsulta();

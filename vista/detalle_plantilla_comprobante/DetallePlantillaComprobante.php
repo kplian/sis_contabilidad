@@ -513,7 +513,52 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
           },
-        
+          
+        {
+			config:{
+				name: 'campo_id_cuenta_bancaria',
+				fieldLabel: 'Campo Cuenta Bancaria',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_id_cuenta_bancaria',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+        {
+			config:{
+				name: 'campo_id_cuenta_bancaria_mov',
+				fieldLabel: 'Campo Movimiento Cuenta Bancaria',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_id_cuenta_bancaria_mov',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+        {
+			config:{
+				name: 'campo_nro_cheque',
+				fieldLabel: 'Campo Nro. Cheque',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_nro_cheque',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
 		{
 			config:{
 				name: 'estado_reg',
@@ -634,7 +679,10 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'func_act_transaccion', 
         'campo_id_tabla_detalle', 
         'rel_dev_pago', 
-        'campo_trasaccion_dev','descripcion_base'
+        'campo_trasaccion_dev','descripcion_base',
+        {name:'campo_id_cuenta_bancaria', type: 'string'},
+        {name:'campo_id_cuenta_bancaria_mov', type: 'string'},
+        {name:'campo_nro_cheque', type: 'string'}
 		
 	],
 	sortInfo:{

@@ -15,7 +15,6 @@ DECLARE
 	v_id_uo integer;
 	v_nro_cuenta varchar;
 	v_codigo_trel varchar;
-
 		
 BEGIN
 

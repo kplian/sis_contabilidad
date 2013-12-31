@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_tabla_valor integer,
   p_codigo varchar,
@@ -65,7 +63,7 @@ BEGIN
 	where cbte.codigo=p_codigo;
     
     
-    v_def_campos = ARRAY['campo_depto','campo_acreedor','campo_descripcion','campo_gestion_relacion','campo_fk_comprobante','campo_moneda','campo_fecha','otros_campos'];
+    v_def_campos = ARRAY['campo_depto','campo_acreedor','campo_descripcion','campo_gestion_relacion','campo_fk_comprobante','campo_moneda','campo_fecha','otros_campos','campo_id_cuenta_bancaria','campo_id_cuenta_bancaria_mov'];
     
     v_tamano:=array_upper(v_def_campos,1);
     
@@ -167,6 +165,24 @@ BEGIN
                                                 hstore(v_this), 
                                                 hstore(v_tabla))::integer;   
 	end if;   
+    
+    --RCM: guardar id_cuenta_bancaria
+    if ( v_plantilla.campo_id_cuenta_bancaria != ''  AND  v_plantilla.campo_id_cuenta_bancaria is not null ) then
+        v_this.columna_id_cuenta_bancaria = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_id_cuenta_bancaria::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla));
+	end if;    
+    
+    --RCM: guardar id_cuenta_bancaria_mov
+    if ( v_plantilla.campo_id_cuenta_bancaria_mov != ''  AND  v_plantilla.campo_id_cuenta_bancaria_mov is not null ) then
+        v_this.columna_id_cuenta_bancaria_mov = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_id_cuenta_bancaria_mov::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla));
+	end if;
+    
+    
 
     v_resp:=v_this;
     

@@ -83,8 +83,10 @@ BEGIN
                         cmpbdet.campo_id_tabla_detalle, 
                         cmpbdet.rel_dev_pago, 
                         cmpbdet.campo_trasaccion_dev ,
-                        cmpbdetb.descripcion as descripcion_base
-                        
+                        cmpbdetb.descripcion as descripcion_base,
+                        cmpbdet.campo_id_cuenta_bancaria,
+                        cmpbdet.campo_id_cuenta_bancaria_mov,
+                        cmpbdet.campo_nro_cheque
                         
 						from conta.tdetalle_plantilla_comprobante cmpbdet
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg

@@ -73,7 +73,10 @@ BEGIN
             otros_campos, 
             momento_comprometido,
             momento_ejecutado,
-            momento_pagado
+            momento_pagado,
+            campo_id_cuenta_bancaria,
+            campo_id_cuenta_bancaria_mov,
+            campo_nro_cheque
              
           	) values(
           	v_parametros.codigo,
@@ -99,7 +102,10 @@ BEGIN
             v_parametros.otros_campos ,
             v_parametros.momento_comprometido,
             v_parametros.momento_ejecutado,
-            v_parametros.momento_pagado
+            v_parametros.momento_pagado,
+            v_parametros.campo_id_cuenta_bancaria,
+            v_parametros.campo_id_cuenta_bancaria_mov,
+            v_parametros.campo_nro_cheque
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -144,7 +150,10 @@ BEGIN
             otros_campos=v_parametros.otros_campos,
             momento_comprometido=v_parametros.momento_comprometido,
             momento_ejecutado=v_parametros.momento_ejecutado,
-            momento_pagado=v_parametros.momento_pagado
+            momento_pagado=v_parametros.momento_pagado,
+            campo_id_cuenta_bancaria=v_parametros.campo_id_cuenta_bancaria,
+            campo_id_cuenta_bancaria_mov=v_parametros.campo_id_cuenta_bancaria_mov,
+            campo_nro_cheque = v_parametros.campo_nro_cheque
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta

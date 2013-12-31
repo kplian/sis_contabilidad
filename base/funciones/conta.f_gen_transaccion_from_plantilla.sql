@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla (
   p_super public.hstore,
   p_tabla_padre public.hstore,
@@ -255,6 +253,11 @@ BEGIN
               v_record_int_tran.id_usuario_reg = p_id_usuario;
               v_record_int_tran.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_comprobante')::integer;
               
+              --rcm: TODO modificar para que pueda tomar lo del detalle, ahorita agarra por default del padre
+              v_record_int_tran.id_cuenta_bancaria = (p_super->'columna_id_cuenta_bancaria')::integer;
+              v_record_int_tran.id_cuenta_bancaria_mov = (p_super->'id_cuenta_bancaria_mov')::integer;
+              v_record_int_tran.nro_cheque = (p_super->'nro_cheque')::integer;
+              
              raise notice '>>>>>>>>>>>>>>>>>>   glosa %',v_this_hstore -> 'campo_concepto_transaccion';
               
               /****************************************************************
@@ -338,7 +341,7 @@ BEGIN
                  
                    --------------------------
                    --  CALCULO DESCUENTO
-                   -----------------------------
+                   --------------------------
                    
                    IF (p_reg_det_plantilla -> 'id_detalle_plantilla_fk') is NULL  THEN
                       
