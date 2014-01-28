@@ -61,8 +61,7 @@ BEGIN
                                 COALESCE(NEW.id_cuenta::varchar,'NULL')||','||
                                 COALESCE(v_id_uo::varchar,'NULL')||','||
                                 COALESCE(NEW.id_auxiliar::varchar,'NULL')||','||
-                                COALESCE(NEW.id_centro_costo::varchar,'NULL')||','||
-                                COALESCE(NEW.id_gestion::varchar,'NULL')||')';
+                                COALESCE(NEW.id_centro_costo::varchar,'NULL')||')';
 				
 			elsif v_tabla = 'tcuenta_bancaria' and v_codigo_trel = 'CUEBANCEGRE' then
 			
