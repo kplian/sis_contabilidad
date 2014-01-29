@@ -13,6 +13,10 @@ class ACTAuxiliar extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_auxiliar');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		if($this->objParam->getParametro('id_cuenta')!=''){
+            $this->objParam->addFiltro("auxcta.id_auxiliar IN (select id_auxiliar 
+            							from conta.tcuenta_auxiliar where id_cuenta = ".$this->objParam->getParametro('id_cuenta') . ") ");    
+        }
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODAuxiliar','listarAuxiliar');

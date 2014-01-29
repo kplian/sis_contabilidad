@@ -270,15 +270,18 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'tiene_centro_costo', type: 'string'},
 		{name:'tiene_partida', type: 'string'},
 		{name:'tiene_auxiliar', type: 'string'},
-		{name:'nombre_partida', type: 'string'},'defecto'
-		
+		{name:'nombre_partida', type: 'string'},
+		{name:'defecto', type: 'string'},
+		{name:'partida_tipo', type: 'string'},
+		{name:'partida_rubro', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_relacion_contable',
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true	
+	bsave:true,
+	bedit: false
 })
 </script>
 		

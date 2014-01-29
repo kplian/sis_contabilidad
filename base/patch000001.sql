@@ -679,3 +679,66 @@ IS 'recurso, gasto';
 
 /***********************************F-SCP-RAC-CONTA-0-14/11/2013****************************************/
 
+/***********************************I-SCP-RCM-CONTA-0-21/11/2013****************************************/
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD COLUMN partida_tipo VARCHAR(25);
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ALTER COLUMN partida_tipo SET DEFAULT 'flujo_presupuestaria';
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD COLUMN partida_rubro VARCHAR(15);
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ALTER COLUMN partida_rubro SET DEFAULT 'ingreso_gasto';
+/***********************************F-SCP-RCM-CONTA-0-21/11/2013****************************************/
+
+
+/***********************************I-SCP-RCM-CONTA-0-12/12/2013****************************************/
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_cuenta_bancaria INTEGER;
+  
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_cuenta_bancaria_mov INTEGER;
+/***********************************F-SCP-RCM-CONTA-0-12/12/2013****************************************/
+
+/***********************************I-SCP-RCM-CONTA-0-16/12/2013****************************************/
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_id_cuenta_bancaria varchar(100);
+  
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_id_cuenta_bancaria_mov varchar(100);
+  
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_nro_cheque VARCHAR(100);
+  
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_id_cuenta_bancaria VARCHAR(100);
+  
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_id_cuenta_bancaria_mov VARCHAR(100);
+  
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_nro_cheque VARCHAR(100);
+  
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN nro_cheque INTEGER;
+  
+/***********************************F-SCP-RCM-CONTA-0-16/12/2013****************************************/
+
+/***********************************I-SCP-RCM-CONTA-0-19/12/2013****************************************/
+ALTER TABLE conta.trelacion_contable
+  ALTER COLUMN fecha_mod DROP DEFAULT;
+/***********************************F-SCP-RCM-CONTA-0-19/12/2013****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-03/01/2014****************************************/
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ALTER COLUMN partida_rubro SET DEFAULT 'recurso_gasto'::character varying;
+
+/***********************************F-SCP-RAC-CONTA-0-03/01/2014****************************************/
+
+
+

@@ -55,7 +55,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'tiprelco.codigo_tipo_relacion',type:'string'},
-			id_grupo:1,
+			id_grupo:0,
 			grid:true,
 			form:true
 		},
@@ -70,7 +70,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'tiprelco.nombre_tipo_relacion',type:'string'},
-			id_grupo:1,
+			id_grupo:0,
 			grid:true,
 			form:true
 		},
@@ -98,7 +98,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 					displayField:'valor',
 	       		},
 	       		type:'ComboBox',
-	       		id_grupo:1,
+	       		id_grupo:0,
 	       		grid:true,
 	       		form:true
 	       	},	
@@ -113,7 +113,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'tiprelco.estado_reg',type:'string'},
-			id_grupo:1,
+			id_grupo:0,
 			grid:true,
 			form:false
 		},
@@ -130,7 +130,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'DateField',
 			filters:{pfiltro:'tiprelco.fecha_reg',type:'date'},
-			id_grupo:1,
+			id_grupo:0,
 			grid:true,
 			form:false
 		},
@@ -145,7 +145,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'NumberField',
 			filters:{pfiltro:'usu1.cuenta',type:'string'},
-			id_grupo:1,
+			id_grupo:0,
 			grid:true,
 			form:false
 		},
@@ -161,7 +161,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'DateField',
 			filters:{pfiltro:'tiprelco.fecha_mod',type:'date'},
-			id_grupo:1,
+			id_grupo:0,
 			grid:true,
 			form:false
 		},
@@ -176,7 +176,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'NumberField',
 			filters:{pfiltro:'usu2.cuenta',type:'string'},
-			id_grupo:1,
+			id_grupo:0,
 			grid:true,
 			form:false
 		},
@@ -197,7 +197,51 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 	       		id_grupo:1,
 	       		grid:true,
 	       		form:true
-	       	},
+	      },
+	      {
+			config: {
+				name: 'partida_tipo',
+				fieldLabel: 'Tipo Partida',
+				anchor: '100%',
+				tinit: false,
+				allowBlank: false,
+				origen: 'CATALOGO',
+				gdisplayField: 'partida_tipo',
+				gwidth: 100,
+				baseParams:{
+						cod_subsistema:'CONTA',
+						catalogo_tipo:'tttipo_relacion_contable__partida_tipo'
+				},
+				renderer:function (value, p, record){return String.format('{0}', record.data['partida_tipo']);}
+			},
+			type: 'ComboRec',
+			id_grupo: 1,
+			filters:{pfiltro:'tiprelco.partida_tipo',type:'string'},
+			grid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'partida_rubro',
+				fieldLabel: 'Rubro',
+				anchor: '100%',
+				tinit: false,
+				allowBlank: false,
+				origen: 'CATALOGO',
+				gdisplayField: 'partida_rubro',
+				gwidth: 100,
+				baseParams:{
+						cod_subsistema:'CONTA',
+						catalogo_tipo:'tttipo_relacion_contable__partida_rubro'
+				},
+				renderer:function (value, p, record){return String.format('{0}', record.data['partida_rubro']);}
+			},
+			type: 'ComboRec',
+			id_grupo: 1,
+			filters:{pfiltro:'tiprelco.partida_rubro',type:'string'},
+			grid: true,
+			form: true
+		},
 	      {
 	       		config:{
 	       			name:'tiene_auxiliar',
@@ -212,7 +256,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 	       		    store:['si','no']
 	       		},
 	       		type:'ComboBox',
-	       		id_grupo:1,
+	       		id_grupo:0,
 	       		grid:true,
 	       		form:true
 	       	}
@@ -238,14 +282,62 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		
+		{name:'partida_tipo', type: 'string'},
+		{name:'partida_rubro', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_tipo_relacion_contable',
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true	
+	bsave:true,
+	Grupos:[{ 
+		layout: 'column',
+		items:[
+			{
+				xtype:'fieldset',
+				layout: 'form',
+                border: true,
+                title: 'Datos Generales',
+                bodyStyle: 'padding:0 10px 0;',
+                columnWidth: 0.5,
+                items:[],
+		        id_grupo:0,
+		        collapsible:true
+			},
+			{
+				xtype:'fieldset',
+				layout: 'form',
+                border: true,
+                title: 'Partida Presupuestaria',
+                bodyStyle: 'padding:0 10px 0;',
+                columnWidth: 0.5,
+                items:[],
+		        id_grupo:1,
+		        collapsible:true,
+		        collapsed:false
+			}
+			]
+	}],
+	iniciarEventos: function() {
+		this.Cmp.tiene_partida.on('select', function(cmb,rec,val){
+			if(cmb.getValue()=='si'){
+				this.Cmp.partida_tipo.enable();
+				this.setAllowBlank(this.Cmp.partida_tipo, false);
+				this.Cmp.partida_rubro.enable();
+				this.setAllowBlank(this.Cmp.partida_rubro, false);
+				
+			} else{
+				this.Cmp.partida_tipo.disable();
+				this.Cmp.partida_tipo.setValue('');
+				this.setAllowBlank(this.Cmp.partida_tipo, true);
+				this.Cmp.partida_rubro.disable();
+				this.Cmp.partida_rubro.setValue('');
+				this.setAllowBlank(this.Cmp.partida_rubro, true);
+			}
+
+		},this);
+	}	
 })
 </script>
 		

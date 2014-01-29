@@ -193,6 +193,44 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'importe_presupuesto',
+				fieldLabel: 'Presup.Importe/Porcen.',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:30,
+				minValue:0
+			},
+			type:'NumberField',
+			filters:{pfiltro:'placal.importe_presupuesto',type:'numeric'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config: {
+				name: 'descuento',
+				fieldLabel: 'Descuento',
+				anchor: '60%',
+				tinit: false,
+				allowBlank: false,
+				origen: 'CATALOGO',
+				gdisplayField: 'descuento',
+				gwidth: 100,
+				baseParams:{
+						cod_subsistema:'PARAM',
+						catalogo_tipo:'tgral__bandera_min'
+				},
+				renderer:function (value, p, record){return String.format('{0}', record.data['descuento']);}
+			},
+			type: 'ComboRec',
+			id_grupo: 0,
+			filters:{pfiltro:'placal.descuento',type:'string'},
+			grid: true,
+			form: true
+		},
+		{
+			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
@@ -291,6 +329,8 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		{name:'importe_presupuesto', type: 'numeric'},
+		{name:'descuento', type: 'string'}
 		
 	],
 	sortInfo:{

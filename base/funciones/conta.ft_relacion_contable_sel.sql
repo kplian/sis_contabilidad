@@ -74,7 +74,9 @@ BEGIN
 						tiprelco.tiene_partida,
 						tiprelco.tiene_auxiliar,
                         cc.codigo_cc,
-                        relcon.defecto
+                        relcon.defecto,
+                        tiprelco.partida_tipo,
+                        tiprelco.partida_rubro
 						from conta.trelacion_contable relcon
 						inner join conta.ttipo_relacion_contable tiprelco
 							on tiprelco.id_tipo_relacion_contable = relcon.id_tipo_relacion_contable

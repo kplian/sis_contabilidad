@@ -331,6 +331,51 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'campo_id_cuenta_bancaria',
+				fieldLabel: 'Campo Cuenta Bancaria',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:200
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_id_cuenta_bancaria',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_id_cuenta_bancaria_mov',
+				fieldLabel: 'Campo Movimiento Cuenta Bancaria',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:200
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_id_cuenta_bancaria_mov',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_nro_cheque',
+				fieldLabel: 'Campo Número Cheque',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:200
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_nro_cheque',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
@@ -440,7 +485,10 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'otros_campos', type: 'string'},
 		{name:'momento_comprometido', type: 'string'},
 		{name:'momento_ejecutado', type: 'string'},
-		{name:'momento_pagado', type: 'string'}
+		{name:'momento_pagado', type: 'string'},
+		{name:'campo_id_cuenta_bancaria', type: 'string'},
+		{name:'campo_id_cuenta_bancaria_mov', type: 'string'},
+		{name:'campo_nro_cheque', type: 'string'}
         
 		
 	],

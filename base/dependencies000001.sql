@@ -351,3 +351,13 @@ ALTER TABLE conta.tint_transaccion
     NOT DEFERRABLE;
 
 /***********************************F-DEP-RCM-CONTA-0-21/10/2013*****************************************/
+
+/***********************************I-DEP-RCM-CONTA-0-13/12/2013*****************************************/
+
+CREATE TRIGGER tr_trelacion_contable
+  		AFTER INSERT OR UPDATE OR DELETE 
+  		ON conta.trelacion_contable FOR EACH ROW 
+  		EXECUTE PROCEDURE conta.f_tri_trelacion_contable();
+
+  		
+/***********************************F-DEP-RCM-CONTA-0-13/12/2013*****************************************/

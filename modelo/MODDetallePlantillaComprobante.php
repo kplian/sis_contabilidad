@@ -59,6 +59,9 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('rel_dev_pago','varchar');
 		$this->captura('campo_trasaccion_dev','TEXT');
 		$this->captura('descripcion_base','varchar');
+		$this->captura('campo_id_cuenta_bancaria','varchar');
+		$this->captura('campo_id_cuenta_bancaria_mov','varchar');
+		$this->captura('campo_nro_cheque','varchar');
 		
         
 		
@@ -114,6 +117,9 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_id_tabla_detalle','campo_id_tabla_detalle','consulta_select');
 		$this->setParametro('rel_dev_pago','rel_dev_pago','consulta_select');
 		$this->setParametro('campo_trasaccion_dev','campo_trasaccion_dev','consulta_select');
+		$this->setParametro('campo_id_cuenta_bancaria','campo_id_cuenta_bancaria','consulta_select');
+		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','consulta_select');
+		$this->setParametro('campo_nro_cheque','campo_nro_cheque','consulta_select');
 		
 		 
 
@@ -163,7 +169,9 @@ class MODDetallePlantillaComprobante extends MODbase{
         $this->setParametro('campo_id_tabla_detalle','campo_id_tabla_detalle','consulta_select');
         $this->setParametro('rel_dev_pago','rel_dev_pago','consulta_select');
         $this->setParametro('campo_trasaccion_dev','campo_trasaccion_dev','consulta_select');
-        
+		$this->setParametro('campo_id_cuenta_bancaria','campo_id_cuenta_bancaria','consulta_select');
+		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','consulta_select');
+        $this->setParametro('campo_nro_cheque','campo_nro_cheque','consulta_select');
          
 
 		//Ejecuta la instruccion

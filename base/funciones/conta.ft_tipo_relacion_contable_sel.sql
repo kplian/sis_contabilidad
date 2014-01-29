@@ -54,7 +54,9 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
 						tiprelco.tiene_partida,
-						tiprelco.tiene_auxiliar
+						tiprelco.tiene_auxiliar,
+						tiprelco.partida_tipo,
+						tiprelco.partida_rubro
 						from conta.ttipo_relacion_contable tiprelco
 						left join conta.ttabla_relacion_contable tabrelco
 							on tabrelco.id_tabla_relacion_contable = tiprelco.id_tabla_relacion_contable

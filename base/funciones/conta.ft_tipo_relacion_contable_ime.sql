@@ -55,7 +55,9 @@ BEGIN
 			fecha_mod,
 			id_usuario_mod,
 			tiene_partida,
-			tiene_auxiliar
+			tiene_auxiliar,
+			partida_tipo,
+			partida_rubro
           	) values(
 			'activo',
 			v_parametros.nombre_tipo_relacion,
@@ -67,7 +69,9 @@ BEGIN
 			null,
 			null,
 			v_parametros.tiene_partida,
-			v_parametros.tiene_auxiliar				
+			v_parametros.tiene_auxiliar,
+			v_parametros.partida_tipo,
+			v_parametros.partida_rubro				
 			)RETURNING id_tipo_relacion_contable into v_id_tipo_relacion_contable;
 			
 			--Definicion de la respuesta
@@ -98,7 +102,9 @@ BEGIN
 			codigo_tipo_relacion = v_parametros.codigo_tipo_relacion,
 			id_tabla_relacion_contable = v_parametros.id_tabla_relacion_contable,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+			partida_tipo = v_parametros.partida_tipo,
+			partida_rubro = v_parametros.partida_rubro
 			where id_tipo_relacion_contable=v_parametros.id_tipo_relacion_contable;
                
 			--Definicion de la respuesta

@@ -73,7 +73,10 @@ BEGIN
                         cmpb.otros_campos,
                         cmpb.momento_comprometido,
                         cmpb.momento_ejecutado,
-                        cmpb.momento_pagado
+                        cmpb.momento_pagado,
+                        cmpb.campo_id_cuenta_bancaria,
+                        cmpb.campo_id_cuenta_bancaria_mov,
+                        cmpb.campo_nro_cheque
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod
