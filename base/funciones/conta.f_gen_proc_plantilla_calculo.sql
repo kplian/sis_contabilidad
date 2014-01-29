@@ -163,6 +163,28 @@ BEGIN
                                                              NULL, --id_tabla
                                                              v_record_int_tran.id_centro_costo);  --id_dento_costo
                
+                    
+                    IF(v_record_rel_con.ps_id_cuenta is NULL) THEN
+                    
+                       raise exception 'Revisar la ps_id_cuenta para la relacion contable:  % (%)',  v_record_rel_conps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;
+                    
+                    
+                    END IF;
+                    
+                    IF(v_record_rel_con.ps_id_partida is NULL) THEN
+                    
+                        raise exception 'Revisar la partida para la relacion contable:  % (%)',  v_record_rel_conps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;
+                    
+                    
+                    END IF;
+                    
+                    IF(v_record_rel_con.ps_id_auxiliar is NULL) THEN
+                    
+                       raise exception 'Revisar el auxiliar para la relacion contable:  % (%)',  v_record_rel_conps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;
+                    
+                    END IF;
+                    
+                    
                     --replanza las cuenta, partida y auxiliar obtenidos 
                  
                      v_record_int_tran.id_cuenta = v_record_rel_con.ps_id_cuenta;

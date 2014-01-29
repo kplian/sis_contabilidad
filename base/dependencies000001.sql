@@ -307,6 +307,7 @@ ALTER TABLE conta.ttransaccion
 /***********************************F-DEP-RCM-CONTA-18-29/08/2013*****************************************/
 
 /***********************************I-DEP-RCM-CONTA-0-21/10/2013*****************************************/
+
 ALTER TABLE conta.tint_transaccion
   ADD CONSTRAINT fk_tint_transaccion__id_int_comprobante FOREIGN KEY (id_int_comprobante)
     REFERENCES conta.tint_comprobante(id_int_comprobante)

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_get_config_relacion_contable (
   p_codigo varchar,
   p_id_gestion integer,
@@ -6,7 +8,8 @@ CREATE OR REPLACE FUNCTION conta.f_get_config_relacion_contable (
   out ps_id_cuenta integer,
   out ps_id_auxiliar integer,
   out ps_id_partida integer,
-  out ps_id_centro_costo integer
+  out ps_id_centro_costo integer,
+  out ps_nombre_tipo_relacion varchar
 )
 RETURNS SETOF record AS
 $body$
@@ -76,7 +79,10 @@ BEGIN
     where trc.codigo_tipo_relacion = p_codigo 
       and trc.estado_reg = 'activo'; 
       
---      raise notice '_________**********________*******%:',p_codigo;
+      
+     ps_nombre_tipo_relacion =  v_registros.nombre_tipo_relacion;
+      
+
     
        
       IF   v_registros.id_tipo_relacion_contable is null THEN
