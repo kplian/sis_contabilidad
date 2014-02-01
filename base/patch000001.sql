@@ -730,12 +730,3 @@ ALTER TABLE conta.tint_transaccion
 ALTER TABLE conta.trelacion_contable
   ALTER COLUMN fecha_mod DROP DEFAULT;
 /***********************************F-SCP-RCM-CONTA-0-19/12/2013****************************************/
-
-/***********************************I-SCP-RCM-CONTA-0-23/12/2013****************************************/
-
-CREATE TRIGGER tr_trelacion_contable__endesis
-AFTER INSERT OR UPDATE OR DELETE 
-ON conta.trelacion_contable FOR EACH ROW 
-EXECUTE PROCEDURE conta.f_tri_trelacion_contable();
-  		
-/***********************************F-SCP-RCM-CONTA-0-23/12/2013****************************************/
