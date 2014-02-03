@@ -730,3 +730,15 @@ ALTER TABLE conta.tint_transaccion
 ALTER TABLE conta.trelacion_contable
   ALTER COLUMN fecha_mod DROP DEFAULT;
 /***********************************F-SCP-RCM-CONTA-0-19/12/2013****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-03/01/2014****************************************/
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ALTER COLUMN partida_rubro SET DEFAULT 'recurso_gasto'::character varying;
+
+/***********************************F-SCP-RAC-CONTA-0-03/01/2014****************************************/
+
+
+

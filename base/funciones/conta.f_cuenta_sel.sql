@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_cuenta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -74,7 +72,7 @@ BEGIN
                         ges.gestion
                         from conta.tcuenta cta
 						inner join segu.tusuario usu1 on usu1.id_usuario = cta.id_usuario_reg
-                        inner join param.tmoneda mon on mon.id_moneda = cta.id_moneda
+                        left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         inner join param.tgestion ges on ges.id_gestion = cta.id_gestion
 						left join segu.tusuario usu2 on usu2.id_usuario = cta.id_usuario_mod
                         where  ';
@@ -129,7 +127,7 @@ BEGIN
                         cta.sw_transaccional,
                         cta.id_gestion                       
                         from conta.tcuenta cta
-                        inner join param.tmoneda mon on mon.id_moneda = cta.id_moneda
+                        left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         where  '||v_where|| ' 
                            and cta.id_gestion = '||COALESCE(v_parametros.id_gestion,0)||'
                            and cta.estado_reg = ''activo''
@@ -155,7 +153,7 @@ BEGIN
 			v_consulta:='select count(id_cuenta)
 					    from conta.tcuenta cta
 						inner join segu.tusuario usu1 on usu1.id_usuario = cta.id_usuario_reg
-                        inner join param.tmoneda mon on mon.id_moneda = cta.id_moneda
+                        left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         inner join param.tgestion ges on ges.id_gestion = cta.id_gestion
 						left join segu.tusuario usu2 on usu2.id_usuario = cta.id_usuario_mod
                         where ';
