@@ -16,6 +16,7 @@ Phx.vista.RelacionContableTabla = {
 	title:'Relacion Contable',
 	tiene_partida:'no',
 	tiene_auxiliar:'no',
+	filtro_partida:'no',
 	constructor:function(config){
 		this.maestro=config.maestro;
 		this.Atributos.splice(4, 0, {
@@ -106,8 +107,7 @@ Phx.vista.RelacionContableTabla = {
 			this.Cmp.id_auxiliar.store.setBaseParam('id_gestion',r.data.id_gestion);
 			this.Cmp.id_partida.store.setBaseParam('id_gestion',r.data.id_gestion);
 			
-			this.Cmp.id_tipo_relacion_contable.enable(); 
-			 
+			this.Cmp.id_tipo_relacion_contable.enable();			 
 			this.Cmp.id_cuenta.enable();			
 			
 			this.Cmp.id_centro_costo.modificado = true;
@@ -130,19 +130,7 @@ Phx.vista.RelacionContableTabla = {
             
             this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
             this.Cmp.id_partida.modificado = true;
-            this.Cmp.id_partida.reset();
-            
-            if (this.tiene_partida == 'si') {
-	            this.Cmp.id_partida.store.load({params:{start:0,limit:this.tam_pag}, 
-		        	callback : function (r) {
-			       		if (r.length == 1 ) {	       				       				
-			    			this.Cmp.id_partida.setValue(r[0].data.id_partida);
-			    			this.Cmp.id_partida.collapse();	 
-			    		}			    			    		
-			    	}, scope : this
-			    });
-			}
-            
+            this.Cmp.id_partida.reset();            
             
         }, this);
 		
@@ -181,6 +169,7 @@ Phx.vista.RelacionContableTabla = {
 			}
 			//partida
 			if (r.data.tiene_partida == 'si') {
+				
 				this.tiene_partida = 'si';
 				this.mostrarComponente(this.Cmp.id_partida);
 				this.setAllowBlank(this.Cmp.id_partida, false);
@@ -189,10 +178,24 @@ Phx.vista.RelacionContableTabla = {
 				Ext.apply(this.Cmp.id_partida.store.baseParams,{
 					partida_tipo:r.data.partida_tipo,
 					partida_rubro:r.data.partida_rubro});
-				if ('filtro_partida' in this.maestro && r.data.codigo == this.maestro.filtro_partida.tipo) {
+				//anade el filtro de partida en caso de que exista
+				if ('filtro_partida' in this.maestro && r.data.codigo_tipo_relacion == this.maestro.filtro_partida.tipo) {
+						
 					this.Cmp.id_partida.store.setBaseParam(this.maestro.filtro_partida.propiedad,this.maestro.filtro_partida.valor);
 					this.Cmp.id_partida.modificado = true;
-				}
+				}	
+				//carga el combo de partida si existe una sola partida			
+	            this.Cmp.id_partida.store.load({params:{start:0,limit:this.tam_pag}, 
+		        	callback : function (r) {
+			       		if (r.length == 1 ) {	       				       				
+			    			this.Cmp.id_partida.setValue(r[0].data.id_partida);
+			    			this.Cmp.id_partida.collapse();
+			    			this.Cmp.id_cuenta.store.setBaseParam('id_partida', this.Cmp.id_partida.getValue());
+			    			this.filtro_partida = 'si';
+			    		}			    			    		
+			    	}, scope : this
+			    });
+			
 				
 			} else {
 				this.tiene_partida = 'no';
@@ -239,6 +242,7 @@ Phx.vista.RelacionContableTabla = {
 	    			    		
 	    	}, scope : this
 	    });
+	    this.filtro_partida = 'no';	    
 	} ,
 	onButtonEdit : function () {
 	   
