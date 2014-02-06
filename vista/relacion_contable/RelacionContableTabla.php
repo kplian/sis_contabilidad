@@ -127,12 +127,22 @@ Phx.vista.RelacionContableTabla = {
             this.Cmp.id_auxiliar.store.setBaseParam('id_cuenta',r.data.id_cuenta);
             this.Cmp.id_auxiliar.modificado = true;
             this.Cmp.id_auxiliar.reset();
-            
-            this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
-            this.Cmp.id_partida.modificado = true;
-            this.Cmp.id_partida.reset();            
+            if (this.filtro_partida == 'no') {
+	            this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
+	            this.Cmp.id_partida.modificado = true;
+	            this.Cmp.id_partida.reset(); 
+	        }           
             
         }, this);
+        
+        this.Cmp.id_centro_costo.on('select', function (c,r,i) {           
+            if (this.filtro_partida == 'no') {
+	            this.Cmp.id_centro_costo.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
+	            this.Cmp.id_partida.modificado = true;
+	            this.Cmp.id_partida.reset(); 
+	        }           
+            
+        }, this);        
 		
 		
 		this.Cmp.id_tipo_relacion_contable.on('select', function (c,r,i) {
@@ -184,6 +194,7 @@ Phx.vista.RelacionContableTabla = {
 					this.Cmp.id_partida.store.setBaseParam(this.maestro.filtro_partida.propiedad,this.maestro.filtro_partida.valor);
 					this.Cmp.id_partida.modificado = true;
 				}	
+				this.filtro_partida = 'no';
 				//carga el combo de partida si existe una sola partida			
 	            this.Cmp.id_partida.store.load({params:{start:0,limit:this.tam_pag}, 
 		        	callback : function (r) {
@@ -192,6 +203,8 @@ Phx.vista.RelacionContableTabla = {
 			    			this.Cmp.id_partida.collapse();
 			    			this.Cmp.id_cuenta.store.setBaseParam('id_partida', this.Cmp.id_partida.getValue());
 			    			this.filtro_partida = 'si';
+			    			//si selecciona automaticamante la partida es necesario aplicar nuevo filtro al centro de costos
+			    			this.Cmp.id_centro_costo.store.setBaseParam('id_partida',r[0].data.id_partida);
 			    		}			    			    		
 			    	}, scope : this
 			    });
@@ -242,7 +255,7 @@ Phx.vista.RelacionContableTabla = {
 	    			    		
 	    	}, scope : this
 	    });
-	    this.filtro_partida = 'no';	    
+	       
 	} ,
 	onButtonEdit : function () {
 	   

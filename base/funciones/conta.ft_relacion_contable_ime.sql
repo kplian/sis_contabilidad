@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -52,7 +50,7 @@ BEGIN
 	if(p_transaccion='CONTA_RELCON_INS')then
 					
         begin
-        
+        	--raise exception 'Desabilitado por unos instantes...';
             -- sies una relacion contable unica buscamos que para la misma tabla no exista otrao
             select 
               * 
@@ -69,6 +67,7 @@ BEGIN
                    from conta.trelacion_contable  rc 
                    where rc.id_gestion = v_parametros.id_gestion 
                      and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
+                     and rc.id_centro_costo = v_parametros.id_centro_costo
                      and rc.estado_reg = 'activo'  
                      and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null )  ) THEN
                      
