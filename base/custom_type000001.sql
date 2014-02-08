@@ -36,3 +36,16 @@ CREATE TYPE conta.maestro_comprobante AS (
 ALTER TYPE conta.maestro_comprobante
   OWNER TO postgres;
 /***********************************F-TYP-RCM-CONTA-0-16/12/2013****************************************/
+
+
+
+/***********************************I-TYP-RAC-CONTA-0-08/02/2014****************************************/
+
+
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_nro_tramite VARCHAR(255),
+  ADD ATTRIBUTE columna_nro_cuenta_bancaria_trans VARCHAR(255);
+  
+
+/***********************************F-TYP-RAC-CONTA-0-08/02/2014****************************************/
+

@@ -742,12 +742,6 @@ ALTER TABLE conta.ttipo_relacion_contable
 
 
 /***********************************I-SCP-RAC-CONTA-0-08/02/2014****************************************/
---------------- SQL ---------------
-ALTER TABLE conta.tinter_comprobante
-  ADD COLUMN nro_cuenta_bancaria_trans VARCHAR(350);
-
-COMMENT ON COLUMN conta.tinter_comprobante.nro_cuenta_bancaria_trans
-IS '''Duenta bancaria desctino para hacer transferencias''';
 
 
 --------------- SQL ---------------
@@ -808,9 +802,6 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
 COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_porc_monto_excento_var
 IS 'Aca definimos el porcenta para el monto excento que se aplican a las plantillas de calculo';
 
-ALTER TYPE conta.maestro_comprobante
-  ADD ATTRIBUTE columna_nro_tramite VARCHAR(255),
-  ADD ATTRIBUTE columna_nro_cuenta_bancaria_trans VARCHAR(255);
   
 ALTER TABLE conta.tint_comprobante
   ADD COLUMN id_cuenta_bancaria INTEGER;
