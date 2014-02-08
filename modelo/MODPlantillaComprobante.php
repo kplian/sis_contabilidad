@@ -50,6 +50,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('campo_id_cuenta_bancaria','varchar');
 		$this->captura('campo_id_cuenta_bancaria_mov','varchar');
 		$this->captura('campo_nro_cheque','varchar');
+		$this->captura('campo_nro_cuenta_bancaria_trans','varchar');
+		$this->captura('campo_nro_tramite','varchar');
+		
         
 		
 		//Ejecuta la instruccion
@@ -91,6 +94,11 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_id_cuenta_bancaria','campo_id_cuenta_bancaria','varchar');
 		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','varchar');
 		$this->setParametro('campo_nro_cheque','campo_nro_cheque','varchar');
+		
+		$this->setParametro('campo_nro_tramite','campo_nro_tramite','varchar');
+		$this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','varchar');
+		
+		
 		
 		
 
@@ -134,6 +142,10 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_id_cuenta_bancaria','campo_id_cuenta_bancaria','varchar');
 		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','varchar');
 		$this->setParametro('campo_nro_cheque','campo_nro_cheque','varchar');
+		
+		$this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','varchar');
+        $this->setParametro('campo_nro_tramite','campo_nro_tramite','varchar');
+        
         
 		//Ejecuta la instruccion
 		$this->armarConsulta();

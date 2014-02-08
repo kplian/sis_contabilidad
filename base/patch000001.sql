@@ -741,4 +741,88 @@ ALTER TABLE conta.ttipo_relacion_contable
 /***********************************F-SCP-RAC-CONTA-0-03/01/2014****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-08/02/2014****************************************/
+--------------- SQL ---------------
+ALTER TABLE conta.tinter_comprobante
+  ADD COLUMN nro_cuenta_bancaria_trans VARCHAR(350);
+
+COMMENT ON COLUMN conta.tinter_comprobante.nro_cuenta_bancaria_trans
+IS '''Duenta bancaria desctino para hacer transferencias''';
+
+
+--------------- SQL ---------------
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.otros_campos
+IS 'Sirve para sacar de la consulta maestro otros campos que pueden ser utilies en las plantilla detalle (para las trasacciones)';
+
+ALTER TABLE conta.tplantilla_comprobante
+  ALTER COLUMN otros_campos TYPE VARCHAR(1000) COLLATE pg_catalog."default";
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_nro_tramite VARCHAR(350);
+  
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_nro_cuenta_bancaria_trans VARCHAR(350);
+   
+
+--------------- SQL ---------------
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN nro_cuenta_bancaria_trans VARCHAR(300);
+
+COMMENT ON COLUMN conta.tint_transaccion.nro_cuenta_bancaria_trans
+IS 'Nro de cuenta destino para transferencias bancarias';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN porc_monto_excento_var NUMERIC(1000,8);
+
+COMMENT ON COLUMN conta.tint_transaccion.porc_monto_excento_var
+IS 'Porcentaje para el calculo de montos excentos variable, emeplo utilizado para las facturas electrica dondel no se conoce con exactiud el porcentaje excento de antemoano (antes de la emision del factura)';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_nro_cuenta_bancaria_trans VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_nro_cuenta_bancaria_trans
+IS 'Define el campo desde donde capturamos el nro de cuenta bancarias destino para transferencias';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_porc_monto_excento_var VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_porc_monto_excento_var
+IS 'Aca definimos el porcenta para el monto excento que se aplican a las plantillas de calculo';
+
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_nro_tramite VARCHAR(255),
+  ADD ATTRIBUTE columna_nro_cuenta_bancaria_trans VARCHAR(255);
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_cuenta_bancaria INTEGER;
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_cuenta_bancaria_mov INTEGER;
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN nro_cheque INTEGER;
+  
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN nro_cuenta_bancaria_trans VARCHAR(255);
+
+/***********************************F-SCP-RAC-CONTA-0-08/02/2014****************************************/
 

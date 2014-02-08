@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_unitaria (
   p_super public.hstore,
   p_tabla_padre public.hstore,
@@ -69,7 +71,24 @@ BEGIN
    --------------------------------------------------------- 
     
    
-    v_def_campos = ARRAY['campo_monto','campo_cuenta','campo_auxiliar','campo_partida','campo_centro_costo','campo_partida_ejecucion','campo_relacion_contable','campo_documento','otros_campos','campo_monto_pres','campo_id_tabla_detalle','campo_trasaccion_dev','campo_concepto_transaccion','campo_id_cuenta_bancaria','campo_id_cuenta_bancaria_mov','campo_nro_cheque'];
+    v_def_campos = ARRAY['campo_monto',
+    					'campo_cuenta',
+                        'campo_auxiliar',
+                        'campo_partida',
+                        'campo_centro_costo',
+                        'campo_partida_ejecucion',
+                        'campo_relacion_contable',
+                        'campo_documento',
+                        'otros_campos',
+                        'campo_monto_pres',
+                        'campo_id_tabla_detalle',
+                        'campo_trasaccion_dev',
+                        'campo_concepto_transaccion',
+                        'campo_id_cuenta_bancaria',
+                        'campo_id_cuenta_bancaria_mov',
+                        'campo_nro_cheque',
+                        'campo_nro_cuenta_bancaria_tarns',
+                        'campo_porc_monto_excento_var'];
     v_tamano:=array_upper(v_def_campos,1);
          
   

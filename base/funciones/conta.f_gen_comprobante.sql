@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_tabla_valor integer,
   p_codigo varchar,
@@ -63,7 +65,18 @@ BEGIN
 	where cbte.codigo=p_codigo;
     
     
-    v_def_campos = ARRAY['campo_depto','campo_acreedor','campo_descripcion','campo_gestion_relacion','campo_fk_comprobante','campo_moneda','campo_fecha','otros_campos','campo_id_cuenta_bancaria','campo_id_cuenta_bancaria_mov'];
+    v_def_campos = ARRAY['campo_depto',
+    					'campo_acreedor',
+                        'campo_descripcion',
+                        'campo_gestion_relacion',
+                        'campo_fk_comprobante',
+                        'campo_moneda',
+                        'campo_fecha','otros_campos',
+                        'campo_id_cuenta_bancaria',
+                        'campo_id_cuenta_bancaria_mov',
+                        'campo_nro_cheque',
+                        'campo_nro_tramite',
+                        'campo_nro_cuenta_bancaria_trans'];
     
     v_tamano:=array_upper(v_def_campos,1);
     
@@ -182,6 +195,30 @@ BEGIN
                                                                   hstore(v_tabla));
 	end if;
     
+     --JRR: guardar campo_nro_cheque
+    if ( v_plantilla.campo_nro_cheque != ''  AND  v_plantilla.campo_nro_cheque is not null ) then
+        v_this.columna_nro_cheque = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_nro_cheque::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla));
+	end if;
+    
+     --RCM: guardar campo_nro_tramite
+    if ( v_plantilla.campo_nro_tramite != ''  AND  v_plantilla.campo_nro_tramite is not null ) then
+        v_this.columna_nro_tramite = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_nro_tramite::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla));
+	end if;
+    
+     --RCM: guardar campo_nro_cuenta_bancaria_trans
+    if ( v_plantilla.campo_nro_cuenta_bancaria_trans != ''  AND  v_plantilla.campo_nro_cuenta_bancaria_trans is not null ) then
+        v_this.columna_nro_cuenta_bancaria_trans = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_nro_cuenta_bancaria_trans::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla));
+	end if;
+    
     
 
     v_resp:=v_this;
@@ -256,8 +293,13 @@ BEGIN
       --id_funcionario_firma3,
       fecha,
       funcion_comprobante_validado,
-      funcion_comprobante_eliminado
-      
+      funcion_comprobante_eliminado,
+      id_cuenta_bancaria, 
+      id_cuenta_bancaria_mov, 
+      nro_cheque, 
+      nro_cuenta_bancaria_trans,
+      nro_tramite
+             
     ) 
     VALUES (
       p_id_usuario,
@@ -284,7 +326,12 @@ BEGIN
       --:id_funcionario_firma3,
       v_this.columna_fecha,
       v_plantilla.funcion_comprobante_validado,
-      v_plantilla.funcion_comprobante_eliminado
+      v_plantilla.funcion_comprobante_eliminado,
+      v_this.columna_id_cuenta_bancaria, 
+      v_this.columna_id_cuenta_bancaria_mov, 
+      v_this.columna_nro_cheque, 
+      v_this.columna_nro_cuenta_bancaria_trans,
+      v_this.columna_nro_tramite
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
     

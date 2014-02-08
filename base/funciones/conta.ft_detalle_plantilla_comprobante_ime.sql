@@ -86,7 +86,9 @@ BEGIN
             campo_trasaccion_dev,
             campo_id_cuenta_bancaria,
             campo_id_cuenta_bancaria_mov,
-            campo_nro_cheque
+            campo_nro_cheque,
+            campo_nro_cuenta_bancaria_trans,
+            campo_porc_monto_excento_var
           	) values(
 			v_parametros.id_plantilla_comprobante,
 			v_parametros.debe_haber,
@@ -124,7 +126,9 @@ BEGIN
             v_parametros.campo_trasaccion_dev,
             v_parametros.campo_id_cuenta_bancaria,
             v_parametros.campo_id_cuenta_bancaria_mov,
-            v_parametros.campo_nro_cheque 
+            v_parametros.campo_nro_cheque ,
+            v_parametros.campo_nro_cuenta_bancaria_trans,
+            v_parametros.campo_porc_monto_excento_var
 							
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 			
@@ -166,8 +170,7 @@ BEGIN
 			campo_auxiliar = v_parametros.campo_auxiliar,
 			campo_fecha = v_parametros.campo_fecha,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario,
-            
+			id_usuario_mod = p_id_usuario,            
             primaria=v_parametros.primaria, 
             otros_campos=v_parametros.otros_campos, 
             nom_fk_tabla_maestro=v_parametros.nom_fk_tabla_maestro, 
@@ -182,7 +185,9 @@ BEGIN
             campo_trasaccion_dev=v_parametros.campo_trasaccion_dev,
             campo_id_cuenta_bancaria = v_parametros.campo_id_cuenta_bancaria,
             campo_id_cuenta_bancaria_mov = v_parametros.campo_id_cuenta_bancaria_mov,
-            campo_nro_cheque = v_parametros.campo_nro_cheque
+            campo_nro_cheque = v_parametros.campo_nro_cheque,
+            campo_nro_cuenta_bancaria_trans=v_parametros.campo_nro_cuenta_bancaria_trans,
+            campo_porc_monto_excento_var=v_parametros.campo_porc_monto_excento_var
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta

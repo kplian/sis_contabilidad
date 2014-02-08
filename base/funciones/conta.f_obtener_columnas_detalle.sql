@@ -1,7 +1,7 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_obtener_columnas_detalle (
-  p_det_plantilla hstore,
+  p_det_plantilla public.hstore,
   p_def_campos varchar [],
   p_tipo varchar = 'maestro'::character varying
 )

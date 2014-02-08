@@ -559,6 +559,36 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+        {
+            config:{
+                name: 'campo_nro_cuenta_bancaria_trans',
+                fieldLabel: 'Nro. CB Dest. Trans',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.campo_nro_cuenta_bancaria_trans',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'campo_porc_monto_excento_var',
+                fieldLabel: '% Monto Excento',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.campo_porc_monto_excento_var',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -682,7 +712,9 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_trasaccion_dev','descripcion_base',
         {name:'campo_id_cuenta_bancaria', type: 'string'},
         {name:'campo_id_cuenta_bancaria_mov', type: 'string'},
-        {name:'campo_nro_cheque', type: 'string'}
+        {name:'campo_nro_cheque', type: 'string'}, 
+        'campo_nro_cuenta_bancaria_trans',
+        'campo_porc_monto_excento_var'
 		
 	],
 	sortInfo:{

@@ -59,8 +59,13 @@ BEGIN
           importe_gasto_mb,
           id_detalle_plantilla_comprobante,
           importe_reversion,
-          factor_reversion
-        ) 
+          factor_reversion,
+          id_cuenta_bancaria, 
+          id_cuenta_bancaria_mov, 
+          nro_cheque, 
+          nro_cuenta_bancaria_trans, 
+          porc_monto_excento_var
+         ) 
         VALUES (
           (p_hstore_transaccion->'id_usuario_reg')::integer,
           now(),
@@ -83,7 +88,14 @@ BEGIN
           (p_hstore_transaccion->'importe_gasto_mb')::numeric,
           (p_hstore_transaccion->'id_detalle_plantilla_comprobante')::integer,
           COALESCE((p_hstore_transaccion->'importe_reversion')::numeric,0),
-          COALESCE((p_hstore_transaccion->'factor_reversion')::numeric,0)
+          COALESCE((p_hstore_transaccion->'factor_reversion')::numeric,0),
+          (p_hstore_transaccion->'id_cuenta_bancaria')::integer,
+          (p_hstore_transaccion->'id_cuenta_bancaria_mov')::integer,
+          (p_hstore_transaccion->'nro_cheque')::integer,
+          (p_hstore_transaccion->'nro_cuenta_bancaria_trans')::varchar,
+          COALESCE((p_hstore_transaccion->'porc_monto_excento_var')::numeric,0)
+          
+          
         ) RETURNING id_int_transaccion into v_id_transaccion;
 			
 			

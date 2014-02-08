@@ -7,7 +7,8 @@ CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
   p_id_usuario integer,
   p_id_depto_conta integer,
   p_id_gestion integer,
-  p_proc_terci varchar = 'no'::character varying
+  p_proc_terci varchar = 'no'::character varying,
+  p_porc_monto_excento_var numeric = 0
 )
 RETURNS integer [] AS
 $body$

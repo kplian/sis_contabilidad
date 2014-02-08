@@ -63,6 +63,9 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('campo_id_cuenta_bancaria_mov','varchar');
 		$this->captura('campo_nro_cheque','varchar');
 		
+		$this->captura('campo_nro_cuenta_bancaria_trans','varchar');
+		$this->captura('campo_porc_monto_excento_var','varchar');
+		
         
 		
 
@@ -121,6 +124,10 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','consulta_select');
 		$this->setParametro('campo_nro_cheque','campo_nro_cheque','consulta_select');
 		
+		$this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','consulta_select');
+        $this->setParametro('campo_porc_monto_excento_var','campo_porc_monto_excento_var','consulta_select');
+        
+		
 		 
 
 		//Ejecuta la instruccion
@@ -172,7 +179,10 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_id_cuenta_bancaria','campo_id_cuenta_bancaria','consulta_select');
 		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','consulta_select');
         $this->setParametro('campo_nro_cheque','campo_nro_cheque','consulta_select');
-         
+        
+        $this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','consulta_select');
+        $this->setParametro('campo_porc_monto_excento_var','campo_porc_monto_excento_var','consulta_select');
+        
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

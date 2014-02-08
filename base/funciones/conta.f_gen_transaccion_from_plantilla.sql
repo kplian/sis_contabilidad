@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla (
   p_super public.hstore,
   p_tabla_padre public.hstore,
@@ -253,10 +255,12 @@ BEGIN
               v_record_int_tran.id_usuario_reg = p_id_usuario;
               v_record_int_tran.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_comprobante')::integer;
               
-              --rcm: TODO modificar para que pueda tomar lo del detalle, ahorita agarra por default del padre
-              v_record_int_tran.id_cuenta_bancaria = (p_super->'columna_id_cuenta_bancaria')::integer;
-              v_record_int_tran.id_cuenta_bancaria_mov = (p_super->'id_cuenta_bancaria_mov')::integer;
-              v_record_int_tran.nro_cheque = (p_super->'nro_cheque')::integer;
+             
+              v_record_int_tran.id_cuenta_bancaria = (v_this_hstore->'campo_id_cuenta_bancaria')::integer;
+              v_record_int_tran.id_cuenta_bancaria_mov = (v_this_hstore->'campo_id_cuenta_bancaria_mov')::integer;
+              v_record_int_tran.nro_cheque = (v_this_hstore->'campo_nro_cheque')::integer;
+              v_record_int_tran.nro_cuenta_bancaria_trans = (v_this_hstore->'campo_nro_cuenta_bancaria_trans')::varchar;
+              v_record_int_tran.porc_monto_excento_var = (v_this_hstore->'campo_porc_monto_excento_var')::varchar;
               
              raise notice '>>>>>>>>>>>>>>>>>>   glosa %',v_this_hstore -> 'campo_concepto_transaccion';
               
@@ -487,7 +491,9 @@ BEGIN
                                                     p_id_usuario,
                                                     (p_super->'columna_depto')::integer,--p_id_depto_conta 
                                                     (p_super->'columna_gestion')::integer, 
-                                                    'no');
+                                                    'no',
+                                                    (v_this_hstore->'campo_porc_monto_excento_var')::numeric 
+                                                    );
                          
                      
                           --si tiene funcion de actualizacion,  envia el id de la trasaccion generada para que se almacene 
@@ -500,7 +506,7 @@ BEGIN
                                 
                                 IF ((v_this_hstore -> 'campo_id_tabla_detalle') is NULL) or (v_this_hstore -> 'campo_id_tabla_detalle')= ''   THEN
                                 
-                                   raise exception 'El para la funcion de actualizacion no puede ser nulo ni vacio (%)',(p_reg_det_plantilla -> 'func_act_transaccion');
+                                   raise exception 'El campo_id_tabla_detalle para la funcion de actualizacion no puede ser nulo ni vacio (%)',(p_reg_det_plantilla -> 'func_act_transaccion');
                                 
                                 
                                 END IF;

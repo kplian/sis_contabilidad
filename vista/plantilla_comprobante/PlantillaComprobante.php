@@ -194,6 +194,21 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+        {
+            config:{
+                name: 'campo_nro_tramite',
+                fieldLabel: 'Nro Tramite',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpb.campo_nro_tramite',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'campo_acreedor',
@@ -374,6 +389,21 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+        {
+            config:{
+                name: 'campo_nro_cuenta_bancaria_trans',
+                fieldLabel: 'Campo Cuen Banc Trans',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpb.campo_nro_cuenta_bancaria_trans',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -488,7 +518,9 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'momento_pagado', type: 'string'},
 		{name:'campo_id_cuenta_bancaria', type: 'string'},
 		{name:'campo_id_cuenta_bancaria_mov', type: 'string'},
-		{name:'campo_nro_cheque', type: 'string'}
+		{name:'campo_nro_cheque', type: 'string'},
+		'campo_nro_cuenta_bancaria_trans',
+		'campo_nro_tramite'
         
 		
 	],
