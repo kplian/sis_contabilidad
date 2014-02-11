@@ -560,6 +560,21 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
         {
+			config:{
+				name: 'campo_nombre_cheque_trans',
+				fieldLabel: 'Campo Nombre Cheque/Trans',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_nombre_cheque_trans',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+        {
             config:{
                 name: 'campo_nro_cuenta_bancaria_trans',
                 fieldLabel: 'Nro. CB Dest. Trans',
@@ -714,7 +729,8 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         {name:'campo_id_cuenta_bancaria_mov', type: 'string'},
         {name:'campo_nro_cheque', type: 'string'}, 
         'campo_nro_cuenta_bancaria_trans',
-        'campo_porc_monto_excento_var'
+        'campo_porc_monto_excento_var',
+        {name:'campo_nombre_cheque_trans', type: 'string'}
 		
 	],
 	sortInfo:{

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_gen_inser_transaccion (
   p_hstore_transaccion public.hstore,
   p_id_usuario integer
@@ -64,7 +62,8 @@ BEGIN
           id_cuenta_bancaria_mov, 
           nro_cheque, 
           nro_cuenta_bancaria_trans, 
-          porc_monto_excento_var
+          porc_monto_excento_var,
+          nombre_cheque_trans
          ) 
         VALUES (
           (p_hstore_transaccion->'id_usuario_reg')::integer,
@@ -93,8 +92,8 @@ BEGIN
           (p_hstore_transaccion->'id_cuenta_bancaria_mov')::integer,
           (p_hstore_transaccion->'nro_cheque')::integer,
           (p_hstore_transaccion->'nro_cuenta_bancaria_trans')::varchar,
-          COALESCE((p_hstore_transaccion->'porc_monto_excento_var')::numeric,0)
-          
+          COALESCE((p_hstore_transaccion->'porc_monto_excento_var')::numeric,0),
+          (p_hstore_transaccion->'nombre_cheque_trans')::varchar
           
         ) RETURNING id_int_transaccion into v_id_transaccion;
 			

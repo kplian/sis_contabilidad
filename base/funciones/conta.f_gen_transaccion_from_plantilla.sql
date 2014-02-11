@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla (
   p_super public.hstore,
   p_tabla_padre public.hstore,
@@ -261,6 +259,7 @@ BEGIN
               v_record_int_tran.nro_cheque = (v_this_hstore->'campo_nro_cheque')::integer;
               v_record_int_tran.nro_cuenta_bancaria_trans = (v_this_hstore->'campo_nro_cuenta_bancaria_trans')::varchar;
               v_record_int_tran.porc_monto_excento_var = (v_this_hstore->'campo_porc_monto_excento_var')::varchar;
+              v_record_int_tran.nombre_cheque_trans = (v_this_hstore->'campo_nombre_cheque_trans')::integer;
               
              raise notice '>>>>>>>>>>>>>>>>>>   glosa %',v_this_hstore -> 'campo_concepto_transaccion';
               

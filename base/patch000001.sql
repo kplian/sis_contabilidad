@@ -817,3 +817,18 @@ ALTER TABLE conta.tint_comprobante
 
 /***********************************F-SCP-RAC-CONTA-0-08/02/2014****************************************/
 
+
+/***********************************I-SCP-RCM-CONTA-0-10/02/2014****************************************/
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN nombre_cheque_trans VARCHAR(200);
+
+COMMENT ON COLUMN conta.tint_transaccion.nombre_cheque_trans
+IS 'Nombre a la cual se emitirá el cheque o transferencia';
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_nombre_cheque_trans VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_nombre_cheque_trans
+IS 'Columna para obtener el nombre del cheque o transferencia con la que se hará el pago';
+
+/***********************************F-SCP-RCM-CONTA-0-10/02/2014****************************************/
