@@ -119,8 +119,8 @@ BEGIN
                         
                         --si es una trasaccion primeria (priorida =1 )se suma el porcentaje del monto no imponible
                          IF v_registros.prioridad = 1 THEN
-                             v_porc_importe = v_importe + p_porc_monto_excento_var;
-                             v_porc_importe_presupuesto = v_importe_presupuesto + p_porc_monto_excento_var;
+                             v_porc_importe = v_porc_importe + p_porc_monto_excento_var;
+                             v_porc_importe_presupuesto = v_porc_importe_presupuesto + p_porc_monto_excento_var;
                          END IF;
                    
                    
@@ -168,7 +168,7 @@ BEGIN
                
                END IF;
                
-               v_record_int_tran.importe_reversion = v_porc_monto_revertir;
+               v_record_int_tran.importe_reversion = v_monto_revertir;
                v_record_int_tran.factor_reversion = v_factor_reversion;
                
                

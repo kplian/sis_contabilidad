@@ -606,8 +606,10 @@ IS 'este importe se revierte del comprometido si es mayor a 0, por ejm. util par
 
 --------------- SQL ---------------
 
+
+  
 ALTER TABLE conta.tint_transaccion
-  ADD COLUMN factor_reversion NUMERIC(18,2) DEFAULT 0 NOT NULL;
+  ADD COLUMN factor_reversion NUMERIC DEFAULT 0 NOT NULL;
 
 COMMENT ON COLUMN conta.tint_transaccion.factor_reversion
 IS 'porcentaje de reversion con repecto al comprometido, sirve para prorratear las cotas de pago con referencian al monto devengado';
@@ -832,3 +834,12 @@ COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_nombre_cheque_trans
 IS 'Columna para obtener el nombre del cheque o transferencia con la que se hará el pago';
 
 /***********************************F-SCP-RCM-CONTA-0-10/02/2014****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-11/02/2014****************************************/
+ALTER TABLE conta.tint_transaccion
+  ALTER COLUMN factor_reversion TYPE NUMERIC;
+  
+/***********************************F-SCP-RAC-CONTA-0-11/02/2014****************************************/
+
+
