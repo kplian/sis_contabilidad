@@ -17,6 +17,7 @@ DECLARE
 	v_codigo_trel varchar;
     v_id_tipo_relacion_contable integer;
     v_id_institucion integer;
+    v_id_concepto_ingas		integer;
 		
 BEGIN
 
@@ -53,11 +54,17 @@ BEGIN
 				select id_uo into v_id_uo
 				from param.tcentro_costo
 				where id_centro_costo = NEW.id_centro_costo;
+                
+                select ci.id_concepto_ingas
+                into v_id_concepto_ingas
+                from migra.tconcepto_ids ci
+                where id_gestion = (select id_gestion from param.tcentro_costo where id_centro_costo = NEW.id_centro_costo) and
+                	ci.id_concepto_ingas_pxp = NEW.id_tabla;
 
 				v_consulta = 'select migracion.f_mig_relacion_contable__tpr_concepto_cta('''||
 								TG_OP ||''',' ||
                                 COALESCE(NEW.id_relacion_contable::varchar,'NULL')||','||
-                                COALESCE(NEW.id_tabla::varchar,'NULL')||','||
+                                COALESCE(v_id_concepto_ingas::varchar,'NULL')||','||
                                 COALESCE(NEW.id_cuenta::varchar,'NULL')||','||
                                 COALESCE(v_id_uo::varchar,'NULL')||','||
                                 COALESCE(NEW.id_auxiliar::varchar,'NULL')||','||
