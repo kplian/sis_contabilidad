@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -31,9 +29,7 @@ DECLARE
 BEGIN
 
      v_nombre_funcion:='conta.f_validar_cbte';
-     
-    -- raise exception 'LLEGA AL PXP';
-	
+    	
 	v_errores = '';
 
 	--1. Verificar existencia del comprobante
@@ -149,11 +145,15 @@ BEGIN
 
 EXCEPTION
 WHEN OTHERS THEN
+	if (current_user like '%dblink_%') then
+    	return 'error' || '#@@@#'|| SQLERRM;
+    else
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
+    end if;
 END;
 $body$
 LANGUAGE 'plpgsql'

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_eliminar_int_comprobante (
   p_id_usuario integer,
   p_id_int_comprobante integer
@@ -16,9 +14,11 @@ DECLARE
 
 	v_rec_cbte record;
     v_funcion_comprobante_eliminado varchar;
+    v_resp			varchar;
+    v_nombre_funcion   varchar;
  
 BEGIN
-  
+  	v_nombre_funcion:='conta.f_eliminar_int_comprobante';
 	select * 
     into v_rec_cbte
     from conta.tint_comprobante
@@ -44,8 +44,17 @@ BEGIN
      END IF;
      
      return 'Comprobante eliminado';
-
-
+EXCEPTION
+WHEN OTHERS THEN
+	if (current_user like '%dblink_%') then
+    	return 'error' || '#@@@#'|| SQLERRM;
+    else
+			v_resp='';
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+			raise exception '%',v_resp;
+    end if;
 END;
 $body$
 LANGUAGE 'plpgsql'
