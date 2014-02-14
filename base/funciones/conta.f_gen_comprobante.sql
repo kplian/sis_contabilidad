@@ -354,10 +354,10 @@ BEGIN
     v_sincronizar=pxp.f_get_variable_global('sincronizar');
     
         
-   
+    
     IF(v_sincronizar='true')THEN
   	
-     v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante);
+     	v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante);
     
     END IF;
    

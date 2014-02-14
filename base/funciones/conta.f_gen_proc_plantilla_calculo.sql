@@ -180,6 +180,7 @@ BEGIN
               
                --  TODO , obtener replicar el centro de costo ???
                   
+                  v_record_int_tran.glosa = v_registros.descripcion;
                   
                   raise notice ')))))))))))))) p_id_gestion = %, p_id_depto_conta = % ',p_id_gestion,p_id_depto_conta ;
                   
