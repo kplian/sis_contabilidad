@@ -104,7 +104,9 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 	   				fieldLabel:'Cuenta',
 	   				gdisplayField:'nombre_cuenta',//mapea al store del grid
 	   				gwidth:200,
-		   			 renderer:function (value, p, record){return String.format('{0}',record.data['nro_cuenta'] + '-' + record.data['nombre_cuenta']);}
+	   				anchor: '80%',
+	   				listWidth:'400',
+	   				renderer:function (value, p, record){return String.format('{0}',record.data['nro_cuenta'] + '-' + record.data['nombre_cuenta']);}
 	       	     },
 	   			type:'ComboRec',
 	   			id_grupo:0,
@@ -123,9 +125,11 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 	   				origen:'AUXILIAR',
 	   				allowBlank:false,
 	   				fieldLabel:'Auxiliar',
+	   				anchor: '80%',
 	   				gdisplayField:'nombre_auxiliar',//mapea al store del grid
 	   				gwidth:200,
-		   			 renderer:function (value, p, record){return String.format('{0}',record.data['codigo_auxiliar'] + '-' + record.data['nombre_auxiliar']);}
+	   				listWidth:'400',
+	   				renderer:function (value, p, record){return String.format('{0}',record.data['codigo_auxiliar'] + '-' + record.data['nombre_auxiliar']);}
 	       	     },
 	   			type:'ComboRec',
 	   			id_grupo:0,
@@ -144,9 +148,11 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 	   				origen:'PARTIDA',
 	   				allowBlank:true,
 	   				fieldLabel:'Partida',
+	   				anchor: '80%',
 	   				gdisplayField:'nombre_partida',//mapea al store del grid
 	   				gwidth:200,
-		   			 renderer:function (value, p, record){return String.format('{0}',record.data['codigo_partida'] + '-' + record.data['nombre_partida']);}
+	   				listWidth:'400',
+	   				 renderer:function (value, p, record){return String.format('{0}',record.data['codigo_partida'] + '-' + record.data['nombre_partida']);}
 	       	     },
 	   			type:'ComboRec',
 	   			id_grupo:0,
