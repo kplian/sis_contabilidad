@@ -89,9 +89,10 @@ Phx.vista.RelacionContableTabla = {
 	onReloadPage:function(m){
 		this.maestro=m;
 		var id_tabla_padre = this.maestro[this.tabla_id];
+		this.store.setBaseParam('id_tabla', id_tabla_padre);
+		this.store.setBaseParam('nombre_tabla', this.nombre_tabla);
 		
-		this.load({params:{start:0, limit:this.tam_pag, id_tabla:id_tabla_padre, 
-								nombre_tabla:this.nombre_tabla}});
+		this.load({params:{start:0, limit:this.tam_pag}});
 		// add baseparams to tipo relacion contable by codigos_tipo_relacion
 		this.Cmp.id_tipo_relacion_contable.store.setBaseParam('codigos_tipo_relacion',this.maestro.codigos_tipo_relacion);
 		// add baseparams to tipo relacion contable by nombre_tabla
