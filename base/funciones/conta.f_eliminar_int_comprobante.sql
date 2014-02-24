@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_eliminar_int_comprobante (
   p_id_usuario integer,
   p_id_int_comprobante integer
@@ -16,6 +18,7 @@ DECLARE
     v_funcion_comprobante_eliminado varchar;
     v_resp			varchar;
     v_nombre_funcion   varchar;
+    v_rec_cbte_trans record;
  
 BEGIN
   	v_nombre_funcion:='conta.f_eliminar_int_comprobante';
@@ -24,11 +27,8 @@ BEGIN
     from conta.tint_comprobante
     where id_int_comprobante = p_id_int_comprobante;
         
-    --Sentencia de la eliminacion
-    delete from conta.tint_comprobante
-    where id_int_comprobante=p_id_int_comprobante;
-            
-            
+    
+              
     -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
      IF v_rec_cbte.id_plantilla_comprobante is not null THEN
              
@@ -42,6 +42,16 @@ BEGIN
         EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','|| p_id_int_comprobante::varchar||')');
                                    
      END IF;
+     
+    
+    
+    --delete transacciones del comprobante intermedio
+    delete from conta.tint_transaccion
+    where id_int_comprobante=p_id_int_comprobante;
+    
+     --Sentencia de la eliminacion
+    delete from conta.tint_comprobante
+    where id_int_comprobante=p_id_int_comprobante;
      
      return 'Comprobante eliminado';
 EXCEPTION

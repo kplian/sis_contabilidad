@@ -69,7 +69,7 @@ BEGIN
     v_nombre_funcion:='conta.f_gen_transaccion_from_plantilla';
     
     
-  
+   
     
      /*******************************************************************************************
      --      obtener la definicion de las variablles y los valores segun la plantilla del detalle
@@ -77,7 +77,8 @@ BEGIN
              v_this_hstore = hstore(v_this);
              
              FOR v_i in 1..(p_tamano) loop
-    
+             
+               
                   --evalua la columna
                  if (p_reg_det_plantilla->p_def_campos[v_i] !='' AND p_reg_det_plantilla->p_def_campos[v_i]!='NULL' AND (p_reg_det_plantilla->p_def_campos[v_i]) is not NULL) then
       	
@@ -89,18 +90,22 @@ BEGIN
                                                               p_tabla_padre
                                                               );
                                                               
-                      v_this_hstore = v_this_hstore || (p_def_campos[v_i] => v_campo_tempo);
+                     
+                                           
+                       v_this_hstore = v_this_hstore || hstore(p_def_campos[v_i],v_campo_tempo);
                   
                   end if;
+                  
+               
            
              END LOOP;
              
-         
+          
      /********************************************************
      *  Si la plantilla es del tipo relacion devengado pago
      * 
      *********************************************************/
-     
+    
     
       IF (p_reg_det_plantilla->'rel_dev_pago') = 'si'THEN
       
@@ -165,7 +170,7 @@ BEGIN
       ELSE
       -- si no es una relacion devengado pago procesa la plantilla normalmente
            
-                 
+                  
               /******************************************************************  
                -- si no tiene centro_costo lo obtiene a partir del depto de conta---
               *********************************************************************/
@@ -181,7 +186,7 @@ BEGIN
                                                                  (p_super->'columna_depto')::integer,--p_id_depto_conta 
                                                                  NULL);  --id_dento_costo
                                                                      
-                       v_this_hstore = v_this_hstore || ('campo_centro_costo' => v_id_centro_costo_depto::varchar);
+                       v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
                   
                   END IF;
                
@@ -204,23 +209,25 @@ BEGIN
                         
                         IF v_this_hstore ->'campo_cuenta' ='' or v_this_hstore ->'campo_cuenta'='NULL' or (v_this_hstore ->'campo_cuenta') is NULL THEN 
                              
-                             v_this_hstore = v_this_hstore || ('campo_cuenta' => v_record_rel_con.ps_id_cuenta::varchar);
+                             v_this_hstore = v_this_hstore || hstore('campo_cuenta', v_record_rel_con.ps_id_cuenta::varchar);
                         
                         END IF;
                         
                         IF v_this_hstore ->'campo_partida' ='' or v_this_hstore ->'campo_partida'='NULL' or (v_this_hstore ->'campo_partida') is NULL THEN 
                              
-                             v_this_hstore = v_this_hstore || ('campo_partida' => v_record_rel_con.ps_id_partida::varchar);
+                             v_this_hstore = v_this_hstore || hstore('campo_partida' ,v_record_rel_con.ps_id_partida::varchar);
                         
                         END IF;
                         
                         IF v_this_hstore ->'campo_auxiliar' ='' or v_this_hstore ->'campo_auxiliar'='NULL' or (v_this_hstore ->'campo_auxiliar') is NULL THEN 
                              
-                             v_this_hstore = v_this_hstore || ('campo_auxiliar' => v_record_rel_con.ps_id_auxiliar::varchar);
+                             v_this_hstore = v_this_hstore || hstore('campo_auxiliar', v_record_rel_con.ps_id_auxiliar::varchar);
                         
                         END IF;          
                     
               END IF;
+              
+             
            
               
               /********************************
@@ -273,7 +280,7 @@ BEGIN
                --  CALCULO SIMPLE
                -----------------------
                
-               
+             
                
                IF (p_reg_det_plantilla -> 'forma_calculo_monto') = 'simple' THEN
                

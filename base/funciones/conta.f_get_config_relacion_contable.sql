@@ -305,70 +305,109 @@ BEGIN
           --Ejecuta la consulta
           if v_sw_arb then
           
-          	  v_sql_arbol = 'WITH RECURSIVE t(id,id_fk,n) AS (
-                            SELECT l.'|| v_rec.tabla_id || ',l.'|| v_rec.tabla_id_fk ||',1
-                            FROM ' || v_rec.tabla || ' l
-                            WHERE l.' || v_rec.tabla_id || '= ' || p_id_tabla || '
-                            UNION ALL
-                            SELECT l.' || v_rec.tabla_id || ',l.' || v_rec.tabla_id_fk || ',n+1
-                            FROM ' || v_rec.tabla ||' l, t
-                            WHERE l.' || v_rec.tabla_id || ' = t.id_fk
-                        )
-                        SELECT *
-                        FROM t
-                        ORDER BY n '||coalesce(v_rec.recorrido_arbol,'asc');
---              raise notice '&&&& &&&&& &&&&&: %, %, %, %, %',v_rec.tabla_id,v_rec.tabla_id_fk,v_rec.tabla,p_id_tabla,v_rec.recorrido_arbol;
-              
-              	
-   			  --Recorre el arbol en la dirección especificada y salta a la primera ocurrencia
-              for v_rec_arbol in execute(v_sql_arbol) loop
-              	/*if p_codigo = 'SALALM' then
-                	raise notice '==================>>>>>>>>>>>>>>>>>>>>>>>>>%  %  %',v_rec_arbol.id,p_id_centro_costo,p_id_centro_costo;
-                end if;*/
-              
-              	  --Define las condiciones por el centro de costo
-              	  if v_registros.tiene_centro_costo = 'no' then
-          
-                      va_sql[1] = ' and rc.id_centro_costo is NULL
-                                  and rc.id_tabla = ' || v_rec_arbol.id;
-                      va_sql[2] = ' and rc.id_centro_costo is NULL
-                                  and rc.id_tabla is NULL
-                                  and rc.defecto = ''si''';
-                  
-                  elsif v_registros.tiene_centro_costo = 'si' then
-                  
-                      va_sql[1] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
-                                  and rc.id_tabla = ' || v_rec_arbol.id;
-                      va_sql[2] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
-                                  and rc.id_tabla is NULL
-                                  and rc.defecto = ''si''';
+                    v_sql_arbol = 'WITH RECURSIVE t(id,id_fk,n) AS (
+                                  SELECT l.'|| v_rec.tabla_id || ',l.'|| v_rec.tabla_id_fk ||',1
+                                  FROM ' || v_rec.tabla || ' l
+                                  WHERE l.' || v_rec.tabla_id || '= ' || p_id_tabla || '
+                                  UNION ALL
+                                  SELECT l.' || v_rec.tabla_id || ',l.' || v_rec.tabla_id_fk || ',n+1
+                                  FROM ' || v_rec.tabla ||' l, t
+                                  WHERE l.' || v_rec.tabla_id || ' = t.id_fk
+                              )
+                              SELECT *
+                              FROM t
+                              ORDER BY n '||coalesce(v_rec.recorrido_arbol,'asc');
+                    
+                    	
+                    --Recorre el arbol en la dirección especificada y salta a la primera ocurrencia
+                    for v_rec_arbol in execute(v_sql_arbol) loop
+                    	
+                    
+                        --Define las condiciones por el centro de costo
+                        if v_registros.tiene_centro_costo = 'no' then
+                
+                            va_sql[1] = ' and rc.id_centro_costo is NULL
+                                        and rc.id_tabla = ' || v_rec_arbol.id;
+                            va_sql[2] = ' and rc.id_centro_costo is NULL
+                                        and rc.id_tabla is NULL
+                                        and rc.defecto = ''si''';
+                        
+                        elsif v_registros.tiene_centro_costo = 'si' then
+                        
+                            va_sql[1] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
+                                        and rc.id_tabla = ' || v_rec_arbol.id;
+                            va_sql[2] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
+                                        and rc.id_tabla is NULL
+                                        and rc.defecto = ''si''';
+                                  
+                        elsif v_registros.tiene_centro_costo = 'si-general' then
+                        
+                            va_sql[1] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
+                                        and rc.id_tabla = ' || v_rec_arbol.id;
+                            va_sql[2] = ' and rc.id_centro_costo is NULL
+                                        and rc.id_tabla = ' || v_rec_arbol.id;
+                            va_sql[3] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
+                                        and rc.id_tabla is NULL 
+                                        and rc.defecto = ''si''';
+                            va_sql[4] = ' and rc.id_centro_costo is NULL
+                                        and rc.id_tabla is NULL 
+                                        and rc.defecto = ''si''';
+                        
+                        elsif v_registros.tiene_centro_costo = 'si-unico' then
+                        
+                            va_sql[1] = ' and rc.id_tabla = ' || v_rec_arbol.id;
+                        
+                        end if;
+                        
+                        --Recorre el array de condiciones para encontrar cuenta, partida y auxiliar en en el nivel del árbol
+                        for i in 1..array_upper(va_sql,1) loop
+                            v_sql1 = v_sql || va_sql[i] || ' limit 1 offset 0';
+                            --raise notice '==================>>>>>>>>>>>>>>>>>>>>>>>>>%  %',i,v_sql1;
+                            if p_codigo = 'SALALM' and v_rec_arbol.id = 1 then
+                              raise notice '###########################%  %  %',v_rec_arbol.id,p_id_centro_costo,p_id_centro_costo;
+                            end if;
+                            for v_rec_rel in execute(v_sql1) loop
+                                ps_id_cuenta = v_rec_rel.id_cuenta;
+                                ps_id_auxiliar = v_rec_rel.id_auxiliar;
+                                ps_id_partida = v_rec_rel.id_partida;
+                                ps_id_centro_costo = v_rec_rel.id_centro_costo;
+                            end loop;
                             
-                  elsif v_registros.tiene_centro_costo = 'si-general' then
-                  
-                      va_sql[1] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
-                                  and rc.id_tabla = ' || v_rec_arbol.id;
-                      va_sql[2] = ' and rc.id_centro_costo is NULL
-                                  and rc.id_tabla = ' || v_rec_arbol.id;
-                      va_sql[3] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
-                                  and rc.id_tabla is NULL 
-                                  and rc.defecto = ''si''';
-                      va_sql[4] = ' and rc.id_centro_costo is NULL
-                                  and rc.id_tabla is NULL 
-                                  and rc.defecto = ''si''';
-                  
-                  elsif v_registros.tiene_centro_costo = 'si-unico' then
-                  
-                      va_sql[1] = ' and rc.id_tabla = ' || v_rec_arbol.id;
-                  
-                  end if;
-                  
-                  --Recorre el array de condiciones para encontrar cuenta, partida y auxiliar en en el nivel del árbol
+                            if ps_id_cuenta is not null then
+                                --Salir del for
+                                exit;
+                            end if;		
+                            
+                        end loop;
+                        
+                        if ps_id_cuenta is not null then
+                                --Salir del for
+                                return next;
+                        end if;
+                        
+                       
+                    
+                    
+                    end loop;
+                    
+                    
+                    
+                    if ps_id_cuenta is null then
+                        
+                        select gestion into v_gestion
+                        from param.tgestion
+                        where id_Gestion = p_id_gestion;
+                        
+                        raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
+                    end if;		
+              
+              
+          --si la relacion contable no es un arbol
+          else
+
                   for i in 1..array_upper(va_sql,1) loop
                       v_sql1 = v_sql || va_sql[i] || ' limit 1 offset 0';
-                      --raise notice '==================>>>>>>>>>>>>>>>>>>>>>>>>>%  %',i,v_sql1;
-                      if p_codigo = 'SALALM' and v_rec_arbol.id = 1 then
-                		raise notice '###########################%  %  %',v_rec_arbol.id,p_id_centro_costo,p_id_centro_costo;
-                	  end if;
+        		  	  
                       for v_rec_rel in execute(v_sql1) loop
                           ps_id_cuenta = v_rec_rel.id_cuenta;
                           ps_id_auxiliar = v_rec_rel.id_auxiliar;
@@ -382,57 +421,32 @@ BEGIN
                       end if;		
                       
                   end loop;
-                  
-                  if ps_id_cuenta is not null then
-                          --Salir del for
-                          return next;
-                  end if;
-                  
-/*if p_codigo = 'SALALM' and v_rec_arbol.id = 1 then
-                		raise exception '###########################%  %  % %',v_rec_arbol.id,p_id_centro_costo,p_id_centro_costo,ps_id_cuenta;
-                  end if;*/                  
-              
-              
-              end loop;
-              
-              /*if p_codigo = 'SALALM' then
-                      raise notice '!!!!XXXXXXXXXXXXXXXXXXX!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: %, %, codigo:% gestion:% cc:%', v_sql1,ps_id_cuenta,p_codigo,v_gestion,v_registros.tiene_centro_costo;
-                      end if;*/	
-              
-              if ps_id_cuenta is null then
-                  select gestion into v_gestion
-                  from param.tgestion
-                  where id_Gestion = p_id_gestion;
-                  raise exception '(%) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_gestion,v_registros.tiene_centro_costo;
-              end if;		
-              
-              
-          else
 
-          	  for i in 1..array_upper(va_sql,1) loop
-                  v_sql1 = v_sql || va_sql[i] || ' limit 1 offset 0';
-    		  	  
-                  for v_rec_rel in execute(v_sql1) loop
-                      ps_id_cuenta = v_rec_rel.id_cuenta;
-                      ps_id_auxiliar = v_rec_rel.id_auxiliar;
-                      ps_id_partida = v_rec_rel.id_partida;
-                      ps_id_centro_costo = v_rec_rel.id_centro_costo;
-                  end loop;
-                  
-                  if ps_id_cuenta is not null then
-                      --Salir del for
-                      exit;
-                  end if;		
-                  
-              end loop;
+              --si la relacion contable es para encontrat departamentos
+              --  no es obigatorio que regreuna cuenta contable
+                 IF v_registros.tiene_centro_costo != 'si-unico' THEN
 
-              if ps_id_cuenta is null then
-              
-                  select gestion into v_gestion
-                  from param.tgestion
-                  where id_gestion = p_id_gestion;
-                  raise exception '(%) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_gestion,v_registros.tiene_centro_costo;
-              end if;
+                        if ps_id_cuenta is null then
+                        
+                              select gestion into v_gestion
+                              from param.tgestion
+                              where id_gestion = p_id_gestion;
+                              raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
+                        end if;
+                  
+                 ELSE
+                 
+                        if ps_id_centro_costo is null then
+                   
+                           select gestion into v_gestion
+                           from param.tgestion
+                           where id_gestion = p_id_gestion;
+                       	 
+                           raise exception '(% - %) No se encuentra Centro de costo para  la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
+                        
+                        end if;
+                 
+                 END IF;
               
           end if;
           
