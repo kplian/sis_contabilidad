@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_eliminar_int_comprobante (
   p_id_usuario integer,
   p_id_int_comprobante integer
@@ -57,7 +55,11 @@ BEGIN
 EXCEPTION
 WHEN OTHERS THEN
 	if (current_user like '%dblink_%') then
-    	return 'error' || '#@@@#'|| SQLERRM;
+    	v_resp = pxp.f_obtiene_clave_valor(SQLERRM,'mensaje','','','valor');
+        if v_resp = '' then        	
+        	v_resp = SQLERRM;
+        end if;
+    	return 'error' || '#@@@#' || v_resp;        
     else
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);

@@ -29,16 +29,16 @@ DECLARE
 BEGIN
 
      v_nombre_funcion:='conta.f_validar_cbte';
-    	
+    --raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';	
 	v_errores = '';
-
+	
 	--1. Verificar existencia del comprobante
     if not exists(select 1 from conta.tint_comprobante
     			where id_int_comprobante = p_id_int_comprobante
                 and estado_reg in ('borrador')) then
     	raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';
     end if;
-    
+    	
     --2. Obtención de datos del comprobante
     select * 
 	into v_rec_cbte
@@ -98,7 +98,8 @@ BEGIN
                    p_id_usuario, 
                    'CONTA', 
                    NULL);
-
+	
+    	
         --Se guarda el número del comprobante y se cambia el estado a validado
         update conta.tint_comprobante set
         nro_cbte = v_nro_cbte,
@@ -121,22 +122,23 @@ BEGIN
           from conta.tplantilla_comprobante pc  
           where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
           
-          
+        	 
           EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','|| p_id_int_comprobante::varchar||')');
                              
-          
+		          
        
        
        END IF;
        
         --9. Valifacion presupuestaria del comprobante
-      
+		      
         v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante);
        
     
     
         
     else
+    	
     	raise exception 'Validación no realizada: %', v_errores;
     end if;
     
@@ -146,7 +148,11 @@ BEGIN
 EXCEPTION
 WHEN OTHERS THEN
 	if (current_user like '%dblink_%') then
-    	return 'error' || '#@@@#'|| SQLERRM;
+    	v_resp = pxp.f_obtiene_clave_valor(SQLERRM,'mensaje','','','valor');
+        if v_resp = '' then        	
+        	v_resp = SQLERRM;
+        end if;
+    	return 'error' || '#@@@#' || v_resp;        
     else
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
