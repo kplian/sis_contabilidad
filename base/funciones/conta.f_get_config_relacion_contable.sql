@@ -305,15 +305,15 @@ BEGIN
                           and rc.id_tabla is NULL 
                           and rc.defecto = ''si''';
           
+          --si unico sirce para recuperar el centro de costo a partir del dato de la tabla
+          
           elsif v_registros.tiene_centro_costo = 'si-unico' then
           
           	 
-             va_sql[1] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||' 
-                           and rc.id_tabla = ' || p_id_tabla;
+             va_sql[1] = ' and rc.id_tabla = ' || p_id_tabla;
                            
              
-             va_sql[2] = ' and rc.id_centro_costo = ' || p_id_centro_costo ||'
-                            and rc.id_tabla is NULL
+             va_sql[2] = ' and rc.id_tabla is NULL
                           and rc.defecto = ''si''';              
           
           end if;
