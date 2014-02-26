@@ -118,21 +118,23 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_relacion_contable)
 					    from conta.trelacion_contable relcon
-					    inner join conta.ttipo_relacion_contable tiprelco
+						inner join conta.ttipo_relacion_contable tiprelco
 							on tiprelco.id_tipo_relacion_contable = relcon.id_tipo_relacion_contable
 						inner join param.tgestion ges
 							on ges.id_gestion = relcon.id_gestion
+                        left join param.vcentro_costo cc 
+                          on cc.id_centro_costo = relcon.id_centro_costo
 						left join conta.ttabla_relacion_contable tabrelco 
 							on tiprelco.id_tabla_relacion_contable = tabrelco.id_tabla_relacion_contable
-					    inner join segu.tusuario usu1 on usu1.id_usuario = relcon.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = relcon.id_usuario_mod
 						left join conta.tcuenta cu 
 							on cu.id_cuenta = relcon.id_cuenta
 						left join conta.tauxiliar au 
-							on au.id_auxiliar = relcon.id_cuenta
+							on au.id_auxiliar = relcon.id_auxiliar
 						left join pre.tpartida par 
 							on par.id_partida = relcon.id_partida
-					    where ';
+						inner join segu.tusuario usu1 on usu1.id_usuario = relcon.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = relcon.id_usuario_mod
+				        where ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
