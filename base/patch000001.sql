@@ -846,22 +846,28 @@ ALTER TABLE conta.tint_transaccion
 
 
 /***********************************I-SCP-RAC-CONTA-0-24/02/2014****************************************/
-
 --------------- SQL ---------------
-
 ALTER TABLE conta.tint_comprobante
   ADD COLUMN id_plantilla_comprobante INTEGER;
+--------------- SQL ---------------
+ALTER TABLE conta.tplantilla_calculo
+  ALTER COLUMN importe TYPE NUMERIC;
+--------------- SQL ---------------
+ALTER TABLE conta.tplantilla_calculo
+  ALTER COLUMN importe_presupuesto TYPE NUMERIC;
+/***********************************F-SCP-RAC-CONTA-0-24/02/2014****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-27/02/2014****************************************/
 
 --------------- SQL ---------------
 
 ALTER TABLE conta.tplantilla_calculo
   ALTER COLUMN importe TYPE NUMERIC;
 
+
 --------------- SQL ---------------
 
 ALTER TABLE conta.tplantilla_calculo
   ALTER COLUMN importe_presupuesto TYPE NUMERIC;
-
-/***********************************F-SCP-RAC-CONTA-0-24/02/2014****************************************/
-
-
+/***********************************F-SCP-RAC-CONTA-0-27/02/2014****************************************/

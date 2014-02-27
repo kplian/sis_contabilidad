@@ -102,7 +102,7 @@ class MODPlantillaCalculo extends MODbase{
 	function eliminarPlantillaCalculo(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='conta.ft_plantilla_calculo_ime';
-		$this->transaccion='CONTA_GETDEC_IME';
+		$this->transaccion='CONTA_PLACAL_ELI';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
