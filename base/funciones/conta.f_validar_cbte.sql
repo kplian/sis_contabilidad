@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -24,6 +26,7 @@ DECLARE
     v_resp			varchar;
     v_nombre_funcion   varchar;
     v_funcion_comprobante_validado  varchar;
+    v_variacion         numeric;
      
 
 BEGIN
@@ -61,11 +64,33 @@ BEGIN
     from conta.tint_transaccion tra
     where tra.id_int_comprobante = p_id_int_comprobante;
     
+    v_variacion = v_debe - v_haber;
+    
     if v_debe < v_haber then
-    	v_errores = 'El comprobante no iguala: el Haber supera al Debe por '||v_haber-v_debe;
+       v_variacion = v_haber - v_debe;
     elsif v_debe > v_haber then
-    	v_errores = 'El comprobante no iguala: el Debe supera al Haber por '||v_debe-v_haber;
+       v_variacion = v_debe - v_haber;
     end if;
+    
+    --si el origen es endesis confiamos en las validaciones
+    if p_origen != 'endesis' then
+        
+        if p_igualar = 'no' and  v_variacion != 0  then
+             
+             v_errores = 'El comprobante no iguala: Diferencia '||v_haber-v_debe;
+       
+        else
+         
+          -- TODO obtener la ventana de error de las variables globales
+          if  v_variacion  > 0.3 then
+             v_errores = 'No podemos igualar un comprobante con una variación mayor a: '||v_haber-v_debe;
+          else
+          -- TODO --  funcion que agerga  transacciones de diferencia por redondeo 
+              v_errores = 'no implementado';
+          end if;
+        end if;
+     
+     end if;
     
     
     --4. Verificación de igualdad del gasto y recurso
