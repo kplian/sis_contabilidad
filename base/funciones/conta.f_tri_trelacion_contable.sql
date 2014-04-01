@@ -18,6 +18,8 @@ DECLARE
     v_id_tipo_relacion_contable integer;
     v_id_institucion integer;
     v_id_concepto_ingas		integer;
+    v_centro		varchar;
+    v_denominacion	varchar;
 		
 BEGIN
 
@@ -73,8 +75,8 @@ BEGIN
 			elsif v_tabla = 'tcuenta_bancaria' and v_codigo_trel = 'CUEBANCEGRE' then
 			
 				--Obtener nro cuenta bancaria
-				select nro_cuenta, id_institucion
-				into v_nro_cuenta, v_id_institucion
+				select nro_cuenta, id_institucion, centro, denominacion
+				into v_nro_cuenta, v_id_institucion, v_centro, v_denominacion
 				from tes.tcuenta_bancaria
 				where id_cuenta_bancaria = NEW.id_tabla;
 
@@ -87,6 +89,8 @@ BEGIN
 								COALESCE(NEW.id_centro_costo::varchar,'NULL')||','||
 								COALESCE(NEW.id_gestion::varchar,'NULL')||','||
 								COALESCE(''''||v_nro_cuenta::varchar||'''','NULL')||','||
+                                COALESCE(''''||v_denominacion::varchar||'''','NULL')||','||
+                                COALESCE(''''||v_centro::varchar||'''','NULL')||','||
                                 COALESCE(v_id_institucion::varchar,'NULL')||')';
 
 			end if;
@@ -116,7 +120,7 @@ BEGIN
 								TG_OP ||''',' ||
 								OLD.id_relacion_contable||',NULL,NULL,NULL,NULL,'||
                                 COALESCE(OLD.id_gestion::varchar,'NULL')||','||
-								COALESCE(''''||v_nro_cuenta::varchar||'''','NULL')||',NULL)';
+								COALESCE(''''||v_nro_cuenta::varchar||'''','NULL') || ',NULL,NULL,NULL)';
 			end if;
 		
 
