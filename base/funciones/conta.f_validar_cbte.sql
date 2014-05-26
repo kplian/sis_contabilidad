@@ -2,6 +2,8 @@
 
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
   p_id_usuario integer,
+  p_id_usuario_ai integer,
+  p_usuario_ai varchar,
   p_id_int_comprobante integer,
   p_igualar varchar = 'no'::character varying,
   p_origen varchar = 'pxp'::character varying
@@ -148,7 +150,7 @@ BEGIN
           where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
           
         	 
-          EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','|| p_id_int_comprobante::varchar||')');
+          EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
                              
 		          
        

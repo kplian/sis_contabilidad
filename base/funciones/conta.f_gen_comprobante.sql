@@ -3,7 +3,9 @@
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_tabla_valor integer,
   p_codigo varchar,
-  p_id_usuario integer = NULL::integer
+  p_id_usuario integer = NULL::integer,
+  p_id_usuario_ai integer = NULL::integer,
+  p_usuario_ai varchar = NULL::character varying
 )
 RETURNS integer AS
 $body$
@@ -298,7 +300,9 @@ BEGIN
       id_cuenta_bancaria_mov, 
       nro_cheque, 
       nro_cuenta_bancaria_trans,
-      nro_tramite
+      nro_tramite,
+      id_usuario_ai,
+      usuario_ai
              
     ) 
     VALUES (
@@ -331,7 +335,9 @@ BEGIN
       v_this.columna_id_cuenta_bancaria_mov, 
       v_this.columna_nro_cheque, 
       v_this.columna_nro_cuenta_bancaria_trans,
-      v_this.columna_nro_tramite
+      v_this.columna_nro_tramite,
+      p_id_usuario_ai,
+      p_usuario_ai
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
     

@@ -101,7 +101,9 @@ BEGIN
 			id_usuario_reg,
 			fecha_reg,
 			id_usuario_mod,
-			fecha_mod
+			fecha_mod,
+            id_usuario_ai,
+            usuario_ai
           	) values(
 			v_parametros.id_clase_comprobante,
 			v_parametros.id_int_comprobante_fk,
@@ -124,7 +126,9 @@ BEGIN
 			p_id_usuario,
 			now(),
 			null,
-			null
+			null,
+            v_parametros._id_usuario_ai,
+            v_parametros._nombre_usuario_ai
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
@@ -190,7 +194,9 @@ BEGIN
 			nro_tramite = v_parametros.nro_tramite,
 			--momento = v_parametros.momento,
 			id_usuario_mod = p_id_usuario,
-			fecha_mod = now()
+			fecha_mod = now(),
+            id_usuario_ai = v_parametros._id_usuario_ai,
+            usuario_ai = v_parametros._nombre_usuario_ai
 			where id_int_comprobante=v_parametros.id_int_comprobante;
                
 			--Definicion de la respuesta
@@ -213,7 +219,10 @@ BEGIN
 
 		begin
 			
-            v_result = conta.f_eliminar_int_comprobante(p_id_usuario,v_parametros.id_int_comprobante);
+            v_result = conta.f_eliminar_int_comprobante(p_id_usuario,
+                                                        v_parametros._id_usuario_ai,
+                                                        v_parametros._nombre_usuario_ai,
+                                                        v_parametros.id_int_comprobante);
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 

@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_comprobante_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_comprobante_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_comprobante_ime
@@ -62,7 +67,9 @@ BEGIN
 			fecha_reg,
 			id_usuario_mod,
 			fecha_mod,
-			fecha
+			fecha,
+            id_usuario_ai,
+            usuario_ai
           	) values(
 			'activo',
 			v_parametros.id_periodo,
@@ -81,7 +88,10 @@ BEGIN
 			now(),
 			null,
 			null,
-			v_parametros.fecha			
+			v_parametros.fecha,
+            v_parametros._id_usuario_ai,
+            v_parametros._nombre_usuario_ai
+            			
 			)RETURNING id_comprobante into v_id_comprobante;
 			
 			--Definicion de la respuesta
@@ -122,7 +132,9 @@ BEGIN
 			id_comprobante_fk = v_parametros.id_comprobante_fk,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
-			fecha = v_parametros.fecha
+			fecha = v_parametros.fecha,
+            id_usuario_ai = v_parametros._id_usuario_ai,
+            usuario_ai = v_parametros._nombre_usuario_ai
 			where id_comprobante=v_parametros.id_comprobante;
                
 			--Definicion de la respuesta
@@ -173,7 +185,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_comprobante_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

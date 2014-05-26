@@ -1,5 +1,9 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_eliminar_int_comprobante (
   p_id_usuario integer,
+  p_id_usuario_ai integer,
+  p_usuario_ai varchar,
   p_id_int_comprobante integer
 )
 RETURNS varchar AS
@@ -37,7 +41,7 @@ BEGIN
         where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
                 
                 
-        EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','|| p_id_int_comprobante::varchar||')');
+        EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
                                    
      END IF;
      
