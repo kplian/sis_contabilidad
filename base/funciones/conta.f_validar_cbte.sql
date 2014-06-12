@@ -6,7 +6,8 @@ CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
   p_usuario_ai varchar,
   p_id_int_comprobante integer,
   p_igualar varchar = 'no'::character varying,
-  p_origen varchar = 'pxp'::character varying
+  p_origen varchar = 'pxp'::character varying,
+  p_fecha_ejecucion date = NULL::date
 )
 RETURNS varchar AS
 $body$
@@ -33,11 +34,31 @@ DECLARE
 
 BEGIN
 
+ 
+
      v_nombre_funcion:='conta.f_validar_cbte';
     --raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';	
 	v_errores = '';
+    
+    
+     --si el origen es endesis confiamos en las validaciones
+    if p_origen  = 'endesis' then
+    
+          --si el comprobante viene de endesis y tenemso fecha de ejecucion actualizamos la fecha del comprobante intermedio
+         IF p_fecha_ejecucion is NULL THEN
+         
+              update conta.tint_comprobante set
+                fecha = p_fecha_ejecucion
+              where id_int_comprobante = p_id_int_comprobante;
+         
+         END IF;
+    
+    end if;
 	
-	--1. Verificar existencia del comprobante
+	
+    
+    
+    --1. Verificar existencia del comprobante
     if not exists(select 1 from conta.tint_comprobante
     			where id_int_comprobante = p_id_int_comprobante
                 and estado_reg in ('borrador')) then
@@ -68,6 +89,8 @@ BEGIN
     
     v_variacion = v_debe - v_haber;
     
+   -- raise exception 'variacion %', v_variacion ;
+    
     if v_debe < v_haber then
        v_variacion = v_haber - v_debe;
     elsif v_debe > v_haber then
@@ -83,18 +106,30 @@ BEGIN
        
         else
          
-          -- TODO obtener la ventana de error de las variables globales
-          if  v_variacion  > 0.3 then
-             v_errores = 'No podemos igualar un comprobante con una variación mayor a: '||v_haber-v_debe;
-          else
-          -- TODO --  funcion que agerga  transacciones de diferencia por redondeo 
-              v_errores = 'no implementado';
+              -- TODO obtener la ventana de error de las variables globales
+              if  v_variacion  > 0.3 then
+                 v_errores = 'No podemos igualar un comprobante con una variación mayor a: '||v_haber-v_debe;
+              else
+              
+              IF v_variacion != 0 THEN
+                 -- TODO --  funcion que agerga  transacciones de diferencia por redondeo 
+                  v_errores = 'no implementado';
+              
+              ELSE 
+              
+               raise exception 'No se pueden validar comprobantes desde PXP en BOA';
+              
+              END IF;
+          
+          
           end if;
         end if;
+        
+       
      
      end if;
     
-    
+  
     --4. Verificación de igualdad del gasto y recurso
     
     
@@ -115,6 +150,8 @@ BEGIN
         select po_id_periodo 
         into v_id_periodo
         from param.f_get_periodo_gestion(v_rec_cbte.fecha);
+        
+      
         
         --Obtención del número de comprobante
         v_nro_cbte =  param.f_obtener_correlativo(
@@ -137,7 +174,7 @@ BEGIN
         v_resp = conta.f_replicar_cbte(p_id_usuario,p_id_int_comprobante);
         
         
-       
+      
         
        -- 8 si viene de una plantilla de comprobante busca la funcion de validacion configurada
        
@@ -149,6 +186,8 @@ BEGIN
           from conta.tplantilla_comprobante pc  
           where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
           
+          
+          -- raise exception 'validar comprobante pxp %',v_funcion_comprobante_validado ;
         	 
           EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
                              
@@ -157,9 +196,14 @@ BEGIN
        
        END IF;
        
+      
+       
+        
+       
         --9. Valifacion presupuestaria del comprobante
-		      
-        v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante);
+        
+       
+        v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion);
        
     
     

@@ -3,7 +3,8 @@
 CREATE OR REPLACE FUNCTION conta.f_gestionar_presupuesto_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer,
-  p_igualar varchar = 'no'::character varying
+  p_igualar varchar = 'no'::character varying,
+  p_fecha_ejecucion date = NULL::date
 )
 RETURNS varchar AS
 $body$
@@ -93,7 +94,8 @@ BEGIN
       ic.momento_ejecutado,
       ic.momento_pagado,
       ic.estado_reg,
-      ic.id_moneda
+      ic.id_moneda,
+      ic.fecha
     into v_registros_comprobante
     from conta.tint_comprobante ic
     inner join conta.tclase_comprobante cl  on ic.id_clase_comprobante =  cl.id_clase_comprobante
@@ -231,7 +233,15 @@ BEGIN
                                      va_columna_relacion[v_i]= 'id_int_transaccion';
                                      va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                      va_id_transaccion[v_i]= v_registros.id_int_transaccion;
-                                     va_fecha[v_i]=now()::date;  --OJO, talves sea necesario utilizar la fecha del comprobante
+                                     
+                                   -- fechaejecucion presupuestaria  
+                                     IF p_fecha_ejecucion is NULL THEN
+                                       va_fecha[v_i]=v_registros_comprobante.fecha::date;  --OJO, talves sea necesario utilizar la fecha del comprobante
+                                     ELSE
+                                      va_fecha[v_i]=p_fecha_ejecucion;  --OJO, talves sea necesario utilizar la fecha del comprobante
+                                     END IF;
+                                     
+                                    
                                      
                                    -------------------------------------------------------  
                                    --   si existe monto a revertir y tenememos el id_partida_ejecucion, revertimos
