@@ -244,7 +244,12 @@ BEGIN
 
 		begin
 			--Lamada a la función de validación
-			v_result = conta.f_validar_cbte(p_id_usuario,v_parametros.id_int_comprobante,v_parametros.igualar);
+			v_result = conta.f_validar_cbte(
+                 p_id_usuario,
+                 v_parametros._id_usuario_ai,
+                 v_parametros._nombre_usuario_ai,
+                 v_parametros.id_int_comprobante,
+                 v_parametros.igualar);
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 
