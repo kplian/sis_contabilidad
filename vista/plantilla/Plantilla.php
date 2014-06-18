@@ -13,10 +13,10 @@ Phx.vista.PlantillaConta = {
 	require:'../../../sis_parametros/vista/plantilla/Plantilla.php',
 	requireclase:'Phx.vista.Plantilla',
 	title:'Plantilla',
-	bdel: true,
 	bedit: true,
-	bnew: true,
-
+	bdel:(Phx.CP.config_ini.sis_integracion=='ENDESIS')?false:true,
+    bnew:(Phx.CP.config_ini.sis_integracion=='ENDESIS')?false:true,
+    
 	constructor: function(config) {
        	Phx.vista.PlantillaConta.superclass.constructor.call(this,config);
 		this.init();
