@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.f_gestionar_presupuesto_cbte (
+CREATE OR REPLACE FUNCTION conta.f_verificar_presupuesto_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer,
   p_igualar varchar = 'no'::character varying,
@@ -119,13 +119,6 @@ BEGIN
      -- si el comprobante tiene efecto presupouestario'
     
     IF v_registros_comprobante.momento= 'presupuestario' THEN
-    
-            --recuepra el error maximo opr redondeo
-            v_error_presupuesto=pxp.f_get_variable_global('error_presupuesto')::numeric;
-            IF v_error_presupuesto is NULL THEN
-             raise exception 'No se encontro el valor de la variable global : error_presupuesto';
-            END IF;
-    
    
            --rrecorrer todas las transacciones revisando las partidas presupuestarias
             v_i = 0;
@@ -237,9 +230,6 @@ BEGIN
                                      ELSE
                                          v_monto_cmp  = v_registros.importe_haber;
                                      END IF;
-                                     
-                                     
-                                    
                                            
                                       
                                      --  armamos los array para enviar a presupuestos          
@@ -254,31 +244,12 @@ BEGIN
                                      va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                      va_id_transaccion[v_i]= v_registros.id_int_transaccion;
                                      
-                                     -- fechaejecucion presupuestaria  
+                                   -- fechaejecucion presupuestaria  
                                      IF p_fecha_ejecucion is NULL THEN
                                        va_fecha[v_i]=v_registros_comprobante.fecha::date;  --, fecha del comprobante
                                      ELSE
                                       va_fecha[v_i]=p_fecha_ejecucion;  -- fecha como parametros
                                      END IF;
-                                     
-                                     --chequeamos si el presupuesto alcanza, 
-                                     --si no,  pero la diferencia es minima ajustamos el monto a ejecutar
-                                     v_respuesta_verificar = pre.f_verificar_com_eje_pag(
-                                                                                  va_id_partida_ejecucion[v_i],
-                                                                                  va_id_moneda[v_i]);
-                                       IF  va_momento[v_i] <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
-                                        
-                                         IF  va_momento[v_i] > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
-                                      
-                                             va_momento[v_i] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
-                                      
-                                         END IF;
-                                      
-                                      END IF;
-                                     
-                                     
-                                      
-                                     
                                      
                                     
                                      
@@ -287,49 +258,23 @@ BEGIN
                                    -------------------------------------------------------
                                    
                                    IF v_registros.importe_reversion > 0 and v_registros.id_partida_ejecucion is not null THEN
-                                              
-                                                v_i = v_i + 1;
-                                               
-                                                
-                                               --  armamos los array para enviar a presupuestos
-                                               va_tipo_partida[v_i] = v_registros.tipo;          
-                                               va_id_presupuesto[v_i] = v_registros.id_presupuesto;
-                                               va_id_partida[v_i]= v_registros.id_partida;
-                                               va_momento[v_i]	= 2;  --momento revertido
-                                               va_monto[v_i]  = (v_registros.importe_reversion)*-1; --signo negativo para revertir
-                                               va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
-                                               va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
-                                               va_columna_relacion[v_i]= 'id_int_transaccion';
-                                               va_fk_llave[v_i] = v_registros.id_int_transaccion;
-                                               va_id_transaccion[v_i]= v_registros.id_int_transaccion;
-                                               
-                                               -- fechaejecucion presupuestaria  
-                                               IF p_fecha_ejecucion is NULL THEN
-                                                 va_fecha[v_i]=v_registros_comprobante.fecha::date;  --, fecha del comprobante
-                                               ELSE
-                                                va_fecha[v_i]=p_fecha_ejecucion;  -- fecha como parametros
-                                               END IF;
-                                               
-                                               v_marca_reversion = v_marca_reversion || v_i;
-                                               
-                                               
-                                               --chequeamos si el presupuesto alcanza para revertir, 
-                                               --si no,  pero la diferencia es minima ajustamos el monto a ejecutar
-                                               v_respuesta_verificar = pre.f_verificar_com_eje_pag(
-                                                                                          va_id_partida_ejecucion[v_i],
-                                                                                          va_id_moneda[v_i]);
-                                                                                          
-                                              
-                                              IF  (va_momento[v_i]*-1) <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
-                                                
-                                                 IF  (va_momento[v_i]*-1) > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
-                                              
-                                                     va_momento[v_i] = (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric))*-1;
-                                              
-                                                 END IF;
-                                              
-                                             END IF;
+                                       v_i = v_i + 1;
                                        
+                                        
+                                        --  armamos los array para enviar a presupuestos
+                                       va_tipo_partida[v_i] = v_registros.tipo;          
+                                       va_id_presupuesto[v_i] = v_registros.id_presupuesto;
+                                       va_id_partida[v_i]= v_registros.id_partida;
+                                       va_momento[v_i]	= 2;  --momento revertido
+                                       va_monto[v_i]  = (v_registros.importe_reversion)*-1; --signo negativo para revertir
+                                       va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
+                                       va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
+                                       va_columna_relacion[v_i]= 'id_int_transaccion';
+                                       va_fk_llave[v_i] = v_registros.id_int_transaccion;
+                                       va_id_transaccion[v_i]= v_registros.id_int_transaccion;
+                                       va_fecha[v_i]=now()::date;
+                                       
+                                       v_marca_reversion = v_marca_reversion || v_i;
                                       
                                    
                                    END IF;
@@ -345,7 +290,7 @@ BEGIN
                           --si es solo pagar debemos identificar las transacciones del devengado 
                            
                           
-                           v_aux = v_aux || ','||v_registros.id_int_transaccion;
+                              v_aux = v_aux || ','||v_registros.id_int_transaccion;
                            
                                  FOR  v_registros_dev in (
                                                           select 
@@ -367,13 +312,14 @@ BEGIN
                                               
                                                
                                               v_monto_x_pagar = v_registros_dev.monto_pago;
-                                               -- revisar la reversion del devengado para ajustar el monto a pagar
                                                
+                                               -- revisar la reversion del devengado para ajustar el monto a pagar
                                                ----------------------------------------------------------------------------
                                                --   Obtener el factor de reversion de la transaccion de devengado      ---
                                                --   Ejeplo fue comprometido 100  se devego 87 por el IVA se revirtio 13 ---  
                                                --   presupeustariamente solo pagamos el 87                              ---
                                                ----------------------------------------------------------------------------
+                                               
                                                
                                               IF  v_registros_dev.factor_reversion > 0   THEN
                                                 
@@ -392,27 +338,18 @@ BEGIN
                                                               raise exception ' La diferencia por redondeo al determinar el monto a pagar presupuestariamente es mayor a 1, (%)',(v_monto_rev - (importe_reversion - monto_pagado_revertido));
                                                            
                                                            ELSE
-                                                              
+                                                               --si el factor es mayor a cero reducrie el monto a pagar en esa proporcion
                                                               v_monto_rev = v_registros_dev.importe_reversion - v_registros_dev.monto_pagado_revertido;
                                                            
                                                            END IF;
                                                            
-                                                           --actualizamos el monto no pagado
-                                                           UPDATE conta.tint_transaccion it SET
-                                                            monto_pagado_revertido = monto_pagado_revertido + v_monto_rev
-                                                           WHERE it.id_int_transaccion = v_registros_dev.id_int_transaccion_dev;
-                                                           
-                                                    
                                                      END IF;
                                                  
                                                -- raise exception 'MONOTO %',  ;
                                               
                                               END IF;
                                                
-                                               
-                                               --obtener el factor de reversion de la transaccion de devengado
-                                               
-                                               --si el factor es mayor a cero reducrie el monto a pagar en esa proporcion
+                                              
                                                
                                                v_i = v_i + 1;         
                                                --armamos los array para enviar a presupuestos          
@@ -425,36 +362,11 @@ BEGIN
                                                va_columna_relacion[v_i]= 'id_int_transaccion';
                                                va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                                va_id_int_rel_devengado[v_i]= v_registros_dev.id_int_rel_devengado;
-                                               -- fechaejecucion presupuestaria  
-                                               IF p_fecha_ejecucion is NULL THEN
-                                                 va_fecha[v_i]=v_registros_comprobante.fecha::date;  --, fecha del comprobante
-                                               ELSE
-                                                va_fecha[v_i]=p_fecha_ejecucion;  -- fecha como parametros
-                                               END IF; 
-                                               
-                                               
-                                               --chequeamos si el presupuesto devengado si alcanza para pagar, 
-                                               --si no,  pero la diferencia es minima pagamos   el monto disponible
-                                               v_respuesta_verificar = pre.f_verificar_com_eje_pag(
-                                                                                          va_id_partida_ejecucion[v_i],
-                                                                                          va_id_moneda[v_i]);
-                                                                                          
-                                              
-                                              IF  (va_momento[v_i]) <= (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto) THEN
-                                                
-                                                 IF  (va_momento[v_i]) > (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)) THEN
-                                              
-                                                     va_momento[v_i] = (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric));
-                                              
-                                                 END IF;
-                                              
-                                             END IF;                          
-                                 
-                                           --raise exception 'xx % % %',v_i,va_fk_llave,va_momento ;
+                                               va_fecha[v_i]=now()::date;  
                                  
                                    END LOOP;
                                
-                          ELSE
+                           ELSE
                                
                                raise exception 'Momento prespuestario no reconocido';
                           
@@ -466,86 +378,142 @@ BEGIN
                
               
                
-             -- raise exception 'SOLO PAGAR %, %',v_i, v_aux;
+           
             	
-        
-             -- llamar a la funcion de gestion presupuestaria incremeto presupuestario
-                   
-                 IF v_i > 0 THEN 
-                 
-                         va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
-                                                                       va_id_partida, 
-                                                                       va_id_moneda, 
-                                                                       va_monto, 
-                                                                       va_fecha, --p_fecha
-                                                                       va_momento, 
-                                                                       va_id_partida_ejecucion,--  p_id_partida_ejecucion 
-                                                                       va_columna_relacion, 
-                                                                       va_fk_llave);
-                                
-                 END IF;
-                 
-                 --actualiza el los id en las transacciones
-                 
-                 IF  v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
-                    
-                         --actualizacion de los id_partida_ejecucion en las transacciones
-                         
-                          FOR v_cont IN 1..v_i LOOP
-                             
-                              IF v_momento_aux='solo ejecutar' THEN
-                              
-                              --raise exception 'v_marca_reversion %',v_marca_reversion;
-                              	 
-                                      --verificamos que no sea un trasaccion de reversion
-                                      IF  (v_cont  =  ANY(v_marca_reversion)) THEN
-                                      
-                                      
-                                           update conta.tint_transaccion it set
-                                             id_partida_ejecucion_rev = va_resp_ges[v_cont],   --partida de reversion
-                                             fecha_mod = now(),
-                                             id_usuario_mod = p_id_usuario
-                                          where it.id_int_transaccion  =  va_id_transaccion[v_cont];
-                                    
-                                      ELSE
-                                      
-                                          update conta.tint_transaccion it set
-                                             id_partida_ejecucion_dev = va_resp_ges[v_cont],    --partida de devengado
-                                             fecha_mod = now(),
-                                             id_usuario_mod = p_id_usuario
-                                          where it.id_int_transaccion  =  va_id_transaccion[v_cont]; 
-                                      
-                                        
-                                        
-                                      END IF;
-                              ELSE    
-                                
-                                  update conta.tint_transaccion it set
-                                     id_partida_ejecucion = va_resp_ges[v_cont],
-                                     fecha_mod = now(),
-                                     id_usuario_mod = p_id_usuario
-                                  where it.id_int_transaccion  =  va_id_transaccion[v_cont];
-                              
-                              END IF;
-                             
+         
+          v_sw_error_validacion = FALSE;
+          v_mensaje_error_validacion = '';
+          
+          --recuepra el error maximo opr redondeo
+         v_error_presupuesto=pxp.f_get_variable_global('error_presupuesto')::numeric;
+         IF v_error_presupuesto is NULL THEN
+             raise exception 'No se encontro el valor de la variable global : error_presupuesto';
+         END IF;
+          
+              
+          --si tenemos trasaccione y es un comprobante presupuestario
+         IF v_i > 0 and v_registros_comprobante.momento= 'presupuestario' THEN
+                     
+                     IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
+                                  
+                                    -- si solo ejecutamos el presupuesto 
+                                    --  o (compromentemos y ejecutamos) 
+                                    --  o (compromentemos, ejecutamos y pagamos)                              
+                          
+                                   --verificamos todos lo montos si se tiene dinero suficiendete para proseguir
+                                  
                                
-                         END LOOP;
-                  
-               
-                  ELSIF   v_momento_aux='solo pagar'  THEN
-                  
-                       FOR v_cont IN 1..v_i LOOP
+                                   FOR v_cont IN 1..v_i LOOP
+                                   
+                                             --si no es el momento de reversion (2)
+                                             -- y si es una partida de gasto 
+                                             
+                                             IF  va_tipo_partida[v_i]='gasto' THEN
+                                                 
+                                                 v_respuesta_verificar = pre.f_verificar_com_eje_pag(
+                                                                                  va_id_partida_ejecucion[v_i],
+                                                                                  va_id_moneda[v_i]);
+                                                                                  
+                                            
+                                                  IF va_momento[v_i] != 2 THEN
+                                                  --validamso que el monto a ejecutar sea menor o igual que el faltante por comprometer
+                                                      IF  va_momento[v_i] <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
+                                                         v_retorno = 'exito';
+                                                      ELSE
+                                                         v_retorno = 'falla';
+                                                      END IF;  
+                                                 
+                                                  ElSIF va_momento[v_i] = 2  and va_monto[v_i] < 0 THEN
+                                                  --si el momento es 2 y el monto es menor a cero se bsca la reversion de monto
+                                                  -- validamos que el monto comprometido no ejecutado sea mayor o igual que el monto que se quiere revertir
+                                                  
+                                                      IF  (va_momento[v_i]*-1) <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
+                                                         v_retorno = 'exito';
+                                                      ELSE
+                                                         v_retorno = 'falla';
+                                                      END IF; 
+                                                  ELSE
+                                                     --TODO verificacion si necesita comprometer
+                                                     raise exception 'No opcion no validada';
+                                                 
+                                                  END IF;
+                                                 
+                                                 --si existe error recuperamos los datos del presupuesto y partida
+                                                 IF v_retorno = 'falla' THEN 
+                                                     v_sw_error_validacion = TRUE;
+                                                  
+                                                       select
+                                                        p.nombre_partida
+                                                      into
+                                                        v_nombre_partida 
+                                                      from pre.tpartida p 
+                                                      where p.id_partida = va_id_partida[v_i]; 
+                                                      
+                                                      
+                                                      
+                                                      select 
+                                                       cc.codigo_cc
+                                                      into
+                                                        v_codigo_cc 
+                                                      from pre.tpresupuesto pre
+                                                      inner join param.vcentro_costo cc on pre.id_centro_costo = cc.id_centro_costo
+                                                      where pre.id_presupuesto = va_id_presupuesto;
+                                                      
+                                                     v_mensaje_error_validacion = v_mensaje_error_validacion|| COALESCE(v_nombre_partida,'');
+                                                     v_mensaje_error_validacion = v_mensaje_error_validacion||'  ' || COALESCE(v_codigo_cc,'');
+                                                     v_mensaje_error_validacion = v_mensaje_error_validacion||' Monto: ' ||COALESCE(va_monto[v_i]::varchar,'0')||'<br/>';
+                                                     
+                                                  END IF;
+                                            
+                                           END IF; --IF SI no son partidas de gasto
+                                          
+                                   END LOOP;
+                                   
+                                   --COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)
+                           
+                          ELSIF  v_momento_aux='solo pagar'  THEN 
+                          
+                                FOR v_cont IN 1..v_i LOOP 
+                                
+                                      v_respuesta_verificar = pre.f_verificar_com_eje_pag(
+                                                                                  va_id_partida_ejecucion[v_i],
+                                                                                  va_id_moneda[v_i]);
+                                                                                  
+                                      IF  va_momento[v_i] <= (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto) THEN
+                                        v_retorno = 'exito';
+                                      ELSE
+                                        v_retorno = 'falla';
+                                      END IF;
+                                      
+                                      IF v_retorno = 'falla' THEN 
+                                          
+                                          v_sw_error_validacion = TRUE;
+                                          v_mensaje_error_validacion = v_mensaje_error_validacion||'al pagar el  Monto: ' ||COALESCE(va_monto[v_i]::varchar,'0')||'<br/>';
+                                      END IF;                                           
+                           
+                               END LOOP;
+                          
+                          
+                          
+                          ELSE
                              
-                                  update conta.tint_rel_devengado rd set
-                                     id_partida_ejecucion_pag = va_resp_ges[v_cont],
-                                     fecha_mod = now(),
-                                     id_usuario_mod = p_id_usuario
-                                  where rd.id_int_rel_devengado  =  va_id_int_rel_devengado[v_cont];
-                              
-                       END LOOP;
-                  
-                 END IF; 
-        
+                             raise exception 'Momento presupuestario no reconocido';
+                          
+                          END IF; --IF SI ES   v_momento_aux='todo' or   v_momento_aux='solo ejecutar' 
+           
+               END IF;  --FIN IF TAMANHO es mayor a cero
+               
+               
+               
+               IF v_sw_error_validacion THEN
+               
+                  raise exception 'Error al verificar presupuesto segun el siguiente detalle: <br/> %',v_mensaje_error_validacion;
+               
+               END IF;
+               
+          
+       
+    
     END IF; -- fin del if de movimiento presupuestario
     
     

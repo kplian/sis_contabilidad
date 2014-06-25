@@ -133,8 +133,11 @@ BEGIN
     --4. Verificación de igualdad del gasto y recurso
     
     
-    --5. Ejecución del presupuesto si corresponde
-    
+    --5.  Validacion presupuestaria del comprobante
+         -- no se ejecuta solo verifica si el dinero comprometido o devengado es suficiente para proseguir con 
+         --la transaccion
+        
+     v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion);
    
     --6. Numeración del comprobante
     if v_errores = '' then
@@ -200,7 +203,7 @@ BEGIN
        
         
        
-        --9. Valifacion presupuestaria del comprobante
+        --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
         
        
         v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion);
