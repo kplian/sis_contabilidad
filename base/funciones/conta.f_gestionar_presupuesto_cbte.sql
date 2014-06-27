@@ -115,7 +115,7 @@ BEGIN
     where ic.id_int_comprobante  =  p_id_int_comprobante;
     
       
-     raise notice ' >>>> zzzzzzz';
+     
      -- si el comprobante tiene efecto presupouestario'
     
     IF v_registros_comprobante.momento= 'presupuestario' THEN
@@ -135,31 +135,21 @@ BEGIN
                 v_momento_presupeustario = 4; --pagado 
                 v_momento_aux='todo';
                 
-                   raise notice ' >>>> 0';
-                
             ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
                  
                 v_momento_presupeustario = 3;  --ejecutado
-                 v_momento_aux='todo';
-                 
-                    raise notice ' >>>> 1';
-             
-       
-            ELSIF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
+                v_momento_aux='todo';
+                
+           ELSIF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
                  
                 v_momento_presupeustario = 3;  --ejecutado
                 v_momento_aux='solo ejecutar';
-                
-                   raise notice ' >>>> 2';
                 
             ELSIF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'si'  THEN   
                  
                 v_momento_presupeustario = 4;  --pagado
                 v_momento_aux='solo pagar';  
                 
-                raise notice ' >>>> 3';   
-           
-            
             ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'no' then
               
               raise exception 'Solo comprometer no esta implmentado';
@@ -171,7 +161,7 @@ BEGIN
        
             END IF;
           
-            raise notice ' >>>> 4';
+            
       
       
            v_aux = '';
@@ -233,9 +223,12 @@ BEGIN
                                      v_i = v_i + 1;
                                      -- determinamos el monto a comprometer
                                      IF v_registros.tipo = 'gasto'  THEN
+                                         -- importe debe ejecucion
                                          v_monto_cmp  = v_registros.importe_debe;
+                                         --TODO importe haber es reversion, multiplicar por -1
                                      ELSE
                                          v_monto_cmp  = v_registros.importe_haber;
+                                         --TODO importe haber es reversion, multiplicar por -1
                                      END IF;
                                      
                                      
@@ -266,21 +259,17 @@ BEGIN
                                      v_respuesta_verificar = pre.f_verificar_com_eje_pag(
                                                                                   va_id_partida_ejecucion[v_i],
                                                                                   va_id_moneda[v_i]);
-                                       IF  va_momento[v_i] <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
+                                                                                  
+                                    IF  va_monto[v_i] <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
                                         
-                                         IF  va_momento[v_i] > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
+                                         IF  va_monto[v_i] > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
                                       
-                                             va_momento[v_i] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
+                                             va_monto[v_i] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
                                       
                                          END IF;
                                       
-                                      END IF;
+                                    END IF;
                                      
-                                     
-                                      
-                                     
-                                     
-                                    
                                      
                                    -------------------------------------------------------  
                                    --   si existe monto a revertir y tenememos el id_partida_ejecucion, revertimos
@@ -318,13 +307,14 @@ BEGIN
                                                v_respuesta_verificar = pre.f_verificar_com_eje_pag(
                                                                                           va_id_partida_ejecucion[v_i],
                                                                                           va_id_moneda[v_i]);
-                                                                                          
                                               
-                                              IF  (va_momento[v_i]*-1) <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
+                                              --como esta revirtiendo tenemos que considerar el monto que ejecutamso en el anterior paso  -va_monto[v_i -1]                                         
+                                              
+                                              IF  (va_monto[v_i]*-1) <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - va_monto[v_i -1] -COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
                                                 
-                                                 IF  (va_momento[v_i]*-1) > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
+                                                 IF  (va_monto[v_i]*-1) > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) -va_monto[v_i -1] - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
                                               
-                                                     va_momento[v_i] = (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric))*-1;
+                                                     va_monto[v_i] = (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) -va_monto[v_i -1] - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric))*-1;
                                               
                                                  END IF;
                                               
@@ -440,17 +430,17 @@ BEGIN
                                                                                           va_id_moneda[v_i]);
                                                                                           
                                               
-                                              IF  (va_momento[v_i]) <= (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto) THEN
+                                              IF  (va_monto[v_i]) <= (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto) THEN
                                                 
-                                                 IF  (va_momento[v_i]) > (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)) THEN
+                                                 IF  (va_monto[v_i]) > (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)) THEN
                                               
-                                                     va_momento[v_i] = (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric));
+                                                     va_monto[v_i] = (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric));
                                               
                                                  END IF;
                                               
                                              END IF;                          
                                  
-                                           --raise exception 'xx % % %',v_i,va_fk_llave,va_momento ;
+                                           
                                  
                                    END LOOP;
                                
@@ -466,12 +456,9 @@ BEGIN
                
               
                
-             -- raise exception 'SOLO PAGAR %, %',v_i, v_aux;
-            	
-        
-             -- llamar a la funcion de gestion presupuestaria incremeto presupuestario
+              -- llamar a la funcion de gestion presupuestaria incremeto presupuestario
                    
-                 IF v_i > 0 THEN 
+               IF v_i > 0 THEN 
                  
                          va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
                                                                        va_id_partida, 
@@ -483,11 +470,11 @@ BEGIN
                                                                        va_columna_relacion, 
                                                                        va_fk_llave);
                                 
-                 END IF;
+               END IF;
                  
                  --actualiza el los id en las transacciones
                  
-                 IF  v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
+               IF  v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
                     
                          --actualizacion de los id_partida_ejecucion en las transacciones
                          
@@ -495,7 +482,6 @@ BEGIN
                              
                               IF v_momento_aux='solo ejecutar' THEN
                               
-                              --raise exception 'v_marca_reversion %',v_marca_reversion;
                               	 
                                       --verificamos que no sea un trasaccion de reversion
                                       IF  (v_cont  =  ANY(v_marca_reversion)) THEN
@@ -532,7 +518,7 @@ BEGIN
                          END LOOP;
                   
                
-                  ELSIF   v_momento_aux='solo pagar'  THEN
+                ELSIF   v_momento_aux='solo pagar'  THEN
                   
                        FOR v_cont IN 1..v_i LOOP
                              
@@ -544,7 +530,7 @@ BEGIN
                               
                        END LOOP;
                   
-                 END IF; 
+                END IF; 
         
     END IF; -- fin del if de movimiento presupuestario
     

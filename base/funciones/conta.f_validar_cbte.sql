@@ -139,6 +139,8 @@ BEGIN
         
      v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion);
    
+  
+   
     --6. Numeración del comprobante
     if v_errores = '' then
     	--Obtiene el documento para la numeración
@@ -177,8 +179,6 @@ BEGIN
         v_resp = conta.f_replicar_cbte(p_id_usuario,p_id_int_comprobante);
         
         
-      
-        
        -- 8 si viene de una plantilla de comprobante busca la funcion de validacion configurada
        
        IF v_rec_cbte.id_plantilla_comprobante is not null THEN
@@ -200,7 +200,6 @@ BEGIN
        END IF;
        
       
-       
         
        
         --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
@@ -215,6 +214,8 @@ BEGIN
     	
     	raise exception 'Validación no realizada: %', v_errores;
     end if;
+    
+  
     
     --8. Respuesta
     return 'Comprobante validado';

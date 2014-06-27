@@ -36,6 +36,7 @@ DECLARE
     va_id_partida     		integer[];
     va_momento				INTEGER[];
     va_monto          		numeric[];
+    va_temp_array           numeric[];
     va_id_moneda    		integer[];
     va_id_partida_ejecucion integer[];
     va_columna_relacion     varchar[];
@@ -69,6 +70,8 @@ DECLARE
     
     v_nombre_partida  varchar;
     v_codigo_cc varchar;
+    
+   
     
 
 BEGIN
@@ -390,11 +393,17 @@ BEGIN
              raise exception 'No se encontro el valor de la variable global : error_presupuesto';
          END IF;
           
-              
+        
+        
+         
           --si tenemos trasaccione y es un comprobante presupuestario
          IF v_i > 0 and v_registros_comprobante.momento= 'presupuestario' THEN
+         
+        
                      
                      IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
+                     
+                     
                                   
                                     -- si solo ejecutamos el presupuesto 
                                     --  o (compromentemos y ejecutamos) 
@@ -408,26 +417,39 @@ BEGIN
                                              --si no es el momento de reversion (2)
                                              -- y si es una partida de gasto 
                                              
-                                             IF  va_tipo_partida[v_i]='gasto' THEN
-                                                 
-                                                 v_respuesta_verificar = pre.f_verificar_com_eje_pag(
-                                                                                  va_id_partida_ejecucion[v_i],
-                                                                                  va_id_moneda[v_i]);
+                                              v_respuesta_verificar = pre.f_verificar_com_eje_pag(
+                                                                                  va_id_partida_ejecucion[v_cont],
+                                                                                  va_id_moneda[v_cont]);
                                                                                   
-                                            
-                                                  IF va_momento[v_i] != 2 THEN
-                                                  --validamso que el monto a ejecutar sea menor o igual que el faltante por comprometer
-                                                      IF  va_momento[v_i] <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
+                                             
+                                           
+                                             
+                                                   
+                                             
+                                             IF  va_tipo_partida[v_cont]='gasto' THEN
+                                             
+                                                 IF va_momento[v_cont] != 2 THEN
+                                                      
+                                                      va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto::numeric;
+                                           
+                                                     --validamso que el monto a ejecutar sea menor o igual que el faltante por comprometer
+                                                      IF  va_monto[v_cont] <= va_temp_array[v_cont]  THEN
                                                          v_retorno = 'exito';
+                                                        
                                                       ELSE
                                                          v_retorno = 'falla';
+                                                         
                                                       END IF;  
                                                  
-                                                  ElSIF va_momento[v_i] = 2  and va_monto[v_i] < 0 THEN
-                                                  --si el momento es 2 y el monto es menor a cero se bsca la reversion de monto
-                                                  -- validamos que el monto comprometido no ejecutado sea mayor o igual que el monto que se quiere revertir
+                                                  ElSIF va_momento[v_cont] = 2  and va_monto[v_cont] < 0 THEN
                                                   
-                                                      IF  (va_momento[v_i]*-1) <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
+                                                     -- si es el caso de reversion ..   
+                                                     va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric)- (va_monto[v_cont-1]) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto::numeric;
+                                           
+                                                      -- si el momento es 2 y el monto es menor a cero se bsca la reversion de monto
+                                                      -- validamos que el monto comprometido no ejecutado sea mayor o igual que el monto que se quiere revertir
+                                                  
+                                                      IF  (va_monto[v_cont]*-1) <= va_temp_array[v_cont] THEN
                                                          v_retorno = 'exito';
                                                       ELSE
                                                          v_retorno = 'falla';
@@ -438,6 +460,7 @@ BEGIN
                                                  
                                                   END IF;
                                                  
+                                                  
                                                  --si existe error recuperamos los datos del presupuesto y partida
                                                  IF v_retorno = 'falla' THEN 
                                                      v_sw_error_validacion = TRUE;
@@ -447,7 +470,7 @@ BEGIN
                                                       into
                                                         v_nombre_partida 
                                                       from pre.tpartida p 
-                                                      where p.id_partida = va_id_partida[v_i]; 
+                                                      where p.id_partida = va_id_partida[v_cont]; 
                                                       
                                                       
                                                       
@@ -457,17 +480,19 @@ BEGIN
                                                         v_codigo_cc 
                                                       from pre.tpresupuesto pre
                                                       inner join param.vcentro_costo cc on pre.id_centro_costo = cc.id_centro_costo
-                                                      where pre.id_presupuesto = va_id_presupuesto;
+                                                      where pre.id_presupuesto = va_id_presupuesto[v_cont];
                                                       
                                                      v_mensaje_error_validacion = v_mensaje_error_validacion|| COALESCE(v_nombre_partida,'');
                                                      v_mensaje_error_validacion = v_mensaje_error_validacion||'  ' || COALESCE(v_codigo_cc,'');
-                                                     v_mensaje_error_validacion = v_mensaje_error_validacion||' Monto: ' ||COALESCE(va_monto[v_i]::varchar,'0')||'<br/>';
+                                                     v_mensaje_error_validacion = v_mensaje_error_validacion||' Monto: ' ||COALESCE(va_monto[v_cont]::varchar,'0')||' y el disponible '||va_temp_array[v_cont]||'<br>';
                                                      
                                                   END IF;
                                             
                                            END IF; --IF SI no son partidas de gasto
                                           
                                    END LOOP;
+                                   
+                                    --raise exception 'qq  xxxx  % - % - %', va_momento,va_monto,va_temp_array;
                                    
                                    --COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)
                            
@@ -476,10 +501,13 @@ BEGIN
                                 FOR v_cont IN 1..v_i LOOP 
                                 
                                       v_respuesta_verificar = pre.f_verificar_com_eje_pag(
-                                                                                  va_id_partida_ejecucion[v_i],
-                                                                                  va_id_moneda[v_i]);
-                                                                                  
-                                      IF  va_momento[v_i] <= (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto) THEN
+                                                                                  va_id_partida_ejecucion[v_cont],
+                                                                                  va_id_moneda[v_cont]);
+                                      
+                                      va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto;                                           
+                                      
+                                      
+                                      IF  va_monto[v_cont] <= va_temp_array[v_cont] THEN
                                         v_retorno = 'exito';
                                       ELSE
                                         v_retorno = 'falla';
@@ -488,7 +516,7 @@ BEGIN
                                       IF v_retorno = 'falla' THEN 
                                           
                                           v_sw_error_validacion = TRUE;
-                                          v_mensaje_error_validacion = v_mensaje_error_validacion||'al pagar el  Monto: ' ||COALESCE(va_monto[v_i]::varchar,'0')||'<br/>';
+                                          v_mensaje_error_validacion = v_mensaje_error_validacion||'al pagar el  Monto: ' ||COALESCE(va_monto[v_cont]::varchar,'0')||'y el disponible es '||va_temp_array[v_cont]||'<br>';
                                       END IF;                                           
                            
                                END LOOP;
@@ -507,7 +535,7 @@ BEGIN
                
                IF v_sw_error_validacion THEN
                
-                  raise exception 'Error al verificar presupuesto segun el siguiente detalle: <br/> %',v_mensaje_error_validacion;
+                  raise exception 'Error al verificar presupuesto segun el siguiente detalle: <br><br> % <br><br>',v_mensaje_error_validacion;
                
                END IF;
                
@@ -516,6 +544,8 @@ BEGIN
     
     END IF; -- fin del if de movimiento presupuestario
     
+    
+   
     
    return v_retorno; 
 
