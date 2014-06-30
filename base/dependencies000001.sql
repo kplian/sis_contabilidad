@@ -1766,3 +1766,50 @@ select pxp.f_insert_trol_procedimiento_gui ('CONTA - Plantilla de Documentos', '
 select pxp.f_insert_trol_procedimiento_gui ('CONTA - Plantilla de Documentos', 'PM_CAT_ELI', 'PLADOC.1.1');
 
 /***********************************F-DEP-JRR-CONTA-0-24/04/2014*****************************************/
+
+
+
+
+/***********************************I-DEP-RAC-CONTA-0-27/06/2014*****************************************/
+
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_rel_devengado
+  ADD CONSTRAINT tint_rel_devengado__id_int_transaccion_pag FOREIGN KEY (id_int_transaccion_pag)
+    REFERENCES conta.tint_transaccion(id_int_transaccion)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_rel_devengado
+  ADD CONSTRAINT tint_rel_devengado_int_transaccion_dev FOREIGN KEY (id_int_transaccion_dev)
+    REFERENCES conta.tint_transaccion(id_int_transaccion)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+update conta.tplantilla_calculo c set
+codigo_tipo_relacion = NULL
+where codigo_tipo_relacion = '';
+
+CREATE UNIQUE INDEX ttipo_relacion_contable_codigo_tipo_relacion_key ON conta.ttipo_relacion_contable
+(codigo_tipo_relacion);
+
+ALTER TABLE conta.tplantilla_calculo
+  ADD CONSTRAINT tplantilla_calculo_coodigo_tipo_relacion FOREIGN KEY (codigo_tipo_relacion)
+    REFERENCES conta.ttipo_relacion_contable(codigo_tipo_relacion)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;   
+   
+    
+/***********************************F-DEP-RAC-CONTA-0-27/06/2014*****************************************/
+
+
+

@@ -70,6 +70,11 @@ DECLARE
     
     v_nombre_partida  varchar;
     v_codigo_cc varchar;
+    v_estado    varchar;
+    
+    v_monto_previo_ejecutado   numeric;
+    v_monto_previo_revertido   numeric;
+    v_monto_previo_pagado      numeric;
     
    
     
@@ -77,7 +82,7 @@ DECLARE
 BEGIN
 	
 	
-    v_nombre_funcion:='conta.f_gestionar_precupuesto_cbte';
+    v_nombre_funcion:='conta.f_verificar_presupuesto_cbte';
     
     /*
     codigo_clase_cbtr
@@ -171,8 +176,29 @@ BEGIN
       
       
            v_aux = '';
-    
- 
+           
+           DROP TABLE IF EXISTS tt_check_presu;
+           create temp table tt_check_presu(
+                           id integer,
+                           tipo_partida varchar,
+                           id_presupuesto  integer,
+                           id_partida  integer,
+                           momento integer,
+                           monto numeric,
+                           id_moneda integer,
+                           id_partida_ejecucion integer,
+                           columna_relacion varchar,
+                           fk_llave  integer,
+                           id_transaccion integer,
+                           momento_aux varchar,
+                           fecha date,
+                           id_int_rel_devengado integer,
+                           estado varchar,
+                           retorno varchar
+                      )on commit drop;
+                      
+                      
+              
              
              FOR v_registros in (
                                   select
@@ -254,6 +280,39 @@ BEGIN
                                       va_fecha[v_i]=p_fecha_ejecucion;  -- fecha como parametros
                                      END IF;
                                      
+                                     --inserta en tabla temporal
+                                     INSERT INTO tt_check_presu(
+                                         id,
+                                         tipo_partida,
+                                         id_presupuesto,
+                                         id_partida,
+                                         momento,
+                                         monto ,
+                                         id_moneda ,
+                                         id_partida_ejecucion ,
+                                         columna_relacion ,
+                                         fk_llave  ,
+                                         id_transaccion ,
+                                         momento_aux ,
+                                         fecha
+                                    ) 
+                                    VALUES (
+                                         v_i,
+                                         v_registros.tipo,
+                                         v_registros.id_presupuesto,
+                                         v_registros.id_partida,
+                                         v_momento_presupeustario,
+                                         v_monto_cmp,
+                                         v_registros_comprobante.id_moneda,
+                                         v_registros.id_partida_ejecucion,
+                                         'id_int_transaccion',
+                                         v_registros.id_int_transaccion,
+                                         v_registros.id_int_transaccion,
+                                         v_momento_aux,
+                                         va_fecha[v_i]
+                                         
+                                     );
+                                     
                                     
                                      
                                    -------------------------------------------------------  
@@ -278,6 +337,39 @@ BEGIN
                                        va_fecha[v_i]=now()::date;
                                        
                                        v_marca_reversion = v_marca_reversion || v_i;
+                                       
+                                       
+                                       --inserta en tabla temporal
+                                       INSERT  INTO  tt_check_presu(
+                                           id,
+                                           tipo_partida,
+                                           id_presupuesto,
+                                           id_partida,
+                                           momento,
+                                           monto ,
+                                           id_moneda ,
+                                           id_partida_ejecucion ,
+                                           columna_relacion ,
+                                           fk_llave  ,
+                                           id_transaccion ,
+                                           momento_aux,
+                                           fecha
+                                      ) 
+                                      VALUES (
+                                         v_i,
+                                         v_registros.tipo,
+                                         v_registros.id_presupuesto,
+                                         v_registros.id_partida,
+                                         2,
+                                         (v_registros.importe_reversion)*-1,
+                                         v_registros_comprobante.id_moneda,
+                                         v_registros.id_partida_ejecucion,
+                                         'id_int_transaccion',
+                                         v_registros.id_int_transaccion,
+                                         v_registros.id_int_transaccion,
+                                         v_momento_aux,
+                                         va_fecha[v_i]
+                                     );
                                       
                                    
                                    END IF;
@@ -366,6 +458,41 @@ BEGIN
                                                va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                                va_id_int_rel_devengado[v_i]= v_registros_dev.id_int_rel_devengado;
                                                va_fecha[v_i]=now()::date;  
+                                               
+                                               
+                                               INSERT  INTO tt_check_presu(
+                                                   id,
+                                                   tipo_partida,
+                                                   id_presupuesto,
+                                                   id_partida,
+                                                   momento,
+                                                   monto ,
+                                                   id_moneda ,
+                                                   id_partida_ejecucion ,
+                                                   columna_relacion ,
+                                                   fk_llave  ,
+                                                   id_transaccion ,
+                                                   id_int_rel_devengado,
+                                                   momento_aux ,
+                                                   fecha
+                                              ) 
+                                              VALUES (
+                                                   v_i,
+                                                   NULL,
+                                                   NULL,
+                                                   NULL,
+                                                   4,
+                                                   v_monto_x_pagar,
+                                                   v_registros_comprobante.id_moneda,
+                                                   v_registros_dev.id_partida_ejecucion_dev,
+                                                   'id_int_transaccion',
+                                                   v_registros.id_int_transaccion,
+                                                   v_registros.id_int_transaccion,
+                                                   v_registros_dev.id_int_rel_devengado,
+                                                   v_momento_aux,
+                                                   va_fecha[v_i]
+                                                   
+                                               );
                                  
                                    END LOOP;
                                
@@ -394,7 +521,7 @@ BEGIN
          END IF;
           
         
-        
+      
          
           --si tenemos trasaccione y es un comprobante presupuestario
          IF v_i > 0 and v_registros_comprobante.momento= 'presupuestario' THEN
@@ -414,51 +541,89 @@ BEGIN
                                
                                    FOR v_cont IN 1..v_i LOOP
                                    
+                                             v_respuesta_verificar = pre.f_verificar_com_eje_pag(
+                                                                                              va_id_partida_ejecucion[v_cont],
+                                                                                              va_id_moneda[v_cont]);
+                                                                                              
+                                             --antes de validar el monto,  calculamos en la tabla temporal los montos previos ya ejecutados
+                                              select
+                                                sum(tt.monto) 
+                                              into 
+                                               v_monto_previo_ejecutado
+                                              from tt_check_presu tt 
+                                              where id < v_cont 
+                                                and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
+                                                and momento =  va_momento[v_cont]
+                                                and estado = 'ejecutado';
+                                                            
+                                            --caculamos los montos previos revertidos    
+                                            select
+                                                sum(tt.monto) 
+                                              into 
+                                               v_monto_previo_revertido
+                                              from tt_check_presu tt 
+                                              where id < v_cont 
+                                                and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
+                                                and momento =  2
+                                                and estado = 'revertido';                                                 
+                                   
+                                   
                                              --si no es el momento de reversion (2)
-                                             -- y si es una partida de gasto 
-                                             
-                                              v_respuesta_verificar = pre.f_verificar_com_eje_pag(
-                                                                                  va_id_partida_ejecucion[v_cont],
-                                                                                  va_id_moneda[v_cont]);
-                                                                                  
-                                             
-                                           
-                                             
-                                                   
-                                             
+                                             -- y si es una partida de gasto      
                                              IF  va_tipo_partida[v_cont]='gasto' THEN
                                              
                                                  IF va_momento[v_cont] != 2 THEN
-                                                      
-                                                      va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto::numeric;
-                                           
-                                                     --validamso que el monto a ejecutar sea menor o igual que el faltante por comprometer
-                                                      IF  va_monto[v_cont] <= va_temp_array[v_cont]  THEN
-                                                         v_retorno = 'exito';
-                                                        
-                                                      ELSE
-                                                         v_retorno = 'falla';
+                                                 
+                                                         va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0)  - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
+                                                         v_estado = 'ejecutado';
                                                          
-                                                      END IF;  
+                                                         --validamso que el monto a ejecutar sea menor o igual que el faltante por comprometer
+                                                          IF  va_monto[v_cont] <= va_temp_array[v_cont]  + v_error_presupuesto::numeric THEN
+                                                             v_retorno = 'exito';
+                                                              IF  va_monto[v_cont] > va_temp_array[v_cont] THEN
+                                                                  va_monto[v_cont] = va_temp_array[v_cont];
+                                                              END IF;
+                                                            
+                                                          ELSE
+                                                             v_retorno = 'falla';
+                                                             
+                                                          END IF;  
                                                  
                                                   ElSIF va_momento[v_cont] = 2  and va_monto[v_cont] < 0 THEN
-                                                  
-                                                     -- si es el caso de reversion ..   
-                                                     va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric)- (va_monto[v_cont-1]) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto::numeric;
-                                           
-                                                      -- si el momento es 2 y el monto es menor a cero se bsca la reversion de monto
-                                                      -- validamos que el monto comprometido no ejecutado sea mayor o igual que el monto que se quiere revertir
-                                                  
-                                                      IF  (va_monto[v_cont]*-1) <= va_temp_array[v_cont] THEN
-                                                         v_retorno = 'exito';
-                                                      ELSE
-                                                         v_retorno = 'falla';
-                                                      END IF; 
+                                                        
+                                                         -- si es el caso de reversion ..   
+                                                         va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
+                                                         v_estado = 'revertido';
+                                                          -- si el momento es 2 y el monto es menor a cero se bsca la reversion de monto
+                                                          -- validamos que el monto comprometido no ejecutado sea mayor o igual que el monto que se quiere revertir
+                                                      
+                                                          IF  (va_monto[v_cont]*-1) <= va_temp_array[v_cont]  + v_error_presupuesto::numeric THEN
+                                                             
+                                                              v_retorno = 'exito';
+                                                             
+                                                             IF  (va_monto[v_cont]*-1) > va_temp_array[v_cont] THEN
+                                                                 va_monto[v_cont] = (va_temp_array[v_cont]*-1);
+                                                             END IF;
+                                                          
+                                                          ELSE
+                                                             v_retorno = 'falla';
+                                                          END IF; 
+                                                 
+                                                 
                                                   ELSE
-                                                     --TODO verificacion si necesita comprometer
-                                                     raise exception 'No opcion no validada';
+                                                         --TODO verificacion si necesita comprometer
+                                                         raise exception 'No opcion no validada';
                                                  
                                                   END IF;
+                                                  
+                                                  --actualicemos ele stado y valor de retorno para el registro
+                                                  UPDATE tt_check_presu set
+                                                     estado = v_estado,
+                                                     retorno = v_retorno,
+                                                     monto = va_monto[v_cont]
+                                                  where id = v_cont;
+                                                  
+                                                  
                                                  
                                                   
                                                  --si existe error recuperamos los datos del presupuesto y partida
@@ -504,14 +669,40 @@ BEGIN
                                                                                   va_id_partida_ejecucion[v_cont],
                                                                                   va_id_moneda[v_cont]);
                                       
-                                      va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto;                                           
+                                      --antes de validar el monto,  calculamos en la tabla temporal los montos previos ya pagado
+                                      select
+                                        sum(tt.monto) 
+                                      into 
+                                       v_monto_previo_pagado
+                                      from tt_check_presu tt 
+                                      where id < v_cont 
+                                        and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
+                                        and momento =  va_momento[v_cont]
+                                        and estado = 'pagado';
+                                      
+                                      v_estado = 'pagado';
+                                      
+                                      va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)  - COALESCE(v_monto_previo_pagado,0.0)  - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) ;                                           
                                       
                                       
-                                      IF  va_monto[v_cont] <= va_temp_array[v_cont] THEN
+                                      IF  va_monto[v_cont] <= va_temp_array[v_cont] + v_error_presupuesto  THEN
                                         v_retorno = 'exito';
+                                        IF  va_monto[v_cont] > va_temp_array[v_cont] THEN
+                                            va_monto[v_cont] = va_temp_array[v_cont];
+                                        END IF;
+                                        
                                       ELSE
-                                        v_retorno = 'falla';
+                                          v_retorno = 'falla';
+                                     
+                                
                                       END IF;
+                                      
+                                      --actualicemos ele stado y valor de retorno para el registro
+                                      UPDATE tt_check_presu set
+                                         estado = v_estado,
+                                         retorno = v_retorno,
+                                         monto =  va_monto[v_cont]
+                                      where id = v_cont;
                                       
                                       IF v_retorno = 'falla' THEN 
                                           
