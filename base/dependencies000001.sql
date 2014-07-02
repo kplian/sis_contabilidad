@@ -1812,4 +1812,20 @@ ALTER TABLE conta.tplantilla_calculo
 /***********************************F-DEP-RAC-CONTA-0-27/06/2014*****************************************/
 
 
+/***********************************I-DEP-RAC-CONTA-0-02/07/2014*****************************************/
 
+--------------- SQL ---------------
+
+-- object recreation
+ALTER TABLE conta.tint_rel_devengado
+  DROP CONSTRAINT tint_rel_devengado__id_int_transaccion_pag RESTRICT;
+
+ALTER TABLE conta.tint_rel_devengado
+  ADD CONSTRAINT tint_rel_devengado__id_int_transaccion_pag FOREIGN KEY (id_int_transaccion_pag)
+    REFERENCES conta.tint_transaccion(id_int_transaccion)
+    MATCH FULL
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/***********************************F-DEP-RAC-CONTA-0-02/07/2014*****************************************/

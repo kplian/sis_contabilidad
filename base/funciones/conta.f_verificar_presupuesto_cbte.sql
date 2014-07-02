@@ -221,11 +221,11 @@ BEGIN
                                   inner join pre.tpartida par on par.id_partida = it.id_partida
                                   inner join pre.tpresupuesto pr on pr.id_centro_costo = it.id_centro_costo
                                   where it.id_int_comprobante = p_id_int_comprobante
-                                        and it.estado_reg = 'activo'       )  LOOP
+                                        and it.estado_reg = 'activo' )  LOOP
                 
                      
                         
-                        IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
+                        IF  v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
                           
                             -- si solo ejecutamos el presupuesto 
                             --  o (compromentemos y ejecutamos) 
@@ -298,20 +298,21 @@ BEGIN
                                     ) 
                                     VALUES (
                                          v_i,
-                                         v_registros.tipo,
-                                         v_registros.id_presupuesto,
-                                         v_registros.id_partida,
-                                         v_momento_presupeustario,
-                                         v_monto_cmp,
-                                         v_registros_comprobante.id_moneda,
-                                         v_registros.id_partida_ejecucion,
-                                         'id_int_transaccion',
-                                         v_registros.id_int_transaccion,
-                                         v_registros.id_int_transaccion,
+                                         va_tipo_partida[v_i],
+                                         va_id_presupuesto[v_i],
+                                         va_id_partida[v_i],
+                                         va_momento[v_i],
+                                         va_monto[v_i],
+                                         va_id_moneda[v_i],
+                                         va_id_partida_ejecucion[v_i],
+                                         va_columna_relacion[v_i],
+                                         va_fk_llave[v_i],
+                                         va_id_transaccion[v_i],
                                          v_momento_aux,
                                          va_fecha[v_i]
                                          
                                      );
+                                     
                                      
                                     
                                      
@@ -330,7 +331,7 @@ BEGIN
                                        va_momento[v_i]	= 2;  --momento revertido
                                        va_monto[v_i]  = (v_registros.importe_reversion)*-1; --signo negativo para revertir
                                        va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
-                                       va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
+                                       va_id_partida_ejecucion[v_i] = v_registros.id_partida_ejecucion ;   
                                        va_columna_relacion[v_i]= 'id_int_transaccion';
                                        va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                        va_id_transaccion[v_i]= v_registros.id_int_transaccion;
@@ -357,16 +358,16 @@ BEGIN
                                       ) 
                                       VALUES (
                                          v_i,
-                                         v_registros.tipo,
-                                         v_registros.id_presupuesto,
-                                         v_registros.id_partida,
-                                         2,
-                                         (v_registros.importe_reversion)*-1,
-                                         v_registros_comprobante.id_moneda,
-                                         v_registros.id_partida_ejecucion,
-                                         'id_int_transaccion',
-                                         v_registros.id_int_transaccion,
-                                         v_registros.id_int_transaccion,
+                                         va_tipo_partida[v_i],
+                                         va_id_presupuesto[v_i],
+                                         va_id_partida[v_i],
+                                         va_momento[v_i],
+                                         va_monto[v_i],
+                                         va_id_moneda[v_i],
+                                         va_id_partida_ejecucion[v_i],
+                                         va_columna_relacion[v_i],
+                                         va_fk_llave[v_i],
+                                         va_id_transaccion[v_i],
                                          v_momento_aux,
                                          va_fecha[v_i]
                                      );
@@ -469,6 +470,7 @@ BEGIN
                                                    monto ,
                                                    id_moneda ,
                                                    id_partida_ejecucion ,
+                                                   
                                                    columna_relacion ,
                                                    fk_llave  ,
                                                    id_transaccion ,
@@ -479,19 +481,18 @@ BEGIN
                                               VALUES (
                                                    v_i,
                                                    NULL,
-                                                   NULL,
-                                                   NULL,
-                                                   4,
-                                                   v_monto_x_pagar,
-                                                   v_registros_comprobante.id_moneda,
-                                                   v_registros_dev.id_partida_ejecucion_dev,
-                                                   'id_int_transaccion',
+                                                   va_id_presupuesto[v_i],
+                                                   va_id_partida[v_i],
+                                                   va_momento[v_i],
+                                                   va_monto[v_i],
+                                                   va_id_moneda[v_i],
+                                                   va_id_partida_ejecucion [v_i],
+                                                    va_columna_relacion[v_i],
+                                                   va_fk_llave[v_i],
                                                    v_registros.id_int_transaccion,
-                                                   v_registros.id_int_transaccion,
-                                                   v_registros_dev.id_int_rel_devengado,
+                                                   va_id_int_rel_devengado[v_i],
                                                    v_momento_aux,
                                                    va_fecha[v_i]
-                                                   
                                                );
                                  
                                    END LOOP;
@@ -521,7 +522,7 @@ BEGIN
          END IF;
           
         
-      
+     
          
           --si tenemos trasaccione y es un comprobante presupuestario
          IF v_i > 0 and v_registros_comprobante.momento= 'presupuestario' THEN
@@ -553,7 +554,7 @@ BEGIN
                                               from tt_check_presu tt 
                                               where id < v_cont 
                                                 and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
-                                                and momento =  va_momento[v_cont]
+                                                and momento in (3,4)  --momento pagado o ejecutado
                                                 and estado = 'ejecutado';
                                                             
                                             --caculamos los montos previos revertidos    
@@ -565,17 +566,20 @@ BEGIN
                                               where id < v_cont 
                                                 and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
                                                 and momento =  2
-                                                and estado = 'revertido';                                                 
+                                                and estado = 'revertido'; 
+                                                
+                                                
+                                             va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
+                                                                                                           
                                    
                                    
                                              --si no es el momento de reversion (2)
                                              -- y si es una partida de gasto      
                                              IF  va_tipo_partida[v_cont]='gasto' THEN
                                              
-                                                 IF va_momento[v_cont] != 2 THEN
+                                               IF va_momento[v_cont] != 2 THEN
                                                  
-                                                         va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0)  - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
-                                                         v_estado = 'ejecutado';
+                                                          v_estado = 'ejecutado';
                                                          
                                                          --validamso que el monto a ejecutar sea menor o igual que el faltante por comprometer
                                                           IF  va_monto[v_cont] <= va_temp_array[v_cont]  + v_error_presupuesto::numeric THEN
@@ -589,11 +593,14 @@ BEGIN
                                                              
                                                           END IF;  
                                                  
-                                                  ElSIF va_momento[v_cont] = 2  and va_monto[v_cont] < 0 THEN
+                                               
+                                              --si es el momento de reversion
+                                              ElSIF va_momento[v_cont] = 2  and va_monto[v_cont] < 0 THEN
+                                                  
+                                                   -- raise exception '%,%,%',va_id_partida_ejecucion, COALESCE(v_monto_previo_ejecutado,0.0), COALESCE((v_monto_previo_revertido*-1),0.0);
                                                         
                                                          -- si es el caso de reversion ..   
-                                                         va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
-                                                         v_estado = 'revertido';
+                                                          v_estado = 'revertido';
                                                           -- si el momento es 2 y el monto es menor a cero se bsca la reversion de monto
                                                           -- validamos que el monto comprometido no ejecutado sea mayor o igual que el monto que se quiere revertir
                                                       
@@ -677,7 +684,7 @@ BEGIN
                                       from tt_check_presu tt 
                                       where id < v_cont 
                                         and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
-                                        and momento =  va_momento[v_cont]
+                                        and momento =  4  --momento pagado
                                         and estado = 'pagado';
                                       
                                       v_estado = 'pagado';
@@ -736,7 +743,8 @@ BEGIN
     END IF; -- fin del if de movimiento presupuestario
     
     
-   
+    -- raise exception '%,%,%',va_momento,va_monto  ,va_temp_array;
+    
     
    return v_retorno; 
 

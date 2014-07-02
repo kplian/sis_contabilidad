@@ -285,75 +285,17 @@ BEGIN
                                                                                   va_id_partida_ejecucion[v_i],
                                                                                   va_id_moneda[v_i]);
                                                                                   
-                                    --antes de validar el monto,  calculamos en la tabla temporal los montos previos ya ejecutados
-                                    select
-                                      sum(tt.monto) 
-                                    into 
-                                     v_monto_previo_ejecutado
-                                    from tt_check_presu tt 
-                                    where id < v_i 
-                                      and id_partida_ejecucion =  va_id_partida_ejecucion[v_i]
-                                      and momento =  va_momento[v_i]
-                                      and estado = 'ejecutado';
-                                                            
-                                  --caculamos los montos previos revertidos    
-                                  select
-                                      sum(tt.monto) 
-                                    into 
-                                     v_monto_previo_revertido
-                                    from tt_check_presu tt 
-                                    where id < v_i 
-                                      and id_partida_ejecucion =  va_id_partida_ejecucion[v_i]
-                                      and momento =  2
-                                      and estado = 'revertido';                                              
-                                                                                  
-                                                                                  
-                                    IF  va_monto[v_i] <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
+                                     IF  va_monto[v_i] <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
                                         
-                                         IF  va_monto[v_i] > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
+                                         IF  va_monto[v_i] > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
                                       
-                                             va_monto[v_i] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
+                                             va_monto[v_i] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
                                       
                                          END IF;
                                       
                                     END IF;
                                     
-                                    --insertamos el nuevo valor en la tabla temporal
-                                    
-                                    INSERT INTO tt_check_presu(
-                                         id,
-                                         tipo_partida,
-                                         id_presupuesto,
-                                         id_partida,
-                                         momento,
-                                         monto ,
-                                         id_moneda ,
-                                         id_partida_ejecucion ,
-                                         columna_relacion ,
-                                         fk_llave  ,
-                                         id_transaccion ,
-                                         momento_aux ,
-                                         fecha,
-                                         estado
-                                    ) 
-                                    VALUES (
-                                         v_i,
-                                         va_tipo_partida[v_i],
-                                         va_id_presupuesto[v_i],
-                                         va_id_partida[v_i],
-                                         va_momento[v_i],
-                                         va_monto[v_i] ,
-                                         va_id_moneda[v_i] ,
-                                         va_id_partida_ejecucion[v_i] ,
-                                         va_columna_relacion[v_i] ,
-                                         va_fk_llave[v_i]  ,
-                                         va_id_transaccion[v_i] ,
-                                         v_momento_aux ,
-                                         va_fecha[v_i],
-                                         'ejecutado'
-                                         
-                                     );
-                                     
+                                   
                                      
                                    -------------------------------------------------------  
                                    --   si existe monto a revertir y tenememos el id_partida_ejecucion, revertimos
@@ -392,76 +334,19 @@ BEGIN
                                                                                               va_id_partida_ejecucion[v_i],
                                                                                               va_id_moneda[v_i]);
                                                                                               
-                                                                                              
-                                                   --antes de validar el monto,  calculamos en la tabla temporal los montos previos ya ejecutados
-                                                    select
-                                                      sum(tt.monto) 
-                                                    into 
-                                                     v_monto_previo_ejecutado
-                                                    from tt_check_presu tt 
-                                                    where id < v_i 
-                                                      and id_partida_ejecucion =  va_id_partida_ejecucion[v_i]
-                                                      and momento =  va_momento[v_i]
-                                                      and estado = 'ejecutado';
-                                                                            
-                                                  --caculamos los montos previos revertidos    
-                                                  select
-                                                      sum(tt.monto) 
-                                                    into 
-                                                     v_monto_previo_revertido
-                                                    from tt_check_presu tt 
-                                                    where id < v_i 
-                                                      and id_partida_ejecucion =  va_id_partida_ejecucion[v_i]
-                                                      and momento =  2
-                                                      and estado = 'revertido';                                           
-                                                  
-                                                 
                                                   --como esta revirtiendo tenemos que considerar el monto que ejecutamso en el anterior paso  -va_monto[v_i -1]                                         
                                                   
-                                                  IF  (va_monto[v_i]*-1) <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) -COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
+                                                  IF  (va_monto[v_i]*-1) <= (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) + v_error_presupuesto) THEN
                                                     
-                                                     IF  (va_monto[v_i]*-1) > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
+                                                     IF  (va_monto[v_i]*-1) > (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) -  COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric)) THEN
                                                   
-                                                         va_monto[v_i] = (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric))*-1;
+                                                         va_monto[v_i] = (COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) -  COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric))*-1;
                                                   
                                                      END IF;
                                                   
                                                  END IF;
                                                 
-                                                 --insertamos el nuevo valor en la tabla temporal
-                                        
-                                                INSERT INTO tt_check_presu(
-                                                     id,
-                                                     tipo_partida,
-                                                     id_presupuesto,
-                                                     id_partida,
-                                                     momento,
-                                                     monto ,
-                                                     id_moneda ,
-                                                     id_partida_ejecucion ,
-                                                     columna_relacion ,
-                                                     fk_llave  ,
-                                                     id_transaccion ,
-                                                     momento_aux ,
-                                                     fecha,
-                                                     estado
-                                                ) 
-                                                VALUES (
-                                                     v_i,
-                                                     va_tipo_partida[v_i],
-                                                     va_id_presupuesto[v_i],
-                                                     va_id_partida[v_i],
-                                                     va_momento[v_i],
-                                                     va_monto[v_i] ,
-                                                     va_id_moneda[v_i] ,
-                                                     va_id_partida_ejecucion[v_i] ,
-                                                     va_columna_relacion[v_i] ,
-                                                     va_fk_llave[v_i]  ,
-                                                     va_id_transaccion[v_i] ,
-                                                     v_momento_aux ,
-                                                     va_fecha[v_i],
-                                                     'revertido'
-                                                 );
+                                                
                                        
                                      END IF;
                                              
@@ -579,52 +464,16 @@ BEGIN
                                                   and estado = 'pagado';
                                                                                           
                                               
-                                              IF  (va_monto[v_i]) <= (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_monto_previo_pagado,0.0) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto) THEN
+                                              IF  (va_monto[v_i]) <= (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric) + v_error_presupuesto) THEN
                                                 
-                                                 IF  (va_monto[v_i]) > (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_monto_previo_pagado,0.0)- COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)) THEN
+                                                 IF  (va_monto[v_i]) > (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)) THEN
                                               
-                                                     va_monto[v_i] = (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) - COALESCE(v_monto_previo_pagado,0.0) - COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric));
+                                                     va_monto[v_i] = (COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric) -  COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric));
                                               
                                                  END IF;
                                               
                                              END IF;
                                              
-                                             --insertamos el nuevo valor en la tabla temporal
-                                        
-                                                INSERT INTO tt_check_presu(
-                                                     id,
-                                                     tipo_partida,
-                                                     id_presupuesto,
-                                                     id_partida,
-                                                     momento,
-                                                     monto ,
-                                                     id_moneda ,
-                                                     id_partida_ejecucion ,
-                                                     columna_relacion ,
-                                                     fk_llave  ,
-                                                     id_transaccion ,
-                                                     momento_aux ,
-                                                     fecha,
-                                                     estado
-                                                ) 
-                                                VALUES (
-                                                     v_i,
-                                                     va_tipo_partida[v_i],
-                                                     va_id_presupuesto[v_i],
-                                                     va_id_partida[v_i],
-                                                     va_momento[v_i],
-                                                     va_monto[v_i] ,
-                                                     va_id_moneda[v_i] ,
-                                                     va_id_partida_ejecucion[v_i] ,
-                                                     va_columna_relacion[v_i] ,
-                                                     va_fk_llave[v_i]  ,
-                                                     va_id_transaccion[v_i] ,
-                                                     v_momento_aux ,
-                                                     va_fecha[v_i],
-                                                    'pagado'
-                                                 );                          
-                                 
-                                           
                                  
                                    END LOOP;
                                
