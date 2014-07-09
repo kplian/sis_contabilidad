@@ -589,6 +589,9 @@ BEGIN
                                                  
                                                   ElSIF va_momento[v_cont] = 2  and va_monto[v_cont] < 0 THEN    --si es revertido el monto es negativo
                                                         
+                                                        
+                                                       
+                                                  
                                                          -- si es el caso de reversion ..   
                                                          va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
                                                          v_estado = 'revertido';
@@ -605,7 +608,9 @@ BEGIN
                                                           
                                                           ELSE
                                                              v_retorno = 'falla';
-                                                          END IF; 
+                                                          END IF;
+                                                          
+                                                          -- raise exception 'xxxx %,%,%,%,%',va_monto[v_cont],va_monto[v_cont],va_temp_array[v_cont],v_monto_previo_ejecutado,v_monto_previo_revertido; 
                                                  
                                                  
                                                   ELSE
@@ -733,7 +738,7 @@ BEGIN
     END IF; -- fin del if de movimiento presupuestario
     
     
-   
+  -- raise exception 'prueba error controlado, comunicarce con glober';
     
    return v_retorno; 
 
