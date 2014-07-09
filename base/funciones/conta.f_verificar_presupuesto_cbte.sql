@@ -553,7 +553,6 @@ BEGIN
                                               from tt_check_presu tt 
                                               where id < v_cont 
                                                 and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
-                                                and momento =  va_momento[v_cont]
                                                 and estado = 'ejecutado';
                                                             
                                             --caculamos los montos previos revertidos    
@@ -564,7 +563,6 @@ BEGIN
                                               from tt_check_presu tt 
                                               where id < v_cont 
                                                 and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
-                                                and momento =  2
                                                 and estado = 'revertido';                                                 
                                    
                                    
@@ -589,7 +587,7 @@ BEGIN
                                                              
                                                           END IF;  
                                                  
-                                                  ElSIF va_momento[v_cont] = 2  and va_monto[v_cont] < 0 THEN
+                                                  ElSIF va_momento[v_cont] = 2  and va_monto[v_cont] < 0 THEN    --si es revertido el monto es negativo
                                                         
                                                          -- si es el caso de reversion ..   
                                                          va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0) - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
@@ -677,7 +675,6 @@ BEGIN
                                       from tt_check_presu tt 
                                       where id < v_cont 
                                         and id_partida_ejecucion =  va_id_partida_ejecucion[v_cont]
-                                        and momento =  va_momento[v_cont]
                                         and estado = 'pagado';
                                       
                                       v_estado = 'pagado';
