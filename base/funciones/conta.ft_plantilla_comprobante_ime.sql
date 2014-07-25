@@ -77,7 +77,6 @@ BEGIN
             campo_id_cuenta_bancaria,
             campo_id_cuenta_bancaria_mov,
             campo_nro_cheque,
-            campo_nro_cheque,
             campo_nro_cuenta_bancaria_trans,
             campo_nro_tramite
              

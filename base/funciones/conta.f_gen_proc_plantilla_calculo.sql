@@ -7,6 +7,7 @@ CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
   p_id_usuario integer,
   p_id_depto_conta integer,
   p_id_gestion integer,
+  p_prioridad_documento integer = 2,
   p_proc_terci varchar = 'no'::character varying,
   p_porc_monto_excento_var numeric = 0
 )
@@ -98,8 +99,9 @@ BEGIN
           END IF;             
                            
       
-        --IF es registro primario o secundario
-        IF  p_proc_terci = 'si' or (v_registros.prioridad <= 2 )   THEN
+        --IF es registro primario o secundario  
+        
+        IF  p_proc_terci = 'si' or (v_registros.prioridad <= p_prioridad_documento )   THEN  -- p_prioridad_documento  por defecto tiene el valor de dos
         
                 --  crea un record del tipo de la transaccion  
                 

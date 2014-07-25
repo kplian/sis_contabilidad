@@ -42,6 +42,10 @@ Autor: RAC
 Fcha: 26/02/2014
 Descripción:  ... 
 ##################################
+Autor: RAC
+Fcha: 18/07/2014
+Descripción:  Se agregan las opcion de que la relacion contables por tabla tegan el manejo de auxiliar dinamico 
+##################################
 
 */
 DECLARE
@@ -58,8 +62,14 @@ DECLARE
 	v_sql_arbol varchar;
     v_rec_arbol record;    
     v_rec_rel record;
+    v_consulta_auxiliar   varchar;
+    v_codigo_auxiliar     varchar;
+    v_relacion_tabla      BOOLEAN;
 
 BEGIN
+
+
+          
 
     
     v_nombre_funcion:='conta.f_get_config_relacion_contable';
@@ -67,6 +77,7 @@ BEGIN
      ps_id_cuenta = NULL;
      ps_id_auxiliar=NULL;
      ps_id_partida=NULL;
+     v_relacion_tabla = FALSE;
     
     
     --1)  recuperamos el tipo de relacion
@@ -100,18 +111,12 @@ BEGIN
               inner join conta.ttabla_relacion_contable ttab
               on ttab.id_tabla_relacion_contable = trel.id_tabla_relacion_contable
               where trel.id_tipo_relacion_contable = v_registros.id_tipo_relacion_contable
-              and ttab.tabla_id_fk is not null) then
+              and (ttab.tabla_id_fk is not null and ttab.tabla_id_fk!='')) then
     	--Enciende la bandera de relacióncontable tipo arbol
     	v_sw_arb = true;
-        --Obtiene datos de larelación contable de tipo árbol
-        select
-        lower(ttab.esquema) || '.' || lower(ttab.tabla) as tabla,
-        ttab.tabla_id, ttab.tabla_id_fk, ttab.recorrido_arbol
-        into v_rec
-        from conta.ttipo_relacion_contable trel
-        inner join conta.ttabla_relacion_contable ttab
-        on ttab.id_tabla_relacion_contable = trel.id_tabla_relacion_contable
-        where trel.id_tipo_relacion_contable = v_registros.id_tipo_relacion_contable;
+        
+    
+    
     else
     	--Apaga la bandera de relacióncontable tipo arbol
     	v_sw_arb = false;
@@ -119,12 +124,15 @@ BEGIN
     
     
     
+    
+    
+    
+     
+    
 
      IF p_id_centro_costo is NULL  and v_registros.tiene_centro_costo != 'si-unico' THEN
                 
-        
-        
-        raise exception 'El tipo de relacion relacion contable indica que necesita  centro de costo: % (%)',v_registros.nombre_tipo_relacion,p_codigo;
+         raise exception 'El tipo de relacion relacion contable indica que necesita  centro de costo: % (%)',v_registros.nombre_tipo_relacion,p_codigo;
               
      END IF;
     
@@ -132,131 +140,135 @@ BEGIN
 
   
    IF  v_registros.id_tabla_relacion_contable is NULL THEN
-     --  si no necesita, obtiene el valor para la gestion indica 
-     
-             IF   v_registros.tiene_centro_costo = 'no' THEN 
-               
-                   select
-                      rc.id_cuenta,
-                      rc.id_auxiliar,
-                      rc.id_partida,
-                      rc.id_centro_costo
-                   into
-                      ps_id_cuenta,
-                      ps_id_auxiliar,
-                      ps_id_partida,
-                      ps_id_centro_costo
-                   from conta.trelacion_contable rc 
-                   where  
-                      rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
-                      and rc.id_gestion = p_id_gestion
-                      and rc.estado_reg = 'activo'
-                      and rc.id_centro_costo is NULL
-                      LIMIT 1  OFFSET 0;
-              
-            ELSEIF v_registros.tiene_centro_costo = 'si' THEN
+       --  si no necesita, obtiene el valor para la gestion indica 
+       
+               IF   v_registros.tiene_centro_costo = 'no' THEN 
+                 
+                     select
+                        rc.id_cuenta,
+                        rc.id_auxiliar,
+                        rc.id_partida,
+                        rc.id_centro_costo
+                     into
+                        ps_id_cuenta,
+                        ps_id_auxiliar,
+                        ps_id_partida,
+                        ps_id_centro_costo
+                     from conta.trelacion_contable rc 
+                     where  
+                        rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
+                        and rc.id_gestion = p_id_gestion
+                        and rc.estado_reg = 'activo'
+                        and rc.id_centro_costo is NULL
+                        LIMIT 1  OFFSET 0;
+                
+              ELSEIF v_registros.tiene_centro_costo = 'si' THEN
+                    
+                     select
+                        rc.id_cuenta,
+                        rc.id_auxiliar,
+                        rc.id_partida,
+                        rc.id_centro_costo
+                     into
+                        ps_id_cuenta,
+                        ps_id_auxiliar,
+                        ps_id_partida,
+                        ps_id_centro_costo
+                     from conta.trelacion_contable rc 
+                     where  
+                        rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
+                        and rc.id_gestion = p_id_gestion
+                        and rc.estado_reg = 'activo'
+                        and rc.id_centro_costo = p_id_centro_costo
+                        LIMIT 1  OFFSET 0;
+                
+                
+             ELSEIF v_registros.tiene_centro_costo = 'si-general' THEN
+                
+           
                   
-                   select
-                      rc.id_cuenta,
-                      rc.id_auxiliar,
-                      rc.id_partida,
-                      rc.id_centro_costo
-                   into
-                      ps_id_cuenta,
-                      ps_id_auxiliar,
-                      ps_id_partida,
-                      ps_id_centro_costo
-                   from conta.trelacion_contable rc 
-                   where  
-                      rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
-                      and rc.id_gestion = p_id_gestion
-                      and rc.estado_reg = 'activo'
-                      and rc.id_centro_costo = p_id_centro_costo
-                      LIMIT 1  OFFSET 0;
-              
-              
-           ELSEIF v_registros.tiene_centro_costo = 'si-general' THEN
-              
-         
-                
-                -- es caso de ser si general primero buscamos una configuracion con centro de costos
-                -- si no la encontramos buscamos una general, sin centro de costo (la especifica prevalece sobre la general)
-                
-                   select
-                      rc.id_cuenta,
-                      rc.id_auxiliar,
-                      rc.id_partida,
-                      rc.id_centro_costo
-                   into
-                      ps_id_cuenta,
-                      ps_id_auxiliar,
-                      ps_id_partida,
-                      ps_id_centro_costo
-                   from conta.trelacion_contable rc 
-                   where  
-                      rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
-                      and rc.id_gestion = p_id_gestion
-                      and rc.estado_reg = 'activo'
-                      and rc.id_centro_costo = p_id_centro_costo
-                      LIMIT 1  OFFSET 0;
-                
-         
-                   IF ps_id_cuenta is NULL THEN
-                   --buscamos una configuracion general sin centro de costo
-                         select
-                            rc.id_cuenta,
-                            rc.id_auxiliar,
-                            rc.id_partida,
-                            rc.id_centro_costo
-                         into
-                            ps_id_cuenta,
-                            ps_id_auxiliar,
-                            ps_id_partida,
-                            ps_id_centro_costo
-                         from conta.trelacion_contable rc 
-                         where  
-                            rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
-                            and rc.id_gestion = p_id_gestion
-                            and rc.estado_reg = 'activo'
-                            and rc.id_centro_costo is NULL
-                            LIMIT 1  OFFSET 0;
-                    END IF;
-                    
-               ELSEIF v_registros.tiene_centro_costo = 'si-unico' THEN 
-               
-                  select
-                      rc.id_cuenta,
-                      rc.id_auxiliar,
-                      rc.id_partida,
-                      rc.id_centro_costo
-                   into
-                      ps_id_cuenta,
-                      ps_id_auxiliar,
-                      ps_id_partida,
-                      ps_id_centro_costo
-                   from conta.trelacion_contable rc 
-                   where  
-                      rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
-                      and rc.id_gestion = p_id_gestion
-                      and rc.estado_reg = 'activo'
-                      LIMIT 1  OFFSET 0;  
+                  -- es caso de ser si general primero buscamos una configuracion con centro de costos
+                  -- si no la encontramos buscamos una general, sin centro de costo (la especifica prevalece sobre la general)
+                  
+                     select
+                        rc.id_cuenta,
+                        rc.id_auxiliar,
+                        rc.id_partida,
+                        rc.id_centro_costo
+                     into
+                        ps_id_cuenta,
+                        ps_id_auxiliar,
+                        ps_id_partida,
+                        ps_id_centro_costo
+                     from conta.trelacion_contable rc 
+                     where  
+                        rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
+                        and rc.id_gestion = p_id_gestion
+                        and rc.estado_reg = 'activo'
+                        and rc.id_centro_costo = p_id_centro_costo
+                        LIMIT 1  OFFSET 0;
+                  
+           
+                     IF ps_id_cuenta is NULL THEN
+                     --buscamos una configuracion general sin centro de costo
+                           select
+                              rc.id_cuenta,
+                              rc.id_auxiliar,
+                              rc.id_partida,
+                              rc.id_centro_costo
+                           into
+                              ps_id_cuenta,
+                              ps_id_auxiliar,
+                              ps_id_partida,
+                              ps_id_centro_costo
+                           from conta.trelacion_contable rc 
+                           where  
+                              rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
+                              and rc.id_gestion = p_id_gestion
+                              and rc.estado_reg = 'activo'
+                              and rc.id_centro_costo is NULL
+                              LIMIT 1  OFFSET 0;
+                      END IF;
                       
-            
+                 ELSEIF v_registros.tiene_centro_costo = 'si-unico' THEN 
+                 
+                    select
+                        rc.id_cuenta,
+                        rc.id_auxiliar,
+                        rc.id_partida,
+                        rc.id_centro_costo
+                     into
+                        ps_id_cuenta,
+                        ps_id_auxiliar,
+                        ps_id_partida,
+                        ps_id_centro_costo
+                     from conta.trelacion_contable rc 
+                     where  
+                        rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
+                        and rc.id_gestion = p_id_gestion
+                        and rc.estado_reg = 'activo'
+                        LIMIT 1  OFFSET 0;  
+                        
+              
+                  
+                      
+                 ELSE
                 
-                    
-               ELSE
-              
-                 raise exception 'valor para la variable  "tiene_centro_costo" desconocido %',v_registros.tiene_centro_costo;
-              
-              END IF; 
-   
-  -- si la tabla de relacion contable es no nula 
+                   raise exception 'valor para la variable  "tiene_centro_costo" desconocido %',v_registros.tiene_centro_costo;
+                
+                END IF; 
+  ----------------------------------------------------- 
+  --  si la tabla de relacion contable es no nula 
+  --  tiene varias segun  la tabla
+  --------------------------------------------------
    ELSE
          
          --si necesita tabla de configuracion el parametros p_tabla y p_id_tabla no pueden ser nulos
           IF p_id_tabla is NULL THEN
             raise exception 'Para este tipo de relacion contable (%) se necesita indicar la tabla y el id para busquedas',p_codigo;
           END IF;
+          
+          
           
          
           
@@ -317,13 +329,31 @@ BEGIN
                           and rc.defecto = ''si''';              
           
           end if;
---                  raise exception 'CON: %',v_sql || va_sql[1] || ' limit 1 offset 0';
-
+          --    raise exception 'CON: %',v_sql || va_sql[1] || ' limit 1 offset 0';
           
-          ----------------------
+          --Obtiene datos de larelación contable de tipo árbol
+        
+        select
+        lower(ttab.esquema) || '.' || lower(ttab.tabla) as tabla,
+        ttab.tabla_id, 
+        ttab.tabla_id_fk, 
+        ttab.recorrido_arbol,
+        ttab.tabla_codigo_auxiliar,
+        ttab.tabla_id_auxiliar,
+        trel.tiene_auxiliar
+        into v_rec
+        from conta.ttipo_relacion_contable trel
+        inner join conta.ttabla_relacion_contable ttab
+        on ttab.id_tabla_relacion_contable = trel.id_tabla_relacion_contable
+        where trel.id_tipo_relacion_contable = v_registros.id_tipo_relacion_contable;
+        
+        
+          -----------------------------------------
           --Ejecuta la consulta  ripo ARBOL --RCM
-          -------------------------
+          ----------------------------------------------
           if v_sw_arb then
+          
+         
           
                     v_sql_arbol = 'WITH RECURSIVE t(id,id_fk,n) AS (
                                   SELECT l.'|| v_rec.tabla_id || ',l.'|| v_rec.tabla_id_fk ||',1
@@ -338,6 +368,8 @@ BEGIN
                               FROM t
                               ORDER BY n '||coalesce(v_rec.recorrido_arbol,'asc');
                     
+                    
+                     
                     	
                     --Recorre el arbol en la dirección especificada y salta a la primera ocurrencia
                     for v_rec_arbol in execute(v_sql_arbol) loop
@@ -378,6 +410,8 @@ BEGIN
                             va_sql[1] = ' and rc.id_tabla = ' || v_rec_arbol.id;
                         
                         end if;
+                        
+                       
                         
                         --Recorre el array de condiciones para encontrar cuenta, partida y auxiliar en en el nivel del árbol
                         for i in 1..array_upper(va_sql,1) loop
@@ -420,8 +454,10 @@ BEGIN
                         
                         raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
                     end if;		
+          
+          
               
-         ---------------------------------------------       
+        ---------------------------------------------       
         --si la relacion contable no es un arbol
         -----------------------------------------------
         else
@@ -470,22 +506,60 @@ BEGIN
                  END IF;
               
           end if;
+          /*
+          IF p_codigo = 'PAGOANT' THEN
+              raise exception 'bbbbbbb';
+          END IF;*/
           
-          		
           
-   
+          --si es de auxiliar dinamico accedemos a la tabla	
+          IF v_rec.tiene_auxiliar = 'dinamico' THEN
+               
+                         
+                        IF v_rec.tabla_codigo_auxiliar is not null and v_rec.tabla_codigo_auxiliar != '' THEN
+                           --si no dan un codigo buscamos el id auxiliar usandolo como forenckey 
+                            
+                            v_consulta_auxiliar = 'select 
+                                                   tt.'||v_rec.tabla_codigo_auxiliar||' as codigo_auxiliar,
+                                                   aux.id_auxiliar as id_auxiliar
+                                                 from '||v_rec.tabla||' tt
+                                                 inner join conta.tauxiliar aux on aux.codigo_auxiliar = tt.'||v_rec.tabla_codigo_auxiliar||'
+                                                 where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
+                        ELSE
+                          v_consulta_auxiliar = 'select 
+                                                   tt.'||v_rec.tabla_id_auxiliar ||' as id_auxiliar
+                                                 from '||v_rec.tabla||' tt
+                                                 where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
+                        
+                        END IF;
+                        
+                        --raise exception 'bbbbbbb    %',v_consulta_auxiliar;
+                    
+                         for v_rec_rel in execute(v_consulta_auxiliar) loop
+                                    v_codigo_auxiliar = v_rec_rel.codigo_auxiliar;
+                                    ps_id_auxiliar = v_rec_rel.id_auxiliar;
+                         end loop;
+                         
+                         
+                       IF v_rec_rel.id_auxiliar is NULL THEN             
+                           raise exception 'la relacion (%) no tiene configurado un  auxiliar',v_rec.tabla;
+                       END IF;  
+                     
+                     
+                     
+           END IF;
+         	
    END IF;
    
 
 return NEXT;
---raise exception '%',ps_id_cuenta;
 return;
 
    
 EXCEPTION
 	WHEN OTHERS THEN 
 			v_resp='';
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM||' - '||COALESCE(p_codigo,'-')::text);
 			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;

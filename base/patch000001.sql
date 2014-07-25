@@ -871,3 +871,41 @@ ALTER TABLE conta.tplantilla_calculo
 ALTER TABLE conta.tplantilla_calculo
   ALTER COLUMN importe_presupuesto TYPE NUMERIC;
 /***********************************F-SCP-RAC-CONTA-0-27/02/2014****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-18/07/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttabla_relacion_contable
+  ADD COLUMN tabla_id_auxiliar VARCHAR(100);
+
+COMMENT ON COLUMN conta.ttabla_relacion_contable.tabla_id_auxiliar
+IS 'cahe referencia al nombre del campo que contiene el id_auxiliar';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttabla_relacion_contable
+  ADD COLUMN tabla_codigo_auxiliar VARCHAR(100);
+
+COMMENT ON COLUMN conta.ttabla_relacion_contable.tabla_codigo_auxiliar
+IS 'hace referencia al nombre del campo que contiene el codigo del auxiliar';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ALTER COLUMN tiene_auxiliar TYPE VARCHAR(20) COLLATE pg_catalog."default";
+
+/***********************************F-SCP-RAC-CONTA-0-18/07/2014****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-22/07/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN prioridad_documento INTEGER DEFAULT 2 NOT NULL;
+
+/***********************************F-SCP-RAC-CONTA-0-22/07/2014****************************************/

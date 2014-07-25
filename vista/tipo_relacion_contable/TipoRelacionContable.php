@@ -253,7 +253,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 	       		    lazyRender:true,
 	       		    mode: 'local',
 	       		    gwidth: 100,
-	       		    store:['si','no']
+	       		    store:['si','no','dinamico']
 	       		},
 	       		type:'ComboBox',
 	       		id_grupo:0,

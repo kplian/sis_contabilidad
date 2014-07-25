@@ -89,7 +89,8 @@ BEGIN
             campo_nro_cheque,
             campo_nro_cuenta_bancaria_trans,
             campo_porc_monto_excento_var,
-            campo_nombre_cheque_trans
+            campo_nombre_cheque_trans,
+            prioridad_documento
           	) values(
 			v_parametros.id_plantilla_comprobante,
 			v_parametros.debe_haber,
@@ -130,7 +131,8 @@ BEGIN
             v_parametros.campo_nro_cheque ,
             v_parametros.campo_nro_cuenta_bancaria_trans,
             v_parametros.campo_porc_monto_excento_var,
-			v_parametros.campo_nombre_cheque_trans
+			v_parametros.campo_nombre_cheque_trans,
+            v_parametros.prioridad_documento
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 			
 			--Definicion de la respuesta
@@ -189,7 +191,8 @@ BEGIN
             campo_nro_cheque = v_parametros.campo_nro_cheque,
             campo_nro_cuenta_bancaria_trans=v_parametros.campo_nro_cuenta_bancaria_trans,
             campo_porc_monto_excento_var=v_parametros.campo_porc_monto_excento_var,
-            campo_nombre_cheque_trans = v_parametros.campo_nombre_cheque_trans
+            campo_nombre_cheque_trans = v_parametros.campo_nombre_cheque_trans,
+            prioridad_documento = v_parametros.prioridad_documento
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta

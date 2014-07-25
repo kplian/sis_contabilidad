@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_tabla_relacion_contable_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -57,7 +59,10 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
 						tabrecon.tabla_id_fk,
-						tabrecon.recorrido_arbol	
+						tabrecon.recorrido_arbol,
+                        tabrecon.tabla_codigo_auxiliar,
+                        tabrecon.tabla_id_auxiliar
+                        	
 						from conta.ttabla_relacion_contable tabrecon
 						inner join segu.tusuario usu1 on usu1.id_usuario = tabrecon.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = tabrecon.id_usuario_mod

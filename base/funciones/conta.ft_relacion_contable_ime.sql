@@ -71,8 +71,20 @@ BEGIN
                      and rc.estado_reg = 'activo'  
                      and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null )  ) THEN
                      
-                     raise exception 'Ya existe una relacion contable paes este elemento';
+                     raise exception 'Ya existe una relacion contable para este elemento';
                      
+               END IF;   
+            
+            END IF;
+            
+            IF v_tipo_rel.tiene_centro_costo = 'no' THEN            
+            
+               IF  EXISTS(select  1 
+                   from conta.trelacion_contable  rc 
+                   where rc.id_gestion = v_parametros.id_gestion 
+                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
+                     and rc.id_tabla = v_parametros.id_tabla) THEN                     
+                     raise exception 'Ya existe una relacion contable para este registro';                     
                END IF;   
             
             END IF;

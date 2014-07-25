@@ -492,7 +492,7 @@ BEGIN
                        
                            --TODO, validar que exista una plantilla de documento     
                          
-                              --inserta las trasaccion asociadas al documento
+                           --inserta las trasaccion asociadas al documento
                            IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN
                                
                                  v_resp_doc =  conta.f_gen_proc_plantilla_calculo(
@@ -502,15 +502,13 @@ BEGIN
                                                             p_id_usuario,
                                                             (p_super->'columna_depto')::integer,--p_id_depto_conta 
                                                             (p_super->'columna_gestion')::integer, 
+                                                            (p_reg_det_plantilla->'prioridad_documento')::integer,
                                                             'no',
                                                             (v_this_hstore->'campo_porc_monto_excento_var')::numeric 
                                                             );
                                  
                              
                                   --si tiene funcion de actualizacion,  envia el id de la trasaccion generada para que se almacene 
-                                  
-                                  
-                                
                                   
                                   IF (p_reg_det_plantilla -> 'func_act_transaccion') != ''  THEN
                                        

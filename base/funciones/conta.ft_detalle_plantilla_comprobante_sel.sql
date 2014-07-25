@@ -89,7 +89,8 @@ BEGIN
                         cmpbdet.campo_nro_cheque,
                         cmpbdet.campo_nro_cuenta_bancaria_trans,
                         cmpbdet.campo_porc_monto_excento_var,
-                        cmpbdet.campo_nombre_cheque_trans
+                        cmpbdet.campo_nombre_cheque_trans,
+                        cmpbdet.prioridad_documento
 						from conta.tdetalle_plantilla_comprobante cmpbdet
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpbdet.id_usuario_mod

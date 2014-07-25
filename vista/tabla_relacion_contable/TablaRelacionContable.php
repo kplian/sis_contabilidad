@@ -154,7 +154,40 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
+        
+        {
+            config:{
+                name: 'tabla_id_auxiliar',
+                fieldLabel: 'ID auxiliar',
+                qtip:'hace referencia al nombre de campo que contiene id del auxiliar',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:200
+            },
+            type:'TextField',
+            filters:{pfiltro:'tabrecon.tabla_id',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		
+		{
+            config:{
+                name: 'tabla_codigo_auxiliar',
+                fieldLabel: 'Codigo auxiliar',
+                qtip:'hace referencia al nombre de campo que contiene codigo del auxiliar. (Si no encuentra un id pasa a la busqueda por codigo)',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:200
+            },
+            type:'TextField',
+            filters:{pfiltro:'tabrecon.tabla_id',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -251,7 +284,9 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		{name:'recorrido_arbol', type: 'string'}
+		{name:'recorrido_arbol', type: 'string'},
+		'tabla_codigo_auxiliar',
+        'tabla_id_auxiliar'
 	],
 	sortInfo:{
 		field: 'id_tabla_relacion_contable',

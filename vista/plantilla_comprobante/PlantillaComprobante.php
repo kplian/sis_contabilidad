@@ -69,6 +69,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            config:{
                 name:'momento_comprometido',
                 fieldLabel: 'Compromete',
+                qtip:'Compromete presupuesto',
                 allowBlank: false,
                 anchor: '80%',
                 typeAhead: true,
@@ -87,6 +88,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            config:{
                 name:'momento_ejecutado',
                 fieldLabel: 'Ejecuta',
+                qtip:'Ejecuta presupuesto',
                 allowBlank: false,
                 anchor: '80%',
                 typeAhead: true,
@@ -106,6 +108,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
                 name:'momento_pagado',
                 fieldLabel: 'Paga',
                 allowBlank: false,
+                qtip:'Paga presupuesto',
                 anchor: '80%',
                 typeAhead: true,
                 triggerAction: 'all',
@@ -124,6 +127,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				name: 'clase_comprobante',
 				fieldLabel: 'Clase Comprobante',
 				allowBlank: true,
+				qtip:'... DIARIO, PAGO',
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:255
@@ -138,6 +142,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'tabla_origen',
 				fieldLabel: 'Tabla Origen',
+				qtip:'Nombre de la tabla o vista de donde se sacaran los datos',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -153,6 +158,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'idtabla',
 				fieldLabel: 'Id Tabla',
+				qtip:'Nombre del campo llave de la tabla o vista  definida en (Tabla Origen)',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -167,6 +173,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'campo_subsistema',
+				qtip:'Identifica el subsistema que origina el comprobante',
 				fieldLabel: 'Campo Subsistema',
 				allowBlank: false,
 				anchor: '80%',
@@ -183,6 +190,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_depto',
 				fieldLabel: 'Campo Depto',
+				qtip:'Identifica el Departamento contable',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
@@ -288,6 +296,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'campo_gestion_relacion',
                 fieldLabel: 'Gestion Rel Contable',
+                qtip:'Para obtener cuentas contables es importante saber de gestion se obtendran',
                 allowBlank: false,
                 anchor: '80%',
                 gwidth: 100,
@@ -302,11 +311,12 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'otros_campos',
+                qtip:'Define otros campos que se guardan temporalmente para ser usados depues en la plantilla de transacciones',
                 fieldLabel: 'Otros Campos',
                 allowBlank: false,
                 anchor: '80%',
                 gwidth: 100,
-                maxLength:200
+                maxLength:800
             },
             type:'TextArea',
             filters:{pfiltro:'cmpb.otros_campos',type:'string'},
@@ -317,6 +327,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'funcion_comprobante_validado',
+				qtip:'funcion que se ejecuta una vez que se valida el comprobante',
 				fieldLabel: 'Funcion Comprobante Validado',
 				allowBlank: true,
 				anchor: '80%',
@@ -333,6 +344,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'funcion_comprobante_eliminado',
 				fieldLabel: 'Funcion Comprobante Eliminado',
+				qtip:'Funcion que se ejecuta al eliminar el comprobante',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,

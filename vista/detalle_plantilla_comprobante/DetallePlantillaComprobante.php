@@ -45,6 +45,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            config:{
             	name:'debe_haber',
             	fieldLabel: 'Debe Haber',
+            	qtip:'La transaccion se mueve al debe o al haber',
                 allowBlank: false,
                 anchor: '80%',
         		typeAhead: true,
@@ -62,6 +63,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            config:{
                 name:'aplicar_documento',
                 fieldLabel: 'Aplicar Documento',
+                qtip:'Si la transaccion necesita ser modificada por un documento (ejm,  factura, recibo, etc)',
                 allowBlank: false,
                 anchor: '80%',
                 typeAhead: true,
@@ -75,6 +77,29 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            grid:true,
            form:true
           },
+        
+        {
+            config:{
+                name: 'prioridad_documento',
+                fieldLabel: 'Prioridad Minima del documento',
+                qtip:'Si tiene documento solo ejecuta la plantilla <= a este valor (por defecto 2)',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'NumberField',
+            valorInicial:2,
+            filters:{pfiltro:'cmpbdet.prioridad_documento',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+          
+          
+          
+          
+          
           {
            config:{
             	name:'agrupar',
@@ -96,6 +121,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            config:{
             	name:'es_relacion_contable',
             	fieldLabel: 'Relacion Contable',
+            	qtip:'Si tiene o no relacon contable',
                 allowBlank: false,
                 anchor: '80%',
         		typeAhead: true,
@@ -114,6 +140,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config: {
                 name: 'tipo_relacion_contable',
                 fieldLabel: 'Relación Contable',
+                qtip:'Codigo de la relacion contable de donde se obtendran la partida, cuenta y auxiliar',
                 allowBlank: true,
                 emptyText: 'Elija Relación Contable...',
                 store: new Ext.data.JsonStore({
@@ -155,6 +182,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'tabla_detalle',
 				fieldLabel: 'Tabla Detalle',
+				qtip:'Nombre de tabla o vista de donde se obtendran datos para la transaccion',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -170,6 +198,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_centro_costo',
 				fieldLabel: 'Campo Centro Costo',
+				qtip:'Las relaciones contables necesitan in CC para funcionar, tambien es CC que va en la transaccion',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -185,6 +214,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_partida',
 				fieldLabel: 'Campo Partida',
+				qtip:'Si se define sobreescribe el obtenido en la Relacion contable',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -200,6 +230,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_cuenta',
 				fieldLabel: 'Campo Cuenta',
+				qtip:'Si se define sobreescribe el obtenido en la Relacion contable',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -215,6 +246,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_auxiliar',
 				fieldLabel: 'Campo Auxiliar',
+				qtip:'Si se define sobreescribe el obtenido en la Relacion contable',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -230,6 +262,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_relacion_contable',
 				fieldLabel: 'Campo Relacion Contable',
+				qtip:'Define el campo llave para obtener la relacion contable, ejm proveedor, cuenta bancaria, concepto de gato, etc',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -245,6 +278,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_documento',
 				fieldLabel: 'Campo Documento',
+				qtip:'Define el campo donde se tiene almacenado el id_platilla que se aplicara como documento',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -260,7 +294,8 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_concepto_transaccion',
 				fieldLabel: 'Campo Concepto Transaccion',
-				allowBlank: true,
+				qtip:'Define el contenido de la glosa de la transaccion',
+                allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:100
@@ -305,6 +340,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            config:{
                 name: 'primaria',
                 fieldLabel: 'Trans Primaria',
+                qtip:'Si es una trasaccion primaria se ejecuta primero, si no lo es se ejecuta despues de la plantilla base',
                 allowBlank: false,
                 anchor: '80%',
                 typeAhead: true,
@@ -323,9 +359,9 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
           {
             config: {
                 name: 'id_detalle_plantilla_fk',
+                qtip:'Si no es una trasaccion primaria, aca se indica cual es un transaccion base',
                 fieldLabel: 'Plantilla base',
                 allowBlank: true,
-              
                 store: new Ext.data.JsonStore({
                     url: '../../sis_contabilidad/control/DetallePlantillaComprobante/listarDetallePlantillaComprobante',
                     id: 'id_detalle_plantilla_comprobante',
@@ -361,6 +397,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'otros_campos',
                 fieldLabel: 'Otros Campos',
+                qtip:'Otros campo que son necesarios y se obtienen desde la tabla detalle',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -376,6 +413,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'nom_fk_tabla_maestro',
                 fieldLabel: 'Fk Tabla Maestro',
+                qtip:'Hace referencia al nombre del campo en la Tabla Detalle que se usa como llave foranea',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -391,6 +429,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'campo_partida_ejecucion',
                 fieldLabel: 'Campo Partida Ejecucion',
+                qtip:'Si el comprobante no compromete por si solo, aca se define la id_partida_ejecucion del comprometido que se usara',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -406,6 +445,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'descripcion',
                 fieldLabel: 'Desc. Trans.',
+                qtip:'Descripciond e la transaccion se utiliza para mostrar mejores mensajes de error',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -436,6 +476,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            config:{
                 name: 'rel_dev_pago',
                 fieldLabel: 'Es plant. presu.',
+                qtip:'Si plantilla de presupuesto se utiliza para relacion el devengado con el pagado, no genera transacciones',
                 allowBlank: false,
                 anchor: '80%',
                 typeAhead: true,
@@ -484,6 +525,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            config:{
                 name: 'forma_calculo_monto',
                 fieldLabel: 'Forma de Calculo',
+                qtip:'Forma en la que se calcula el monto, simple es una copia directa, decuento le resta al transaccion base, etc',
                 allowBlank: false,
                 anchor: '80%',
                 typeAhead: true,
@@ -502,6 +544,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'func_act_transaccion',
                 fieldLabel: 'Fun act transaccion.',
+                qtip:'Funcion que se ejecuta despues  crear transaccion, por ejemplo es util para almacenar el id de la transaccion en algun otro lugar',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -593,6 +636,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'campo_porc_monto_excento_var',
                 fieldLabel: '% Monto Excento',
+                qtip:'Alguno documentos necesitan aplicar un % excento que modifica el monto original (por ejm iva de electricidad )',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -730,7 +774,8 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         {name:'campo_nro_cheque', type: 'string'}, 
         'campo_nro_cuenta_bancaria_trans',
         'campo_porc_monto_excento_var',
-        {name:'campo_nombre_cheque_trans', type: 'string'}
+        {name:'campo_nombre_cheque_trans', type: 'string'},
+        'prioridad_documento'
 		
 	],
 	sortInfo:{
@@ -759,13 +804,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 					Phx.vista.DetallePlantillaComprobante.superclass.loadValoresIniciales.call(this);
 					if (this.maestro.id_plantilla_comprobante != undefined) {
 						this.getComponente('id_plantilla_comprobante').setValue(this.maestro.id_plantilla_comprobante);
-					    
-					
 					}
-					
-					
-					
-					
 				},
     
 	bdel:true,

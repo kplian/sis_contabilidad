@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_tabla_relacion_contable_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -57,7 +59,11 @@ BEGIN
 			fecha_mod,
 			id_usuario_mod,
 			tabla_id_fk,
-			recorrido_arbol
+			recorrido_arbol,
+            tabla_codigo_auxiliar,
+            tabla_id_auxiliar
+            
+            
           	) values(
 			'activo',
 			v_parametros.tabla,
@@ -68,7 +74,9 @@ BEGIN
 			null,
 			null,
 			v_parametros.tabla_id_fk,
-			v_parametros.recorrido_arbol			
+			v_parametros.recorrido_arbol,
+            v_parametros.tabla_codigo_auxiliar,
+            v_parametros.tabla_id_auxiliar			
 			)RETURNING id_tabla_relacion_contable into v_id_tabla_relacion_contable;
 			
 			--Definicion de la respuesta
@@ -92,13 +100,16 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update conta.ttabla_relacion_contable set
-			tabla = v_parametros.tabla,
-			esquema = v_parametros.esquema,
-            tabla_id = v_parametros.tabla_id,
-			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario,
-			tabla_id_fk = v_parametros.tabla_id_fk,
-			recorrido_arbol = v_parametros.recorrido_arbol
+              tabla = v_parametros.tabla,
+              esquema = v_parametros.esquema,
+              tabla_id = v_parametros.tabla_id,
+              fecha_mod = now(),
+              id_usuario_mod = p_id_usuario,
+              tabla_id_fk = v_parametros.tabla_id_fk,
+              recorrido_arbol = v_parametros.recorrido_arbol,
+              tabla_codigo_auxiliar=v_parametros.tabla_codigo_auxiliar,
+              tabla_id_auxiliar=v_parametros.tabla_id_auxiliar
+            
 			where id_tabla_relacion_contable=v_parametros.id_tabla_relacion_contable;
                
 			--Definicion de la respuesta

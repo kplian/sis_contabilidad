@@ -34,31 +34,18 @@ DECLARE
   v_tamano integer;
 BEGIN
  	
-    v_nombre_funcion = 'f_obtener_columnas_detalle';
+    v_nombre_funcion = 'conta.f_obtener_columnas_detalle';
     
    -- recupera plantila comprobante
     
  
-    
+   
     
     v_prefijo = 'tabla';
     
   --LOOP
         
-        
-         
-        -- v_record = p_det_plantilla
-        IF p_tipo = 'maestro' THEN
-         
-            v_record = populate_record(null::conta.tdetalle_plantilla_comprobante,p_det_plantilla);
-        
-        ELSE
-        
-            v_record = populate_record(null::conta.tplantilla_comprobante,p_det_plantilla);
-        
-        END IF;
-        
-        
+       
         ------------------------------
         -- Procesa campo por campo---
         ------------------------------
@@ -75,7 +62,7 @@ BEGIN
           v_campo_tempo = p_det_plantilla -> v_def_campos[v_i];
                  
         
-         
+         --raise exception '--> %', v_campo_tempo;
           
               LOOP
                   --resetemaos el sw de busquedas
