@@ -131,7 +131,7 @@ BEGIN
            --rrecorrer todas las transacciones revisando las partidas presupuestarias
             v_i = 0;
            --Definir el momento 
-            IF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si' then
+            IF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si' then
                 
                 v_momento_presupeustario = 4; --pagado 
                 v_momento_aux='todo';
@@ -664,7 +664,7 @@ BEGIN
                                    
                                    --COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)
                            
-                          ELSIF  v_momento_aux='solo pagar'  THEN 
+                   ELSIF  v_momento_aux='solo pagar'  THEN 
                           
                                 FOR v_cont IN 1..v_i LOOP 
                                 

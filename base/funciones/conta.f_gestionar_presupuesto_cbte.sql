@@ -133,7 +133,7 @@ BEGIN
            --rrecorrer todas las transacciones revisando las partidas presupuestarias
             v_i = 0;
            --Definir el momento 
-            IF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si' then
+            IF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si' then
                 
                 v_momento_presupeustario = 4; --pagado 
                 v_momento_aux='todo';
@@ -168,8 +168,8 @@ BEGIN
           v_aux = '';
           
           --crea tabla temporal para almacenar los que seran ejecutados  
-           DROP TABLE IF EXISTS tt_check_presu;
-           create temp table tt_check_presu(
+          DROP TABLE IF EXISTS tt_check_presu;
+          create temp table tt_check_presu(
                            id integer,
                            tipo_partida varchar,
                            id_presupuesto  integer,
@@ -215,7 +215,7 @@ BEGIN
                 
                      
                         
-                        IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
+                   IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
                           
                             -- si solo ejecutamos el presupuesto 
                             --  o (compromentemos y ejecutamos) 
@@ -471,7 +471,7 @@ BEGIN
                                              
                                 END IF; -- if partida presupuestaria
                             
-                           ELSIF   v_momento_aux='solo pagar'  THEN
+                  ELSIF   v_momento_aux='solo pagar'  THEN
                            
                           --si es solo pagar debemos identificar las transacciones del devengado 
                            
@@ -710,7 +710,7 @@ BEGIN
                          END LOOP;
                   
                
-                ELSIF   v_momento_aux='solo pagar'  THEN
+             ELSIF   v_momento_aux='solo pagar'  THEN
                   
                        FOR v_cont IN 1..v_i LOOP
                              
@@ -722,7 +722,7 @@ BEGIN
                               
                        END LOOP;
                   
-                END IF; 
+             END IF; 
         
     END IF; -- fin del if de movimiento presupuestario
     
