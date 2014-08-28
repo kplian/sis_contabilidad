@@ -510,12 +510,12 @@ BEGIN
           IF p_codigo = 'PAGOANT' THEN
               raise exception 'bbbbbbb';
           END IF;*/
-          
+         
           
           --si es de auxiliar dinamico accedemos a la tabla	
           IF v_rec.tiene_auxiliar = 'dinamico' THEN
                
-                         
+                      
                         IF v_rec.tabla_codigo_auxiliar is not null and v_rec.tabla_codigo_auxiliar != '' THEN
                            --si no dan un codigo buscamos el id auxiliar usandolo como forenckey 
                             
@@ -525,13 +525,24 @@ BEGIN
                                                  from '||v_rec.tabla||' tt
                                                  inner join conta.tauxiliar aux on aux.codigo_auxiliar = tt.'||v_rec.tabla_codigo_auxiliar||'
                                                  where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
-                        ELSE
-                          v_consulta_auxiliar = 'select 
-                                                   tt.'||v_rec.tabla_id_auxiliar ||' as id_auxiliar
-                                                 from '||v_rec.tabla||' tt
-                                                 where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
-                        
-                        END IF;
+                       
+              
+          
+           ELSE
+               
+                        IF v_rec.tabla_id_auxiliar is not NULL and  TRIM(v_rec.tabla_id_auxiliar) !='' THEN
+                          
+                              v_consulta_auxiliar = 'select 
+                                                       tt.'||v_rec.tabla_id_auxiliar ||' as id_auxiliar
+                                                     from '||v_rec.tabla||' tt
+                                                     where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
+                          ELSE
+                             
+                              raise exception 'Falta parametros para la configuracion de auxiliar dinamico de la tabla %',v_rec.tabla;
+                          
+                          END IF;
+                            
+                      END IF;
                         
                         --raise exception 'bbbbbbb    %',v_consulta_auxiliar;
                     
@@ -545,7 +556,7 @@ BEGIN
                            raise exception 'la relacion (%) no tiene configurado un  auxiliar',v_rec.tabla;
                        END IF;  
                      
-                     
+                          
                      
            END IF;
          	
