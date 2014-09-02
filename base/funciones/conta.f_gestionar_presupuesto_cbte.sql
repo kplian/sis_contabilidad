@@ -96,10 +96,7 @@ BEGIN
     */
     -- revisar el tipo de comrpobante y su estado
     
-     raise notice ' >>>> yyyyyyyyyyyyy';
-    
-    
-    v_retorno = 'exito';
+     v_retorno = 'exito';
     
     select    
       ic.momento,
@@ -660,7 +657,8 @@ BEGIN
                                                                        va_momento, 
                                                                        va_id_partida_ejecucion,--  p_id_partida_ejecucion 
                                                                        va_columna_relacion, 
-                                                                       va_fk_llave);
+                                                                       va_fk_llave,
+                                                                       p_id_int_comprobante);
                                 
                END IF;
                  
