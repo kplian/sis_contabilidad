@@ -51,7 +51,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'fecha_inicio',
 				fieldLabel: 'Fecha Inicio',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 						format: 'd/m/Y', 
@@ -67,7 +67,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'desc_orden',
 				fieldLabel: 'Descripcion Orden',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:100
