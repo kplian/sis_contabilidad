@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_unitaria (
   p_super public.hstore,
   p_tabla_padre public.hstore,
@@ -74,6 +76,7 @@ BEGIN
                         'campo_auxiliar',
                         'campo_partida',
                         'campo_centro_costo',
+                        'campo_orden_trabajo',
                         'campo_partida_ejecucion',
                         'campo_relacion_contable',
                         'campo_documento',
@@ -102,6 +105,9 @@ BEGIN
       	  
           v_columnas=replace(v_columnas,'{','');
       	  v_columnas=replace(v_columnas,'}','');
+          
+          
+         
          
    
          IF p_reg_det_plantilla->'nom_fk_tabla_maestro' ='' or p_reg_det_plantilla->'nom_fk_tabla_maestro' ='NULL' THEN
@@ -123,7 +129,8 @@ BEGIN
         --  FOR, para todos los cada registro que satisfaga la consulta de la tabla detalle
         --   procesamos los valores
         FOR v_tabla in EXECUTE(v_consulta_tab) LOOP
-       
+              --raise exception '%',v_tabla;
+              
               v_resp = conta.f_gen_transaccion_from_plantilla(
                                               p_super,    --p_super
                                               p_tabla_padre, --p_tabla_padre
@@ -136,6 +143,9 @@ BEGIN
                                               v_def_campos,
                                               v_tamano
                                               );
+                                              
+                                              
+             
           
        END LOOP;
 

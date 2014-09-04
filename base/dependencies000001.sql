@@ -1829,3 +1829,30 @@ ALTER TABLE conta.tint_rel_devengado
     NOT DEFERRABLE;
 
 /***********************************F-DEP-RAC-CONTA-0-02/07/2014*****************************************/
+
+
+/***********************************I-DEP-RAC-CONTA-0-04/08/2014*****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttransaccion
+  ADD CONSTRAINT fk_ttransaccion__id_orden_trabajo FOREIGN KEY (id_orden_trabajo)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT fk_tint_transaccion__if_orden_trabajo FOREIGN KEY (id_orden_trabajo)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+/***********************************F-DEP-RAC-CONTA-0-04/08/2014*****************************************/
+
+

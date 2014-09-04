@@ -198,7 +198,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'campo_centro_costo',
 				fieldLabel: 'Campo Centro Costo',
-				qtip:'Las relaciones contables necesitan in CC para funcionar, tambien es CC que va en la transaccion',
+				qtip:'Las relaciones contables necesitan un CC para funcionar, tambien es CC que va en la transaccion',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -206,6 +206,22 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpbdet.campo_centro_costo',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_orden_trabajo',
+				fieldLabel: 'Campo Orden de Trabajo',
+				qtip:'Algunas relaciones contables necesitan una OT para acumular costos',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_orden_trabajo',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -775,7 +791,8 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_nro_cuenta_bancaria_trans',
         'campo_porc_monto_excento_var',
         {name:'campo_nombre_cheque_trans', type: 'string'},
-        'prioridad_documento'
+        'prioridad_documento',
+        'campo_orden_trabajo'
 		
 	],
 	sortInfo:{
@@ -812,5 +829,3 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 	}
 )
 </script>
-		
-		

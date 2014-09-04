@@ -7,9 +7,7 @@ CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
   p_id_usuario integer,
   p_id_depto_conta integer,
   p_id_gestion integer,
-  p_prioridad_documento integer = 2,
-  p_proc_terci varchar = 'no'::character varying,
-  p_porc_monto_excento_var numeric = 0
+  p_proc_terci varchar = 'no'::character varying
 )
 RETURNS integer [] AS
 $body$
@@ -50,11 +48,6 @@ DECLARE
     v_cont integer;
     v_monto_revertir numeric;
     v_factor_reversion numeric;
-    
-    v_sw_calcular_excento boolean;
-    v_porc_monto_imponible numeric;
-    v_porc_importe numeric;
-    v_porc_importe_presupuesto numeric;
 			    
 BEGIN
 
@@ -62,17 +55,6 @@ BEGIN
     
     v_monto_revertir = 0;
     v_factor_reversion = 0;
-    
-    --RAC 11/02/2014, agrega la capacidad de calcular si el documento utiliza el monto excento
-    
-    if p_porc_monto_excento_var > 0 THEN
-    
-        v_sw_calcular_excento  = TRUE;
-        v_porc_monto_imponible = 1 - p_porc_monto_excento_var;
-    ELSE
-        v_sw_calcular_excento  = TRUE;
-        
-    END IF;
   
      
     v_cont = 1;
@@ -85,23 +67,14 @@ BEGIN
                                   pc.importe,
                                   pc.prioridad,
                                   pc.descripcion,
-                                  pc.importe_presupuesto,
-                                  plan.sw_monto_excento
+                                  pc.importe_presupuesto
                           FROM  conta.tplantilla_calculo pc 
-                          inner join param.tplantilla plan on plan.id_plantilla = pc.id_plantilla
                           WHERE pc.estado_reg = 'activo' and
                                 pc.id_plantilla = p_id_plantilla
                            order by pc.prioridad ) LOOP
-                           
-          --coconfirma  si es necesario el monto excento             
-          IF v_registros.sw_monto_excento = 'no'  and v_sw_calcular_excento THEN
-              v_sw_calcular_excento = FALSE;   
-          END IF;             
-                           
       
-        --IF es registro primario o secundario  
-        
-        IF  p_proc_terci = 'si' or (v_registros.prioridad <= p_prioridad_documento )   THEN  -- p_prioridad_documento  por defecto tiene el valor de dos
+        --IF es registro primario o secundario
+            IF  p_proc_terci = 'si' or (v_registros.prioridad <= 2 )   THEN
         
                 --  crea un record del tipo de la transaccion  
                 
@@ -110,35 +83,11 @@ BEGIN
               --  obtine valor o porcentajes aplicado
                IF v_registros.tipo_importe = 'porcentaje' THEN
                
-                   IF v_sw_calcular_excento  THEN
-                      
-                      
-                        -- si se considera el porcentaje de monto imponible 
-                        --multiplicamos los factores para obtener un nuevo valor
-                        v_porc_importe = v_porc_monto_imponible * v_registros.importe; 
-                        v_porc_importe_presupuesto = v_porc_monto_imponible * v_registros.importe_presupuesto;
-                        
-                        
-                        --si es una trasaccion primeria (priorida =1 )se suma el porcentaje del monto no imponible
-                         IF v_registros.prioridad = 1 THEN
-                             v_porc_importe = v_porc_importe + p_porc_monto_excento_var;
-                             v_porc_importe_presupuesto = v_porc_importe_presupuesto + p_porc_monto_excento_var;
-                         END IF;
-                   
-                   
-                   ELSE
-                   
-                     v_porc_importe = v_registros.importe; 
-                     v_porc_importe_presupuesto = v_registros.importe_presupuesto;
-                   
-                   END IF;
-               
-               
-                  v_monto_x_aplicar = (p_monto * v_porc_importe)::numeric;
-                  v_monto_x_aplicar_pre = (p_monto * v_porc_importe_presupuesto)::numeric;
+                  v_monto_x_aplicar = (p_monto * v_registros.importe)::numeric;
+                  v_monto_x_aplicar_pre = (p_monto * v_registros.importe_presupuesto)::numeric;
                   
                   v_monto_revertir = p_monto - v_monto_x_aplicar_pre;
-                  v_factor_reversion  = 1 - v_porc_importe_presupuesto; 
+                  v_factor_reversion  = 1 - v_registros.importe_presupuesto; 
                   
                
                ELSE
@@ -182,7 +131,6 @@ BEGIN
               
                --  TODO , obtener replicar el centro de costo ???
                   
-                  v_record_int_tran.glosa = v_registros.descripcion;
                   
                   raise notice ')))))))))))))) p_id_gestion = %, p_id_depto_conta = % ',p_id_gestion,p_id_depto_conta ;
                   

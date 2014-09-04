@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_replicar_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer
@@ -60,13 +62,31 @@ BEGIN
     				
     	--Inserción de la transacción
     	insert into conta.ttransaccion(
-    	id_usuario_reg, fecha_reg, estado_reg, id_comprobante,
-    	id_cuenta, id_auxiliar, id_centro_costo, id_partida,
-    	id_partida_ejecucion, glosa, id_int_transaccion
+          id_usuario_reg, 
+          fecha_reg, 
+          estado_reg, 
+          id_comprobante,
+          id_cuenta, 
+          id_auxiliar, 
+          id_centro_costo, 
+          id_partida,
+          id_partida_ejecucion, 
+          glosa, 
+          id_int_transaccion,
+          id_orden_trabajo
     	) values(
-    	p_id_usuario, now(), 'activo', v_id_comprobante,
-    	v_rec.id_cuenta, v_rec.id_auxiliar, v_rec.id_centro_costo, v_rec.id_partida,
-    	v_rec.id_partida_ejecucion, v_rec.glosa, v_rec.id_int_transaccion
+          p_id_usuario, 
+          now(), 
+          'activo', 
+          v_id_comprobante,
+          v_rec.id_cuenta, 
+          v_rec.id_auxiliar, 
+          v_rec.id_centro_costo, 
+          v_rec.id_partida,
+          v_rec.id_partida_ejecucion, 
+          v_rec.glosa, 
+          v_rec.id_int_transaccion,
+          v_rec.id_orden_trabajo
     	) returning id_transaccion into v_id_transaccion;
     	
     	--Inserción de Transacción Valor
@@ -98,4 +118,5 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
-SECURITY INVOKER;
+SECURITY INVOKER
+COST 100;

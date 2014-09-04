@@ -39,12 +39,11 @@ DECLARE
     v_posicion				integer;
     v_columnas				varchar;
     v_columna_requerida		varchar;
-    r 						record;  --  esta variable no se usa
     v_valor					varchar;
     
-    v_id_int_comprobante    integer;
+     v_id_int_comprobante    integer;
     
-    v_consulta_tab  varchar;
+     v_consulta_tab  varchar;
     
      v_def_campos      varchar[];
      v_campo_tempo     varchar;
@@ -109,59 +108,59 @@ BEGIN
     
       IF (p_reg_det_plantilla->'rel_dev_pago') = 'si'THEN
       
-      
-      -- raise exception '>>  %, %, % >>',p_reg_det_plantilla->'id_detalle_plantilla_fk',p_id_int_comprobante,v_this_hstore ->'campo_trasaccion_dev';
-     
-         --obtener trasaccion pagado  (Puede ser uno mismo pago para varios devengados)
-         
-         select  
-           t.id_int_transaccion
-         into
-           v_id_int_transaccion_pagado
-         from   conta.tint_transaccion t
-         where  
-                t.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_fk')::integer
-            and t.id_int_comprobante = p_id_int_comprobante 
-            limit 1 OFFSET 0; 
-         
-        
-      
-          --validar que no sean lalves nulas
-          IF v_id_int_transaccion_pagado is NULL THEN
-          
-             raise exception 'no existe una trasaccion de referencia para el pago';
-           
-          END IF;
-          
-          --validar que no sean lalves nulas
-         
-          IF (v_this_hstore ->'campo_trasaccion_dev') ='' or (v_this_hstore ->'campo_trasaccion_dev')='NULL' or (v_this_hstore ->'campo_trasaccion_dev') is NULL THEN
-          
-             raise exception 'no existe una trasaccion de referencia para el devengado revisa el campo de la plantilla, campo_trasaccion_dev para la plantilla: %',p_reg_det_plantilla ->'descripcion';
-           
-          END IF;
-          
-          --  insertar rel_dev_pago
-           
-           
-          INSERT INTO 
-                      conta.tint_rel_devengado
-                    (
-                      id_usuario_reg,
-                      fecha_reg,
-                      estado_reg,
-                      id_int_transaccion_dev,
-                      id_int_transaccion_pag,
-                      monto_pago
-                    ) 
-                    VALUES (
-                      p_id_usuario,
-                      now(),
-                      'activo',
-                      (v_this_hstore -> 'campo_trasaccion_dev')::integer,
-                       v_id_int_transaccion_pagado,
-                      (v_this_hstore -> 'campo_monto')::numeric
-                    );
+              
+              -- raise exception '>>  %, %, % >>',p_reg_det_plantilla->'id_detalle_plantilla_fk',p_id_int_comprobante,v_this_hstore ->'campo_trasaccion_dev';
+             
+                 --obtener trasaccion pagado  (Puede ser uno mismo pago para varios devengados)
+                 
+                 select  
+                   t.id_int_transaccion
+                 into
+                   v_id_int_transaccion_pagado
+                 from   conta.tint_transaccion t
+                 where  
+                        t.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_fk')::integer
+                    and t.id_int_comprobante = p_id_int_comprobante 
+                    limit 1 OFFSET 0; 
+                 
+                
+              
+                  --validar que no sean lalves nulas
+                  IF v_id_int_transaccion_pagado is NULL THEN
+                  
+                     raise exception 'no existe una trasaccion de referencia para el pago';
+                   
+                  END IF;
+                  
+                  --validar que no sean lalves nulas
+                 
+                  IF (v_this_hstore ->'campo_trasaccion_dev') ='' or (v_this_hstore ->'campo_trasaccion_dev')='NULL' or (v_this_hstore ->'campo_trasaccion_dev') is NULL THEN
+                  
+                     raise exception 'no existe una trasaccion de referencia para el devengado revisa el campo de la plantilla, campo_trasaccion_dev para la plantilla: %',p_reg_det_plantilla ->'descripcion';
+                   
+                  END IF;
+                  
+                  --  insertar rel_dev_pago
+                   
+                   
+                  INSERT INTO 
+                              conta.tint_rel_devengado
+                            (
+                              id_usuario_reg,
+                              fecha_reg,
+                              estado_reg,
+                              id_int_transaccion_dev,
+                              id_int_transaccion_pag,
+                              monto_pago
+                            ) 
+                            VALUES (
+                              p_id_usuario,
+                              now(),
+                              'activo',
+                              (v_this_hstore -> 'campo_trasaccion_dev')::integer,
+                               v_id_int_transaccion_pagado,
+                              (v_this_hstore -> 'campo_monto')::numeric
+                            );
                     
                    
       
@@ -255,10 +254,17 @@ BEGIN
                       --tranforma el hstore a record de int_transaccion
                       *************************************************/
                       
+                     --  IF v_this_hstore ->'campo_orden_trabajo' != '' THEN
+                     --     raise exception  ',xx %', v_this_hstore ->'campo_orden_trabajo';
+                     --  END IF;
+                      
+                      
+                      
                       v_record_int_tran.id_cuenta =   (v_this_hstore -> 'campo_cuenta')::integer;
                       v_record_int_tran.id_partida =   (v_this_hstore -> 'campo_partida')::integer;
                       v_record_int_tran.id_auxiliar =   (v_this_hstore -> 'campo_auxiliar')::integer;
                       v_record_int_tran.id_centro_costo =   (v_this_hstore -> 'campo_centro_costo')::integer;
+                      v_record_int_tran.id_orden_trabajo =   (v_this_hstore -> 'campo_orden_trabajo')::integer;
                       v_record_int_tran.id_partida_ejecucion = (v_this_hstore -> 'campo_partida_ejecucion')::integer;
                       v_record_int_tran.glosa = (v_this_hstore -> 'campo_concepto_transaccion')::varchar;
                       v_record_int_tran.id_int_comprobante = p_id_int_comprobante;

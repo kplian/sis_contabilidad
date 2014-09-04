@@ -909,3 +909,28 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
   ADD COLUMN prioridad_documento INTEGER DEFAULT 2 NOT NULL;
 
 /***********************************F-SCP-RAC-CONTA-0-22/07/2014****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-04/09/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_orden_trabajo VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_orden_trabajo
+IS 'este campo hace referencia al id_orden_trabajo';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_orden_trabajo INTEGER;
+  
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttransaccion
+  ADD COLUMN id_orden_trabajo INTEGER;  
+
+/***********************************F-SCP-RAC-CONTA-0-04/09/2014****************************************/
