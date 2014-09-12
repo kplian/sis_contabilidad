@@ -934,3 +934,27 @@ ALTER TABLE conta.ttransaccion
   ADD COLUMN id_orden_trabajo INTEGER;  
 
 /***********************************F-SCP-RAC-CONTA-0-04/09/2014****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-11/09/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE param.tconcepto_ingas
+  ADD COLUMN requiere_ot VARCHAR(20) DEFAULT 'opcional' NOT NULL;
+
+COMMENT ON COLUMN param.tconcepto_ingas.requiere_ot
+IS 'obligatorio, opcional';
+
+--------------- SQL ---------------
+
+ALTER TABLE param.tconcepto_ingas
+  ADD COLUMN filtro_ot VARCHAR(25) DEFAULT 'todos' NOT NULL;
+
+COMMENT ON COLUMN param.tconcepto_ingas.filtro_ot
+IS 'todos, listado  , si es listado filtra atravez de la relacion ot_concepto_gasto';
+
+
+/***********************************F-SCP-RAC-CONTA-0-11/09/2014****************************************/

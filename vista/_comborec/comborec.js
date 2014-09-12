@@ -118,7 +118,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
                gdisplayField: 'desc_orden',
                hiddenName: 'id_orden_trabajo',
                forceSelection:true,
-               typeAhead: true,
+               typeAhead: false,
                triggerAction: 'all',
                 listWidth:350,
                lazyRender:true,
