@@ -60,7 +60,7 @@ BEGIN
             where trc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable;
             
             
-            IF v_tipo_rel.tiene_centro_costo = 'si-unico' THEN
+            IF v_tipo_rel.tiene_centro_costo IN ('si-unico','si-general') THEN
             
             
                IF  EXISTS(select  1 
