@@ -49,3 +49,15 @@ ALTER TYPE conta.maestro_comprobante
 
 /***********************************F-TYP-RAC-CONTA-0-08/02/2014****************************************/
 
+
+/***********************************I-TYP-RAC-CONTA-0-24/09/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TYPE conta.maestro_comprobante
+  ALTER ATTRIBUTE columna_descripcion TYPE VARCHAR(500),
+  ALTER ATTRIBUTE columna_acreedor TYPE VARCHAR(500),
+  ALTER ATTRIBUTE columna_nro_tramite TYPE VARCHAR(500),
+  ALTER ATTRIBUTE columna_nro_cuenta_bancaria_trans TYPE VARCHAR(500);
+
+/***********************************F-TYP-RAC-CONTA-0-24/09/2014****************************************/
