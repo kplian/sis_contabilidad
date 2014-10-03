@@ -278,6 +278,7 @@ BEGIN
                       v_record_int_tran.nro_cuenta_bancaria_trans = (v_this_hstore->'campo_nro_cuenta_bancaria_trans')::varchar;
                       v_record_int_tran.porc_monto_excento_var = (v_this_hstore->'campo_porc_monto_excento_var')::varchar;
                       v_record_int_tran.nombre_cheque_trans = (v_this_hstore->'campo_nombre_cheque_trans')::varchar;
+                      v_record_int_tran.forma_pago = (v_this_hstore->'campo_forma_pago')::varchar;
                       
                      raise notice '>>>>>>>>>>>>>>>>>>   glosa %',v_this_hstore -> 'campo_concepto_transaccion';
                       

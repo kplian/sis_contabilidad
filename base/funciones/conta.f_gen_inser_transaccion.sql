@@ -29,13 +29,13 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_transaccion	integer;
+	v_id_transaccion	    integer;
 			    
 BEGIN
 
-    v_nombre_funcion = 'conta.f_gen_inser_transaccion';
+       v_nombre_funcion = 'conta.f_gen_inser_transaccion';
   
-            INSERT INTO 
+         INSERT INTO 
           conta.tint_transaccion
         (
           id_usuario_reg,
@@ -66,7 +66,8 @@ BEGIN
           nro_cuenta_bancaria_trans, 
           porc_monto_excento_var,
           nombre_cheque_trans,
-          id_orden_trabajo
+          id_orden_trabajo,
+          forma_pago
          ) 
         VALUES (
           (p_hstore_transaccion->'id_usuario_reg')::integer,
@@ -97,7 +98,9 @@ BEGIN
           (p_hstore_transaccion->'nro_cuenta_bancaria_trans')::varchar,
           COALESCE((p_hstore_transaccion->'porc_monto_excento_var')::numeric,0),
           (p_hstore_transaccion->'nombre_cheque_trans')::varchar,
-          (p_hstore_transaccion->'id_orden_trabajo')::integer
+          (p_hstore_transaccion->'id_orden_trabajo')::integer,
+          (p_hstore_transaccion->'forma_pago')::varchar
+          
           
         ) RETURNING id_int_transaccion into v_id_transaccion;
 			

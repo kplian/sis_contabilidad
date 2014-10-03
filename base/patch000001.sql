@@ -958,3 +958,28 @@ IS 'todos, listado  , si es listado filtra atravez de la relacion ot_concepto_ga
 
 
 /***********************************F-SCP-RAC-CONTA-0-11/09/2014****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-02/10/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_forma_pago VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_forma_pago
+IS 'este campo carga los valores cheque o transferencia';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN forma_pago VARCHAR(100);
+
+COMMENT ON COLUMN conta.tint_transaccion.forma_pago
+IS 'cheque o transferencia';
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-02/10/2014****************************************/

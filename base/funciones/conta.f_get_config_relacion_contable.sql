@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_get_config_relacion_contable (
   p_codigo varchar,
   p_id_gestion integer,
@@ -450,7 +452,7 @@ BEGIN
                         from param.tgestion
                         where id_Gestion = p_id_gestion;
                         
-                        raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) Centro de Costo : %',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,p_id_centro_costo;
+                        raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
                     end if;		
           
           
@@ -479,14 +481,14 @@ BEGIN
 
               --si la relacion contable es para encontrat departamentos
               --  no es obigatorio que regreuna cuenta contable
-                 IF v_registros.tiene_centro_costo != 'si-unico'  THEN
+                 IF v_registros.tiene_centro_costo != 'si-unico' THEN
 
                         if ps_id_cuenta is null then
                         
                               select gestion into v_gestion
                               from param.tgestion
                               where id_gestion = p_id_gestion;
-                              raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) Centro de Costo : %',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,p_id_centro_costo;
+                              raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
                         end if;
                   
                  ELSE
@@ -510,11 +512,11 @@ BEGIN
           END IF;*/
          
           
-          --si es de auxiliar dinamico accedemos a la tabla	y no tiene un id_auxiliar especifico
-          IF v_rec.tiene_auxiliar = 'dinamico' and ps_id_auxiliar is NULL THEN
+          --si es de auxiliar dinamico accedemos a la tabla	
+          IF v_rec.tiene_auxiliar = 'dinamico' and ps_id_auxiliar  is NULL  THEN
                
                       
-                        IF v_rec.tabla_codigo_auxiliar is not null and v_rec.tabla_codigo_auxiliar != '' THEN
+                      IF v_rec.tabla_codigo_auxiliar is not null and v_rec.tabla_codigo_auxiliar != '' THEN
                            --si no dan un codigo buscamos el id auxiliar usandolo como forenckey 
                             
                             v_consulta_auxiliar = 'select 
@@ -526,19 +528,20 @@ BEGIN
                        
               
           
-                        ELSE
+                      ELSE
                
-                          IF v_rec.tabla_id_auxiliar is not NULL and  TRIM(v_rec.tabla_id_auxiliar) !='' THEN
+                         IF v_rec.tabla_id_auxiliar is not NULL and  TRIM(v_rec.tabla_id_auxiliar) !='' THEN
+                          
+                              v_consulta_auxiliar = 'select 
+                                                       tt.'||v_rec.tabla_id_auxiliar ||' as id_auxiliar
+                                                     from '||v_rec.tabla||' tt
+                                                     where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
+                          ELSE
+                             
+                              raise exception 'Falta parametros para la configuracion de auxiliar dinamico de la tabla %',v_rec.tabla;
+                          
+                          END IF;
                             
-                                v_consulta_auxiliar = 'select 
-                                                         tt.'||v_rec.tabla_id_auxiliar ||' as id_auxiliar
-                                                       from '||v_rec.tabla||' tt
-                                                       where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
-                            ELSE
-                               
-                                raise exception 'Falta parametros para la configuracion de auxiliar dinamico de la tabla %',v_rec.tabla;
-                            
-                            END IF;
                       END IF;
                         
                         --raise exception 'bbbbbbb    %',v_consulta_auxiliar;
@@ -552,6 +555,9 @@ BEGIN
                        IF v_rec_rel.id_auxiliar is NULL THEN             
                            raise exception 'la relacion (%) no tiene configurado un  auxiliar',v_rec.tabla;
                        END IF;  
+                     
+                          
+                     
            END IF;
          	
    END IF;
