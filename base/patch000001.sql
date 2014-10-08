@@ -983,3 +983,38 @@ IS 'cheque o transferencia';
 
 
 /***********************************F-SCP-RAC-CONTA-0-02/10/2014****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-05/10/2014****************************************/
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tgrupo_ot (
+  id_grupo_ot SERIAL,
+  descripcion VARCHAR(500),
+  PRIMARY KEY(id_grupo_ot)
+) INHERITS (pxp.tbase)
+;
+
+ALTER TABLE conta.tgrupo_ot
+  OWNER TO postgres;
+  
+--------------- SQL ---------------
+
+CREATE TABLE conta.tgrupo_ot_det (
+  id_grupo_ot_det SERIAL,
+  id_grupo_ot INTEGER,
+  id_orden_trabajo INTEGER,
+  PRIMARY KEY(id_grupo_ot_det)
+) INHERITS (pxp.tbase)
+;
+
+ALTER TABLE conta.tgrupo_ot_det
+  OWNER TO postgres; 
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-05/10/2014****************************************/
+
