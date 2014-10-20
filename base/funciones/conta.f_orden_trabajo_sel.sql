@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_orden_trabajo_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -45,27 +47,27 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						odt.id_orden_trabajo,
-						odt.estado_reg,
-						odt.fecha_final,
-						odt.fecha_inicio,
-						odt.desc_orden,
-						odt.motivo_orden,
-						odt.fecha_reg,
-						odt.id_usuario_reg,
-						odt.id_usuario_mod,
-						odt.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	
-						from conta.torden_trabajo odt
-						inner join segu.tusuario usu1 on usu1.id_usuario = odt.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = odt.id_usuario_mod
-				        where odt.estado_reg = ''activo'' and ';
+                          id_orden_trabajo,
+                          estado_reg,
+                          fecha_final,
+                          fecha_inicio,
+                          desc_orden,
+                          motivo_orden,
+                          fecha_reg,
+                          id_usuario_reg,
+                          id_usuario_mod,
+                          fecha_mod,
+                          usr_reg,
+                          usr_mod
+                        
+						from conta.vorden_trabajo odt
+				        where  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
+            raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -83,10 +85,8 @@ BEGIN
 		begin
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_orden_trabajo)
-					    from conta.torden_trabajo odt
-					    inner join segu.tusuario usu1 on usu1.id_usuario = odt.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = odt.id_usuario_mod
-					    where odt.estado_reg = ''activo'' and ';
+					     from conta.vorden_trabajo odt
+					     where  ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

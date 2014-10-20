@@ -13,6 +13,14 @@ class ACTOrdenTrabajo extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_orden_trabajo');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if($this->objParam->getParametro('filtro_ot')=='listado'){
+			
+			if($this->objParam->getParametro('id_grupo_ots')!=''){
+               $this->objParam->addFiltro("''{".$this->objParam->getParametro('id_grupo_ots')."}''::integer[] && odt.id_grupo_ots");    
+			}
+		}
+		
 		if($this->objParam->getParametro('fecha_solicitud')!=''){
             $this->objParam->addFiltro("odt.fecha_inicio <=''".$this->objParam->getParametro('fecha_solicitud')."'' and (odt.fecha_final is null or odt.fecha_final >= ''". $this->objParam->getParametro('fecha_solicitud') ."'')");    
         }
