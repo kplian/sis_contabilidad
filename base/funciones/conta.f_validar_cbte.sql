@@ -45,7 +45,7 @@ BEGIN
     if p_origen  = 'endesis' then
     
           --si el comprobante viene de endesis y tenemso fecha de ejecucion actualizamos la fecha del comprobante intermedio
-         IF p_fecha_ejecucion is NULL THEN
+         IF p_fecha_ejecucion is NOT NULL THEN
          
               update conta.tint_comprobante set
                 fecha = p_fecha_ejecucion
