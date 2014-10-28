@@ -91,7 +91,8 @@ BEGIN
             campo_porc_monto_excento_var,
             campo_nombre_cheque_trans,
             prioridad_documento,
-            campo_orden_trabajo
+            campo_orden_trabajo,
+            campo_forma_pago
           	) values(
 			v_parametros.id_plantilla_comprobante,
 			v_parametros.debe_haber,
@@ -134,7 +135,8 @@ BEGIN
             v_parametros.campo_porc_monto_excento_var,
 			v_parametros.campo_nombre_cheque_trans,
             v_parametros.prioridad_documento,
-            v_parametros.campo_orden_trabajo
+            v_parametros.campo_orden_trabajo,
+            v_parametros.campo_forma_pago
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 			
 			--Definicion de la respuesta
@@ -195,7 +197,8 @@ BEGIN
             campo_porc_monto_excento_var=v_parametros.campo_porc_monto_excento_var,
             campo_nombre_cheque_trans = v_parametros.campo_nombre_cheque_trans,
             prioridad_documento = v_parametros.prioridad_documento,
-            campo_orden_trabajo = v_parametros.campo_orden_trabajo
+            campo_orden_trabajo = v_parametros.campo_orden_trabajo,
+            campo_forma_pago = v_parametros.campo_forma_pago
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta
