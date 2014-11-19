@@ -62,10 +62,11 @@ BEGIN
     
     v_monto_revertir = 0;
     v_factor_reversion = 0;
+    p_porc_monto_excento_var = COALESCE(p_porc_monto_excento_var,0);
     
     --RAC 11/02/2014, agrega la capacidad de calcular si el documento utiliza el monto excento
     
-    if p_porc_monto_excento_var > 0 THEN
+    if p_porc_monto_excento_var >= 0 THEN
     
         v_sw_calcular_excento  = TRUE;
         v_porc_monto_imponible = 1 - p_porc_monto_excento_var;
@@ -74,6 +75,7 @@ BEGIN
         
     END IF;
   
+
      
     v_cont = 1;
      -- FOR obtener las plantillas calculos del documento(id_plantlla)
@@ -119,20 +121,20 @@ BEGIN
                         v_porc_importe_presupuesto = v_porc_monto_imponible * v_registros.importe_presupuesto;
                         
                         
-                        --si es una trasaccion primeria (priorida =1 )se suma el porcentaje del monto no imponible
-                         IF v_registros.prioridad = 1 THEN
+                       --si es una trasaccion primeria (priorida =1 )se suma el porcentaje del monto no imponible
+                       IF v_registros.prioridad = 1 THEN
                              v_porc_importe = v_porc_importe + p_porc_monto_excento_var;
                              v_porc_importe_presupuesto = v_porc_importe_presupuesto + p_porc_monto_excento_var;
-                         END IF;
-                   
-                   
+                       END IF;
+                         
+                     
+                      
                    ELSE
                    
                      v_porc_importe = v_registros.importe; 
                      v_porc_importe_presupuesto = v_registros.importe_presupuesto;
                    
-                   END IF;
-               
+                   END IF;               
                
                   v_monto_x_aplicar = (p_monto * v_porc_importe)::numeric;
                   v_monto_x_aplicar_pre = (p_monto * v_porc_importe_presupuesto)::numeric;

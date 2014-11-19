@@ -1018,3 +1018,18 @@ ALTER TABLE conta.tgrupo_ot_det
 
 /***********************************F-SCP-RAC-CONTA-0-05/10/2014****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-0-05/11/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ALTER COLUMN beneficiario TYPE VARCHAR(500) COLLATE pg_catalog."default";
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcomprobante
+  ALTER COLUMN beneficiario TYPE VARCHAR(500) COLLATE pg_catalog."default";
+  
+  
+/***********************************F-SCP-RAC-CONTA-0-05/11/2014****************************************/
