@@ -138,7 +138,7 @@ Phx.vista.RelacionContableTabla = {
         
         this.Cmp.id_centro_costo.on('select', function (c,r,i) {           
             if (this.filtro_partida == 'no') {
-	            this.Cmp.id_centro_costo.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
+	            this.Cmp.id_partida.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
 	            this.Cmp.id_partida.modificado = true;
 	            this.Cmp.id_partida.reset(); 
 	        }           
@@ -196,20 +196,22 @@ Phx.vista.RelacionContableTabla = {
 					this.Cmp.id_partida.modificado = true;
 				}	
 				this.filtro_partida = 'no';
+				if ('filtro_partida' in this.maestro) {
 				//carga el combo de partida si existe una sola partida			
-	            this.Cmp.id_partida.store.load({params:{start:0,limit:this.tam_pag}, 
-		        	callback : function (r) {
-			       		if (r.length == 1 ) {	       				       				
-			    			this.Cmp.id_partida.setValue(r[0].data.id_partida);
-			    			this.Cmp.id_partida.collapse();
-			    			this.Cmp.id_cuenta.store.setBaseParam('id_partida', this.Cmp.id_partida.getValue());
-			    			this.filtro_partida = 'si';
-			    			//si selecciona automaticamante la partida es necesario aplicar nuevo filtro al centro de costos
-			    			this.Cmp.id_centro_costo.store.setBaseParam('id_partida',r[0].data.id_partida);
-			    		}			    			    		
-			    	}, scope : this
-			    });
-			
+		            this.Cmp.id_partida.store.load({params:{start:0,limit:this.tam_pag}, 
+			        	callback : function (r) {
+				       		if (r.length == 1 ) {	       				       				
+				    			this.Cmp.id_partida.setValue(r[0].data.id_partida);
+				    			this.Cmp.id_partida.collapse();
+				    			this.Cmp.id_cuenta.store.setBaseParam('id_partida', this.Cmp.id_partida.getValue());
+				    			//si se selecciona automaticamente la partida ya no se filtrara por cuenta ni por centro de costo
+				    			this.filtro_partida = 'si';
+				    			//si selecciona automaticamante la partida es necesario aplicar nuevo filtro al centro de costos
+				    			this.Cmp.id_centro_costo.store.setBaseParam('id_partida',r[0].data.id_partida);
+				    		}			    			    		
+				    	}, scope : this
+				    });
+				}
 				
 			} else {
 				this.tiene_partida = 'no';
@@ -238,7 +240,8 @@ Phx.vista.RelacionContableTabla = {
 		}, this);
 	},
 	onButtonNew : function () {
-		Phx.vista.RelacionContableTabla.superclass.onButtonNew.call(this);		
+		Phx.vista.RelacionContableTabla.superclass.onButtonNew.call(this);	
+			
 		this.setAllowBlank(this.Cmp.id_cuenta, true);		
 		this.Cmp.id_tabla.setValue(this.maestro[this.tabla_id]);
 		this.Cmp.nombre_tabla.setValue(this.maestro.nombre_tabla);	
