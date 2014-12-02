@@ -129,6 +129,23 @@ class MODRelacionContable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function clonarConfig(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_relacion_contable_ime';
+		$this->transaccion='CONTA_REPRELCON_REP';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_relacion_contable','id_relacion_contable','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>

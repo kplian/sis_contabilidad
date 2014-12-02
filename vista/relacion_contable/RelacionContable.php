@@ -19,6 +19,8 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.RelacionContable.superclass.constructor.call(this,config);
 		this.init();
 		this.iniciarEventos();
+		this.addButton('clonarConf',{ text: 'Clonar cnfiguración', iconCls: 'blist',disabled: false, handler: this.clonarConf, tooltip: 'Clonar la configuración para la siguiente gestión'});
+        
 		
 	},
 	tam_pag:50,
@@ -284,6 +286,45 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 	sortInfo:{
 		field: 'id_relacion_contable',
 		direction: 'ASC'
+	},
+	
+	clonarConf:function(){
+	     if(confirm('¿Está seguro de clonar?')){
+	        var d = this.getSelectedData();
+		    Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_contabilidad/control/RelacionContable/clonarConfig',
+                params: { 
+                	      id_tipo_relacion_contable: d.id_tipo_relacion_contable,
+                	      id_relacion_contable: d.id_relacion_contable
+                	    },
+                success: this.successSinc,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+	     }
+	},
+	successSinc:function(resp){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+            	
+            	alert(reg.ROOT.datos.observaciones)
+            	this.reload();
+             }else{
+                alert('ocurrio un error durante el proceso')
+            }
+    },
+	preparaMenu: function(n) {
+		var tb = Phx.vista.RelacionContable.superclass.preparaMenu.call(this);
+	   	this.getBoton('clonarConf').setDisabled(false);
+  		return tb;
+	},
+	liberaMenu: function() {
+		var tb = Phx.vista.RelacionContable.superclass.liberaMenu.call(this);
+		this.getBoton('clonarConf').setDisabled(true);
+		return tb;
 	},
 	bdel:true,
 	bsave:true,

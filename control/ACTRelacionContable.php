@@ -55,6 +55,12 @@ class ACTRelacionContable extends ACTbase{
 		$this->res=$this->objFunc->eliminarRelacionContable($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+    function clonarConfig(){
+		$this->objFunc=$this->create('MODRelacionContable');	
+		$this->res=$this->objFunc->clonarConfig($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 			
 }
 
