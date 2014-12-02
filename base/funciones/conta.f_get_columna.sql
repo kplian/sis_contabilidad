@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION conta.f_get_columna (
 )
 RETURNS varchar AS
 $body$
-/*
+ 	/*
 Autor GAYME RIMERA ROJAS (No sabe poner comentarios)
 Fecha 28/06/2013
 Descripcion: nose por que el gayme no puso comentarios
@@ -18,7 +18,7 @@ Descripcion: nose por que el gayme no puso comentarios
 
 Autor:  Rensi Arteaga Copari
 Fecha 21/08/2013
-Descripcion:   Esta funcion ejecuta la fomrula de la columna definida en la plantilla
+Descripcion:   Esta funcion ejecuta la formula de la columna definida en la plantilla
               
 
 
@@ -65,6 +65,7 @@ BEGIN
   
   v_es_select = position('select' in v_cadena);
  
+  
   -- get variables plantilla
   v_variables = conta.f_get_variables_plantilla_comprobante(p_cadena, p_tipo);
   
@@ -82,34 +83,36 @@ BEGIN
   
   	   v_variable = replace(split_part(v_variables[1], '.', 2), '$', '');
   	
-    if (position('$this' in v_variables[1]) = 1)then
-    	
-        return p_this-> v_variable::varchar;
-    
-    elsif (position('$tabla_padre' in v_variables[1]) = 1) then
-    	
-        return p_tabla_padre-> v_variable::varchar;
-    
-    elsif (position('$super' in v_variables[1]) = 1) then
-    	
-        return p_super-> v_variable::varchar;
-    
-    else
-    	return p_tabla-> v_variable::varchar;
-       
-    
-    end if;
+      if (position('$this' in v_variables[1]) = 1)then
+      	
+          return p_this-> v_variable::varchar;
+      
+      elsif (position('$tabla_padre' in v_variables[1]) = 1) then
+      	
+          return p_tabla_padre-> v_variable::varchar;
+      
+      elsif (position('$super' in v_variables[1]) = 1) then
+      	
+          return p_super-> v_variable::varchar;
+      
+      else
+          return p_tabla-> v_variable::varchar;
+         
+      
+      end if;
   
   
   
   ELSE
   
+ 
+   -- raise exception '------ %', v_variables;
   --si es select reemplazar los valores de la cadena por los de los records, ejecutar la consulta y devolver el resultado
   
-  -- TODO falta revisar la ejecucion de consultas ...
   
+    v_i = 1;
   	WHILE (v_i <= array_length(v_variables, 1)) LOOP
-    	
+    	-- raise exception '------ %', v_variables[v_i];
         v_variable = replace(split_part(v_variables[v_i], '.', 2), '$', '');
         
         if (position('$this' in v_variables[v_i]) = 1)then
