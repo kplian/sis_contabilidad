@@ -5,6 +5,7 @@ CREATE OR REPLACE FUNCTION conta.f_get_config_relacion_contable (
   p_id_gestion integer,
   p_id_tabla integer = NULL::integer,
   p_id_centro_costo integer = NULL::integer,
+  p_mensaje_error varchar = NULL::character varying,
   out ps_id_cuenta integer,
   out ps_id_auxiliar integer,
   out ps_id_partida integer,
@@ -130,9 +131,9 @@ BEGIN
      
     
 
-     IF p_id_centro_costo is NULL  and v_registros.tiene_centro_costo != 'si-unico' THEN
+     IF p_id_centro_costo is NULL  and v_registros.tiene_centro_costo != 'si-unico' and  v_registros.tiene_centro_costo != 'no'THEN
                 
-         raise exception 'El tipo de relacion relacion contable indica que necesita  centro de costo: % (%)',v_registros.nombre_tipo_relacion,p_codigo;
+         raise exception 'El tipooo de relacion relacion contable indica que necesita  centro de costo: % (%)',v_registros.nombre_tipo_relacion,p_codigo;
               
      END IF;
     
@@ -452,7 +453,7 @@ BEGIN
                         from param.tgestion
                         where id_Gestion = p_id_gestion;
                         
-                        raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
+                        raise exception '% (% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) - Centro de costo: %',COALESCE(p_mensaje_error,''),p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0');
                     end if;		
           
           
@@ -488,7 +489,7 @@ BEGIN
                               select gestion into v_gestion
                               from param.tgestion
                               where id_gestion = p_id_gestion;
-                              raise exception '(% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
+                              raise exception '% (% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) - Centro de costo: %',COALESCE(p_mensaje_error,''), p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0');
                         end if;
                   
                  ELSE
@@ -499,7 +500,7 @@ BEGIN
                            from param.tgestion
                            where id_gestion = p_id_gestion;
                        	 
-                           raise exception '(% - %) No se encuentra Centro de costo para  la Gestión % (tiene_centro_costo = %)',p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo;
+                           raise exception '% (% - %) No se encuentra Centro de costo para  la Gestión % (tiene_centro_costo = %) - Centro de costo: %',COALESCE(p_mensaje_error,''),p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0');
                         
                         end if;
                  
@@ -553,7 +554,7 @@ BEGIN
                          
                          
                        IF v_rec_rel.id_auxiliar is NULL THEN             
-                           raise exception 'la relacion (%) no tiene configurado un  auxiliar',v_rec.tabla;
+                           raise exception '%  La relacion (%) no tiene configurado un  auxiliar',COALESCE(p_mensaje_error,''),v_rec.tabla;
                        END IF;  
                      
                           

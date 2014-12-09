@@ -670,50 +670,45 @@ BEGIN
                          
                           FOR v_cont IN 1..v_i LOOP
                              
-                              IF v_momento_aux='solo ejecutar' THEN
+                             
                               
                               	 
-                                      --verificamos que no sea un trasaccion de reversion
-                                      IF  (v_cont  =  ANY(v_marca_reversion)) THEN
+                                    --verificamos que no sea un trasaccion de reversion
+                                    IF  (v_cont  =  ANY(v_marca_reversion)) THEN
                                       
                                       
-                                           update conta.tint_transaccion it set
-                                             id_partida_ejecucion_rev = va_resp_ges[v_cont],   --partida de reversion
-                                             fecha_mod = now(),
-                                             id_usuario_mod = p_id_usuario
-                                          where it.id_int_transaccion  =  va_id_transaccion[v_cont];
+                                         update conta.tint_transaccion it set
+                                           id_partida_ejecucion_rev = va_resp_ges[v_cont],   --partida de reversion
+                                           fecha_mod = now(),
+                                           id_usuario_mod = p_id_usuario
+                                        where it.id_int_transaccion  =  va_id_transaccion[v_cont];
                                     
-                                      ELSE
+                                    ELSE
                                       
-                                          update conta.tint_transaccion it set
-                                             id_partida_ejecucion_dev = va_resp_ges[v_cont],    --partida de devengado
-                                             fecha_mod = now(),
-                                             id_usuario_mod = p_id_usuario
-                                          where it.id_int_transaccion  =  va_id_transaccion[v_cont]; 
-                                      
-                                        
-                                        
-                                      END IF;
-                              ELSE    
-                                
-                                  update conta.tint_transaccion it set
-                                     id_partida_ejecucion = va_resp_ges[v_cont],
-                                     fecha_mod = now(),
-                                     id_usuario_mod = p_id_usuario
-                                  where it.id_int_transaccion  =  va_id_transaccion[v_cont];
-                              
-                              END IF;
+                                     		IF v_momento_aux='solo ejecutar' THEN
+                                                  update conta.tint_transaccion it set
+                                                     id_partida_ejecucion_dev = va_resp_ges[v_cont],    --partida de devengado
+                                                     fecha_mod = now(),
+                                                     id_usuario_mod = p_id_usuario
+                                                  where it.id_int_transaccion  =  va_id_transaccion[v_cont]; 
+                                                  
+                                             ELSE
+                                                update conta.tint_transaccion it set
+                                                   id_partida_ejecucion = va_resp_ges[v_cont],   --id_partida_ejecucion del devengado o comprometido segun tipo de comprobante)
+                                                   fecha_mod = now(),
+                                                   id_usuario_mod = p_id_usuario
+                                                where it.id_int_transaccion  =  va_id_transaccion[v_cont];
+                                            END IF;
+                                     END IF;
                              
-                               
-                         END LOOP;
+                        END LOOP;
                   
-               
              ELSIF   v_momento_aux='solo pagar'  THEN
                   
                        FOR v_cont IN 1..v_i LOOP
                              
                                   update conta.tint_rel_devengado rd set
-                                     id_partida_ejecucion_pag = va_resp_ges[v_cont],
+                                     id_partida_ejecucion_pag = va_resp_ges[v_cont],  --partida ejecucion del pagado
                                      fecha_mod = now(),
                                      id_usuario_mod = p_id_usuario
                                   where rd.id_int_rel_devengado  =  va_id_int_rel_devengado[v_cont];

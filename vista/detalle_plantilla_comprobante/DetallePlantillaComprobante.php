@@ -329,7 +329,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:150
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpbdet.campo_monto',type:'string'},
@@ -480,7 +480,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
-                maxLength:100
+                maxLength:150
             },
             type:'TextArea',
             filters:{pfiltro:'cmpbdet.campo_monto_pres',type:'string'},
@@ -763,6 +763,12 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:false
 		}
 	],
+	
+	onSubmit : function(o) {
+		this.Cmp.campo_monto_pres.setValue(encodeURIComponent(this.Cmp.campo_monto_pres.getValue()));
+		this.Cmp.campo_monto.setValue(encodeURIComponent(this.Cmp.campo_monto.getValue()));
+		Phx.vista.DetallePlantillaComprobante.superclass.onSubmit.call(this,o);
+	},
 	
 	title:'Detalla Comprobante',
 	ActSave:'../../sis_contabilidad/control/DetallePlantillaComprobante/insertarDetallePlantillaComprobante',
