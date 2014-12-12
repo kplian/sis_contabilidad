@@ -1908,3 +1908,22 @@ AS
            usu2.cuenta;
 
 /***********************************F-DEP-RAC-CONTA-0-09/08/2014*****************************************/
+
+
+
+/***********************************I-DEP-RAC-CONTA-0-11/12/2014*****************************************/
+--------------- SQL ---------------
+
+CREATE TRIGGER f_trig_insert_int_trans_val
+  AFTER INSERT OR UPDATE 
+  ON conta.tint_transaccion FOR EACH ROW 
+  EXECUTE PROCEDURE conta.f_insert_int_trans_val();
+
+
+CREATE TRIGGER f_trig_insert_trans_val
+  AFTER INSERT OR UPDATE 
+  ON conta.tint_transaccion FOR EACH ROW 
+  EXECUTE PROCEDURE conta.f_insert_trans_val();
+  
+  
+/***********************************F-DEP-RAC-CONTA-0-11/12/2014*****************************************/

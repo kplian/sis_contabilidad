@@ -46,15 +46,16 @@ DECLARE
     
     ------------
     
-    v_def_campos      varchar[];
-    v_campo_tempo     varchar;
-    v_i integer;
-    v_tamano integer;
+    v_def_campos      		varchar[];
+    v_campo_tempo     		varchar;
+    v_i 					integer;
+    v_tamano 				integer;
     v_rec_periodo record;
-    v_id_subsistema integer;
-    v_id_clase_comprobante integer;
-     v_sincronizar varchar;
-     v_resp_int_endesis varchar;
+    v_id_subsistema 		integer;
+    v_id_clase_comprobante 	integer;
+    v_sincronizar 			varchar;
+    v_resp_int_endesis 		varchar;
+    v_tipo_cambio			numeric;
   
 BEGIN
 
@@ -90,16 +91,16 @@ BEGIN
     v_columnas=conta.f_obtener_columnas_detalle(hstore(v_plantilla),v_def_campos)::varchar;
 	v_columnas=replace(v_columnas,'{','');
 	v_columnas=replace(v_columnas,'}','');
-    
-    
-   
-    
+    v_consulta = 'select '||v_columnas ||
+            ' from '||v_plantilla.tabla_origen|| ' where '
+            ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'';
+      
     execute	'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'' into v_tabla;
             
             
-            
+          
     
     
     ----------------------------------------------------------
@@ -211,6 +212,7 @@ BEGIN
                                                                   v_plantilla.campo_nro_tramite::text, 
                                                                   hstore(v_this), 
                                                                   hstore(v_tabla));
+        
 	end if;
     
      --RCM: guardar campo_nro_cuenta_bancaria_trans
@@ -261,7 +263,9 @@ BEGIN
           END IF;
     
     
+    --calcular el tipo de cambio segun fecha y moneda del comprobante
     
+    v_tipo_cambio =   param.f_get_tipo_cambio( v_this.columna_moneda::integer, v_this.columna_fecha::date, 'O');
     
     --  genera tabla intermedia de comrobante
     
@@ -289,7 +293,7 @@ BEGIN
       glosa1,
       --glosa2,
       beneficiario,
-      --tipo_cambio,
+      tipo_cambio,
       --id_funcionario_firma1,
       --id_funcionario_firma2,
       --id_funcionario_firma3,
@@ -324,7 +328,7 @@ BEGIN
       v_this.columna_descripcion,
       --:glosa2,
       v_this.columna_acreedor,
-      --:tipo_cambio,
+      v_tipo_cambio,
       --:id_funcionario_firma1,
       --:id_funcionario_firma2,
       --:id_funcionario_firma3,

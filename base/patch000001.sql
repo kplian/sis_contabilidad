@@ -1033,3 +1033,42 @@ ALTER TABLE conta.tcomprobante
   
   
 /***********************************F-SCP-RAC-CONTA-0-05/11/2014****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-11/12/2014****************************************/
+
+
+CREATE TABLE conta.tint_trans_val (
+  id_int_trans_val SERIAL,
+  id_int_transaccion INTEGER NOT NULL,
+  id_moneda INTEGER,
+  importe_debe NUMERIC(19,2),
+  importe_haber NUMERIC(19,2),
+  importe_recurso NUMERIC(19,2),
+  importe_gasto NUMERIC(19,2),
+  CONSTRAINT pk_ttrans_val__id_int_trans_val PRIMARY KEY(id_int_trans_val)
+) INHERITS (pxp.tbase)
+
+WITH (oids = true);
+
+
+--------------- SQL ---------------
+
+  ALTER TABLE conta.ttransaccion
+  ADD COLUMN importe_debe NUMERIC(18,2) DEFAULT 0 NOT NULL;
+  
+  ALTER TABLE conta.ttransaccion
+  ADD COLUMN importe_haber NUMERIC(18,2) DEFAULT 0 NOT NULL;
+  
+  ALTER TABLE conta.ttransaccion
+  ADD COLUMN importe_gasto NUMERIC(18,2) DEFAULT 0 NOT NULL;
+  
+  ALTER TABLE conta.ttransaccion
+  ADD COLUMN importe_recurso NUMERIC(18,2) DEFAULT 0 NOT NULL;
+  
+  
+  
+/***********************************F-SCP-RAC-CONTA-0-11/12/2014****************************************/
+

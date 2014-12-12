@@ -30,6 +30,14 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_transaccion	    integer;
+    
+    v_importe_debe 			numeric;
+    v_importe_haber 		numeric;
+    v_importe_recurso 		numeric;
+    v_importe_gasto 		numeric;
+    v_registros 			record;
+    v_registros_con 		record;
+    v_id_moneda_base		integer;
 			    
 BEGIN
 
@@ -104,9 +112,10 @@ BEGIN
           
         ) RETURNING id_int_transaccion into v_id_transaccion;
 			
+        
 			
-            --Devuelve la respuesta
-            return v_id_transaccion;
+      --Devuelve la respuesta
+      return v_id_transaccion;
 
 	
 	
