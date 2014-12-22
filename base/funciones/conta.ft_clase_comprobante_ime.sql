@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_clase_comprobante_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_clase_comprobante_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_clase_comprobante_ime
@@ -52,7 +57,11 @@ BEGIN
 			id_usuario_reg,
 			fecha_reg,
 			fecha_mod,
-			id_usuario_mod
+			id_usuario_mod,
+            codigo,
+            momento_comprometido,
+            momento_ejecutado,
+            momento_pagado
           	) values(
 			v_parametros.id_documento,
 			v_parametros.tipo_comprobante,
@@ -61,7 +70,11 @@ BEGIN
 			p_id_usuario,
 			now(),
 			null,
-			null
+			null,
+            v_parametros.codigo,
+            v_parametros.momento_comprometido,
+            v_parametros.momento_ejecutado,
+            v_parametros.momento_pagado
 							
 			)RETURNING id_clase_comprobante into v_id_clase_comprobante;
 			
@@ -90,7 +103,11 @@ BEGIN
 			tipo_comprobante = v_parametros.tipo_comprobante,
 			descripcion = v_parametros.descripcion,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+            codigo = v_parametros.codigo,
+            momento_comprometido = v_parametros.momento_comprometido,
+            momento_ejecutado = v_parametros.momento_ejecutado,
+            momento_pagado = v_parametros.momento_pagado
 			where id_clase_comprobante=v_parametros.id_clase_comprobante;
                
 			--Definicion de la respuesta
@@ -141,7 +158,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_clase_comprobante_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

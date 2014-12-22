@@ -58,7 +58,11 @@ BEGIN
 						ccom.id_usuario_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        ''(''||doc.codigo||'') ''|| doc.descripcion as desc_doc	
+                        ''(''||doc.codigo||'') ''|| doc.descripcion as desc_doc,
+                        ccom.momento_comprometido,
+                        ccom.momento_ejecutado,
+                        ccom.momento_pagado,
+                        ccom.codigo
 						from conta.tclase_comprobante ccom
                         inner join param.tdocumento doc on ccom.id_documento = doc.id_documento
 						inner join segu.tusuario usu1 on usu1.id_usuario = ccom.id_usuario_reg

@@ -15,9 +15,9 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
-		Phx.vista.Comprobante.superclass.constructor.call(this,config);
+		Phx.vista.Comprobante.superclass.constructor.call(this, config);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.load({ params: { start: 0, limit: this.tam_pag }})
 		
 		//Botón para Imprimir el Comprobante
 		this.addButton('btnImprimir',
@@ -34,17 +34,27 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 		this.Cmp.id_subsistema.hide();
 		
 		//Eventos
-		this.Cmp.id_moneda.on('select',this.getTipoCambio,this);
-		this.Cmp.fecha.on('select',this.getTipoCambio,this);
+		this.Cmp.id_moneda.on('select', this.getTipoCambio, this);
+		this.Cmp.fecha.on('select', this.getTipoCambio, this);
 	},
 			
 	Atributos:[
 		{
 			//configuracion del componente
 			config:{
-					labelSeparator:'',
-					inputType:'hidden',
+					labelSeparator: '',
+					inputType: 'hidden',
 					name: 'id_comprobante'
+			},
+			type:'Field',
+			form:true 
+		},
+		{
+			//configuracion del componente
+			config:{
+					labelSeparator: '',
+					inputType: 'hidden',
+					name: 'id_periodo'
 			},
 			type:'Field',
 			form:true 
@@ -53,104 +63,27 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 			config: {
 				name: 'nro_tramite',
 				fieldLabel: 'Nro. Trámite',
-				allowBlank: true,
-				emptyText: 'Nro. Trámite...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'nro_tramite',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
 				gwidth: 150,
 				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				},
-				hidden:true
+				
 			},
-			type: 'ComboBox',
+			type: 'Field',
 			id_grupo: 4,
 			filters: {pfiltro: 'incbte.nro_tramite',type: 'string'},
 			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name:'d_nro_cbte',
-				value: 'Nro. Cbte.',
-				width:70
-			},
-			type:'DisplayField',
-			id_grupo: 4,
-			grid:false,
-			form:true,
-			valorInicial:'Nro. Cbte.'
+			form: false
 		},
 		{
 			config:{
 				name: 'nro_cbte',
 				fieldLabel: 'Nro.Cbte.',
-				emptyText: 'Nro. de Cbte.',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:30,
-				labelAlign: 'top',
-				disabled:true
+				gwidth: 100
 			},
 			type:'TextField',
 			filters:{pfiltro:'incbte.nro_cbte',type:'string'},
 			id_grupo:4,
 			grid:true,
-			form:true
-		},
-		{
-			config: {
-				name:'d_estado_reg',
-				value: 'Estado Cbte.',
-				width:80
-			},
-			type:'DisplayField',
-			id_grupo: 4,
-			grid:false,
-			form:true,
-			valorInicial:'Estado Cbte.',
-		},
-		{
-			config:{
-				name: 'estado_reg',
-				fieldLabel: 'Estado',
-				emptyText: 'Estado Cbte.',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:10,
-				disabled:true
-			},
-			type:'TextField',
-			filters:{pfiltro:'incbte.estado_reg',type:'string'},
-			id_grupo:4,
-			grid:true,
-			form:true
+			form:false
 		},
 		{
 			config:{
@@ -167,18 +100,6 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:5,
 			grid:true,
 			form:true
-		},
-		{
-			config: {
-				name:'d_id_depto',
-				value: 'Depto.',
-				width:55
-			},
-			type:'DisplayField',
-			id_grupo: 5,
-			grid:false,
-			form:true,
-			valorInicial:'Depto.'
 		},
 		{
 			config: {
@@ -226,18 +147,6 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config: {
-				name:'d_id_clase_comprobante',
-				value: 'Tipo Cbte.',
-				width:70
-			},
-			type:'DisplayField',
-			id_grupo: 5,
-			grid:false,
-			form:true,
-			valorInicial:'Tipo Cbte.',
-		},
-		{
-			config: {
 				name: 'id_clase_comprobante',
 				fieldLabel: 'Tipo Cbte.',
 				allowBlank: false,
@@ -251,12 +160,12 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_clase_comprobante', 'tipo_comprobante', 'descripcion'],
+					fields: ['id_clase_comprobante', 'tipo_comprobante', 'descripcion','codigo'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'ccom.tipo_comprobante#ccom.descripcion'}
+					baseParams: {par_filtro: 'ccom.tipo_comprobante#ccom.descripcion#ccom.codigo'}
 				}),
 				valueField: 'id_clase_comprobante',
-				displayField: 'tipo_comprobante',
+				displayField: 'descripcion',
 				gdisplayField: 'desc_clase_comprobante',
 				hiddenName: 'id_clase_comprobante',
 				forceSelection: true,
@@ -275,7 +184,7 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type: 'ComboBox',
 			id_grupo: 5,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
+			filters: {pfiltro: 'ccbte.descripcion',type: 'string'},
 			grid: true,
 			form: true
 		},
@@ -297,7 +206,7 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type: 'ComboRec',
 			id_grupo: 6,
-			filters:{pfiltro:'placal.prioridad',type:'string'},
+			filters:{pfiltro:'incbte.accion',type:'string'},
 			grid: true,
 			form: true
 		},
@@ -362,18 +271,6 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo: 7,
 			grid: true,
 			form: true
-		},
-		{
-			config: {
-				name:'d_tipo_cambio',
-				value: 'Tipo Cambio',
-				width:70
-			},
-			type:'DisplayField',
-			id_grupo: 7,
-			grid:false,
-			form:true,
-			valorInicial:'Tipo Cambio',
 		},
 		{
 			config:{
@@ -602,6 +499,18 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
+		{
+			config:{
+				name: 'estado_reg',
+				emptyText: 'Estado Reg.',
+				gwidth: 100
+			},
+			type:'Field',
+			filters:{pfiltro:'incbte.estado_reg',type:'string'},
+			id_grupo:4,
+			grid:true,
+			form:true
+		},
 		
 		{
 			config:{
@@ -612,7 +521,7 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:4
 			},
-				type:'NumberField',
+				type:'Field',
 				filters:{pfiltro:'usu1.cuenta',type:'string'},
 				id_grupo:0,
 				grid:true,
@@ -643,7 +552,7 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:4
 			},
-			type:'NumberField',
+			type:'Field',
 			filters:{pfiltro:'usu2.cuenta',type:'string'},
 			id_grupo:0,
 			grid:true,
@@ -704,7 +613,10 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_moneda', type: 'string'},
 		{name:'desc_firma1', type: 'string'},
 		{name:'desc_firma2', type: 'string'},
-		{name:'desc_firma3', type: 'string'}
+		{name:'desc_firma3', type: 'string'},
+		'momento_comprometido',
+        'momento_ejecutado',
+        'momento_pagado'
 	],
 	sortInfo:{
 		field: 'fecha',
@@ -734,7 +646,7 @@ Phx.vista.Comprobante=Ext.extend(Phx.gridInterfaz,{
 							    	flex: 1
 							    },
 							    items:[ ],
-							    id_grupo:4
+							    id_grupo: 4
 						      },
 						      {
 					        	xtype: 'compositefield',

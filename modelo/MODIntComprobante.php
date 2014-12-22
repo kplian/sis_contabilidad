@@ -22,7 +22,7 @@ class MODIntComprobante extends MODbase{
 		//Definicion de la lista del resultado del query
 		$this->captura('id_int_comprobante','int4');
 		$this->captura('id_clase_comprobante','int4');
-		$this->captura('id_int_comprobante_fk','int4');
+		
 		$this->captura('id_subsistema','int4');
 		$this->captura('id_depto','int4');
 		$this->captura('id_moneda','int4');
@@ -52,6 +52,12 @@ class MODIntComprobante extends MODbase{
 		$this->captura('desc_firma1','text');
 		$this->captura('desc_firma2','text');
 		$this->captura('desc_firma3','text');
+		$this->captura('momento_comprometido','varchar');
+		$this->captura('momento_ejecutado','varchar');
+		$this->captura('momento_pagado','varchar');
+		$this->captura('manual','varchar');
+		$this->captura('id_int_comprobante_fks','text');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

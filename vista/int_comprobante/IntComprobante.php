@@ -10,14 +10,17 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
-
+Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
+    fheight:500,
+    fwidth: 850,
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
+		this.initButtons=[this.cmbDepto];
+		
+		//llama al constructor de la clase padre
 		Phx.vista.IntComprobante.superclass.constructor.call(this,config);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		//this.load({params:{start:0, limit:this.tam_pag}});
 		
 		//Botón para Validación del Comprobante
 		this.addButton('btnValidar',
@@ -41,14 +44,59 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 			}
 		);
 		
+		this.bloquearOrdenamientoGrid();
+		
+		this.cmbDepto.on('clicksearch', function(){
+			this.getBoton('act').focus()
+		    this.capturaFiltros();
+		    
+        },this);
+        
+        this.cmbDepto.on('clearcmb', function(){
+        	this.DisableSelect();
+		    this.store.removeAll();
+        },this);
 		
 		
-		//Esconde el id_subsistema
-		this.Cmp.id_subsistema.hide();
+		this.iniciarEventos();
+	},
+	
+	capturaFiltros:function(combo, record, index){
+        this.desbloquearOrdenamientoGrid();
+        this.store.baseParams.id_deptos = this.cmbDepto.getValue();
+        this.load(); 
+            
+        
+    },
+    
+    validarFiltros:function(){
+        if(this.cmbDepto.isValid()){
+            return true;
+        }
+        else{
+            return false;
+        }
+        
+    },
+    onButtonAct:function(){
+        if(!this.validarFiltros()){
+            alert('Especifique los filtros antes')
+         }
+        else{
+            this.store.baseParams.id_deptos=this.cmbDepto.getValue();
+            Phx.vista.IntComprobante.superclass.onButtonAct.call(this);
+        }
+    },
+	iniciarEventos:function(){
 		
 		//Eventos
 		this.Cmp.id_moneda.on('select',this.getTipoCambio,this);
-		this.Cmp.fecha.on('select',this.getTipoCambio,this);
+		this.Cmp.fecha.on('select',this.getTipoCambio,this);		
+		this.Cmp.id_clase_comprobante.on('select', this.habilitaMomentos,this);		
+		console.log('this.Cmp.momento_ejecutado  ... ', this.Cmp.momento_ejecutado);
+		
+		
+		
 	},
 			
 	Atributos:[
@@ -60,110 +108,42 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_int_comprobante'
 			},
 			type:'Field',
+			id_grupo: 0,
+			form:true 
+		},
+		{
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_periodo'
+			},
+			type:'Field',
+			id_grupo: 0,
 			form:true 
 		},
 		{
 			config: {
 				name: 'nro_tramite',
-				fieldLabel: 'Nro. Trámite',
-				allowBlank: true,
-				emptyText: 'Nro. Trámite...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'nro_tramite',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				},
-				hidden:true
+				fieldLabel: 'Nro. Trámite'
 			},
 			type: 'ComboBox',
-			id_grupo: 4,
+			id_grupo: 0,
 			filters: {pfiltro: 'incbte.nro_tramite',type: 'string'},
 			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name:'d_nro_cbte',
-				value: 'Nro. Cbte.',
-				width:70
-			},
-			type:'DisplayField',
-			id_grupo: 4,
-			grid:false,
-			form:true,
-			valorInicial:'Nro. Cbte.'
+			form: false
 		},
 		{
 			config:{
 				name: 'nro_cbte',
 				fieldLabel: 'Nro.Cbte.',
-				emptyText: 'Nro. de Cbte.',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:30,
-				labelAlign: 'top',
-				disabled:true
+				emptyText: 'Nro. de Cbte.'
 			},
-			type:'TextField',
+			type:'Field',
 			filters:{pfiltro:'incbte.nro_cbte',type:'string'},
-			id_grupo:4,
+			id_grupo:0,
 			grid:true,
-			form:true
-		},
-		{
-			config: {
-				name:'d_estado_reg',
-				value: 'Estado Cbte.',
-				width:80
-			},
-			type:'DisplayField',
-			id_grupo: 4,
-			grid:false,
-			form:true,
-			valorInicial:'Estado Cbte.',
-		},
-		{
-			config:{
-				name: 'estado_reg',
-				fieldLabel: 'Estado',
-				emptyText: 'Estado Cbte.',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:10,
-				disabled:true
-			},
-			type:'TextField',
-			filters:{pfiltro:'incbte.estado_reg',type:'string'},
-			id_grupo:4,
-			grid:true,
-			form:true
+			form:false
 		},
 		{
 			config:{
@@ -177,79 +157,32 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'DateField',
 			filters:{pfiltro:'incbte.fecha',type:'date'},
-			id_grupo:5,
+			id_grupo:2,
 			grid:true,
 			form:true
 		},
 		{
-			config: {
-				name:'d_id_depto',
-				value: 'Depto.',
-				width:55
-			},
-			type:'DisplayField',
-			id_grupo: 5,
-			grid:false,
-			form:true,
-			valorInicial:'Depto.'
-		},
-		{
-			config: {
-				name: 'id_depto',
-				fieldLabel: 'Depto.',
-				allowBlank: false,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_depto', 'codigo', 'nombre'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'DEPPTO.nombre#DEPPTO.codigo'}
-				}),
-				valueField: 'id_depto',
-				displayField: 'nombre',
-				gdisplayField: 'desc_depto',
-				hiddenName: 'id_depto',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_depto']);
-				},
-				listWidth:300
-			},
-			type: 'ComboBox',
-			id_grupo: 5,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name:'d_id_clase_comprobante',
-				value: 'Tipo Cbte.',
-				width:70
-			},
-			type:'DisplayField',
-			id_grupo: 5,
-			grid:false,
-			form:true,
-			valorInicial:'Tipo Cbte.',
-		},
-		{
+   			config:{
+   				name:'id_depto',
+   				 hiddenName: 'id_depto',
+   				 url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
+	   				origen:'DEPTO',
+	   				allowBlank:false,
+	   				fieldLabel: 'Depto',
+	   				gdisplayField:'desc_depto',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
+	   				width:250,
+   			        gwidth:180,
+	   				baseParams:{estado:'activo',codigo_subsistema:'CONTA'},//parametros adicionales que se le pasan al store
+	      			renderer:function (value, p, record){return String.format('{0}', record.data['desc_depto']);}
+   			},
+   			//type:'TrigguerCombo',
+   			type:'ComboRec',
+   			id_grupo:0,
+   			filters:{pfiltro:'dpto.nombre',type:'string'},
+   		    grid:false,
+   			form:true
+       },
+	   {
 			config: {
 				name: 'id_clase_comprobante',
 				fieldLabel: 'Tipo Cbte.',
@@ -264,12 +197,12 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_clase_comprobante', 'tipo_comprobante', 'descripcion'],
+					fields: ['id_clase_comprobante', 'tipo_comprobante', 'descripcion','codigo','momento_comprometido','momento_ejecutado','momento_pagado'],
 					remoteSort: true,
 					baseParams: {par_filtro: 'ccom.tipo_comprobante#ccom.descripcion'}
 				}),
 				valueField: 'id_clase_comprobante',
-				displayField: 'tipo_comprobante',
+				displayField: 'descripcion',
 				gdisplayField: 'desc_clase_comprobante',
 				hiddenName: 'id_clase_comprobante',
 				forceSelection: true,
@@ -279,6 +212,7 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 				mode: 'remote',
 				pageSize: 15,
 				queryDelay: 1000,
+				width:250,
 				anchor: '100%',
 				gwidth: 150,
 				minChars: 2,
@@ -287,107 +221,102 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 				}
 			},
 			type: 'ComboBox',
-			id_grupo: 5,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
+			id_grupo: 1,
+			filters: {pfiltro: 'ccbte.descripcion',type: 'string'},
 			grid: true,
 			form: true
 		},
 		{
-			config: {
-				name: 'accion',
-				fieldLabel: 'Acción',
-				anchor: '40%',
-				tinit: false,
+			config:{
+				name: 'momento',
+				fieldLabel: 'Tipo',
+				qtip: 'Si el comprobante es presupuestario es encesario especificar los momentos que utiliza',
 				allowBlank: false,
-				origen: 'CATALOGO',
-				gdisplayField: 'accion',
 				gwidth: 100,
-				baseParams:{
-						cod_subsistema:'CONTA',
-						catalogo_tipo:'tcomprobante__accion'
-				},
-				renderer:function (value, p, record){return String.format('{0}', record.data['accion']);}
-			},
-			type: 'ComboRec',
-			id_grupo: 6,
-			filters:{pfiltro:'placal.prioridad',type:'string'},
-			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name:'momento',
-				fieldLabel: 'Momento Presupuestario',
-				items: [
-	                {boxLabel: 'Comprometer', name: 'cb-auto-1',checked: true},
-	                {boxLabel: 'Devengar', name: 'cb-auto-2', checked: true},
-	                {boxLabel: 'Pagar', name: 'cb-auto-3'}
-	            ]
-			},
-			type: 'CheckboxGroup',
-			id_grupo: 6,
-			filters: {pfiltro: 'incbte.nro_tramite',type: 'string'},
-			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name: 'id_moneda',
-				fieldLabel: 'Moneda',
-				allowBlank: true,
-				emptyText: 'Seleccione una Moneda...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_parametros/control/Moneda/listarMoneda',
-					id: 'id_moneda',
-					root: 'datos',
-					sortInfo: {
-						field: 'codigo',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_moneda','codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro:'codigo'}
-				}),
-				//hidden: true,
-				valueField: 'id_moneda',
-				displayField: 'codigo',
-				gdisplayField: 'desc_moneda',
-				forceSelection: false,
-				typeAhead: false,
-    			triggerAction: 'all',
-    			lazyRender: true,
-				mode: 'remote',
-				pageSize: 20,
-				queryDelay: 500,
-				anchor: '99%',
-				gwidth: 70,
-				minChars: 2,
-				renderer: function (value, p, record) {
-					return String.format('{0}', value?record.data['desc_moneda']:'');
-				}
+				width:250,
+				typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender: true,
+       		    mode: 'local',
+       		    valueField: 'inicio',       		    
+       		    store: ['contable','presupuestario']
 			},
 			type: 'ComboBox',
-			filters: {
-				pfiltro: 'mon.codigo',
-				type: 'string'
-			},
-			id_grupo: 7,
+			id_grupo: 1,
+			filters: {	
+	       		         type: 'list',
+	       				 pfiltro:'incbte.momento',
+	       				 options: ['contable','presupuestario'],	
+	       		 	},
 			grid: true,
-			form: true
+			form: false
 		},
 		{
-			config: {
-				name:'d_tipo_cambio',
-				value: 'Tipo Cambio',
-				width:70
+			config:{
+				name: 'momento_comprometido',
+				fieldLabel: 'Comprometido',
+				renderer : function(value, p, record) {
+					return record.data['momento_comprometido']=='true'?'si':'no';
+				},
+				gwidth: 50,
+				
 			},
-			type:'DisplayField',
-			id_grupo: 7,
-			grid:false,
-			form:true,
-			valorInicial:'Tipo Cambio',
+			type:'Checkbox',
+			id_grupo:1,
+			grid:true,
+			form:false
 		},
+		{
+			config:{
+				name: 'momento_ejecutado',
+				fieldLabel: 'Ejecutado',
+				renderer : function(value, p, record) {
+					return record.data['momento_ejecutado']=='true'?'si':'no';
+				},
+				gwidth: 50,
+				
+			},
+			type:'Checkbox',
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'momento_pagado',
+				fieldLabel: 'Pagado',
+				renderer : function(value, p, record) {
+					return record.data['momento_pagado']=='true'?'si':'no';
+				},
+				gwidth: 50,
+				
+			},
+			type:'Checkbox',
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		
+        {
+            config:{
+                name:'id_moneda',
+                origen:'MONEDA',
+                allowBlank:false,
+                fieldLabel:'Moneda',
+                gdisplayField:'desc_moneda',//mapea al store del grid
+                gwidth:100,
+                width:250,
+                renderer:function (value, p, record){return String.format('{0}', record.data['desc_moneda']);}
+             },
+            type:'ComboRec',
+            id_grupo:2,
+            filters:{   
+                pfiltro:'mon.codigo',
+                type:'string'
+            },
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'tipo_cambio',
@@ -400,7 +329,7 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'NumberField',
 			filters:{pfiltro:'incbte.tipo_cambio',type:'numeric'},
-			id_grupo:7,
+			id_grupo:2,
 			grid:true,
 			form:true
 		},
@@ -462,7 +391,7 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 		   			renderer: function (value, p, record){return String.format('{0}', record.data['desc_firma1']);}
 	       	     },
 	   			type:'ComboRec',
-	   			id_grupo:8,
+	   			id_grupo:0,
 	   			filters:{	
 			        pfiltro:'fir1.desc_funcionario2',
 					type:'string'
@@ -483,7 +412,7 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 		   			renderer: function (value, p, record){return String.format('{0}', record.data['desc_firma2']);}
 	       	     },
 	   			type:'ComboRec',
-	   			id_grupo:8,
+	   			id_grupo:0,
 	   			filters:{	
 			        pfiltro:'fir2.desc_funcionario2',
 					type:'string'
@@ -504,7 +433,7 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 		   			renderer: function (value, p, record){return String.format('{0}', record.data['desc_firma3']);}
 	       	     },
 	   			type:'ComboRec',
-	   			id_grupo:8,
+	   			id_grupo:0,
 	   			filters:{	
 			        pfiltro:'fir3.desc_funcionario2',
 					type:'string'
@@ -512,51 +441,6 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 	   			grid:true,
 	   			form:true
 	   	},
-		
-		{
-			config: {
-				name: 'id_int_comprobante_fk',
-				fieldLabel: 'id_int_comprobante_fk',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_int_comprobante_fk',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				},
-				hidden:true
-			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
-		},
 		{
 			config: {
 				name: 'id_subsistema',
@@ -569,53 +453,18 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo: 0,
 			filters: {pfiltro: 'sis.codigo#sis.nombre',type: 'string'},
 			grid: true,
-			form: true
+			form: false
 		},
-		
-		
 		{
-			config: {
-				name: 'id_periodo',
-				fieldLabel: 'id_periodo',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_periodo',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				},
-				hidden:true
+			config:{
+				name: 'estado_reg',
+				fieldLabel: 'Estado',
+				emptyText: 'Estado Reg.'
 			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
+			type:'Field',
+			filters:{pfiltro:'incbte.estado_reg',type:'string'},
+			grid:true,
+			form:false
 		},
 		
 		{
@@ -627,7 +476,7 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:4
 			},
-				type:'NumberField',
+				type:'Field',
 				filters:{pfiltro:'usu1.cuenta',type:'string'},
 				id_grupo:0,
 				grid:true,
@@ -658,7 +507,7 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:4
 			},
-				type:'NumberField',
+				type:'Field',
 				filters:{pfiltro:'usu2.cuenta',type:'string'},
 				id_grupo:0,
 				grid:true,
@@ -681,6 +530,49 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
+	
+	 Grupos: [
+            {
+                layout: 'column',
+                border: false,
+                defaults: {
+                   border: false
+                },            
+                items: [{
+					        bodyStyle: 'padding-right:5px;',
+					        items: [{
+					            xtype: 'fieldset',
+					            title: 'Datos principales',
+					            autoHeight: true,
+					            columns: 1,
+					            items: [],
+						        id_grupo:0
+					        }]
+					    }, {
+					        bodyStyle: 'padding-left:5px;',
+					        items: [{
+					            xtype: 'fieldset',
+					            columns: 2,
+					            //layout: 'hbox',
+					            title: 'Tipo  Comprobante',
+					            autoHeight: true,
+					            items: [],
+						        id_grupo:1
+					        }]
+					    }, {
+					        bodyStyle: 'padding-left:5px;',
+					        items: [{
+					            xtype: 'fieldset',
+					            columns: 2,
+					            //layout: 'hbox',
+					            title: 'Tipo de Cambio',
+					            autoHeight: true,
+					            items: [],
+						        id_grupo:2
+					        }]
+					    }]
+            }
+        ],
 	tam_pag:50,	
 	title:'Comprobante',
 	ActSave:'../../sis_contabilidad/control/IntComprobante/insertarIntComprobante',
@@ -719,7 +611,10 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_moneda', type: 'string'},
 		{name:'desc_firma1', type: 'string'},
 		{name:'desc_firma2', type: 'string'},
-		{name:'desc_firma3', type: 'string'}
+		{name:'desc_firma3', type: 'string'},
+		'momento_comprometido',
+        'momento_ejecutado',
+        'momento_pagado','manual'
 	],
 	sortInfo:{
 		field: 'fecha',
@@ -727,86 +622,46 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:true,
-	Grupos: [
-            {
-                //layout: 'hbox',
-                border: false,
-                defaults: {
-                   border: false
-                },            
-                items: [
-                	{
-						bodyStyle: 'padding-right:5px;',
-					    items: [{
-					    	xtype: 'fieldset',
-					        title: 'Datos principales',
-					        autoHeight: true,
-					        //layout:'hbox',
-					        items: [{
-					        	xtype: 'compositefield',
-							    fieldLabel: 'Nro.Trámite',
-							    msgTarget : 'side',
-							    // anchor    : '-20',
-							    Defaults: {
-							    	flex: 1
-							    },
-							    items:[ ],
-							    id_grupo:4
-						      },
-						      {
-					        	xtype: 'compositefield',
-							    fieldLabel: 'Fecha',
-							    msgTarget : 'side',
-							    // anchor    : '-20',
-							    Defaults: {
-							    	flex: 1
-							    },
-							    items:[ ],
-							    id_grupo:5
-						      },
-						      {
-						    	xtype: 'fieldset',
-						        title: 'Momentos Presupuestarios',
-						        autoHeight: true,
-						        //layout:'hbox',
-						        items: [{
-						        	xtype: 'compositefield',
-								    fieldLabel: 'Acción',
-								    msgTarget : 'side',
-								    // anchor    : '-20',
-								    Defaults: {
-								    	flex: 1
-								    },
-								    items:[ ],
-								    id_grupo:6
-							      }]
-						       },
-						       {
-					        	xtype: 'compositefield',
-							    fieldLabel: 'Moneda',
-							    //msgTarget : 'side',
-							    // anchor    : '-20',
-							    Defaults: {
-							    	flex: 1
-							    },
-							    items:[ ],
-							    id_grupo:7
-						      },
-						      ],
-						      id_grupo:0//fin grupo primario
-					        },
-					        {
-						    	xtype: 'fieldset',
-						        title: 'Firmas Comprobante',
-						        autoHeight: true,
-						        //layout:'hbox',
-						        items: [],
-							    id_grupo:8
-						       }]
-					    }
-					]
-            }
-        ],
+	cmbDepto: new Ext.form.AwesomeCombo({
+                name: 'id_depto',
+                fieldLabel: 'Depto',
+                typeAhead: false,
+                forceSelection: true,
+                allowBlank: false,
+                disableSearchButton: false,
+                emptyText: 'Depto Contable',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_parametros/control/Depto/listarDeptoFiltradoDeptoUsuario',
+                    id: 'id_depto',
+					root: 'datos',
+					sortInfo:{
+						field: 'deppto.nombre',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_depto','nombre','codigo'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams:{par_filtro:'deppto.nombre#deppto.codigo',estado:'activo'}
+                }),
+                valueField: 'id_depto',
+   				displayField: 'nombre',
+   				//tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p></div></tpl>',
+   				hiddenName: 'id_depto',
+                enableMultiSelect:true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 20,
+                queryDelay: 200,
+                anchor: '80%',
+                listWidth:'280',
+                resizable:true,
+                minChars: 2,
+              // tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{nombre}</b></p>Codigo: <strong>{codigo}</strong> </div></tpl>'
+            }),
+            
+            
     south:{
 	  url:'../../../sis_contabilidad/vista/int_transaccion/IntTransaccion.php',
 	  title:'Transacciones', 
@@ -875,6 +730,50 @@ Phx.vista.IntComprobante=Ext.extend(Phx.gridInterfaz,{
 				scope:this
 			});
 		}
+		
+	},
+	
+	habilitaMomentos: function(combo, record, index){
+		//si es solo contable coloco en falo los momentos y los deshabilita
+		if(record.data.tipo_comprobante == 'contable'){
+			
+			this.Cmp.momento_ejecutado.setValue(false);
+			this.Cmp.momento_pagado.setValue(false);
+			
+			this.Cmp.momento_ejecutado.disable();
+			this.Cmp.momento_pagado.disable();
+			
+		}
+		else{
+			
+			//ejecutado
+			if(record.data.momento_ejecutado == 'opcional'){
+				this.Cmp.momento_ejecutado.enable();
+			}
+			if(record.data.momento_ejecutado == 'obligatorio'){
+				this.Cmp.momento_ejecutado.setValue(true);
+				this.Cmp.momento_ejecutado.disable();
+			}
+			if(record.data.momento_ejecutado == 'no_permitido'){
+				this.Cmp.momento_ejecutado.setValue(false);
+				this.Cmp.momento_ejecutado.disable();
+			}
+			//pagado
+			if(record.data.momento_pagado == 'opcional'){
+				this.Cmp.momento_pagado.enable();
+			}
+			if(record.data.momento_pagado == 'obligatorio'){
+				this.Cmp.momento_pagado.setValue(true);
+				this.Cmp.momento_pagado.disable();
+			}
+			if(record.data.momento_pagado == 'no_permitido'){
+				this.Cmp.momento_pagado.setValue(false);
+				this.Cmp.momento_pagado.disable();
+			}
+			
+		}
+		
+		//si es presupeustario acomoda los valores por defecto a los momentos
 		
 	},
 	imprimirCbte: function(){

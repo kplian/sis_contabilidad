@@ -32,6 +32,12 @@ class MODClaseComprobante extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('desc_doc','text');
+		$this->captura('momento_comprometido','varchar');
+		$this->captura('momento_ejecutado','varchar');
+		$this->captura('momento_pagado','varchar');
+		$this->captura('codigo','varchar');
+		
+		
 		
 		
 		//Ejecuta la instruccion
@@ -53,6 +59,10 @@ class MODClaseComprobante extends MODbase{
 		$this->setParametro('tipo_comprobante','tipo_comprobante','varchar');
 		$this->setParametro('descripcion','descripcion','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
+		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('momento_comprometido','momento_comprometido','varchar');
+		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
+		$this->setParametro('momento_pagado','momento_pagado','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -74,6 +84,10 @@ class MODClaseComprobante extends MODbase{
 		$this->setParametro('tipo_comprobante','tipo_comprobante','varchar');
 		$this->setParametro('descripcion','descripcion','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
+		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('momento_comprometido','momento_comprometido','varchar');
+		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
+		$this->setParametro('momento_pagado','momento_pagado','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

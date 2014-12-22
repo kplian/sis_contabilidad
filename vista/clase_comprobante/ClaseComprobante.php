@@ -32,22 +32,47 @@ Phx.vista.ClaseComprobante=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
-		
 		{
 			config:{
 				name: 'tipo_comprobante',
 				fieldLabel: 'Tipo',
+				qtip: 'Si el comprobante es presupuestario es encesario especificar los momentos que utiliza',
+				allowBlank: false,
+				anchor: '40%',
+				gwidth: 100,
+				typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio',       		    
+       		    store:['contable','presupuestario']
+			},
+			type:'ComboBox',
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'ccom.tipo_comprobante',
+	       				 options: ['contable','presupuestario'],	
+	       		 	},
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'codigo',
+				fieldLabel: 'Código',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 200,
-				maxLength:300
+				gwidth: 100,
+				maxLength:10
 			},
 			type:'TextField',
-			filters:{pfiltro:'ccom.tipo_comprobante',type:'string'},
+			filters:{pfiltro:'ccom.codigo',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
+		
 		{
 			config:{
 				name: 'descripcion',
@@ -68,6 +93,7 @@ Phx.vista.ClaseComprobante=Ext.extend(Phx.gridInterfaz,{
                 name:'id_documento',
                 fieldLabel:'Documento',
                 allowBlank:false,
+                qtip: 'Tipo de documento que se utiliza para numerar el comprobante',
                 emptyText:'Documento...',
                 store: new Ext.data.JsonStore({
                     url: '../../sis_parametros/control/Documento/listarDocumento',
@@ -111,6 +137,84 @@ Phx.vista.ClaseComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
        },
+		{
+			config:{
+				name: 'momento_comprometido',
+				fieldLabel: 'Comprometido?',
+				allowBlank: false,
+				anchor: '40%',
+				gwidth: 100,
+				typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio',       		    
+       		   // displayField: 'descestilo',
+       		    store:['opcional','obligatorio','no_permitido']
+			},
+			type:'ComboBox',
+			//filters:{pfiltro:'promac.inicio',type:'string'},
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'ccom.momento_comprometido',
+	       				 options: ['opcional','obligatorio','no_permitido'],	
+	       		 	},
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'momento_ejecutado',
+				fieldLabel: 'Ejecutado?',
+				allowBlank: false,
+				anchor: '40%',
+				gwidth: 100,
+				typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio',       		    
+       		   // displayField: 'descestilo',
+       		    store:['opcional','obligatorio','no_permitido']
+			},
+			type:'ComboBox',
+			//filters:{pfiltro:'promac.inicio',type:'string'},
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'ccom.momento_ejecutado',
+	       				 options: ['opcional','obligatorio','no_permitido'],	
+	       		 	},
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'momento_pagado',
+				fieldLabel: 'Pagado?',
+				allowBlank: false,
+				anchor: '40%',
+				gwidth: 100,
+				typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio',       		    
+       		   // displayField: 'descestilo',
+       		    store:['opcional','obligatorio','no_permitido']
+			},
+			type:'ComboBox',
+			//filters:{pfiltro:'promac.inicio',type:'string'},
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'ccom.momento_pagado',
+	       				 options: ['opcional','obligatorio','no_permitido'],	
+	       		 	},
+			grid:true,
+			form:true
+		},
 		{
 			config:{
 				name: 'estado_reg',
@@ -206,7 +310,10 @@ Phx.vista.ClaseComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_doc'
+		{name:'usr_mod', type: 'string'},'desc_doc',
+		'momento_comprometido',
+		'momento_ejecutado',
+		'momento_pagado','codigo'
 		
 	],
 	sortInfo:{

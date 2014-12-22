@@ -641,3 +641,297 @@ select pxp.f_insert_trol ('Rol para relaciones contables', 'CONTA - Relaciones c
 select pxp.f_insert_trol ('Rol pra edicion modiificacion o configuracion de plantilla de docuemntos contables ', 'CONTA - Plantilla de Documentos', 'CONTA');
 
 /***********************************F-DAT-JRR-CONTA-0-24/04/2014*****************************************/
+
+
+
+
+/***********************************I-DAT-RAC-CONTA-0-17/04/2014*****************************************/
+
+
+
+----------------------------------
+--COPY LINES TO data.sql FILE  
+---------------------------------
+
+select pxp.f_insert_tgui ('Plan de Cuentas', 'Cuentas', 'CTA', 'si', 0, 'sis_contabilidad/vista/cuenta/Cuenta.php', 2, '', 'Cuenta', 'CONTA');
+select pxp.f_insert_tgui ('Auxiliares de Cuentas', 'Auxiliares de cuenta', 'AUXCTA', 'si', 0, 'sis_contabilidad/vista/auxiliar/Auxiliar.php', 2, '', 'Auxiliar', 'CONTA');
+select pxp.f_insert_tgui ('Ordenes de Trabajo', 'ordenes de trabajo', 'ODT', 'si', 0, 'sis_contabilidad/vista/orden_trabajo/OrdenTrabajo.php', 2, '', 'OrdenTrabajo', 'CONTA');
+select pxp.f_insert_tgui ('Config Tipo Cuenta', 'Configuracion de numero para los tipos de cuenta', 'CTIP', 'si', 0, 'sis_contabilidad/vista/config_tipo_cuenta/ConfigTipoCuenta.php', 2, '', 'ConfigTipoCuenta', 'CONTA');
+select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'CCBT', 'si', 0, 'sis_contabilidad/vista/clase_comprobante/ClaseComprobante.php', 2, '', 'ClaseComprobante', 'CONTA');
+select pxp.f_insert_tgui ('Plantilla Comprobante', 'comprobante', 'CMPB', 'si', 0, 'sis_contabilidad/vista/plantilla_comprobante/PlantillaComprobante.php', 2, '', 'PlantillaComprobante', 'CONTA');
+select pxp.f_insert_tgui ('Plantilla de Documentos', 'Plantilla de Documentos', 'PLADOC', 'si', 0, 'sis_contabilidad/vista/plantilla/Plantilla.php', 2, '', 'PlantillaConta', 'CONTA');
+select pxp.f_insert_tgui ('Gestión de Períodos', 'Gestión de Períodos', 'CONPER', 'si', 0, 'sis_contabilidad/vista/periodo_subsistema/PeriodoConta.php', 2, '', 'PeriodoConta', 'CONTA');
+select pxp.f_insert_tgui ('Replicación Relaciones Contables', 'Replicación Relaciones Contables', 'RERELCON', 'si', 0, 'sis_contabilidad/vista/gestion/GestionConta.php', 2, '', 'GestionConta', 'CONTA');
+select pxp.f_insert_tgui ('Grupos de OTs', 'Grupos de ordenes de trabajo', 'GRUOT', 'si', 0, 'sis_contabilidad/vista/grupo_ot/GrupoOt.php', 2, '', 'GrupoOt', 'CONTA');
+select pxp.f_insert_tgui ('Catálogo', 'Catálogo', 'DEPTCON.2.2', 'no', 0, 'sis_parametros/vista/catalogo/Catalogo.php', 5, '', 'Catalogo', 'CONTA');
+select pxp.f_insert_tgui ('Estados', 'Estados', 'GRUOT.1', 'no', 0, 'sis_contabilidad/vista/grupo_ot_det/GrupoOtDet.php', 3, '', '60%', 'CONTA');
+select pxp.f_insert_tgui ('Tipo Obligacion (Planillas)', 'Tipo Obligacion (Planillas)', 'TIPOBLICUE', 'si', 99, 'sis_contabilidad/vista/tipo_obligacion_cuenta/TipoObligacionCuenta.php', 3, '', 'TipoObligacionCuenta', 'CONTA');
+select pxp.f_insert_tgui ('AFP (Planillas)', 'AFP (Planillas)', 'CUEAFP', 'si', 100, 'sis_contabilidad/vista/afp_cuenta/AfpCuenta.php', 3, '', 'AfpCuenta', 'CONTA');
+select pxp.f_insert_tgui ('Ordenes de trabajo', 'Ordenes de trabajo', 'CROT', 'si', 1, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Nomenclatura', 'Nomenclatura', 'NOMEN', 'si', 1, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Configuraciones', 'Configuraciones', 'CONF', 'si', 1, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Tipo de relaicon comprobantes', 'Tipo de relaicon comprobantes', 'TRECOM', 'si', 4, 'sis_contabilidad/vista/tipo_relacion_comprobante/TipoRelacionComprobante.php', 3, '', 'TipoRelacionComprobante', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.ft_grupo_ot_sel', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.ft_grupo_ot_ime', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.f_mig_presupuestos', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.f_verificar_presupuesto_cbte', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.ft_grupo_ot_det_sel', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tfuncion ('conta.ft_grupo_ot_det_ime', 'Funcion para tabla     ', 'CONTA');
+select pxp.f_insert_tprocedimiento ('CONTA_GOT_SEL', 'Consulta de datos', 'si', '', '', 'conta.ft_grupo_ot_sel');
+select pxp.f_insert_tprocedimiento ('CONTA_GOT_CONT', 'Conteo de registros', 'si', '', '', 'conta.ft_grupo_ot_sel');
+select pxp.f_insert_tprocedimiento ('CONTA_GOT_INS', 'Insercion de registros', 'si', '', '', 'conta.ft_grupo_ot_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_GOT_MOD', 'Modificacion de registros', 'si', '', '', 'conta.ft_grupo_ot_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_GOT_ELI', 'Eliminacion de registros', 'si', '', '', 'conta.ft_grupo_ot_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_GOTD_SEL', 'Consulta de datos', 'si', '', '', 'conta.ft_grupo_ot_det_sel');
+select pxp.f_insert_tprocedimiento ('CONTA_GOTD_CONT', 'Conteo de registros', 'si', '', '', 'conta.ft_grupo_ot_det_sel');
+select pxp.f_insert_tprocedimiento ('CONTA_GOTD_INS', 'Insercion de registros', 'si', '', '', 'conta.ft_grupo_ot_det_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_GOTD_MOD', 'Modificacion de registros', 'si', '', '', 'conta.ft_grupo_ot_det_ime');
+select pxp.f_insert_tprocedimiento ('CONTA_GOTD_ELI', 'Eliminacion de registros', 'si', '', '', 'conta.ft_grupo_ot_det_ime');
+select pxp.f_delete_trol ('Relación Contable Concepto Gasto');
+select pxp.f_delete_trol ('CONTA-Rleacion contable concepto gatos');
+----------------------------------
+--COPY LINES TO dependencies.sql FILE  
+---------------------------------
+
+select pxp.f_delete_testructura_gui ('CTA', 'CONTA');
+select pxp.f_delete_testructura_gui ('AUXCTA', 'CONTA');
+select pxp.f_delete_testructura_gui ('ODT', 'CONTA');
+select pxp.f_delete_testructura_gui ('CTIP', 'CONTA');
+select pxp.f_delete_testructura_gui ('CCBT', 'CONTA');
+select pxp.f_delete_testructura_gui ('CMPB', 'CONTA');
+select pxp.f_delete_testructura_gui ('PLADOC', 'DEFRECONCAR');
+select pxp.f_delete_testructura_gui ('CONPER', 'CONTA');
+select pxp.f_delete_testructura_gui ('RERELCON', 'CONTA');
+select pxp.f_delete_testructura_gui ('GRUOT', 'CONTA');
+select pxp.f_insert_testructura_gui ('DEPTCON.2.2', 'DEPTCON.2');
+select pxp.f_insert_testructura_gui ('GRUOT.1', 'GRUOT');
+select pxp.f_insert_testructura_gui ('TIPOBLICUE', 'RELACON');
+select pxp.f_insert_testructura_gui ('CUEAFP', 'RELACON');
+select pxp.f_delete_testructura_gui ('GRUOT', 'DEFRECONCAR');
+select pxp.f_delete_testructura_gui ('CCBT', 'DEFRECONCAR');
+select pxp.f_delete_testructura_gui ('CTA', 'DEFRECONCAR');
+select pxp.f_delete_testructura_gui ('CTIP', 'DEFRECONCAR');
+select pxp.f_delete_testructura_gui ('ODT', 'DEFRECONCAR');
+select pxp.f_insert_testructura_gui ('CROT', 'CONTA');
+select pxp.f_insert_testructura_gui ('ODT', 'CROT');
+select pxp.f_insert_testructura_gui ('GRUOT', 'CROT');
+select pxp.f_insert_testructura_gui ('NOMEN', 'CONTA');
+select pxp.f_insert_testructura_gui ('AUXCTA', 'NOMEN');
+select pxp.f_insert_testructura_gui ('CTA', 'NOMEN');
+select pxp.f_insert_testructura_gui ('CTIP', 'NOMEN');
+select pxp.f_delete_testructura_gui ('CMPB', 'NOMEN');
+select pxp.f_delete_testructura_gui ('CONPER', 'NOMEN');
+select pxp.f_insert_testructura_gui ('CONF', 'CONTA');
+select pxp.f_insert_testructura_gui ('CMPB', 'CONF');
+select pxp.f_insert_testructura_gui ('CONPER', 'CONF');
+select pxp.f_insert_testructura_gui ('RERELCON', 'CONF');
+select pxp.f_insert_testructura_gui ('PLADOC', 'CONF');
+select pxp.f_insert_testructura_gui ('CCBT', 'CONF');
+select pxp.f_insert_testructura_gui ('TRECOM', 'CONF');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOT_SEL', 'CONGASCUE', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'CONGASCUE', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CATCMB_SEL', 'DEPTCON.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_SUBSIS_SEL', 'DEPTCON.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PACATI_SEL', 'DEPTCON.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CAT_INS', 'DEPTCON.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CAT_MOD', 'DEPTCON.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CAT_ELI', 'DEPTCON.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CAT_SEL', 'DEPTCON.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CATCMB_SEL', 'DEPTCON.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_SINCEPUO_IME', 'DEPTCON.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'ALMCUE.6.2.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOT_INS', 'GRUOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOT_MOD', 'GRUOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOT_ELI', 'GRUOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOT_SEL', 'GRUOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOTD_INS', 'GRUOT.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOTD_MOD', 'GRUOT.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOTD_ELI', 'GRUOT.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('CONTA_GOTD_SEL', 'GRUOT.1', 'no');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_INS', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_MOD', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_ELI', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIGPP_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CATCMB_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'SEG_SUBSIS_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_PACATI_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_INS', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_MOD', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_ELI', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CATCMB_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_TIPRELCO_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_INS', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_MOD', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_ELI', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_GES_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CEC_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CECCOM_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CECCOMFU_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CCFILDEP_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_INS', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_MOD', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_ELI', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIGPP_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CATCMB_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'SEG_SUBSIS_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_PACATI_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_INS', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_MOD', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_ELI', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CATCMB_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_TIPRELCO_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_INS', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_MOD', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_ELI', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_GES_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CEC_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CECCOM_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CECCOMFU_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CCFILDEP_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion Proveedor - Cuenta Contable', 'CONTA_RELCON_INS', 'RELCONGEN.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion Proveedor - Cuenta Contable', 'CONTA_RELCON_MOD', 'RELCONGEN.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion Proveedor - Cuenta Contable', 'CONTA_RELCON_ELI', 'RELCONGEN.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion Proveedor - Cuenta Contable', 'CONTA_RELCON_SEL', 'RELCONGEN.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion Proveedor - Cuenta Contable', 'PM_GES_SEL', 'RELCONGEN.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_MONEDA_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_INS', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_MOD', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_ELI', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_TIPRELCO_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_INS', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_MOD', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_ELI', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_GES_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CEC_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CECCOM_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CECCOMFU_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CCFILDEP_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_SEL', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_INS', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_MOD', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_ELI', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSONMIN_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_INS', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_MOD', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_ELI', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSONMIN_SEL', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_ELI', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_MOD', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_INS', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_UPFOTOPER_MOD', 'RELCCCB.3.1.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_MONEDA_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_INS', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_MOD', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_ELI', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_TIPRELCO_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_INS', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_MOD', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_ELI', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_GES_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CEC_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CECCOM_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CECCOMFU_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CCFILDEP_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_SEL', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_INS', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_MOD', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_ELI', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSONMIN_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_INS', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_MOD', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_ELI', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSONMIN_SEL', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_ELI', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_MOD', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_INS', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_UPFOTOPER_MOD', 'RELCCCB.3.1.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_INS', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_MOD', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_ELI', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIG_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CONIGPP_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CATCMB_SEL', 'CONGASCUE');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'SEG_SUBSIS_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_PACATI_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_INS', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_MOD', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_ELI', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CAT_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CATCMB_SEL', 'CONGASCUE.2');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_TIPRELCO_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_INS', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_MOD', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_ELI', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'CONTA_RELCON_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_GES_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CEC_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CECCOM_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CECCOMFU_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('Relación Contable Concepto Gasto', 'PM_CCFILDEP_SEL', 'CONGASCUE.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_MONEDA_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_INS', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_MOD', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_ELI', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CTABAN_SEL', 'RELCCCB');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_TIPRELCO_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_INS', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_MOD', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_ELI', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'CONTA_RELCON_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_GES_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CEC_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CECCOM_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CECCOMFU_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_CCFILDEP_SEL', 'RELCCCB.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_SEL', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_INS', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_MOD', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'TES_CHQ_ELI', 'RELCCCB.2');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSONMIN_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_INS', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_MOD', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_ELI', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'PM_INSTIT_SEL', 'RELCCCB.3');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSONMIN_SEL', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_ELI', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_MOD', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_PERSON_INS', 'RELCCCB.3.1');
+select pxp.f_delete_trol_procedimiento_gui ('CONTA - Relacion cuenta Bancaria', 'SEG_UPFOTOPER_MOD', 'RELCCCB.3.1.1');
+
+
+/* Data for the 'conta.ttipo_relacion_comprobante' table  (Records 1 - 4) */
+
+INSERT INTO conta.ttipo_relacion_comprobante ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "codigo", "nombre")
+VALUES (1, NULL, E'2014-12-17 16:13:43.521', NULL, E'activo', NULL, NULL, E'AJUSTE', E'Ajuste del comprobante');
+
+INSERT INTO conta.ttipo_relacion_comprobante ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "codigo", "nombre")
+VALUES (1, NULL, E'2014-12-17 16:14:06.581', NULL, E'activo', NULL, NULL, E'PAGODEV', E'Pago del devengado');
+
+INSERT INTO conta.ttipo_relacion_comprobante ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "codigo", "nombre")
+VALUES (1, NULL, E'2014-12-17 16:14:25.580', NULL, E'activo', NULL, NULL, E'REVERSION', E'Reversion del comprobante');
+
+INSERT INTO conta.ttipo_relacion_comprobante ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "codigo", "nombre")
+VALUES (1, NULL, E'2014-12-17 16:15:09.388', NULL, E'activo', NULL, NULL, E'APLICACIONANT', E'Aplicación del anticipo');
+
+
+
+/***********************************F-DAT-RAC-CONTA-0-17/04/2014*****************************************/
+

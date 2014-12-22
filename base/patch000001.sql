@@ -1072,3 +1072,81 @@ WITH (oids = true);
   
 /***********************************F-SCP-RAC-CONTA-0-11/12/2014****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-0-15/12/2014****************************************/
+--------------- SQL ---------------
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN momento_comprometido VARCHAR(30) DEFAULT 'opcional' NOT NULL;
+
+COMMENT ON COLUMN conta.tclase_comprobante.momento_comprometido
+IS 'define si para este comprobante el comprometido es opcional, obligatorio o no_permitido';
+
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN momento_ejecutado VARCHAR(30) DEFAULT 'opcional' NOT NULL;
+
+COMMENT ON COLUMN conta.tclase_comprobante.momento_ejecutado
+IS 'define si para este comprobante el comprometido es opcional, obligatorio o no_permitido';
+
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN momento_pagado VARCHAR(30) DEFAULT 'opcional' NOT NULL;
+
+COMMENT ON COLUMN conta.tclase_comprobante.momento_pagado
+IS 'define si para este comprobante el comprometido es opcional, obligatorio o no_permitido';
+
+--------------- SQL ---------------
+
+COMMENT ON COLUMN conta.tclase_comprobante.tipo_comprobante
+IS 'contable o presupuestario,  se refleja en el campo momento de la tabla int_comprobante';
+
+ALTER TABLE conta.tclase_comprobante
+  ALTER COLUMN tipo_comprobante SET DEFAULT 'contable';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN manual VARCHAR(5) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.manual
+IS 'si o no, es un comprobante manual o generado por otros sistemas, los comprobantes generados tienen edicion limitada ..';
+
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-15/12/2014****************************************/
+
+/***********************************I-SCP-RAC-CONTA-0-17/12/2014****************************************/
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.ttipo_relacion_comprobante (
+  id_tipo_relacion_comprobante SERIAL,
+  codigo VARCHAR(100) NOT NULL,
+  nombre VARCHAR(200) NOT NULL,
+  PRIMARY KEY(id_tipo_relacion_comprobante)
+) INHERITS (pxp.tbase)
+;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_int_comprobante_fks INTEGER[];
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_tipo_relacion_comprobante INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_tipo_relacion_comprobante
+IS 'define el tipo de relacion en tre so comprobantes que sen encuentran en el array id_int_comprobante_fks';
+
+
+/***********************************F-SCP-RAC-CONTA-0-17/12/2014****************************************/
+
+
+
+

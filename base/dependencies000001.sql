@@ -1927,3 +1927,18 @@ CREATE TRIGGER f_trig_insert_trans_val
   
   
 /***********************************F-DEP-RAC-CONTA-0-11/12/2014*****************************************/
+
+/***********************************I-DEP-RAC-CONTA-0-17/12/2014*****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  DROP CONSTRAINT fk_tcomprobante__id_int_comprobante_fk RESTRICT;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  DROP COLUMN id_int_comprobante_fk;
+  
+/***********************************F-DEP-RAC-CONTA-0-17/12/2014*****************************************/
+

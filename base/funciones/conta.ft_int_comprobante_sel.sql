@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -76,7 +78,12 @@ BEGIN
 						mon.codigo || '' - '' || mon.moneda as desc_moneda,
 						fir1.desc_funcionario2 as desc_firma1,
 						fir2.desc_funcionario2 as desc_firma2,
-						fir3.desc_funcionario2 as desc_firma3
+						fir3.desc_funcionario2 as desc_firma3,
+                        pxp.f_iif(incbte.momento_comprometido=''si'',''true'',''false'')::varchar as momento_comprometido,
+                        pxp.f_iif(incbte.momento_ejecutado=''si'',''true'',''false'')::varchar as momento_ejecutado,
+                        pxp.f_iif(incbte.momento_pagado=''si'',''true'',''false'')::varchar as momento_pagado,
+                        manual
+                        
 						from conta.tint_comprobante incbte
 						inner join segu.tusuario usu1 on usu1.id_usuario = incbte.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = incbte.id_usuario_mod
