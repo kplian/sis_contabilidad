@@ -1,386 +1,197 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
-  p_id_tabla_valor integer,
-  p_codigo varchar,
-  p_id_usuario integer = NULL::integer,
-  p_id_usuario_ai integer = NULL::integer,
-  p_usuario_ai varchar = NULL::character varying
+CREATE OR REPLACE FUNCTION conta.f_insert_int_trans_val (
 )
-RETURNS integer AS
+RETURNS trigger AS
 $body$
-/*
-Autor inicial GAYME RIMERA ROJAS (No sabe porner comentarios)
-Fecha 28/06/2013
-Descripcion: nose por que el gayme no puso comentarios
+/**************************************************************************
+ SISTEMA ENDESIS - SISTEMA DE SEGURIDAD (SSS)
+***************************************************************************
+ SCRIPT: 		trisg_usuario
+ DESCRIPCIÓN: 	Segun la int_trasaccion del comprobante inserta o modfica los valores de int_trans_Val
+ AUTOR: 		KPLIAN(rac)
+ FECHA:			11-12-2014
+ COMENTARIOS:	
+**************************************************************************/
+--------------------------
+-- CUERPO DE LA FUNCIÓN --
+--------------------------
 
-
-Autor:  Rensi Arteaga Copari
-Fecha 21/08/2013
-Descripcion:   Esta funciona inicia la generacion de comprobantes contables,  
-               apartir de una plantilla predefinida
-
-
-
-
-
-*/
+--**** DECLARACION DE VARIABLES DE LA FUNCIÓN (LOCALES) ****---
 
 
 DECLARE
-	v_this					conta.maestro_comprobante;
-    v_tabla					record;
-    v_nombre_funcion        text;
-    v_plantilla				record;        
-    v_resp 					varchar;
-    v_consulta				varchar;
-    v_posicion				integer;
-    v_columnas				varchar;
-    v_columna_requerida		varchar;
-    r 						record;  --  esta variable no se usa
-    v_valor					varchar;
+   v_registros_con 	 record;
+   v_registros		 record;
+   v_id_moneda_base  integer;
+   v_importe_debe    numeric;
+   v_importe_haber	 numeric;
+   v_importe_recurso numeric;
+   v_importe_gasto	 numeric;
+   v_resp        varchar;
+   v_nombre_funcion varchar;
     
-    v_id_int_comprobante    integer;
-    resp_det varchar;
-    
-    
-    ------------
-    
-    v_def_campos      		varchar[];
-    v_campo_tempo     		varchar;
-    v_i 					integer;
-    v_tamano 				integer;
-    v_rec_periodo record;
-    v_id_subsistema 		integer;
-    v_id_clase_comprobante 	integer;
-    v_sincronizar 			varchar;
-    v_resp_int_endesis 		varchar;
-    v_tipo_cambio			numeric;
-  
 BEGIN
 
-    v_nombre_funcion:='conta.f_gen_comprobante';
-    
-    --recupero el record de la plantilla con el codigo (parametro) dado
-    
-    select * into v_plantilla
-	from conta.tplantilla_comprobante cbte
-	where cbte.codigo=p_codigo;
-    
-    
-    v_def_campos = ARRAY['campo_depto',
-    					'campo_acreedor',
-                        'campo_descripcion',
-                        'campo_gestion_relacion',
-                        'campo_fk_comprobante',
-                        'campo_moneda',
-                        'campo_fecha','otros_campos',
-                        'campo_id_cuenta_bancaria',
-                        'campo_id_cuenta_bancaria_mov',
-                        'campo_nro_cheque',
-                        'campo_nro_tramite',
-                        'campo_nro_cuenta_bancaria_trans'];
-    
-    v_tamano:=array_upper(v_def_campos,1);
-    
-   
-	--obtener la columnas que se consultaran  para la tabla  ( los nombre de variables con prefijo $tabla)
-    
-    --v_columnas=conta.f_obtener_columnas(p_codigo)::varchar;
-    
-    v_columnas=conta.f_obtener_columnas_detalle(hstore(v_plantilla),v_def_campos)::varchar;
-	v_columnas=replace(v_columnas,'{','');
-	v_columnas=replace(v_columnas,'}','');
-    v_consulta = 'select '||v_columnas ||
-            ' from '||v_plantilla.tabla_origen|| ' where '
-            ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'';
+      --*** EJECUCIÓN DEL PROCEDIMIENTO ESPECÍFICO
       
-    execute	'select '||v_columnas ||
-            ' from '||v_plantilla.tabla_origen|| ' where '
-            ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'' into v_tabla;
-            
-            
-          
-    
-    
-    ----------------------------------------------------------
-    --  OBTIENE LOS VALORES,  THIS   (tipo de dato agrupador)     
-    ----------------------------------------------------------
-    
-	--  guardo subsistema  
-    
-    
-    if ( v_plantilla.campo_subsistema != ''  AND  v_plantilla.campo_subsistema is not null ) then
-    	
-        v_this.columna_subsistema = conta.f_get_columna('maestro', 
-                                                                  v_plantilla.campo_subsistema::text, 
-                                                                  hstore(v_this), 
-                                                                  hstore(v_tabla));
-	end if;    
-    
-    --guardo depto
-    
-    
-    
-  
-    
-   
-    if (v_plantilla.campo_depto!='' AND v_plantilla.campo_depto is not null) then
-    	
-        v_this.columna_depto = conta.f_get_columna(	'maestro', 
-        										v_plantilla.campo_depto::text, 
-                                                hstore(v_this), 
-                                                hstore(v_tabla));
-	end if;
-    
-    --guardo acreedor
-    if (v_plantilla.campo_acreedor!='' AND v_plantilla.campo_acreedor is not null) then
-    	v_this.columna_acreedor = conta.f_get_columna(	'maestro', 
-        										v_plantilla.campo_acreedor::text, 
-                                                hstore(v_this), 
-                                                hstore(v_tabla));           
-	end if;
-    
-    --guardo descripcion--
-    if (v_plantilla.campo_descripcion!='' AND v_plantilla.campo_descripcion is not null) then
-    	v_this.columna_descripcion = conta.f_get_columna(	'maestro', 
-        										v_plantilla.campo_descripcion::text, 
-                                                hstore(v_this), 
-                                                hstore(v_tabla)); 
       
-	end if;    
+          select 
+            c.fecha,
+            c.tipo_cambio,
+            c.id_moneda
+          into
+           v_registros_con
+          from conta.tint_comprobante  c
+          where c.id_int_comprobante = NEW.id_int_comprobante;
+                  
+         -- Obtener la moneda base
+         v_id_moneda_base=param.f_get_moneda_base();
+      
+         IF TG_OP = 'INSERT' THEN
 
-    --guardo moneda--
-    if (v_plantilla.campo_moneda!='' AND v_plantilla.campo_moneda is not null) then
-    	v_this.columna_moneda = conta.f_get_columna(	'maestro', 
-        										v_plantilla.campo_moneda::text, 
-                                                hstore(v_this), 
-                                                hstore(v_tabla))::integer; 
-	end if;    
-    
-    --guardo fecha
-    if (v_plantilla.campo_fecha!='' AND v_plantilla.campo_fecha is not null) then
-    	v_this.columna_fecha = conta.f_get_columna(	'maestro', 
-        										v_plantilla.campo_fecha::text, 
-                                                hstore(v_this), 
-                                                hstore(v_tabla));   
-	end if; 
-    
-    
-      --guardo fecha
-    if (v_plantilla.campo_gestion_relacion!='' AND v_plantilla.campo_gestion_relacion is not null) then
-    	
-       /*raise notice '??????  %, %',v_plantilla.campo_gestion_relacion,
-                                                conta.f_get_columna('maestro', 
-        										v_plantilla.campo_gestion_relacion::text, 
-                                                hstore(v_this), 
-                                                hstore(v_tabla));*/
-        
-        v_this.columna_gestion = conta.f_get_columna('maestro', 
-        										v_plantilla.campo_gestion_relacion::text, 
-                                                hstore(v_this), 
-                                                hstore(v_tabla))::integer;   
-	end if;   
-    
-    --RCM: guardar id_cuenta_bancaria
-    if ( v_plantilla.campo_id_cuenta_bancaria != ''  AND  v_plantilla.campo_id_cuenta_bancaria is not null ) then
-        v_this.columna_id_cuenta_bancaria = conta.f_get_columna('maestro', 
-                                                                  v_plantilla.campo_id_cuenta_bancaria::text, 
-                                                                  hstore(v_this), 
-                                                                  hstore(v_tabla));
-	end if;    
-    
-    --RCM: guardar id_cuenta_bancaria_mov
-    if ( v_plantilla.campo_id_cuenta_bancaria_mov != ''  AND  v_plantilla.campo_id_cuenta_bancaria_mov is not null ) then
-        v_this.columna_id_cuenta_bancaria_mov = conta.f_get_columna('maestro', 
-                                                                  v_plantilla.campo_id_cuenta_bancaria_mov::text, 
-                                                                  hstore(v_this), 
-                                                                  hstore(v_tabla));
-	end if;
-    
-     --JRR: guardar campo_nro_cheque
-    if ( v_plantilla.campo_nro_cheque != ''  AND  v_plantilla.campo_nro_cheque is not null ) then
-        v_this.columna_nro_cheque = conta.f_get_columna('maestro', 
-                                                                  v_plantilla.campo_nro_cheque::text, 
-                                                                  hstore(v_this), 
-                                                                  hstore(v_tabla));
-	end if;
-    
-     --RCM: guardar campo_nro_tramite
-    if ( v_plantilla.campo_nro_tramite != ''  AND  v_plantilla.campo_nro_tramite is not null ) then
-        v_this.columna_nro_tramite = conta.f_get_columna('maestro', 
-                                                                  v_plantilla.campo_nro_tramite::text, 
-                                                                  hstore(v_this), 
-                                                                  hstore(v_tabla));
-        
-	end if;
-    
-     --RCM: guardar campo_nro_cuenta_bancaria_trans
-    if ( v_plantilla.campo_nro_cuenta_bancaria_trans != ''  AND  v_plantilla.campo_nro_cuenta_bancaria_trans is not null ) then
-        v_this.columna_nro_cuenta_bancaria_trans = conta.f_get_columna('maestro', 
-                                                                  v_plantilla.campo_nro_cuenta_bancaria_trans::text, 
-                                                                  hstore(v_this), 
-                                                                  hstore(v_tabla));
-	end if;
-    
-    
-
-    v_resp:=v_this;
-    
-    
-    
-    --obtener el periodo a partir de la fecha
-    
-      v_rec_periodo = param.f_get_periodo_gestion(v_this.columna_fecha);
-    
-    
-    --  obtener id_subsistema
-    
-         Select  id_subsistema  into   v_id_subsistema 
-         from  segu.tsubsistema sub 
-         where sub.estado_reg = 'activo' 
-            and sub.codigo =  v_this.columna_subsistema;
-            
-          IF v_id_subsistema is null THEN
-          
-               raise exception 'No existe un subsistema con el codigo %',v_this.columna_subsistema;   
-          
-          END IF;  
-    
-    --  obtener id clase comprobante
-    
-  
-    
-         Select  id_clase_comprobante  into   v_id_clase_comprobante 
-         from  conta.tclase_comprobante cl 
-         where cl.estado_reg = 'activo' 
-            and cl.codigo =  v_plantilla.clase_comprobante::varchar;
-            
-          IF v_id_clase_comprobante is null THEN
-          
-               raise exception 'No existe un comprobante de la clase codigo : %',v_plantilla.clase_comprobante;   
-          
-          END IF;
-    
-    
-    --calcular el tipo de cambio segun fecha y moneda del comprobante
-    
-    v_tipo_cambio =   param.f_get_tipo_cambio( v_this.columna_moneda::integer, v_this.columna_fecha::date, 'O');
-    
-    --  genera tabla intermedia de comrobante
-    
-   INSERT INTO 
-      conta.tint_comprobante
-    (
-      id_usuario_reg,
-    
-      fecha_reg,
-     
-      estado_reg,
-     
-      id_clase_comprobante,
-      id_int_comprobante_fk,
-      id_subsistema,
-      id_depto,
-      id_moneda,
-      id_periodo,
-      --nro_cbte,
-      momento,
-      momento_comprometido,
-      momento_ejecutado,
-      momento_pagado,
-      id_plantilla_comprobante,
-      glosa1,
-      --glosa2,
-      beneficiario,
-      tipo_cambio,
-      --id_funcionario_firma1,
-      --id_funcionario_firma2,
-      --id_funcionario_firma3,
-      fecha,
-      funcion_comprobante_validado,
-      funcion_comprobante_eliminado,
-      id_cuenta_bancaria, 
-      id_cuenta_bancaria_mov, 
-      nro_cheque, 
-      nro_cuenta_bancaria_trans,
-      nro_tramite,
-      id_usuario_ai,
-      usuario_ai
-             
-    ) 
-    VALUES (
-      p_id_usuario,
-      now(),
-     'borrador',
-      v_id_clase_comprobante, --TODO agregar a la interface de plantilla
-      NULL,
-      v_id_subsistema, --TODO agregar a la interface de plantilla,
-      v_this.columna_depto::integer,
-      v_this.columna_moneda::integer,
-      v_rec_periodo.po_id_periodo,
-      --:nro_cbte,
-      v_plantilla.momento_presupuestario, -- contable, o presupuestario
-      v_plantilla.momento_comprometido,
-      v_plantilla.momento_ejecutado,
-      v_plantilla.momento_pagado,
-      v_plantilla.id_plantilla_comprobante,
-      v_this.columna_descripcion,
-      --:glosa2,
-      v_this.columna_acreedor,
-      v_tipo_cambio,
-      --:id_funcionario_firma1,
-      --:id_funcionario_firma2,
-      --:id_funcionario_firma3,
-      v_this.columna_fecha,
-      v_plantilla.funcion_comprobante_validado,
-      v_plantilla.funcion_comprobante_eliminado,
-      v_this.columna_id_cuenta_bancaria, 
-      v_this.columna_id_cuenta_bancaria_mov, 
-      v_this.columna_nro_cheque, 
-      v_this.columna_nro_cuenta_bancaria_trans,
-      v_this.columna_nro_tramite,
-      p_id_usuario_ai,
-      p_usuario_ai
-    )RETURNING id_int_comprobante into v_id_int_comprobante;
-    
-    
-    raise notice '=====> AL INSERTAR  v_id_int_comprobante= %',  v_id_int_comprobante;
-    -- genera transacciones del comprobante
-    
-    
-  
-   resp_det =  conta.f_gen_transaccion(hstore(v_this), 
-                            hstore(v_tabla),
-                            hstore(v_plantilla),
-                            p_id_tabla_valor,
-                            v_id_int_comprobante,
-                            p_id_usuario
+           BEGIN
+               
+                 -- inserta transaccion valor para las diferente monedas habilitadas
+                  
+                  FOR  v_registros in (
+                            select 
+                              mon.id_moneda
+                            from param.tmoneda mon
+                             where mon.estado_reg = 'activo' and contabilidad = 'si'
+                             order by mon.prioridad
+                      ) LOOP
+                  
+                       
+                            IF v_registros.id_moneda = v_id_moneda_base   and v_registros_con.tipo_cambio is not  NULL THEN
+                            
+                               --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
+                               v_importe_debe  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_debe, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                               v_importe_haber = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_haber, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                               v_importe_recurso =  param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_recurso, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                               v_importe_gasto  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_gasto, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                            
+                            ELSE
+                            
+                              --si no tenemso tipo de cambio convenido .....
+                               v_importe_debe  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_debe, v_registros_con.fecha,'O',2);
+                               v_importe_haber = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_haber, v_registros_con.fecha,'O',2);
+                               v_importe_recurso =  param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_recurso, v_registros_con.fecha,'O',2);
+                               v_importe_gasto  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda,  NEW.importe_gasto, v_registros_con.fecha,'O',2);
+                           
+                            
+                            END IF;
+                      
+                             
+                      
+                          insert into conta.tint_trans_val(
+                              id_usuario_reg, 
+                              fecha_reg, 
+                              estado_reg, 
+                              id_int_transaccion,
+                              id_moneda,
+                              importe_debe, 
+                              importe_haber, 
+                              importe_recurso,
+                              importe_gasto
+                          ) 
+                          values(
+                              NEW.id_usuario_reg, 
+                              NEW.fecha_reg, 
+                              'activo', 
+                              NEW.id_int_transaccion,
+                              v_registros.id_moneda,
+                              v_importe_debe,
+                              v_importe_haber,
+                              v_importe_recurso,
+                              v_importe_gasto
                            );
-    
-    
-    -- migraciond e comprobante endesis  DBLINK
-    
-    v_sincronizar=pxp.f_get_variable_global('sincronizar');
-    
+                  
+                  END LOOP;
+
+     
+    	 END;
+     
+   ELSIF TG_OP = 'UPDATE' THEN
+
+        BEGIN
+            
+                --obtenemos los registros de trans_valor de la transacion
+                  
+                  FOR  v_registros in (
+                            select 
+                              tv.id_moneda,
+                              tv.id_int_transaccion,
+                              tv.id_int_trans_val
+                            from conta.tint_trans_val  tv 
+                            where tv.estado_reg = 'activo' and tv.id_int_transaccion = NEW.id_int_transaccion
+                      ) LOOP
+                  
+                       
+                            IF v_registros.id_moneda = v_id_moneda_base   and v_registros_con.tipo_cambio is not  NULL THEN
+                            
+                               --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
+                               v_importe_debe  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_debe, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                               v_importe_haber = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_haber, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                               v_importe_recurso =  param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_recurso, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                               v_importe_gasto  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_gasto, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                            
+                            ELSE
+                            
+                              --si no tenemso tipo de cambio convenido .....
+                               v_importe_debe  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_debe, v_registros_con.fecha,'O',2);
+                               v_importe_haber = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_haber, v_registros_con.fecha,'O',2);
+                               v_importe_recurso =  param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_recurso, v_registros_con.fecha,'O',2);
+                               v_importe_gasto  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda,  NEW.importe_gasto, v_registros_con.fecha,'O',2);
+                           
+                            
+                            END IF;
+                      
+                             
+                      
+                          update conta.tint_trans_val set
+                             
+                              estado_reg = NEW.estado_reg,
+                              fecha_mod = NEW.fecha_mod,
+                              id_usuario_mod =  NEW.id_usuario_mod,
+                              importe_debe = v_importe_debe, 
+                              importe_haber = v_importe_haber, 
+                              importe_recurso = v_importe_recurso,
+                              importe_gasto = v_importe_gasto
+                          where id_int_trans_val = v_registros.id_int_trans_val;
+                  
+                  END LOOP;
+              
+             
+             
+             -- si el nuevo estado reg cambi a inactivo,... inactivamos los registros de transaccion valor
+            
+
+
+        END;
+
+  --procedimiento de eliminación 
+
+   ELSIF TG_OP = 'DELETE' THEN
+
+        BEGIN
+
+        END;
         
-    
-    IF(v_sincronizar='true')THEN
-  	
-     	v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante);
-    
-    END IF;
+
+   END IF;
+
+   RETURN NULL;
    
-    
-    return v_id_int_comprobante;
-    
-EXCEPTION
+   EXCEPTION
+				
 WHEN OTHERS THEN
-			v_resp='';
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-			raise exception '%',v_resp;
+		v_resp='';
+		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+		raise exception '%',v_resp;
+
 END;
 $body$
 LANGUAGE 'plpgsql'

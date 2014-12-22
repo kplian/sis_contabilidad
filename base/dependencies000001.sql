@@ -1922,7 +1922,7 @@ CREATE TRIGGER f_trig_insert_int_trans_val
 
 CREATE TRIGGER f_trig_insert_trans_val
   AFTER INSERT OR UPDATE 
-  ON conta.tint_transaccion FOR EACH ROW 
+  ON conta.ttransaccion FOR EACH ROW 
   EXECUTE PROCEDURE conta.f_insert_trans_val();
   
   
