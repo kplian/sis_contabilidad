@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -10,7 +12,7 @@ $body$
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_relacion_contable_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.trelacion_contable'
- AUTOR: 		 (admin)
+ AUTOR: 		 (rac - kplian)
  FECHA:	        16-05-2013 21:52:14
  COMENTARIOS:	
 ***************************************************************************
@@ -299,7 +301,7 @@ BEGIN
 
 		begin
 			--Llamada a la función de replicación
-			v_resp_rep = conta.f_replicar_relacion_contable_cambio_gestion(v_parametros.id_gestion_ori,v_parametros.id_gestion);
+			v_resp_rep = conta.f_replicar_relacion_contable_cambio_gestion(v_parametros.id_relacion_contable, p_id_usuario);
             
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Replicacion realizada'); 
@@ -309,6 +311,8 @@ BEGIN
             return v_resp;
 
 		end;
+    
+    
          
 	else
      
