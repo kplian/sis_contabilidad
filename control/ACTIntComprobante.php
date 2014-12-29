@@ -36,6 +36,29 @@ class ACTIntComprobante extends ACTbase{
 		//echo dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php';exit;
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function listarSimpleIntComprobante(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		$this->objParam->addFiltro("inc.estado_reg = ''validado''");
+		
+		if($this->objParam->getParametro('id_deptos')!=''){
+            $this->objParam->addFiltro("inc.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
+        }
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarSimpleIntComprobante');
+		} else{
+			$this->objFunc=$this->create('MODIntComprobante');
+			
+			$this->res=$this->objFunc->listarSimpleIntComprobante($this->objParam);
+		}
+		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
 				
 	function insertarIntComprobante(){
 		$this->objFunc=$this->create('MODIntComprobante');	

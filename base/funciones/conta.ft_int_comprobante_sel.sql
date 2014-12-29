@@ -41,65 +41,65 @@ BEGIN
  	#AUTOR:		admin	
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
-
-	if(p_transaccion='CONTA_INCBTE_SEL')then
+    if(p_transaccion='CONTA_INCBTE_SEL') then
      				
     	begin
     		--Sentencia de la consulta
-			v_consulta:='select
-						incbte.id_int_comprobante,
-						incbte.id_clase_comprobante,
-						incbte.id_int_comprobante_fk,
-						incbte.id_subsistema,
-						incbte.id_depto,
-						incbte.id_moneda,
-						incbte.id_periodo,
-						incbte.id_funcionario_firma1,
-						incbte.id_funcionario_firma2,
-						incbte.id_funcionario_firma3,
-						incbte.tipo_cambio,
-						incbte.beneficiario,
-						incbte.nro_cbte,
-						incbte.estado_reg,
-						incbte.glosa1,
-						incbte.fecha,
-						incbte.glosa2,
-						incbte.nro_tramite,
-						incbte.momento,
-						incbte.id_usuario_reg,
-						incbte.fecha_reg,
-						incbte.id_usuario_mod,
-						incbte.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-						ccbte.descripcion as desc_clase_comprobante,
-						sis.nombre as desc_subsistema,
-						dpto.codigo || '' - '' || dpto.nombre as desc_depto,	
-						mon.codigo || '' - '' || mon.moneda as desc_moneda,
-						fir1.desc_funcionario2 as desc_firma1,
-						fir2.desc_funcionario2 as desc_firma2,
-						fir3.desc_funcionario2 as desc_firma3,
-                        pxp.f_iif(incbte.momento_comprometido=''si'',''true'',''false'')::varchar as momento_comprometido,
-                        pxp.f_iif(incbte.momento_ejecutado=''si'',''true'',''false'')::varchar as momento_ejecutado,
-                        pxp.f_iif(incbte.momento_pagado=''si'',''true'',''false'')::varchar as momento_pagado,
-                        manual
-                        
-						from conta.tint_comprobante incbte
-						inner join segu.tusuario usu1 on usu1.id_usuario = incbte.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = incbte.id_usuario_mod
-						inner join conta.tclase_comprobante ccbte on ccbte.id_clase_comprobante = incbte.id_clase_comprobante
-						inner join segu.tsubsistema sis on sis.id_subsistema = incbte.id_subsistema
-						inner join param.tdepto dpto on dpto.id_depto = incbte.id_depto
-						inner join param.tmoneda mon on mon.id_moneda = incbte.id_moneda
-						left join orga.vfuncionario fir1 on fir1.id_funcionario = incbte.id_funcionario_firma1
-						left join orga.vfuncionario fir2 on fir2.id_funcionario = incbte.id_funcionario_firma2
-						left join orga.vfuncionario fir3 on fir3.id_funcionario = incbte.id_funcionario_firma3
-				        where  ';
+			v_consulta := 'select
+                          incbte.id_int_comprobante,
+                          incbte.id_clase_comprobante,
+  						
+                          incbte.id_subsistema,
+                          incbte.id_depto,
+                          incbte.id_moneda,
+                          incbte.id_periodo,
+                          incbte.id_funcionario_firma1,
+                          incbte.id_funcionario_firma2,
+                          incbte.id_funcionario_firma3,
+                          incbte.tipo_cambio,
+                          incbte.beneficiario,
+                          incbte.nro_cbte,
+                          incbte.estado_reg,
+                          incbte.glosa1,
+                          incbte.fecha,
+                          incbte.glosa2,
+                          incbte.nro_tramite,
+                          incbte.momento,
+                          incbte.id_usuario_reg,
+                          incbte.fecha_reg,
+                          incbte.id_usuario_mod,
+                          incbte.fecha_mod,
+                          usu1.cuenta as usr_reg,
+                          usu2.cuenta as usr_mod,
+                          ccbte.descripcion as desc_clase_comprobante,
+                          sis.nombre as desc_subsistema,
+                          dpto.codigo || '' - '' || dpto.nombre as desc_depto,	
+                          mon.codigo || '' - '' || mon.moneda as desc_moneda,
+                          fir1.desc_funcionario2 as desc_firma1,
+                          fir2.desc_funcionario2 as desc_firma2,
+                          fir3.desc_funcionario2 as desc_firma3,
+                          pxp.f_iif(incbte.momento_comprometido=''si'',''true'',''false'')::varchar as momento_comprometido,
+                          pxp.f_iif(incbte.momento_ejecutado=''si'',''true'',''false'')::varchar as momento_ejecutado,
+                          pxp.f_iif(incbte.momento_pagado=''si'',''true'',''false'')::varchar as momento_pagado,
+                          manual,
+                          array_to_string(incbte.id_int_comprobante_fks,'','') as id_int_comprobante_fks
+                          
+                          from conta.tint_comprobante incbte
+                          inner join segu.tusuario usu1 on usu1.id_usuario = incbte.id_usuario_reg
+                          left join segu.tusuario usu2 on usu2.id_usuario = incbte.id_usuario_mod
+                          inner join conta.tclase_comprobante ccbte on ccbte.id_clase_comprobante = incbte.id_clase_comprobante
+                          inner join segu.tsubsistema sis on sis.id_subsistema = incbte.id_subsistema
+                          inner join param.tdepto dpto on dpto.id_depto = incbte.id_depto
+                          inner join param.tmoneda mon on mon.id_moneda = incbte.id_moneda
+                          left join orga.vfuncionario fir1 on fir1.id_funcionario = incbte.id_funcionario_firma1
+                          left join orga.vfuncionario fir2 on fir2.id_funcionario = incbte.id_funcionario_firma2
+                          left join orga.vfuncionario fir3 on fir3.id_funcionario = incbte.id_funcionario_firma3
+                          where  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+            
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -136,7 +136,65 @@ BEGIN
 			return v_consulta;
 
 		end;
-		
+        
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_ICSIM_SEL'
+ 	#DESCRIPCION:	Consulta simplificada de comprobantes intermedios
+ 	#AUTOR:		rac	
+ 	#FECHA:		29-12-2014 00:28:30
+	***********************************/
+    elseif(p_transaccion='CONTA_ICSIM_SEL') then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta :=  'select inc.id_int_comprobante,
+                                   inc.nro_cbte,
+                                   inc.nro_tramite,
+                                   inc.fecha,
+                                   inc.glosa1,
+                                   inc.glosa2,
+                                   cc.id_clase_comprobante,
+                                   cc.codigo,
+                                   cc.descripcion
+                                   
+                            from conta.tint_comprobante inc
+                            inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = inc.id_clase_comprobante
+                            where  ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;    
+	
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_ICSIM_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		29-08-2013 00:28:30
+	***********************************/
+
+	elsif(p_transaccion='CONTA_ICSIM_CONT')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(id_int_comprobante)
+			             from conta.tint_comprobante inc
+                         inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = inc.id_clase_comprobante
+                         where ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+    
+    	
 	/*********************************    
  	#TRANSACCION:  'CONTA_CABCBT_SEL'
  	#DESCRIPCION:	Cabecera para el reporte de Comprobante

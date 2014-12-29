@@ -67,6 +67,36 @@ class MODIntComprobante extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function listarSimpleIntComprobante(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_comprobante_sel';
+		$this->transaccion='CONTA_ICSIM_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_int_comprobante','int4');
+		$this->captura('nro_cbte','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('fecha','date');
+		$this->captura('glosa1','varchar');
+		$this->captura('glosa2','varchar');
+		$this->captura('id_clase_comprobante','int4');
+		$this->captura('codigo','varchar');
+		$this->captura('descripcion','varchar');
+		
+		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		        
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
 			
 	function insertarIntComprobante(){
 		//Definicion de variables para ejecucion del procedimiento

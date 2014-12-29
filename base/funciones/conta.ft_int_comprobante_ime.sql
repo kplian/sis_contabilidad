@@ -58,7 +58,7 @@ BEGIN
         	-- VALIDACIONES
         	------------------
         	--SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
-        	if coalesce(v_parametros.id_subsistema,0)!=0 then
+        	IF  pxp.f_existe_parametro(p_tabla,'id_subsistema') THEN
         		v_id_subsistema = v_parametros.id_subsistema;
         	else
         		select id_subsistema
@@ -81,7 +81,7 @@ BEGIN
         	-----------------------------
         	insert into conta.tint_comprobante(
 			id_clase_comprobante,
-			id_int_comprobante_fk,
+		
 			id_subsistema,
 			id_depto,
 			id_moneda,
@@ -91,12 +91,12 @@ BEGIN
 			id_funcionario_firma3,
 			tipo_cambio,
 			beneficiario,
-			nro_cbte,
+			
 			estado_reg,
 			glosa1,
 			fecha,
 			glosa2,
-			nro_tramite,
+			
 			--momento,
 			id_usuario_reg,
 			fecha_reg,
@@ -106,7 +106,7 @@ BEGIN
             usuario_ai
           	) values(
 			v_parametros.id_clase_comprobante,
-			v_parametros.id_int_comprobante_fk,
+			
 			v_id_subsistema,
 			v_parametros.id_depto,
 			v_parametros.id_moneda,
@@ -116,12 +116,12 @@ BEGIN
 			v_parametros.id_funcionario_firma3,
 			v_parametros.tipo_cambio,
 			v_parametros.beneficiario,
-			v_parametros.nro_cbte,
+			
 			'borrador',
 			v_parametros.glosa1,
 			v_parametros.fecha,
 			v_parametros.glosa2,
-			v_parametros.nro_tramite,
+			
 			--v_parametros.momento,
 			p_id_usuario,
 			now(),

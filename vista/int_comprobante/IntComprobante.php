@@ -46,15 +46,16 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		
 		this.bloquearOrdenamientoGrid();
 		
-		this.cmbDepto.on('clicksearch', function(){
-			this.getBoton('act').focus()
-		    this.capturaFiltros();
-		    
-        },this);
+		
         
         this.cmbDepto.on('clearcmb', function(){
         	this.DisableSelect();
 		    this.store.removeAll();
+        },this);
+        
+        this.cmbDepto.on('valid', function(){
+			this.capturaFiltros();
+		    
         },this);
 		
 		
@@ -295,6 +296,109 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
+		},
+	   {
+			config: {
+				name: 'id_tipo_relacion_comprobante',
+				fieldLabel: 'Tipo Rel.',
+				qtip: 'Tipo de relacion entre comprobantes',
+				allowBlank: true,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/TipoRelacionComprobante/listarTipoRelacionComprobante',
+					id: 'id_tipo_relacion_comprobante',
+					root: 'datos',
+					sortInfo: {
+						field: 'id_tipo_relacion_comprobante',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_tipo_relacion_comprobante', 'codigo', 'nombre'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'tiprelco.nombre#tiprelco.codigo'}
+				}),
+				valueField: 'id_tipo_relacion_comprobante',
+				displayField: 'nombre',
+				gdisplayField: 'desc_tipo_relacion_comprobante',
+				hiddenName: 'id_tipo_relacion_comprobante',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				width:250,
+				anchor: '100%',
+				gwidth: 150,
+				minChars: 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_tipo_relacion_comprobante']);
+				}
+			},
+			type: 'ComboBox',
+			id_grupo: 1,
+			filters: {pfiltro: 'tiprelco.nombre',type: 'string'},
+			grid: true,
+			form: true
+		},
+	   {
+			config: {
+				name: 'id_int_comprobante_fks',
+				enableMultiSelect:true,
+				fieldLabel: 'Tipo Rel.',
+				qtip: 'Comprobantes relacionados',
+				allowBlank: true,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/IntComprobante/listarSimpleIntComprobante',
+					id: 'id_int_comprobante',
+					root: 'datos',
+					sortInfo: {
+						field: 'id_int_comprobante',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: [ 'id_int_comprobante','nro_cbte','nro_tramite',
+                               'fecha','glosa1','glosa2','id_clase_comprobante', 'codigo', 'descripcion'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'inc.nro_cbte#inc.fecha#inc.glosa1#inc.glosa2#inc.nro_tramite'}
+				}),
+				//tpl: '<tpl for="."><div class="awesomecombo-item {checked}"><p>{nro_cbte}</p>Fecha: <strong>{fecha}</strong>{nro_tramite}<p>{glosa1}<p> </div></tpl>',
+				
+				tpl: new Ext.XTemplate(
+				'<tpl for="."><div class="awesomecombo-3item {checked}">',
+				'<p>{nro_cbte}</p>Fecha: <strong>{fecha}</strong>{nro_tramite}<p>{glosa1}<p>',
+				
+				'</div></tpl>'),
+				itemSelector: 'div.awesomecombo-3item',
+				
+				valueField: 'id_int_comprobante',
+				displayField: 'nro_cbte',
+				gdisplayField: 'desc_comprobante_rel',
+				hiddenName: 'id_int_comprobante_fks',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				width:250,
+				anchor: '100%',
+				gwidth: 150,
+				minChars: 2,
+				resizable:true,				
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_tipo_relacion_comprobante']);
+				}
+			},
+			//type: 'ComboMultiple',
+			type: 'AwesomeCombo',
+			id_grupo: 1,
+			//filters: {pfiltro: 'tiprelco.nombre',type: 'string'},
+			grid: true,
+			form: true
 		},
 		
         {
@@ -628,7 +732,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
                 typeAhead: false,
                 forceSelection: true,
                 allowBlank: false,
-                disableSearchButton: false,
+                disableSearchButton: true,
                 emptyText: 'Depto Contable',
                 store: new Ext.data.JsonStore({
                     url: '../../sis_parametros/control/Depto/listarDeptoFiltradoDeptoUsuario',
@@ -642,11 +746,10 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 					fields: ['id_depto','nombre','codigo'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams:{par_filtro:'deppto.nombre#deppto.codigo',estado:'activo'}
+					baseParams: { par_filtro:'deppto.nombre#deppto.codigo', estado:'activo', codigo_subsistema: 'CONTA'}
                 }),
                 valueField: 'id_depto',
    				displayField: 'nombre',
-   				//tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p></div></tpl>',
    				hiddenName: 'id_depto',
                 enableMultiSelect:true,
                 triggerAction: 'all',
@@ -657,8 +760,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
                 anchor: '80%',
                 listWidth:'280',
                 resizable:true,
-                minChars: 2,
-              // tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{nombre}</b></p>Codigo: <strong>{codigo}</strong> </div></tpl>'
+                minChars: 2
             }),
             
             
