@@ -21,8 +21,7 @@ class MODIntComprobante extends MODbase{
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_int_comprobante','int4');
-		$this->captura('id_clase_comprobante','int4');
-		
+		$this->captura('id_clase_comprobante','int4');		
 		$this->captura('id_subsistema','int4');
 		$this->captura('id_depto','int4');
 		$this->captura('id_moneda','int4');
@@ -57,6 +56,10 @@ class MODIntComprobante extends MODbase{
 		$this->captura('momento_pagado','varchar');
 		$this->captura('manual','varchar');
 		$this->captura('id_int_comprobante_fks','text');
+		$this->captura('id_tipo_relacion_comprobante','int');
+		$this->captura('desc_tipo_relacion_comprobante','varchar');
+		
+		
 		
 		
 		//Ejecuta la instruccion
@@ -106,7 +109,6 @@ class MODIntComprobante extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_clase_comprobante','id_clase_comprobante','int4');
-		$this->setParametro('id_int_comprobante_fk','id_int_comprobante_fk','int4');
 		$this->setParametro('id_subsistema','id_subsistema','int4');
 		$this->setParametro('id_depto','id_depto','int4');
 		$this->setParametro('id_moneda','id_moneda','int4');
@@ -122,7 +124,11 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('fecha','fecha','date');
 		$this->setParametro('glosa2','glosa2','varchar');
 		$this->setParametro('nro_tramite','nro_tramite','varchar');
-		$this->setParametro('momento','momento','varchar');
+		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
+		$this->setParametro('momento_pagado','momento_pagado','varchar');
+		
+		$this->setParametro('id_int_comprobante_fks','id_int_comprobante_fks','varchar');
+		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -143,7 +149,6 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 		$this->setParametro('id_clase_comprobante','id_clase_comprobante','int4');
 		$this->setParametro('id_int_comprobante_fk','id_int_comprobante_fk','int4');
-		$this->setParametro('id_subsistema','id_subsistema','int4');
 		$this->setParametro('id_depto','id_depto','int4');
 		$this->setParametro('id_moneda','id_moneda','int4');
 		$this->setParametro('id_periodo','id_periodo','int4');
@@ -158,7 +163,11 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('fecha','fecha','date');
 		$this->setParametro('glosa2','glosa2','varchar');
 		$this->setParametro('nro_tramite','nro_tramite','varchar');
-		$this->setParametro('momento','momento','varchar');
+		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
+		$this->setParametro('momento_pagado','momento_pagado','varchar');
+		$this->setParametro('id_int_comprobante_fks','id_int_comprobante_fks','varchar');
+		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

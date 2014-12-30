@@ -94,7 +94,21 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		this.Cmp.id_moneda.on('select',this.getTipoCambio,this);
 		this.Cmp.fecha.on('select',this.getTipoCambio,this);		
 		this.Cmp.id_clase_comprobante.on('select', this.habilitaMomentos,this);		
-		console.log('this.Cmp.momento_ejecutado  ... ', this.Cmp.momento_ejecutado);
+		
+		this.Cmp.id_tipo_relacion_comprobante.on('valid', 
+		   function(){
+		   	  if(this.Cmp.id_tipo_relacion_comprobante.getValue()){
+		   	  	this.Cmp.id_int_comprobante_fks.allowBlank = false;
+		   	  	this.Cmp.id_int_comprobante_fks.enable();
+		   	  }
+		   	  else{
+		   	  	this.Cmp.id_int_comprobante_fks.allowBlank = true;
+		   	  	this.Cmp.id_int_comprobante_fks.reset();
+		   	  	this.Cmp.id_int_comprobante_fks.disable();
+		   	  }
+		   	  
+		   	
+		   },this);	
 		
 		
 		
@@ -179,7 +193,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
    			//type:'TrigguerCombo',
    			type:'ComboRec',
    			id_grupo:0,
-   			filters:{pfiltro:'dpto.nombre',type:'string'},
+   			filters:{pfiltro:'incbte.desc_depto',type:'string'},
    		    grid:false,
    			form:true
        },
@@ -223,7 +237,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			},
 			type: 'ComboBox',
 			id_grupo: 1,
-			filters: {pfiltro: 'ccbte.descripcion',type: 'string'},
+			filters: {pfiltro: 'incbte.desc_clase_comprobante',type: 'string'},
 			grid: true,
 			form: true
 		},
@@ -321,7 +335,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				displayField: 'nombre',
 				gdisplayField: 'desc_tipo_relacion_comprobante',
 				hiddenName: 'id_tipo_relacion_comprobante',
-				forceSelection: true,
+				//forceSelection: true,
 				typeAhead: false,
 				triggerAction: 'all',
 				lazyRender: true,
@@ -338,7 +352,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			},
 			type: 'ComboBox',
 			id_grupo: 1,
-			filters: {pfiltro: 'tiprelco.nombre',type: 'string'},
+			filters: {pfiltro: 'incbte.desc_tipo_relacion_comprobante',type: 'string'},
 			grid: true,
 			form: true
 		},
@@ -346,7 +360,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			config: {
 				name: 'id_int_comprobante_fks',
 				enableMultiSelect:true,
-				fieldLabel: 'Tipo Rel.',
+				fieldLabel: 'Cbte rels.',
 				qtip: 'Comprobantes relacionados',
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
@@ -376,7 +390,6 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				valueField: 'id_int_comprobante',
 				displayField: 'nro_cbte',
 				gdisplayField: 'desc_comprobante_rel',
-				hiddenName: 'id_int_comprobante_fks',
 				forceSelection: true,
 				typeAhead: false,
 				triggerAction: 'all',
@@ -393,11 +406,9 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 					return String.format('{0}', record.data['desc_tipo_relacion_comprobante']);
 				}
 			},
-			//type: 'ComboMultiple',
 			type: 'AwesomeCombo',
 			id_grupo: 1,
-			//filters: {pfiltro: 'tiprelco.nombre',type: 'string'},
-			grid: true,
+			grid: false,
 			form: true
 		},
 		
@@ -415,7 +426,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
             type:'ComboRec',
             id_grupo:2,
             filters:{   
-                pfiltro:'mon.codigo',
+                pfiltro:'incbte.desc_moneda',
                 type:'string'
             },
             grid:true,
@@ -497,7 +508,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	   			type:'ComboRec',
 	   			id_grupo:0,
 	   			filters:{	
-			        pfiltro:'fir1.desc_funcionario2',
+			        pfiltro:'incbte.desc_firma1',
 					type:'string'
 				},
 	   			grid:true,
@@ -518,7 +529,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	   			type:'ComboRec',
 	   			id_grupo:0,
 	   			filters:{	
-			        pfiltro:'fir2.desc_funcionario2',
+			        pfiltro:'incbte.desc_firma2',
 					type:'string'
 				},
 	   			grid:true,
@@ -539,7 +550,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	   			type:'ComboRec',
 	   			id_grupo:0,
 	   			filters:{	
-			        pfiltro:'fir3.desc_funcionario2',
+			        pfiltro:'incbte.desc_firma3',
 					type:'string'
 				},
 	   			grid:true,
@@ -555,7 +566,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			},
 			type: 'TextField',
 			id_grupo: 0,
-			filters: {pfiltro: 'sis.codigo#sis.nombre',type: 'string'},
+			filters: {pfiltro: 'incbte.desc_subsistema', type: 'string'},
 			grid: true,
 			form: false
 		},
@@ -581,7 +592,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				maxLength:4
 			},
 				type:'Field',
-				filters:{pfiltro:'usu1.cuenta',type:'string'},
+				filters:{pfiltro:'incbte.usr_reg',type:'string'},
 				id_grupo:0,
 				grid:true,
 				form:false
@@ -612,10 +623,10 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				maxLength:4
 			},
 				type:'Field',
-				filters:{pfiltro:'usu2.cuenta',type:'string'},
-				id_grupo:0,
-				grid:true,
-				form:false
+				filters: { pfiltro: 'incbte.usr_mod', type: 'string'},
+				id_grupo: 0,
+				grid: true,
+				form: false
 		},
 		{
 			config:{
@@ -625,7 +636,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				anchor: '80%',
 				gwidth: 100,
 				format: 'd/m/Y', 
-				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+				renderer:function (value,p,record){ return value?value.dateFormat('d/m/Y H:i:s'):'' }
 			},
 				type:'DateField',
 				filters:{pfiltro:'incbte.fecha_mod',type:'date'},
@@ -718,7 +729,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_firma3', type: 'string'},
 		'momento_comprometido',
         'momento_ejecutado',
-        'momento_pagado','manual'
+        'momento_pagado','manual','desc_tipo_relacion_comprobante','id_int_comprobante_fks','manual','id_tipo_relacion_comprobante'
 	],
 	sortInfo:{
 		field: 'fecha',
