@@ -20,6 +20,11 @@ class MODIntTransaccion extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		
 		$this->setParametro('id_moneda','id_moneda','int4');
+		
+		//captura parametros adicionales para el count
+		$this->capturaCount('total_debe','numeric');
+		$this->capturaCount('total_haber','numeric');
+		
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_int_transaccion','int4');
@@ -42,15 +47,13 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('importe_haber','numeric');
 		$this->captura('importe_gasto','numeric');
 		$this->captura('importe_recurso','numeric');
-		$this->captura('importe_debe_mb','numeric');	
-		$this->captura('importe_haber_mb','numeric');
-		$this->captura('importe_gasto_mb','numeric');
-		$this->captura('importe_recurso_mb','numeric');
 		$this->captura('desc_partida','text');
 		$this->captura('desc_centro_costo','text');
 		$this->captura('desc_cuenta','text');
 		$this->captura('desc_auxiliar','text');
 		$this->captura('tipo_partida','varchar');
+		$this->captura('id_orden_trabajo','int4');
+		$this->captura('desc_orden','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

@@ -63,14 +63,10 @@ BEGIN
 						transa.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-						transa.importe_debe,	
-						transa.importe_haber,
-						transa.importe_gasto,
-						transa.importe_recurso,
-						transa.importe_debe_mb,	
-						transa.importe_haber_mb,
-						transa.importe_gasto_mb,
-						transa.importe_recurso_mb,
+						tval.importe_debe,	
+						tval.importe_haber,
+						tval.importe_gasto,
+						tval.importe_recurso,
 						
                          CASE par.sw_movimiento
                         	WHEN ''flujo'' THEN
@@ -82,14 +78,18 @@ BEGIN
 						cc.codigo_cc as desc_centro_costo,
 						cue.nro_cuenta || '' - '' || cue.nombre_cuenta as desc_cuenta,
 						aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar,
-                        par.sw_movimiento as tipo_partida
+                        par.sw_movimiento as tipo_partida,
+                        ot.id_orden_trabajo,
+                        ot.desc_orden
 						from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                        inner join conta.tint_trans_val tval on tval.id_int_transaccion = transa.id_int_transaccion
+                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
 						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
 						left join pre.tpartida par on par.id_partida = transa.id_partida
 						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
-						inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
 				        where ';
 			
 			--Definicion de la respuesta
@@ -112,14 +112,19 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(transa.id_int_transaccion)
+			v_consulta:='select 
+                        count(transa.id_int_transaccion) as total,
+                        sum(tval.importe_debe) as total_debe,
+                        sum(tval.importe_haber) as total_haber
 					    from conta.tint_transaccion transa
-					    inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                        inner join conta.tint_trans_val tval on tval.id_int_transaccion = transa.id_int_transaccion
+                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
 						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
 						left join pre.tpartida par on par.id_partida = transa.id_partida
-						left join param.tcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
-						inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
+						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
 					    where ';
 			
 			--Definicion de la respuesta		    

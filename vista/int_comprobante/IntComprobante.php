@@ -139,10 +139,30 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config: {
+				name: 'manual',
+				fieldLabel: 'Manual',
+				gwidth: 50,
+					renderer:function (value,p,record){
+							if(value == 'si'){
+								return String.format('<b><font color="green">{0}</font></b>', value);
+							}
+							else{
+								return String.format('<b><font color="orange">{0}</font></b>', value);
+							}
+					 }
+			},
+			type: 'Field',
+			id_grupo: 0,
+			filters: {pfiltro: 'incbte.manual',type: 'string'},
+			grid: true,
+			form: false
+		},
+		{
+			config: {
 				name: 'nro_tramite',
 				fieldLabel: 'Nro. Trámite'
 			},
-			type: 'ComboBox',
+			type: 'Field',
 			id_grupo: 0,
 			filters: {pfiltro: 'incbte.nro_tramite',type: 'string'},
 			grid: true,
@@ -167,8 +187,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				format: 'd/m/Y', 
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
 			type:'DateField',
 			filters:{pfiltro:'incbte.fecha',type:'date'},

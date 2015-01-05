@@ -13,12 +13,18 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
+		
+		
 		this.maestro=config.maestro;
+		 //Agrega combo de moneda
+		this.initButtons=[this.cmbMoneda];
     	//llama al constructor de la clase padre
 		Phx.vista.IntTransaccion.superclass.constructor.call(this,config);
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
 		this.init();
+		
+		
 		
 		//Manejo de Eventos
 		this.Cmp.id_partida.on('select',function(cmb, rec, index){
@@ -69,8 +75,43 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				this.Cmp.importe_recurso.setValue(this.Cmp.importe_haber.getValue());
 			}
 		},this);
+		
+		
+		this.cmbMoneda.on('select',function(cmb,rec,index){
+			Ext.apply(this.store.baseParams,{id_moneda:rec.data.id_moneda});
+			this.reload();
+		},this);
 	},
-			
+	cmbMoneda:new Ext.form.ComboBox({
+		fieldLabel: 'Moneda',
+		allowBlank: true,
+		emptyText:'Moneda...',
+		store:new Ext.data.JsonStore(
+		{
+			url: '../../sis_parametros/control/Moneda/listarMoneda',
+			id: 'id_moneda',
+			root: 'datos',
+			sortInfo:{
+				field: 'moneda',
+				direction: 'ASC'
+			},
+			totalProperty: 'total',
+			fields: ['id_moneda','moneda','codigo','tipo_moneda'],
+			// turn on remote sorting
+			remoteSort: true,
+			baseParams:{par_filtro:'moneda#codigo'}
+		}),
+		valueField: 'id_moneda',
+		tpl:'<tpl for="."><div class="x-combo-list-item"><p>Moneda:{moneda}</p><p>Codigo:{codigo}</p> </div></tpl>',
+		triggerAction: 'all',
+		displayField: 'moneda',
+	    hiddenName: 'id_moneda',
+		mode:'remote',
+		pageSize:50,
+		queryDelay:500,
+		listWidth:280,
+		width:170
+	}),		
 	Atributos:[
 		{
 			//configuracion del componente
@@ -100,23 +141,36 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				allowBlank:false,
    				fieldLabel:'Transaccion',
    				gdisplayField:'desc_cuenta',//mapea al store del grid
-   				gwidth:500,
+   				gwidth:600,
+   				
 	   			renderer:function (value, p, record){
 	   			    var color = 'green';
-	   			    
-	   			    if(record.data["tipo_partida"] == 'flujo'){
-	   			        color = 'red';
+	   			    if(record.data["tipo_reg"] != 'summary'){
+		   			    if(record.data["tipo_partida"] == 'flujo'){
+		   			        color = 'red';
+		   			    }
+		   			    
+		   					
+		   				var retorno =  String.format('<b>CC:</b>{0}, <b>Ptda.:</b> <font color="{1}">{2}</font><br><b>Cta.:</b>{3}<br><b>Aux.:</b>{4}',record.data['desc_centro_costo'],color, record.data['desc_partida'],
+		   					                   record.data['desc_cuenta'],record.data['desc_auxiliar']);	
+		   					
+			   				
+			   				if(record.data['desc_orden']){
+			   					retorno = retorno + '<br><b>Ot.:</b> '+record.data['desc_orden'];
+			   				}	
+		   				return retorno;	
+	   			    	
+	   			    }
+	   			    else{
+	   			    	return '<b><p align="right">Total: &nbsp;&nbsp; </p></b>';
 	   			    }
 	   			    
-	   				return String.format('{0}','<b>CC:</b> '+record.data['desc_centro_costo']+', <b>Ptda.:</b> <font color="'+color+'">'+record.data['desc_partida']+'</font><br>'+
-	   					'<b>Cta.:</b> '+record.data['desc_cuenta']+'<br>'+
-	   					'<b>Aux.:</b> '+record.data['desc_auxiliar']);
 	   			}
        	     },
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro:'cue.nombre_cuenta#cu.nro_cuenta',
+		        pfiltro:'cue.nombre_cuenta#cue.nro_cuenta#cc.codigo_cc#cue.nro_cuenta#cue.nombre_cuenta#aux.codigo_auxiliar#aux.nombre_auxiliar#par.codigo#par.nombre_partida#ot.desc_orden',
 				type:'string'
 			},
    			grid:true,
@@ -182,6 +236,23 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
             grid:false,
             form:true
         },
+        {
+            config:{
+                    name:'id_orden_trabajo',
+                    fieldLabel: 'Orden Trabajo',
+                    sysorigen:'sis_contabilidad',
+	       		    origen:'OT',
+                    allowBlank:true,
+                    gwidth:200,
+                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden']);}
+            
+            },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'ot.motivo_orden#ot.desc_orden',type:'string'},
+            grid:false,
+            form:true
+        },
 		{
 			config: {
 				name: 'importe_debe',
@@ -190,6 +261,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				width: '100%',
 				gwidth: 100,
 				maxLength: 100,
+				summaryType:'sum',
 				disabled:true
 			},
 			type: 'NumberField',
@@ -214,45 +286,14 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
-		{
-			config: {
-				name: 'importe_gasto',
-				fieldLabel: 'Gasto',
-				allowBlank: true,
-				width: '100%',
-				gwidth: 100,
-				maxLength: 100,
-				disabled:true
-			},
-			type: 'NumberField',
-			filters: {pfiltro: 'transa.importe_gasto',type: 'numeric'},
-			id_grupo: 1,
-			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name: 'importe_recurso',
-				fieldLabel: 'Recurso',
-				allowBlank: true,
-				width: '100%',
-				gwidth: 100,
-				maxLength: 100,
-				disabled:true
-			},
-			type: 'NumberField',
-			filters: {pfiltro: 'transa.importe_recurso',type: 'numeric'},
-			id_grupo: 1,
-			grid: true,
-			form: true
-		},
+		
 		{
 			config:{
 				name: 'glosa',
 				fieldLabel: 'Glosa',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 300,
 				maxLength:1000
 			},
 			type:'TextArea',
@@ -261,115 +302,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
-		{
-			config: {
-				name: 'importe_debe_mb',
-				fieldLabel: 'Debe MB',
-				allowBlank: true,
-				width: '100%',
-				gwidth: 100,
-				maxLength: 100,
-				hidden:true
-			},
-			type: 'NumberField',
-			filters: {pfiltro: 'transa.importe_debe_mb',type: 'numeric'},
-			id_grupo: 1,
-			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name: 'importe_haber_mb',
-				fieldLabel: 'Haber MB',
-				allowBlank: true,
-				width: '100%',
-				gwidth: 100,
-				maxLength: 100,
-				hidden:true
-			},
-			type: 'NumberField',
-			filters: {pfiltro: 'transa.importe_haber_mb',type: 'numeric'},
-			id_grupo: 1,
-			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name: 'importe_gasto_mb',
-				fieldLabel: 'Gasto MB',
-				allowBlank: true,
-				width: '100%',
-				gwidth: 100,
-				maxLength: 100,
-				hidden:true
-			},
-			type: 'NumberField',
-			filters: {pfiltro: 'transa.importe_gasto_mb',type: 'numeric'},
-			id_grupo: 1,
-			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name: 'importe_recurso_mb',
-				fieldLabel: 'Recurso MB',
-				allowBlank: true,
-				width: '100%',
-				gwidth: 100,
-				maxLength: 100,
-				hidden:true
-			},
-			type: 'NumberField',
-			filters: {pfiltro: 'transa.importe_recurso_mb',type: 'numeric'},
-			id_grupo: 1,
-			grid: true,
-			form: true
-		},
 		
-		{
-			config: {
-				name: 'id_partida_ejecucion',
-				fieldLabel: 'id_partida_ejecucion',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_partida_ejecucion',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				},
-				hidden:true
-			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
-		},
+		
 		{
 			config:{
 				name: 'estado_reg',
@@ -379,56 +313,13 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:10
 			},
-			type:'TextField',
+			type:'Field',
 			filters:{pfiltro:'transa.estado_reg',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
 		},
-		{
-			config: {
-				name: 'id_int_transaccion_fk',
-				fieldLabel: 'id_int_transaccion_fk',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_int_transaccion_fk',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				},
-				hidden:true
-			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
-		},
+		
 		{
 			config:{
 				name: 'usr_reg',
@@ -438,7 +329,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:4
 			},
-			type:'NumberField',
+			type:'Field',
 			filters:{pfiltro:'usu1.cuenta',type:'string'},
 			id_grupo:1,
 			grid:true,
@@ -469,7 +360,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:4
 			},
-			type:'NumberField',
+			type:'Field',
 			filters:{pfiltro:'usu2.cuenta',type:'string'},
 			id_grupo:1,
 			grid:true,
@@ -526,7 +417,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_cuenta', type: 'string'},
 		{name:'desc_auxiliar', type: 'string'},
 		{name:'desc_partida', type: 'string'},
-		{name:'desc_centro_costo', type: 'string'},'tipo_partida'
+		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg'
 		
 	],
 	sortInfo:{
@@ -547,6 +438,22 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var fecha=new Date(this.maestro.fecha);
 		this.maestro.id_gestion = this.getGestion(fecha);
+		//Se setea el combo de moneda con el valor del padre
+		this.cmbMoneda.store.load({params:{start:0, limit:this.tam_pag}});
+		this.cmbMoneda.setRawValue(this.maestro.desc_moneda)
+	},
+	
+	preparaMenu:function(){
+		var rec = this.sm.getSelected();
+		var tb = this.tbar;
+		if(rec.data.tipo_reg != 'summary'){
+			return Phx.vista.IntTransaccion.superclass.preparaMenu.call(this);
+		}
+		else{
+			 tb.items.get('b-edit-' + this.idContenedor).disable();
+			 tb.items.get('b-del-' + this.idContenedor).disable();
+		}
+		
 	},
 	getGestion:function(x){
 		if(Ext.isDate(x)){

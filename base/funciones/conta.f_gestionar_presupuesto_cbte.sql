@@ -73,6 +73,9 @@ DECLARE
     v_monto_previo_ejecutado numeric;
     v_monto_previo_pagado    numeric;
     v_monto_previo_revertido numeric;
+    
+    v_ano_1  integer;
+    v_ano_2  integer;
 
 BEGIN
 	
@@ -470,12 +473,12 @@ BEGIN
                             
                   ELSIF   v_momento_aux='solo pagar'  THEN
                            
-                          --si es solo pagar debemos identificar las transacciones del devengado 
+                                --si es solo pagar debemos identificar las transacciones del devengado 
                            
                           
-                           v_aux = v_aux || ','||v_registros.id_int_transaccion;
+                                v_aux = v_aux || ','||v_registros.id_int_transaccion;
                            
-                                 FOR  v_registros_dev in (
+                                FOR  v_registros_dev in (
                                                           select 
                                                             ird.id_int_rel_devengado,
                                                             ird.monto_pago,
@@ -483,11 +486,13 @@ BEGIN
                                                             it.id_partida_ejecucion_dev,
                                                             it.importe_reversion,
                                                             it.factor_reversion,
-                                                            it.monto_pagado_revertido
+                                                            it.monto_pagado_revertido,
+                                                            ic.fecha
                                                             
                                                           from  conta.tint_rel_devengado ird
                                                           inner join conta.tint_transaccion it 
                                                             on it.id_int_transaccion = ird.id_int_transaccion_dev
+                                                          inner join conta.tint_comprobante ic on ic.id_int_comprobante = it.id_int_comprobante
                                                           where  ird.id_int_transaccion_pag = v_registros.id_int_transaccion
                                                                  and ird.estado_reg = 'activo'
                                                          ) LOOP  
@@ -553,16 +558,27 @@ BEGIN
                                                va_columna_relacion[v_i]= 'id_int_transaccion';
                                                va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                                va_id_int_rel_devengado[v_i]= v_registros_dev.id_int_rel_devengado;
-                                               -- fechaejecucion presupuestaria  
+                                               -- fecha pago presupuestaria  
+                                               
+                                               
+                                               
                                                IF p_fecha_ejecucion is NULL THEN
                                                  va_fecha[v_i]=v_registros_comprobante.fecha::date;  --, fecha del comprobante
                                                ELSE
                                                 va_fecha[v_i]=p_fecha_ejecucion;  -- fecha como parametros
                                                END IF; 
                                                
+                                               --si la el año de pago es mayor que el año del devengado , el pago va con fecha de 31 de diciembre del año del devengado
+                                               v_ano_1 =  EXTRACT(YEAR FROM  va_fecha[v_i]::date);
+                                               v_ano_2 =  EXTRACT(YEAR FROM  v_registros_dev.fecha::date);
                                                
-                                               --chequeamos si el presupuesto devengado si alcanza para pagar, 
-                                               --si no,  pero la diferencia es minima pagamos   el monto disponible
+                                               IF  v_ano_1  >  v_ano_2 THEN
+                                                 va_fecha[v_i] = ('31-12-'|| v_ano_2::varchar)::date;
+                                               END IF;
+                                               
+                                               
+                                               -- chequeamos si el presupuesto devengado si alcanza para pagar, 
+                                               -- si no,  pero la diferencia es minima pagamos   el monto disponible
                                                v_respuesta_verificar = pre.f_verificar_com_eje_pag(
                                                                                           va_id_partida_ejecucion[v_i],
                                                                                           va_id_moneda[v_i]);
