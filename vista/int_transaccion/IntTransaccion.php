@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
-
+   
 	constructor:function(config){
 		
 		
@@ -24,63 +24,27 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		this.grid.getBottomToolbar().disable();
 		this.init();
 		
-		
-		
-		//Manejo de Eventos
-		this.Cmp.id_partida.on('select',function(cmb, rec, index){
-			if(rec.data.tipo=='gasto'){
-				//Habilita deshabilita componentes
-				this.Cmp.importe_debe.enable();
-				this.Cmp.importe_haber.disable();
-				this.Cmp.importe_gasto.enable();
-				this.Cmp.importe_recurso.disable();
-				//Pone como obligatrio o no los componentes
-				this.Cmp.importe_debe.allowBlank=false;
-				this.Cmp.importe_haber.allowBlank=true;
-				this.Cmp.importe_gasto.allowBlank=false;
-				this.Cmp.importe_recurso.allowBlank=true;
-			} else if(rec.data.tipo=='recurso'){
-				//Habilita deshabilita componentes
-				this.Cmp.importe_debe.disable();
-				this.Cmp.importe_haber.enable();
-				this.Cmp.importe_gasto.disable();
-				this.Cmp.importe_recurso.enable();
-				//Pone como obligatrio o no los componentes
-				this.Cmp.importe_debe.allowBlank=true;
-				this.Cmp.importe_haber.allowBlank=false;
-				this.Cmp.importe_gasto.allowBlank=true;
-				this.Cmp.importe_recurso.allowBlank=false;
-			} else{
-				//Habilita deshabilita componentes
-				this.Cmp.importe_debe.disable();
-				this.Cmp.importe_haber.disable();
-				this.Cmp.importe_gasto.disable();
-				this.Cmp.importe_recurso.disable();
-				//Pone como obligatrio o no los componentes
-				this.Cmp.importe_debe.allowBlank=true;
-				this.Cmp.importe_haber.allowBlank=true;
-				this.Cmp.importe_gasto.allowBlank=true;
-				this.Cmp.importe_recurso.allowBlank=true;
-			}
-		}, this);
-		
-		this.Cmp.importe_debe.on('blur',function(){
-			if(this.Cmp.importe_gasto.getValue()==''){
-				this.Cmp.importe_gasto.setValue(this.Cmp.importe_debe.getValue());
-			}
-		},this);
-		
-		this.Cmp.importe_haber.on('blur',function(){
-			if(this.Cmp.importe_recurso.getValue()==''){
-				this.Cmp.importe_recurso.setValue(this.Cmp.importe_haber.getValue());
-			}
-		},this);
-		
-		
 		this.cmbMoneda.on('select',function(cmb,rec,index){
 			Ext.apply(this.store.baseParams,{id_moneda:rec.data.id_moneda});
 			this.reload();
 		},this);
+		
+		
+		this.Cmp.importe_debe.on('change',function(cmp){
+			this.Cmp.importe_haber.suspendEvents();
+			this.Cmp.importe_haber.setValue(0);
+			this.Cmp.importe_haber.resumeEvents();
+			
+		},this);
+		
+		this.Cmp.importe_haber.on('change',
+		    function(cmp){
+			    this.Cmp.importe_debe.suspendEvents();
+				this.Cmp.importe_debe.setValue(0);
+				this.Cmp.importe_debe.resumeEvents();
+			  
+		   },this);
+		
 	},
 	cmbMoneda:new Ext.form.ComboBox({
 		fieldLabel: 'Moneda',
@@ -139,9 +103,11 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
        		    name:'id_cuenta',
    				origen:'CUENTA',
    				allowBlank:false,
-   				fieldLabel:'Transaccion',
+   				fieldLabel:'Cuenta',
    				gdisplayField:'desc_cuenta',//mapea al store del grid
    				gwidth:600,
+   				width: 350,
+   				listWidth: 350,
    				
 	   			renderer:function (value, p, record){
 	   			    var color = 'green';
@@ -151,7 +117,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		   			    }
 		   			    
 		   					
-		   				var retorno =  String.format('<b>CC:</b>{0}, <b>Ptda.:</b> <font color="{1}">{2}</font><br><b>Cta.:</b>{3}<br><b>Aux.:</b>{4}',record.data['desc_centro_costo'],color, record.data['desc_partida'],
+		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Ptda.:</b> <font color="{1}">{2}</font><br><b>Cta.:</b>{3}<br><b>Aux.:</b>{4}',record.data['desc_centro_costo'],color, record.data['desc_partida'],
 		   					                   record.data['desc_cuenta'],record.data['desc_auxiliar']);	
 		   					
 			   				
@@ -181,11 +147,14 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				sysorigen:'sis_contabilidad',
        		    name:'id_auxiliar',
    				origen:'AUXILIAR',
-   				allowBlank:false,
+   				allowBlank:true,
    				fieldLabel:'Auxiliar',
    				gdisplayField:'desc_auxiliar',//mapea al store del grid
    				gwidth:200,
-	   			 renderer:function (value, p, record){return String.format('{0}', record.data['desc_auxiliar']);}
+   				width: 350,
+   				listWidth: 350,
+   				//anchor: '80%',
+	   			renderer:function (value, p, record){return String.format('{0}', record.data['desc_auxiliar']);}
        	     },
    			type:'ComboRec',
    			id_grupo:0,
@@ -206,13 +175,15 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				fieldLabel:'Partida',
    				gdisplayField:'desc_partida',//mapea al store del grid
    				gwidth:200,
+   				width: 350,
+   				listWidth: 350,
 	   			renderer:function (value, p, record){return String.format('{0}',record.data['desc_partida']);}
        	     },
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro:'par.codigo_partida#au.nombre_partida',
-				type:'string'
+		        pfiltro: 'par.codigo_partida#au.nombre_partida',
+				type: 'string'
 			},
    		   
    			grid:false,
@@ -226,7 +197,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                 tinit:false,
                 origen:'CENTROCOSTO',
                 gdisplayField: 'desc_centro_costo',
-                anchor: '80%',
+                width: 350,
+   				listWidth: 350,
                 gwidth: 300,
                 renderer:function (value, p, record){return String.format('{0}',record.data['desc_centro_costo']);}
             },
@@ -244,6 +216,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	       		    origen:'OT',
                     allowBlank:true,
                     gwidth:200,
+                    width: 350,
+   				    listWidth: 350,
                     renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden']);}
             
             },
@@ -260,9 +234,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100,
-				summaryType:'sum',
-				disabled:true
+				maxLength: 100
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_debe',type: 'numeric'},
@@ -277,8 +249,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100,
-				disabled:true
+				maxLength: 100
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_haber',type: 'numeric'},
@@ -424,8 +395,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_int_transaccion',
 		direction: 'ASC'
 	},
-	bdel:true,
-	bsave:true,
+	bdel: true,
+	bsave: false,
 	loadValoresIniciales:function(){
 		Phx.vista.IntTransaccion.superclass.loadValoresIniciales.call(this);
 		this.getComponente('id_int_comprobante').setValue(this.maestro.id_int_comprobante);		

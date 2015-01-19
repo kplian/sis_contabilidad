@@ -1148,5 +1148,11 @@ IS 'define el tipo de relacion en tre so comprobantes que sen encuentran en el a
 /***********************************F-SCP-RAC-CONTA-0-17/12/2014****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-15/01/2015****************************************/
 
+--------------- SQL ---------------
 
+ALTER TABLE conta.tint_transaccion
+  ALTER COLUMN id_auxiliar DROP NOT NULL;
+
+/***********************************F-SCP-RAC-CONTA-0-15/01/2015****************************************/

@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_int_transaccion_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_int_transaccion_ime
@@ -54,9 +59,7 @@ BEGIN
         	insert into conta.tint_transaccion(
 			id_partida,
 			id_centro_costo,
-			id_partida_ejecucion,
 			estado_reg,
-			id_int_transaccion_fk,
 			id_cuenta,
 			glosa,
 			id_int_comprobante,
@@ -72,17 +75,15 @@ BEGIN
           	) values(
 			v_parametros.id_partida,
 			v_parametros.id_centro_costo,
-			v_parametros.id_partida_ejecucion,
 			'activo',
-			v_parametros.id_int_transaccion_fk,
 			v_parametros.id_cuenta,
 			v_parametros.glosa,
 			v_parametros.id_int_comprobante,
 			v_parametros.id_auxiliar,
 			v_parametros.importe_debe,
 			v_parametros.importe_haber,
-			v_parametros.importe_gasto,
-			v_parametros.importe_recurso,
+            v_parametros.importe_debe,
+			v_parametros.importe_haber,
 			p_id_usuario,
 			now(),
 			null,
@@ -126,8 +127,8 @@ BEGIN
 			update conta.tint_transaccion set
 			id_partida = v_parametros.id_partida,
 			id_centro_costo = v_parametros.id_centro_costo,
-			id_partida_ejecucion = v_parametros.id_partida_ejecucion,
-			id_int_transaccion_fk = v_parametros.id_int_transaccion_fk,
+			
+			
 			id_cuenta = v_parametros.id_cuenta,
 			glosa = v_parametros.glosa,
 			id_int_comprobante = v_parametros.id_int_comprobante,
@@ -136,8 +137,8 @@ BEGIN
 			fecha_mod = now(),
 			importe_debe = v_parametros.importe_debe,
 			importe_haber = v_parametros.importe_haber,
-			importe_gasto = v_parametros.importe_gasto,
-			importe_recurso = v_parametros.importe_recurso
+			importe_gasto = v_parametros.importe_debe,
+			importe_recurso = v_parametros.importe_debe
 			where id_int_transaccion=v_parametros.id_int_transaccion;
                
 			--Definicion de la respuesta
@@ -203,7 +204,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_int_transaccion_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

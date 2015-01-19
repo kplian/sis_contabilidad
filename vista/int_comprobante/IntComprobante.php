@@ -755,8 +755,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		field: 'fecha',
 		direction: 'desc'
 	},
-	bdel:true,
-	bsave:true,
+	bdel: true,
+	bsave: false,
 	cmbDepto: new Ext.form.AwesomeCombo({
                 name: 'id_depto',
                 fieldLabel: 'Depto',
