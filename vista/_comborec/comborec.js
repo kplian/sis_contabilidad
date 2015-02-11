@@ -27,7 +27,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
 					fields: ['id_cuenta','nombre_cuenta','desc_cuenta','nro_cuenta'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams:{par_filtro:'nro_cuenta#nombre_cuenta#desc_cuenta',sw_transaccional:'movimiento'}
+					baseParams:Ext.apply({par_filtro:'nro_cuenta#nombre_cuenta#desc_cuenta',sw_transaccional:'movimiento'}, config.baseParams)
 					}),
 				valueField: 'id_cuenta',
  				displayField: 'nombre_cuenta',
@@ -71,7 +71,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
 					fields: ['id_auxiliar','nombre_auxiliar','codigo_auxiliar'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams:{par_filtro:'codigo_auxiliar#nombre_auxiliar'}
+					baseParams:Ext.apply({par_filtro:'codigo_auxiliar#nombre_auxiliar'}, config.baseParams)
 					}),
 				valueField: 'id_auxiliar',
  				displayField: 'nombre_auxiliar',
@@ -111,7 +111,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
                             totalProperty: 'total',
                             fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden'],
                             remoteSort: true,
-                            baseParams:{par_filtro:'desc_orden#motivo_orden'}
+                            baseParams:Ext.apply({par_filtro:'desc_orden#motivo_orden'}, config.baseParams)
                 }),
                valueField: 'id_orden_trabajo',
                displayField: 'desc_orden',
