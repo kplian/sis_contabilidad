@@ -78,7 +78,8 @@ BEGIN
                         cmpb.campo_id_cuenta_bancaria_mov,
                         cmpb.campo_nro_cheque,
                         cmpb.campo_nro_cuenta_bancaria_trans,
-                        cmpb.campo_nro_tramite
+                        cmpb.campo_nro_tramite,
+                        cmpb.campo_tipo_cambio
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod

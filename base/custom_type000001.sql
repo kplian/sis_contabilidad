@@ -61,3 +61,14 @@ ALTER TYPE conta.maestro_comprobante
   ALTER ATTRIBUTE columna_nro_cuenta_bancaria_trans TYPE VARCHAR(500);
 
 /***********************************F-TYP-RAC-CONTA-0-24/09/2014****************************************/
+
+
+
+/***********************************I-TYP-RAC-CONTA-0-31/03/2015****************************************/
+
+  --------------- SQL ---------------
+
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_tipo_cambio NUMERIC(14,8);
+  
+/***********************************F-TYP-RAC-CONTA-0-31/03/2015****************************************/

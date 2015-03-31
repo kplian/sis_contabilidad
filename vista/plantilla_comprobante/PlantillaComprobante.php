@@ -416,6 +416,22 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+        {
+            config: {
+                name: 'campo_tipo_cambio',
+                qtip: 'define de donde obtendra el tipo de cambio convenido',
+                fieldLabel: 'Tipo de cambio convenido',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpb.campo_tipo_cambio',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -532,7 +548,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'campo_id_cuenta_bancaria_mov', type: 'string'},
 		{name:'campo_nro_cheque', type: 'string'},
 		'campo_nro_cuenta_bancaria_trans',
-		'campo_nro_tramite'
+		'campo_nro_tramite','campo_tipo_cambio'
         
 		
 	],

@@ -52,6 +52,7 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('campo_nro_cheque','varchar');
 		$this->captura('campo_nro_cuenta_bancaria_trans','varchar');
 		$this->captura('campo_nro_tramite','varchar');
+		$this->captura('campo_tipo_cambio','varchar');
 		
         
 		
@@ -97,6 +98,7 @@ class MODPlantillaComprobante extends MODbase{
 		
 		$this->setParametro('campo_nro_tramite','campo_nro_tramite','varchar');
 		$this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','varchar');
+		$this->setParametro('campo_tipo_cambio','campo_tipo_cambio','varchar');
 		
 		
 		
@@ -135,16 +137,15 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_moneda','campo_moneda','consulta_select');
 		$this->setParametro('campo_gestion_relacion','campo_gestion_relacion','varchar');
         $this->setParametro('otros_campos','otros_campos','varchar');
-
         $this->setParametro('momento_comprometido','momento_comprometido','varchar');
         $this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
         $this->setParametro('momento_pagado','momento_pagado','varchar');
 		$this->setParametro('campo_id_cuenta_bancaria','campo_id_cuenta_bancaria','varchar');
 		$this->setParametro('campo_id_cuenta_bancaria_mov','campo_id_cuenta_bancaria_mov','varchar');
-		$this->setParametro('campo_nro_cheque','campo_nro_cheque','varchar');
-		
+		$this->setParametro('campo_nro_cheque','campo_nro_cheque','varchar');		
 		$this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','varchar');
         $this->setParametro('campo_nro_tramite','campo_nro_tramite','varchar');
+		$this->setParametro('campo_tipo_cambio','campo_tipo_cambio','varchar');
         
         
 		//Ejecuta la instruccion

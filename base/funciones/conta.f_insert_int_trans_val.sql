@@ -42,6 +42,8 @@ BEGIN
            v_registros_con
           from conta.tint_comprobante  c
           where c.id_int_comprobante = NEW.id_int_comprobante;
+          
+         -- raise exception 'tipo de cambio en la tras %', v_registros_con.tipo_cambio;
                   
          -- Obtener la moneda base
          v_id_moneda_base=param.f_get_moneda_base();
@@ -62,12 +64,12 @@ BEGIN
                   
                        
                             IF v_registros.id_moneda = v_id_moneda_base   and v_registros_con.tipo_cambio is not  NULL THEN
-                            
+                               
                                --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
-                               v_importe_debe  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_debe, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
-                               v_importe_haber = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_haber, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
-                               v_importe_recurso =  param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_recurso, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
-                               v_importe_gasto  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_gasto, v_registros_con.fecha,'C',2, v_registros_con.tipo_cambio);
+                               v_importe_debe  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_debe, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                               v_importe_haber = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_haber, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                               v_importe_recurso =  param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_recurso, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                               v_importe_gasto  = param.f_convertir_moneda (v_registros_con.id_moneda, v_registros.id_moneda, NEW.importe_gasto, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
                             
                             ELSE
                             

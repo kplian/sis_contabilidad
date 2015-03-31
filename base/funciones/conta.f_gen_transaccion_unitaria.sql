@@ -96,7 +96,7 @@ BEGIN
          
   
    
-   IF p_reg_det_plantilla->'tabla_detalle'!=''  and p_reg_det_plantilla->'tabla_detalle' !='NULL' THEN
+   IF (p_reg_det_plantilla->'tabla_detalle')!=''  and (p_reg_det_plantilla->'tabla_detalle') !='NULL' THEN
    
     
     
@@ -111,7 +111,7 @@ BEGIN
          
          
    
-         IF p_reg_det_plantilla->'nom_fk_tabla_maestro' ='' or p_reg_det_plantilla->'nom_fk_tabla_maestro' ='NULL' THEN
+         IF (p_reg_det_plantilla->'nom_fk_tabla_maestro') = '' or (p_reg_det_plantilla->'nom_fk_tabla_maestro') = 'NULL' THEN
          
            raise exception 'En el detalle de plantilla el campo nom_fk_tabla_maestro no puede ser vacio si hace referencia a una tabla_detalle';
            
