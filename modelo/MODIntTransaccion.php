@@ -146,6 +146,67 @@ class MODIntTransaccion extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+   function listarIntTransaccionMayor(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_transaccion_sel';
+		$this->transaccion='CONTA_INTMAY_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('id_moneda','id_moneda','int4');
+		$this->setParametro('id_cuenta','id_cuenta','int4');
+		$this->setParametro('id_partida','id_partida','int4');
+		
+		//captura parametros adicionales para el count
+		$this->capturaCount('total_debe','numeric');
+		$this->capturaCount('total_haber','numeric');
+		
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_int_transaccion','int4');
+		$this->captura('id_partida','int4');
+		$this->captura('id_centro_costo','int4');
+		$this->captura('id_partida_ejecucion','int4');
+		$this->captura('estado_reg','varchar');
+		$this->captura('id_int_transaccion_fk','int4');
+		$this->captura('id_cuenta','int4');
+		$this->captura('glosa','varchar');
+		$this->captura('id_int_comprobante','int4');
+		$this->captura('id_auxiliar','int4');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		$this->captura('importe_debe','numeric');	
+		$this->captura('importe_haber','numeric');
+		$this->captura('importe_gasto','numeric');
+		$this->captura('importe_recurso','numeric');
+		$this->captura('desc_partida','text');
+		$this->captura('desc_centro_costo','text');
+		$this->captura('desc_cuenta','text');
+		$this->captura('desc_auxiliar','text');
+		$this->captura('tipo_partida','varchar');
+		$this->captura('id_orden_trabajo','int4');
+		$this->captura('desc_orden','varchar');		
+		$this->captura('nro_cbte','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('nombre_corto','varchar');
+		$this->captura('fecha','date');
+		$this->captura('glosa1','varchar');
+		
+		
+		
+		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>

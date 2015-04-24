@@ -79,7 +79,8 @@ BEGIN
             campo_nro_cheque,
             campo_nro_cuenta_bancaria_trans,
             campo_nro_tramite,
-            campo_tipo_cambio
+            campo_tipo_cambio,
+            campo_depto_libro
              
           	) values(
           	v_parametros.codigo,
@@ -111,7 +112,8 @@ BEGIN
             v_parametros.campo_nro_cheque,
             v_parametros.campo_nro_cuenta_bancaria_trans,
             v_parametros.campo_nro_tramite,
-            v_parametros.campo_tipo_cambio
+            v_parametros.campo_tipo_cambio,
+            v_parametros.campo_depto_libro
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -162,7 +164,8 @@ BEGIN
             campo_nro_cheque = v_parametros.campo_nro_cheque,
             campo_nro_cuenta_bancaria_trans= v_parametros.campo_nro_cuenta_bancaria_trans,
             campo_nro_tramite= v_parametros.campo_nro_tramite,
-            campo_tipo_cambio = v_parametros.campo_tipo_cambio
+            campo_tipo_cambio = v_parametros.campo_tipo_cambio,
+            campo_depto_libro = v_parametros.campo_depto_libro
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta

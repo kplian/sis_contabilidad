@@ -80,7 +80,8 @@ BEGIN
                         'campo_nro_cheque',
                         'campo_nro_tramite',
                         'campo_nro_cuenta_bancaria_trans',
-                        'campo_tipo_cambio'];
+                        'campo_tipo_cambio',
+                        'campo_depto_libro'];
     
     v_tamano:=array_upper(v_def_campos,1);
     
@@ -121,12 +122,8 @@ BEGIN
     
     --guardo depto
     
-    
-    
-  
-    
    
-    if (v_plantilla.campo_depto!='' AND v_plantilla.campo_depto is not null) then
+    if (v_plantilla.campo_depto != '' AND v_plantilla.campo_depto is not null) then
     	
         v_this.columna_depto = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_depto::text, 
@@ -134,8 +131,19 @@ BEGIN
                                                 hstore(v_tabla));
 	end if;
     
+    if (v_plantilla.campo_depto_libro != '' AND v_plantilla.campo_depto_libro is not null) then
+    	
+        v_this.columna_libro_banco = conta.f_get_columna(	'maestro', 
+        										v_plantilla.campo_depto_libro::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla));
+	end if;
+    
+    
+    
+    
     --guardo acreedor
-    if (v_plantilla.campo_acreedor!='' AND v_plantilla.campo_acreedor is not null) then
+    if (v_plantilla.campo_acreedor != '' AND v_plantilla.campo_acreedor is not null) then
     	v_this.columna_acreedor = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_acreedor::text, 
                                                 hstore(v_this), 
@@ -143,7 +151,7 @@ BEGIN
 	end if;
     
     --guardo descripcion--
-    if (v_plantilla.campo_descripcion!='' AND v_plantilla.campo_descripcion is not null) then
+    if (v_plantilla.campo_descripcion != '' AND v_plantilla.campo_descripcion is not null) then
     	v_this.columna_descripcion = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_descripcion::text, 
                                                 hstore(v_this), 
@@ -152,7 +160,7 @@ BEGIN
 	end if;    
 
     --guardo moneda--
-    if (v_plantilla.campo_moneda!='' AND v_plantilla.campo_moneda is not null) then
+    if (v_plantilla.campo_moneda != '' AND v_plantilla.campo_moneda is not null) then
     	v_this.columna_moneda = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_moneda::text, 
                                                 hstore(v_this), 
@@ -160,7 +168,7 @@ BEGIN
 	end if;    
     
     --guardo fecha
-    if (v_plantilla.campo_fecha!='' AND v_plantilla.campo_fecha is not null) then
+    if (v_plantilla.campo_fecha != '' AND v_plantilla.campo_fecha is not null) then
     	v_this.columna_fecha = conta.f_get_columna(	'maestro', 
         										v_plantilla.campo_fecha::text, 
                                                 hstore(v_this), 
@@ -169,7 +177,7 @@ BEGIN
     
     
       --guardo fecha
-    if (v_plantilla.campo_gestion_relacion!='' AND v_plantilla.campo_gestion_relacion is not null) then
+    if (v_plantilla.campo_gestion_relacion != '' AND v_plantilla.campo_gestion_relacion is not null) then
     	
        /*raise notice '??????  %, %',v_plantilla.campo_gestion_relacion,
                                                 conta.f_get_columna('maestro', 
@@ -295,6 +303,7 @@ BEGIN
       id_clase_comprobante,
       id_subsistema,
       id_depto,
+      id_depto_libro,
       id_moneda,
       id_periodo,
       --nro_cbte,
@@ -329,6 +338,7 @@ BEGIN
       v_id_clase_comprobante, --TODO agregar a la interface de plantilla
       v_id_subsistema, --TODO agregar a la interface de plantilla,
       v_this.columna_depto::integer,
+      v_this.columna_libro_banco::integer,
       v_this.columna_moneda::integer,
       v_rec_periodo.po_id_periodo,
       --:nro_cbte,

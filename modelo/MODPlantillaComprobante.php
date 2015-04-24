@@ -53,6 +53,7 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('campo_nro_cuenta_bancaria_trans','varchar');
 		$this->captura('campo_nro_tramite','varchar');
 		$this->captura('campo_tipo_cambio','varchar');
+		$this->captura('campo_depto_libro','text');
 		
         
 		
@@ -99,6 +100,8 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_nro_tramite','campo_nro_tramite','varchar');
 		$this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','varchar');
 		$this->setParametro('campo_tipo_cambio','campo_tipo_cambio','varchar');
+		$this->setParametro('campo_depto_libro','campo_depto_libro','text');
+		
 		
 		
 		
@@ -146,7 +149,7 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','varchar');
         $this->setParametro('campo_nro_tramite','campo_nro_tramite','varchar');
 		$this->setParametro('campo_tipo_cambio','campo_tipo_cambio','varchar');
-        
+        $this->setParametro('campo_depto_libro','campo_depto_libro','text');
         
 		//Ejecuta la instruccion
 		$this->armarConsulta();

@@ -1165,3 +1165,49 @@ ALTER TABLE conta.tplantilla_comprobante
 
   
 /***********************************F-SCP-RAC-CONTA-0-31/03/2015****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-13/04/2015****************************************/
+
+ALTER TABLE conta.ttransaccion
+  ALTER COLUMN glosa TYPE VARCHAR COLLATE pg_catalog."default";
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ALTER COLUMN glosa TYPE VARCHAR COLLATE pg_catalog."default";
+
+/***********************************F-SCP-RAC-CONTA-0-13/04/2015****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-16/04/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcomprobante
+  ADD COLUMN id_depto_libro INTEGER;
+
+COMMENT ON COLUMN conta.tcomprobante.id_depto_libro
+IS 'identifica el depto de libro de banco';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_depto_libro INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_depto_libro
+IS 'departamento de libro de bancos';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_depto_libro TEXT;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.campo_depto_libro
+IS 'este campo es para definir el depto de libro de bancos del comprobante';
+
+/***********************************F-SCP-RAC-CONTA-0-16/04/2015****************************************/

@@ -72,3 +72,13 @@ ALTER TYPE conta.maestro_comprobante
   ADD ATTRIBUTE columna_tipo_cambio NUMERIC(14,8);
   
 /***********************************F-TYP-RAC-CONTA-0-31/03/2015****************************************/
+
+
+/***********************************I-TYP-RAC-CONTA-0-16/04/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_libro_banco INTEGER;
+  
+/***********************************F-TYP-RAC-CONTA-0-16/04/2015****************************************/

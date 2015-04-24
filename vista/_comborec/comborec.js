@@ -20,7 +20,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
 						 id: 'id_cuenta',
 						 root: 'datos',
 						 sortInfo:{
-							field: 'nombre_cuenta',
+							field: 'nro_cuenta',
 							direction: 'ASC'
 					},
 					totalProperty: 'total',
