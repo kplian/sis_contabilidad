@@ -1185,16 +1185,6 @@ ALTER TABLE conta.tint_transaccion
 
 --------------- SQL ---------------
 
-ALTER TABLE conta.tcomprobante
-  ADD COLUMN id_depto_libro INTEGER;
-
-COMMENT ON COLUMN conta.tcomprobante.id_depto_libro
-IS 'identifica el depto de libro de banco';
-
-
-
---------------- SQL ---------------
-
 ALTER TABLE conta.tint_comprobante
   ADD COLUMN id_depto_libro INTEGER;
 
