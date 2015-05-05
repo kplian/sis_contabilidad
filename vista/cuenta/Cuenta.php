@@ -120,11 +120,15 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbInterfaz,{
 				name: 'digito',
 				fieldLabel: 'Digito',
 				allowBlank: false,
+				allowNegative: false,
+				vtype: 'alpha',
+				//regex: new RegExp('/^[0-9]$/'),
+				//regexText: 'Solo números',
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:5
 			},
-			type:'NumberField',
+			type:'Field',
 			id_grupo:1,
 			grid:false,
 			form:true
