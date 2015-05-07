@@ -1214,3 +1214,13 @@ ALTER TABLE conta.ttransaccion
   ALTER COLUMN id_auxiliar DROP NOT NULL;
   
 /***********************************F-SCP-RAC-CONTA-0-05/05/2015****************************************/
+
+/***********************************I-SCP-GSS-CONTA-0-07/05/2015****************************************/
+
+ALTER TABLE conta.tcomprobante
+  ADD COLUMN id_depto_libro INTEGER;
+
+COMMENT ON COLUMN conta.tcomprobante.id_depto_libro
+IS 'identifica el depto de libro de banco';
+
+/***********************************F-SCP-GSS-CONTA-0-07/05/2015****************************************/
