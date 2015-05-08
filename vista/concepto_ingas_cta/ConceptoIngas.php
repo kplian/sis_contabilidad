@@ -15,17 +15,24 @@ Phx.vista.ConceptoIngasCuenta = {
 	title:'Concepto de Ingreso/Gasto',
 	constructor: function(config) {
     	Phx.vista.ConceptoIngasCuenta.superclass.constructor.call(this,config);    	
-	},    
-	east : { 
-          url:'../../../sis_contabilidad/vista/relacion_contable/RelacionContableTabla.php',
-          title:'Relacion Contable', 
-          width:'50%',
-          cls:'RelacionContableTabla',
-          params:{nombre_tabla:'param.tconcepto_ingas',tabla_id : 'id_concepto_ingas'}
-   },
-   bedit:false,
-   bnew:false,
-   bdel:false,
+	}, 
+	tabeast:[
+		  { 
+	          url:'../../../sis_contabilidad/vista/relacion_contable/RelacionContableTabla.php',
+	          title:'Relacion Contable', 
+	          width:'50%',
+	          cls:'RelacionContableTabla',
+	          params:{nombre_tabla:'param.tconcepto_ingas',tabla_id : 'id_concepto_ingas'}
+   		 },
+	      { 
+		  url:'../../../sis_presupuestos/vista/concepto_partida/ConceptoPartida.php',
+		  title:'Partidas', 
+		  height:'50%',
+		  cls:'ConceptoPartida'
+		 }],
+   bedit:true,
+   bnew:true,
+   bdel:true,
    bsave:false,
    EnableSelect : function (n, extra) {
    		var selected = this.sm.getSelected().data;

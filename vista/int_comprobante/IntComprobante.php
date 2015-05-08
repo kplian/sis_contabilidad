@@ -71,7 +71,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
     },
     
     validarFiltros:function(){
-        if(this.cmbDepto.isValid()){
+        if(this.cmbDepto.validate()){
             return true;
         }
         else{
@@ -782,7 +782,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
                 valueField: 'id_depto',
    				displayField: 'nombre',
    				hiddenName: 'id_depto',
-                enableMultiSelect:true,
+                enableMultiSelect: true,
                 triggerAction: 'all',
                 lazyRender: true,
                 mode: 'remote',
