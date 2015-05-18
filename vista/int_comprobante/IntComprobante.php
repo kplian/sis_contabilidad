@@ -915,7 +915,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			var data = rec.data;
 			if (data) {
 				Ext.Ajax.request({
-						url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
+						//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
+						url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
 						params : {
 							'id_int_comprobante' : data.id_int_comprobante
 						},

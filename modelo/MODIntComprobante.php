@@ -213,10 +213,12 @@ class MODIntComprobante extends MODbase{
 	}
 	
 	function listarCbteCabecera(){
+			
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_int_comprobante_sel';
 		$this->transaccion='CONTA_CABCBT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
 		
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 				
@@ -248,7 +250,7 @@ class MODIntComprobante extends MODbase{
 		$this->procedimiento='conta.ft_int_comprobante_sel';
 		$this->transaccion='CONTA_DETCBT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		
+		$this->setCount(false);
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 				
 		//Definicion de la lista del resultado del query

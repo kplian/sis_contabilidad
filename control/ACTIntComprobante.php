@@ -7,9 +7,10 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 //require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
+// convert to PDF
+require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/PlantillasHTML.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
-
 class ACTIntComprobante extends ACTbase{
 	
 	private $objPlantHtml;
@@ -263,176 +264,7 @@ class ACTIntComprobante extends ACTbase{
 		$repCbte->assign('tot_importe_debe',$arrTotalesCbte['tot_debe']); //dinámico
 		$repCbte->assign('tot_importe_haber',$arrTotalesCbte['tot_haber']); //dinámico
 		$detail=$repCbte->fetch('comprobante.tpl');
-		
 
-/*		
-		///////////////////
-		//Creación de pdf
-		///////////////////
-		$this->objParam->addParametro('orientation','P');
-		$this->objParam->addParametro('unit','mm');
-		$this->objParam->addParametro('format','Letter');
-		$this->objParam->addParametro('unicode',true);
-		$this->objParam->addParametro('encoding','UTF-8');
-		$this->objParam->addParametro('diskcache',false);
-		$this->objParam->addParametro('pdfa',false);
-		//Archivo
-		$this->objParam->addParametro('nombre_archivo','pxp_comprobante');
-		
-		/*$header='<table border="1" cellspacing="0" cellpadding="1">
-				<tr>
-					<td width="23%" rowspan="4"><img src="../../lib/lib_reporte/logo.png" border="0" width=156 height=117 /></td>
-					<td align="center" width="54%" rowspan="2">**main_title1**</td>
-					<td width="23%">**header_key_right1**: **header_value_right1**</td>
-				</tr>
-				<tr>
-					<td width="23%">**header_key_right2**: **header_value_right2**</td>
-				</tr>
-				<tr>
-					<td align="center" width="54%" rowspan="2">**main_title2**</td>
-					<td width="23%">**header_key_right3**: **header_value_right3**</td>
-				</tr>
-				<tr>
-					<td width="23%">Página **main_pagina_actual** de **main_pagina_total**</td>
-				</tr>
-			</table>';*/
-/*			
-			$header1 = <<<EOF
-<!-- EXAMPLE OF CSS STYLE -->
-<style>
-	h1 {
-		color: navy;
-		font-family: times;
-		font-size: 24pt;
-		text-decoration: underline;
-	}
-	p.first {
-		color: #003300;
-		font-family: helvetica;
-		font-size: 12pt;
-	}
-	p.first span {
-		color: #006600;
-		font-style: italic;
-	}
-	p#second {
-		color: rgb(00,63,127);
-		font-family: times;
-		font-size: 12pt;
-		text-align: justify;
-	}
-	p#second > span {
-		background-color: #FFFFAA;
-	}
-	table.first {
-		color: #003300;
-		font-family: helvetica;
-		font-size: 8pt;
-		border-left: 3px solid red;
-		border-right: 3px solid #FF00FF;
-		border-top: 3px solid green;
-		border-bottom: 3px solid blue;
-		background-color: #ccffcc;
-	}
-	td {
-		border: 2px solid blue;
-		background-color: #ffffee;
-	}
-	td.second {
-		border: 2px dashed green;
-	}
-	div.test {
-		color: #CC0000;
-		background-color: #FFFF66;
-		font-family: helvetica;
-		font-size: 10pt;
-		border-style: solid solid solid solid;
-		border-width: 2px 2px 2px 2px;
-		border-color: green #FF00FF blue red;
-		text-align: center;
-	}
-</style>
-
-<h1 class="title">Example of <i style="color:#990000">XHTML + CSS</i></h1>
-
-<p class="first">Example of paragraph with class selector. <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sed imperdiet lectus. Phasellus quis velit velit, non condimentum quam. Sed neque urna, ultrices ac volutpat vel, laoreet vitae augue. Sed vel velit erat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Cras eget velit nulla, eu sagittis elit. Nunc ac arcu est, in lobortis tellus. Praesent condimentum rhoncus sodales. In hac habitasse platea dictumst. Proin porta eros pharetra enim tincidunt dignissim nec vel dolor. Cras sapien elit, ornare ac dignissim eu, ultricies ac eros. Maecenas augue magna, ultrices a congue in, mollis eu nulla. Nunc venenatis massa at est eleifend faucibus. Vivamus sed risus lectus, nec interdum nunc.</span></p>
-
-<p id="second">Example of paragraph with ID selector. <span>Fusce et felis vitae diam lobortis sollicitudin. Aenean tincidunt accumsan nisi, id vehicula quam laoreet elementum. Phasellus egestas interdum erat, et viverra ipsum ultricies ac. Praesent sagittis augue at augue volutpat eleifend. Cras nec orci neque. Mauris bibendum posuere blandit. Donec feugiat mollis dui sit amet pellentesque. Sed a enim justo. Donec tincidunt, nisl eget elementum aliquam, odio ipsum ultrices quam, eu porttitor ligula urna at lorem. Donec varius, eros et convallis laoreet, ligula tellus consequat felis, ut ornare metus tellus sodales velit. Duis sed diam ante. Ut rutrum malesuada massa, vitae consectetur ipsum rhoncus sed. Suspendisse potenti. Pellentesque a congue massa.</span></p>
-
-<div class="test">example of DIV with border and fill.<br />Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sed imperdiet lectus.</div>
-
-<br />
-
-<table class="first" cellpadding="4" cellspacing="6">
- <tr>
-  <td width="30" align="center"><b>No.</b></td>
-  <td width="140" align="center" bgcolor="#FFFF00"><b>XXXX</b></td>
-  <td width="140" align="center"><b>XXXX</b></td>
-  <td width="80" align="center"> <b>XXXX</b></td>
-  <td width="80" align="center"><b>XXXX</b></td>
-  <td width="45" align="center"><b>XXXX</b></td>
- </tr>
- <tr>
-  <td width="30" align="center">1.</td>
-  <td width="140" rowspan="6" class="second">XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX</td>
-  <td width="140">XXXX<br />XXXX</td>
-  <td width="80">XXXX<br />XXXX</td>
-  <td width="80">XXXX</td>
-  <td align="center" width="45">XXXX<br />XXXX</td>
- </tr>
- <tr>
-  <td width="30" align="center" rowspan="3">2.</td>
-  <td width="140" rowspan="3">XXXX<br />XXXX</td>
-  <td width="80">XXXX<br />XXXX</td>
-  <td width="80">XXXX<br />XXXX</td>
-  <td align="center" width="45">XXXX<br />XXXX</td>
- </tr>
- <tr>
-  <td width="80">XXXX<br />XXXX<br />XXXX<br />XXXX</td>
-  <td width="80">XXXX<br />XXXX</td>
-  <td align="center" width="45">XXXX<br />XXXX</td>
- </tr>
- <tr>
-  <td width="80" rowspan="2" >XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX<br />XXXX</td>
-  <td width="80">XXXX<br />XXXX</td>
-  <td align="center" width="45">XXXX<br />XXXX</td>
- </tr>
- <tr>
-  <td width="30" align="center">3.</td>
-  <td width="140">XXXX<br />XXXX</td>
-  <td width="80">XXXX<br />XXXX</td>
-  <td align="center" width="45">XXXX<br />XXXX</td>
- </tr>
- <tr bgcolor="#FFFF80">
-  <td width="30" align="center">4.</td>
-  <td width="140" bgcolor="#00CC00" color="#FFFF00">XXXX<br />XXXX</td>
-  <td width="80">XXXX<br />XXXX</td>
-  <td width="80">XXXX<br />XXXX</td>
-  <td align="center" width="45">XXXX<br />XXXX</td>
- </tr>
-</table>
-EOF;
-			
-	
-		//Instancia la clase de reportes
-		$this->objReporte = new ReportePDF2($this->objParam);
-		$this->objReporte->setHeaderHtml('<<<EOF'.$header.'EOF');
-		//$this->objReporte->setFooterHtml($footer);
-
-		//Genera el reporte		
-		$this->objReporte->generarReporte();
-		$mensajeExito = new Mensaje();
-		$mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$this->objParam->getParametro('nombre_archivo'),'control');
-		$mensajeExito->setArchivoGenerado($this->objReporte->getNombreArchivo());
-		$this->res = $mensajeExito;
-		$this->res->imprimirRespuesta($this->res->generarJson());
-		exit;
-		
-		
-		
-		
-		*/
-		
 		
 		////////////////////////////
 		//Creación del archivo html
@@ -449,10 +281,115 @@ EOF;
 		$this->res = $mensajeExito;
 		$this->res->imprimirRespuesta($this->res->generarJson());
 		
+		//Se obtienen la suma de debe y haber
+		$arrTotalesCbte= array('tot_ejec'=>0,'tot_debe'=>0,'tot_haber'=>0,'tot_debe1'=>0,'tot_haber1'=>0);
+		
+		foreach($cbteTransData as $key=>$val){
+			$arrTotalesCbte['tot_debe']+=$val['importe_debe'];
+			$arrTotalesCbte['tot_haber']+=$val['importe_haber'];
+			$arrTotalesCbte['tot_debe1']+=$val['importe_debe1'];
+			$arrTotalesCbte['tot_haber1']+=$val['importe_haber1'];
+		}
 		
 		
 	}
+
+    function recuperarDatosCbte(){
+    	$dataSource = new DataSource();	
+		$this->objFunc = $this->create('MODIntComprobante');
+		$cbteHeader = $this->objFunc->listarCbteCabecera($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){
+				 	
+				$dataSource->putParameter('cabecera',$cbteHeader->getDatos());
+						
+				$this->objFunc=$this->create('MODIntComprobante');
+				$cbteTrans = $this->objFunc->listarCbteDetalle($this->objParam);
+				if($cbteTrans->getTipo()=='EXITO'){
+					$dataSource->putParameter('detalleCbte', $cbteTrans->getDatos());
+				}
+		        else{
+		            $cbteTrans->imprimirRespuesta($cbteTrans->generarJson());
+				}
+			return $dataSource;
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+		}              
+		
+    }
+
+    function reporteCbte(){
+   	    	
+   	    $dataSource = $this->recuperarDatosCbte(); 
+   	   	
+   	    // get the HTML
+	    ob_start();
+	    //include(dirname(__FILE__).'/../reportes/res/exemple10.php');
+		//include(dirname(__FILE__).'/../reportes/res/exemple07a.php');
+		include(dirname(__FILE__).'/../reportes/tpl/intCbte.php');
+        $content = ob_get_clean();
+	    //ob_start();
+	   // include(dirname(__FILE__).'/../reportes/res/exemple07b.php');
+		//$content2 = ob_get_clean();
+	    try
+	    {
+	    	
+			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 			
+			$pdf->SetDisplayMode('fullpage');
+			
+            // set document information
+            $pdf->SetCreator(PDF_CREATOR);
+			// set default header data
+			//$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 061', PDF_HEADER_STRING);
+			
+			// set header and footer fonts
+			//$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+			//$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+			
+			// set default monospaced font
+			$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+			
+			// set margins
+			$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+			$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+			$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+			
+			// set auto page breaks
+			$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+			
+			// set image scale factor
+			//$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+			
+			// set font
+			$pdf->SetFont('helvetica', '', 10);
+			// add a page
+            $pdf->AddPage();
+			$pdf->writeHTML($content, true, false, true, false, '');
+			/*
+			$pdf->SetFont('helvetica', '', 6);
+			 $pdf->AddPage('L');
+			$pdf->writeHTML($content2, true, false, true, false, '');
+			*/
+			$nombreArchivo = 'OrdenCompraServicio.pdf';
+			$pdf->Output(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo, 'F');
+			
+			$mensajeExito = new Mensaje();
+            $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado', 'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+            $mensajeExito->setArchivoGenerado($nombreArchivo);
+            $this->res = $mensajeExito;
+            $this->res->imprimirRespuesta($this->res->generarJson());
+			
+			
+			
+			
+	    }
+	    catch(HTML2PDF_exception $e) {
+	        echo $e;
+	        exit;
+	    }
+    }	
+		
 }
 
 ?>
