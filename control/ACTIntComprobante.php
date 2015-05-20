@@ -384,7 +384,7 @@ class ACTIntComprobante extends ACTbase{
 			
 			
 	    }
-	    catch(HTML2PDF_exception $e) {
+	    catch(exception $e) {
 	        echo $e;
 	        exit;
 	    }
