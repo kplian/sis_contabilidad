@@ -58,7 +58,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_int_comprobante_fks','text');
 		$this->captura('id_tipo_relacion_comprobante','int');
 		$this->captura('desc_tipo_relacion_comprobante','varchar');
-		
+		$this->captura('id_moneda_base','int4');
 		
 		
 		

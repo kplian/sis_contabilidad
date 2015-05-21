@@ -32,6 +32,20 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_int_transaccion	integer;
+    
+    v_importe_debe 			numeric;
+    v_importe_haber 		numeric;
+    v_importe_recurso 		numeric;
+    v_importe_gasto 		numeric;
+    v_registros 			record;
+    v_registros_con 		record;
+    v_id_moneda_base		integer;
+    
+    
+    v_importe_debe_mb  		numeric;
+    v_importe_haber_mb 		numeric;
+    v_importe_recurso_mb 	numeric;
+    v_importe_gasto_mb		numeric;
  
 BEGIN
 
@@ -51,43 +65,101 @@ BEGIN
         	---------------
         	--VALIDACIONES
         	---------------
+            
+             select 
+              c.fecha,
+              c.tipo_cambio,
+              c.id_moneda
+            into
+             v_registros_con
+            from conta.tint_comprobante  c
+            where c.id_int_comprobante = v_parametros.id_int_comprobante;
+          
+          --recupera moneda base
+          v_id_moneda_base = param.f_get_moneda_base();
+          
+          --pordefecto solo copiamos
+          v_importe_debe  =  v_parametros.importe_debe;
+          v_importe_haber 	=  v_parametros.importe_haber;
+          v_importe_recurso = v_parametros.importe_debe;
+          v_importe_gasto	= v_parametros.importe_haber;
+          
+          v_importe_debe_mb  =  v_importe_debe;
+          v_importe_haber_mb 	= v_importe_haber;
+          v_importe_recurso_mb = v_importe_recurso;
+          v_importe_gasto_mb	= v_importe_gasto;
+       
+          
+          -- si la moneda es distinto de la moneda base, calculamos segun tipo de cambio
+          IF v_id_moneda_base != v_registros_con.id_moneda  THEN
+             
+               IF  v_registros_con.tipo_cambio is not  NULL THEN
+                               
+                 --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
+                 v_importe_debe_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_debe, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                 v_importe_haber_mb = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_haber, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                 v_importe_recurso_mb =  param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_recurso, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                 v_importe_gasto_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_gasto, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                            
+              ELSE
+                            
+                --si no tenemso tipo de cambio convenido .....
+                 v_importe_debe_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_debe, v_registros_con.fecha,'O',2);
+                 v_importe_haber_mb = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_haber, v_registros_con.fecha,'O',2);
+                 v_importe_recurso_mb =  param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_recurso, v_registros_con.fecha,'O',2);
+                 v_importe_gasto_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base,  v_importe_gasto, v_registros_con.fecha,'O',2);
+                           
+                            
+              END IF;
+           
+          END IF;
 
-        
+         
         	-----------------------------
         	--REGISTRO DE LA TRANSACCIÓN
         	-----------------------------
         	insert into conta.tint_transaccion(
-			id_partida,
-			id_centro_costo,
-			estado_reg,
-			id_cuenta,
-			glosa,
-			id_int_comprobante,
-			id_auxiliar,
-			importe_debe,
-			importe_haber,
-			importe_gasto,
-			importe_recurso,
-			id_usuario_reg,
-			fecha_reg,
-			id_usuario_mod,
-			fecha_mod
+              id_partida,
+              id_centro_costo,
+              estado_reg,
+              id_cuenta,
+              glosa,
+              id_int_comprobante,
+              id_auxiliar,
+              importe_debe,
+              importe_haber,
+              importe_recurso,
+              importe_gasto,			
+              importe_debe_mb,
+              importe_haber_mb,
+              importe_recurso_mb,
+              importe_gasto_mb,			
+              id_usuario_reg,
+              fecha_reg,
+              id_usuario_mod,
+              fecha_mod,
+              id_orden_trabajo
           	) values(
-			v_parametros.id_partida,
-			v_parametros.id_centro_costo,
-			'activo',
-			v_parametros.id_cuenta,
-			v_parametros.glosa,
-			v_parametros.id_int_comprobante,
-			v_parametros.id_auxiliar,
-			v_parametros.importe_debe,
-			v_parametros.importe_haber,
-            v_parametros.importe_debe,
-			v_parametros.importe_haber,
-			p_id_usuario,
-			now(),
-			null,
-			null
+              v_parametros.id_partida,
+              v_parametros.id_centro_costo,
+              'activo',
+              v_parametros.id_cuenta,
+              v_parametros.glosa,
+              v_parametros.id_int_comprobante,
+              v_parametros.id_auxiliar,
+              v_importe_debe,
+              v_importe_haber,
+              v_importe_recurso,
+              v_importe_gasto,
+              v_importe_debe_mb,
+              v_importe_haber_mb,
+              v_importe_recurso_mb,
+              v_importe_gasto_mb,
+              p_id_usuario,
+              now(),
+              null,
+              null,
+              v_parametros.id_orden_trabajo
 			)RETURNING id_int_transaccion into v_id_int_transaccion;
 			
 			--Definicion de la respuesta
@@ -112,6 +184,56 @@ BEGIN
 			---------------
         	--VALIDACIONES
         	---------------
+            select 
+              c.fecha,
+              c.tipo_cambio,
+              c.id_moneda
+            into
+             v_registros_con
+            from conta.tint_comprobante  c
+            where c.id_int_comprobante = v_parametros.id_int_comprobante;
+          
+          --recupera moneda base
+          v_id_moneda_base = param.f_get_moneda_base();
+          
+          --pordefecto solo copiamos
+          v_importe_debe  =  v_parametros.importe_debe;
+          v_importe_haber 	=  v_parametros.importe_haber;
+          v_importe_recurso = v_parametros.importe_debe;
+          v_importe_gasto	= v_parametros.importe_haber;
+          
+          v_importe_debe_mb  =  v_importe_debe;
+          v_importe_haber_mb 	= v_importe_haber;
+          v_importe_recurso_mb = v_importe_recurso;
+          v_importe_gasto_mb	= v_importe_gasto;
+       
+          
+          -- si la moneda es distinto de la moneda base, calculamos segun tipo de cambio
+          IF v_id_moneda_base != v_registros_con.id_moneda  THEN
+             
+               IF  v_registros_con.tipo_cambio is not  NULL THEN
+                               
+                 --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
+                 v_importe_debe_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_debe, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                 v_importe_haber_mb = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_haber, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                 v_importe_recurso_mb =  param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_recurso, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                 v_importe_gasto_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_gasto, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
+                            
+              ELSE
+                            
+                --si no tenemso tipo de cambio convenido .....
+                 v_importe_debe_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_debe, v_registros_con.fecha,'O',2);
+                 v_importe_haber_mb = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_haber, v_registros_con.fecha,'O',2);
+                 v_importe_recurso_mb =  param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_recurso, v_registros_con.fecha,'O',2);
+                 v_importe_gasto_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base,  v_importe_gasto, v_registros_con.fecha,'O',2);
+                           
+                            
+              END IF;
+           
+          END IF;
+            
+            
+            
         	--VerIfica el estado
         	if not exists(select 1 from conta.tint_transaccion tra
 			        	inner join conta.tint_comprobante cbte
@@ -121,24 +243,28 @@ BEGIN
         		raise exception 'Modificación no realizada: el comprobante no está en estado Borrador';
         	end if;
 		
+           --raise exception 'ss';
 			--------------------------------
 			--MODIFICACION DE LA TRANSACCION
 			--------------------------------
 			update conta.tint_transaccion set
 			id_partida = v_parametros.id_partida,
+            id_orden_trabajo = v_parametros.id_orden_trabajo,
 			id_centro_costo = v_parametros.id_centro_costo,
-			
-			
 			id_cuenta = v_parametros.id_cuenta,
 			glosa = v_parametros.glosa,
 			id_int_comprobante = v_parametros.id_int_comprobante,
 			id_auxiliar = v_parametros.id_auxiliar,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
-			importe_debe = v_parametros.importe_debe,
-			importe_haber = v_parametros.importe_haber,
-			importe_gasto = v_parametros.importe_debe,
-			importe_recurso = v_parametros.importe_debe
+			importe_debe = v_importe_debe,
+			importe_haber = v_importe_haber,
+			importe_gasto = v_importe_gasto,
+			importe_recurso = v_importe_recurso,
+            importe_debe_mb = v_importe_debe_mb,
+			importe_haber_mb = v_importe_haber_mb,
+			importe_gasto_mb = v_importe_gasto_mb,
+			importe_recurso_mb = v_importe_recurso_mb
 			where id_int_transaccion=v_parametros.id_int_transaccion;
                
 			--Definicion de la respuesta

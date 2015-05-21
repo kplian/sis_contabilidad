@@ -16,9 +16,6 @@ class ACTIntTransaccion extends ACTbase{
 		if($this->objParam->getParametro('id_int_comprobante')!=''){
 			$this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));	
 		}
-		if($this->objParam->getParametro('id_moneda')!=''){
-			$this->objParam->addFiltro("tval.id_moneda = ".$this->objParam->getParametro('id_moneda'));	
-		}
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
@@ -32,6 +29,9 @@ class ACTIntTransaccion extends ACTbase{
 		$temp = Array();
 		$temp['importe_debe'] = $this->res->extraData['total_debe'];
 		$temp['importe_haber'] = $this->res->extraData['total_haber'];
+		$temp['importe_debe_mb'] = $this->res->extraData['total_debe_mb'];
+		$temp['importe_haber_mb'] = $this->res->extraData['total_haber_mb'];
+		$temp['glosa'] = 'Sumas iguales';
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_int_transaccion'] = 0;
 		

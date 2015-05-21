@@ -935,3 +935,14 @@ VALUES (1, NULL, E'2014-12-17 16:15:09.388', NULL, E'activo', NULL, NULL, E'APLI
 
 /***********************************F-DAT-RAC-CONTA-0-17/04/2014*****************************************/
 
+
+
+/***********************************I-DAT-RAC-CONTA-0-21/05/2015*****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_partidas', E'si', E'si o no,  considerar partidas presupeustarias en el sistema de contabilidad');
+
+
+/***********************************F-DAT-RAC-CONTA-0-21/05/2015*****************************************/
+

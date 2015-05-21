@@ -17,6 +17,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
 		this.initButtons=[this.cmbDepto];
 		
+		
 		//llama al constructor de la clase padre
 		Phx.vista.IntComprobante.superclass.constructor.call(this,config);
 		this.init();
@@ -138,6 +139,18 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
 		{
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_subsistema'
+			},
+			type:'Field',
+			id_grupo: 0,
+			form: true 
+		},
+		
+		{
 			config: {
 				name: 'manual',
 				fieldLabel: 'Manual',
@@ -154,17 +167,6 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			type: 'Field',
 			id_grupo: 0,
 			filters: {pfiltro: 'incbte.manual',type: 'string'},
-			grid: true,
-			form: false
-		},
-		{
-			config: {
-				name: 'nro_tramite',
-				fieldLabel: 'Nro. Trámite'
-			},
-			type: 'Field',
-			id_grupo: 0,
-			filters: {pfiltro: 'incbte.nro_tramite',type: 'string'},
 			grid: true,
 			form: false
 		},
@@ -469,6 +471,18 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		{
+			config: {
+				name: 'nro_tramite',
+				gwidth: 150,
+				fieldLabel: 'Nro. Trámite'
+			},
+			type: 'Field',
+			id_grupo: 0,
+			filters: {pfiltro: 'incbte.nro_tramite',type: 'string'},
+			grid: true,
+			form: false
+		},
+		{
 			config:{
 				name: 'glosa1',
 				fieldLabel: 'Glosa',
@@ -478,10 +492,10 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				maxLength:1500
 			},
 			type:'TextArea',
-			filters:{pfiltro:'incbte.glosa1',type:'string'},
-			id_grupo:0,
-			grid:true,
-			form:true
+			filters: { pfiltro:'incbte.glosa1', type:'string' },
+			id_grupo: 0,
+			grid: true,
+			form: true
 		},
 		{
 			config:{
@@ -504,7 +518,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Beneficiario',
 				allowBlank: false,
 				anchor: '100%',
-				gwidth: 100,
+				gwidth: 250,
 				maxLength:100
 			},
 			type:'TextField',
@@ -576,20 +590,6 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	   			grid:true,
 	   			form:true
 	   	},
-		{
-			config: {
-				name: 'id_subsistema',
-				fieldLabel: 'Sistema Origen',
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_subsistema']);
-				}
-			},
-			type: 'TextField',
-			id_grupo: 0,
-			filters: {pfiltro: 'incbte.desc_subsistema', type: 'string'},
-			grid: true,
-			form: false
-		},
 		{
 			config:{
 				name: 'estado_reg',
@@ -748,9 +748,31 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_firma2', type: 'string'},
 		{name:'desc_firma3', type: 'string'},
 		'momento_comprometido',
-        'momento_ejecutado',
+        'momento_ejecutado','id_moneda_base',
         'momento_pagado','manual','desc_tipo_relacion_comprobante','id_int_comprobante_fks','manual','id_tipo_relacion_comprobante'
 	],
+	
+	rowExpander: new Ext.ux.grid.RowExpander({
+	        tpl : new Ext.Template(
+	            '<br>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto} </p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Clase cbte:&nbsp;&nbsp;</b> {desc_clase_comprobante}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Origen:&nbsp;&nbsp;</b> {desc_subsistema}</p>',	           
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Beneficiario:&nbsp;&nbsp;</b> {beneficiario}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa1} {glosa2}</p>',
+	            
+	             '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Frima 1:&nbsp;&nbsp;</b> {desc_firma1} </p>',
+	              '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 2:&nbsp;&nbsp;</b> {desc_firma2} </p>',
+	              '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 3:&nbsp;&nbsp;</b> {desc_firma3} </p>',
+	            
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>'
+	        )
+    }),
+    
+    arrayDefaultColumHidden:[ 'id_funcionario_firma1','id_funcionario_firma2','id_funcionario_firma3','id_subsistema','id_tipo_relacion_comprobante','momento_comprometido','momento_ejecutado','momento_pagado','fecha_mod','usr_reg','usr_mod','id_depto','estado','glosa1','id_clase_comprobante','momento','glosa2','desc_subsistema','desc_clase_comprobante','estado_reg','fecha_reg'],
+
+	
 	sortInfo:{
 		field: 'fecha',
 		direction: 'desc'
@@ -865,6 +887,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		}
 		
 	},
+	
+	
 	
 	habilitaMomentos: function(combo, record, index){
 		//si es solo contable coloco en falo los momentos y los deshabilita

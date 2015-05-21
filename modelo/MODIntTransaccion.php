@@ -24,6 +24,8 @@ class MODIntTransaccion extends MODbase{
 		//captura parametros adicionales para el count
 		$this->capturaCount('total_debe','numeric');
 		$this->capturaCount('total_haber','numeric');
+		$this->capturaCount('total_debe_mb','numeric');
+		$this->capturaCount('total_haber_mb','numeric');
 		
 				
 		//Definicion de la lista del resultado del query
@@ -42,11 +44,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
-		$this->captura('usr_mod','varchar');
-		$this->captura('importe_debe','numeric');	
-		$this->captura('importe_haber','numeric');
-		$this->captura('importe_gasto','numeric');
-		$this->captura('importe_recurso','numeric');
+		$this->captura('usr_mod','varchar');		
 		$this->captura('desc_partida','text');
 		$this->captura('desc_centro_costo','text');
 		$this->captura('desc_cuenta','text');
@@ -54,6 +52,14 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('tipo_partida','varchar');
 		$this->captura('id_orden_trabajo','int4');
 		$this->captura('desc_orden','varchar');
+		$this->captura('importe_debe','numeric');	
+		$this->captura('importe_haber','numeric');
+		$this->captura('importe_gasto','numeric');
+		$this->captura('importe_recurso','numeric');
+		$this->captura('importe_debe_mb','numeric');	
+		$this->captura('importe_haber_mb','numeric');
+		$this->captura('importe_gasto_mb','numeric');
+		$this->captura('importe_recurso_mb','numeric');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -71,6 +77,7 @@ class MODIntTransaccion extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_partida','id_partida','int4');
+		$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_partida_ejecucion','id_partida_ejecucion','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
@@ -105,6 +112,7 @@ class MODIntTransaccion extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('id_int_transaccion','id_int_transaccion','int4');
 		$this->setParametro('id_partida','id_partida','int4');
+		$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_partida_ejecucion','id_partida_ejecucion','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');

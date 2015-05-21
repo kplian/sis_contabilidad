@@ -16,18 +16,14 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		
 		
 		this.maestro=config.maestro;
-		 //Agrega combo de moneda
-		this.initButtons=[this.cmbMoneda];
+		
     	//llama al constructor de la clase padre
 		Phx.vista.IntTransaccion.superclass.constructor.call(this,config);
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
 		this.init();
 		
-		this.cmbMoneda.on('select',function(cmb,rec,index){
-			Ext.apply(this.store.baseParams,{id_moneda:rec.data.id_moneda});
-			this.reload();
-		},this);
+		this.obtenerVariableGlobal();
 		
 		
 		this.Cmp.importe_debe.on('change',function(cmp){
@@ -46,36 +42,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		   },this);
 		
 	},
-	cmbMoneda:new Ext.form.ComboBox({
-		fieldLabel: 'Moneda',
-		allowBlank: true,
-		emptyText:'Moneda...',
-		store:new Ext.data.JsonStore(
-		{
-			url: '../../sis_parametros/control/Moneda/listarMoneda',
-			id: 'id_moneda',
-			root: 'datos',
-			sortInfo:{
-				field: 'moneda',
-				direction: 'ASC'
-			},
-			totalProperty: 'total',
-			fields: ['id_moneda','moneda','codigo','tipo_moneda'],
-			// turn on remote sorting
-			remoteSort: true,
-			baseParams:{par_filtro:'moneda#codigo'}
-		}),
-		valueField: 'id_moneda',
-		tpl:'<tpl for="."><div class="x-combo-list-item"><p>Moneda:{moneda}</p><p>Codigo:{codigo}</p> </div></tpl>',
-		triggerAction: 'all',
-		displayField: 'moneda',
-	    hiddenName: 'id_moneda',
-		mode:'remote',
-		pageSize:50,
-		queryDelay:500,
-		listWidth:280,
-		width:170
-	}),		
+		
 	Atributos:[
 		{
 			//configuracion del componente
@@ -89,7 +56,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			//configuracion del componente
-			config:{
+			config: {
 					labelSeparator:'',
 					inputType:'hidden',
 					name: 'id_int_comprobante'
@@ -117,12 +84,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		   			    }
 		   			    
 		   					
-		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Ptda.:</b> <font color="{1}">{2}</font><br><b>Cta.:</b>{3}<br><b>Aux.:</b>{4}',record.data['desc_centro_costo'],color, record.data['desc_partida'],
-		   					                   record.data['desc_cuenta'],record.data['desc_auxiliar']);	
+		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Cta.:</b>{1}<br><b>Aux.:</b>{2}</br>',record.data['desc_centro_costo'],color, record.data['desc_cuenta'],record.data['desc_auxiliar']);	
+		   					
+		   					if(record.data['desc_partida']){
+			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
+			   				}
+		   					
 		   					
 			   				
 			   				if(record.data['desc_orden']){
-			   					retorno = retorno + '<br><b>Ot.:</b> '+record.data['desc_orden'];
+			   					retorno = retorno + '<b>Ot.:</b> '+record.data['desc_orden'];
 			   				}	
 		   				return retorno;	
 	   			    	
@@ -256,6 +227,36 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			id_grupo: 1,
 			grid: true,
 			form: true
+		},
+		{
+			config: {
+				name: 'importe_debe_mb',
+				fieldLabel: 'Debe MB',
+				allowBlank: true,
+				width: '100%',
+				gwidth: 100,
+				maxLength: 100
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_debe_mb',type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			form: false
+		},
+		{
+			config: {
+				name: 'importe_haber_mb',
+				fieldLabel: 'Haber MB',
+				allowBlank: true,
+				width: '100%',
+				gwidth: 100,
+				maxLength: 100
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_haber_mb',type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			form: false
 		},
 		
 		{
@@ -391,6 +392,19 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg'
 		
 	],
+	
+	
+	rowExpander: new Ext.ux.grid.RowExpander({
+	        tpl : new Ext.Template(
+	            '<br>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa} </p><br>'
+	        )
+    }),
+    
+    arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','glosa','estado_reg','fecha_reg'],
+
+
+
 	sortInfo:{
 		field: 'id_int_transaccion',
 		direction: 'ASC'
@@ -410,8 +424,18 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		var fecha=new Date(this.maestro.fecha);
 		this.maestro.id_gestion = this.getGestion(fecha);
 		//Se setea el combo de moneda con el valor del padre
-		this.cmbMoneda.store.load({params:{start:0, limit:this.tam_pag}});
-		this.cmbMoneda.setRawValue(this.maestro.desc_moneda)
+		
+		 this.setColumnHeader('importe_debe', this.Cmp.importe_haber.fieldLabel +' '+this.maestro.desc_moneda);
+		 this.setColumnHeader('importe_haber', this.Cmp.importe_haber.fieldLabel +' '+this.maestro.desc_moneda);
+		 //si a moneda del comprobate es base ocultamos la columnas duplicadas
+		 if(this.maestro.id_moneda_base == this.maestro.id_moneda){
+		 	this.ocultarColumnaByName('importe_debe_mb');
+		 	this.ocultarColumnaByName('importe_haber_mb');
+		 }
+		 else{
+		 	this.mostrarColumnaByName('importe_debe_mb');
+		 	this.mostrarColumnaByName('importe_haber_mb');
+		 }
 	},
 	
 	preparaMenu:function(){
@@ -439,6 +463,32 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		} else{
 			alert('Error al obtener gestión: fecha inválida')
 		}
+	},
+	obtenerVariableGlobal: function(){
+		//Verifica que la fecha y la moneda hayan sido elegidos
+		Phx.CP.loadingShow();
+		Ext.Ajax.request({
+				url:'../../sis_seguridad/control/Subsistema/obtenerVariableGlobal',
+				params:{
+					codigo: 'conta_partidas'  
+				},
+				success: function(resp){
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error','Error a recuperar la variable global')
+					} else {
+						if(reg.ROOT.datos.valor = 'no'){
+							this.ocultarComponente(this.Cmp.id_partida);
+						}
+					}
+				},
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope:this
+			});
+		
 	},
 	successGestion: function(resp){
 		var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));

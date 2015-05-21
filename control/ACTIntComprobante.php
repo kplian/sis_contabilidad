@@ -324,13 +324,8 @@ class ACTIntComprobante extends ACTbase{
    	   	
    	    // get the HTML
 	    ob_start();
-	    //include(dirname(__FILE__).'/../reportes/res/exemple10.php');
-		//include(dirname(__FILE__).'/../reportes/res/exemple07a.php');
-		include(dirname(__FILE__).'/../reportes/tpl/intCbte.php');
+	    include(dirname(__FILE__).'/../reportes/tpl/intCbte.php');
         $content = ob_get_clean();
-	    //ob_start();
-	   // include(dirname(__FILE__).'/../reportes/res/exemple07b.php');
-		//$content2 = ob_get_clean();
 	    try
 	    {
 	    	
@@ -371,7 +366,7 @@ class ACTIntComprobante extends ACTbase{
 			 $pdf->AddPage('L');
 			$pdf->writeHTML($content2, true, false, true, false, '');
 			*/
-			$nombreArchivo = 'OrdenCompraServicio.pdf';
+			$nombreArchivo = 'IntComprobante.pdf';
 			$pdf->Output(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo, 'F');
 			
 			$mensajeExito = new Mensaje();

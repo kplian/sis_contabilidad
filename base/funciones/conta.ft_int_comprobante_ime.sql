@@ -37,6 +37,8 @@ DECLARE
 	v_result				varchar;
     v_rec_cbte record;
     v_funcion_comprobante_eliminado varchar;
+    v_id_subsistema_conta			integer;
+    v_resp2					varchar;
 			    
 BEGIN
 
@@ -57,22 +59,32 @@ BEGIN
         	------------------
         	-- VALIDACIONES
         	------------------
-        	--SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
+        	select 
+              id_subsistema
+              into 
+             v_id_subsistema_conta
+            from segu.tsubsistema
+            where codigo = 'CONTA';
+            
+            --SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
         	IF  pxp.f_existe_parametro(p_tabla,'id_subsistema') THEN
-        		v_id_subsistema = v_parametros.id_subsistema;
-        	else
-        		select id_subsistema
-	        	into v_id_subsistema
-	        	from segu.tsubsistema
-	        	where codigo = 'CONTA';
-        	end if;
+        		
+                 IF v_parametros.id_subsistema is not NULL THEN
+               	     v_id_subsistema = v_parametros.id_subsistema;
+        	     else
+                    v_id_subsistema = v_id_subsistema_conta;
+                 end if;
+        	ELSE
+                v_id_subsistema = v_id_subsistema_conta;
+            end if;
         	
         	--PERIODO
         	--Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha,v_id_subsistema);
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha,v_id_subsistema_conta);
         	
+        	      	
         	--Verifica si el Periodo esta abierto
-        	v_resp = param.f_verifica_periodo_subsistema_abierto(v_rec.po_id_periodo_subsistema);
+        	v_resp2 = param.f_verifica_periodo_subsistema_abierto(v_rec.po_id_periodo_subsistema);
         	
         	
         	
@@ -103,7 +115,8 @@ BEGIN
 			id_usuario_mod,
 			fecha_mod,
             id_usuario_ai,
-            usuario_ai
+            usuario_ai,
+            id_int_comprobante_fks
           	) values(
 			v_parametros.id_clase_comprobante,
 			
@@ -128,7 +141,8 @@ BEGIN
 			null,
 			null,
             v_parametros._id_usuario_ai,
-            v_parametros._nombre_usuario_ai
+            v_parametros._nombre_usuario_ai,
+            (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[]
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
@@ -155,30 +169,39 @@ BEGIN
 			------------------
         	-- VALIDACIONES
         	------------------
-        	--SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
-        	if coalesce(v_parametros.id_subsistema,0)!=0 then
-        		v_id_subsistema = v_parametros.id_subsistema;
-        	else
-        		select id_subsistema
-	        	into v_id_subsistema
-	        	from segu.tsubsistema
-	        	where codigo = 'CONTA';
-        	end if;
+        	select 
+              id_subsistema
+              into 
+             v_id_subsistema_conta
+            from segu.tsubsistema
+            where codigo = 'CONTA';
+            
+            --SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
+        	IF  pxp.f_existe_parametro(p_tabla,'id_subsistema') THEN
+        		
+                 IF v_parametros.id_subsistema is not NULL THEN
+               	     v_id_subsistema = v_parametros.id_subsistema;
+        	     else
+                    v_id_subsistema = v_id_subsistema_conta;
+                 end if;
+        	ELSE
+                v_id_subsistema = v_id_subsistema_conta;
+            end if;
         	
         	--PERIODO
         	--Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha,v_id_subsistema);
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha,v_id_subsistema_conta);
         	
         	--Verifica si el Periodo esta abierto
-        	v_resp = param.f_verifica_periodo_subsistema_abierto(v_rec.po_id_periodo_subsistema);
+        	v_resp2 = param.f_verifica_periodo_subsistema_abierto(v_rec.po_id_periodo_subsistema);
         	
 			------------------------------
 			--Sentencia de la modificacion
 			------------------------------
 			update conta.tint_comprobante set
 			id_clase_comprobante = v_parametros.id_clase_comprobante,
-			id_int_comprobante_fk = v_parametros.id_int_comprobante_fk,
-			id_subsistema = v_parametros.id_subsistema,
+			id_int_comprobante_fks =  (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
+			id_subsistema = v_id_subsistema,
 			id_depto = v_parametros.id_depto,
 			id_moneda = v_parametros.id_moneda,
 			id_periodo = v_parametros.id_periodo,
@@ -187,11 +210,11 @@ BEGIN
 			id_funcionario_firma3 = v_parametros.id_funcionario_firma3,
 			tipo_cambio = v_parametros.tipo_cambio,
 			beneficiario = v_parametros.beneficiario,
-			nro_cbte = v_parametros.nro_cbte,
+			
 			glosa1 = v_parametros.glosa1,
 			fecha = v_parametros.fecha,
 			glosa2 = v_parametros.glosa2,
-			nro_tramite = v_parametros.nro_tramite,
+			
 			--momento = v_parametros.momento,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),

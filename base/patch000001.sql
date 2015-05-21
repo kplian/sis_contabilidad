@@ -1230,3 +1230,17 @@ COMMENT ON COLUMN conta.tplantilla_comprobante.campo_depto_libro
 IS 'este campo es para definir el depto de libro de bancos del comprobante';
 
 /***********************************F-SCP-GSS-CONTA-0-07/05/2015****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-07/05/2015****************************************/
+
+--------------- SQL ---------------
+
+DROP TRIGGER f_trig_insert_int_trans_val ON conta.tint_transaccion;
+--------------- SQL ---------------
+
+DROP TABLE conta.tint_trans_val;
+
+/***********************************F-SCP-RAC-CONTA-0-07/05/2015****************************************/
