@@ -223,19 +223,46 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 				
 		//Definicion de la lista del resultado del query
-		$this->captura('cod_depto','varchar');
-		$this->captura('nro_cbte','varchar');
-		$this->captura('fecha','date');
-		$this->captura('beneficiario','varchar');
-		$this->captura('glosa1','varchar');
-		$this->captura('glosa2','varchar');
+		$this->captura('id_int_comprobante','int4');
+		$this->captura('id_clase_comprobante','int4');		
+		$this->captura('id_subsistema','int4');
+		$this->captura('id_depto','int4');
+		$this->captura('id_moneda','int4');
+		$this->captura('id_periodo','int4');
+		$this->captura('id_funcionario_firma1','int4');
+		$this->captura('id_funcionario_firma2','int4');
+		$this->captura('id_funcionario_firma3','int4');
 		$this->captura('tipo_cambio','numeric');
-		$this->captura('firma1','text');
-		$this->captura('firma2','text');
-		$this->captura('firma3','text');
-		$this->captura('firma1_cargo','varchar');
-		$this->captura('firma2_cargo','varchar');
-		$this->captura('firma3_cargo','varchar');
+		$this->captura('beneficiario','varchar');
+		$this->captura('nro_cbte','varchar');
+		$this->captura('estado_reg','varchar');
+		$this->captura('glosa1','varchar');
+		$this->captura('fecha','date');
+		$this->captura('glosa2','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('momento','varchar');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		$this->captura('desc_clase_comprobante','varchar');
+		$this->captura('desc_subsistema','varchar');
+		$this->captura('desc_depto','text');
+		$this->captura('desc_moneda','text');
+		$this->captura('desc_firma1','text');
+		$this->captura('desc_firma2','text');
+		$this->captura('desc_firma3','text');
+		$this->captura('momento_comprometido','varchar');
+		$this->captura('momento_ejecutado','varchar');
+		$this->captura('momento_pagado','varchar');
+		$this->captura('manual','varchar');
+		$this->captura('id_int_comprobante_fks','text');
+		$this->captura('id_tipo_relacion_comprobante','int');
+		$this->captura('desc_tipo_relacion_comprobante','varchar');
+		$this->captura('id_moneda_base','int4');
+		$this->captura('codigo_depto','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -254,14 +281,20 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 				
 		//Definicion de la lista del resultado del query
-		$this->captura('cuenta','text');
-		$this->captura('auxiliar','text');
+		$this->captura('nro_cuenta','varchar');
+		$this->captura('nombre_cuenta','varchar');
+		$this->captura('codigo_auxiliar','varchar');
+		$this->captura('nombre_auxiliar','varchar');
 		$this->captura('cc','text');
-		$this->captura('partida','text');
+		$this->captura('codigo_partida','varchar');
+		$this->captura('nombre_partida','varchar');
+		$this->captura('desc_orden','varchar');
+		$this->captura('glosa','varchar');
 		$this->captura('importe_debe','numeric');
 		$this->captura('importe_haber','numeric');
-		$this->captura('importe_debe1','numeric');
-		$this->captura('importe_haber1','numeric');
+		$this->captura('importe_debe_mb','numeric');
+		$this->captura('importe_haber_mb','numeric');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

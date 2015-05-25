@@ -329,7 +329,9 @@ class ACTIntComprobante extends ACTbase{
 	    try
 	    {
 	    	
-			$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+			//$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+			$pdf = new TCPDF();
+			
 			
 			$pdf->SetDisplayMode('fullpage');
 			
@@ -337,10 +339,6 @@ class ACTIntComprobante extends ACTbase{
             $pdf->SetCreator(PDF_CREATOR);
 			// set default header data
 			//$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 061', PDF_HEADER_STRING);
-			
-			// set header and footer fonts
-			//$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-			//$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 			
 			// set default monospaced font
 			$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
@@ -353,19 +351,11 @@ class ACTIntComprobante extends ACTbase{
 			// set auto page breaks
 			$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 			
-			// set image scale factor
-			//$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-			
 			// set font
 			$pdf->SetFont('helvetica', '', 10);
 			// add a page
             $pdf->AddPage();
 			$pdf->writeHTML($content, true, false, true, false, '');
-			/*
-			$pdf->SetFont('helvetica', '', 6);
-			 $pdf->AddPage('L');
-			$pdf->writeHTML($content2, true, false, true, false, '');
-			*/
 			$nombreArchivo = 'IntComprobante.pdf';
 			$pdf->Output(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo, 'F');
 			

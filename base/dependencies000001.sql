@@ -2050,110 +2050,77 @@ FROM conta.tint_comprobante incbte
 /***********************************F-DEP-RAC-CONTA-0-30/12/2014*****************************************/
 
 
-/***********************************I-DEP-RAC-CONTA-0-16/04/2015*****************************************/
-
+/***********************************I-DEP-RAC-CONTA-0-22/04/2015*****************************************/
 
 
 --------------- SQL ---------------
 
-CREATE OR REPLACE VIEW tes.vcomp_devtesprov_plan_pago(
-    id_plan_pago,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto_conta,
-    numero,
-    fecha_actual,
-    estado,
-    monto_ejecutar_total_mb,
-    monto_ejecutar_total_mo,
-    monto,
-    monto_mb,
-    monto_retgar_mb,
-    monto_retgar_mo,
-    monto_no_pagado,
-    monto_no_pagado_mb,
-    otros_descuentos,
-    otros_descuentos_mb,
-    id_plantilla,
-    id_cuenta_bancaria,
-    id_cuenta_bancaria_mov,
-    nro_cheque,
-    nro_cuenta_bancaria,
-    num_tramite,
-    tipo,
-    id_gestion_cuentas,
-    id_int_comprobante,
-    liquido_pagable,
-    liquido_pagable_mb,
-    nombre_pago,
-    porc_monto_excento_var,
-    obs_pp,
-    descuento_anticipo,
-    descuento_inter_serv,
-    tipo_obligacion,
-    id_categoria_compra,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    forma_pago,
-    monto_ajuste_ag,
-    monto_ajuste_siguiente_pago,
-    monto_anticipo,
-    tipo_cambio_conv)
+ -- object recreation
+DROP VIEW conta.vint_comprobante;
+
+CREATE VIEW conta.vint_comprobante
 AS
-  SELECT pp.id_plan_pago,
-         op.id_proveedor,
-         p.desc_proveedor,
-         op.id_moneda,
-         op.id_depto_conta,
-         op.numero,
-         now() AS fecha_actual,
-         pp.estado,
-         pp.monto_ejecutar_total_mb,
-         pp.monto_ejecutar_total_mo,
-         pp.monto,
-         pp.monto_mb,
-         pp.monto_retgar_mb,
-         pp.monto_retgar_mo,
-         pp.monto_no_pagado,
-         pp.monto_no_pagado_mb,
-         pp.otros_descuentos,
-         pp.otros_descuentos_mb,
-         pp.id_plantilla,
-         pp.id_cuenta_bancaria,
-         pp.id_cuenta_bancaria_mov,
-         pp.nro_cheque,
-         pp.nro_cuenta_bancaria,
-         op.num_tramite,
-         pp.tipo,
-         op.id_gestion AS id_gestion_cuentas,
-         pp.id_int_comprobante,
-         pp.liquido_pagable,
-         pp.liquido_pagable_mb,
-         pp.nombre_pago,
-         pp.porc_monto_excento_var,
-         ((COALESCE(op.numero, ''::character varying)::text || ' '::text) ||
-           COALESCE(pp.obs_monto_no_pagado, ''::text))::character varying AS
-           obs_pp,
-         pp.descuento_anticipo,
-         pp.descuento_inter_serv,
-         op.tipo_obligacion,
-         op.id_categoria_compra,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         pp.id_proceso_wf,
-         pp.forma_pago,
-         pp.monto_ajuste_ag,
-         pp.monto_ajuste_siguiente_pago,
-         pp.monto_anticipo,
-         op.tipo_cambio_conv,
-         pp.id_depto_lb as id_depto_libro
-  FROM tes.tplan_pago pp
-       JOIN tes.tobligacion_pago op ON pp.id_obligacion_pago =
-         op.id_obligacion_pago
-       JOIN param.vproveedor p ON p.id_proveedor = op.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         op.id_categoria_compra;
-         
-/***********************************F-DEP-RAC-CONTA-0-16/04/2015*****************************************/
+  SELECT incbte.id_int_comprobante,
+         incbte.id_clase_comprobante,
+         incbte.id_subsistema,
+         incbte.id_depto,
+         incbte.id_moneda,
+         incbte.id_periodo,
+         incbte.id_funcionario_firma1,
+         incbte.id_funcionario_firma2,
+         incbte.id_funcionario_firma3,
+         incbte.tipo_cambio,
+         incbte.beneficiario,
+         incbte.nro_cbte,
+         incbte.estado_reg,
+         incbte.glosa1,
+         incbte.fecha,
+         incbte.glosa2,
+         incbte.nro_tramite,
+         incbte.momento,
+         incbte.id_usuario_reg,
+         incbte.fecha_reg,
+         incbte.id_usuario_mod,
+         incbte.fecha_mod,
+         usu1.cuenta AS usr_reg,
+         usu2.cuenta AS usr_mod,
+         ccbte.descripcion AS desc_clase_comprobante,
+         sis.nombre AS desc_subsistema,
+         (dpto.codigo::text || '-'::text) || dpto.nombre::text AS desc_depto,
+         mon.codigo::text AS desc_moneda,
+         fir1.desc_funcionario2 AS desc_firma1,
+         fir2.desc_funcionario2 AS desc_firma2,
+         fir3.desc_funcionario2 AS desc_firma3,
+         pxp.f_iif(incbte.momento_comprometido::text = 'si'::text, 'true'::
+           character varying, 'false'::character varying) AS
+           momento_comprometido,
+         pxp.f_iif(incbte.momento_ejecutado::text = 'si'::text, 'true'::
+           character varying, 'false'::character varying) AS momento_ejecutado,
+         pxp.f_iif(incbte.momento_pagado::text = 'si'::text, 'true'::character
+           varying, 'false'::character varying) AS momento_pagado,
+         incbte.manual,
+         array_to_string(incbte.id_int_comprobante_fks, ','::text) AS
+           id_int_comprobante_fks,
+         incbte.id_tipo_relacion_comprobante,
+         trc.nombre AS desc_tipo_relacion_comprobante,
+         dpto.codigo as codigo_depto
+  FROM conta.tint_comprobante incbte
+       JOIN segu.tusuario usu1 ON usu1.id_usuario = incbte.id_usuario_reg
+       LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = incbte.id_usuario_mod
+       JOIN conta.tclase_comprobante ccbte ON ccbte.id_clase_comprobante =
+         incbte.id_clase_comprobante
+       JOIN segu.tsubsistema sis ON sis.id_subsistema = incbte.id_subsistema
+       JOIN param.tdepto dpto ON dpto.id_depto = incbte.id_depto
+       JOIN param.tmoneda mon ON mon.id_moneda = incbte.id_moneda
+       LEFT JOIN orga.vfuncionario fir1 ON fir1.id_funcionario =
+         incbte.id_funcionario_firma1
+       LEFT JOIN orga.vfuncionario fir2 ON fir2.id_funcionario =
+         incbte.id_funcionario_firma2
+       LEFT JOIN orga.vfuncionario fir3 ON fir3.id_funcionario =
+         incbte.id_funcionario_firma3
+       LEFT JOIN conta.ttipo_relacion_comprobante trc ON
+         trc.id_tipo_relacion_comprobante = incbte.id_tipo_relacion_comprobante;
+
+ALTER TABLE conta.vint_comprobante
+  OWNER TO postgres;
+/***********************************F-DEP-RAC-CONTA-0-22/04/2015*****************************************/

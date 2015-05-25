@@ -186,25 +186,60 @@ BEGIN
 	/*********************************    
  	#TRANSACCION:  'CONTA_CABCBT_SEL'
  	#DESCRIPCION:	Cabecera para el reporte de Comprobante
- 	#AUTOR:			RCM	
- 	#FECHA:			10/09/2013
+ 	#AUTOR:			RAC	
+ 	#FECHA:			22/05/2015
 	***********************************/
 
 	elsif(p_transaccion='CONTA_CABCBT_SEL')then
      				
     	begin
+             v_id_moneda_base=param.f_get_moneda_base();
     		--Sentencia de la consulta
 			v_consulta:='select
-						depto.codigo as cod_depto, incbte.nro_cbte, incbte.fecha, incbte.beneficiario,
-						incbte.glosa1, incbte.glosa2, incbte.tipo_cambio,
-						fun1.desc_funcionario1 as firma1, fun2.desc_funcionario1 as firma2, fun3.desc_funcionario1 as firma3,
-						fun1.nombre_cargo as firma1_cargo, fun2.nombre_cargo as firma2_cargo, fun3.nombre_cargo as firma3_cargo
-						from conta.tint_comprobante incbte
-						inner join param.tdepto depto on depto.id_depto = incbte.id_depto
-						left join orga.vfuncionario_cargo fun1 on fun1.id_funcionario = incbte.id_funcionario_firma1
-						left join orga.vfuncionario_cargo fun2 on fun2.id_funcionario = incbte.id_funcionario_firma2
-						left join orga.vfuncionario_cargo fun3 on fun3.id_funcionario = incbte.id_funcionario_firma3
-						where incbte.id_int_comprobante = '||v_parametros.id_int_comprobante;
+                            incbte.id_int_comprobante,
+                            incbte.id_clase_comprobante,
+                            incbte.id_subsistema,
+                            incbte.id_depto,
+                            incbte.id_moneda,
+                            incbte.id_periodo,
+                            incbte.id_funcionario_firma1,
+                            incbte.id_funcionario_firma2,
+                            incbte.id_funcionario_firma3,
+                            incbte.tipo_cambio,
+                            incbte.beneficiario,
+                            incbte.nro_cbte,
+                            incbte.estado_reg,
+                            incbte.glosa1,
+                            incbte.fecha,
+                            incbte.glosa2,
+                            incbte.nro_tramite,
+                            incbte.momento,
+                            incbte.id_usuario_reg,
+                            incbte.fecha_reg,
+                            incbte.id_usuario_mod,
+                            incbte.fecha_mod,
+                            incbte.usr_reg,
+                            incbte.usr_mod,
+                            incbte.desc_clase_comprobante,
+                            incbte.desc_subsistema,
+                            incbte.desc_depto,	
+                            incbte.desc_moneda,
+                            incbte.desc_firma1,
+                            incbte.desc_firma2,
+                            incbte.desc_firma3,
+                            incbte.momento_comprometido,
+                            incbte.momento_ejecutado,
+                            incbte.momento_pagado,
+                            incbte.manual,
+                            incbte.id_int_comprobante_fks,
+                            incbte.id_tipo_relacion_comprobante,
+                            incbte.desc_tipo_relacion_comprobante,
+                            '||v_id_moneda_base::VARCHAR||'::integer as id_moneda_base,
+                            incbte.codigo_depto
+                          
+                          from conta.vint_comprobante incbte
+                          
+                          where incbte.id_int_comprobante = '||v_parametros.id_int_comprobante;
 			
 			--Devuelve la respuesta
 			return v_consulta;
@@ -223,20 +258,39 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						cue.nro_cuenta || '' - '' || cue.nombre_cuenta as cuenta,
-						aux.codigo_auxiliar || '' '' || aux.nombre_auxiliar as auxiliar,
-						cc.codigo_cc as cc,
-						par.codigo || '' -'' || par.nombre_partida as partida,
-						tra.importe_debe, tra.importe_haber,
-						param.f_convertir_moneda(cbte.id_moneda,2,tra.importe_debe,cbte.fecha,''O'',2) as importe_debe1,
-						param.f_convertir_moneda(cbte.id_moneda,2,tra.importe_haber,cbte.fecha,''O'',2) as importe_haber1
-						from conta.tint_transaccion tra
-						inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
-						inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta
-						left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
-						inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
-						inner join pre.tpartida par on par.id_partida = tra.id_partida
-						where tra.id_int_comprobante = '||v_parametros.id_int_comprobante;
+                            cue.nro_cuenta,
+                            cue.nombre_cuenta,
+                            aux.codigo_auxiliar,
+                            aux.nombre_auxiliar,
+                            cc.codigo_cc as cc,
+                            par.codigo as codigo_partida,
+                            par.nombre_partida,
+                            ot.desc_orden,
+                            tra.glosa,
+                            sum(tra.importe_debe) as importe_debe, 
+                            sum(tra.importe_haber) as importe_haber,
+                            sum(tra.importe_debe_mb) as importe_debe_mb,
+                            sum(tra.importe_haber_mb) as importe_haber_mb
+                          from conta.tint_transaccion tra
+                          inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
+                          inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
+                          inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
+                          left join pre.tpartida par on par.id_partida = tra.id_partida
+                          left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
+                          left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
+                          where tra.id_int_comprobante = '||v_parametros.id_int_comprobante||'
+                          group by 
+                            cue.nro_cuenta,
+                            cue.nombre_cuenta,
+                            aux.codigo_auxiliar,
+                            aux.nombre_auxiliar,
+                            cc.codigo_cc ,
+                            par.codigo ,
+                            par.nombre_partida,
+                            ot.desc_orden,
+                            tra.glosa
+                          order by importe_debe desc, importe_haber desc';
+						
 			
 			--Devuelve la respuesta
 			return v_consulta;
