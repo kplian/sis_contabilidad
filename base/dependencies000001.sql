@@ -2050,15 +2050,49 @@ FROM conta.tint_comprobante incbte
 /***********************************F-DEP-RAC-CONTA-0-30/12/2014*****************************************/
 
 
-/***********************************I-DEP-RAC-CONTA-0-22/04/2015*****************************************/
 
 
---------------- SQL ---------------
-
- -- object recreation
-DROP VIEW conta.vint_comprobante;
-
-CREATE VIEW conta.vint_comprobante
+/***********************************I-DEP-RAC-CONTA-0-21/05/2015*****************************************/
+CREATE OR REPLACE VIEW conta.vint_comprobante(
+    id_int_comprobante,
+    id_clase_comprobante,
+    id_subsistema,
+    id_depto,
+    id_moneda,
+    id_periodo,
+    id_funcionario_firma1,
+    id_funcionario_firma2,
+    id_funcionario_firma3,
+    tipo_cambio,
+    beneficiario,
+    nro_cbte,
+    estado_reg,
+    glosa1,
+    fecha,
+    glosa2,
+    nro_tramite,
+    momento,
+    id_usuario_reg,
+    fecha_reg,
+    id_usuario_mod,
+    fecha_mod,
+    usr_reg,
+    usr_mod,
+    desc_clase_comprobante,
+    desc_subsistema,
+    desc_depto,
+    desc_moneda,
+    desc_firma1,
+    desc_firma2,
+    desc_firma3,
+    momento_comprometido,
+    momento_ejecutado,
+    momento_pagado,
+    manual,
+    id_int_comprobante_fks,
+    id_tipo_relacion_comprobante,
+    desc_tipo_relacion_comprobante,
+    codigo_depto)
 AS
   SELECT incbte.id_int_comprobante,
          incbte.id_clase_comprobante,
@@ -2103,7 +2137,7 @@ AS
            id_int_comprobante_fks,
          incbte.id_tipo_relacion_comprobante,
          trc.nombre AS desc_tipo_relacion_comprobante,
-         dpto.codigo as codigo_depto
+         dpto.codigo AS codigo_depto
   FROM conta.tint_comprobante incbte
        JOIN segu.tusuario usu1 ON usu1.id_usuario = incbte.id_usuario_reg
        LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = incbte.id_usuario_mod
@@ -2121,6 +2155,5 @@ AS
        LEFT JOIN conta.ttipo_relacion_comprobante trc ON
          trc.id_tipo_relacion_comprobante = incbte.id_tipo_relacion_comprobante;
 
-ALTER TABLE conta.vint_comprobante
-  OWNER TO postgres;
-/***********************************F-DEP-RAC-CONTA-0-22/04/2015*****************************************/
+         
+/***********************************F-DEP-RAC-CONTA-0-21/05/2015*****************************************/

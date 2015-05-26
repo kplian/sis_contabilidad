@@ -187,10 +187,10 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		$this->captura('importe_debe','numeric');	
-		$this->captura('importe_haber','numeric');
-		$this->captura('importe_gasto','numeric');
-		$this->captura('importe_recurso','numeric');
+		$this->captura('importe_debe_mb','numeric');	
+		$this->captura('importe_haber_mb','numeric');
+		$this->captura('importe_gasto_mb','numeric');
+		$this->captura('importe_recurso_mb','numeric');
 		$this->captura('desc_partida','text');
 		$this->captura('desc_centro_costo','text');
 		$this->captura('desc_cuenta','text');

@@ -17,7 +17,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		var me = this;
 		this.maestro=config.maestro;
 		 //Agrega combo de moneda
-		this.initButtons=[this.cmbMoneda];
+		
 		
 		this.Atributos = [
 			{
@@ -181,7 +181,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	        },
 			{
 				config: {
-					name: 'importe_debe',
+					name: 'importe_debe_mb',
 					fieldLabel: 'Debe',
 					allowBlank: true,
 					width: '100%',
@@ -189,14 +189,14 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 					maxLength: 100
 				},
 				type: 'NumberField',
-				filters: {pfiltro: 'transa.importe_debe',type: 'numeric'},
+				filters: {pfiltro: 'transa.importe_debe_mb',type: 'numeric'},
 				id_grupo: 1,
 				grid: true,
 				form: true
 			},
 			{
 				config: {
-					name: 'importe_haber',
+					name: 'importe_haber_mb',
 					fieldLabel: 'Haber',
 					allowBlank: true,
 					width: '100%',
@@ -204,7 +204,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 					maxLength: 100
 				},
 				type: 'NumberField',
-				filters: {pfiltro: 'transa.importe_haber',type: 'numeric'},
+				filters: {pfiltro: 'transa.importe_haber_mb',type: 'numeric'},
 				id_grupo: 1,
 				grid: true,
 				form: true
@@ -315,58 +315,12 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		this.grid.getBottomToolbar().disable();
 		this.init();
 		
-		this.cmbMoneda.on('select',function(cmb,rec,index){
-			Ext.apply(this.store.baseParams,{id_moneda:rec.data.id_moneda});
-			this.reload();
-		},this);
 		
 		
-		this.Cmp.importe_debe.on('change',function(cmp){
-			this.Cmp.importe_haber.suspendEvents();
-			this.Cmp.importe_haber.setValue(0);
-			this.Cmp.importe_haber.resumeEvents();
-			
-		},this);
 		
-		this.Cmp.importe_haber.on('change',
-		    function(cmp){
-			    this.Cmp.importe_debe.suspendEvents();
-				this.Cmp.importe_debe.setValue(0);
-				this.Cmp.importe_debe.resumeEvents();
-			  
-		   },this);
 		
 	},
-	cmbMoneda:new Ext.form.ComboBox({
-		fieldLabel: 'Moneda',
-		allowBlank: true,
-		emptyText:'Moneda...',
-		store:new Ext.data.JsonStore(
-		{
-			url: '../../sis_parametros/control/Moneda/listarMoneda',
-			id: 'id_moneda',
-			root: 'datos',
-			sortInfo:{
-				field: 'moneda',
-				direction: 'ASC'
-			},
-			totalProperty: 'total',
-			fields: ['id_moneda','moneda','codigo','tipo_moneda'],
-			// turn on remote sorting
-			remoteSort: true,
-			baseParams:{par_filtro:'moneda#codigo'}
-		}),
-		valueField: 'id_moneda',
-		tpl:'<tpl for="."><div class="x-combo-list-item"><p>Moneda:{moneda}</p><p>Codigo:{codigo}</p> </div></tpl>',
-		triggerAction: 'all',
-		displayField: 'moneda',
-	    hiddenName: 'id_moneda',
-		mode:'remote',
-		pageSize:50,
-		queryDelay:500,
-		listWidth:280,
-		width:170
-	}),		
+	
 	
 	tam_pag:50,	
 	title:'Transacción',
@@ -437,18 +391,11 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	onReloadPage:function(param){
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var me = this;
-		//Se setea el combo de moneda con el valor del padre
-		this.cmbMoneda.store.load( { params: { start: 0, limit: this.tam_pag },
-									 scope: this,
-		                             callback : function (r) {
-							       		  me.cmbMoneda.setValue(r[0].data.id_moneda);
-							       		  me.initFiltro(param)
-							    	  }
-					    	  });
+		this.initFiltro();
 	},
 	
 	initFiltro: function(param){
-		this.store.baseParams=Ext.apply({id_moneda: this.cmbMoneda.getValue()}, param);
+		
 		this.load( { params: { start:0, limit: this.tam_pag } } );
 	},
 	

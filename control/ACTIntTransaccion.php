@@ -65,9 +65,6 @@ class ACTIntTransaccion extends ACTbase{
 			$this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));	
 		}
 		
-		if($this->objParam->getParametro('id_moneda')!=''){
-			$this->objParam->addFiltro("tval.id_moneda = ".$this->objParam->getParametro('id_moneda'));	
-		}
 		
 		if($this->objParam->getParametro('id_gestion')!=''){
 			$this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));	
@@ -126,8 +123,8 @@ class ACTIntTransaccion extends ACTbase{
 		}
 		//adicionar una fila al resultado con el summario
 		$temp = Array();
-		$temp['importe_debe'] = $this->res->extraData['total_debe'];
-		$temp['importe_haber'] = $this->res->extraData['total_haber'];
+		$temp['importe_debe_mb'] = $this->res->extraData['total_debe'];
+		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_int_transaccion'] = 0;
 		
