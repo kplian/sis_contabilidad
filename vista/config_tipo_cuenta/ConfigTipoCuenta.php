@@ -60,14 +60,14 @@ header("content-type: text/javascript; charset=UTF-8");
 				lazyRender : true,
 				mode : 'local',
 				gwidth : 100,
-				store : ['activo', 'pasivo', 'patrimonio', 'gasto', 'ingreso']
+				store : ['activo', 'pasivo', 'patrimonio', 'resultado','ingreso','gasto','costo','cierre', 'orden']
 			},
 			type : 'ComboBox',
 			id_grupo : 0,
 			filters : {
 				type : 'list',
 				pfiltro : 'tipo_cuenta',
-				options : ['activo', 'pasivo', 'patrimonio', 'gasto', 'ingreso']
+				options : ['activo', 'pasivo', 'patrimonio', 'resultado','ingreso','gasto','costo','cierre', 'orden']
 			},
 			grid : true,
 			form : true
