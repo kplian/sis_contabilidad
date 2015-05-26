@@ -30,6 +30,7 @@ DECLARE
     v_nombre_funcion   varchar;
     v_funcion_comprobante_validado  varchar;
     v_variacion         numeric;
+    v_nombre_conexion		varchar;
      
 
 BEGIN
@@ -52,6 +53,9 @@ BEGIN
               where id_int_comprobante = p_id_int_comprobante;
          
          END IF;
+         
+         --abrimo conexion dblink
+         select * into v_nombre_conexion from migra.f_crear_conexion(); 
     
     end if;
 	
@@ -137,7 +141,7 @@ BEGIN
          -- no se ejecuta solo verifica si el dinero comprometido o devengado es suficiente para proseguir con 
          --la transaccion
         
-     v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion);
+     v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
    
   
    
@@ -192,7 +196,7 @@ BEGIN
           
           -- raise exception 'validar comprobante pxp %',v_funcion_comprobante_validado ;
         	 
-          EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
+          EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '''||v_nombre_conexion||''')');
                              
 		          
        
@@ -205,10 +209,13 @@ BEGIN
         --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
         
        
-        v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion);
+        v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
        
     
-    
+        --10.cerrar conexion dblink si es que existe 
+        if p_origen  = 'endesis' then
+        	select * into v_resp from migra.f_cerrar_conexion(v_nombre_conexion,'exito'); 
+        end if;
         
     else
     	

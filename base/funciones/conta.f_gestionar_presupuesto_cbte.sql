@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION conta.f_gestionar_presupuesto_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer,
   p_igualar varchar = 'no'::character varying,
-  p_fecha_ejecucion date = NULL::date
+  p_fecha_ejecucion date = NULL::date,
+  p_conexion varchar = NULL::character varying
 )
 RETURNS varchar AS
 $body$
@@ -674,7 +675,8 @@ BEGIN
                                                                        va_id_partida_ejecucion,--  p_id_partida_ejecucion 
                                                                        va_columna_relacion, 
                                                                        va_fk_llave,
-                                                                       p_id_int_comprobante);
+                                                                       p_id_int_comprobante,
+                                                                       p_conexion);
                                 
                END IF;
                  

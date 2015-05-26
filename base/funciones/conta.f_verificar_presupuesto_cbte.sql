@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION conta.f_verificar_presupuesto_cbte (
   p_id_usuario integer,
   p_id_int_comprobante integer,
   p_igualar varchar = 'no'::character varying,
-  p_fecha_ejecucion date = NULL::date
+  p_fecha_ejecucion date = NULL::date,
+  p_conexion varchar = NULL::character varying
 )
 RETURNS varchar AS
 $body$

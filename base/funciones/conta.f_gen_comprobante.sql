@@ -5,7 +5,8 @@ CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_codigo varchar,
   p_id_usuario integer = NULL::integer,
   p_id_usuario_ai integer = NULL::integer,
-  p_usuario_ai varchar = NULL::character varying
+  p_usuario_ai varchar = NULL::character varying,
+  p_conexion varchar = NULL::character varying
 )
 RETURNS integer AS
 $body$
@@ -390,7 +391,7 @@ BEGIN
     
     IF(v_sincronizar='true')THEN
   	
-     	v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante);
+     	v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante, p_conexion);
     
     END IF;
    
