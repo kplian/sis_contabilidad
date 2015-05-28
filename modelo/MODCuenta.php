@@ -157,6 +157,28 @@ class MODCuenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function listarPlanCuentas(){
+	    //Definicion de variables para ejecucion del procedimientp
+	    $this->procedimiento='conta.f_cuenta_sel';
+	    $this-> setCount(false);
+	    $this->transaccion='CONTA_PLANCNT_SEL';
+	    $this->tipo_procedimiento='SEL';//tipo de transaccion
+	    
+	    $this->setParametro('id_gestion','id_gestion','integer');       
+	            
+	    //Definicion de la lista del resultado del query
+	     $this->captura('id_cuenta','int4');     
+		 $this->captura('nro_cuenta','varchar');
+		 $this->captura('nombre_cuenta','varchar');
+		 $this->captura('id_cuenta_padre','int4');
+	     
+	    //Ejecuta la instruccion
+	    $this->armarConsulta();
+	    $this->ejecutarConsulta();
+	    
+	    return $this->respuesta;       
+ }
 			
 }
 ?>

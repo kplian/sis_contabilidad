@@ -22,13 +22,40 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbInterfaz,{
 		
 		this.cmbGestion.on('select',this.capturaFiltros,this);
 		this.addButton('bAux',{text:'Interfaces',iconCls: 'blist',disabled:true,handler:this.onButonAux,tooltip: '<b>Iauxiliares de la cuenta</b><br/>Se habilita si esta cuenta tiene permitido el rgistro de auxiliares '});
-        
+        this.addButton('btnImprimir',
+			{
+				text: 'Imprimir',
+				iconCls: 'bprint',
+				disabled: true,
+				handler: this.imprimirCbte,
+				tooltip: '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
+			}
+		);
 		
 	},
 	capturaFiltros:function(combo, record, index){
 		
 		this.loaderTree.baseParams={id_gestion:this.cmbGestion.getValue()};
 		this.root.reload();
+		if(this.cmbGestion.getValue()){
+        	this.getBoton('btnImprimir').setDisabled(false);
+        }
+        else{
+        	this.getBoton('btnImprimir').setDisabled(true);
+        }
+	},
+	imprimirCbte: function(){
+		Ext.Ajax.request({
+						//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
+						url : '../../sis_contabilidad/control/Cuenta/reportePlanCuentas',
+						params : {
+							'id_gestion' : this.cmbGestion.getValue()
+						},
+						success : this.successExport,
+						failure : this.conexionFailure,
+						timeout : this.timeout,
+						scope : this
+					});
 	},
 			
 	Atributos:[
@@ -254,7 +281,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbInterfaz,{
 		{name:'sw_transaccional', type: 'string'},
 		{name:'id_gestion', type: 'numeric'},'desc_moneda'
 		
-	],cmbGestion:new Ext.form.ComboBox({
+	],
+	cmbGestion: new Ext.form.ComboBox({
 				fieldLabel: 'Gestion',
 				allowBlank: true,
 				emptyText:'Gestion...',
@@ -323,14 +351,17 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbInterfaz,{
            this.getBoton('bAux').disable(); 
         }
         
+       
         // llamada funcion clase padre
-            Phx.vista.Cuenta.superclass.preparaMenu.call(this,n);
+        Phx.vista.Cuenta.superclass.preparaMenu.call(this,n);
     },
     
     liberaMenu:function(n){
-        this.getBoton('bAux').disable(); 
+        this.getBoton('bAux').disable();
+        
         // llamada funcion clase padre
         Phx.vista.Cuenta.superclass.liberaMenu.call(this,n);
+        
     },
     
     

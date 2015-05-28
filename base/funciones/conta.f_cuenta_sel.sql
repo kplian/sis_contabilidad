@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_cuenta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -165,7 +167,50 @@ BEGIN
 			return v_consulta;
 
 		end;
-					
+	/*********************************   
+     #TRANSACCION:    'CONTA_PLANCNT_SEL'
+     #DESCRIPCION:    lstado del plan de cuenta, recibe como parametro la id_gestion 
+     #AUTOR:          rensi arteaga copari  kplian
+     #FECHA:            27-05-2015
+    ***********************************/
+
+    elseif(p_transaccion='CONTA_PLANCNT_SEL')then
+                    
+        begin       
+              
+             
+            --Sentencia de la consulta
+            v_consulta:='WITH RECURSIVE plan_cuentas(id_cuenta, nro_cuenta, nombre_cuenta, id_cuenta_padre) AS (
+                          select 
+                            c.id_cuenta,
+                            c.nro_cuenta,
+                            c.nombre_cuenta,
+                            c.id_cuenta_padre
+                          from conta.tcuenta c  
+                          where c.id_cuenta_padre is NULL and c.estado_reg = ''activo'' and c.id_gestion = '|| v_parametros.id_gestion::varchar||'
+                            UNION
+                          SELECT
+                           c2.id_cuenta,
+                           c2.nro_cuenta,
+                           c2.nombre_cuenta,
+                           c2.id_cuenta_padre
+                          FROM conta.tcuenta c2, plan_cuentas pc
+                          WHERE c2.id_cuenta_padre = pc.id_cuenta  and c2.estado_reg = ''activo''
+                          )
+                          SELECT 
+                               id_cuenta, 
+                               nro_cuenta, 
+                               nombre_cuenta, 
+                               id_cuenta_padre 
+                          FROM plan_cuentas order by nro_cuenta asc;';
+           
+             raise notice '%',v_consulta;
+           
+            --Devuelve la respuesta
+            return v_consulta;
+                       
+        end;   
+    				
 	else
 					     
 		raise exception 'Transaccion inexistente';
