@@ -946,3 +946,16 @@ VALUES (E'conta_partidas', E'si', E'si o no,  considerar partidas presupeustaria
 
 /***********************************F-DAT-RAC-CONTA-0-21/05/2015*****************************************/
 
+
+
+
+/***********************************I-DAT-RAC-CONTA-0-28/05/2015*****************************************/
+
+select pxp.f_insert_tgui ('Libro Mayor', 'Libro Mayor', 'LIBMAY', 'si', 2, 'sis_contabilidad/vista/int_transaccion/FormFiltro.php', 3, '', 'FormFiltro', 'CONTA');
+select pxp.f_insert_testructura_gui ('LIBMAY', 'CBTE.1.3');
+
+/***********************************F-DAT-RAC-CONTA-0-28/05/2015*****************************************/
+
+
+
+
