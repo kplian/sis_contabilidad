@@ -1244,3 +1244,42 @@ DROP TRIGGER f_trig_insert_int_trans_val ON conta.tint_transaccion;
 DROP TABLE conta.tint_trans_val;
 
 /***********************************F-SCP-RAC-CONTA-0-07/05/2015****************************************/
+
+
+
+
+***********************************I-SCP-RAC-CONTA-0-03/06/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tconfig_tipo_cuenta
+  ADD COLUMN incremento VARCHAR(10) DEFAULT 'debe' NOT NULL;
+
+COMMENT ON COLUMN conta.tconfig_tipo_cuenta.incremento
+IS 'la cuenta se incrementa al debe o al haber';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  ADD COLUMN valor_incremento VARCHAR(10) DEFAULT 'positivo' NOT NULL;
+
+COMMENT ON COLUMN conta.tcuenta.valor_incremento
+IS 'positivo o negativo, caso depresiacion acumulado es negativo';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  ADD COLUMN eeff VARCHAR(15) DEFAULT 'defecto' NOT NULL;
+
+COMMENT ON COLUMN conta.tcuenta.eeff
+IS 'defecto, (toma valor de config del tipo), resultado o balance';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tconfig_tipo_cuenta
+  DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
+  
+  
+***********************************F-SCP-RAC-CONTA-0-03/06/2015****************************************/
+
+

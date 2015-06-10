@@ -78,13 +78,15 @@ class MODCuenta extends MODbase{
 	 $this->captura('tipo_cuenta_pat','varchar');
 	 $this->captura('sw_transaccional','varchar');
 	 $this->captura('id_gestion','integer');
+	 $this->captura('valor_incremento','varchar');
+	 $this->captura('eeff','varchar');
 	 
 
     
     
-    //Ejecuta la instruccion
-    $this->armarConsulta();
-    $this->ejecutarConsulta();
+     //Ejecuta la instruccion
+     $this->armarConsulta();
+	 $this->ejecutarConsulta();
     
     return $this->respuesta;       
  }
@@ -106,6 +108,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('id_moneda','id_moneda','int4');
 		$this->setParametro('sw_transaccional','sw_transaccional','varchar');
 		$this->setParametro('id_gestion','id_gestion','int4');
+		$this->setParametro('eeff','eeff','varchar');
+		$this->setParametro('valor_incremento','evalor_incrementoeff','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -133,6 +137,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('id_moneda','id_moneda','int4');
 		$this->setParametro('sw_transaccional','sw_transaccional','varchar');
 		$this->setParametro('id_gestion','id_gestion','int4');
+		$this->setParametro('eeff','eeff','varchar');
+		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

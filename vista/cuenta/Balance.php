@@ -9,13 +9,13 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
+Phx.vista.Balance=Ext.extend(Phx.arbGridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
 		this.initButtons=[this.cmbGestion];
     	//llama al constructor de la clase padre
-		Phx.vista.Cuenta.superclass.constructor.call(this,config);
+		Phx.vista.Balance.superclass.constructor.call(this,config);
 		this.loaderTree.baseParams={id_gestion:0};
 		this.init();
 		this.iniciarEventos();
@@ -408,14 +408,14 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
         
        
         // llamada funcion clase padre
-        Phx.vista.Cuenta.superclass.preparaMenu.call(this,n);
+        Phx.vista.Balance.superclass.preparaMenu.call(this,n);
     },
     
     liberaMenu:function(n){
         this.getBoton('bAux').disable();
         
         // llamada funcion clase padre
-        Phx.vista.Cuenta.superclass.liberaMenu.call(this,n);
+        Phx.vista.Balance.superclass.liberaMenu.call(this,n);
         
     },
     
@@ -424,7 +424,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
     
     loadValoresIniciales:function()
 	{
-		Phx.vista.Cuenta.superclass.loadValoresIniciales.call(this);
+		Phx.vista.Balance.superclass.loadValoresIniciales.call(this);
 		this.getComponente('id_gestion').setValue(this.cmbGestion.getValue());	
 		
 	},
@@ -433,7 +433,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		this.ocultarComponente(this.cmpTipoCuentaPat);
 		this.ocultarComponente(this.cmpDigito);
 		this.cmpNroCuenta.disable();
-		Phx.vista.Cuenta.superclass.onButtonEdit.call(this);
+		Phx.vista.Balance.superclass.onButtonEdit.call(this);
 		
 		var nodo = this.sm.getSelectedNode(this.cmpTipoCuenta);           
 	        
@@ -456,7 +456,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
     		
     		this.cmpNroCuenta.disable();
 		
-			Phx.vista.Cuenta.superclass.onButtonNew.call(this);
+			Phx.vista.Balance.superclass.onButtonNew.call(this);
 	        var nodo = this.sm.getSelectedNode(this.cmpTipoCuenta);           
 	        
 	        

@@ -71,7 +71,32 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : true
-		}, {
+		},
+		{
+			config : {
+				name : 'incremento',
+				fieldLabel : 'Incremento',
+				allowBlank : false,
+				emptyText : 'Incremento...',
+				typeAhead : true,
+				forceSelect: true,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'local',
+				gwidth : 100,
+				store : ['debe', 'haber']
+			},
+			type : 'ComboBox',
+			id_grupo : 0,
+			filters : {
+				type : 'list',
+				pfiltro : 'incremento',
+				options : ['debe', 'haber']
+			},
+			grid : true,
+			form : true
+		},
+		{
 			config : {
 				name : 'estado_reg',
 				fieldLabel : 'Estado Reg.',
@@ -201,7 +226,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		}, {
 			name : 'usr_mod',
 			type : 'string'
-		}],
+		}, 'incremento'],
 		sortInfo : {
 			field : 'id_cofig_tipo_cuenta',
 			direction : 'ASC'

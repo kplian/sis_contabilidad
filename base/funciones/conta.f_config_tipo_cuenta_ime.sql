@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."f_config_tipo_cuenta_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.f_config_tipo_cuenta_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.f_config_tipo_cuenta_ime
@@ -51,15 +56,18 @@ BEGIN
 			id_usuario_reg,
 			fecha_reg,
 			fecha_mod,
-			id_usuario_mod
-          	) values(
+			id_usuario_mod,
+            incremento
+          	) 
+            values(
 			v_parametros.nro_base,
 			v_parametros.tipo_cuenta,
 			'activo',
 			p_id_usuario,
 			now(),
 			null,
-			null
+			null,
+            v_parametros.incremento
 							
 			)RETURNING id_cofig_tipo_cuenta into v_id_cofig_tipo_cuenta;
 			
@@ -87,7 +95,8 @@ BEGIN
 			nro_base = v_parametros.nro_base,
 			tipo_cuenta = v_parametros.tipo_cuenta,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+            incremento = v_parametros.incremento
 			where id_cofig_tipo_cuenta=v_parametros.id_cofig_tipo_cuenta;
                
 			--Definicion de la respuesta
@@ -138,7 +147,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."f_config_tipo_cuenta_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

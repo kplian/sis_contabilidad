@@ -31,10 +31,12 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_cuenta	integer;
+	v_id_cuenta				integer;
     
-    v_id_cuenta_padre integer;
-    v_tipo_cuenta_pat varchar;
+    v_id_cuenta_padre 		integer;
+    v_tipo_cuenta_pat 		varchar;
+    v_registros_cuenta		record;
+    v_registros				record;
 			    
 BEGIN
 
@@ -51,8 +53,9 @@ BEGIN
 	if(p_transaccion='CONTA_CTA_INS')then
 					
         begin
+           
            IF v_parametros.id_cuenta_padre != 'id' and v_parametros.id_cuenta_padre != '' THEN
-             v_id_cuenta_padre=v_parametros.id_cuenta_padre::integer;
+             v_id_cuenta_padre = v_parametros.id_cuenta_padre::integer;
            ELSE
            --verificamos que no existe una cuenta raiz para este tipo_cuenta
            
@@ -64,7 +67,7 @@ BEGIN
                             
                     raise exception 'solo se permite una cuenta base de %',v_parametros.tipo_cuenta;        
                
-           END IF;
+                END IF;
            END IF;
         
         
@@ -98,7 +101,9 @@ BEGIN
 			fecha_reg,
 			id_usuario_reg,
 			fecha_mod,
-			id_usuario_mod
+			id_usuario_mod,
+            eeff,
+            valor_incremento
           	) values(
 			v_id_cuenta_padre,
 			v_parametros.nombre_cuenta,
@@ -115,7 +120,9 @@ BEGIN
             now(),
 			p_id_usuario,
 			null,
-			null
+			null,
+            v_parametros.eeff,
+            v_parametros.valor_incremento
 							
 			)RETURNING id_cuenta into v_id_cuenta;
 			
@@ -150,24 +157,66 @@ BEGIN
        		 v_tipo_cuenta_pat = v_parametros.tipo_cuenta_pat;
         
         END IF;
-         
+        
+            --  obtener valores previos
+            select
+              cue.valor_incremento,
+              cue.eeff,
+              cue.tipo_cuenta
+            into
+              v_registros
+            from conta.tcuenta cue
+            where cue.id_cuenta = v_parametros.id_cuenta;
         
 			--Sentencia de la modificacion
 			update conta.tcuenta set
-			nombre_cuenta = v_parametros.nombre_cuenta,
-			sw_auxiliar = v_parametros.sw_auxiliar,
-			tipo_cuenta = v_parametros.tipo_cuenta,
-			id_cuenta_padre = v_id_cuenta_padre,
-			desc_cuenta = v_parametros.desc_cuenta,
-			tipo_cuenta_pat = v_tipo_cuenta_pat,
-			nro_cuenta = v_parametros.nro_cuenta,
-			id_moneda = v_parametros.id_moneda,
-			sw_transaccional = v_parametros.sw_transaccional,
-			id_gestion = v_parametros.id_gestion,
-			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
-			where id_cuenta=v_parametros.id_cuenta;
-               
+              nombre_cuenta = v_parametros.nombre_cuenta,
+              sw_auxiliar = v_parametros.sw_auxiliar,
+              tipo_cuenta = v_parametros.tipo_cuenta,
+              id_cuenta_padre = v_id_cuenta_padre,
+              desc_cuenta = v_parametros.desc_cuenta,
+              tipo_cuenta_pat = v_tipo_cuenta_pat,
+              nro_cuenta = v_parametros.nro_cuenta,
+              id_moneda = v_parametros.id_moneda,
+              sw_transaccional = v_parametros.sw_transaccional,
+              id_gestion = v_parametros.id_gestion,
+              fecha_mod = now(),
+              id_usuario_mod = p_id_usuario,
+              eeff = v_parametros.eeff,
+              valor_incremento = v_parametros.valor_incremento
+			where id_cuenta = v_parametros.id_cuenta;
+             
+            --raise exception '% ', v_parametros.id_cuenta;
+            --si los valores por defecto cambiarno modificar recursivamente
+            IF v_registros.eeff != v_parametros.eeff or   v_registros.valor_incremento != v_parametros.valor_incremento or  v_registros.tipo_cuenta != v_parametros.tipo_cuenta  THEN
+            
+                 FOR v_registros_cuenta in  (
+                     WITH RECURSIVE cuenta_inf(id_cuenta, id_cuenta_padre) AS (
+                          select 
+                            c.id_cuenta,
+                            c.id_cuenta_padre
+                          from conta.tcuenta c  
+                          where c.id_cuenta = v_parametros.id_cuenta
+                        UNION
+                          SELECT
+                           c2.id_cuenta,
+                           c2.id_cuenta_padre
+                          FROM conta.tcuenta c2, cuenta_inf pc
+                          WHERE c2.id_cuenta_padre = pc.id_cuenta  and c2.estado_reg = 'activo'
+                        )
+                       SELECT * FROM cuenta_inf) LOOP
+                    
+                    update conta.tcuenta c  set
+                      eeff = v_parametros.eeff,
+                      valor_incremento = v_parametros.valor_incremento,
+                      tipo_cuenta = v_parametros.tipo_cuenta
+                     where id_cuenta = v_registros_cuenta.id_cuenta;
+                
+               END LOOP;
+            
+            
+            END IF;
+              
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cuenta modificado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_cuenta',v_parametros.id_cuenta::varchar);

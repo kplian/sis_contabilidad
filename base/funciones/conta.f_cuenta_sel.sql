@@ -127,7 +127,9 @@ BEGIN
                         cta.sw_auxiliar,
                         cta.tipo_cuenta_pat,
                         cta.sw_transaccional,
-                        cta.id_gestion                       
+                        cta.id_gestion,
+                        cta.valor_incremento,
+                        cta.eeff                     
                         from conta.tcuenta cta
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         where  '||v_where|| ' 
