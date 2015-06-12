@@ -36,18 +36,7 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
     },
     
     Atributos:[
-           {
-	   			config:{
-	   				name : 'id_gestion',
-	   				origen : 'GESTION',
-	   				fieldLabel : 'Gestion',
-	   				allowBlank : false,
-	   				width: 150
-	   			},
-	   			type : 'ComboRec',
-	   			id_grupo : 0,
-	   			form : true
-	   	   },
+          
 	   	   {
 				config:{
 					name: 'desde',
@@ -74,7 +63,7 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
 		  },
 		  {
    			config:{
-                name: 'id_depto',
+                name: 'id_deptos',
                 fieldLabel: 'Depto',
                 typeAhead: false,
                 forceSelection: true,
@@ -113,39 +102,45 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
    			type:'AwesomeCombo',
    			id_grupo:0,
    			form:true
-         }
+         },
+	     {
+	       		config:{
+	       			name:'nivel',
+	       			fieldLabel:'Nivel',
+	       			allowBlank:false,
+	       			emptyText:'nivel...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    valueField: 'autentificacion',
+	       		    store:[1,2,3,4,5,6,7,8]
+	       		    
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		form:true
+	      }
     ],
     labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
-    east: {
-          url: '../../../sis_contabilidad/vista/cuenta/Balance.php',
-          title: undefined, 
-          width: '70%',
-          cls: 'Balance'
-         },
     title: 'Filtro de mayores',
     // Funcion guardar del formulario
     onSubmit: function(o) {
     	var me = this;
     	if (me.form.getForm().isValid()) {
-
              var parametros = me.getValForm()
-             
-             console.log('parametros ....', parametros);
-             
-             this.onEnablePanel(this.idContenedor + '-east', parametros)
+             Phx.CP.loadingShow();
+             Ext.Ajax.request({
+						url : '../../sis_contabilidad/control/Cuenta/reporteBalanceGeneral',
+						params : parametros,
+						success : this.successExport,
+						failure : this.conexionFailure,
+						timeout : this.timeout,
+						scope : this
+					})
                     
         }
 
-    },
-    iniciarEventos:function(){
-    	this.Cmp.id_gestion.on('select', function(cmb, rec, ind){
-    		
-    		 Ext.apply(this.Cmp.id_cuenta.store.baseParams,{id_gestion: rec.data.id_gestion})
-			 Ext.apply(this.Cmp.id_partida.store.baseParams,{id_gestion: rec.data.id_gestion})
-			 Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: rec.data.id_gestion})
-    		
-    	},this);
-    	
     }
     
     

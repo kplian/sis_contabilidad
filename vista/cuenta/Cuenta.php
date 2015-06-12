@@ -45,6 +45,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
         }
 	},
 	imprimirCbte: function(){
+		Phx.CP.loadingShow();
 		Ext.Ajax.request({
 						//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
 						url : '../../sis_contabilidad/control/Cuenta/reportePlanCuentas',

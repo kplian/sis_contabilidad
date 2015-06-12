@@ -184,6 +184,36 @@ class MODCuenta extends MODbase{
 	    $this->ejecutarConsulta();
 	    
 	    return $this->respuesta;       
+    }
+   
+   function listarBalanceGeneral(){
+	    //Definicion de variables para ejecucion del procedimientp
+	    $this->procedimiento='conta.f_balance';
+	    $this-> setCount(false);
+		$this->setTipoRetorno('record');
+	    $this->transaccion='CONTA_BALANCE_SEL';
+	    $this->tipo_procedimiento='SEL';//tipo de transaccion
+	    
+	    $this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('nivel','nivel','integer');
+		$this->setParametro('id_deptos','id_deptos','varchar');       
+	            
+	    //Definicion de la lista del resultado del query
+	     $this->captura('id_cuenta','int4');     
+		 $this->captura('nro_cuenta','varchar');
+		 $this->captura('nombre_cuenta','varchar');
+		 $this->captura('id_cuenta_padre','int4');
+		 $this->captura('monto','numeric');
+		 $this->captura('nivel','int4');
+		 
+		//Ejecuta la instruccion
+	    $this->armarConsulta();
+		//echo $this->getConsulta();
+		//exit;
+	    $this->ejecutarConsulta();
+	    
+	    return $this->respuesta;       
  }
 			
 }

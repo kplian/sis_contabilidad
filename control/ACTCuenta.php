@@ -7,6 +7,7 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 require_once(dirname(__FILE__).'/../reportes/RPlanCuentas.php');
+require_once(dirname(__FILE__).'/../reportes/RBalanceGeneral.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 class ACTCuenta extends ACTbase{    
 			
@@ -170,62 +171,53 @@ class ACTCuenta extends ACTbase{
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		
 	}
-
-    function reportePlanCuentas_bk(){
-   	    	
-   	   
-		$dataSource = new DataSource();	
-		$dataSource->putParameter('cabecera',$this->recuperarDatosPlanCuentas());
-   	   	 /*
-   	   	 $cabecera = $dataSource->getParameter('cabecera');
-   	   	 foreach($cabecera as $key=>$val){
-		 	echo $val['nro_cuenta'].'<br>';
-		 }
-   	    //var_dump($dataSource->getParameter('cabecera'));
-		exit;*/
-	    try
-	    {// get the HTML
-		    ob_start();
-		    include(dirname(__FILE__).'/../reportes/tpl/planCuentas.php');
-	        $content = ob_get_clean();
-	    	
-			//$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-			$pdf = new TCPDF();
-			$pdf->SetDisplayMode('fullpage');
-			// set document information
-            $pdf->SetCreator(PDF_CREATOR);
-			// set default header data
-			// set default monospaced font
-			$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-			
-			// set margins
-			$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-			$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-			$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-			
-			// set auto page breaks
-			$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-			
-			// set font
-			$pdf->SetFont('helvetica', '', 10);
-			// add a page
-            $pdf->AddPage();
-			$pdf->writeHTML($content, true, false, true, false, '');
-			$nombreArchivo = 'PlanCuentas.pdf';
-			$pdf->Output(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo, 'F');
-			
-			$mensajeExito = new Mensaje();
-            $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado', 'Se generó con éxito el reporte: '.$nombreArchivo,'control');
-            $mensajeExito->setArchivoGenerado($nombreArchivo);
-            $this->res = $mensajeExito;
-            $this->res->imprimirRespuesta($this->res->generarJson());
-			
+   
+   function recuperarDatosBalanceGeneral(){
+    	
+		$this->objFunc = $this->create('MODCuenta');
+		$cbteHeader = $this->objFunc->listarBalanceGeneral($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){
+				
+			return $cbteHeader->getDatos();
 		}
-	    catch(exception $e) {
-	        echo $e;
-	        exit;
-	    }
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}              
+		
     }
+   
+   function reporteBalanceGeneral(){
+			
+		$nombreArchivo = uniqid(md5(session_id()).'PlanCuentas') . '.pdf'; 
+		$dataSource = $this->recuperarDatosBalanceGeneral();	
+		
+		//parametros basicos
+		$tamano = 'LETTER';
+		$orientacion = 'P';
+		$titulo = 'Balance General';
+		
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);		
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		//Instancia la clase de pdf
+		
+		$reporte = new RBalanceGeneral($this->objParam);
+		$reporte->datosHeader($dataSource);
+		//$this->objReporteFormato->renderDatos($this->res2->datos);
+		
+		$reporte->generarReporte();
+		$reporte->output($reporte->url_archivo,'F');
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		
+	}
+
+   
 			
 }
 

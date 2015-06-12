@@ -3,7 +3,8 @@
 CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
   p_id_cuenta integer,
   p_fecha_ini date,
-  p_fecha_fin date
+  p_fecha_fin date,
+  p_id_deptos varchar
 )
 RETURNS numeric AS
 $body$
@@ -25,12 +26,15 @@ DECLARE
     v_registros						record;
     v_sum_debe						numeric;
     v_sum_haber						numeric;
+    va_id_deptos					integer[];
  
 BEGIN
   	 v_nombre_funcion:='conta.f_mayor_cuenta';
 	
      --iniciamos acumulador en cero
      v_resp_mayor = 0;
+     
+     va_id_deptos = string_to_array(p_id_deptos,',')::INTEGER[];
      
      -- identificamos si es de momiento o titular,  el incremento y el valor_incremento para la cuenta
      select
@@ -68,7 +72,8 @@ BEGIN
               t.id_cuenta = p_id_cuenta AND 
               t.estado_reg = 'activo'  AND 
               c.estado_reg = 'validado' AND
-              c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin;
+              c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin AND
+              c.id_depto::integer = ANY(va_id_deptos);
           
           -- si el incremento es debe 
           IF  v_registros.incremento = 'debe'   THEN
@@ -94,7 +99,7 @@ BEGIN
                              from conta.tcuenta c 
                              where c.id_cuenta_padre = p_id_cuenta and c.estado_reg = 'activo') LOOP
                --    llamada recursiva
-               v_resp_mayor = v_resp_mayor + conta.f_mayor_cuenta(v_registros.id_cuenta, p_fecha_ini, p_fecha_fin);
+               v_resp_mayor = v_resp_mayor + conta.f_mayor_cuenta(v_registros.id_cuenta, p_fecha_ini, p_fecha_fin, p_id_deptos);
          
          END LOOP;
         
