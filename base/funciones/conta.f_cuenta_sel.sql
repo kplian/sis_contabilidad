@@ -129,7 +129,7 @@ BEGIN
                         cta.sw_transaccional,
                         cta.id_gestion,
                         cta.valor_incremento,
-                        cta.eeff                     
+                        array_to_string( cta.eeff, '','',''null'')::varchar	 as eeff                    
                         from conta.tcuenta cta
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         where  '||v_where|| ' 

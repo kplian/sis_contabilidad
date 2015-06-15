@@ -57,7 +57,8 @@ BEGIN
 			fecha_reg,
 			fecha_mod,
 			id_usuario_mod,
-            incremento
+            incremento,
+            eeff
           	) 
             values(
 			v_parametros.nro_base,
@@ -67,7 +68,8 @@ BEGIN
 			now(),
 			null,
 			null,
-            v_parametros.incremento
+            v_parametros.incremento,
+            string_to_array(v_parametros.eeff,',')::varchar[]
 							
 			)RETURNING id_cofig_tipo_cuenta into v_id_cofig_tipo_cuenta;
 			
@@ -96,7 +98,8 @@ BEGIN
 			tipo_cuenta = v_parametros.tipo_cuenta,
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario,
-            incremento = v_parametros.incremento
+            incremento = v_parametros.incremento,
+            eeff = string_to_array(v_parametros.eeff,',')::varchar[]
 			where id_cofig_tipo_cuenta=v_parametros.id_cofig_tipo_cuenta;
                
 			--Definicion de la respuesta

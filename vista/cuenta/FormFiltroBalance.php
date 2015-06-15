@@ -85,7 +85,7 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
 					baseParams: { par_filtro:'deppto.nombre#deppto.codigo', estado:'activo', codigo_subsistema: 'CONTA'}
                 }),
                 valueField: 'id_depto',
-   				displayField: 'nombre',
+   				displayField: 'codigo',
    				hiddenName: 'id_depto',
                 enableMultiSelect: true,
                 triggerAction: 'all',
@@ -130,9 +130,23 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
     	if (me.form.getForm().isValid()) {
              var parametros = me.getValForm()
              Phx.CP.loadingShow();
+             
+             var deptos = this.Cmp.id_deptos.getValue('object');
+             console.log('deptos',deptos)
+             var sw = 0, codigos = ''
+             deptos.forEach(function(entry) {
+			    if(sw == 0){
+			    	codigos = entry.codigo;
+			    }
+			    else{
+			    	codigos = codigos + ', '+ entry.codigo;
+			    }
+			    sw = 1;
+			});
+             
              Ext.Ajax.request({
 						url : '../../sis_contabilidad/control/Cuenta/reporteBalanceGeneral',
-						params : parametros,
+						params : Ext.apply(parametros,{'codigos': codigos}),
 						success : this.successExport,
 						failure : this.conexionFailure,
 						timeout : this.timeout,

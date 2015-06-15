@@ -31,6 +31,25 @@ BEGIN
     -- 0) inicia suma
     v_suma = 0;
     
+     --recupera datos de la cuenta padre
+     IF p_id_cuenta_padre is not null THEN
+       select
+         cue.tipo_cuenta,
+         cue.sw_transaccional
+       into
+         v_registros
+       from conta.tcuenta cue
+       where cue.id_cuenta_padre = p_id_cuenta_padre;
+       
+       IF v_registros.sw_transaccional = 'movimiento' THEN
+            -- caculamos el mayor
+            v_mayor =  conta.f_mayor_cuenta(p_id_cuenta_padre, p_desde, p_hasta, p_id_deptos);
+            return v_mayor;
+       END IF; 
+        
+     END IF;
+    
+    
     --1) IF   si el nivel inicial es igual al nivel final calculamo el mayor de la cuenta
            
        IF p_nivel_ini  = p_nivel_final  THEN  
@@ -45,7 +64,9 @@ BEGIN
                                      c.nivel_cuenta,
                                      c.id_cuenta_padre
                                    from conta.tcuenta c
-                                   where c.id_cuenta_padre = p_id_cuenta_padre)   LOOP
+                                   where c.id_cuenta_padre = p_id_cuenta_padre 
+                                         and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff)
+                                    )   LOOP
                    
                    -- caculamos el mayor
                     v_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos);
@@ -88,7 +109,9 @@ BEGIN
                                          c.nivel_cuenta,
                                          c.id_cuenta_padre
                                        from conta.tcuenta c  
-                                        where c.id_cuenta_padre is NULL and c.id_gestion = v_id_gestion and c.estado_reg = 'activo' )   LOOP
+                                        where c.id_cuenta_padre is NULL 
+                                        and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff)
+                                        and c.id_gestion = v_id_gestion and c.estado_reg = 'activo' )   LOOP
                        
                        -- caculamos el mayor
                         v_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos);
@@ -143,7 +166,8 @@ BEGIN
                                  c.nivel_cuenta,
                                  c.id_cuenta_padre
                                 from conta.tcuenta c  
-                                where c.id_cuenta_padre is NULL and c.id_gestion = v_id_gestion and c.estado_reg = 'activo' )   LOOP
+                                where c.id_cuenta_padre is NULL and c.id_gestion = v_id_gestion 
+                                and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff))   LOOP
                 
                  -- llamada recursiva del balance general
            
@@ -183,7 +207,8 @@ BEGIN
                                  c.nivel_cuenta,
                                  c.id_cuenta_padre
                                 from conta.tcuenta c  
-                                where c.id_cuenta_padre = p_id_cuenta_padre  and c.estado_reg = 'activo' )   LOOP
+                                where     c.id_cuenta_padre = p_id_cuenta_padre  
+                                      and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff) )   LOOP
                 
                 -- llamada recursiva del balance general
                 v_mayor = conta.f_balance_recursivo(p_desde, p_hasta, p_id_deptos, v_nivel, p_nivel_final, v_registros.id_cuenta);

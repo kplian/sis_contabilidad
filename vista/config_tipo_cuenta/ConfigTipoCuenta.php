@@ -96,6 +96,37 @@ header("content-type: text/javascript; charset=UTF-8");
 			grid : true,
 			form : true
 		},
+
+	    	{
+       			config:{
+       				name:'eeff',
+       				fieldLabel:'EEFF',
+       				allowBlank:true,
+       				emptyText:'Roles...',
+       				store: new Ext.data.ArrayStore({
+                        fields: ['variable', 'valor'],
+                        data : [ ['balance', 'Balance'],
+                                 ['resultado', 'Resultado'],
+                               ]
+                        }),
+       				valueField: 'variable',
+				    displayField: 'valor',
+       				forceSelection:true,
+       				typeAhead: true,
+           			triggerAction: 'all',
+           			lazyRender:true,
+       				mode:'local',
+       				pageSize:10,
+       				queryDelay:1000,
+       				width:250,
+       				minChars:2,
+	       			enableMultiSelect:true
+       			},
+       			type:'AwesomeCombo',
+       			id_grupo:0,
+       			grid:true,
+       			form:true
+       	},
 		{
 			config : {
 				name : 'estado_reg',
@@ -226,7 +257,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		}, {
 			name : 'usr_mod',
 			type : 'string'
-		}, 'incremento'],
+		}, 'incremento','eeff'],
 		sortInfo : {
 			field : 'id_cofig_tipo_cuenta',
 			direction : 'ASC'

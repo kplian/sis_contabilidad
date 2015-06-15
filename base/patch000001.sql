@@ -1248,7 +1248,7 @@ DROP TABLE conta.tint_trans_val;
 
 
 
-***********************************I-SCP-RAC-CONTA-0-03/06/2015****************************************/
+/***********************************I-SCP-RAC-CONTA-0-03/06/2015****************************************/
 
 --------------- SQL ---------------
 
@@ -1280,6 +1280,30 @@ ALTER TABLE conta.tconfig_tipo_cuenta
   DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
   
   
-***********************************F-SCP-RAC-CONTA-0-03/06/2015****************************************/
+/***********************************F-SCP-RAC-CONTA-0-03/06/2015****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-0-15/06/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tconfig_tipo_cuenta
+  ADD COLUMN eeff VARCHAR(20)[] DEFAULT '{"balance"}' NOT NULL;
+
+COMMENT ON COLUMN conta.tconfig_tipo_cuenta.eeff
+IS 'array que permite configurar el valor por defecto de la cuenta balance, resultado, ... otro que pudieran aparecer';
+
+
+ALTER TABLE conta.tcuenta
+  DROP COLUMN eeff;
+  
+  
+ --------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  ADD COLUMN eeff VARCHAR(20)[] DEFAULT '{balance}' NOT NULL; 
+ 
+
+/***********************************F-SCP-RAC-CONTA-0-15/06/2015****************************************/
 

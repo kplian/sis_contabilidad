@@ -289,27 +289,37 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	       		grid:true,
 	       		form:true
 	       	},
-   	      
    	      {
-	       		config:{
-	       			name:'eeff',
-	       			fieldLabel:'EEFF',
-	       			qtip: 'si la cuenta es de balance o de resultado, con defecto toma el valor de la configuracion del tipo de cuenta',
-	       			allowBlank:false,
-	       			emptyText:'Tipo...',
-	       			typeAhead: true,
-	       		    triggerAction: 'all',
-	       		    lazyRender:true,
-	       		    mode: 'local',
-	       		    gwidth: 100,
-	       		    store:['defecto','balance','resultado']
-	       		},
-	       		type:'ComboBox',
-	       		valorInicial: 'defecto',
-	       		id_grupo:0,
-	       		grid:true,
-	       		form:true
-	       	}
+       			config:{
+       				name:'eeff',
+       				fieldLabel:'EEFF',
+       				allowBlank:true,
+       				emptyText:'Roles...',
+       				store: new Ext.data.ArrayStore({
+                        fields: ['variable', 'valor'],
+                        data : [ ['balance', 'Balance'],
+                                 ['resultado', 'Resultado'],
+                               ]
+                        }),
+       				valueField: 'variable',
+				    displayField: 'valor',
+       				forceSelection:true,
+       				typeAhead: true,
+           			triggerAction: 'all',
+           			lazyRender:true,
+       				mode:'local',
+       				pageSize:10,
+       				queryDelay:1000,
+       				width:250,
+       				minChars:2,
+	       			enableMultiSelect:true
+       			},
+       			type:'AwesomeCombo',
+       			id_grupo:0,
+       			grid:true,
+       			form:true
+       	}
+   	      
 		
 		
 	],

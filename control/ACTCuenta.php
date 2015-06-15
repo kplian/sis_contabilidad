@@ -58,7 +58,7 @@ class ACTCuenta extends ACTbase{
             $this->objParam->addParametro('id_padre',$id_cuenta);
         }
         
-								$this->objFunc=$this->create('MODCuenta');
+		$this->objFunc=$this->create('MODCuenta');
         $this->res=$this->objFunc->listarCuentaArb();
         
         $this->res->setTipoRespuestaArbol();
@@ -204,7 +204,7 @@ class ACTCuenta extends ACTbase{
 		//Instancia la clase de pdf
 		
 		$reporte = new RBalanceGeneral($this->objParam);
-		$reporte->datosHeader($dataSource);
+		$reporte->datosHeader($dataSource, $this->objParam->getParametro('nivel'), $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'));
 		//$this->objReporteFormato->renderDatos($this->res2->datos);
 		
 		$reporte->generarReporte();

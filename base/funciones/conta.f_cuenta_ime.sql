@@ -121,7 +121,7 @@ BEGIN
 			p_id_usuario,
 			null,
 			null,
-            v_parametros.eeff,
+            string_to_array(v_parametros.eeff,',')::varchar[],
             v_parametros.valor_incremento
 							
 			)RETURNING id_cuenta into v_id_cuenta;
@@ -182,13 +182,13 @@ BEGIN
               id_gestion = v_parametros.id_gestion,
               fecha_mod = now(),
               id_usuario_mod = p_id_usuario,
-              eeff = v_parametros.eeff,
+              eeff = string_to_array(v_parametros.eeff,',')::varchar[],
               valor_incremento = v_parametros.valor_incremento
 			where id_cuenta = v_parametros.id_cuenta;
              
             --raise exception '% ', v_parametros.id_cuenta;
             --si los valores por defecto cambiarno modificar recursivamente
-            IF v_registros.eeff != v_parametros.eeff or   v_registros.valor_incremento != v_parametros.valor_incremento or  v_registros.tipo_cuenta != v_parametros.tipo_cuenta  THEN
+            IF v_registros.eeff != string_to_array(v_parametros.eeff,',')::varchar[] or   v_registros.valor_incremento != v_parametros.valor_incremento or  v_registros.tipo_cuenta != v_parametros.tipo_cuenta  THEN
             
                  FOR v_registros_cuenta in  (
                      WITH RECURSIVE cuenta_inf(id_cuenta, id_cuenta_padre) AS (
@@ -207,7 +207,7 @@ BEGIN
                        SELECT * FROM cuenta_inf) LOOP
                     
                     update conta.tcuenta c  set
-                      eeff = v_parametros.eeff,
+                      eeff = string_to_array(v_parametros.eeff,',')::varchar[],
                       valor_incremento = v_parametros.valor_incremento,
                       tipo_cuenta = v_parametros.tipo_cuenta
                      where id_cuenta = v_registros_cuenta.id_cuenta;
