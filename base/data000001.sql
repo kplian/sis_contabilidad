@@ -957,5 +957,7 @@ select pxp.f_insert_testructura_gui ('LIBMAY', 'CBTE.1.3');
 /***********************************F-DAT-RAC-CONTA-0-28/05/2015*****************************************/
 
 
-
+/***********************************I-DAT-RAC-CONTA-0-25/06/2015*****************************************/
+select pxp.f_insert_tgui ('Libro Diario', 'Libro Diario', 'CBTE.1.3.1', 'si', 1, 'sis_contabilidad/vista/int_comprobante/IntComprobanteLd.php', 3, '', 'IntComprobanteLd', 'CONTA');
+/***********************************F-DAT-RAC-CONTA-0-25/06/2015*****************************************/
 
