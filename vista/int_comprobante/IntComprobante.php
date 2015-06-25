@@ -13,6 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
     fheight:500,
     fwidth: 850,
+    nombreVista: 'IntComprobante',
 	constructor:function(config){
 		this.maestro=config.maestro;
 		this.initButtons=[this.cmbDepto];
@@ -66,9 +67,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
         this.store.baseParams.id_deptos = this.cmbDepto.getValue();
+        this.store.baseParams.nombreVista = this.nombreVista
         this.load(); 
-            
-        
     },
     
     validarFiltros:function(){
@@ -78,15 +78,10 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
         else{
             return false;
         }
-        
     },
     onButtonAct:function(){
-        if(!this.validarFiltros()){
+    	if(!this.validarFiltros()){
             alert('Especifique los filtros antes')
-         }
-        else{
-            this.store.baseParams.id_deptos=this.cmbDepto.getValue();
-            Phx.vista.IntComprobante.superclass.onButtonAct.call(this);
         }
     },
 	iniciarEventos:function(){

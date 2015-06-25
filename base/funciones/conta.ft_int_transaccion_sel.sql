@@ -198,8 +198,18 @@ BEGIN
 						transa.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-						COALESCE(transa.importe_debe_mb,0),	
-						COALESCE(transa.importe_haber_mb,0),
+                        CASE cue.valor_incremento 
+                        	WHEN ''negativo'' THEN
+								COALESCE(transa.importe_debe_mb*-1,0)
+                            ELSE
+                            	COALESCE(transa.importe_debe_mb,0)
+                        	END  as importe_debe_mb,
+                        CASE cue.valor_incremento 
+                        	WHEN ''negativo'' THEN
+								COALESCE(transa.importe_haber_mb*-1,0)
+                            ELSE
+                            	COALESCE(transa.importe_haber_mb,0)
+                        	END  as importe_haber_mb,    
 						COALESCE(transa.importe_gasto_mb,0),
 						COALESCE(transa.importe_recurso_mb,0),
 						
@@ -286,15 +296,22 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select 
                         count(transa.id_int_transaccion) as total,
-                        sum(COALESCE(transa.importe_debe_mb,0)) as total_debe,
+                        sum(CASE cue.valor_incremento 
+                        	WHEN ''negativo'' THEN
+								COALESCE(transa.importe_debe_mb*-1,0)
+                            ELSE
+                            	COALESCE(transa.importe_debe_mb,0)
+                        	END)  as total_debe, 
+                        
                         sum(COALESCE(transa.importe_haber_mb,0)) as total_haber
+                        
 					    from conta.tint_transaccion transa
                         inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
                         inner join param.tdepto dep on dep.id_depto = icbte.id_depto
                         inner join param.tperiodo per on per.id_periodo = icbte.id_periodo
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         
-                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
+                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta               
 						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
 						left join pre.tpartida par on par.id_partida = transa.id_partida
 						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo

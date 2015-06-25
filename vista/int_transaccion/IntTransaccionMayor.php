@@ -72,12 +72,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    }
 		   			    else{
 		   			    	//cargar resumen en el panel
-		   			    	
-		   			    	console.log(me, me.idContenedor)
-		   			    	console.log('sssss', Phx.CP.getPagina(me.idContenedorPadre));
-		   			    	
-		   			    	var debe = record.data["importe_debe"]?record.data["importe_debe"]:0,
-		   			    		haber = record.data["importe_haber"]?record.data["importe_haber"]:0;
+		   			    	var debe = record.data["importe_debe_mb"]?record.data["importe_debe_mb"]:0,
+		   			    		haber = record.data["importe_haber_mb"]?record.data["importe_haber_mb"]:0;
 		   			    	
 		   			    	Phx.CP.getPagina(me.idContenedorPadre).panelResumen.update( String.format('<p>DEBE: {0} <br> HABER: {1} </br> SALDO: {2}</p>' ,debe, haber, debe - haber))
 		   			    	return '<b><p align="right">Total: &nbsp;&nbsp; </p></b>';
@@ -322,40 +318,40 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	},
 	
 	
-	tam_pag:50,	
+	tam_pag: 50,	
 	title:'Transacción',
 	
-	ActList:'../../sis_contabilidad/control/IntTransaccion/listarIntTransaccionMayor',
-	id_store:'id_int_transaccion',
+	ActList: '../../sis_contabilidad/control/IntTransaccion/listarIntTransaccionMayor',
+	id_store: 'id_int_transaccion',
 	fields: [
-		{name:'id_int_transaccion', type: 'numeric'},
-		{name:'id_partida', type: 'numeric'},
-		{name:'id_centro_costo', type: 'numeric'},
-		{name:'id_partida_ejecucion', type: 'numeric'},
-		{name:'estado_reg', type: 'string'},
-		{name:'id_int_transaccion_fk', type: 'numeric'},
-		{name:'id_cuenta', type: 'numeric'},
-		{name:'glosa', type: 'string'},
-		{name:'id_int_comprobante', type: 'numeric'},
-		{name:'id_auxiliar', type: 'numeric'},
-		{name:'id_usuario_reg', type: 'numeric'},
-		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
-		{name:'id_usuario_mod', type: 'numeric'},
-		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
-		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
-		{name:'importe_debe', type: 'numeric'},
-		{name:'importe_haber', type: 'numeric'},
-		{name:'importe_gasto', type: 'numeric'},
-		{name:'importe_recurso', type: 'numeric'},
-		{name:'importe_debe_mb', type: 'numeric'},
-		{name:'importe_haber_mb', type: 'numeric'},
-		{name:'importe_gasto_mb', type: 'numeric'},
-		{name:'importe_recurso_mb', type: 'numeric'},
-		{name:'desc_cuenta', type: 'string'},
-		{name:'desc_auxiliar', type: 'string'},
-		{name:'desc_partida', type: 'string'},
-		{name:'desc_centro_costo', type: 'string'},
+		{ name:'id_int_transaccion', type: 'numeric'},
+		{ name:'id_partida', type: 'numeric'},
+		{ name:'id_centro_costo', type: 'numeric'},
+		{ name:'id_partida_ejecucion', type: 'numeric'},
+		{ name:'estado_reg', type: 'string'},
+		{ name:'id_int_transaccion_fk', type: 'numeric'},
+		{ name:'id_cuenta', type: 'numeric'},
+		{ name:'glosa', type: 'string'},
+		{ name:'id_int_comprobante', type: 'numeric'},
+		{ name:'id_auxiliar', type: 'numeric'},
+		{ name:'id_usuario_reg', type: 'numeric'},
+		{ name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{ name:'id_usuario_mod', type: 'numeric'},
+		{ name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{ name:'usr_reg', type: 'string'},
+		{ name:'usr_mod', type: 'string'},
+		{ name:'importe_debe', type: 'numeric'},
+		{ name:'importe_haber', type: 'numeric'},
+		{ name:'importe_gasto', type: 'numeric'},
+		{ name:'importe_recurso', type: 'numeric'},
+		{ name:'importe_debe_mb', type: 'numeric'},
+		{ name:'importe_haber_mb', type: 'numeric'},
+		{ name:'importe_gasto_mb', type: 'numeric'},
+		{ name:'importe_recurso_mb', type: 'numeric'},
+		{ name:'desc_cuenta', type: 'string'},
+		{ name:'desc_auxiliar', type: 'string'},
+		{ name:'desc_partida', type: 'string'},
+		{ name:'desc_centro_costo', type: 'string'},
 		'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1'
 		
 	],
@@ -375,10 +371,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
     
     arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','estado_reg','fecha_reg','glosa'],
 
-
-	
-	
-	sortInfo:{
+    sortInfo:{
 		field: 'id_int_transaccion',
 		direction: 'ASC'
 	},
@@ -391,12 +384,12 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	onReloadPage:function(param){
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var me = this;
-		this.initFiltro();
+		this.initFiltro(param);
 	},
 	
 	initFiltro: function(param){
-		
-		this.load( { params: { start:0, limit: this.tam_pag } } );
+		this.store.baseParams=param;
+		this.load( { params: { start:0, limit: this.tam_pag } });
 	},
 	
 	preparaMenu:function(){

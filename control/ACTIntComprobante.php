@@ -19,11 +19,18 @@ class ACTIntComprobante extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_int_comprobante');
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
-		$this->objParam->addFiltro("incbte.estado_reg = ''borrador''");
+		
 		
 		if($this->objParam->getParametro('id_deptos')!=''){
             $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
         }
+		
+		if($this->objParam->getParametro('nombreVista')=='IntComprobanteLd'){
+            $this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
+        }
+		else{
+			$this->objParam->addFiltro("incbte.estado_reg in (''borrador'', ''edicion'')");
+		}
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);

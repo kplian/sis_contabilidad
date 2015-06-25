@@ -105,9 +105,7 @@ BEGIN
     if p_origen != 'endesis' then
         
         if p_igualar = 'no' and  v_variacion != 0  then
-             
-             v_errores = 'El comprobante no iguala: Diferencia '||v_haber-v_debe;
-       
+            v_errores = 'El comprobante no iguala: Diferencia '||v_haber-v_debe;
         else
          
               -- TODO obtener la ventana de error de las variables globales
@@ -179,8 +177,9 @@ BEGIN
         estado_reg = 'validado'
         where id_int_comprobante = p_id_int_comprobante;
         
-        --7. Replicación del comprobante hacia las estructuras destino
-        v_resp = conta.f_replicar_cbte(p_id_usuario,p_id_int_comprobante);
+        -- 7. Replicación del comprobante hacia las estructuras destino
+        -- RAC, 26/06/2015,  la talba comprobnates destino no se usara mas, por que es redundante
+        -- v_resp = conta.f_replicar_cbte(p_id_usuario,p_id_int_comprobante);
         
         
        -- 8 si viene de una plantilla de comprobante busca la funcion de validacion configurada
@@ -203,12 +202,7 @@ BEGIN
        
        END IF;
        
-      
-        
-       
         --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
-        
-       
         v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
        
     
