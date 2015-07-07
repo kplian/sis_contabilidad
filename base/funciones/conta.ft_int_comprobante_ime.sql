@@ -80,12 +80,7 @@ BEGIN
         	
         	--PERIODO
         	--Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha,v_id_subsistema_conta);
-        	
-        	      	
-        	--Verifica si el Periodo esta abierto
-        	v_resp2 = param.f_verifica_periodo_subsistema_abierto(v_rec.po_id_periodo_subsistema);
-        	
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
         	
         	
         	-----------------------------
@@ -123,7 +118,7 @@ BEGIN
 			v_id_subsistema,
 			v_parametros.id_depto,
 			v_parametros.id_moneda,
-			v_parametros.id_periodo,
+			v_rec.po_id_periodo,
 			v_parametros.id_funcionario_firma1,
 			v_parametros.id_funcionario_firma2,
 			v_parametros.id_funcionario_firma3,
@@ -190,11 +185,8 @@ BEGIN
         	
         	--PERIODO
         	--Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha,v_id_subsistema_conta);
-        	
-        	--Verifica si el Periodo esta abierto
-        	v_resp2 = param.f_verifica_periodo_subsistema_abierto(v_rec.po_id_periodo_subsistema);
-        	
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+            
 			------------------------------
 			--Sentencia de la modificacion
 			------------------------------
@@ -204,7 +196,7 @@ BEGIN
 			id_subsistema = v_id_subsistema,
 			id_depto = v_parametros.id_depto,
 			id_moneda = v_parametros.id_moneda,
-			id_periodo = v_parametros.id_periodo,
+			id_periodo = v_rec.po_id_periodo,
 			id_funcionario_firma1 = v_parametros.id_funcionario_firma1,
 			id_funcionario_firma2 = v_parametros.id_funcionario_firma2,
 			id_funcionario_firma3 = v_parametros.id_funcionario_firma3,

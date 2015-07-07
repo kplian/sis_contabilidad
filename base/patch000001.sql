@@ -1307,3 +1307,15 @@ ALTER TABLE conta.tcuenta
 
 /***********************************F-SCP-RAC-CONTA-0-15/06/2015****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-0-07/07/2015****************************************/
+
+
+select pxp.f_insert_tgui ('Reportes', 'Reportes', 'REPCON', 'si', 10, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Balance de cuentas', 'Balance general', 'BALCON', 'si', 1, 'sis_contabilidad/vista/cuenta/FormFiltroBalance.php', 3, '', 'FormFiltroBalance', 'CONTA');
+
+
+select pxp.f_insert_testructura_gui ('REPCON', 'CONTA');
+select pxp.f_insert_testructura_gui ('BALCON', 'REPCON');
+
+/***********************************F-SCP-RAC-CONTA-0-07/07/2015****************************************/

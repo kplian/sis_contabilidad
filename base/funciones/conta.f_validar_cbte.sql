@@ -27,10 +27,11 @@ DECLARE
     v_id_periodo 	integer;
     v_filas			bigint;
     v_resp			varchar;
-    v_nombre_funcion   varchar;
+    v_nombre_funcion   				varchar;
     v_funcion_comprobante_validado  varchar;
-    v_variacion         numeric;
-    v_nombre_conexion		varchar;
+    v_variacion        				numeric;
+    v_nombre_conexion				varchar;
+    v_sincronizar					varchar;
      
 
 BEGIN
@@ -41,6 +42,9 @@ BEGIN
     --raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';	
 	v_errores = '';
     
+    
+    
+
     
      --si el origen es endesis confiamos en las validaciones
     if p_origen  = 'endesis' then
@@ -119,8 +123,14 @@ BEGIN
               
               ELSE 
               
-               raise exception 'No se pueden validar comprobantes desde PXP en BOA';
               
+              
+              END IF;
+              
+              v_sincronizar = pxp.f_get_variable_global('sincronizar');
+              
+               IF(v_sincronizar = 'true')THEN
+                  raise exception 'No se pueden validar comprobantes desde PXP en BOA';
               END IF;
           
           
