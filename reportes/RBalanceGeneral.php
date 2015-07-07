@@ -13,6 +13,9 @@ class RBalanceGeneral extends  ReportePDF {
 	var $ancho_sin_totales;
 	var $cantidad_columnas_estaticas;
 	var $codigos;
+	var $total_activo;
+	var $total_pasigo;
+	var $total_patrimonio;
 	
 	function datosHeader ( $detalle, $nivel, $desde, $hasta, $codigos) {
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
@@ -70,7 +73,11 @@ class RBalanceGeneral extends  ReportePDF {
 		
    }
 	
-	function generarReporte() {		
+	function generarReporte() {
+		
+		$this->total_activo = 0;
+	    $this->total_pasigo = 0;
+	    $this->total_patrimonio = 0;		
 		//Reporte de unasola columna de monto
 		if($this->nivel == 1 || $this->nivel > 3 ){
 		    $this->generarReporte1C();
@@ -84,7 +91,36 @@ class RBalanceGeneral extends  ReportePDF {
 		     $this->generarReporte3C();
 		}
 		
+		//escribe formula contabla
+		$this->SetFont('times', 'BI', 17);
+		
+		$formula = "ACTIVO =  PASIVO + PATRIMONIO";
+		// print a block of text using Write()
+		$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
+		
+		
+		$tactivo = number_format( $this->total_activo , 2 , '.' , ',' );
+		$tpasivo = number_format( $this->total_pasivo , 2 , '.' , ',' );
+		$tpatrimonio = number_format( $this->total_patrimonio , 2 , '.' , ',' );
+		
+		
+		$formula = "$tactivo =  $tpasivo + $tpatrimonio";
+		// print a block of text using Write()
+		$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
+		
 	}
+	function definirTotales($val){
+		if($val ["nivel"] ==1 && $val ["tipo_cuenta"] == 'activo'){
+			$this->total_activo = $val['monto'];
+		}
+		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'pasivo'){
+			$this->total_pasivo = $val['monto'];
+		}
+		if($val ["nivel"] ==1 && $val ["tipo_cuenta"] == 'patrimonio'){
+			$this->total_patrimonio = $val['monto'];
+		}
+	}
+	
 	function generarReporte1C() {
 		$this->setFontSubsetting(false);
 		$this->AddPage();
@@ -93,6 +129,8 @@ class RBalanceGeneral extends  ReportePDF {
 		$this->SetFont('','',9);
 		
         foreach ($this->datos_detalle as $val) {
+	       		
+			$this->definirTotales($val);	
 	       	$tabs = "";
 		    for($i = 1; $i < $val ["nivel"]; $i++){
 		    	$tabs = $tabs."\t\t\t\t";
@@ -127,7 +165,7 @@ class RBalanceGeneral extends  ReportePDF {
         $tabs = '';
         
         foreach ($this->datos_detalle as $val) {
-        	
+        	$this->definirTotales($val);
 			if($val['nivel'] == 2){
 				$tabs = "\t\t\t\t";
 			}
@@ -174,7 +212,7 @@ class RBalanceGeneral extends  ReportePDF {
         $tabs = '';
         
         foreach ($this->datos_detalle as $val) {
-        	
+        	$this->definirTotales($val);
 			if($val['nivel'] == 3){
 				$tabs = "\t\t\t\t\t\t\t\t";
 			}

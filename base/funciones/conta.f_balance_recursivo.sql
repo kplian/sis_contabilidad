@@ -62,7 +62,8 @@ BEGIN
                                      c.nro_cuenta,
                                      c.nombre_cuenta,
                                      c.nivel_cuenta,
-                                     c.id_cuenta_padre
+                                     c.id_cuenta_padre,
+                                     c.tipo_cuenta
                                    from conta.tcuenta c
                                    where c.id_cuenta_padre = p_id_cuenta_padre 
                                          and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff)
@@ -78,14 +79,16 @@ BEGIN
                                     nombre_cuenta,
                                     id_cuenta_padre,
                                     monto,
-                                    nivel)
+                                    nivel,
+                                    tipo_cuenta)
                                   VALUES(
                                    v_registros.id_cuenta,
                                    v_registros.nro_cuenta,
                                    v_registros.nombre_cuenta,
                                    v_registros.id_cuenta_padre,
                                    v_mayor,
-                                   p_nivel_ini );
+                                   p_nivel_ini,
+                                   v_registros.tipo_cuenta );
                     
                     
                  
@@ -107,7 +110,8 @@ BEGIN
                                          c.nro_cuenta,
                                          c.nombre_cuenta,
                                          c.nivel_cuenta,
-                                         c.id_cuenta_padre
+                                         c.id_cuenta_padre.
+                                         c.tipo_cuenta
                                        from conta.tcuenta c  
                                         where c.id_cuenta_padre is NULL 
                                         and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff)
@@ -123,14 +127,16 @@ BEGIN
                                         nombre_cuenta,
                                         id_cuenta_padre,
                                         monto,
-                                        nivel)
+                                        nivel,
+                                        tipo_cuenta)
                                       VALUES(
                                        v_registros.id_cuenta,
                                        v_registros.nro_cuenta,
                                        v_registros.nombre_cuenta,
                                        v_registros.id_cuenta_padre,
                                        v_mayor,
-                                       p_nivel_ini );
+                                       p_nivel_ini,
+                                       v_registros.tipo_cuenta );
                         
                         
                      
@@ -164,7 +170,8 @@ BEGIN
                                  c.nro_cuenta,
                                  c.nombre_cuenta,
                                  c.nivel_cuenta,
-                                 c.id_cuenta_padre
+                                 c.id_cuenta_padre,
+                                 c.tipo_cuenta
                                 from conta.tcuenta c  
                                 where c.id_cuenta_padre is NULL and c.id_gestion = v_id_gestion 
                                 and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff))   LOOP
@@ -180,14 +187,16 @@ BEGIN
                                   nombre_cuenta,
                                   id_cuenta_padre,
                                   monto,
-                                  nivel)
+                                  nivel,
+                                  tipo_cuenta)
                                 VALUES(
                                  v_registros.id_cuenta,
                                  v_registros.nro_cuenta,
                                  v_registros.nombre_cuenta,
                                  v_registros.id_cuenta_padre,
                                  v_mayor,
-                                 p_nivel_ini );
+                                 p_nivel_ini,
+                                 v_registros.tipo_cuenta );
                                  
                                  
                -- incrementamos suma
@@ -205,7 +214,8 @@ BEGIN
                                  c.nro_cuenta,
                                  c.nombre_cuenta,
                                  c.nivel_cuenta,
-                                 c.id_cuenta_padre
+                                 c.id_cuenta_padre,
+                                 c.tipo_cuenta
                                 from conta.tcuenta c  
                                 where     c.id_cuenta_padre = p_id_cuenta_padre  
                                       and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff) )   LOOP
@@ -220,14 +230,16 @@ BEGIN
                                   nombre_cuenta,
                                   id_cuenta_padre,
                                   monto,
-                                  nivel)
+                                  nivel,
+                                  tipo_cuenta)
                                 VALUES(
                                  v_registros.id_cuenta,
                                  v_registros.nro_cuenta,
                                  v_registros.nombre_cuenta,
                                  v_registros.id_cuenta_padre,
                                  v_mayor,
-                                 p_nivel_ini );
+                                 p_nivel_ini,
+                                 v_registros.tipo_cuenta );
                 -- incrementamos suma
                 v_suma = v_suma + COALESCE(v_mayor,0);
               END LOOP;

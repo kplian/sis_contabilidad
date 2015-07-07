@@ -206,6 +206,7 @@ class MODCuenta extends MODbase{
 		 $this->captura('id_cuenta_padre','int4');
 		 $this->captura('monto','numeric');
 		 $this->captura('nivel','int4');
+		 $this->captura('tipo_cuenta','varchar');
 		 
 		//Ejecuta la instruccion
 	    $this->armarConsulta();
