@@ -198,19 +198,9 @@ BEGIN
 						transa.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        CASE cue.valor_incremento 
-                        	WHEN ''negativo'' THEN
-								COALESCE(transa.importe_debe_mb*-1,0)
-                            ELSE
-                            	COALESCE(transa.importe_debe_mb,0)
-                        	END  as importe_debe_mb,
-                        CASE cue.valor_incremento 
-                        	WHEN ''negativo'' THEN
-								COALESCE(transa.importe_haber_mb*-1,0)
-                            ELSE
-                            	COALESCE(transa.importe_haber_mb,0)
-                        	END  as importe_haber_mb,    
-						COALESCE(transa.importe_gasto_mb,0),
+                        COALESCE(transa.importe_debe_mb,0) as importe_debe_mb,
+                        COALESCE(transa.importe_haber_mb,0) as importe_haber_mb, 
+                       	COALESCE(transa.importe_gasto_mb,0),
 						COALESCE(transa.importe_recurso_mb,0),
 						
                         CASE par.sw_movimiento

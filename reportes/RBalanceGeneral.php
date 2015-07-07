@@ -104,7 +104,7 @@ class RBalanceGeneral extends  ReportePDF {
 			if($val['monto']*1 < 0){
 				$this->SetTextColor(0,100,100,0,false,'');
 			}
-			$this->Cell(40,3.5, number_format( $val['monto'] , 0 , '.' , ',' ) ,'LTR',0,'R');
+			$this->Cell(40,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'LTR',0,'R');
 			$this->ln();
 			
 			//colores por defecto
@@ -143,13 +143,13 @@ class RBalanceGeneral extends  ReportePDF {
 			}
 			
 			if($val['nivel'] == 2){
-			   $this->Cell(20,3.5, number_format( $val['monto'] , 0 , '.' , ',' ) ,'LT',0,'R');
+			   $this->Cell(20,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'LT',0,'R');
 			   $this->Cell(20,3.5,"",'TR',0,'R');
 			}
 			else{
 				$this->SetFont('','BU',10);
 		        $this->Cell(20,3.5, "" ,'LT',0,'R');
-				$this->Cell(20,3.5, number_format( $val['monto'] , 0 , '.' , ',' ) ,'TR',0,'R');	
+				$this->Cell(20,3.5, number_format( $val['monto'], 2 , '.' , ',' ) ,'TR',0,'R');	
 				$this->SetFont('','',9);
 			}
 			
@@ -195,14 +195,14 @@ class RBalanceGeneral extends  ReportePDF {
 			}
 			
 			if($val['nivel'] == 3){
-			   $this->Cell(20,3.5, number_format( $val['monto'] , 0 , '.' , ',' ) ,'LT',0,'R');
+			   $this->Cell(20,3.5, number_format( $val['monto'] ,2 , '.' , ',' ) ,'LT',0,'R');
 			   $this->Cell(20,3.5,"",'T',0,'R');
 			   $this->Cell(20,3.5,"",'TR',0,'R');
 			}
 			elseif($val['nivel'] == 2){
 			   $this->SetFont('','B',10);
 			   $this->Cell(20,3.5,"",'LT',0,'R');
-			   $this->Cell(20,3.5, number_format( $val['monto'] , 0 , '.' , ',' ) ,'T',0,'R');
+			   $this->Cell(20,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'T',0,'R');
 			   $this->Cell(20,3.5,"",'TR',0,'R');
 			   $this->SetFont('','',9);
 			  
@@ -211,7 +211,7 @@ class RBalanceGeneral extends  ReportePDF {
 				$this->SetFont('','BU',11);
 		        $this->Cell(20,3.5, "" ,'LT',0,'R');
 				$this->Cell(20,3.5,"",'T',0,'R');
-				$this->Cell(20,3.5, number_format( $val['monto'] , 0 , '.' , ',' ) ,'TR',0,'R');	
+				$this->Cell(20,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'TR',0,'R');	
 				
 				$this->SetFont('','',9);
 			}

@@ -85,11 +85,9 @@ BEGIN
           -- retornamos el resultado multiplicado por el signo     
           
           raise notice 'id: % parcial % ', p_id_cuenta, v_resp_mayor;
-          IF v_registros.valor_incremento = 'negativo'  THEN
-            return v_resp_mayor * (-1);
-          else
-            return v_resp_mayor;
-          END IF;
+          
+          return v_resp_mayor;
+         
           
      ELSE
      -- si no es una cuenta titular

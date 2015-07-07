@@ -176,6 +176,9 @@ BEGIN
             
              -- Obtener la moneda base
              v_id_moneda_base = param.f_get_moneda_base();
+             
+             
+             
             
              v_importe_debe  =  v_parametros.importe_debe;
              v_importe_haber = v_parametros.importe_haber;          
@@ -201,6 +204,8 @@ BEGIN
                 END IF;
              
             END IF;
+            
+            --raise exception '%, % , %',v_id_moneda_base, v_importe_debe_mb,v_importe_debe;
 			---------------
         	--VALIDACIONES
         	---------------
@@ -232,7 +237,7 @@ BEGIN
               importe_debe = v_parametros.importe_debe,
               importe_haber = v_parametros.importe_haber,
               importe_gasto = v_parametros.importe_debe,
-              importe_recurso = v_parametros.importe_debe,
+              importe_recurso = v_parametros.importe_haber,
               importe_debe_mb = v_importe_debe_mb,
               importe_haber_mb = v_importe_haber_mb,
               importe_gasto_mb = v_importe_debe_mb,
