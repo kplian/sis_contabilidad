@@ -30,6 +30,9 @@ DECLARE
 	v_nombre_funcion   	text;
 	v_resp				varchar;
     v_where 			varchar;
+    v_gestion			varchar;
+    v_id_gestion		integer;
+    v_add_filtro		varchar;
 			    
 BEGIN
 
@@ -46,6 +49,27 @@ BEGIN
 	if(p_transaccion='CONTA_CTA_SEL')then
      				
     	begin
+        
+            -- si existe el filtro de gestion actual , filtramos en funcion a la fecha actual
+            IF  pxp.f_existe_parametro(p_tabla,'filtro_ges')   THEN
+            
+               --recuepra gestion actual
+               
+               v_gestion =  EXTRACT(YEAR FROM  now())::varchar;
+            
+              select 
+               ges.id_gestion
+              into
+               v_id_gestion
+              from param.tgestion ges 
+              where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
+            END IF;
+            
+            v_add_filtro = '0=0 and ';
+            IF  v_id_gestion is not null THEN
+              v_add_filtro = ' cta.id_gestion = '||v_id_gestion::varchar|| '  and ';
+            END IF;
+        
     		--Sentencia de la consulta
 			v_consulta:='SELECT 
                         cta.id_cuenta,
@@ -77,7 +101,7 @@ BEGIN
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         inner join param.tgestion ges on ges.id_gestion = cta.id_gestion
 						left join segu.tusuario usu2 on usu2.id_usuario = cta.id_usuario_mod
-                        where  ';
+                        where  '||v_add_filtro;
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -153,6 +177,28 @@ BEGIN
 	elsif(p_transaccion='CONTA_CTA_CONT')then
 
 		begin
+        
+           -- si existe el filtro de gestion actual , filtramos en funcion a la fecha actual
+            IF  pxp.f_existe_parametro(p_tabla,'filtro_ges')   THEN
+            
+               --recuepra gestion actual
+               
+               v_gestion =  (EXTRACT(YEAR FROM  now()))::varchar;
+            
+              select 
+               ges.id_gestion
+              into
+               v_id_gestion
+              from param.tgestion ges 
+              where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
+            END IF;
+            
+            v_add_filtro = '0=0 and ';
+            IF  v_id_gestion is not null THEN
+              v_add_filtro = ' cta.id_gestion = '||v_id_gestion::varchar|| '  and ';
+            END IF;
+            
+            
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_cuenta)
 					    from conta.tcuenta cta
@@ -160,7 +206,7 @@ BEGIN
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         inner join param.tgestion ges on ges.id_gestion = cta.id_gestion
 						left join segu.tusuario usu2 on usu2.id_usuario = cta.id_usuario_mod
-                        where ';
+                        where  '||v_add_filtro;
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

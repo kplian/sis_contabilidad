@@ -19,6 +19,7 @@ class MODCuenta extends MODbase{
 		$this->transaccion='CONTA_CTA_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
+		$this->setParametro('filtro_ges','filtro_ges','varchar'); 
 		//Definicion de la lista del resultado del query
 		$this->captura('id_cuenta','int4');
 		$this->captura('id_usuario_reg','int4');
@@ -216,6 +217,47 @@ class MODCuenta extends MODbase{
 	    
 	    return $this->respuesta;       
  }
+
+   function listarDetResultados(){
+	    //Definicion de variables para ejecucion del procedimientp
+	    $this->procedimiento='conta.f_resultados';
+	    $this-> setCount(false);
+		$this->setTipoRetorno('record');
+	    $this->transaccion='CONTA_RESUTADO_SEL';
+	    $this->tipo_procedimiento='SEL';//tipo de transaccion
+	    
+	    $this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('id_resultado_plantilla','id_resultado_plantilla','integer');
+		$this->setParametro('id_deptos','id_deptos','varchar');       
+	            
+	    //Definicion de la lista del resultado del query
+	    $this->captura('subrayar','varchar'); 
+        $this->captura('font_size','varchar'); 
+        $this->captura('posicion','varchar'); 
+        $this->captura('signo','varchar'); 
+        $this->captura('id_cuenta','int4'); 
+        $this->captura('desc_cuenta','varchar'); 
+        $this->captura('codigo_cuenta','varchar'); 
+        $this->captura('codigo','varchar'); 
+        $this->captura('origen','varchar'); 
+        $this->captura('orden','int4'); 
+        $this->captura('nombre_variable','varchar'); 
+        $this->captura('montopos','int4'); 
+        $this->captura('monto','numeric'); 
+        $this->captura('id_resultado_det_plantilla','int4'); 
+        $this->captura('id_cuenta_raiz','int4'); 
+		 
+		//Ejecuta la instruccion
+	    $this->armarConsulta();
+		//echo $this->getConsulta();
+		//exit;
+	    $this->ejecutarConsulta();
+	    
+	    return $this->respuesta;       
+   }
+
+
 			
 }
 ?>

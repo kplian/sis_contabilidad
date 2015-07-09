@@ -1319,3 +1319,83 @@ select pxp.f_insert_testructura_gui ('REPCON', 'CONTA');
 select pxp.f_insert_testructura_gui ('BALCON', 'REPCON');
 
 /***********************************F-SCP-RAC-CONTA-0-07/07/2015****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-08/07/2015****************************************/
+--------------- SQL ---------------
+
+CREATE TABLE conta.tresultado_plantilla (
+  id_resultado_plantilla SERIAL NOT NULL,
+  codigo VARCHAR(100),
+  nombre VARCHAR,
+  PRIMARY KEY(id_resultado_plantilla)
+) INHERITS (pxp.tbase);
+
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tresultado_det_plantilla (
+  id_resultado_det_plantilla SERIAL,
+  origen VARCHAR(20) DEFAULT 'balance' NOT NULL,
+  formula VARCHAR,
+  subrayar VARCHAR(3) DEFAULT 'si',
+  font_size VARCHAR DEFAULT 10,
+  posicion VARCHAR DEFAULT 'left',
+  signo VARCHAR(15) DEFAULT 'positivo',
+  nivel_detalle INTEGER DEFAULT 1,
+  codigo_cuenta VARCHAR,
+  codigo VARCHAR,
+  orden NUMERIC NOT NULL,
+  nombre_variable VARCHAR,
+  montopos INTEGER,
+  PRIMARY KEY(id_resultado_det_plantilla)
+) INHERITS (pxp.tbase)
+;
+
+ALTER TABLE conta.tresultado_det_plantilla
+  OWNER TO postgres;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.origen
+IS 'balance(balance de la cuenta), detalle (listado segun nivel, y balance de los detalles), titulo (Solo titulo sin monto), formula (aplica la suma de varios campos)';
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.posicion
+IS 'left  center rihgt';
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.signo
+IS 'signo que v apor delante el texto';
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.nivel_detalle
+IS 'nivel del detalle en caso de que el origen sea detalle';
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.codigo_cuenta
+IS 'codigo de la cuenta contable raiz';
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.codigo
+IS 'codigo de registros se utiliza en las formulas';
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.orden
+IS 'orden en el que aparecen en el reprote ademas de ser el orden de evaluacion';
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.nombre_variable
+IS 'nombre que aparece en el texto, si se especifica prevalece sobre el nombre de la cuenta';
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.montopos
+IS 'posicion en que va el monto, 1, 2 o 3';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN id_resultado_plantilla INTEGER NOT NULL;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ALTER COLUMN signo SET DEFAULT '+'::character varying;
+
+/***********************************F-SCP-RAC-CONTA-0-08/07/2015****************************************/
+
+
+

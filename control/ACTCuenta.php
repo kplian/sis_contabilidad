@@ -8,6 +8,7 @@
 */
 require_once(dirname(__FILE__).'/../reportes/RPlanCuentas.php');
 require_once(dirname(__FILE__).'/../reportes/RBalanceGeneral.php');
+require_once(dirname(__FILE__).'/../reportes/RResultados.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 class ACTCuenta extends ACTbase{    
 			
@@ -205,6 +206,51 @@ class ACTCuenta extends ACTbase{
 		
 		$reporte = new RBalanceGeneral($this->objParam);
 		$reporte->datosHeader($dataSource, $this->objParam->getParametro('nivel'), $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'));
+		//$this->objReporteFormato->renderDatos($this->res2->datos);
+		
+		$reporte->generarReporte();
+		$reporte->output($reporte->url_archivo,'F');
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		
+	}
+
+   function recuperarDatosResultados(){
+    	
+		$this->objFunc = $this->create('MODCuenta');
+		$cbteHeader = $this->objFunc->listarDetResultados($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){
+				
+			return $cbteHeader->getDatos();
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}              
+		
+    }
+   
+   function reporteResultados(){
+			
+		$nombreArchivo = uniqid(md5(session_id()).'PlanCuentas') . '.pdf'; 
+		$dataSource = $this->recuperarDatosResultados();	
+		
+		//parametros basicos
+		$tamano = 'LETTER';
+		$orientacion = 'P';
+		$titulo = 'Estado de Resultados';
+		
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);		
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		//Instancia la clase de pdf
+		
+		$reporte = new RResultados($this->objParam);
+		$reporte->datosHeader($dataSource, $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'));
 		//$this->objReporteFormato->renderDatos($this->res2->datos);
 		
 		$reporte->generarReporte();
