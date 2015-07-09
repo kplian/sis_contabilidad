@@ -250,7 +250,7 @@ class ACTCuenta extends ACTbase{
 		//Instancia la clase de pdf
 		
 		$reporte = new RResultados($this->objParam);
-		$reporte->datosHeader($dataSource, $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'));
+		$reporte->datosHeader($dataSource, $this->objParam->getParametro('titulo_rep'), $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'));
 		//$this->objReporteFormato->renderDatos($this->res2->datos);
 		
 		$reporte->generarReporte();

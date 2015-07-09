@@ -6,7 +6,7 @@ class RResultados extends  ReportePDF {
 	var $datos_detalle;
 	var $desde;
 	var $hasta;
-	var $nivel;
+	var $titulo;
 	var $ancho_hoja;
 	var $gerencia;
 	var $numeracion;
@@ -17,10 +17,10 @@ class RResultados extends  ReportePDF {
 	var $total_pasigo;
 	var $total_patrimonio;
 	
-	function datosHeader ( $detalle,  $desde, $hasta, $codigos) {
+	function datosHeader ( $detalle,  $titulo,$desde, $hasta, $codigos) {
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
-		$this->nivel = $nivel;
+		$this->titulo = $titulo;
 		$this->desde = $desde;
 		$this->hasta = $hasta;
 		$this->codigos = $codigos;
@@ -34,7 +34,7 @@ class RResultados extends  ReportePDF {
 		$this->Image(dirname(__FILE__).'/../../lib'.$_SESSION['_DIR_LOGO'], $this->ancho_hoja, 5, 30, 10);
 		$this->ln(5);
 		$this->SetFont('','BU',12);
-		$this->Cell(0,5,'Resultados',0,1,'C');
+		$this->Cell(0,5, strtoupper($this->titulo), 0 , 1,'C');
 		$this->SetFont('','BU',11);
 		$this->Cell(0,5,'Depto: ('.$this->codigos.')',0,1,'C');
 		$this->SetFont('','BU',10);		

@@ -36,6 +36,17 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
     },
     
     Atributos:[
+           {
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'titulo_rep'
+			},
+			type:'Field',
+			form:true 
+		    },
+    
             {
 	   			config:{
 	                name: 'id_resultado_plantilla',
@@ -176,6 +187,13 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
                     
         }
 
+    },
+    iniciarEventos: function(){
+    	
+    	this.Cmp.id_resultado_plantilla.on('select',function(cmb,record){
+    		
+    		this.Cmp.titulo_rep.setValue(record.data.nombre)
+    	}, this)
     }
     
     
