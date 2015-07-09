@@ -12,7 +12,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.ConceptoIngasCuenta = {
 	require:'../../../sis_parametros/vista/concepto_ingas/ConceptoIngas.php',
 	requireclase:'Phx.vista.ConceptoIngas',
-	title:'Concepto de Ingreso/Gasto',
+	title:'Conceptos',
 	constructor: function(config) {
     	Phx.vista.ConceptoIngasCuenta.superclass.constructor.call(this,config);    	
 	}, 
