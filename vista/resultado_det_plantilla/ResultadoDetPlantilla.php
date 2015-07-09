@@ -440,6 +440,11 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                
    },
    
+   onSubmit : function(o) {
+		this.Cmp.formula.setValue(encodeURIComponent(this.Cmp.formula.getValue()));
+		Phx.vista.ResultadoDetPlantilla.superclass.onSubmit.call(this,o);
+	},
+   
    loadValoresIniciales : function() {
 					Phx.vista.ResultadoDetPlantilla.superclass.loadValoresIniciales.call(this);
 					if (this.maestro.id_resultado_plantilla != undefined) {

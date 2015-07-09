@@ -961,3 +961,13 @@ select pxp.f_insert_testructura_gui ('LIBMAY', 'CBTE.1.3');
 select pxp.f_insert_tgui ('Libro Diario', 'Libro Diario', 'CBTE.1.3.1', 'si', 1, 'sis_contabilidad/vista/int_comprobante/IntComprobanteLd.php', 3, '', 'IntComprobanteLd', 'CONTA');
 /***********************************F-DAT-RAC-CONTA-0-25/06/2015*****************************************/
 
+
+
+/***********************************I-DAT-RAC-CONTA-0-09/07/2015*****************************************/
+
+select pxp.f_insert_tgui ('Plantilla de Resultados', 'Plantilla  para reporte de resultados', 'PLANRES', 'si', 3, 'sis_contabilidad/vista/resultado_plantilla/ResultadoPlantilla.php', 3, '', 'ResultadoPlantilla', 'CONTA');
+select pxp.f_insert_tgui ('Resultados', 'Reportes de Resutlados', 'REPRES', 'si', 2, 'sis_contabilidad/vista/cuenta/FormFiltroResultado.php', 3, '', 'FormFiltroResultado', 'CONTA');
+select pxp.f_insert_testructura_gui ('REPRES', 'REPCON');
+select pxp.f_insert_testructura_gui ('PLANRES', 'CONF');
+/***********************************F-DAT-RAC-CONTA-0-09/07/2015*****************************************/
+
