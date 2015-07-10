@@ -84,7 +84,7 @@ class RResultados extends  ReportePDF {
         	//signo	
         	$signo = '';	
         	if(isset($val['signo'])){
-			 $signo = $val['signo'].' ';	
+			 $signo = $val['signo'];	
 			}
 			
 			//alineacion del texto	
@@ -108,17 +108,22 @@ class RResultados extends  ReportePDF {
         	// Formateo el texto
         	
 			if(isset($val['nombre_variable']) && $val['nombre_variable'] != ''){
-			   $texto = $tabs.$val['signo'].$val['nombre_variable'];
+			   $texto = $tabs.$val['nombre_variable'];
 			   
 			}
 			else{
 				
-				$texto = $tabs.$val['signo'].$val['desc_cuenta'];
+				$texto = $tabs.$val['desc_cuenta'];
 				if($val['origen'] == 'detalle'){
 					$texto = $this->formatearTextoDetalle($texto);	
 				}
 			}
-			$this->Cell(110,3.5,$texto,'',0,$posicion);
+
+             //coloca el signo
+             $this->Cell(10,3.5,$val['signo'],'',0,'C');
+		   
+	        //coloca el texto
+			$this->Cell(100,3.5,$texto,'',0,$posicion);
 			
 			//definir monto
 			if ($val['origen'] == 'titulo'){

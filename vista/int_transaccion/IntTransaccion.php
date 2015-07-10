@@ -84,7 +84,12 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		   			    }
 		   			    
 		   					
-		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Cta.:</b>{1}<br><b>Aux.:</b>{2}</br>',record.data['desc_centro_costo'],color, record.data['desc_cuenta'],record.data['desc_auxiliar']);	
+		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo'], record.data['desc_cuenta']);	
+		   					
+		   					if(record.data['desc_auxiliar']){
+			   					retorno = retorno + String.format('<b>Aux.:</b>{2}</br>', record.data['desc_auxiliar']);
+			   				}
+		   					
 		   					
 		   					if(record.data['desc_partida']){
 			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
