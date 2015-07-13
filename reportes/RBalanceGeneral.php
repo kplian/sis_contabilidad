@@ -136,7 +136,7 @@ class RBalanceGeneral extends  ReportePDF {
 		    	$diferencia = $diferencia * (-1);
 		    }
 			$formula = number_format( $diferencia , 2 , '.' , ',' );
-			$this->Write(0, 'Diferencia d: '.$formula, '', 0, 'C', true, 0, false, false, 0);
+			$this->Write(0, 'Diferencia de: '.$formula, '', 0, 'C', true, 0, false, false, 0);
 		}
 		
 		
