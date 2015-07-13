@@ -123,7 +123,7 @@ class RBalanceGeneral extends  ReportePDF {
 			$formula = "ACTIVO + GASTOS =  PASIVO + PATRIMONIO + INGRESOS";
 			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
 			$formula = "$tactivo  + $tegreso =  $tpasivo + $tpatrimonio + $tingreso";
-			if(($this->total_activo +  $this->total_egreso) !=($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso)){
+			if(($this->total_activo +  $this->total_egreso) != ($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso)){
 				$this->SetTextColor(0,100,100,0,false,'');
 			}
 			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
@@ -151,7 +151,7 @@ class RBalanceGeneral extends  ReportePDF {
 	    if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'costo'){
 			$this->total_egreso = $this->total_egreso + $val['monto'];
 		}
-		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'gesto'){
+		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'gasto'){
 			$this->total_egreso = $this->total_egreso + $val['monto'];
 		}
 		
