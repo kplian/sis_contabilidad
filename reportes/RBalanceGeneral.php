@@ -154,6 +154,10 @@ class RBalanceGeneral extends  ReportePDF {
 		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'gasto'){
 			$this->total_egreso = $this->total_egreso + $val['monto'];
 		}
+		//RAC... 13/07/2014  no me convence esto ....
+		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'resultado'){
+			$this->total_egreso = $this->total_egreso + $val['monto'];
+		}
 		
 		//calculo ingreso
 		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'ventas'){
