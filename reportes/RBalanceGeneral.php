@@ -107,13 +107,14 @@ class RBalanceGeneral extends  ReportePDF {
 		$tpatrimonio = number_format( $this->total_patrimonio , 2 , '.' , ',' );
 		$tingreso = number_format( $this->total_ingreso , 2 , '.' , ',' );
 		$tegreso = number_format( $this->total_egreso , 2 , '.' , ',' );
-		
+		 $sw_dif = 0;
 		if($this->tipo_balance == 'general'){
 			$formula = "ACTIVO =  PASIVO + PATRIMONIO";
 			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
 			$formula = "$tactivo =  $tpasivo + $tpatrimonio";
 			if(($this->total_activo +  $this->total_egreso) !=($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso)){
 				$this->SetTextColor(0,100,100,0,false,'');
+			    $sw_dif = 1;
 			}
 			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);	
 		}
@@ -125,8 +126,17 @@ class RBalanceGeneral extends  ReportePDF {
 			$formula = "$tactivo  + $tegreso =  $tpasivo + $tpatrimonio + $tingreso";
 			if(($this->total_activo +  $this->total_egreso) != ($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso)){
 				$this->SetTextColor(0,100,100,0,false,'');
+				  $sw_dif = 1;
 			}
 			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
+		}
+		if( $sw_dif == 1){
+			$diferencia = ($this->total_activo +  $this->total_egreso) - ($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso);
+		    if($diferencia < 0){
+		    	$diferencia = $diferencia * (-1);
+		    }
+			$formula = number_format( $diferencia , 2 , '.' , ',' );
+			$this->Write(0, 'Diferencia d: '.$formula, '', 0, 'C', true, 0, false, false, 0);
 		}
 		
 		
