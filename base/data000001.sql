@@ -971,3 +971,13 @@ select pxp.f_insert_testructura_gui ('REPRES', 'REPCON');
 select pxp.f_insert_testructura_gui ('PLANRES', 'CONF');
 /***********************************F-DAT-RAC-CONTA-0-09/07/2015*****************************************/
 
+
+/***********************************I-DAT-RAC-CONTA-0-13/07/2015*****************************************/
+
+select pxp.f_insert_tgui ('Balance de Cuentas', 'Balance de Cuentas', 'BALCON', 'si', 1, 'sis_contabilidad/vista/cuenta/FormFiltroBalanceCuentas.php', 3, '', 'FormFiltroBalanceCuentas', 'CONTA');
+select pxp.f_insert_tgui ('Balance General', 'Balance general', 'BALGEN', 'si', 1, 'sis_contabilidad/vista/cuenta/FormFiltroBalance.php', 3, '', 'FormFiltroBalance', 'CONTA');
+select pxp.f_insert_testructura_gui ('BALCON', 'REPCON');
+select pxp.f_insert_testructura_gui ('BALGEN', 'REPCON');
+
+/***********************************F-DAT-RAC-CONTA-0-13/07/2015*****************************************/
+

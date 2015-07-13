@@ -143,16 +143,16 @@ class RBalanceGeneral extends  ReportePDF {
 	    if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'costo'){
 			$this->total_egreso = $this->total_egreso + $val['monto'];
 		}
-		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'gestos'){
+		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'gesto'){
 			$this->total_egreso = $this->total_egreso + $val['monto'];
 		}
 		
 		//calculo ingreso
 		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'ventas'){
-			$this->total_ingreso = $val['monto'];
+			$this->total_ingreso = $this->total_ingreso + $val['monto'];
 		}
 		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'ingreso'){
-			$this->total_ingreso = $val['monto'];
+			$this->total_ingreso = $this->total_ingreso + $val['monto'];
 		}
 		
 		
