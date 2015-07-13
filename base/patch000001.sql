@@ -1398,4 +1398,20 @@ ALTER TABLE conta.tresultado_det_plantilla
 /***********************************F-SCP-RAC-CONTA-0-08/07/2015****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-13/07/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN cbte_cierre VARCHAR(20) DEFAULT 'no' NOT NULL;
+
+
+--------------- SQL ---------------
+
+COMMENT ON COLUMN conta.tint_comprobante.cbte_cierre
+IS 'no, balance, resultado, si es o no un comprobante de cierres, (peude ser ciere de balance o cierre de resutlados), los comprobantes de cierre netean las cuentas, por esto es encesario identificarlo para incluirlos o no en algunos reportes';
+
+
+/***********************************F-SCP-RAC-CONTA-0-13/07/2015****************************************/
 

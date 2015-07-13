@@ -10,7 +10,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 
 <script>
-Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
+Phx.vista.FormFiltroBalanceCuentas=Ext.extend(Phx.frmInterfaz,{
     constructor:function(config)
     {   
     	this.panelResumen = new Ext.Panel({html:'Hola Prueba'});
@@ -27,7 +27,7 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
 				     this.panelResumen
 				    ];
 				    
-        Phx.vista.FormFiltroBalance.superclass.constructor.call(this,config);
+        Phx.vista.FormFiltroBalanceCuentas.superclass.constructor.call(this,config);
         this.init(); 
         this.iniciarEventos();   
        
@@ -121,7 +121,47 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
 	       		id_grupo:0,
 	       		form:true
 	      },
-	      {
+		 {
+			config: {
+				name: 'tipo_cuenta',
+				fieldLabel: 'Tipo Cuenta',
+				typeAhead: false,
+				forceSelection: false,
+				allowBlank: false,
+				emptyText: 'Tipos...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/ConfigTipoCuenta/listarConfigTipoCuenta',
+					id: 'tipo_cuenta',
+					root: 'datos',
+					sortInfo: {
+						field: 'nro_base',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['tipo_cuenta', 'nro_base'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: {par_filtro: 'tipo_cuenta'}
+				}),
+				valueField: 'tipo_cuenta',
+				displayField: 'tipo_cuenta',
+				gdisplayField: 'tipo_cuenta',
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 20,
+				queryDelay: 200,
+				listWidth:280,
+				minChars: 2,
+				gwidth: 90,
+	       			enableMultiSelect:true
+				},
+			type: 'AwesomeCombo',
+			id_grupo: 0,
+			form: true
+		},
+	     
+       	{
 	       		config:{
 	       			name: 'incluir_cierre',
 	       			qtip : 'Incluir los comprobantes de cierre en el balance',
@@ -166,7 +206,7 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
              
              Ext.Ajax.request({
 						url : '../../sis_contabilidad/control/Cuenta/reporteBalanceGeneral',
-						params : Ext.apply(parametros,{'codigos': codigos, 'tipo_balance':'general'}),
+						params : Ext.apply(parametros,{'codigos': codigos, 'tipo_balance':'todos'}),
 						success : this.successExport,
 						failure : this.conexionFailure,
 						timeout : this.timeout,

@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
   p_id_cuenta integer,
   p_fecha_ini date,
   p_fecha_fin date,
-  p_id_deptos varchar
+  p_id_deptos varchar,
+  p_incluir_cierre varchar = 'no'::character varying
 )
 RETURNS numeric AS
 $body$
@@ -27,9 +28,24 @@ DECLARE
     v_sum_debe						numeric;
     v_sum_haber						numeric;
     va_id_deptos					integer[];
+    va_cbte_cierre					varchar[];
  
 BEGIN
   	 v_nombre_funcion:='conta.f_mayor_cuenta';
+     
+     
+     va_cbte_cierre[1] = 'no';
+     
+     if p_incluir_cierre = 'todos' then
+        va_cbte_cierre[2] = 'balance';
+        va_cbte_cierre[3] = 'resultado';
+     elsif p_incluir_cierre = 'balance' then
+        va_cbte_cierre[2] = 'balance';
+     ELSIF p_incluir_cierre = 'resultado' then
+        va_cbte_cierre[2] = 'resultado';
+     end if;
+     
+     
 	
      --iniciamos acumulador en cero
      v_resp_mayor = 0;
@@ -72,6 +88,7 @@ BEGIN
               t.id_cuenta = p_id_cuenta AND 
               t.estado_reg = 'activo'  AND 
               c.estado_reg = 'validado' AND
+              c.cbte_cierre = ANY(va_cbte_cierre) AND
               c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin AND
               c.id_depto::integer = ANY(va_id_deptos);
           

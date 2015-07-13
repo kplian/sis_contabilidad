@@ -16,17 +16,22 @@ class RBalanceGeneral extends  ReportePDF {
 	var $total_activo;
 	var $total_pasigo;
 	var $total_patrimonio;
+	var $total_ingreso;
+	var $total_egreso;
+	var $tipo_balance;
+	var $incluir_cierre;
 	
-	function datosHeader ( $detalle, $nivel, $desde, $hasta, $codigos) {
+	function datosHeader ( $detalle, $nivel, $desde, $hasta, $codigos, $tipo_balance, $incluir_cierre) {
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
 		$this->nivel = $nivel;
 		$this->desde = $desde;
 		$this->hasta = $hasta;
 		$this->codigos = $codigos;
-		
+		$this->incluir_cierre = $incluir_cierre;
+		$this->tipo_balance = $tipo_balance;
 		//$this->SetMargins(5, 22.5, 5);
-		$this->SetMargins(5,34);
+		$this->SetMargins(5,40);
 	}
 	
 	function Header() {
@@ -39,6 +44,8 @@ class RBalanceGeneral extends  ReportePDF {
 		$this->Cell(0,5,'Depto: ('.$this->codigos.')',0,1,'C');
 		$this->SetFont('','BU',10);		
 		$this->Cell(0,5,'Del '.$this->desde.' al '.$this->hasta,0,1,'C');
+		$this->SetFont('','BU',8);		
+		$this->Cell(0,5,'Incluye Cierres: '.$this->incluir_cierre,0,1,'C');
 		
 		
 		$this->Ln(3);
@@ -77,7 +84,9 @@ class RBalanceGeneral extends  ReportePDF {
 		
 		$this->total_activo = 0;
 	    $this->total_pasigo = 0;
-	    $this->total_patrimonio = 0;		
+	    $this->total_patrimonio = 0;
+		$this->total_ingreso = 0;
+		$this->total_egreso = 0;		
 		//Reporte de unasola columna de monto
 		if($this->nivel == 1 || $this->nivel > 3 ){
 		    $this->generarReporte1C();
@@ -93,20 +102,26 @@ class RBalanceGeneral extends  ReportePDF {
 		
 		//escribe formula contabla
 		$this->SetFont('times', 'BI', 17);
-		
-		$formula = "ACTIVO =  PASIVO + PATRIMONIO";
-		// print a block of text using Write()
-		$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
-		
-		
 		$tactivo = number_format( $this->total_activo , 2 , '.' , ',' );
 		$tpasivo = number_format( $this->total_pasivo , 2 , '.' , ',' );
 		$tpatrimonio = number_format( $this->total_patrimonio , 2 , '.' , ',' );
+		$tingreso = number_format( $this->total_ingreso , 2 , '.' , ',' );
+		$tegreso = number_format( $this->total_egreso , 2 , '.' , ',' );
+		
+		if($this->tipo_balance == 'general'){
+			$formula = "ACTIVO =  PASIVO + PATRIMONIO";
+			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
+			$formula = "$tactivo =  $tpasivo + $tpatrimonio";
+			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);	
+		}
+		else{
+			$formula = "ACTIVO + GASTOS =  PASIVO + PATRIMONIO + INGRESOS";
+			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
+			$formula = "$tactivo  + $tegreso =  $tpasivo + $tpatrimonio + $tingreso";
+			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
+		}
 		
 		
-		$formula = "$tactivo =  $tpasivo + $tpatrimonio";
-		// print a block of text using Write()
-		$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
 		
 	}
 	function definirTotales($val){
@@ -119,6 +134,28 @@ class RBalanceGeneral extends  ReportePDF {
 		if($val ["nivel"] ==1 && $val ["tipo_cuenta"] == 'patrimonio'){
 			$this->total_patrimonio = $val['monto'];
 		}
+		
+		//calculo total de egreso
+		
+		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'egreso'){
+			$this->total_egreso = $this->total_egreso + $val['monto'];
+		}
+	    if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'costo'){
+			$this->total_egreso = $this->total_egreso + $val['monto'];
+		}
+		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'gestos'){
+			$this->total_egreso = $this->total_egreso + $val['monto'];
+		}
+		
+		//calculo ingreso
+		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'ventas'){
+			$this->total_ingreso = $val['monto'];
+		}
+		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'ingreso'){
+			$this->total_ingreso = $val['monto'];
+		}
+		
+		
 	}
 	
 	function generarReporte1C() {

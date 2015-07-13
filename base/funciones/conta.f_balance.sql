@@ -24,8 +24,10 @@ v_registros  record;  -- PARA ALMACENAR EL CONJUNTO DE DATOS RESULTADO DEL SELEC
 
 
 v_i integer;
-v_nivel_inicial	integer;
-v_total 		numeric;
+v_nivel_inicial		integer;
+v_total 			numeric;
+v_tipo_cuenta		varchar;
+v_incluir_cierre	varchar;
  
 
 BEGIN
@@ -43,6 +45,15 @@ BEGIN
 
 	IF(p_transaccion='CONTA_BALANCE_SEL')then
     
+        if pxp.f_existe_parametro(p_tabla,'tipo_cuenta') then
+          v_tipo_cuenta = v_parametros.tipo_cuenta;
+        end if;
+        
+        if pxp.f_existe_parametro(p_tabla,'incluir_cierre') then
+          v_incluir_cierre = v_parametros.incluir_cierre;
+        end if;
+        
+        
         -- 1) Crea una tabla temporal con los datos que se utilizaran 
 
         CREATE TEMPORARY TABLE temp_balancef (
@@ -65,7 +76,10 @@ BEGIN
                                           v_parametros.id_deptos, 
                                           1, 
                                           v_parametros.nivel,
-                                          NULL::integer);
+                                          NULL::integer,
+                                          v_tipo_cuenta,
+                                          v_incluir_cierre,
+                                          v_parametros.tipo_balance);
        
       raise notice '------------------------------------------------> total %', v_total;
       

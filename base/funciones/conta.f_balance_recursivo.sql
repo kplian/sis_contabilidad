@@ -6,7 +6,10 @@ CREATE OR REPLACE FUNCTION conta.f_balance_recursivo (
   p_id_deptos varchar,
   p_nivel_ini integer,
   p_nivel_final integer,
-  p_id_cuenta_padre integer
+  p_id_cuenta_padre integer,
+  p_tipo_cuenta varchar,
+  p_incluir_cierre varchar = 'no'::character varying,
+  p_tipo_balance varchar = 'general'::character varying
 )
 RETURNS numeric AS
 $body$
@@ -21,6 +24,7 @@ v_nivel				integer;
 v_suma				numeric;
 v_mayor				numeric;
 v_id_gestion  		integer;
+va_tipo_cuenta		varchar[];
  
 
 BEGIN
@@ -43,12 +47,18 @@ BEGIN
        
        IF v_registros.sw_transaccional = 'movimiento' THEN
             -- caculamos el mayor
-            v_mayor =  conta.f_mayor_cuenta(p_id_cuenta_padre, p_desde, p_hasta, p_id_deptos);
+            v_mayor =  conta.f_mayor_cuenta(p_id_cuenta_padre, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
             return v_mayor;
        END IF; 
         
      END IF;
-    
+     
+     --arma array de tipos de cuenta
+     va_tipo_cuenta = string_to_array(p_tipo_cuenta,',');
+     
+     
+     
+     
     
     --1) IF   si el nivel inicial es igual al nivel final calculamo el mayor de la cuenta
            
@@ -66,11 +76,15 @@ BEGIN
                                      c.tipo_cuenta
                                    from conta.tcuenta c
                                    where c.id_cuenta_padre = p_id_cuenta_padre 
-                                         and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff)
+                                         and c.estado_reg = 'activo' 
+                                         and (    (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff)) 
+                                               or 
+                                                  (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
+                                             )
                                     )   LOOP
                    
                    -- caculamos el mayor
-                    v_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos);
+                    v_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
                    
                    -- insetamos en tabla temporal 
                     insert  into temp_balancef (
@@ -114,11 +128,15 @@ BEGIN
                                          c.tipo_cuenta
                                        from conta.tcuenta c  
                                         where c.id_cuenta_padre is NULL 
-                                        and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff)
+                                        and c.estado_reg = 'activo' 
+                                        and (    (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff)) 
+                                               or 
+                                                  (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
+                                             )
                                         and c.id_gestion = v_id_gestion and c.estado_reg = 'activo' )   LOOP
                        
                        -- caculamos el mayor
-                        v_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos);
+                        v_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
                        
                        -- insetamos en tabla temporal 
                         insert  into temp_balancef (
@@ -174,11 +192,25 @@ BEGIN
                                  c.tipo_cuenta
                                 from conta.tcuenta c  
                                 where c.id_cuenta_padre is NULL and c.id_gestion = v_id_gestion 
-                                and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff))   LOOP
+                                and c.estado_reg = 'activo' 
+                                and ( (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff)) 
+                                       or 
+                                      (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
+                                     )
+                                )   LOOP
                 
                  -- llamada recursiva del balance general
            
-                  v_mayor = conta.f_balance_recursivo(p_desde, p_hasta, p_id_deptos, v_nivel, p_nivel_final, v_registros.id_cuenta);
+                  v_mayor = conta.f_balance_recursivo(
+                                           p_desde, 
+                                           p_hasta, 
+                                           p_id_deptos, 
+                                           v_nivel, 
+                                           p_nivel_final, 
+                                           v_registros.id_cuenta,
+                                           p_tipo_cuenta,
+                                           p_tipo_cuenta,
+                                           p_tipo_balance);
                  
                  -- insetamos en tabla temporal 
                     insert  into temp_balancef (
@@ -218,10 +250,23 @@ BEGIN
                                  c.tipo_cuenta
                                 from conta.tcuenta c  
                                 where     c.id_cuenta_padre = p_id_cuenta_padre  
-                                      and c.estado_reg = 'activo' and 'balance' = ANY(c.eeff) )   LOOP
+                                      and c.estado_reg = 'activo' 
+                                      and ( (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff)) 
+                                             or 
+                                            (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
+                                     ) )   LOOP
                 
                 -- llamada recursiva del balance general
-                v_mayor = conta.f_balance_recursivo(p_desde, p_hasta, p_id_deptos, v_nivel, p_nivel_final, v_registros.id_cuenta);
+                v_mayor = conta.f_balance_recursivo(
+                                      p_desde, 
+                                      p_hasta, 
+                                      p_id_deptos, 
+                                      v_nivel, 
+                                      p_nivel_final, 
+                                      v_registros.id_cuenta,
+                                      p_tipo_cuenta,
+                                      p_tipo_cuenta,
+                                      p_tipo_balance);
                  
                 -- insetamos en tabla temporal 
                 insert  into temp_balancef (
