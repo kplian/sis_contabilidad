@@ -1,7 +1,8 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_evaluar_resultado_formula (
-  p_formula varchar
+  p_formula varchar,
+  p_plantilla varchar
 )
 RETURNS numeric AS
 $body$
@@ -23,6 +24,7 @@ v_columna_nueva     varchar[];
 v_sw_busqueda		boolean;
 v_i					integer;
 v_k					integer;
+va_variables		varchar[];
  
 
 BEGIN
@@ -75,13 +77,29 @@ BEGIN
          --------------------------------------------------
          -- RECUERA LOS VALORES DE LAS VARIABLES
          -------------------------------------------------
-         SELECT 
-           sum(COALESCE(monto,0))
-         into
-           v_monto
-         FROM  temp_balancef
-         WHERE  codigo =  v_columna_nueva[v_i];
-   
+         va_variables[1] = NULL;
+         va_variables[2] = NULL;
+         va_variables[1] = split_part(v_columna_nueva[v_i], '.', 1);
+         va_variables[2] = split_part(v_columna_nueva[v_i], '.', 2);
+         IF va_variables[2] is NULL or va_variables[2]  = '' THEN
+             -- si la variable no contiene el caracters especial "."
+             SELECT 
+               sum(COALESCE(monto,0))
+             into
+               v_monto
+             FROM  temp_balancef
+             WHERE  codigo =  va_variables[1]  and lower(plantilla) = lower(p_plantilla);
+         ELSE
+            
+             --raise exception '... %' , 
+            -- si la variable no contiene el caracters especial ".", buscamos en la plantilla correspondiente
+             SELECT 
+               sum(COALESCE(monto,0))
+             into
+               v_monto
+             FROM  temp_balancef
+             WHERE  codigo = va_variables[2]  and lower(plantilla) = lower(va_variables[1]);
+         END IF;
          --------------------------------------------
          --  REMPLAZA VALROES DE LAS VARIABLES
   		 --------------------------------------------
@@ -114,7 +132,7 @@ EXCEPTION
 END;
 $body$
 LANGUAGE 'plpgsql'
-VOLATILE
+STABLE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;

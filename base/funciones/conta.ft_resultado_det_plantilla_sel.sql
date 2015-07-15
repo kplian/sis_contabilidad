@@ -29,6 +29,8 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
+    v_gestion 			varchar;
+    v_id_gestion		integer;
 			    
 BEGIN
 
@@ -45,34 +47,55 @@ BEGIN
 	if(p_transaccion='CONTA_RESDET_SEL')then
      				
     	begin
+              
+              --recupera la gestion actual
+              v_gestion =  (EXTRACT(YEAR FROM  now()))::varchar;
+              
+             
+              
+              select 
+               ges.id_gestion
+              into
+               v_id_gestion
+              from param.tgestion ges 
+              where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
+                
+              IF v_id_gestion is null THEN
+                 raise exception 'No se encontro gestion para la fecha %', now()::Date;
+              END IF;
     		--Sentencia de la consulta
 			v_consulta:='select
-						resdet.id_resultado_det_plantilla,
-						resdet.orden,
-						resdet.font_size,
-						resdet.formula,
-						resdet.subrayar,
-						resdet.codigo,
-						resdet.montopos,
-						resdet.nombre_variable,
-						resdet.posicion,
-						resdet.estado_reg,
-						resdet.nivel_detalle,
-						resdet.origen,
-						resdet.signo,
-						resdet.codigo_cuenta,
-						resdet.id_usuario_ai,
-						resdet.usuario_ai,
-						resdet.fecha_reg,
-						resdet.id_usuario_reg,
-						resdet.id_usuario_mod,
-						resdet.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	,
-                        resdet.id_resultado_plantilla
-						from conta.tresultado_det_plantilla resdet
-						inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
+                          resdet.id_resultado_det_plantilla,
+                          resdet.orden,
+                          resdet.font_size,
+                          resdet.formula,
+                          resdet.subrayar,
+                          resdet.codigo,
+                          resdet.montopos,
+                          resdet.nombre_variable,
+                          resdet.posicion,
+                          resdet.estado_reg,
+                          resdet.nivel_detalle,
+                          resdet.origen,
+                          resdet.signo,
+                          resdet.codigo_cuenta,
+                          resdet.id_usuario_ai,
+                          resdet.usuario_ai,
+                          resdet.fecha_reg,
+                          resdet.id_usuario_reg,
+                          resdet.id_usuario_mod,
+                          resdet.fecha_mod,
+                          usu1.cuenta as usr_reg,
+                          usu2.cuenta as usr_mod	,
+                          resdet.id_resultado_plantilla,
+                          resdet.visible,
+                          resdet.incluir_apertura,
+                          resdet.incluir_cierre,
+                          COALESCE(cue.nombre_cuenta,''S/C'')::varchar as desc_cuenta
+                          from conta.tresultado_det_plantilla resdet
+                          inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
+                          left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||' 
+                          left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -94,12 +117,26 @@ BEGIN
 	elsif(p_transaccion='CONTA_RESDET_CONT')then
 
 		begin
+              --recupera la gestion actual
+              v_gestion =  (EXTRACT(YEAR FROM  now()))::varchar;
+              
+             select 
+               ges.id_gestion
+              into
+               v_id_gestion
+              from param.tgestion ges 
+              where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
+                
+              IF v_id_gestion is null THEN
+                 raise exception 'No se encontro gestion para la fecha %', now()::Date;
+              END IF;
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_resultado_det_plantilla)
 					    from conta.tresultado_det_plantilla resdet
-					    inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
-					    where ';
+                          inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
+                          left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||' 
+                          left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
+				        where  ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

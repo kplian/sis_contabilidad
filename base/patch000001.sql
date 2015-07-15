@@ -1415,3 +1415,58 @@ IS 'no, balance, resultado, si es o no un comprobante de cierres, (peude ser cie
 
 /***********************************F-SCP-RAC-CONTA-0-13/07/2015****************************************/
 
+/***********************************I-SCP-RAC-CONTA-0-14/07/2015****************************************/
+--------------- SQL ---------------
+
+CREATE TABLE conta.tresultado_dep (
+  id_resultado_dep SERIAL NOT NULL,
+  id_resultado_plantilla INTEGER,
+  prioridad NUMERIC,
+  obs VARCHAR,
+  PRIMARY KEY(id_resultado_dep)
+) INHERITS (pxp.tbase)
+;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN visible VARCHAR(4) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.visible
+IS 'si o no , aparece o no en el reporte';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN incluir_cierre VARCHAR(15) DEFAULT 'todos' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.incluir_cierre
+IS 'todos, resultado, balance,  no, solo_cierre incuye en e calculo deo monto los comprobantes de cierre';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN incluir_apertura VARCHAR(20) DEFAULT 'todos' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.incluir_apertura
+IS 'todo o solo_apertura ,  icluey een el calculo del monto el comprobante de apetura  o hace el calculo solo con apertura,...';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_dep
+  ADD COLUMN id_resultado_plantilla_hijo INTEGER NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_dep.id_resultado_plantilla_hijo
+IS 'plantilla que se procesar primero por depedencia segun orden de prioridad';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN cbte_apertura VARCHAR(10) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.cbte_apertura
+IS 'si o no, es un comprobante de apertura ...';
+
+
+/***********************************F-SCP-RAC-CONTA-0-14/07/2015****************************************/

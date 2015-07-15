@@ -250,6 +250,11 @@ class MODCuenta extends MODbase{
         $this->captura('monto','numeric'); 
         $this->captura('id_resultado_det_plantilla','int4'); 
         $this->captura('id_cuenta_raiz','int4'); 
+		
+		$this->captura('visible','varchar'); 
+		$this->captura('incluir_cierre','varchar'); 
+		$this->captura('incluir_apertura','varchar'); 
+
 		 
 		//Ejecuta la instruccion
 	    $this->armarConsulta();

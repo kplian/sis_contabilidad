@@ -57,6 +57,21 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 				egrid: true,
 				form:true
 		},
+		{
+			config:{
+				name: 'orden',
+				fieldLabel: 'orden',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 50
+			},
+			type: 'NumberField',
+			filters: { pfiltro:'resdet.orden',type:'numeric'},
+			id_grupo: 1,
+			grid: true,
+			egrid: true,
+			form: true
+		},
 		
 		/*
 		 balance(balance de la cuenta), 
@@ -74,9 +89,9 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                 gwidth: 80,
                 typeAhead: true,
                 triggerAction: 'all',
-                lazyRender:true,
+                lazyRender: true,
                 mode: 'local',
-                store:['balance','detalle','titulo','formula']
+                store: ['balance', 'detalle', 'titulo', 'formula']
             },
             type:'ComboBox',
             id_grupo:1,
@@ -90,14 +105,16 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
         },
 		{
 			config:{
-				name: 'orden',
-				fieldLabel: 'orden',
-				allowBlank: false,
+				name: 'nivel_detalle',
+				fieldLabel: 'Nivel Detalle',
+				qtip: 'si el origen es detalle, el nivel especifica cuantos anidar a partir de la cuenta raiz (Código cuenta)',
+				allowBlank: true,
 				anchor: '80%',
-				gwidth: 50
+				gwidth: 100,
+				maxLength:4
 			},
 				type:'NumberField',
-				filters:{pfiltro:'resdet.orden',type:'numeric'},
+				filters:{pfiltro:'resdet.nivel_detalle',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				egrid: true,
@@ -116,12 +133,20 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    				gwidth:200,
    				width: 180,
    				listWidth: 350,
+   				renderer:function (value, p, record){
+   					if(record.data['desc_cuenta'] != 'S/C'){
+   						 return String.format('({0}) {1}', record.data['codigo_cuenta'],record.data['desc_cuenta']);
+   				    }
+   				    else{
+   				    	return String.format('{0}', record.data['desc_cuenta']);
+   				    }
+   				},
    				baseParams: {'filtro_ges':'actual', sw_transaccional: undefined}
        	     },
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro:'resdet.codigo_cuenta',
+		        pfiltro:'resdet.codigo_cuenta#cue.nombre',
 				type:'string'
 			},
    			grid:true,
@@ -162,6 +187,75 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 				egrid: true,
 				form:true
 		},
+		{
+			config:{
+				name: 'incluir_cierre',
+				qtip: 'icluye en el balance los comprobantes de cierre, no -> ninguno, balance -> solo el balance de cierre, resultado -> solo el cierrede resutlados, o solo_cierre',
+				fieldLabel: 'Incluir cierre',
+				qtip: 'Posicion del texto',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['no' ,'todos' ,'balance','resultado','solo_cierre']
+            },
+            type:'ComboBox',
+			filters:{pfiltro:'resdet.incluir_cierre',type:'string'},
+			valorInicial: 'no',
+			id_grupo:1,
+			grid:true,
+			egrid: true,
+			form:true
+		},
+		{
+			config: {
+				name: 'incluir_apertura',
+				qtip: 'icluye en el balance de apertura',
+				fieldLabel: 'Icluir apertura',
+				qtip: 'Posicion del texto',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store: ['todos' ,'solo_apertura', 'no']
+            },
+            type:'ComboBox',
+			filters: { pfiltro: 'resdet.incluir_apertura', type: 'string' },
+			valorInicial: 'todos',
+			id_grupo: 1,
+			grid: true,
+			egrid: true,
+			form: true
+		},
+		
+		{
+            config:{
+                name: 'visible',
+                fieldLabel: 'Visible',
+                qtip: 'Se muestra en el reporte',
+                allowBlank: true,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            valorInicial: 'si',
+            filters: { pfiltro: 'resdet.visible', type: 'string' },
+			grid: true,
+			egrid: true,
+            form: true
+       },
 		
 		{
             config:{
@@ -207,8 +301,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			egrid: true,
             form:true
        },
-		
-		{
+	   {
             config:{
                 name: 'montopos',
                 fieldLabel: 'Pos. Monto',
@@ -251,23 +344,6 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			egrid: true,
 			form:true
-		},
-		{
-			config:{
-				name: 'nivel_detalle',
-				fieldLabel: 'Nivel Detalle',
-				qtip: 'si el origen es detalle, el nivel especifica cuantos anidar a partir de la cuenta raiz (Código cuenta)',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:4
-			},
-				type:'NumberField',
-				filters:{pfiltro:'resdet.nivel_detalle',type:'numeric'},
-				id_grupo:1,
-				grid:true,
-				egrid: true,
-				form:true
 		},
 		{
 			config:{
@@ -423,7 +499,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'id_resultado_plantilla'
+		{name:'usr_mod', type: 'string'},'id_resultado_plantilla', 'visible','incluir_cierre','incluir_apertura','desc_cuenta'
 		
 	],
 	sortInfo:{
@@ -434,7 +510,16 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 	onReloadPage:function(m){
        
         this.maestro=m;
-        this.store.baseParams = { id_resultado_plantilla: this.maestro.id_resultado_plantilla};
+        var pag = Phx.CP.getPagina(this.idContenedorPadre).nombreVista;
+        
+		this.getComponente('id_resultado_plantilla').setValue(this.maestro.id_resultado_plantilla);
+		if(pag == 'ResultadoDep'){
+			this.store.baseParams = { id_resultado_plantilla: this.maestro.id_resultado_plantilla_hijo };
+		}
+		else{
+			this.store.baseParams = { id_resultado_plantilla: this.maestro.id_resultado_plantilla };
+	    }
+        
         this.load({params:{start:0, limit:50}})       
        
                
@@ -448,7 +533,13 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    loadValoresIniciales : function() {
 					Phx.vista.ResultadoDetPlantilla.superclass.loadValoresIniciales.call(this);
 					if (this.maestro.id_resultado_plantilla != undefined) {
-						this.Cmp.id_resultado_plantilla.setValue(this.maestro.id_resultado_plantilla);
+						var pag = Phx.CP.getPagina(this.idContenedorPadre).nombreVista;
+						if(pag == 'ResultadoDep'){
+						   this.Cmp.id_resultado_plantilla.setValue(this.maestro.id_resultado_plantilla_hijo);
+						}
+						else{
+							this.Cmp.id_resultado_plantilla.setValue(this.maestro.id_resultado_plantilla);
+						}
 					}
 				},
 	bdel:true,

@@ -7,7 +7,9 @@ CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel (
   p_id_resultado_det_plantilla integer,
   p_desde date,
   p_hasta date,
-  p_id_deptos varchar
+  p_id_deptos varchar,
+  p_incluir_cierre varchar,
+  p_incluir_apertura varchar
 )
 RETURNS boolean AS
 $body$
@@ -43,7 +45,7 @@ BEGIN
                      where cue.id_cuenta_padre = p_id_cuenta and cue.estado_reg = 'activo') LOOP
                      
                   --calculamos el balance de la cuenta para las fechas indicadas
-                  v_monto = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos);
+                  v_monto = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre, p_incluir_apertura);
                  		
                   --	insertamos en la tabla temporal
                   insert into temp_balancef (
@@ -72,7 +74,16 @@ BEGIN
                      from conta.tcuenta cue 
                      where cue.id_cuenta_padre = p_id_cuenta and cue.estado_reg = 'activo') LOOP
                      
-               IF ( not conta.f_recuperar_cuentas_nivel(v_registros.id_cuenta, p_nivel_ini + 1, p_nivel_final, p_id_resultado_det_plantilla, p_desde, p_hasta, p_id_deptos) ) THEN     
+               IF ( not conta.f_recuperar_cuentas_nivel(
+                							v_registros.id_cuenta, 
+                                            p_nivel_ini + 1, 
+                                            p_nivel_final, 
+                                            p_id_resultado_det_plantilla, 
+                                            p_desde, 
+                                            p_hasta, 
+                                            p_id_deptos,
+                                            p_incluir_cierre,
+                                            p_incluir_apertura) ) THEN     
                   raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
                END IF;
        END LOOP;  
@@ -95,7 +106,7 @@ EXCEPTION
 END;
 $body$
 LANGUAGE 'plpgsql'
-VOLATILE
+STABLE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;

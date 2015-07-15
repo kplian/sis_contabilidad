@@ -77,6 +77,13 @@ DECLARE
     
     v_ano_1  integer;
     v_ano_2  integer;
+    
+    --gonzalo
+    v_id_finalidad		integer;
+    v_estado_cbte_pago	varchar;
+    v_respuesta_libro_bancos varchar;
+    v_codigo_depto_conta	varchar;
+    v_codigo_depto_libro	varchar;
 
 BEGIN
 	
@@ -732,7 +739,31 @@ BEGIN
                                   where rd.id_int_rel_devengado  =  va_id_int_rel_devengado[v_cont];
                               
                        END LOOP;
-                  
+                		--gonzalo insercion de cheque en libro bancos
+                        select fin.id_finalidad into v_id_finalidad
+                        from tes.tfinalidad fin
+                        where fin.nombre_finalidad ilike 'proveedores';
+                        
+             			select cbt.estado_reg, dpc.codigo, dpl.codigo 
+                        into v_estado_cbte_pago, v_codigo_depto_conta, v_codigo_depto_libro       
+                        from conta.tint_comprobante cbt
+                        inner join conta.tint_transaccion tra on tra.id_int_comprobante=cbt.id_int_comprobante
+                        inner join tes.tcuenta_bancaria ctb on ctb.id_cuenta_bancaria = tra.id_cuenta_bancaria
+                        inner join param.tdepto dpc on dpc.id_depto=cbt.id_depto
+					    inner join param.tdepto dpl on dpl.id_depto=cbt.id_depto_libro
+                        where cbt.id_int_comprobante = p_id_int_comprobante
+                        and tra.forma_pago= 'cheque' and ctb.id_finalidad is not null and ctb.centro='no';
+                        raise notice '% % %', p_id_usuario, p_id_int_comprobante,v_id_finalidad;
+                        IF v_estado_cbte_pago = 'validado' THEN
+                        	if(v_codigo_depto_conta='CON' and v_codigo_depto_libro != 'LB-CBB')then                        		
+                            	v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante,
+                                						v_id_finalidad,NULL,'','endesis');	
+							else	
+                                v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante,
+                            							v_id_finalidad,NULL,'','endesis');
+                            end if;
+                        END IF;
+                       
              END IF; 
         
     END IF; -- fin del if de movimiento presupuestario

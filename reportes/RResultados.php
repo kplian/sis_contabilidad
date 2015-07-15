@@ -66,105 +66,102 @@ class RResultados extends  ReportePDF {
 		$this->AddPage();
 		
 		//configuracion de la tabla
-		
-		
-        $tabs = '';
+		$tabs = '';
         
         foreach ($this->datos_detalle as $val) {
-				
-			//TABS
-			$tabs = '';
-			if($val['montopos'] == 1){
-		    	$tabs = "\t\t\t\t";
-		    }
-		    if($val['montopos'] == 2){
-		    	$tabs = "\t\t";
-		    }	
-        	
-        	//signo	
-        	$signo = '';	
-        	if(isset($val['signo'])){
-			 $signo = $val['signo'];	
-			}
-			
-			//alineacion del texto	
-        	$posicion = 'L';	
-        	if($val['posicion']== 'center'){
-			 $posicion = 'C';	
-			}
-			if(($val['posicion']== 'right')){
-			 $posicion = 'R';	
-			}
-			
-			
-			//subrayado
-			if($val['subrayar'] == 'si'){
-			     $this->SetFont('','U',$val['font_size']);	
-			}
-			else{
-				 $this->SetFont('','',$val['font_size']);	
-			}
-			
-        	// Formateo el texto
-        	
-			if(isset($val['nombre_variable']) && $val['nombre_variable'] != ''){
-			   $texto = $tabs.$val['nombre_variable'];
-			   
-			}
-			else{
-				
-				$texto = $tabs.$val['desc_cuenta'];
-				if($val['origen'] == 'detalle'){
-					$texto = $this->formatearTextoDetalle($texto);	
-				}
-			}
-
-             //coloca el signo
-             $this->Cell(10,3.5,$val['signo'],'',0,'C');
-		   
-	        //coloca el texto
-			$this->Cell(100,3.5,$texto,'',0,$posicion);
-			
-			//definir monto
-			if ($val['origen'] == 'titulo'){
-				$monto_str = '';
-			}
-			else {
-				//si el monto es menor a cero color rojo codigo CMYK
-				if($val['monto']*1 < 0){
-					$this->SetTextColor(0,100,100,0,false,'');
-				}
-				$monto_str = number_format( $val['monto'] ,2 , '.' , ',' );
-			}
-			
-			
-			if($val['montopos'] == 1){
-			   $this->Cell(25,3.5,$monto_str ,'',0,'R');
-			   $this->Cell(25,3.5,"",'',0,'R');
-			   $this->Cell(25,3.5,"",'',0,'R');
-			}
-			elseif($val['montopos'] == 2){
-			   $this->SetFont('','B',10);
-			   $this->Cell(25,3.5,"",'',0,'R');
-			   $this->Cell(25,3.5, $monto_str ,'',0,'R');
-			   $this->Cell(25,3.5,"",'',0,'R');
-			   $this->SetFont('','',9);
-			  
-			}
-			else{
-				$this->SetFont('','BU',11);
-		        $this->Cell(25,3.5, "" ,'',0,'R');
-				$this->Cell(25,3.5,"",'',0,'R');
-				$this->Cell(25,3.5, $monto_str ,'',0,'R');	
-				
-				$this->SetFont('','',9);
-			}
-			//Setea colo dfecto
-			$this->SetTextColor(0,-1,-1,-1,false,'');
-			
-			$this->ln();	
-				
-			
+			if($val['visible'] == 'si'){	
+					//TABS
+					$tabs = '';
+					if($val['montopos'] == 1){
+				    	$tabs = "\t\t\t\t";
+				    }
+				    if($val['montopos'] == 2){
+				    	$tabs = "\t\t";
+				    }	
+		        	
+		        	//signo	
+		        	$signo = '';	
+		        	if(isset($val['signo'])){
+					 $signo = $val['signo'];	
+					}
+					
+					//alineacion del texto	
+		        	$posicion = 'L';	
+		        	if($val['posicion']== 'center'){
+					 $posicion = 'C';	
+					}
+					if(($val['posicion']== 'right')){
+					 $posicion = 'R';	
+					}
+					
+					
+					//subrayado
+					if($val['subrayar'] == 'si'){
+					     $this->SetFont('','U',$val['font_size']);	
+					}
+					else{
+						 $this->SetFont('','',$val['font_size']);	
+					}
+					
+		        	// Formateo el texto
+		        	
+					if(isset($val['nombre_variable']) && $val['nombre_variable'] != ''){
+					   $texto = $tabs.$val['nombre_variable'];
+					   
+					}
+					else{
+						
+						$texto = $tabs.$val['desc_cuenta'];
+						if($val['origen'] == 'detalle'){
+							$texto = $this->formatearTextoDetalle($texto);	
+						}
+					}
+		
+		             //coloca el signo
+		             $this->Cell(10,3.5,$val['signo'],'',0,'C');
+				   
+			        //coloca el texto
+					$this->Cell(100,3.5,$texto,'',0,$posicion);
+					
+					//definir monto
+					if ($val['origen'] == 'titulo'){
+						$monto_str = '';
+					}
+					else {
+						//si el monto es menor a cero color rojo codigo CMYK
+						if($val['monto']*1 < 0){
+							$this->SetTextColor(0,100,100,0,false,'');
+						}
+						$monto_str = number_format( $val['monto'] ,2 , '.' , ',' );
+					}
+					
+					
+					if($val['montopos'] == 1){
+					   $this->Cell(25,3.5,$monto_str ,'',0,'R');
+					   $this->Cell(25,3.5,"",'',0,'R');
+					   $this->Cell(25,3.5,"",'',0,'R');
+					}
+					elseif($val['montopos'] == 2){
+					   $this->SetFont('','B',10);
+					   $this->Cell(25,3.5,"",'',0,'R');
+					   $this->Cell(25,3.5, $monto_str ,'',0,'R');
+					   $this->Cell(25,3.5,"",'',0,'R');
+					   $this->SetFont('','',9);
+					  
+					}
+					else{
+						$this->SetFont('','BU',11);
+				        $this->Cell(25,3.5, "" ,'',0,'R');
+						$this->Cell(25,3.5,"",'',0,'R');
+						$this->Cell(25,3.5, $monto_str ,'',0,'R');	
+						
+						$this->SetFont('','',9);
+					}
+					//Setea colo dfecto
+					$this->SetTextColor(0,-1,-1,-1,false,'');
+					
+					$this->ln();	
+			  }
 		}	//Titulos de columnas inferiores 
 								
 			$this->ln();

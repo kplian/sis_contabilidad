@@ -50,26 +50,29 @@ BEGIN
         begin
         	--Sentencia de la insercion
         	insert into conta.tresultado_det_plantilla(
-			orden,
-			font_size,
-			formula,
-			subrayar,
-			codigo,
-			montopos,
-			nombre_variable,
-			posicion,
-			estado_reg,
-			nivel_detalle,
-			origen,
-			signo,
-			codigo_cuenta,
-			id_usuario_ai,
-			usuario_ai,
-			fecha_reg,
-			id_usuario_reg,
-			id_usuario_mod,
-			fecha_mod,
-            id_resultado_plantilla
+              orden,
+              font_size,
+              formula,
+              subrayar,
+              codigo,
+              montopos,
+              nombre_variable,
+              posicion,
+              estado_reg,
+              nivel_detalle,
+              origen,
+              signo,
+              codigo_cuenta,
+              id_usuario_ai,
+              usuario_ai,
+              fecha_reg,
+              id_usuario_reg,
+              id_usuario_mod,
+              fecha_mod,
+              id_resultado_plantilla,
+              visible,
+              incluir_cierre,
+              incluir_apertura
           	) values(
 			v_parametros.orden,
 			v_parametros.font_size,
@@ -90,7 +93,10 @@ BEGIN
 			p_id_usuario,
 			null,
 			null,
-            v_parametros.id_resultado_plantilla
+            v_parametros.id_resultado_plantilla,
+            v_parametros.visible,
+            v_parametros.incluir_cierre,
+            v_parametros.incluir_apertura
 							
 			
 			
@@ -117,23 +123,26 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update conta.tresultado_det_plantilla set
-			orden = v_parametros.orden,
-			font_size = v_parametros.font_size,
-			formula = v_parametros.formula,
-			subrayar = v_parametros.subrayar,
-			codigo = v_parametros.codigo,
-			montopos = v_parametros.montopos,
-			nombre_variable = v_parametros.nombre_variable,
-			posicion = v_parametros.posicion,
-			nivel_detalle = v_parametros.nivel_detalle,
-			origen = v_parametros.origen,
-			signo = v_parametros.signo,
-			codigo_cuenta = v_parametros.codigo_cuenta,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai,
-            id_resultado_plantilla = v_parametros.id_resultado_plantilla
+              orden = v_parametros.orden,
+              font_size = v_parametros.font_size,
+              formula = v_parametros.formula,
+              subrayar = v_parametros.subrayar,
+              codigo = v_parametros.codigo,
+              montopos = v_parametros.montopos,
+              nombre_variable = v_parametros.nombre_variable,
+              posicion = v_parametros.posicion,
+              nivel_detalle = v_parametros.nivel_detalle,
+              origen = v_parametros.origen,
+              signo = v_parametros.signo,
+              codigo_cuenta = v_parametros.codigo_cuenta,
+              id_usuario_mod = p_id_usuario,
+              fecha_mod = now(),
+              id_usuario_ai = v_parametros._id_usuario_ai,
+              usuario_ai = v_parametros._nombre_usuario_ai,
+              id_resultado_plantilla = v_parametros.id_resultado_plantilla,
+              visible = v_parametros.visible,
+              incluir_cierre = v_parametros.incluir_cierre,
+              incluir_apertura = v_parametros.incluir_apertura
 			where id_resultado_det_plantilla=v_parametros.id_resultado_det_plantilla;
                
 			--Definicion de la respuesta

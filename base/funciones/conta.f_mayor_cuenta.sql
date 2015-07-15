@@ -5,7 +5,8 @@ CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
   p_fecha_ini date,
   p_fecha_fin date,
   p_id_deptos varchar,
-  p_incluir_cierre varchar = 'no'::character varying
+  p_incluir_cierre varchar = 'no'::character varying,
+  p_incluir_apertura varchar = 'todos'::character varying
 )
 RETURNS numeric AS
 $body$
@@ -21,7 +22,7 @@ DECLARE
     v_funcion_comprobante_eliminado varchar;
     v_resp							varchar;
     v_nombre_funcion   				varchar;
-    v_rec_cbte_trans record;
+    v_rec_cbte_trans 				record;
     
     v_resp_mayor   					numeric;
     v_registros						record;
@@ -29,6 +30,7 @@ DECLARE
     v_sum_haber						numeric;
     va_id_deptos					integer[];
     va_cbte_cierre					varchar[];
+    va_cbte_apertura				varchar[];
  
 BEGIN
   	 v_nombre_funcion:='conta.f_mayor_cuenta';
@@ -44,8 +46,22 @@ BEGIN
      ELSIF p_incluir_cierre = 'resultado' then
         va_cbte_cierre[2] = 'resultado';
      end if;
+     IF p_incluir_cierre = 'solo_cierre' THEN
+         --sobreexribe la posicion uno ... 
+         va_cbte_cierre[1] = 'resultado';
+         va_cbte_cierre[2] = 'balance';
+     
+     END IF;
      
      
+     IF p_incluir_apertura = 'todos' THEN
+       va_cbte_apertura[1] = 'si';
+       va_cbte_apertura[2] = 'no';
+     ELSIF  p_incluir_apertura = 'solo_apertura' THEN
+        va_cbte_apertura[1] = 'si';
+     ELSIF  p_incluir_apertura = 'no' THEN
+        va_cbte_apertura[1] = 'no';
+     END IF;
 	
      --iniciamos acumulador en cero
      v_resp_mayor = 0;
@@ -69,7 +85,7 @@ BEGIN
      
      -- verificamos la cuenta
      IF   v_registros.id_cofig_tipo_cuenta is NULL THEN
-        raise exception 'LA cuenta con el id: % no tiene un tipo cuenta asociado',  p_id_cuenta;
+        raise exception 'La cuenta con el id: % no tiene un tipo cuenta asociado',  p_id_cuenta;
      END IF;
      
      -- es una cuenta de movimiento
@@ -89,6 +105,7 @@ BEGIN
               t.estado_reg = 'activo'  AND 
               c.estado_reg = 'validado' AND
               c.cbte_cierre = ANY(va_cbte_cierre) AND
+              c.cbte_apertura = ANY(va_cbte_apertura) AND
               c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin AND
               c.id_depto::integer = ANY(va_id_deptos);
           
@@ -114,7 +131,7 @@ BEGIN
                              from conta.tcuenta c 
                              where c.id_cuenta_padre = p_id_cuenta and c.estado_reg = 'activo') LOOP
                --    llamada recursiva
-               v_resp_mayor = v_resp_mayor + conta.f_mayor_cuenta(v_registros.id_cuenta, p_fecha_ini, p_fecha_fin, p_id_deptos);
+               v_resp_mayor = v_resp_mayor + conta.f_mayor_cuenta(v_registros.id_cuenta, p_fecha_ini, p_fecha_fin, p_id_deptos, p_incluir_cierre, p_incluir_apertura);
          
          END LOOP;
         

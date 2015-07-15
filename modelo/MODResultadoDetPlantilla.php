@@ -44,6 +44,13 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('id_resultado_plantilla','int4');
 		
+		$this->captura('visible','varchar');
+		$this->captura('incluir_apertura','varchar');
+		$this->captura('incluir_cierre','varchar');
+		$this->captura('desc_cuenta','varchar');
+		
+		
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -73,6 +80,10 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('origen','origen','varchar');
 		$this->setParametro('signo','signo','varchar');
 		$this->setParametro('codigo_cuenta','codigo_cuenta','varchar');
+		
+		$this->setParametro('visible','visible','varchar');
+		$this->setParametro('incluir_cierre','incluir_cierre','varchar');
+		$this->setParametro('incluir_apertura','incluir_apertura','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -104,6 +115,9 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('origen','origen','varchar');
 		$this->setParametro('signo','signo','varchar');
 		$this->setParametro('codigo_cuenta','codigo_cuenta','varchar');
+		$this->setParametro('visible','visible','varchar');
+		$this->setParametro('incluir_cierre','incluir_cierre','varchar');
+		$this->setParametro('incluir_apertura','incluir_apertura','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

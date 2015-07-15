@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
-
+    nombreVista: 'ResultadoPlantilla',
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
@@ -194,12 +194,21 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_resultado_plantilla',
 		direction: 'ASC'
 	},
-	south : {
+	
+	
+	tabeast:[
+	      {
 			url : '../../../sis_contabilidad/vista/resultado_det_plantilla/ResultadoDetPlantilla.php',
 			title : 'Detalle de Comprobante',
-			height : '50%',
+			width:'70%',
 			cls : 'ResultadoDetPlantilla'
-		},
+		  },
+		  {
+		   url:'../../../sis_contabilidad/vista/resultado_dep/ResultadoDep.php',
+		   title: 'Dependencias', 
+		   width:'70%',
+		   cls: 'ResultadoDep'
+		 }],
 	bdel:true,
 	bsave:true
 	}
