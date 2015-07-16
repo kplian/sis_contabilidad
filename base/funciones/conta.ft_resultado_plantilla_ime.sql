@@ -203,7 +203,10 @@ BEGIN
                                         id_resultado_plantilla,
                                         visible,
                                         incluir_cierre,
-                                        incluir_apertura
+                                        incluir_apertura,
+                                        negrita,
+                                        cursiva,
+                                        espacio_previo
                                       )
                                       VALUES (
                                         p_id_usuario,
@@ -224,7 +227,10 @@ BEGIN
                                         v_id_resultado_plantilla,   --> id nueva plantilla
                                         v_registros.visible,
                                         v_registros.incluir_cierre,
-                                        v_registros.incluir_apertura
+                                        v_registros.incluir_apertura,
+                                        v_registros.negrita,
+                                        v_registros.cursiva,
+                                        v_registros.espacio_previo
                                       );
             
             END LOOP;
