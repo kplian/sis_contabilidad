@@ -84,7 +84,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                 name: 'origen',
                 fieldLabel: 'Origen',
                 qtip: 'Como calcula el monto',
-                allowBlank: true,
+                allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
                 typeAhead: true,
@@ -301,6 +301,72 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			egrid: true,
             form:true
        },
+       {
+            config:{
+                name: 'negrita',
+                fieldLabel: 'Negrita',
+                qtip: 'Negrita',
+                allowBlank: true,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{pfiltro:'resdet.negrita',type:'string'},
+            valorInicial: 'no',
+			grid:true,
+			egrid: true,
+            form:true
+       },
+       {
+            config:{
+                name: 'cursiva',
+                fieldLabel: 'Cursiva',
+                qtip: 'Cursiva en  el texto',
+                allowBlank: true,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{pfiltro:'resdet.cursiva',type:'string'},
+            valorInicial: 'no',
+			grid:true,
+			egrid: true,
+            form:true
+       },
+	   {
+            config:{
+                name: 'espacio_previo',
+                fieldLabel: 'Espacios',
+                qtip: 'Espacios previos antes de introducir el registro',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['0','1','2','3','4','5','6']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{pfiltro:'resdet.espacio_previo',type:'numeric'},
+            valorInicial: '1',
+			grid:true,
+			egrid: true,
+            form:true
+       },
 	   {
             config:{
                 name: 'montopos',
@@ -499,7 +565,8 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'id_resultado_plantilla', 'visible','incluir_cierre','incluir_apertura','desc_cuenta'
+		{name:'usr_mod', type: 'string'},'id_resultado_plantilla', 'visible','incluir_cierre','incluir_apertura','desc_cuenta',
+		'negrita','cursiva','espacio_previo'
 		
 	],
 	sortInfo:{
@@ -528,6 +595,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    onSubmit : function(o) {
 		this.Cmp.formula.setValue(encodeURIComponent(this.Cmp.formula.getValue()));
 		this.Cmp.signo.setValue(encodeURIComponent(this.Cmp.signo.getValue()));
+		console.log(this.Cmp.signo.getValue(), this.Cmp.formula.getValue())
 		Phx.vista.ResultadoDetPlantilla.superclass.onSubmit.call(this,o);
 	},
    

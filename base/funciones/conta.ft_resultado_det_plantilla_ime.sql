@@ -72,7 +72,10 @@ BEGIN
               id_resultado_plantilla,
               visible,
               incluir_cierre,
-              incluir_apertura
+              incluir_apertura,
+              negrita,
+              cursiva,
+              espacio_previo
           	) values(
 			v_parametros.orden,
 			v_parametros.font_size,
@@ -96,7 +99,10 @@ BEGIN
             v_parametros.id_resultado_plantilla,
             v_parametros.visible,
             v_parametros.incluir_cierre,
-            v_parametros.incluir_apertura
+            v_parametros.incluir_apertura,
+            v_parametros.negrita,
+            v_parametros.cursiva,
+            v_parametros.espacio_previo
 							
 			
 			
@@ -142,7 +148,10 @@ BEGIN
               id_resultado_plantilla = v_parametros.id_resultado_plantilla,
               visible = v_parametros.visible,
               incluir_cierre = v_parametros.incluir_cierre,
-              incluir_apertura = v_parametros.incluir_apertura
+              incluir_apertura = v_parametros.incluir_apertura,
+              negrita = v_parametros.negrita,
+              cursiva = v_parametros.cursiva,
+              espacio_previo = v_parametros.espacio_previo
 			where id_resultado_det_plantilla=v_parametros.id_resultado_det_plantilla;
                
 			--Definicion de la respuesta

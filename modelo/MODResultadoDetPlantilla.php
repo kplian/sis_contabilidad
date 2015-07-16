@@ -49,6 +49,10 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->captura('incluir_cierre','varchar');
 		$this->captura('desc_cuenta','varchar');
 		
+		$this->captura('negrita','varchar');
+		$this->captura('cursiva','varchar');
+		$this->captura('espacio_previo','int4');
+		
 		
 		
 		//Ejecuta la instruccion
@@ -84,6 +88,10 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('visible','visible','varchar');
 		$this->setParametro('incluir_cierre','incluir_cierre','varchar');
 		$this->setParametro('incluir_apertura','incluir_apertura','varchar');
+		
+		$this->setParametro('negrita','negrita','varchar');
+		$this->setParametro('cursiva','cursiva','varchar');
+		$this->setParametro('espacio_previo','espacio_previo','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -118,6 +126,9 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('visible','visible','varchar');
 		$this->setParametro('incluir_cierre','incluir_cierre','varchar');
 		$this->setParametro('incluir_apertura','incluir_apertura','varchar');
+		$this->setParametro('negrita','negrita','varchar');
+		$this->setParametro('cursiva','cursiva','varchar');
+		$this->setParametro('espacio_previo','espacio_previo','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

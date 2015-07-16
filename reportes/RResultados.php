@@ -67,9 +67,35 @@ class RResultados extends  ReportePDF {
 		
 		//configuracion de la tabla
 		$tabs = '';
-        
+        $sw_detalle = 1;
         foreach ($this->datos_detalle as $val) {
-			if($val['visible'] == 'si'){	
+			if($val['visible'] == 'si'){
+						
+						
+					//necesita espacios
+					if ($val['origen'] != 'detalle'){
+						$sw_espacio = 1;
+						$sw_detalle = 1;
+					}
+					else{
+						//solo coloca espacios si es el primer detalle
+						if ($sw_detalle == 1){
+							$sw_espacio = 1;
+							$sw_detalle = 0; //deshabilita los espacion para el siguiente detalle
+						}
+						else{
+							$sw_espacio = 0;
+						}
+					}	
+						
+					//INTRODUCE ESPACIOS PREVIOS	
+					if ($sw_espacio == 1){
+						for($i=0; $i<$val['espacio_previo']; $i++){
+							$this->ln();	
+						}	
+					}
+						
+							
 					//TABS
 					$tabs = '';
 					if($val['montopos'] == 1){
@@ -94,15 +120,22 @@ class RResultados extends  ReportePDF {
 					 $posicion = 'R';	
 					}
 					
-					
+					$text_format = '';
 					//subrayado
 					if($val['subrayar'] == 'si'){
-					     $this->SetFont('','U',$val['font_size']);	
+					    $text_format = 'U';
 					}
-					else{
-						 $this->SetFont('','',$val['font_size']);	
+					//negrita
+					if($val['negrita'] == 'si'){
+					    $text_format = 'B'.$text_format;
+					}
+					//cursiva
+					if($val['cursiva'] == 'si'){
+					    $text_format = 'I'.$text_format;
 					}
 					
+					
+					 $this->SetFont('',$text_format,$val['font_size']);
 		        	// Formateo el texto
 		        	
 					if(isset($val['nombre_variable']) && $val['nombre_variable'] != ''){

@@ -1470,3 +1470,36 @@ IS 'si o no, es un comprobante de apertura ...';
 
 
 /***********************************F-SCP-RAC-CONTA-0-14/07/2015****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-16/07/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN negrita VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.negrita
+IS 'si o no';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN cursiva VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.cursiva
+IS 'si o no';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN espacio_previo INTEGER DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.espacio_previo
+IS 'espacios previos en reprote';
+
+/***********************************F-SCP-RAC-CONTA-0-16/07/2015****************************************/
+
+

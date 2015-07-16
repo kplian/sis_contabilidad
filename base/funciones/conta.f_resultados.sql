@@ -95,7 +95,11 @@ BEGIN
                                 id_cuenta_raiz integer,
                                 visible varchar,
                                 incluir_cierre varchar,
-                                incluir_apertura varchar) ON COMMIT DROP;
+                                incluir_apertura varchar,
+                                negrita varchar,
+                                cursiva varchar,
+                                espacio_previo int4
+                                ) ON COMMIT DROP;
          
          
          -- 2)  busca si tiene plantillas dependientes segun prioridad   
@@ -154,7 +158,10 @@ BEGIN
                                     id_cuenta_raiz,
                                     visible,
                                     incluir_cierre,
-                                    incluir_apertura
+                                    incluir_apertura,
+                                    negrita,
+                                    cursiva,
+                                    espacio_previo
                                 FROM temp_balancef 
                                     order by orden asc, codigo_cuenta asc) LOOP
                    RETURN NEXT v_registros;

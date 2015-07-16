@@ -86,7 +86,10 @@ BEGIN
                                 id_cuenta_raiz,
                                 visible,
                                 incluir_cierre,
-                                incluir_apertura)
+                                incluir_apertura,
+                                negrita,
+                                cursiva,
+                                espacio_previo)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -106,7 +109,10 @@ BEGIN
                                 NULL,
                                 v_visible,
                                 v_registros.incluir_cierre,
-                                v_registros.incluir_apertura);
+                                v_registros.incluir_apertura,
+                                v_registros.negrita,
+                                v_registros.cursiva,
+                                v_registros.espacio_previo);
                         
                   --    2.2) si el origen es detall
                   ELSIF  v_registros.origen = 'detalle' THEN
@@ -149,7 +155,10 @@ BEGIN
                                 id_cuenta_raiz = v_reg_cuenta.id_cuenta,
                                 visible = v_visible,
                                 incluir_cierre = v_registros.incluir_cierre,
-                                incluir_apertura = v_registros.incluir_apertura
+                                incluir_apertura = v_registros.incluir_apertura,
+                                negrita = v_registros.negrita,
+                                cursiva = v_registros.cursiva,
+                                espacio_previo = v_registros.espacio_previo
                         WHERE id_resultado_det_plantilla = v_registros.id_resultado_det_plantilla;
                                    
                   --   2.3) si el origen es formula
@@ -178,7 +187,10 @@ BEGIN
                                 id_cuenta_raiz,
                                 visible,
                                 incluir_cierre,
-                                incluir_apertura)
+                                incluir_apertura,
+                                negrita,
+                                cursiva,
+                                espacio_previo)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -195,7 +207,10 @@ BEGIN
                                 NULL,
                                 v_visible,
                                 v_registros.incluir_cierre,
-                                v_registros.incluir_apertura);
+                                v_registros.incluir_apertura,
+                                v_registros.negrita,
+                                v_registros.cursiva,
+                                v_registros.espacio_previo);
                                 
                    --   2.4) si el origen es titulo
 	               ELSEIF  v_registros.origen = 'titulo' THEN
@@ -216,7 +231,10 @@ BEGIN
                                 id_cuenta_raiz,
                                 visible,
                                 incluir_cierre,
-                                incluir_apertura)
+                                incluir_apertura,
+                                negrita,
+                                cursiva,
+                                espacio_previo)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -233,7 +251,10 @@ BEGIN
                                 NULL,
                                 v_visible,
                                 v_registros.incluir_cierre,
-                                v_registros.incluir_apertura);
+                                v_registros.incluir_apertura,
+                                v_registros.negrita,
+                                v_registros.cursiva,
+                                v_registros.espacio_previo);
                   END IF;
           END LOOP;
     

@@ -91,7 +91,10 @@ BEGIN
                           resdet.visible,
                           resdet.incluir_apertura,
                           resdet.incluir_cierre,
-                          COALESCE(cue.nombre_cuenta,''S/C'')::varchar as desc_cuenta
+                          COALESCE(cue.nombre_cuenta,''S/C'')::varchar as desc_cuenta,
+                          resdet.negrita,
+                          resdet.cursiva,
+                          resdet.espacio_previo
                           from conta.tresultado_det_plantilla resdet
                           inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
                           left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||' 

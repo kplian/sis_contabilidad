@@ -254,6 +254,10 @@ class MODCuenta extends MODbase{
 		$this->captura('visible','varchar'); 
 		$this->captura('incluir_cierre','varchar'); 
 		$this->captura('incluir_apertura','varchar'); 
+		
+		$this->captura('negrita','varchar'); 
+		$this->captura('cursiva','varchar'); 
+		$this->captura('espacio_previo','int4'); 
 
 		 
 		//Ejecuta la instruccion
