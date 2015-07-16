@@ -110,15 +110,14 @@ class RResultados extends  ReportePDF {
 					   
 					}
 					else{
-						
 						$texto = $tabs.$val['desc_cuenta'];
 						if($val['origen'] == 'detalle'){
 							$texto = $this->formatearTextoDetalle($texto);	
 						}
 					}
 		
-		             //coloca el signo
-		             $this->Cell(10,3.5,$val['signo'],'',0,'C');
+		            //coloca el signo
+		            $this->Cell(10,3.5,$val['signo'],'',0,'C');
 				   
 			        //coloca el texto
 					$this->Cell(100,3.5,$texto,'',0,$posicion);
@@ -154,7 +153,6 @@ class RResultados extends  ReportePDF {
 				        $this->Cell(25,3.5, "" ,'',0,'R');
 						$this->Cell(25,3.5,"",'',0,'R');
 						$this->Cell(25,3.5, $monto_str ,'',0,'R');	
-						
 						$this->SetFont('','',9);
 					}
 					//Setea colo dfecto

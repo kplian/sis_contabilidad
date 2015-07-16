@@ -35,8 +35,13 @@ class ACTResultadoPlantilla extends ACTbase{
 	}
 						
 	function eliminarResultadoPlantilla(){
-			$this->objFunc=$this->create('MODResultadoPlantilla');	
+		$this->objFunc=$this->create('MODResultadoPlantilla');	
 		$this->res=$this->objFunc->eliminarResultadoPlantilla($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	function clonarPlantilla(){
+		$this->objFunc=$this->create('MODResultadoPlantilla');	
+		$this->res=$this->objFunc->clonarPlantilla($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 			

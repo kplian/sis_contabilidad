@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_resultado_plantilla_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_resultado_plantilla_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_resultado_plantilla_ime
@@ -27,6 +32,7 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_resultado_plantilla	integer;
+    v_registros					record;
 			    
 BEGIN
 
@@ -129,7 +135,139 @@ BEGIN
             return v_resp;
 
 		end;
-         
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_CLONAR_IME'
+ 	#DESCRIPCION:	clonar plantilla de resultados
+ 	#AUTOR:		admin	
+ 	#FECHA:		08-07-2015 13:12:43
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CLONAR_IME')then
+
+		begin
+		    ------------------------------------
+            --  copiar el resultado plantilla	
+            -----------------------------------
+            select 
+             rp.codigo,
+             rp.nombre
+            into
+              v_registros 
+            from conta.tresultado_plantilla rp 
+            where rp.id_resultado_plantilla = v_parametros.id_resultado_plantilla;
+			
+            
+            INSERT INTO conta.tresultado_plantilla (
+                  id_usuario_reg,
+                  fecha_reg,
+                  estado_reg,
+                  codigo,
+                  nombre
+                )
+                VALUES (
+                   p_id_usuario,
+                   now(),
+                   'activo',
+                   v_registros.codigo||'-CLON',
+                   v_registros.nombre
+                )  RETURNING id_resultado_plantilla into v_id_resultado_plantilla;
+            
+            ----------------------------------------------
+            --  copiar el detalle de la plantilla 
+            ---------------------------------------------
+               
+            
+            FOR v_registros in (  Select  *
+                                  from conta.tresultado_det_plantilla rdp 
+                                  where rdp.id_resultado_plantilla = v_parametros.id_resultado_plantilla) LOOP
+                      
+                      
+                      
+                      INSERT INTO  conta.tresultado_det_plantilla
+                                      (
+                                        id_usuario_reg,
+                                        fecha_reg,
+                                        estado_reg,
+                                        origen,
+                                        formula,
+                                        subrayar,
+                                        font_size,
+                                        posicion,
+                                        signo,
+                                        nivel_detalle,
+                                        codigo_cuenta,
+                                        codigo,
+                                        orden,
+                                        nombre_variable,
+                                        montopos,
+                                        id_resultado_plantilla,
+                                        visible,
+                                        incluir_cierre,
+                                        incluir_apertura
+                                      )
+                                      VALUES (
+                                        p_id_usuario,
+                                        now(),
+                                        'activo',
+                                        v_registros.origen,
+                                        v_registros.formula,
+                                        v_registros.subrayar,
+                                        v_registros.font_size,
+                                        v_registros.posicion,
+                                        v_registros.signo,
+                                        v_registros.nivel_detalle,
+                                        v_registros.codigo_cuenta,
+                                        v_registros.codigo,
+                                        v_registros.orden,
+                                        v_registros.nombre_variable,
+                                        v_registros.montopos,
+                                        v_id_resultado_plantilla,   --> id nueva plantilla
+                                        v_registros.visible,
+                                        v_registros.incluir_cierre,
+                                        v_registros.incluir_apertura
+                                      );
+            
+            END LOOP;
+            
+            -----------------------------------
+            -- Clonar las dependencias
+            -----------------------------------
+            
+            FOR  v_registros in ( select  *  
+                                  from  conta.tresultado_dep rd 
+                                  where rd.id_resultado_plantilla  = v_parametros.id_resultado_plantilla) LOOP
+            
+                  INSERT INTO conta.tresultado_dep
+                                  (
+                                    id_usuario_reg,
+                                    fecha_reg,
+                                    estado_reg,
+                                    id_resultado_plantilla,
+                                    prioridad,
+                                    obs,
+                                    id_resultado_plantilla_hijo
+                                  )
+                                  VALUES (
+                                    p_id_usuario,
+                                    now(),
+                                    'activo',
+                                    v_id_resultado_plantilla,  --> nueva plantilla
+                                    v_registros.prioridad,
+                                    v_registros.obs,
+                                    v_registros.id_resultado_plantilla_hijo
+                                  );
+            
+            END LOOP;
+            
+            
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla clonada con exito)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_resultado_plantilla',v_parametros.id_resultado_plantilla::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;     
 	else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;
@@ -146,7 +284,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_resultado_plantilla_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

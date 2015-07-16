@@ -17,7 +17,17 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.ResultadoPlantilla.superclass.constructor.call(this,config);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		//Botón para Validación del Comprobante
+		this.addButton('btnClonar',
+			{
+				text: 'Clonar',
+				iconCls: 'bchecklist',
+				disabled: true,
+				handler: this.clonar,
+				tooltip: '<b>Clonar</b><br/>Clona la plantilla, su detalle y dependencias'
+			}
+		);
+		this.load({params:{start:0, limit:this.tam_pag}});
 	},
 			
 	Atributos:[
@@ -194,8 +204,41 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_resultado_plantilla',
 		direction: 'ASC'
 	},
-	
-	
+	clonar: function(){
+		Ext.Msg.confirm('Confirmación','¿Está seguro de clonar esta plantilla?',function(btn){
+			var rec=this.sm.getSelected();
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/ResultadoPlantilla/clonarPlantilla',
+				params:{
+					id_resultado_plantilla: rec.data.id_resultado_plantilla
+				},
+				success: function(resp){
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error','Clonación no realizada: '+reg.ROOT.error)
+					} else {
+						this.reload();
+						Ext.Msg.alert('Mensaje','Proceso ejecutado con éxito')
+					}
+				},
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope:this
+			});
+		}, this)
+	},
+	preparaMenu: function(n) {
+		var tb = Phx.vista.ResultadoPlantilla.superclass.preparaMenu.call(this);
+	   	this.getBoton('btnClonar').setDisabled(false);
+  		return tb;
+	},
+	liberaMenu: function() {
+		var tb = Phx.vista.ResultadoPlantilla.superclass.liberaMenu.call(this);
+		this.getBoton('btnClonar').setDisabled(true);
+		return tb;
+	},
 	tabeast:[
 	      {
 			url : '../../../sis_contabilidad/vista/resultado_det_plantilla/ResultadoDetPlantilla.php',
