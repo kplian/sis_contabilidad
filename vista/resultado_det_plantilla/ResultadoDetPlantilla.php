@@ -157,13 +157,13 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'formula',
 				fieldLabel: 'Formula',
-				qtip: 'En caso de origen ser formula,  ejm  {C1} + {C2} -{C3}',
+				qtip: 'Si el origen es formula,  ejm  {C1} + {C2} - {C3}',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:200
 			},
-				type:'TextField',
+				type:'TextArea',
 				filters:{pfiltro:'resdet.formula',type:'string'},
 				id_grupo:1,
 				grid:true,
@@ -527,6 +527,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    
    onSubmit : function(o) {
 		this.Cmp.formula.setValue(encodeURIComponent(this.Cmp.formula.getValue()));
+		this.Cmp.signo.setValue(encodeURIComponent(this.Cmp.signo.getValue()));
 		Phx.vista.ResultadoDetPlantilla.superclass.onSubmit.call(this,o);
 	},
    
