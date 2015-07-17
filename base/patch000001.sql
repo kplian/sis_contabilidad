@@ -1503,3 +1503,44 @@ IS 'espacios previos en reprote';
 /***********************************F-SCP-RAC-CONTA-0-16/07/2015****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-17/07/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN cbte_aitb VARCHAR(10) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.cbte_aitb
+IS 'no o si, (si en un futuro es necesario disgregar dejar el NO)';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN incluir_aitb VARCHAR(20) DEFAULT 'todos' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.incluir_aitb
+IS 'todos, no , solo_aitb';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN signo_balance VARCHAR(20) DEFAULT 'defecto_cuenta' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.signo_balance
+IS 'defecto_cuenta,  deudor, acreedor';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN tipo_saldo VARCHAR(20) DEFAULT 'balance' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.tipo_saldo
+IS '1) balance hace la resta segun signo_balance de los saldos acredor y deudor, 2) solo suma los montos del debe 3) solo suma los monstos del haber';
+
+
+/***********************************F-SCP-RAC-CONTA-0-17/07/2015****************************************/
+
+

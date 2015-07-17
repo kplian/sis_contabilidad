@@ -9,7 +9,10 @@ CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel (
   p_hasta date,
   p_id_deptos varchar,
   p_incluir_cierre varchar,
-  p_incluir_apertura varchar
+  p_incluir_apertura varchar,
+  p_incluir_aitb varchar,
+  p_signo_balance varchar,
+  p_tipo_balance varchar
 )
 RETURNS boolean AS
 $body$
@@ -45,7 +48,15 @@ BEGIN
                      where cue.id_cuenta_padre = p_id_cuenta and cue.estado_reg = 'activo') LOOP
                      
                   --calculamos el balance de la cuenta para las fechas indicadas
-                  v_monto = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre, p_incluir_apertura);
+                  v_monto = conta.f_mayor_cuenta(v_registros.id_cuenta, 
+                  								 p_desde, 
+                                                 p_hasta, 
+                                                 p_id_deptos, 
+                                                 p_incluir_cierre, 
+                                                 p_incluir_apertura, 
+                                                 p_incluir_aitb,
+                                                 p_signo_balance,
+                                                 p_tipo_balance);
                  		
                   --	insertamos en la tabla temporal
                   insert into temp_balancef (
@@ -83,7 +94,10 @@ BEGIN
                                             p_hasta, 
                                             p_id_deptos,
                                             p_incluir_cierre,
-                                            p_incluir_apertura) ) THEN     
+                                            p_incluir_apertura,
+                                            p_incluir_aitb,
+                                            p_signo_balance,
+                                            p_tipo_balance) ) THEN     
                   raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
                END IF;
        END LOOP;  

@@ -6,7 +6,10 @@ CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
   p_fecha_fin date,
   p_id_deptos varchar,
   p_incluir_cierre varchar = 'no'::character varying,
-  p_incluir_apertura varchar = 'todos'::character varying
+  p_incluir_apertura varchar = 'todos'::character varying,
+  p_incluir_aitb varchar = 'todos'::character varying,
+  p_signo_balance varchar = 'defecto_cuenta'::character varying,
+  p_tipo_saldo varchar = 'balance'::character varying
 )
 RETURNS numeric AS
 $body$
@@ -31,6 +34,7 @@ DECLARE
     va_id_deptos					integer[];
     va_cbte_cierre					varchar[];
     va_cbte_apertura				varchar[];
+    va_cbte_aitb					varchar[];
  
 BEGIN
   	 v_nombre_funcion:='conta.f_mayor_cuenta';
@@ -53,7 +57,7 @@ BEGIN
      
      END IF;
      
-     
+     --comprobante de apertura
      IF p_incluir_apertura = 'todos' THEN
        va_cbte_apertura[1] = 'si';
        va_cbte_apertura[2] = 'no';
@@ -62,6 +66,18 @@ BEGIN
      ELSIF  p_incluir_apertura = 'no' THEN
         va_cbte_apertura[1] = 'no';
      END IF;
+     
+     IF p_incluir_aitb = 'todos' THEN
+       va_cbte_aitb[1] = 'si';
+       va_cbte_aitb[2] = 'no';
+     ELSIF  p_incluir_aitb = 'solo_aitb' THEN
+        va_cbte_aitb[1] = 'si';
+     ELSIF  p_incluir_aitb = 'no' THEN
+        va_cbte_aitb[1] = 'no';
+     END IF;
+     
+     
+     
 	
      --iniciamos acumulador en cero
      v_resp_mayor = 0;
@@ -106,22 +122,42 @@ BEGIN
               c.estado_reg = 'validado' AND
               c.cbte_cierre = ANY(va_cbte_cierre) AND
               c.cbte_apertura = ANY(va_cbte_apertura) AND
+              c.cbte_aitb = ANY(va_cbte_aitb) AND
               c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin AND
               c.id_depto::integer = ANY(va_id_deptos);
           
-          -- si el incremento es debe 
-          IF  v_registros.incremento = 'debe'   THEN
-             v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
-          ELSE
-          --si el incremento de haber 
-             v_resp_mayor = COALESCE(v_sum_haber,0) -COALESCE(v_sum_debe,0); 
-          END IF;  
-          -- retornamos el resultado multiplicado por el signo     
-          
-          raise notice 'id: % parcial % ', p_id_cuenta, v_resp_mayor;
-          
-          return v_resp_mayor;
+        --------------------------------
+        --  calculo de tipo de resultado
+        --------------------------------
+          IF  p_tipo_saldo = 'balance' THEN
+            
+                IF p_signo_balance = 'defecto_cuenta'  THEN
+                    -- si el incremento es debe 
+                    IF  v_registros.incremento = 'debe'   THEN
+                       v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
+                    ELSE
+                    --si el incremento de haber 
+                       v_resp_mayor = COALESCE(v_sum_haber,0) - COALESCE(v_sum_debe,0); 
+                    END IF;  
+                   
+              
+                ELSIF   p_signo_balance = 'deudor' THEN
+                  --forzar saldo deudor
+                  v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);  
+                ELSE
+                  --forzar saldo acredor 
+                  v_resp_mayor = COALESCE(v_sum_haber,0) - COALESCE(v_sum_debe,0);
+                END IF;
+                
+                -- raise exception 'bal %, %, %,--- % ,%', v_resp_mayor, p_signo_balance, p_tipo_saldo,  COALESCE(v_sum_debe,0),  COALESCE(v_sum_debe,0);
          
+          ELSEIF  p_tipo_saldo = 'deudor' THEN
+                v_resp_mayor = COALESCE(v_sum_debe,0);
+          ELSEIF  p_tipo_saldo = 'acreedor' THEN
+               v_resp_mayor = COALESCE(v_sum_haber,0);
+          END IF; 
+          -- retornamos el resultado   
+          return v_resp_mayor;
           
      ELSE
      -- si no es una cuenta titular
@@ -131,7 +167,7 @@ BEGIN
                              from conta.tcuenta c 
                              where c.id_cuenta_padre = p_id_cuenta and c.estado_reg = 'activo') LOOP
                --    llamada recursiva
-               v_resp_mayor = v_resp_mayor + conta.f_mayor_cuenta(v_registros.id_cuenta, p_fecha_ini, p_fecha_fin, p_id_deptos, p_incluir_cierre, p_incluir_apertura);
+               v_resp_mayor = v_resp_mayor + conta.f_mayor_cuenta(v_registros.id_cuenta, p_fecha_ini, p_fecha_fin, p_id_deptos, p_incluir_cierre, p_incluir_apertura, p_incluir_aitb, p_signo_balance, p_tipo_saldo);
          
          END LOOP;
         

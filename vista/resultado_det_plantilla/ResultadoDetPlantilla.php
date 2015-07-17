@@ -83,7 +83,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'origen',
                 fieldLabel: 'Origen',
-                qtip: 'Como calcula el monto',
+                qtip: 'Como calcula el monto, (1)  en caso de detalle agregar Nivel detalle (2) en caso de formula especificar el campoformula (3) en caso de sumatoria especificar orden inicial y final en campo formula ejmplo 1-10',
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -91,7 +91,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender: true,
                 mode: 'local',
-                store: ['balance', 'detalle', 'titulo', 'formula']
+                store: ['balance', 'detalle', 'titulo', 'formula','sumatoria']
             },
             type:'ComboBox',
             id_grupo:1,
@@ -104,21 +104,70 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             form:true
         },
 		{
-			config:{
-				name: 'nivel_detalle',
+            config:{
+                name: 'nivel_detalle',
 				fieldLabel: 'Nivel Detalle',
 				qtip: 'si el origen es detalle, el nivel especifica cuantos anidar a partir de la cuenta raiz (Código cuenta)',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:4
-			},
-				type:'NumberField',
-				filters:{pfiltro:'resdet.nivel_detalle',type:'numeric'},
-				id_grupo:1,
-				grid:true,
-				egrid: true,
-				form:true
+				allowBlank: false,
+				anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['1','2','3','4']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            valorInicial: '1',
+            filters:{pfiltro:'resdet.nivel_detalle',type:'string'},
+			grid:true,
+			egrid: true,
+            form:true
+       },
+	   {
+			config:{
+				name: 'tipo_saldo',
+				fieldLabel: 'Tipo saldo',
+				qtip: 'Solo se aplica cuando  el tipo de saldo es balance. <br>(1) balance: la diferencia entre saldo deudor y acreedor  (2) Deudor: solo suma los montos del debe (3) Acreedor: solo suma los montos al haber',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['balance' ,'deudor' ,'acreedor']
+            },
+            type:'ComboBox',
+			filters:{pfiltro:'resdet.tipo_saldo',type:'string'},
+			valorInicial: 'balance',
+			id_grupo:1,
+			grid:true,
+			egrid: true,
+			form:true
+		},
+	   {
+			config:{
+				name: 'signo_balance',
+				fieldLabel: 'Signo Balance',
+				qtip: '(1) defecto cuenta: regresa el signo del monto según el tipo de cuenta,  (2) Deudor: monto = saldo duedor - saldo acreedor (3) Acredor: monto = saldo acreedor - saldo deudor',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['defecto_cuenta' ,'deudor' ,'acreedor']
+            },
+            type:'ComboBox',
+			filters:{pfiltro:'resdet.posicion',type:'string'},
+			valorInicial: 'defecto_cuenta',
+			id_grupo:1,
+			grid:true,
+			egrid: true,
+			form:true
 		},
 		{
    			config:{
@@ -192,7 +241,6 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 				name: 'incluir_cierre',
 				qtip: 'icluye en el balance los comprobantes de cierre, no -> ninguno, balance -> solo el balance de cierre, resultado -> solo el cierrede resutlados, o solo_cierre',
 				fieldLabel: 'Incluir cierre',
-				qtip: 'Posicion del texto',
 				allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -215,7 +263,6 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 				name: 'incluir_apertura',
 				qtip: 'icluye en el balance de apertura',
 				fieldLabel: 'Icluir apertura',
-				qtip: 'Posicion del texto',
 				allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -227,6 +274,28 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             },
             type:'ComboBox',
 			filters: { pfiltro: 'resdet.incluir_apertura', type: 'string' },
+			valorInicial: 'todos',
+			id_grupo: 1,
+			grid: true,
+			egrid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'incluir_aitb',
+				qtip: 'incluir comprobantes de  ajuste por inflancion y tenencia de bienes',
+				fieldLabel: 'Icluir AITBs',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store: ['todos' ,'solo_aitb', 'no']
+            },
+            type:'ComboBox',
+			filters: { pfiltro: 'resdet.incluir_aitb', type: 'string' },
 			valorInicial: 'todos',
 			id_grupo: 1,
 			grid: true,
@@ -362,7 +431,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             type:'ComboBox',
             id_grupo:1,
             filters:{pfiltro:'resdet.espacio_previo',type:'numeric'},
-            valorInicial: '1',
+            valorInicial: '0',
 			grid:true,
 			egrid: true,
             form:true
@@ -566,7 +635,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'id_resultado_plantilla', 'visible','incluir_cierre','incluir_apertura','desc_cuenta',
-		'negrita','cursiva','espacio_previo'
+		'negrita','cursiva','espacio_previo','incluir_aitb','tipo_saldo','signo_balance'
 		
 	],
 	sortInfo:{

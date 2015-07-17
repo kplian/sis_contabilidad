@@ -206,7 +206,10 @@ BEGIN
                                         incluir_apertura,
                                         negrita,
                                         cursiva,
-                                        espacio_previo
+                                        espacio_previo,
+                                        incluir_aitb,
+                                        tipo_saldo,
+                                        signo_balance
                                       )
                                       VALUES (
                                         p_id_usuario,
@@ -230,7 +233,10 @@ BEGIN
                                         v_registros.incluir_apertura,
                                         v_registros.negrita,
                                         v_registros.cursiva,
-                                        v_registros.espacio_previo
+                                        v_registros.espacio_previo,
+                                        v_registros.incluir_aitb,
+                                        v_registros.tipo_saldo,
+                                        v_registros.signo_balance
                                       );
             
             END LOOP;

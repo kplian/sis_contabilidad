@@ -98,7 +98,8 @@ BEGIN
                                 incluir_apertura varchar,
                                 negrita varchar,
                                 cursiva varchar,
-                                espacio_previo int4
+                                espacio_previo int4,
+                                incluir_aitb varchar
                                 ) ON COMMIT DROP;
          
          

@@ -75,7 +75,10 @@ BEGIN
               incluir_apertura,
               negrita,
               cursiva,
-              espacio_previo
+              espacio_previo,
+              incluir_aitb,
+              tipo_saldo,
+              signo_balance
           	) values(
 			v_parametros.orden,
 			v_parametros.font_size,
@@ -102,10 +105,10 @@ BEGIN
             v_parametros.incluir_apertura,
             v_parametros.negrita,
             v_parametros.cursiva,
-            v_parametros.espacio_previo
-							
-			
-			
+            v_parametros.espacio_previo,
+            v_parametros.incluir_aitb,
+            v_parametros.tipo_saldo,
+            v_parametros.signo_balance
 			)RETURNING id_resultado_det_plantilla into v_id_resultado_det_plantilla;
 			
 			--Definicion de la respuesta
@@ -151,7 +154,10 @@ BEGIN
               incluir_apertura = v_parametros.incluir_apertura,
               negrita = v_parametros.negrita,
               cursiva = v_parametros.cursiva,
-              espacio_previo = v_parametros.espacio_previo
+              espacio_previo = v_parametros.espacio_previo,
+              incluir_aitb = v_parametros.incluir_aitb,
+              tipo_saldo  = v_parametros.tipo_saldo,
+              signo_balance = v_parametros.signo_balance
 			where id_resultado_det_plantilla=v_parametros.id_resultado_det_plantilla;
                
 			--Definicion de la respuesta

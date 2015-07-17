@@ -52,6 +52,9 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->captura('negrita','varchar');
 		$this->captura('cursiva','varchar');
 		$this->captura('espacio_previo','int4');
+		$this->captura('incluir_aitb','varchar');
+		$this->captura('tipo_saldo','varchar');
+		$this->captura('signo_balance','varchar');
 		
 		
 		
@@ -92,6 +95,9 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('negrita','negrita','varchar');
 		$this->setParametro('cursiva','cursiva','varchar');
 		$this->setParametro('espacio_previo','espacio_previo','int4');
+		$this->setParametro('incluir_aitb','incluir_aitb','varchar');
+		$this->setParametro('tipo_saldo','tipo_saldo','varchar');
+		$this->setParametro('signo_balance','signo_balance','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -129,6 +135,9 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('negrita','negrita','varchar');
 		$this->setParametro('cursiva','cursiva','varchar');
 		$this->setParametro('espacio_previo','espacio_previo','int4');
+		$this->setParametro('incluir_aitb','incluir_aitb','varchar');
+		$this->setParametro('tipo_saldo','tipo_saldo','varchar');
+		$this->setParametro('signo_balance','signo_balance','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

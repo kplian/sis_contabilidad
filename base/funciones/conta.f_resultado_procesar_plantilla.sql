@@ -64,7 +64,15 @@ BEGIN
                         
                         --raise exception '%, %', v_registros.codigo_cuenta, p_id_gestion;
                 		--   2.1.2)  calculamos el balance de la cuenta para las fechas indicadas
-                        v_monto = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, p_desde, p_hasta, p_id_deptos, v_registros.incluir_cierre, v_registros.incluir_apertura);
+                        v_monto = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, 
+                        								p_desde, 
+                                                        p_hasta, 
+                                                        p_id_deptos, 
+                                                        v_registros.incluir_cierre, 
+                                                        v_registros.incluir_apertura, 
+                                                        v_registros.incluir_aitb,
+                                                        v_registros.signo_balance,
+                                                        v_registros.tipo_saldo);
                  		
                         --	 2.1.3)  insertamos en la tabla temporal
                         insert into temp_balancef (
@@ -89,7 +97,8 @@ BEGIN
                                 incluir_apertura,
                                 negrita,
                                 cursiva,
-                                espacio_previo)
+                                espacio_previo,
+                                incluir_aitb)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -112,7 +121,8 @@ BEGIN
                                 v_registros.incluir_apertura,
                                 v_registros.negrita,
                                 v_registros.cursiva,
-                                v_registros.espacio_previo);
+                                v_registros.espacio_previo,
+                                v_registros.incluir_aitb);
                         
                   --    2.2) si el origen es detall
                   ELSIF  v_registros.origen = 'detalle' THEN
@@ -137,7 +147,10 @@ BEGIN
                                                     p_hasta, 
                                                     p_id_deptos, 
                                                     v_registros.incluir_cierre, 
-                                                    v_registros.incluir_apertura ) ) THEN     
+                                                    v_registros.incluir_apertura, 
+                                                    v_registros.incluir_aitb,
+                                                    v_registros.signo_balance,
+                                                    v_registros.tipo_saldo) ) THEN     
                             raise exception 'Error al calcular balance del detalle en el nivel %', 0;
                         END IF;
                         
@@ -158,7 +171,8 @@ BEGIN
                                 incluir_apertura = v_registros.incluir_apertura,
                                 negrita = v_registros.negrita,
                                 cursiva = v_registros.cursiva,
-                                espacio_previo = v_registros.espacio_previo
+                                espacio_previo = v_registros.espacio_previo,
+                                incluir_aitb = v_registros.incluir_aitb
                         WHERE id_resultado_det_plantilla = v_registros.id_resultado_det_plantilla;
                                    
                   --   2.3) si el origen es formula
@@ -190,7 +204,8 @@ BEGIN
                                 incluir_apertura,
                                 negrita,
                                 cursiva,
-                                espacio_previo)
+                                espacio_previo,
+                                incluir_aitb)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -210,8 +225,61 @@ BEGIN
                                 v_registros.incluir_apertura,
                                 v_registros.negrita,
                                 v_registros.cursiva,
-                                v_registros.espacio_previo);
-                                
+                                v_registros.espacio_previo,
+                                v_registros.incluir_aitb);
+                  --   2.4) si el origen es sumatoria
+	              ELSIF  v_registros.origen = 'sumatoria' THEN
+                   
+                           IF v_registros.formula is NULL THEN
+                             raise exception 'En registros de origen sumatoria';
+                           END IF;
+                  
+                          -- 2.3.1)  calculamos el monto para la formula
+                           v_monto = conta.f_evaluar_sumatoria(v_registros.formula, p_plantilla);
+                          -- 2.3.2)  insertamos el registro en tabla temporal        
+                          insert into temp_balancef (
+                                plantilla,
+                                subrayar,
+                                font_size,
+                                posicion,
+                                signo,
+                                codigo,
+                                origen,
+                                orden,
+                                nombre_variable,
+                                montopos,
+                                monto,
+                                id_resultado_det_plantilla,
+                                id_cuenta_raiz,
+                                visible,
+                                incluir_cierre,
+                                incluir_apertura,
+                                negrita,
+                                cursiva,
+                                espacio_previo,
+                                incluir_aitb)
+                            values (
+                                p_plantilla,
+                                v_registros.subrayar,
+                                v_registros.font_size,
+                                v_registros.posicion,
+                                v_registros.signo,
+                                v_registros.codigo,
+                                v_registros.origen,
+                                v_registros.orden,
+                                v_registros.nombre_variable,
+                                v_registros.montopos,
+                                v_monto,
+                                v_registros.id_resultado_det_plantilla,
+                                NULL,
+                                v_visible,
+                                v_registros.incluir_cierre,
+                                v_registros.incluir_apertura,
+                                v_registros.negrita,
+                                v_registros.cursiva,
+                                v_registros.espacio_previo,
+                                v_registros.incluir_aitb);  
+                                           
                    --   2.4) si el origen es titulo
 	               ELSEIF  v_registros.origen = 'titulo' THEN
                        -- 2.4.1) insertamos un registros para el titulo
@@ -234,7 +302,8 @@ BEGIN
                                 incluir_apertura,
                                 negrita,
                                 cursiva,
-                                espacio_previo)
+                                espacio_previo,
+                                incluir_aitb)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -254,7 +323,8 @@ BEGIN
                                 v_registros.incluir_apertura,
                                 v_registros.negrita,
                                 v_registros.cursiva,
-                                v_registros.espacio_previo);
+                                v_registros.espacio_previo,
+                                v_registros.incluir_aitb);
                   END IF;
           END LOOP;
     
