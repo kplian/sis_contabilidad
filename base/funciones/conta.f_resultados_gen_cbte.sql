@@ -201,7 +201,10 @@ BEGIN
 			glosa1,
 			fecha,
 			id_usuario_reg,
-			fecha_reg
+			fecha_reg,
+            cbte_cierre,
+            cbte_apertura,
+            cbte_aitb
           	) values(
 			v_registros_plantilla.id_clase_comprobante,			
 			v_id_subsistema_conta,
@@ -213,10 +216,15 @@ BEGIN
 			v_registros_plantilla.glosa,
 			v_parametros.fecha,
 			p_id_usuario,
-			now()
+			now(),
+            v_registros_plantilla.cbte_cierre,
+            v_registros_plantilla.cbte_apertura,
+            v_registros_plantilla.cbte_aitb
 			
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
+            
+            
          
          --recuepra el centor de costo para el departamento
          

@@ -165,6 +165,8 @@ BEGIN
                         
                   --    2.2) si el origen es detall
                   ELSIF  v_registros.origen = 'detalle' or (v_registros.origen = 'balance' and v_registros.destino != 'reporte') THEN
+                         
+                         
                          --   2.2.1)  recuperamos la cuenta raiz
                          select
                           cue.id_cuenta,
@@ -177,24 +179,55 @@ BEGIN
                         where cue.id_gestion = p_id_gestion and 
                               cue.nro_cuenta = v_registros.codigo_cuenta ;
                        
-                        --  2.2.2) Recuperar las cuentas del nivel requerido
-                        IF ( not conta.f_recuperar_cuentas_nivel(
-                                                    v_reg_cuenta.id_cuenta, 
-                                                    1, 
-                                                    v_registros.nivel_detalle, 
-                                                    v_registros.id_resultado_det_plantilla, 
-                                                    p_desde, 
-                                                    p_hasta, 
-                                                    p_id_deptos, 
-                                                    v_registros.incluir_cierre, 
-                                                    v_registros.incluir_apertura, 
-                                                    v_registros.incluir_aitb,
-                                                    v_registros.signo_balance,
-                                                    v_registros.tipo_saldo,
-                                                    v_registros.origen) ) THEN     
-                            raise exception 'Error al calcular balance del detalle en el nivel %', 0;
-                        END IF;
+                  
+                      IF v_reg_cuenta.sw_transaccional != 'movimiento' THEN  
+                            --  2.2.2) Recuperar las cuentas del nivel requerido
+                            IF ( not conta.f_recuperar_cuentas_nivel(
+                                                        v_reg_cuenta.id_cuenta, 
+                                                        1, 
+                                                        v_registros.nivel_detalle, 
+                                                        v_registros.id_resultado_det_plantilla, 
+                                                        p_desde, 
+                                                        p_hasta, 
+                                                        p_id_deptos, 
+                                                        v_registros.incluir_cierre, 
+                                                        v_registros.incluir_apertura, 
+                                                        v_registros.incluir_aitb,
+                                                        v_registros.signo_balance,
+                                                        v_registros.tipo_saldo,
+                                                        v_registros.origen) ) THEN     
+                                raise exception 'Error al calcular balance del detalle en el nivel %', 0;
+                            END IF;
                         
+                        ELSE
+                          --  si es una cuenta de movimiento
+                              v_monto = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, 
+                  								 p_desde, 
+                                                 p_hasta, 
+                                                 p_id_deptos, 
+                                                  v_registros.incluir_cierre, 
+                                                  v_registros.incluir_apertura, 
+                                                  v_registros.incluir_aitb,
+                                                  v_registros.signo_balance,
+                                                  v_registros.tipo_saldo);
+                       
+                          --	insertamos en la tabla temporal
+                          insert into temp_balancef (
+                              
+                              id_cuenta,
+                              desc_cuenta,
+                              codigo_cuenta,
+                              monto,
+                              id_resultado_det_plantilla)
+                          values (
+                              
+                              v_reg_cuenta.id_cuenta,
+                              v_reg_cuenta.nombre_cuenta,
+                              v_reg_cuenta.nro_cuenta,
+                              v_monto,
+                              v_registros.id_resultado_det_plantilla); 
+                        END IF;
+                       
                         --  2.2.3)  modificamos los registors de la tabla temporal comunes
                         UPDATE temp_balancef  set
                                 plantilla = p_plantilla,

@@ -38,7 +38,7 @@ BEGIN
 
     v_nombre_funcion = 'conta.f_recuperar_cuentas_nivel';
     
-    IF p_nivel_ini = p_nivel_final and p_origen != 'balance' THEN
+    IF (p_nivel_ini = p_nivel_final and p_origen != 'balance') THEN
        
         FOR v_registros in (
                      select 
@@ -59,6 +59,8 @@ BEGIN
                                                  p_signo_balance,
                                                  p_tipo_balance);
                  		
+                  
+                  
                   --	insertamos en la tabla temporal
                   insert into temp_balancef (
                           
@@ -78,6 +80,8 @@ BEGIN
        END LOOP;
     
     ELSE
+    
+    
        FOR v_registros in (
                      select 
                         cue.id_cuenta,
@@ -86,11 +90,15 @@ BEGIN
                         cue.desc_cuenta,
                         cue.sw_transaccional
                      from conta.tcuenta cue 
-                     where cue.id_cuenta_padre = p_id_cuenta and cue.estado_reg = 'activo') LOOP
+                     where 
+                          cue.id_cuenta_padre = p_id_cuenta   
+                         and cue.estado_reg = 'activo') LOOP
                      
                --si viene de un balance verificamos si la cuenta es de moviemitno y calculamos el mayor
                IF p_origen = 'balance'  THEN
                
+             
+                
                      IF  v_registros.sw_transaccional = 'movimiento'  THEN
                          
                          v_monto = conta.f_mayor_cuenta(v_registros.id_cuenta, 
@@ -121,7 +129,7 @@ BEGIN
                      
                      END IF;
                
-               
+                     
                       
                
                END IF;

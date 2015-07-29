@@ -25,6 +25,8 @@ v_suma				numeric;
 v_mayor				numeric;
 v_id_gestion  		integer;
 va_tipo_cuenta		varchar[];
+v_gestion 			integer;
+v_sw_force			boolean;
  
 
 BEGIN
@@ -34,6 +36,8 @@ BEGIN
     v_nombre_funcion = 'conta.f_balance_recursivo';
     -- 0) inicia suma
     v_suma = 0;
+    
+    v_sw_force = FALSE;
     
      --recupera datos de la cuenta padre
      IF p_id_cuenta_padre is not null THEN
@@ -47,8 +51,9 @@ BEGIN
        
        IF v_registros.sw_transaccional = 'movimiento' THEN
             -- caculamos el mayor
-            v_mayor =  conta.f_mayor_cuenta(p_id_cuenta_padre, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
-            return v_mayor;
+           -- v_mayor =  conta.f_mayor_cuenta(p_id_cuenta_padre, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
+            --return v_mayor;
+            v_sw_force = true;
        END IF; 
         
      END IF;
@@ -58,11 +63,11 @@ BEGIN
      
      
      
-     
+     v_gestion = (SELECT EXTRACT(YEAR FROM now()::Date))::integer;
     
     --1) IF   si el nivel inicial es igual al nivel final calculamo el mayor de la cuenta
            
-       IF p_nivel_ini  = p_nivel_final  THEN  
+       IF p_nivel_ini  = p_nivel_final  or v_sw_force THEN  
          
        
           if p_id_cuenta_padre is not NULL THEN
@@ -117,14 +122,14 @@ BEGIN
                    into
                     v_id_gestion  
                    from param.tgestion ges
-                   WHERE ges.gestion = (SELECT EXTRACT(YEAR FROM now()::Date))::integer  and ges.estado_reg = 'activo';
+                   WHERE ges.gestion = v_gestion  and ges.estado_reg = 'activo';
                  -- FOR listamos la cuentas hijos
                   FOR  v_registros in (select
                                          c.id_cuenta,
                                          c.nro_cuenta,
                                          c.nombre_cuenta,
                                          c.nivel_cuenta,
-                                         c.id_cuenta_padre.
+                                         c.id_cuenta_padre,
                                          c.tipo_cuenta
                                        from conta.tcuenta c  
                                         where c.id_cuenta_padre is NULL 
@@ -209,7 +214,7 @@ BEGIN
                                            p_nivel_final, 
                                            v_registros.id_cuenta,
                                            p_tipo_cuenta,
-                                           p_tipo_cuenta,
+                                           p_incluir_cierre,
                                            p_tipo_balance);
                  
                  -- insetamos en tabla temporal 
@@ -265,7 +270,7 @@ BEGIN
                                       p_nivel_final, 
                                       v_registros.id_cuenta,
                                       p_tipo_cuenta,
-                                      p_tipo_cuenta,
+                                      p_incluir_cierre,
                                       p_tipo_balance);
                  
                 -- insetamos en tabla temporal 
