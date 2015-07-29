@@ -1660,5 +1660,5 @@ ALTER TABLE conta.tresultado_plantilla
 ALTER TABLE conta.tresultado_plantilla
   ADD COLUMN id_clase_comprobante INTEGER;
 
-/***********************************I-SCP-RAC-CONTA-1-23/07/2015****************************************/
+/***********************************F-SCP-RAC-CONTA-1-23/07/2015****************************************/
 
