@@ -32,6 +32,15 @@ class MODResultadoPlantilla extends MODbase{
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('tipo','varchar');
+        $this->captura('cbte_aitb','varchar');
+        $this->captura('cbte_apertura','varchar');
+        $this->captura('cbte_cierre','varchar');
+        $this->captura('periodo_calculo','varchar');
+        $this->captura('id_clase_comprobante','integer');
+        $this->captura('glosa','varchar');
+		$this->captura('desc_clase_comprobante','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -51,7 +60,14 @@ class MODResultadoPlantilla extends MODbase{
 		$this->setParametro('codigo','codigo','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('nombre','nombre','varchar');
-
+		$this->setParametro('tipo','tipo','varchar');
+        $this->setParametro('cbte_aitb','cbte_aitb','varchar');
+        $this->setParametro('cbte_apertura','cbte_apertura','varchar');
+        $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+        $this->setParametro('periodo_calculo','periodo_calculo','varchar');
+        $this->setParametro('id_clase_comprobante','id_clase_comprobante','integer');
+        $this->setParametro('glosa','glosa','varchar');
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -71,6 +87,14 @@ class MODResultadoPlantilla extends MODbase{
 		$this->setParametro('codigo','codigo','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('nombre','nombre','varchar');
+		$this->setParametro('tipo','tipo','varchar');
+        $this->setParametro('cbte_aitb','cbte_aitb','varchar');
+        $this->setParametro('cbte_apertura','cbte_apertura','varchar');
+        $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+        $this->setParametro('periodo_calculo','periodo_calculo','varchar');
+        $this->setParametro('id_clase_comprobante','id_clase_comprobante','integer');
+        $this->setParametro('glosa','glosa','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

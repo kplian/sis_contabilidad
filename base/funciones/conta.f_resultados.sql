@@ -77,31 +77,36 @@ BEGIN
           
          --  1) Crear una tabla temporal con los datos que se utilizaran 
          CREATE TEMPORARY TABLE temp_balancef (
-                                plantilla VARCHAR,
-         						subrayar VARCHAR(3) DEFAULT 'si'::character varying,
-                                font_size VARCHAR DEFAULT 10,
-                                posicion VARCHAR DEFAULT 'left'::character varying,
-                                signo VARCHAR(15) DEFAULT '+'::character varying,
-                                id_cuenta integer,
-                                desc_cuenta varchar,
-                                codigo_cuenta varchar,
-                                codigo VARCHAR,
-                                origen varchar,
-                                orden INTEGER,
-                                nombre_variable VARCHAR,
-                                montopos INTEGER,
-                                monto numeric,
-                                id_resultado_det_plantilla INTEGER,
-                                id_cuenta_raiz integer,
-                                visible varchar,
-                                incluir_cierre varchar,
-                                incluir_apertura varchar,
-                                negrita varchar,
-                                cursiva varchar,
-                                espacio_previo int4,
-                                incluir_aitb varchar
-                                ) ON COMMIT DROP;
-         
+                                    plantilla VARCHAR,
+                                    subrayar VARCHAR(3) DEFAULT 'si'::character varying,
+                                    font_size VARCHAR DEFAULT 10,
+                                    posicion VARCHAR DEFAULT 'left'::character varying,
+                                    signo VARCHAR(15) DEFAULT '+'::character varying,
+                                    id_cuenta integer,
+                                    desc_cuenta varchar,
+                                    codigo_cuenta varchar,
+                                    codigo VARCHAR,
+                                    origen varchar,
+                                    orden numeric,
+                                    nombre_variable VARCHAR,
+                                    montopos INTEGER,
+                                    monto numeric,
+                                    id_resultado_det_plantilla INTEGER,
+                                    id_cuenta_raiz integer,
+                                    visible varchar,
+                                    incluir_cierre varchar,
+                                    incluir_apertura varchar,
+                                    negrita varchar,
+                                    cursiva varchar,
+                                    espacio_previo int4,
+                                    incluir_aitb varchar,
+                                    relacion_contable varchar,
+                                    codigo_partida varchar,
+                                    id_auxiliar int4,
+                                    destino  varchar,
+                                    orden_cbte numeric
+                                    ) ON COMMIT DROP;
+             
          
          -- 2)  busca si tiene plantillas dependientes segun prioridad   
          FOR v_registros in ( select 

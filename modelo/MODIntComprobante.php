@@ -194,6 +194,8 @@ class MODIntComprobante extends MODbase{
 		return $this->respuesta;
 	}
 	
+	
+	
 	function validarIntComprobante(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='conta.ft_int_comprobante_ime';
@@ -211,6 +213,32 @@ class MODIntComprobante extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function generarDesdePlantilla(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.f_resultados_gen_cbte';
+		$this->transaccion='CONTA_GENCBTERES_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_depto','id_depto','int4');
+		$this->setParametro('id_resultado_plantilla','id_resultado_plantilla','int4');
+		$this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('fecha','fecha','date');
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	
+	
+	
 	
 	function listarCbteCabecera(){
 			

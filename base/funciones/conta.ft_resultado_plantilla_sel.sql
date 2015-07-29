@@ -58,11 +58,22 @@ BEGIN
 						resplan.fecha_mod,
 						resplan.id_usuario_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	
+						usu2.cuenta as usr_mod	,
+                        resplan.tipo,
+                        resplan.cbte_aitb,
+                        resplan.cbte_apertura,
+                        resplan.cbte_cierre,
+                        resplan.periodo_calculo,
+                        resplan.id_clase_comprobante,
+                        resplan.glosa,
+                        cc.descripcion as desc_clase_comprobante
 						from conta.tresultado_plantilla resplan
-						inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
+						 left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante
 						left join segu.tusuario usu2 on usu2.id_usuario = resplan.id_usuario_mod
 				        where  ';
+                        
+                
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -86,9 +97,10 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_resultado_plantilla)
 					    from conta.tresultado_plantilla resplan
-					    inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
+						 left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante
 						left join segu.tusuario usu2 on usu2.id_usuario = resplan.id_usuario_mod
-					    where ';
+				        where ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

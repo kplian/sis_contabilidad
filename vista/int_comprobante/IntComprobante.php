@@ -46,6 +46,16 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			}
 		);
 		
+		this.addButton('btnWizard',
+            {
+                text: 'Plantilla',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.loadWizard,
+                tooltip: '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
+            }
+        );
+		
 		this.bloquearOrdenamientoGrid();
 		
 		
@@ -63,6 +73,20 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		
 		this.iniciarEventos();
 	},
+	
+	loadWizard:function() {
+            var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardCbte.php',
+                    'Generar comprobante desde plantilla ...',
+                    {
+                        width:'40%',
+                        height:300
+                    },
+                    rec,
+                    this.idContenedor,
+                    'WizardCbte'
+        )
+    },
 	
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
@@ -848,13 +872,14 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
 	   	this.getBoton('btnValidar').setDisabled(false);
 	   	this.getBoton('btnImprimir').setDisabled(false);
+	   	
+	   	
   		return tb;
 	},
 	liberaMenu: function() {
 		var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
 		this.getBoton('btnValidar').setDisabled(true);
 		this.getBoton('btnImprimir').setDisabled(true);
-		return tb;
 	},
 	getTipoCambio: function(){
 		//Verifica que la fecha y la moneda hayan sido elegidos

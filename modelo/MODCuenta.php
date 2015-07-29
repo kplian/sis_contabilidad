@@ -244,7 +244,7 @@ class MODCuenta extends MODbase{
         $this->captura('codigo_cuenta','varchar'); 
         $this->captura('codigo','varchar'); 
         $this->captura('origen','varchar'); 
-        $this->captura('orden','int4'); 
+        $this->captura('orden','numeric'); 
         $this->captura('nombre_variable','varchar'); 
         $this->captura('montopos','int4'); 
         $this->captura('monto','numeric'); 

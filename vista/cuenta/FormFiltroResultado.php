@@ -65,10 +65,10 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 							direction: 'ASC'
 						},
 						totalProperty: 'total',
-						fields: ['id_resultado_plantilla','nombre','codigo'],
+						fields: ['id_resultado_plantilla','nombre','codigo', 'periodo_calculo'],
 						// turn on remote sorting
 						remoteSort: true,
-						baseParams: { par_filtro:'resplan.nombre#resplan.codigo'}
+						baseParams: { par_filtro:'resplan.nombre#resplan.codigo',tipo: 'reporte'}
 	                }),
 	                valueField: 'id_resultado_plantilla',
 	   				displayField: 'nombre',

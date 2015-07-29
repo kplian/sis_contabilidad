@@ -41,11 +41,33 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
+	   {
+			config:{
+				name: 'tipo',
+				fieldLabel: 'Tipo Plantilla',
+				qtip: 'Tipo de plantilla, para reprote o para insertar comprobante',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['reporte' ,'cbte']
+            },
+            type:'ComboBox',
+			filters:{pfiltro:'resplan.tipo',type:'string'},
+			valorInicial: 'reporte',
+			id_grupo:1,
+			grid:true,
+			egrid: true,
+			form:true
+		},
 		{
 			config:{
 				name: 'codigo',
 				fieldLabel: 'codigo',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:100
@@ -60,7 +82,7 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'nombre',
 				fieldLabel: 'nombre',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:300
@@ -71,6 +93,156 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+		
+		
+		{
+			config:{
+				name: 'cbte_cierre',
+				qtip: 'Es un comprobante de cierre?',
+				fieldLabel: 'Cierre',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['no' ,'balance','resultado']
+            },
+            type:'ComboBox',
+			filters:{pfiltro:'resplan.incluir_cierre',type:'string'},
+			valorInicial: 'no',
+			id_grupo:1,
+			grid:true,
+			egrid: true,
+			form:true
+		},
+		{
+			config: {
+				name: 'cbte_apertura',
+				qtip: 'Es un comprobante de apertura',
+				fieldLabel: 'Apertura',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store: ['no' ,'si']
+            },
+            type:'ComboBox',
+			filters: { pfiltro: 'resplan.cbte_apertura', type: 'string' },
+			valorInicial: 'no',
+			id_grupo: 1,
+			grid: true,
+			egrid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'cbte_aitb',
+				qtip: 'es un comprobante para AITB',
+				fieldLabel: 'AITBs',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store: ['no' ,'si']
+            },
+            type:'ComboBox',
+			filters: { pfiltro: 'resplan.cbte_aitb', type: 'string' },
+			valorInicial: 'no',
+			id_grupo: 1,
+			grid: true,
+			egrid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'periodo_calculo',
+				qtip: 'para los calculo con balance de cuentas es necesario especificar el inicio y el fin',
+				fieldLabel: 'Periodo',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store: ['gestion' ,'diario','rango']
+            },
+            type:'ComboBox',
+			filters: { pfiltro: 'resplan.periodo_calculo', type: 'string' },
+			valorInicial: 'no',
+			id_grupo: 1,
+			grid: true,
+			egrid: true,
+			form: true
+		},
+	   {
+			config: {
+				name: 'id_clase_comprobante',
+				fieldLabel: 'Tipo Cbte.',
+				allowBlank: true,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/ClaseComprobante/listarClaseComprobante',
+					id: 'id_clase_comprobante',
+					root: 'datos',
+					sortInfo: {
+						field: 'id_clase_comprobante',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_clase_comprobante', 'tipo_comprobante', 'descripcion','codigo','momento_comprometido','momento_ejecutado','momento_pagado'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'ccom.tipo_comprobante#ccom.descripcion'}
+				}),
+				valueField: 'id_clase_comprobante',
+				displayField: 'descripcion',
+				gdisplayField: 'desc_clase_comprobante',
+				hiddenName: 'id_clase_comprobante',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				width:250,
+				anchor: '100%',
+				gwidth: 150,
+				minChars: 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_clase_comprobante']);
+				}
+			},
+			type: 'ComboBox',
+			id_grupo: 1,
+			filters: {pfiltro: 'cc.descripcion',type: 'string'},
+			grid: true,
+			form: true
+		},
+		{
+			config:{
+				name: 'glosa',
+				fieldLabel: 'Glosa',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 100,
+				maxLength:1500
+			},
+			type:'TextArea',
+			filters: { pfiltro:'resplan.glosa', type:'string' },
+			id_grupo: 0,
+			grid: true,
+			form: true
+		},
+		
 		{
 			config:{
 				name: 'estado_reg',
@@ -198,6 +370,13 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		'tipo',
+        'cbte_aitb',
+        'cbte_apertura',
+        'cbte_cierre',
+        'periodo_calculo',
+        'id_clase_comprobante',
+        'glosa','desc_clase_comprobante'
 		
 	],
 	sortInfo:{

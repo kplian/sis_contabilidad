@@ -59,7 +59,14 @@ BEGIN
 			fecha_reg,
 			id_usuario_ai,
 			fecha_mod,
-			id_usuario_mod
+			id_usuario_mod,
+            tipo,
+            cbte_aitb,
+            cbte_apertura,
+            cbte_cierre,
+            periodo_calculo,
+            id_clase_comprobante,
+            glosa
           	) values(
 			v_parametros.codigo,
 			'activo',
@@ -69,7 +76,14 @@ BEGIN
 			now(),
 			v_parametros._id_usuario_ai,
 			null,
-			null
+			null,
+            v_parametros.tipo,
+            v_parametros.cbte_aitb,
+            v_parametros.cbte_apertura,
+            v_parametros.cbte_cierre,
+            v_parametros.periodo_calculo,
+            v_parametros.id_clase_comprobante,
+            v_parametros.glosa
 							
 			
 			
@@ -96,12 +110,19 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update conta.tresultado_plantilla set
-			codigo = v_parametros.codigo,
-			nombre = v_parametros.nombre,
-			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario,
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+              codigo = v_parametros.codigo,
+              nombre = v_parametros.nombre,
+              fecha_mod = now(),
+              id_usuario_mod = p_id_usuario,
+              id_usuario_ai = v_parametros._id_usuario_ai,
+              usuario_ai = v_parametros._nombre_usuario_ai,
+              tipo=v_parametros.tipo,
+              cbte_aitb=v_parametros.cbte_aitb,
+              cbte_apertura=v_parametros.cbte_apertura,
+              cbte_cierre=v_parametros.cbte_cierre,
+              periodo_calculo=v_parametros.periodo_calculo,
+              id_clase_comprobante=v_parametros.id_clase_comprobante,
+              glosa=v_parametros.glosa
 			where id_resultado_plantilla=v_parametros.id_resultado_plantilla;
                
 			--Definicion de la respuesta
@@ -150,7 +171,13 @@ BEGIN
             -----------------------------------
             select 
              rp.codigo,
-             rp.nombre
+             rp.nombre,
+             rp.cbte_aitb,
+             rp.cbte_apertura,
+             rp.cbte_cierre,
+             rp.id_clase_comprobante,
+             rp.tipo,
+             rp.periodo_calculo
             into
               v_registros 
             from conta.tresultado_plantilla rp 
@@ -162,14 +189,26 @@ BEGIN
                   fecha_reg,
                   estado_reg,
                   codigo,
-                  nombre
+                  nombre,
+                  cbte_aitb,
+                  cbte_apertura,
+                  cbte_cierre,
+                  id_clase_comprobante,
+                  tipo,
+                  periodo_calculo
                 )
                 VALUES (
                    p_id_usuario,
                    now(),
                    'activo',
                    v_registros.codigo||'-CLON',
-                   v_registros.nombre
+                   v_registros.nombre,
+                   v_registros.cbte_aitb,
+                   v_registros.cbte_apertura,
+                   v_registros.cbte_cierre,
+                   v_registros.id_clase_comprobante,
+                   v_registros.tipo,
+                   v_registros.periodo_calculo
                 )  RETURNING id_resultado_plantilla into v_id_resultado_plantilla;
             
             ----------------------------------------------
@@ -209,7 +248,12 @@ BEGIN
                                         espacio_previo,
                                         incluir_aitb,
                                         tipo_saldo,
-                                        signo_balance
+                                        signo_balance,
+                                        relacion_contable,
+                                        codigo_partida,
+                                        id_auxiliar,
+                                        destino,
+                                        orden_cbte
                                       )
                                       VALUES (
                                         p_id_usuario,
@@ -236,8 +280,16 @@ BEGIN
                                         v_registros.espacio_previo,
                                         v_registros.incluir_aitb,
                                         v_registros.tipo_saldo,
-                                        v_registros.signo_balance
+                                        v_registros.signo_balance,
+                                        v_registros.relacion_contable,
+                                        v_registros.codigo_partida,
+                                        v_registros.id_auxiliar,
+                                        v_registros.destino,
+                                        v_registros.orden_cbte
                                       );
+                                      
+                                      
+                                      
             
             END LOOP;
             

@@ -12,7 +12,8 @@ CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel (
   p_incluir_apertura varchar,
   p_incluir_aitb varchar,
   p_signo_balance varchar,
-  p_tipo_balance varchar
+  p_tipo_balance varchar,
+  p_origen varchar
 )
 RETURNS boolean AS
 $body$
@@ -37,7 +38,7 @@ BEGIN
 
     v_nombre_funcion = 'conta.f_recuperar_cuentas_nivel';
     
-    IF p_nivel_ini = p_nivel_final  THEN
+    IF p_nivel_ini = p_nivel_final and p_origen != 'balance' THEN
        
         FOR v_registros in (
                      select 
@@ -81,10 +82,53 @@ BEGIN
                      select 
                         cue.id_cuenta,
                         cue.nro_cuenta,
-                        cue.desc_cuenta
+                        cue.nombre_cuenta,
+                        cue.desc_cuenta,
+                        cue.sw_transaccional
                      from conta.tcuenta cue 
                      where cue.id_cuenta_padre = p_id_cuenta and cue.estado_reg = 'activo') LOOP
                      
+               --si viene de un balance verificamos si la cuenta es de moviemitno y calculamos el mayor
+               IF p_origen = 'balance'  THEN
+               
+                     IF  v_registros.sw_transaccional = 'movimiento'  THEN
+                         
+                         v_monto = conta.f_mayor_cuenta(v_registros.id_cuenta, 
+                  								 p_desde, 
+                                                 p_hasta, 
+                                                 p_id_deptos, 
+                                                 p_incluir_cierre, 
+                                                 p_incluir_apertura, 
+                                                 p_incluir_aitb,
+                                                 p_signo_balance,
+                                                 p_tipo_balance);
+                       
+                          --	insertamos en la tabla temporal
+                          insert into temp_balancef (
+                              
+                              id_cuenta,
+                              desc_cuenta,
+                              codigo_cuenta,
+                              monto,
+                              id_resultado_det_plantilla)
+                          values (
+                              
+                              v_registros.id_cuenta,
+                              v_registros.nombre_cuenta,
+                              v_registros.nro_cuenta,
+                              v_monto,
+                              p_id_resultado_det_plantilla); 
+                     
+                     END IF;
+               
+               
+                      
+               
+               END IF;
+               
+               
+               
+               
                IF ( not conta.f_recuperar_cuentas_nivel(
                 							v_registros.id_cuenta, 
                                             p_nivel_ini + 1, 
@@ -97,7 +141,8 @@ BEGIN
                                             p_incluir_apertura,
                                             p_incluir_aitb,
                                             p_signo_balance,
-                                            p_tipo_balance) ) THEN     
+                                            p_tipo_balance,
+                                            p_origen) ) THEN     
                   raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
                END IF;
        END LOOP;  

@@ -158,7 +158,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro: 'par.codigo_partida#au.nombre_partida',
+		        pfiltro: 'par.codigo_partida#par.nombre_partida',
 				type: 'string'
 			},
    		   

@@ -56,6 +56,13 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->captura('tipo_saldo','varchar');
 		$this->captura('signo_balance','varchar');
 		
+		$this->captura('relacion_contable','varchar');
+		$this->captura('codigo_partida','varchar');
+		$this->captura('id_auxiliar','int4');
+		$this->captura('destino','varchar');
+		$this->captura('orden_cbte','numeric');
+		$this->captura('desc_auxiliar','varchar');
+		$this->captura('desc_partida','varchar');
 		
 		
 		//Ejecuta la instruccion
@@ -98,6 +105,12 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('incluir_aitb','incluir_aitb','varchar');
 		$this->setParametro('tipo_saldo','tipo_saldo','varchar');
 		$this->setParametro('signo_balance','signo_balance','varchar');
+		
+		$this->setParametro('relacion_contable','relacion_contable','varchar');
+		$this->setParametro('codigo_partida','codigo_partida','varchar');
+		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		$this->setParametro('destino','destino','varchar');
+		$this->setParametro('orden_cbte','orden_cbte','numeric');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -138,6 +151,11 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('incluir_aitb','incluir_aitb','varchar');
 		$this->setParametro('tipo_saldo','tipo_saldo','varchar');
 		$this->setParametro('signo_balance','signo_balance','varchar');
+		$this->setParametro('relacion_contable','relacion_contable','varchar');
+		$this->setParametro('codigo_partida','codigo_partida','varchar');
+		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		$this->setParametro('destino','destino','varchar');
+		$this->setParametro('orden_cbte','orden_cbte','numeric');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

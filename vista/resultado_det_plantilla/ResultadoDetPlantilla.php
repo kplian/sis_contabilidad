@@ -45,7 +45,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 				name: 'codigo',
 				fieldLabel: 'Código',
 				qtip:'El código se utiliza en las formulas',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:20
@@ -60,6 +60,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'orden',
+				qtip: 'Prioridad con que se ejecutan las formulas',
 				fieldLabel: 'orden',
 				allowBlank: false,
 				anchor: '80%',
@@ -72,6 +73,48 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			egrid: true,
 			form: true
 		},
+		{
+			config:{
+				name: 'orden_cbte',
+				qtip: 'Orden en el que se inserta en comprobante o el que se muestrna en el reporte',
+				fieldLabel: 'Orden Cbte',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 50
+			},
+			type: 'NumberField',
+			filters: { pfiltro:'resdet.orden_cbte',type:'numeric'},
+			id_grupo: 1,
+			grid: true,
+			egrid: true,
+			form: true
+		},
+		{
+            config:{
+                name: 'destino',
+                fieldLabel: 'Destino',
+                qtip: 'reporte (no se utiliza para generar comprobantes, solo como calculo auxiliar),  (no entra en combaste), debe (al debe si es positivo si no al haber), haber (al haber si espositivo si no al contrario) o segun_saldo (lo suficiente para cuadrar al debe o al haber)',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['reporte','debe','haber','segun_saldo']
+            },
+            type:'ComboBox',
+            
+            id_grupo:1,
+            filters:{   pfiltro:'resdet.destino',
+                        type: 'list',
+                         options: ['reporte','debe','haber','segun_saldo']  
+                    },
+            valorInicial: 'reporte',
+            grid:true,
+            egrid: true,
+            form:true
+       },
 		
 		/*
 		 balance(balance de la cuenta), 
@@ -97,7 +140,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             filters:{   pfiltro:'resdet.origen',
                         type: 'list',
-                         options: ['balance','detalle','titulo','formula']  
+                         options: ['balance','detalle','titulo','formula','sumatoria']  
                     },
             grid:true,
             egrid: true,
@@ -498,6 +541,134 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 				egrid: true,
 				form:true
 		},
+	   	{
+   			config:{
+   				sysorigen:'sis_contabilidad',
+       		    name:'id_auxiliar',
+   				origen:'AUXILIAR',
+   				allowBlank:true,
+   				fieldLabel:'Auxiliar',
+   				gdisplayField:'desc_auxiliar',//mapea al store del grid
+   				gwidth:200,
+   				width: 350,
+   				listWidth: 350,
+   				//anchor: '80%',
+	   			renderer:function (value, p, record){return String.format('{0}', record.data['desc_auxiliar']);}
+       	     },
+   			type:'ComboRec',
+   			id_grupo:0,
+   			filters:{	
+		        pfiltro:'aux.codigo_auxiliar#aux.nombre_auxiliar',
+				type:'string'
+			},
+   		   
+   			grid:true,
+   			form:true
+	   	},
+	   	{
+   			config:{
+   				name: 'codigo_partida',
+       		    hiddenName: 'codigo_partida',
+   				valueField: 'codigo',
+   				displayField: 'nombre_partida',
+   				allowBlank: true,
+   				fieldLabel:' Partida',
+   				gdisplayField: 'desc_partida',//mapea al store del grid
+   				gwidth:200,
+   				width: 350,
+   				emptyText:'Partida...',
+   				forceSelection:true,
+ 				typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+ 				mode:'remote',
+ 				pageSize:10,
+ 				queryDelay:1000,
+ 				listWidth:'280',
+ 				resizable: true,
+   				tpl: new Ext.XTemplate([
+				     '<tpl for=".">',
+				     '<div class="x-combo-list-item">',
+				     	'<tpl if="sw_movimiento == \'flujo\'">',
+				     	'<font color="red"><p>Nombre:{nombre_partida}</p></font>',
+				     	'</tpl>',
+				     	'<tpl if="sw_movimiento == \'presupuestaria\'">',
+				     	'<font color="green"><p>Nombre:{nombre_partida}</p></font>',
+				     	'</tpl>',
+				     '<p>{codigo}</p> <p>Tipo: {sw_movimiento} <p>Rubro: {tipo}</p>',
+				     '</div>',
+				     '</tpl>'
+				     
+				   ]),
+				store: new Ext.data.JsonStore({
+						 url: '../../sis_presupuestos/control/Partida/listarPartida',
+						 id: 'codigo',
+						 root: 'datos',
+						 sortInfo:{
+							field: 'nombre_partida',
+							direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_partida','codigo','nombre_partida','tipo','sw_movimiento'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: {par_filtro:'codigo#nombre_partida','filtro_ges':'actual',sw_transaccional:'movimiento'}, 
+					}),
+	   			renderer:function (value, p, record){return String.format('{0}',record.data['desc_partida']);}
+       	     },
+       	     
+   			type:'ComboBox',
+   			id_grupo:0,
+   			filters:{	
+		        pfiltro: 'par.codigo_partida#par.nombre_partida',
+				type: 'string'
+			},
+   		   
+   			grid:true,
+   			form:true
+	   	},
+        {
+            config: {
+                name: 'relacion_contable',
+                fieldLabel: 'Relación Contable',
+                qtip: 'Codigo de la relacion contable de donde se obtendran la partida, cuenta y auxiliar',
+                allowBlank: true,
+                emptyText: 'Elija Relación Contable...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_contabilidad/control/TipoRelacionContable/listarTipoRelacionContable',
+                    id: 'id_tipo_relacion_contable',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'codigo_tipo_relacion',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_tipo_relacion_contable','codigo_tipo_relacion','nombre_tipo_relacion'],
+                    remoteSort: true,
+                    baseParams: { par_filtro: 'tiprelco.codigo_tipo_relacion#tiprelco.nombre_tipo_relacion' }
+                }),
+                valueField: 'codigo_tipo_relacion',
+                displayField: 'codigo_tipo_relacion',
+                gdisplayField: 'relacion_contable',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>Código: {codigo_tipo_relacion}</p><p>Nombre: {nombre_tipo_relacion}</p></div></tpl>',
+                
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 20,
+                queryDelay: 100,
+                anchor: '100%',
+                gwidth: 120,
+                minChars: 2
+            },
+            type: 'ComboBox',
+            filters: { pfiltro:'resdet.relacion_contable', type:'string' },
+            id_grupo: 1,
+            grid: true,
+            form: true
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -635,7 +806,12 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'id_resultado_plantilla', 'visible','incluir_cierre','incluir_apertura','desc_cuenta',
-		'negrita','cursiva','espacio_previo','incluir_aitb','tipo_saldo','signo_balance'
+		'negrita','cursiva','espacio_previo','incluir_aitb','tipo_saldo','signo_balance',
+        'relacion_contable',
+        'codigo_partida',
+        'id_auxiliar','desc_auxiliar',
+        'destino',
+        'orden_cbte','desc_partida'
 		
 	],
 	sortInfo:{

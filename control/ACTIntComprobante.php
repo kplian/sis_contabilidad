@@ -84,7 +84,13 @@ class ACTIntComprobante extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	
-	function validarIntComprobante(){
+	function generarDesdePlantilla(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->generarDesdePlantilla($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+    function validarIntComprobante(){
 		$this->objFunc=$this->create('MODIntComprobante');	
 		$this->res=$this->objFunc->validarIntComprobante($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());

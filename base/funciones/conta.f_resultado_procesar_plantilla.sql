@@ -14,24 +14,50 @@ $body$
 DECLARE
 
 
-v_parametros  		record;
-v_registros 		record;
-v_nombre_funcion   	text;
-v_resp				varchar;
-v_nivel				integer;
-v_suma				numeric;
-v_mayor				numeric;
-v_id_gestion  		integer;
-v_id_cuentas		integer[];
-v_monto				numeric;
-v_reg_cuenta		record;
-v_visible			varchar; 
+v_parametros  			record;
+v_registros 			record;
+v_nombre_funcion   		text;
+v_resp					varchar;
+v_nivel					integer;
+v_suma					numeric;
+v_mayor					numeric;
+v_id_gestion  			integer;
+v_id_cuentas			integer[];
+v_monto					numeric;
+v_reg_cuenta			record;
+v_visible				varchar; 
+v_nombre_variable		varchar;
+v_destino				varchar;
 
 BEGIN
      
     
     v_nombre_funcion = 'conta.f_resultado_procesar_plantilla';
     
+   --revisar si tiene dependencias  y procesarlas primero
+     IF p_force_invisible  THEN
+         FOR v_registros in ( select 
+                                  rd.*,
+                                  rp.codigo  as plantilla 
+                              from conta.tresultado_dep rd 
+                              inner join conta.tresultado_plantilla rp on rp.id_resultado_plantilla = rd.id_resultado_plantilla_hijo
+                              where rd.id_resultado_plantilla = p_id_resultado_plantilla 
+                              order by prioridad asc ) LOOP
+         
+                       -- procesa la plantilla dependientes ... 
+                      IF  not conta.f_resultado_procesar_plantilla(
+                                                                  v_registros.plantilla,
+                                                                  v_registros.id_resultado_plantilla_hijo, 
+                                                                  p_desde, 
+                                                                  p_hasta, 
+                                                                  p_id_deptos,
+                                                                  p_id_gestion,
+                                                                  true) THEN
+                                                                  
+                           raise exception 'error al procesa la plantilla %', v_registros.codigo;                                       
+                     END IF;
+         END LOOP;
+      END IF;
    -- listar el detalle de la plantilla
          
          FOR v_registros in (
@@ -51,12 +77,13 @@ BEGIN
                   
                   
                   --   2.1) si el origen es balance
-                  IF  v_registros.origen = 'balance' THEN
+                  IF  v_registros.origen = 'balance' and v_registros.destino = 'reporte' THEN
                         --	2.1.1)  recuperamos los datos de la cuenta 
                         select
                           cue.id_cuenta,
                           cue.nro_cuenta,
-                          cue.nombre_cuenta
+                          cue.nombre_cuenta,
+                          cue.sw_transaccional
                         into
                           v_reg_cuenta
                         from conta.tcuenta cue
@@ -98,7 +125,13 @@ BEGIN
                                 negrita,
                                 cursiva,
                                 espacio_previo,
-                                incluir_aitb)
+                                incluir_aitb,
+                                relacion_contable,
+                                codigo_partida,
+                                id_auxiliar,
+                                destino,
+                                orden_cbte
+                                )
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -122,15 +155,21 @@ BEGIN
                                 v_registros.negrita,
                                 v_registros.cursiva,
                                 v_registros.espacio_previo,
-                                v_registros.incluir_aitb);
+                                v_registros.incluir_aitb,
+                                v_registros.relacion_contable,
+                                v_registros.codigo_partida,
+                                v_registros.id_auxiliar,
+                                v_registros.destino,
+                                v_registros.orden_cbte);
                         
                   --    2.2) si el origen es detall
-                  ELSIF  v_registros.origen = 'detalle' THEN
+                  ELSIF  v_registros.origen = 'detalle' or (v_registros.origen = 'balance' and v_registros.destino != 'reporte') THEN
                          --   2.2.1)  recuperamos la cuenta raiz
                          select
                           cue.id_cuenta,
                           cue.nro_cuenta,
-                          cue.nombre_cuenta
+                          cue.nombre_cuenta,
+                          cue.sw_transaccional
                         into
                           v_reg_cuenta
                         from conta.tcuenta cue
@@ -150,7 +189,8 @@ BEGIN
                                                     v_registros.incluir_apertura, 
                                                     v_registros.incluir_aitb,
                                                     v_registros.signo_balance,
-                                                    v_registros.tipo_saldo) ) THEN     
+                                                    v_registros.tipo_saldo,
+                                                    v_registros.origen) ) THEN     
                             raise exception 'Error al calcular balance del detalle en el nivel %', 0;
                         END IF;
                         
@@ -172,19 +212,65 @@ BEGIN
                                 negrita = v_registros.negrita,
                                 cursiva = v_registros.cursiva,
                                 espacio_previo = v_registros.espacio_previo,
-                                incluir_aitb = v_registros.incluir_aitb
+                                incluir_aitb = v_registros.incluir_aitb,
+                                relacion_contable = v_registros.relacion_contable,
+                                codigo_partida = v_registros.codigo_partida,
+                                id_auxiliar = v_registros.id_auxiliar,
+                                destino = v_registros.destino,
+                                orden_cbte = v_registros.orden_cbte
                         WHERE id_resultado_det_plantilla = v_registros.id_resultado_det_plantilla;
                                    
                   --   2.3) si el origen es formula
 	              ELSIF  v_registros.origen = 'formula' THEN
-                   
-                           IF v_registros.formula is NULL THEN
+                           
+                           --la formula vacia solo se admiten cuando el destino es segun balance
+                           IF v_registros.formula is NULL and v_registros.destino != 'reporte' THEN
                              raise exception 'En registros de origen formula, la formula no peude ser nula o vacia';
                            END IF;
-                  
+                          
+                           v_nombre_variable = '';
+                           IF v_registros.codigo_cuenta is not null and v_registros.codigo_cuenta !='' THEN 
+                              select
+                               cue.id_cuenta,
+                               cue.nro_cuenta,
+                               cue.nombre_cuenta,
+                               cue.sw_transaccional
+                             into
+                              v_reg_cuenta
+                             from conta.tcuenta cue
+                             where cue.id_gestion = p_id_gestion and cue.nro_cuenta = v_registros.codigo_cuenta;
+                            
+                             v_nombre_variable = v_reg_cuenta.nombre_cuenta;
+                          END IF;
+                            
+                          IF v_registros.nombre_variable is not null and v_registros.nombre_variable != '' THEN
+                            v_nombre_variable = v_registros.nombre_variable;
+                          END IF;
                           -- 2.3.1)  calculamos el monto para la formula
-                           v_monto = conta.f_evaluar_resultado_formula(v_registros.formula, p_plantilla);
-                          -- 2.3.2)  insertamos el registro en tabla temporal        
+                           v_monto = conta.f_evaluar_resultado_formula(v_registros.formula, p_plantilla, v_registros.destino);
+                          
+                          IF  v_reg_cuenta.id_cuenta is NULL  and v_registros.destino in ('segun_saldo','debe','haber') THEN
+                              raise exception 'es obligatorio especificar uan cuenta cuando el destino es para un CBTE';
+                          ELSIF v_registros.destino in ('segun_saldo','debe','haber') and v_reg_cuenta.sw_transaccional = 'titular' THEN
+                              raise exception 'Las formulas solo admiten cuentas de movimiento, revise %', v_registros.codigo_cuenta;    
+                          END IF;
+                          
+                           
+                          --2.3.1  si el destino es segun balance identifcai si va al debe o al haber (los negativos van al haber)
+                          IF v_registros.destino = 'segun_saldo' THEN
+                            IF v_monto > 0 THEN
+                               v_destino = 'haber';
+                            ELSE
+                               v_destino = 'debe';
+                               v_monto = v_monto *(-1);
+                            END IF;
+                            
+                          else
+                             v_destino =  v_registros.destino;
+                          END IF;
+                         
+                          
+                          -- 2.3.3)  insertamos el registro en tabla temporal        
                           insert into temp_balancef (
                                 plantilla,
                                 subrayar,
@@ -205,7 +291,13 @@ BEGIN
                                 negrita,
                                 cursiva,
                                 espacio_previo,
-                                incluir_aitb)
+                                incluir_aitb,
+                                relacion_contable,
+                                codigo_partida,
+                                id_auxiliar,
+                                destino,
+                                orden_cbte,
+                                id_cuenta)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -215,7 +307,7 @@ BEGIN
                                 v_registros.codigo,
                                 v_registros.origen,
                                 v_registros.orden,
-                                v_registros.nombre_variable,
+                                v_nombre_variable,
                                 v_registros.montopos,
                                 v_monto,
                                 v_registros.id_resultado_det_plantilla,
@@ -226,7 +318,15 @@ BEGIN
                                 v_registros.negrita,
                                 v_registros.cursiva,
                                 v_registros.espacio_previo,
-                                v_registros.incluir_aitb);
+                                v_registros.incluir_aitb,
+                                v_registros.relacion_contable,
+                                v_registros.codigo_partida,
+                                v_registros.id_auxiliar,
+                                v_destino,
+                                v_registros.orden_cbte,
+                                v_reg_cuenta.id_cuenta);
+                                
+                               
                   --   2.4) si el origen es sumatoria
 	              ELSIF  v_registros.origen = 'sumatoria' THEN
                    
@@ -257,7 +357,12 @@ BEGIN
                                 negrita,
                                 cursiva,
                                 espacio_previo,
-                                incluir_aitb)
+                                incluir_aitb,
+                                relacion_contable,
+                                codigo_partida,
+                                id_auxiliar,
+                                destino,
+                                orden_cbte)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -278,7 +383,12 @@ BEGIN
                                 v_registros.negrita,
                                 v_registros.cursiva,
                                 v_registros.espacio_previo,
-                                v_registros.incluir_aitb);  
+                                v_registros.incluir_aitb,
+                                v_registros.relacion_contable,
+                                v_registros.codigo_partida,
+                                v_registros.id_auxiliar,
+                                v_registros.destino,
+                                v_registros.orden_cbte);  
                                            
                    --   2.4) si el origen es titulo
 	               ELSEIF  v_registros.origen = 'titulo' THEN
@@ -303,7 +413,12 @@ BEGIN
                                 negrita,
                                 cursiva,
                                 espacio_previo,
-                                incluir_aitb)
+                                incluir_aitb,
+                                relacion_contable,
+                                codigo_partida,
+                                id_auxiliar,
+                                destino,
+                                orden_cbte)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -324,7 +439,12 @@ BEGIN
                                 v_registros.negrita,
                                 v_registros.cursiva,
                                 v_registros.espacio_previo,
-                                v_registros.incluir_aitb);
+                                v_registros.incluir_aitb,
+                                v_registros.relacion_contable,
+                                v_registros.codigo_partida,
+                                v_registros.id_auxiliar,
+                                v_registros.destino,
+                                v_registros.orden_cbte);
                   END IF;
           END LOOP;
     

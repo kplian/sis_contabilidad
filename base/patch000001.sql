@@ -1544,3 +1544,121 @@ IS '1) balance hace la resta segun signo_balance de los saldos acredor y deudor,
 /***********************************F-SCP-RAC-CONTA-0-17/07/2015****************************************/
 
 
+
+/***********************************I-SCP-RAC-CONTA-0-23/07/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN tipo VARCHAR(15) DEFAULT 'reporte' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.tipo
+IS 'reporte o cbte';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN cbte_aitb VARCHAR(20) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.cbte_aitb
+IS 'cuando sea del tipo comprobante';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN cbte_apertura VARCHAR(20) DEFAULT 'no' NOT NULL;
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN cbte_cierre VARCHAR(20) DEFAULT 'no' NOT NULL;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN periodo_calculo VARCHAR(20) DEFAULT 'gestion' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.periodo_calculo
+IS 'gestion,  toma fecha incial y final de la gestion,  rango pide las fecha inico y fin, diario, lo hace con la fecha del dia';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN clase_cbte VARCHAR(20);
+
+COMMENT ON COLUMN conta.tresultado_plantilla.clase_cbte
+IS 'en el caso de ser del tipo cbte , define la clase del comprobante';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN glosa VARCHAR;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.glosa
+IS 'glosa que va en el comprobante';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN relacion_contable VARCHAR(50);
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.relacion_contable
+IS 'codigo de la relacion contable (solo generales) a utilizar, el calor de los campos cuenta, partida, auxiliar prevalecen sobre este si tienen valor';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN codigo_partida VARCHAR(50);
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.codigo_partida
+IS 'codigo de la partida';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN id_auxiliar INTEGER;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.id_auxiliar
+IS 'define el auxiliar que va a la transaccion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN destino VARCHAR(20) DEFAULT 'reporte' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.destino
+IS 'reporte (no se utiliza para generar comprobantes, solo como calculo auxiliar),  (no entra en combaste), debe (al debe si es positivo si no al haber), haber (al haber si espositivo si no al contrario) o segun_saldo (lo suficiente para cuadrar al debe o al haber)';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN orden_cbte NUMERIC;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.orden_cbte
+IS 'orden en el que se ingresase inserta en el comprobante, (no se tuliza para el calculo)';
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-23/07/2015****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-23/07/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  DROP COLUMN clase_cbte;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN id_clase_comprobante INTEGER;
+
+/***********************************I-SCP-RAC-CONTA-1-23/07/2015****************************************/
+
