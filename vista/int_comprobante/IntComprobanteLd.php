@@ -15,7 +15,7 @@ Phx.vista.IntComprobanteLd = {
     bedit:false,
     bnew:false,
     bsave:false,
-    bdel:false,
+    bdel:true,
 	require: '../../../sis_contabilidad/vista/int_comprobante/IntComprobante.php',
 	requireclase: 'Phx.vista.IntComprobante',
 	title: 'Libro Diario',

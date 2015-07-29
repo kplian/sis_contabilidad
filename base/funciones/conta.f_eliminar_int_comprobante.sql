@@ -29,31 +29,63 @@ BEGIN
     from conta.tint_comprobante
     where id_int_comprobante = p_id_int_comprobante;
         
-    
-              
-    -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
-     IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+    ---------------------------------------
+    -- Si el comprobante esta en borrador
+    ---------------------------------------
+    IF   v_rec_cbte.estado_reg = 'borrador'  THEN         
+   
+              -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
+             IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+                     
+                select 
+                pc.funcion_comprobante_eliminado
+                into v_funcion_comprobante_eliminado
+                from conta.tplantilla_comprobante pc  
+                where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+                        
+                        
+                EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
+                                           
+             END IF;
              
-        select 
-        pc.funcion_comprobante_eliminado
-        into v_funcion_comprobante_eliminado
-        from conta.tplantilla_comprobante pc  
-        where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
-                
-                
-        EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
-                                   
-     END IF;
-     
+            
+            
+            --delete transacciones del comprobante intermedio
+            delete from conta.tint_transaccion
+            where id_int_comprobante=p_id_int_comprobante;
+            
+             --Sentencia de la eliminacion
+            delete from conta.tint_comprobante
+            where id_int_comprobante=p_id_int_comprobante;
+    
+      ELSE
+         ---------------------------------------
+         -- Si el comprobante esta NO esta en borrador
+         --------------------------------------
+       
+         --TODO validar que el periodo contable no este cerrado
+      
+         
+         --TODO validar que solo un usuario autorizado pueda elimar comprobantes
+         
+         -- tiene plantila
+         IF   v_rec_cbte.id_plantilla_comprobante is not null THEN 
+              --  TODO (si tiene presupeusto comprometido REVERTIR, retroceder los planes de agos)
+              --incluir plantilla de funcion, para el caso de retroceder un comprobante validado
+              
+              raise exception 'no se programo la logica para elimiar comprobantes validados con planitlla';
+         ELSE
+            
+         
+            update conta.tint_comprobante  set
+               estado_reg = 'borrador'
+            where id_int_comprobante = p_id_int_comprobante;
+         
+         END IF; 
+      
+      END IF;
     
     
-    --delete transacciones del comprobante intermedio
-    delete from conta.tint_transaccion
-    where id_int_comprobante=p_id_int_comprobante;
-    
-     --Sentencia de la eliminacion
-    delete from conta.tint_comprobante
-    where id_int_comprobante=p_id_int_comprobante;
      
      return 'Comprobante eliminado';
 EXCEPTION
