@@ -28,6 +28,7 @@ v_reg_cuenta			record;
 v_visible				varchar; 
 v_nombre_variable		varchar;
 v_destino				varchar;
+v_id_cuenta				integer;
 
 BEGIN
      
@@ -241,6 +242,15 @@ BEGIN
                              where cue.id_gestion = p_id_gestion and cue.nro_cuenta = v_registros.codigo_cuenta;
                             
                              v_nombre_variable = v_reg_cuenta.nombre_cuenta;
+                             
+                              IF  v_reg_cuenta.id_cuenta is NULL  and v_registros.destino in ('segun_saldo','debe','haber') THEN
+                                  raise exception 'es obligatorio especificar uan cuenta cuando el destino es para un CBTE';
+                              ELSIF v_registros.destino in ('segun_saldo','debe','haber') and v_reg_cuenta.sw_transaccional = 'titular' THEN
+                                  raise exception 'Las formulas solo admiten cuentas de movimiento, revise %', v_registros.codigo_cuenta;    
+                              END IF;
+                              
+                              v_id_cuenta =  v_reg_cuenta.id_cuenta;
+                          
                           END IF;
                             
                           IF v_registros.nombre_variable is not null and v_registros.nombre_variable != '' THEN
@@ -249,11 +259,7 @@ BEGIN
                           -- 2.3.1)  calculamos el monto para la formula
                            v_monto = conta.f_evaluar_resultado_formula(v_registros.formula, p_plantilla, v_registros.destino);
                           
-                          IF  v_reg_cuenta.id_cuenta is NULL  and v_registros.destino in ('segun_saldo','debe','haber') THEN
-                              raise exception 'es obligatorio especificar uan cuenta cuando el destino es para un CBTE';
-                          ELSIF v_registros.destino in ('segun_saldo','debe','haber') and v_reg_cuenta.sw_transaccional = 'titular' THEN
-                              raise exception 'Las formulas solo admiten cuentas de movimiento, revise %', v_registros.codigo_cuenta;    
-                          END IF;
+                          
                           
                            
                           --2.3.1  si el destino es segun balance identifcai si va al debe o al haber (los negativos van al haber)
@@ -324,7 +330,7 @@ BEGIN
                                 v_registros.id_auxiliar,
                                 v_destino,
                                 v_registros.orden_cbte,
-                                v_reg_cuenta.id_cuenta);
+                                v_id_cuenta);
                                 
                                
                   --   2.4) si el origen es sumatoria

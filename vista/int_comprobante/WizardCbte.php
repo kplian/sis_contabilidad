@@ -94,7 +94,7 @@ Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
 	   			config:{
 	                name: 'id_resultado_plantilla',
 	                fieldLabel: 'Plantilla',
-	                qtip: 'plantilla base para generar el comprobante'
+	                qtip: 'plantilla base para generar el comprobante',
 	                typeAhead: false,
 	                forceSelection: true,
 	                allowBlank: false,
