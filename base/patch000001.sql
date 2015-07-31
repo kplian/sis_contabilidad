@@ -1223,12 +1223,6 @@ ALTER TABLE conta.tcomprobante
 COMMENT ON COLUMN conta.tcomprobante.id_depto_libro
 IS 'identifica el depto de libro de banco';
 
-ALTER TABLE conta.tplantilla_comprobante
-  ADD COLUMN campo_depto_libro TEXT;
-
-COMMENT ON COLUMN conta.tplantilla_comprobante.campo_depto_libro
-IS 'este campo es para definir el depto de libro de bancos del comprobante';
-
 /***********************************F-SCP-GSS-CONTA-0-07/05/2015****************************************/
 
 
@@ -1238,7 +1232,7 @@ IS 'este campo es para definir el depto de libro de bancos del comprobante';
 
 --------------- SQL ---------------
 
-DROP TRIGGER f_trig_insert_int_trans_val ON conta.tint_transaccion;
+--DROP TRIGGER f_trig_insert_int_trans_val ON conta.tint_transaccion;
 --------------- SQL ---------------
 
 DROP TABLE conta.tint_trans_val;
