@@ -290,7 +290,7 @@ BEGIN
                    and ges.estado_reg = 'activo';
            
           IF v_id_gestion_destino is null THEN        
-                   raise exception 'no se encontró una siguiente gestión preparada (primero creeo que las gestión)';
+                   raise exception 'no se encontró una siguiente gestión preparada (primero cree  gestión siguiente)';
           END IF;
           v_conta = 0;
           --  consulta recursia de cuentas de la gestion origen
@@ -314,7 +314,7 @@ BEGIN
             
             
                --  busca si ya existe la relacion en la tablas de cuentas ids
-                  IF NOT EXISTS(select 1 from conta.tcuenta_ids i where i.id_cuenta_uno =  v_registros_cuenta. id_cuenta) THEN
+                  IF NOT EXISTS(select 1 from conta.tcuenta_ids i where i.id_cuenta_uno =  v_registros_cuenta.id_cuenta) THEN
                      IF v_registros_cuenta.id_cuenta_padre is not null THEN
                         --  busca la cuenta del padre en cuetaids
                          v_id_cuenta_padre_des  = NULL;

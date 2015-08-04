@@ -197,10 +197,7 @@ Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
     		d2 = new Date(newValue.getFullYear(), 11, 31);
     	    d1 = new Date(newValue.getFullYear(), 0, 1);
 	    	    
-	    	this.Cmp.desde.setMaxValue(d2);
-	    	this.Cmp.desde.setMinValue(d1);
-	    	this.Cmp.hasta.setMaxValue(d2);
-	    	this.Cmp.hasta.setMinValue(d1);
+	    	
     		this.Cmp.id_resultado_plantilla.setReadOnly(false);
     		this.Cmp.desde.reset();
     		this.Cmp.hasta.reset();
@@ -215,6 +212,11 @@ Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
     	        this.Cmp.hasta.setReadOnly(true);
     	        this.Cmp.desde.setValue(d1);
     	        this.Cmp.hasta.setValue(d2);
+    	        
+    	        this.Cmp.desde.setMaxValue(d2);
+		    	this.Cmp.desde.setMinValue(d1);
+		    	this.Cmp.hasta.setMaxValue(d2);
+		    	this.Cmp.hasta.setMinValue(d1);
     			
     		}
     		else{
