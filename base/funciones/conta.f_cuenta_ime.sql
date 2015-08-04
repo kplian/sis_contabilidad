@@ -37,6 +37,11 @@ DECLARE
     v_tipo_cuenta_pat 		varchar;
     v_registros_cuenta		record;
     v_registros				record;
+    v_registros_ges			record;
+    v_id_gestion_destino	integer;
+    v_conta					integer;
+    v_id_cuenta_padre_des	integer;
+    v_reg_cuenta_ori		record;
 			    
 BEGIN
 
@@ -218,7 +223,7 @@ BEGIN
             END IF;
               
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cuenta modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cuenta modificado(a): '|| COALESCE(v_parametros.id_cuenta::varchar,'S/I')); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_cuenta',v_parametros.id_cuenta::varchar);
                
             --Devuelve la respuesta
@@ -241,8 +246,157 @@ BEGIN
             where id_cuenta=v_parametros.id_cuenta;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cuenta eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cuenta eliminado(a)  :'|| COALESCE(v_parametros.id_cuenta::varchar,'S/I')); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_cuenta',v_parametros.id_cuenta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_CLONAR_IME'
+ 	#DESCRIPCION:	Clona el plan de cuentas para la gestion indicada
+ 	#AUTOR:	    Rensi Arteaga Copari
+ 	#FECHA:		03-08-2015 15:04:03
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CLONAR_IME')then
+
+		begin
+			
+           --  definir id de la gestion siguiente
+    
+           select
+              ges.id_gestion,
+              ges.gestion,
+              ges.id_empresa
+           into 
+              v_registros_ges
+           from 
+           param.tgestion ges
+           where ges.id_gestion = v_parametros.id_gestion;
+          
+          
+          
+           select
+              ges.id_gestion
+           into 
+              v_id_gestion_destino
+           from 
+           param.tgestion ges
+           where       ges.gestion = v_registros_ges.gestion + 1 
+                   and ges.id_empresa = v_registros_ges.id_empresa 
+                   and ges.estado_reg = 'activo';
+           
+          IF v_id_gestion_destino is null THEN        
+                   raise exception 'no se encontró una siguiente gestión preparada (primero creeo que las gestión)';
+          END IF;
+          v_conta = 0;
+          --  consulta recursia de cuentas de la gestion origen
+          FOR v_registros_cuenta in  (
+                     WITH RECURSIVE cuenta_inf(id_cuenta, id_cuenta_padre) AS (
+                          select 
+                            c.id_cuenta,
+                            c.id_cuenta_padre
+                          from conta.tcuenta c  
+                          where  c.id_gestion = v_parametros.id_gestion and c.id_cuenta_padre is NULL and c.estado_reg = 'activo'
+                                 
+                        UNION
+                          SELECT
+                           c2.id_cuenta,
+                           c2.id_cuenta_padre
+                          FROM conta.tcuenta c2, cuenta_inf pc
+                          WHERE c2.id_cuenta_padre = pc.id_cuenta  and c2.estado_reg = 'activo'
+                        )
+                       SELECT * FROM cuenta_inf) LOOP
+         
+            
+            
+               --  busca si ya existe la relacion en la tablas de cuentas ids
+                  IF NOT EXISTS(select 1 from conta.tcuenta_ids i where i.id_cuenta_uno =  v_registros_cuenta. id_cuenta) THEN
+                     IF v_registros_cuenta.id_cuenta_padre is not null THEN
+                        --  busca la cuenta del padre en cuetaids
+                         v_id_cuenta_padre_des  = NULL;
+                         select
+                           cid.id_cuenta_dos
+                         into
+                           v_id_cuenta_padre_des
+                         from conta.tcuenta_ids cid
+                         where  cid.id_cuenta_uno = v_registros_cuenta.id_cuenta_padre;
+                     END IF;
+                     --obtiene los dastos de la cuenta origen
+                     v_reg_cuenta_ori = NULL;
+                     select * into v_reg_cuenta_ori from conta.tcuenta c where c.id_cuenta = v_registros_cuenta.id_cuenta;
+                     --  inserta la cuenta para la nueva gestion
+                    
+                    INSERT INTO conta.tcuenta
+                            (
+                              id_usuario_reg,
+                              fecha_reg,
+                              estado_reg,
+                              id_empresa,
+                              id_parametro,
+                              id_cuenta_padre,
+                              nro_cuenta,
+                              id_gestion,
+                              id_moneda,
+                              nombre_cuenta,
+                              desc_cuenta,
+                              nivel_cuenta,
+                              tipo_cuenta,
+                              sw_transaccional,
+                              sw_oec,
+                              sw_auxiliar,
+                              tipo_cuenta_pat,
+                              cuenta_sigma,
+                              sw_sigma,                              
+                              cuenta_flujo_sigma,
+                              valor_incremento,
+                              eeff
+                            )
+                            VALUES (
+                              p_id_usuario,
+                              now(),
+                              'activo',
+                              v_reg_cuenta_ori.id_empresa,
+                              v_reg_cuenta_ori.id_parametro,
+                              v_id_cuenta_padre_des,
+                              v_reg_cuenta_ori.nro_cuenta,
+                              v_id_gestion_destino,  --gestion destino
+                              v_reg_cuenta_ori.id_moneda,
+                              v_reg_cuenta_ori.nombre_cuenta,
+                              v_reg_cuenta_ori.desc_cuenta,
+                              v_reg_cuenta_ori.nivel_cuenta,
+                              v_reg_cuenta_ori.tipo_cuenta,
+                              v_reg_cuenta_ori.sw_transaccional,
+                              v_reg_cuenta_ori.sw_oec,
+                              v_reg_cuenta_ori.sw_auxiliar,
+                              v_reg_cuenta_ori.tipo_cuenta_pat,
+                              v_reg_cuenta_ori.cuenta_sigma,
+                              v_reg_cuenta_ori.sw_sigma,                              
+                              v_reg_cuenta_ori.cuenta_flujo_sigma,
+                              v_reg_cuenta_ori.valor_incremento,
+                              v_reg_cuenta_ori.eeff
+                            ) RETURNING id_cuenta into v_id_cuenta;
+                      
+                      --insertar relacion en tre ambas gestion
+                      INSERT INTO conta.tcuenta_ids (id_cuenta_uno,id_cuenta_dos, sw_cambio_gestion ) VALUES ( v_registros_cuenta.id_cuenta,v_id_cuenta, 'gestion');
+                      v_conta = v_conta + 1;
+                  END IF; 
+            
+               
+           
+        
+             --Definicion de la respuesta
+        
+        
+        
+        
+           END LOOP;
+            
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan de cuentas clonado para la gestion: '||v_registros_ges.gestion::varchar); 
+            v_resp = pxp.f_agrega_clave(v_resp,'observaciones','Se insertaron cuentas: '|| v_conta::varchar);
               
             --Devuelve la respuesta
             return v_resp;

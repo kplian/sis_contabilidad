@@ -31,8 +31,54 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				tooltip: '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
 			}
 		);
+		//Crea el botón para llamar a la replicación
+		this.addButton('btnRepRelCon',
+			{
+				text: 'Duplicar Plan de Cuentas',
+				iconCls: 'bchecklist',
+				disabled: false,
+				handler: this.duplicarCuentas,
+				tooltip: '<b>Clonar  las cuentas para las gestión siguiente </b><br/>Clonar las cuentas, para la gestión siguiente guardando las relacion entre las mismas'
+			}
+		);
+		
+		
 		
 	},
+	
+	
+	
+	duplicarCuentas: function(){
+		if(this.cmbGestion.getValue()){
+			Phx.CP.loadingShow(); 
+	   		Ext.Ajax.request({
+				url: '../../sis_contabilidad/control/Cuenta/clonarCuentasGestion',
+			  	params:{
+			  		id_gestion: this.cmbGestion.getValue()
+			      },
+			      success:this.successRep,
+			      failure: this.conexionFailure,
+			      timeout:this.timeout,
+			      scope:this
+			});
+		}
+		else{
+			alert('primero debe selecionar la gestion origen');
+		}
+   		
+   },
+   
+   successRep:function(resp){
+        Phx.CP.loadingHide();
+        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+        if(!reg.ROOT.error){
+            this.reload();
+            alert(reg.ROOT.datos.observaciones)
+        }else{
+            alert('Ocurrió un error durante el proceso')
+        }
+	},
+	
 	capturaFiltros:function(combo, record, index){
 		
 		this.loaderTree.baseParams={id_gestion:this.cmbGestion.getValue()};
