@@ -609,6 +609,73 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	   			grid:true,
 	   			form:true
 	   	},
+	   	{
+			config:{
+				name: 'cbte_cierre',
+				qtip: 'Es un comprobante de cierre?',
+				fieldLabel: 'Cierre',
+				allowBlank: false,
+                gwidth: 80,
+                width: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                
+                mode: 'local',
+                store:['no' ,'balance','resultado']
+            },
+            type:'ComboBox',
+			filters:{pfiltro:'incbte.incluir_cierre',type:'string'},
+			valorInicial: 'no',
+			id_grupo:0,
+			grid:true,
+			egrid: true,
+			form:true
+		},
+		{
+			config: {
+				name: 'cbte_apertura',
+				qtip: 'Es un comprobante de apertura',
+				fieldLabel: 'Apertura',
+				allowBlank: false,
+                gwidth: 80,
+                width: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store: ['no' ,'si']
+            },
+            type:'ComboBox',
+			filters: { pfiltro: 'incbte.cbte_apertura', type: 'string' },
+			valorInicial: 'no',
+			id_grupo: 0,
+			grid: true,
+			egrid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'cbte_aitb',
+				qtip: 'es un comprobante para AITB',
+				fieldLabel: 'AITBs',
+				allowBlank: false,
+                gwidth: 80,
+                width: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store: ['no' ,'si']
+            },
+            type:'ComboBox',
+			filters: { pfiltro: 'incbte.cbte_aitb', type: 'string' },
+			valorInicial: 'no',
+			id_grupo: 0,
+			grid: true,
+			egrid: true,
+			form: true
+		},
 		{
 			config:{
 				name: 'estado_reg',
@@ -767,7 +834,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_firma2', type: 'string'},
 		{name:'desc_firma3', type: 'string'},
 		'momento_comprometido',
-        'momento_ejecutado','id_moneda_base',
+        'momento_ejecutado','id_moneda_base','cbte_cierre','cbte_apertura','cbte_aitb',
         'momento_pagado','manual','desc_tipo_relacion_comprobante','id_int_comprobante_fks','manual','id_tipo_relacion_comprobante'
 	],
 	
@@ -956,8 +1023,10 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	imprimirCbte: function(){
 		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
 			var rec = this.sm.getSelected();
+			
 			var data = rec.data;
 			if (data) {
+				Phx.CP.loadingShow();
 				Ext.Ajax.request({
 						//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
 						url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',

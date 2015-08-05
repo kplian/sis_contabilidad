@@ -34,6 +34,12 @@ BEGIN
     ---------------------------------------
     IF   v_rec_cbte.estado_reg = 'borrador'  THEN         
    
+              
+              --verifica que no tenga numero
+              IF  v_rec_cbte.nro_cbte is not null and   v_rec_cbte.nro_cbte != '' THEN
+                    raise exception 'No puede eliminar cbtes  que ya fueron validados, para no perder la numeración';
+              END IF;
+              
               -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
              IF v_rec_cbte.id_plantilla_comprobante is not null THEN
                      

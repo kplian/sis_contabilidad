@@ -175,11 +175,11 @@ BEGIN
         select po_id_periodo 
         into v_id_periodo
         from param.f_get_periodo_gestion(v_rec_cbte.fecha);
-        
+       
        -----------------------------------------
        --  Validaciones de cbte de apertura
        -----------------------------------------
-       IF  v_rec_cbte.cbte.apertura = 'si'  THEN
+       IF  v_rec_cbte.cbte_apertura = 'si'  THEN
            --si es comprobnate de apertura , validamos que no  exista otro ya validado para  la gestion y departamento
         
            IF  EXISTS (select 1 from conta.tint_comprobante c 
@@ -197,8 +197,8 @@ BEGIN
            END IF;
            
            --el comprobante de apertura solo puede ser un comprobante de diaraio
-           IF v_doc = 'CDIR' THEN
-             raise exception 'E comprobante de paertura solo fuede del tipo DIARIO (CDIR)';
+           IF v_doc != 'CDIR' THEN
+             raise exception 'E comprobante de paertura solo fuede del tipo DIARIO (CDIR) no %', v_doc;
            END IF;
            
            
@@ -208,13 +208,12 @@ BEGIN
        --  OBTENCION DE LA NUMERACION DEL CBTE
        -------------------------------------------- 
         
-      
        --  Obtención del número de comprobante, si no tiene un numero asignado
-       IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte is null = '' THEN
+       IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte  = '' THEN
            
-            
+           
             -- Si no es un cbte de apertura y estamso en enero fuerza el saltar inicio
-            IF  v_rec_cbte.cbte.apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
+            IF  v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
                  
                  v_nro_cbte =  param.f_obtener_correlativo(
                            v_doc, 
@@ -233,7 +232,7 @@ BEGIN
                            'si',  --par_saltar_inicio
                            'no');
             
-            ELSEIF v_rec_cbte.cbte.apertura = 'no' THEN
+            ELSEIF v_rec_cbte.cbte_apertura = 'no' THEN
                 --si no es un comprobante de apertura y no es enero genera la nmeracion normalmente
                v_nro_cbte =  param.f_obtener_correlativo(
                              v_doc, 

@@ -2157,3 +2157,87 @@ AS
 
          
 /***********************************F-DEP-RAC-CONTA-0-21/05/2015*****************************************/
+
+
+
+
+/***********************************I-DEP-RAC-CONTA-0-05/08/2015*****************************************/
+
+
+
+--------------- SQL ---------------
+
+ -- object recreation
+DROP VIEW conta.vint_comprobante;
+
+CREATE VIEW conta.vint_comprobante
+AS
+  SELECT incbte.id_int_comprobante,
+         incbte.id_clase_comprobante,
+         incbte.id_subsistema,
+         incbte.id_depto,
+         incbte.id_moneda,
+         incbte.id_periodo,
+         incbte.id_funcionario_firma1,
+         incbte.id_funcionario_firma2,
+         incbte.id_funcionario_firma3,
+         incbte.tipo_cambio,
+         incbte.beneficiario,
+         incbte.nro_cbte,
+         incbte.estado_reg,
+         incbte.glosa1,
+         incbte.fecha,
+         incbte.glosa2,
+         incbte.nro_tramite,
+         incbte.momento,
+         incbte.id_usuario_reg,
+         incbte.fecha_reg,
+         incbte.id_usuario_mod,
+         incbte.fecha_mod,
+         usu1.cuenta AS usr_reg,
+         usu2.cuenta AS usr_mod,
+         ccbte.descripcion AS desc_clase_comprobante,
+         sis.nombre AS desc_subsistema,
+         (dpto.codigo::text || '-'::text) || dpto.nombre::text AS desc_depto,
+         mon.codigo::text AS desc_moneda,
+         fir1.desc_funcionario2 AS desc_firma1,
+         fir2.desc_funcionario2 AS desc_firma2,
+         fir3.desc_funcionario2 AS desc_firma3,
+         pxp.f_iif(incbte.momento_comprometido::text = 'si'::text, 'true'::
+           character varying, 'false'::character varying) AS
+           momento_comprometido,
+         pxp.f_iif(incbte.momento_ejecutado::text = 'si'::text, 'true'::
+           character varying, 'false'::character varying) AS momento_ejecutado,
+         pxp.f_iif(incbte.momento_pagado::text = 'si'::text, 'true'::character
+           varying, 'false'::character varying) AS momento_pagado,
+         incbte.manual,
+         array_to_string(incbte.id_int_comprobante_fks, ','::text) AS
+           id_int_comprobante_fks,
+         incbte.id_tipo_relacion_comprobante,
+         trc.nombre AS desc_tipo_relacion_comprobante,
+         dpto.codigo AS codigo_depto,
+          incbte.cbte_cierre,
+          incbte.cbte_apertura,
+          incbte.cbte_aitb
+  FROM conta.tint_comprobante incbte
+       JOIN segu.tusuario usu1 ON usu1.id_usuario = incbte.id_usuario_reg
+       LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = incbte.id_usuario_mod
+       JOIN conta.tclase_comprobante ccbte ON ccbte.id_clase_comprobante =
+         incbte.id_clase_comprobante
+       JOIN segu.tsubsistema sis ON sis.id_subsistema = incbte.id_subsistema
+       JOIN param.tdepto dpto ON dpto.id_depto = incbte.id_depto
+       JOIN param.tmoneda mon ON mon.id_moneda = incbte.id_moneda
+       LEFT JOIN orga.vfuncionario fir1 ON fir1.id_funcionario =
+         incbte.id_funcionario_firma1
+       LEFT JOIN orga.vfuncionario fir2 ON fir2.id_funcionario =
+         incbte.id_funcionario_firma2
+       LEFT JOIN orga.vfuncionario fir3 ON fir3.id_funcionario =
+         incbte.id_funcionario_firma3
+       LEFT JOIN conta.ttipo_relacion_comprobante trc ON
+         trc.id_tipo_relacion_comprobante = incbte.id_tipo_relacion_comprobante;
+
+ALTER TABLE conta.vint_comprobante
+  OWNER TO postgres;
+  
+/***********************************F-DEP-RAC-CONTA-0-05/08/2015*****************************************/
+

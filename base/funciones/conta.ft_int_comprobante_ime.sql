@@ -39,6 +39,7 @@ DECLARE
     v_funcion_comprobante_eliminado varchar;
     v_id_subsistema_conta			integer;
     v_resp2					varchar;
+    v_reg_cbte				record;
 			    
 BEGIN
 
@@ -111,7 +112,10 @@ BEGIN
 			fecha_mod,
             id_usuario_ai,
             usuario_ai,
-            id_int_comprobante_fks
+            id_int_comprobante_fks,
+            cbte_cierre,
+            cbte_apertura,
+            cbte_aitb
           	) values(
 			v_parametros.id_clase_comprobante,
 			
@@ -137,7 +141,10 @@ BEGIN
 			null,
             v_parametros._id_usuario_ai,
             v_parametros._nombre_usuario_ai,
-            (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[]
+            (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
+            v_parametros.cbte_cierre,
+            v_parametros.cbte_apertura,
+            v_parametros.cbte_aitb
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
@@ -170,6 +177,14 @@ BEGIN
              v_id_subsistema_conta
             from segu.tsubsistema
             where codigo = 'CONTA';
+            
+            
+            select * into v_reg_cbte
+            from conta.tint_comprobante ic where ic.id_int_comprobante = v_parametros.id_int_comprobante;
+            
+            IF v_reg_cbte.estado_reg != 'borrador' THEN
+               raise exception 'solo puede editar comprobantes en borrador';
+            END IF;
             
             --SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
         	IF  pxp.f_existe_parametro(p_tabla,'id_subsistema') THEN
@@ -211,7 +226,10 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
             id_usuario_ai = v_parametros._id_usuario_ai,
-            usuario_ai = v_parametros._nombre_usuario_ai
+            usuario_ai = v_parametros._nombre_usuario_ai,
+            cbte_cierre = v_parametros.cbte_cierre,
+            cbte_apertura = v_parametros.cbte_apertura,
+            cbte_aitb = v_parametros.cbte_aitb
 			where id_int_comprobante=v_parametros.id_int_comprobante;
                
 			--Definicion de la respuesta
@@ -258,6 +276,16 @@ BEGIN
 	elsif(p_transaccion='CONTA_INCBTE_VAL')then
 
 		begin
+            
+            --validaciones 
+            select * into v_reg_cbte
+            from conta.tint_comprobante ic where ic.id_int_comprobante = v_parametros.id_int_comprobante;
+            
+            IF v_reg_cbte.estado_reg != 'borrador' THEN
+               raise exception 'solo puede validar  comprobantes en borrador';
+            END IF;
+        
+        
 			--Lamada a la función de validación
 			v_result = conta.f_validar_cbte(
                  p_id_usuario,

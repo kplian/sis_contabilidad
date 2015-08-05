@@ -87,8 +87,10 @@ BEGIN
                             incbte.id_int_comprobante_fks,
                             incbte.id_tipo_relacion_comprobante,
                             incbte.desc_tipo_relacion_comprobante,
-                            '||v_id_moneda_base::VARCHAR||'::integer as id_moneda_base
-                          
+                            '||v_id_moneda_base::VARCHAR||'::integer as id_moneda_base,
+                            incbte.cbte_cierre,
+                            incbte.cbte_apertura,
+                            incbte.cbte_aitb
                           from conta.vint_comprobante incbte
                           
                           where  ';
@@ -97,6 +99,7 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
             
+            raise notice  '-- % --', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						

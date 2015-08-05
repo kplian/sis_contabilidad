@@ -60,6 +60,10 @@ class MODIntComprobante extends MODbase{
 		$this->captura('desc_tipo_relacion_comprobante','varchar');
 		$this->captura('id_moneda_base','int4');
 		
+		$this->captura('cbte_cierre','varchar');
+		$this->captura('cbte_apertura','varchar');
+		$this->captura('cbte_aitb','varchar');
+		
 		
 		
 		//Ejecuta la instruccion
@@ -129,6 +133,10 @@ class MODIntComprobante extends MODbase{
 		
 		$this->setParametro('id_int_comprobante_fks','id_int_comprobante_fks','varchar');
 		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
+		
+		$this->setParametro('cbte_cierre','cbte_cierre','varchar');
+		$this->setParametro('cbte_apertura','cbte_apertura','varchar');
+		$this->setParametro('cbte_aitb','cbte_aitb','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -168,6 +176,9 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('id_int_comprobante_fks','id_int_comprobante_fks','varchar');
 		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
 		
+		$this->setParametro('cbte_cierre','cbte_cierre','varchar');
+		$this->setParametro('cbte_apertura','cbte_apertura','varchar');
+		$this->setParametro('cbte_aitb','cbte_aitb','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
