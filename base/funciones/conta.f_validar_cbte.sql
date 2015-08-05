@@ -44,8 +44,6 @@ BEGIN
     
     
     
-
-    
      --si el origen es endesis confiamos en las validaciones
     if p_origen  = 'endesis' then
     
@@ -74,10 +72,16 @@ BEGIN
     end if;
     	
     --2. Obtención de datos del comprobante
-    select * 
+    select c.*, p.id_gestion 
 	into v_rec_cbte
-    from conta.tint_comprobante
+    from conta.tint_comprobante c
+    inner join param.tperiodo p on p.id_periodo = c.id_periodo
     where id_int_comprobante = p_id_int_comprobante;
+    
+    
+    
+    
+    
     
     --Verificación de existencia de al menos 2 transacciones
     select coalesce(count(id_int_transaccion),0)
@@ -96,6 +100,9 @@ BEGIN
     where tra.id_int_comprobante = p_id_int_comprobante;
     
     v_variacion = v_debe - v_haber;
+    
+    --TODO igualar y validar ....
+    
     
    -- raise exception 'variacion %', v_variacion ;
     
@@ -155,7 +162,8 @@ BEGIN
    
     --6. Numeración del comprobante
     if v_errores = '' then
-    	--Obtiene el documento para la numeración
+    	
+        --Obtiene el documento para la numeración
         select doc.codigo
         into v_doc
         from conta.tclase_comprobante ccbte
@@ -168,31 +176,121 @@ BEGIN
         into v_id_periodo
         from param.f_get_periodo_gestion(v_rec_cbte.fecha);
         
+       -----------------------------------------
+       --  Validaciones de cbte de apertura
+       -----------------------------------------
+       IF  v_rec_cbte.cbte.apertura = 'si'  THEN
+           --si es comprobnate de apertura , validamos que no  exista otro ya validado para  la gestion y departamento
+        
+           IF  EXISTS (select 1 from conta.tint_comprobante c 
+                       inner join param.tperiodo p on p.id_periodo = c.id_periodo
+                       where     c.id_depto = v_rec_cbte.id_depto 
+                             and c.cbte_apertura = 'si' 
+                             and c.estado_reg = 'validado' and p.id_gestion = v_rec_cbte.id_gestion)  THEN
+                             
+                raise exception 'ya existe un comprobante de apertura validado para este departamento en esta gestion';
+           END IF;
+           
+           --valida que sea el primer dia del mes
+           IF to_char(v_rec_cbte.fecha::date, 'DD-MM')::varchar != '01-01' THEN
+              raise exception 'El comprobante de apertura debe ser del primero de enero';
+           END IF;
+           
+           --el comprobante de apertura solo puede ser un comprobante de diaraio
+           IF v_doc = 'CDIR' THEN
+             raise exception 'E comprobante de paertura solo fuede del tipo DIARIO (CDIR)';
+           END IF;
+           
+           
+        END IF;
+        
+       -----------------------------------------
+       --  OBTENCION DE LA NUMERACION DEL CBTE
+       -------------------------------------------- 
+        
       
+       --  Obtención del número de comprobante, si no tiene un numero asignado
+       IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte is null = '' THEN
+           
+            
+            -- Si no es un cbte de apertura y estamso en enero fuerza el saltar inicio
+            IF  v_rec_cbte.cbte.apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
+                 
+                 v_nro_cbte =  param.f_obtener_correlativo(
+                           v_doc, 
+                           v_id_periodo,-- par_id, 
+                           NULL, --id_uo 
+                           v_rec_cbte.id_depto,    -- id_depto
+                           p_id_usuario, 
+                           'CONTA', 
+                           NULL,
+                           0,
+                           0,
+                           'no_aplica',
+                           0,
+                           'no_aplica',
+                           1,
+                           'si',  --par_saltar_inicio
+                           'no');
+            
+            ELSEIF v_rec_cbte.cbte.apertura = 'no' THEN
+                --si no es un comprobante de apertura y no es enero genera la nmeracion normalmente
+               v_nro_cbte =  param.f_obtener_correlativo(
+                             v_doc, 
+                             v_id_periodo,-- par_id, 
+                             NULL, --id_uo 
+                             v_rec_cbte.id_depto,    -- id_depto
+                             p_id_usuario, 
+                             'CONTA', 
+                             NULL);
+            
+            
+            ELSE
+               --si es un comprobante de inicio fuerza a optener el primer numero
+                v_nro_cbte =  param.f_obtener_correlativo(
+                           v_doc, 
+                           v_id_periodo,-- par_id, 
+                           NULL, --id_uo 
+                           v_rec_cbte.id_depto,    -- id_depto
+                           p_id_usuario, 
+                           'CONTA', 
+                           NULL,
+                           0,
+                           0,
+                           'no_aplica',
+                           0,
+                           'no_aplica',
+                           1,
+                           'no',  --par_saltar_inicio
+                           'si'); --par_forzar_inicio
+               
+            
+            END IF;
+            
+       ELSE
+          v_nro_cbte = v_rec_cbte.nro_cbte; 
+       END IF;
         
-        --Obtención del número de comprobante
-        v_nro_cbte =  param.f_obtener_correlativo(
-                   v_doc, 
-                   v_id_periodo,-- par_id, 
-                   NULL, --id_uo 
-                   v_rec_cbte.id_depto,    -- id_depto
-                   p_id_usuario, 
-                   'CONTA', 
-                   NULL);
-	
+       
+        
+	   --Se guarda el número del comprobante y se cambia el estado a validado
+      update conta.tint_comprobante set
+      nro_cbte = v_nro_cbte,
+      estado_reg = 'validado'
+      where id_int_comprobante = p_id_int_comprobante;
     	
-        --Se guarda el número del comprobante y se cambia el estado a validado
-        update conta.tint_comprobante set
-        nro_cbte = v_nro_cbte,
-        estado_reg = 'validado'
-        where id_int_comprobante = p_id_int_comprobante;
         
+        --------------------------------------------------------------------
         -- 7. Replicación del comprobante hacia las estructuras destino
+        -----------------------------------------------------------------------
+        
         -- RAC, 26/06/2015,  la talba comprobnates destino no se usara mas, por que es redundante
         -- v_resp = conta.f_replicar_cbte(p_id_usuario,p_id_int_comprobante);
         
         
+       ----------------------------------------------------------------- 
        -- 8 si viene de una plantilla de comprobante busca la funcion de validacion configurada
+       -----------------------------------------------------------------
        
        IF v_rec_cbte.id_plantilla_comprobante is not null THEN
        
@@ -211,8 +309,10 @@ BEGIN
        
        
        END IF;
-       
+        -----------------------------------------------------------------------------------------------
         --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
+        ------------------------------------------------------------------------------------------------
+        
         v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
        
     

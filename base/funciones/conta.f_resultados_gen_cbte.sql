@@ -248,7 +248,7 @@ BEGIN
                                     ) LOOP
               
          
-          IF v_registros.monto > 0 THEN
+          IF v_registros.monto != 0 THEN
                     -- recupera partida si existe
                     SELECT
                      par.id_partida
@@ -274,14 +274,24 @@ BEGIN
                     END IF;
                     
                     -- define los monto
-                    
-                    if v_registros.destino = 'debe' then
-                       v_monto_debe = v_registros.monto;
-                       v_monto_haber = 0;
-                    else
-                       v_monto_debe = 0;
-                       v_monto_haber = v_registros.monto;
-                    end if;
+                     IF v_registros.monto > 0 THEN
+                        if v_registros.destino = 'debe' then
+                           v_monto_debe = v_registros.monto;
+                           v_monto_haber = 0;
+                        else
+                           v_monto_debe = 0;
+                           v_monto_haber = v_registros.monto;
+                        end if;
+                     ELSE
+                         if v_registros.destino = 'haber' then
+                           v_monto_debe = v_registros.monto*(-1);
+                           v_monto_haber = 0;
+                        else
+                           v_monto_debe = 0;
+                           v_monto_haber = v_registros.monto*(-1);
+                        end if;
+                     
+                     END IF;
                   -----------------------------
                   --REGISTRO DE LA TRANSACCIÓN
                   -----------------------------
