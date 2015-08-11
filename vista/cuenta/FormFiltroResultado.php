@@ -152,8 +152,45 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
    			type:'AwesomeCombo',
    			id_grupo:0,
    			form:true
-         }
-    ],
+         },
+	     {
+	       		config:{
+	       			name: 'extendido',
+	       			qtip : 'Mostrar depedencias',
+	       			fieldLabel: 'Dependecias',
+	       			allowBlank: false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['si','no']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		valorInicial: 'no',
+	       		form:true
+	     },
+	     {
+	       		config:{
+	       			name: 'formato',
+	       			qtip : 'formato de salida del reporte',
+	       			fieldLabel: 'Formato',
+	       			allowBlank: false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['pdf','excel']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		valorInicial: 'pdf',
+	       		form:true
+	     }],
     labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
     title: 'Filtro de mayores',
     // Funcion guardar del formulario

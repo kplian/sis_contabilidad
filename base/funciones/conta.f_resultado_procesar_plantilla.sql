@@ -7,7 +7,8 @@ CREATE OR REPLACE FUNCTION conta.f_resultado_procesar_plantilla (
   p_hasta date,
   p_id_deptos varchar,
   p_id_gestion integer,
-  p_force_invisible boolean = false
+  p_force_invisible boolean = false,
+  p_multiple_col boolean = false
 )
 RETURNS boolean AS
 $body$
@@ -29,6 +30,8 @@ v_visible				varchar;
 v_nombre_variable		varchar;
 v_destino				varchar;
 v_id_cuenta				integer;
+v_forzar_visible		boolean;
+v_registros_plan		record;
 
 BEGIN
      
@@ -39,13 +42,19 @@ BEGIN
      IF p_force_invisible  THEN
          FOR v_registros in ( select 
                                   rd.*,
-                                  rp.codigo  as plantilla 
+                                  rp.codigo  as plantilla,
+                                  rp.glosa as nombre_columna 
                               from conta.tresultado_dep rd 
                               inner join conta.tresultado_plantilla rp on rp.id_resultado_plantilla = rd.id_resultado_plantilla_hijo
                               where rd.id_resultado_plantilla = p_id_resultado_plantilla 
                               order by prioridad asc ) LOOP
+                        
+                        v_forzar_visible = TRUE;
+                        IF p_multiple_col = true THEN
+                          v_forzar_visible = FALSE;
+                        END IF;
          
-                       -- procesa la plantilla dependientes ... 
+                      -- procesa la plantilla dependientes ... 
                       IF  not conta.f_resultado_procesar_plantilla(
                                                                   v_registros.plantilla,
                                                                   v_registros.id_resultado_plantilla_hijo, 
@@ -53,12 +62,24 @@ BEGIN
                                                                   p_hasta, 
                                                                   p_id_deptos,
                                                                   p_id_gestion,
-                                                                  true) THEN
+                                                                  v_forzar_visible,
+                                                                  p_multiple_col) THEN
                                                                   
                            raise exception 'error al procesa la plantilla %', v_registros.codigo;                                       
                      END IF;
          END LOOP;
       END IF;
+      
+      --obtiene datos de la plantilla
+      select 
+          rp.codigo  as plantilla,
+          rp.glosa as nombre_columna 
+      into
+        v_registros_plan
+      from conta.tresultado_plantilla rp 
+      where rp.id_resultado_plantilla = p_id_resultado_plantilla;
+      
+          
    -- listar el detalle de la plantilla
          
          FOR v_registros in (
@@ -486,8 +507,15 @@ BEGIN
                                 v_registros.orden_cbte);
                   END IF;
           END LOOP;
-    
-   
+        
+        --update el nombrede columna para la plantilla
+        
+        
+        UPDATE  temp_balancef set
+          nombre_columna = v_registros_plan.nombre_columna
+        WHERE plantilla = v_registros_plan.plantilla;
+        
+        
     RETURN TRUE;
 
 

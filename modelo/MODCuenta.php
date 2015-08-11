@@ -232,7 +232,8 @@ class MODCuenta extends MODbase{
 	    $this->setParametro('desde','desde','date');
 		$this->setParametro('hasta','hasta','date');
 		$this->setParametro('id_resultado_plantilla','id_resultado_plantilla','integer');
-		$this->setParametro('id_deptos','id_deptos','varchar');       
+		$this->setParametro('id_deptos','id_deptos','varchar'); 
+		$this->setParametro('extendido','extendido','varchar');       
 	            
 	    //Definicion de la lista del resultado del query
 	    $this->captura('subrayar','varchar'); 
@@ -258,6 +259,12 @@ class MODCuenta extends MODbase{
 		$this->captura('negrita','varchar'); 
 		$this->captura('cursiva','varchar'); 
 		$this->captura('espacio_previo','int4'); 
+		
+		$this->captura('id','int4');
+		$this->captura('plantilla','varchar');
+		$this->captura('nombre_columna','varchar');
+		
+		
 
 		 
 		//Ejecuta la instruccion

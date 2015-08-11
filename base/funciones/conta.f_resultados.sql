@@ -32,14 +32,21 @@ v_reg_cuenta		record;
 v_monto 			numeric;
 va_id_cuenta		INTEGER[];
 v_registros_plantilla	record;
+v_multiple_col 			boolean;
+v_forzar_visible		boolean;
  
 
 BEGIN
      
      v_nombre_funcion = 'conta.f_resultados';
      v_parametros = pxp.f_get_record(p_tabla);
-    
-    
+     
+     IF v_parametros.extendido = 'si' THEN
+       v_multiple_col = TRUE;
+     ELSE
+        v_multiple_col = FALSE;
+     END IF;
+     
     /*********************************   
      #TRANSACCION:    'CONTA_RESUTADO_SEL'
      #DESCRIPCION:    Listado para el reporte del resultados
@@ -53,7 +60,7 @@ BEGIN
     
          --  0) recuperamos la gestion segun fecha inicial   
          
-         v_gestion =  EXTRACT(YEAR FROM  v_parametros.desde::Date)::varchar;
+          v_gestion =  EXTRACT(YEAR FROM  v_parametros.desde::Date)::varchar;
             
           select 
             ges.id_gestion
@@ -77,6 +84,7 @@ BEGIN
           
          --  1) Crear una tabla temporal con los datos que se utilizaran 
          CREATE TEMPORARY TABLE temp_balancef (
+         							id SERIAL,
                                     plantilla VARCHAR,
                                     subrayar VARCHAR(3) DEFAULT 'si'::character varying,
                                     font_size VARCHAR DEFAULT 10,
@@ -104,7 +112,8 @@ BEGIN
                                     codigo_partida varchar,
                                     id_auxiliar int4,
                                     destino  varchar,
-                                    orden_cbte numeric
+                                    orden_cbte numeric,
+                                    nombre_columna varchar
                                     ) ON COMMIT DROP;
              
          
@@ -117,7 +126,12 @@ BEGIN
                               where rd.id_resultado_plantilla = v_parametros.id_resultado_plantilla 
                               order by prioridad asc ) LOOP
                 
-                --procesa la plantilla dependientes ... 
+                IF v_multiple_col = true THEN
+                  v_forzar_visible = FALSE;
+                ELSE
+                  v_forzar_visible = TRUE;
+                END IF;
+                -- procesa la plantilla dependientes ... 
                 IF  not conta.f_resultado_procesar_plantilla(
                                                             v_registros.plantilla,
                                                             v_registros.id_resultado_plantilla_hijo, 
@@ -125,7 +139,8 @@ BEGIN
                                                             v_parametros.hasta, 
                                                             v_parametros.id_deptos,
                                                             v_id_gestion,
-                                                            true) THEN
+                                                            v_forzar_visible,
+                                                            v_multiple_col) THEN
                                                             
                      raise exception 'error al procesa la plantilla %', v_registros.codigo;                                       
                END IF;
@@ -139,8 +154,9 @@ BEGIN
                                                       v_parametros.hasta, 
                                                       v_parametros.id_deptos,
                                                       v_id_gestion,
-                                                      false) THEN
-             raise exception 'Error al procesar la plantilla pirncipal';                                                  
+                                                      false,
+                                                      v_multiple_col) THEN
+             raise exception 'Error al procesar la plantilla principal';                                                  
           END IF;
            
          
@@ -167,9 +183,12 @@ BEGIN
                                     incluir_apertura,
                                     negrita,
                                     cursiva,
-                                    espacio_previo
+                                    espacio_previo,
+                                    id,
+                                    plantilla,
+                                    nombre_columna
                                 FROM temp_balancef 
-                                    order by orden asc, codigo_cuenta asc) LOOP
+                                    order by orden asc, codigo_cuenta asc, id asc) LOOP
                    RETURN NEXT v_registros;
          END LOOP;
   

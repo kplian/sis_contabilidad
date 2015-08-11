@@ -10,6 +10,8 @@ require_once(dirname(__FILE__).'/../reportes/RPlanCuentas.php');
 require_once(dirname(__FILE__).'/../reportes/RBalanceGeneral.php');
 require_once(dirname(__FILE__).'/../reportes/RResultados.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
+require_once(dirname(__FILE__).'/../reportes/RResultadosXls.php');
+
 class ACTCuenta extends ACTbase{    
 			
 	function listarCuenta(){
@@ -217,7 +219,11 @@ class ACTCuenta extends ACTbase{
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		
 	}
-
+   function clonarCuentasGestion(){
+		$this->objFunc=$this->create('MODCuenta');	
+		$this->res=$this->objFunc->clonarCuentasGestion($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
    function recuperarDatosResultados(){
     	
 		$this->objFunc = $this->create('MODCuenta');
@@ -234,39 +240,103 @@ class ACTCuenta extends ACTbase{
     }
    
    function reporteResultados(){
-			
-		$nombreArchivo = uniqid(md5(session_id()).'PlanCuentas') . '.pdf'; 
-		$dataSource = $this->recuperarDatosResultados();	
 		
-		//parametros basicos
-		$tamano = 'LETTER';
-		$orientacion = 'P';
-		$titulo = 'Estado de Resultados';
+		if($this->objParam->getParametro('formato') == 'pdf' ){
+			$nombreArchivo = uniqid(md5(session_id()).'PlanCuentas') . '.pdf'; 
+			$dataSource = $this->recuperarDatosResultados();	
+			
+			//parametros basicos
+			$tamano = 'LETTER';
+			$orientacion = 'P';
+			$titulo = 'Estado de Resultados';
+			
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);        
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			//Instancia la clase de pdf
+			
+			$reporte = new RResultados($this->objParam);
+			$reporte->datosHeader($dataSource, $this->objParam->getParametro('titulo_rep'), $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'));
+			//$this->objReporteFormato->renderDatos($this->res2->datos);
+			
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		}
+		else{
+			//genera reprote en excel ....
+			$this->reporteResultadosXls();
+		}	
+		
+		
+	}
+
+    
+	
+	function reporteResultadosXls()	{
+		
+		
+		$dataSource = $this->recuperarDatosResultados();
+		
+		
+		
+		//TODO recueprar configuracion ....
+		
+		$config = 'carta_horizontal';
+		$titulo = $this->objParam->getParametro('titulo_rep');
+		$nombreArchivo=uniqid(md5(session_id()));
+		
+		//obtener tamaño y orientacion
+		if ($config == 'carta_vertical') {
+			$tamano = 'LETTER';
+			$orientacion = 'P';
+		} else if ($config == 'carta_horizontal') {
+			$tamano = 'LETTER';
+			$orientacion = 'L';
+		} else if ($config == 'oficio_vertical') {
+			$tamano = 'LEGAL';
+			$orientacion = 'P';
+		} else {
+			$tamano = 'LEGAL';
+			$orientacion = 'L';
+		}
 		
 		$this->objParam->addParametro('orientacion',$orientacion);
 		$this->objParam->addParametro('tamano',$tamano);		
-		$this->objParam->addParametro('titulo_archivo',$titulo);        
+		$this->objParam->addParametro('titulo_archivo',$titulo);
+		$this->objParam->addParametro('test',$titulo);
+		
+		
+		
+			
+		$nombreArchivo.='.xls';
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
-		//Instancia la clase de pdf
+		//$this->objParam->addParametro('config',$this->res->datos[0]);
+		$this->objParam->addParametro('datos',$dataSource);
 		
-		$reporte = new RResultados($this->objParam);
-		$reporte->datosHeader($dataSource, $this->objParam->getParametro('titulo_rep'), $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'));
-		//$this->objReporteFormato->renderDatos($this->res2->datos);
+		//Instancia la clase de excel
+		$this->objReporteFormato=new RResultadosXls($this->objParam);
+		if($this->objParam->getParametro('extendido') == 'si'){
+			$this->objReporteFormato->imprimeDatosExtendido();
+		}
+		else{
+			$this->objReporteFormato->imprimeDatos();
+		}
 		
-		$reporte->generarReporte();
-		$reporte->output($reporte->url_archivo,'F');
+		$this->objReporteFormato->generarReporte();		
 		
+		
+		//Retorna nombre del archivo
 		$this->mensajeExito=new Mensaje();
 		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
-		
-	}
-
-    function clonarCuentasGestion(){
-		$this->objFunc=$this->create('MODCuenta');	
-		$this->res=$this->objFunc->clonarCuentasGestion($this->objParam);
-		$this->res->imprimirRespuesta($this->res->generarJson());
+				
 	}
 
    

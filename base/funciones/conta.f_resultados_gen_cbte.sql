@@ -132,7 +132,8 @@ BEGIN
                                     codigo_partida varchar,
                                     id_auxiliar int4,
                                     destino  varchar,
-                                    orden_cbte numeric
+                                    orden_cbte numeric,
+                                    nombre_columna  varchar
                                     ) ON COMMIT DROP;
              
          

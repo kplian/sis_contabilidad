@@ -164,7 +164,7 @@ class RResultados extends  ReportePDF {
 						if($val['monto']*1 < 0){
 							$this->SetTextColor(0,100,100,0,false,'');
 						}
-						$monto_str = number_format( $val['monto'] ,2 , '.' , ',' );
+						$monto_str = number_format( $val['monto'] ,2 , ',' , '.' );
 					}
 					
 					
