@@ -353,7 +353,7 @@ class RResultadosXls
 				
 				$sheet->getStyle(($this->equivalencias[$titulos_columnas[$val['plantilla']]]).$titulos_filas[$texto])->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
 					   
-				$sheet->setCellValueByColumnAndRow($titulos_columnas[$val['plantilla']],$titulos_filas[$texto], $val['monto']);
+				$sheet->setCellValueByColumnAndRow($titulos_columnas[$val['plantilla']],$titulos_filas[$texto], $monto_str);
 				
 				
 			}
