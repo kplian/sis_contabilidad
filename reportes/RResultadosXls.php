@@ -233,7 +233,7 @@ class RResultadosXls
 					else{
 						$color = array('rgb'=>'00000000');
 					}
-					$monto_str = number_format( $val['monto'] ,2 , ',' , '.' );
+					$monto_str =  $val['monto'];
 				}
 				
 				
@@ -247,7 +247,7 @@ class RResultadosXls
 					   $sheet->getStyle(($this->equivalencias[1]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
 					   
 					   												
-					   $sheet->setCellValueByColumnAndRow(1,$fila,$val['monto']);
+					   $sheet->setCellValueByColumnAndRow(1,$fila,$monto_str);
 				       $sheet->setCellValueByColumnAndRow(2,$fila,'');
 				       $sheet->setCellValueByColumnAndRow(3,$fila,'');
 				}
@@ -261,7 +261,7 @@ class RResultadosXls
 					   $sheet->getStyle(($this->equivalencias[2]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
 					   													
 				       $sheet->setCellValueByColumnAndRow(1,$fila,'');
-				       $sheet->setCellValueByColumnAndRow(2,$fila,$val['monto']);
+				       $sheet->setCellValueByColumnAndRow(2,$fila,$monto_str);
 				       $sheet->setCellValueByColumnAndRow(3,$fila,'');
 				  
 				}
@@ -275,7 +275,7 @@ class RResultadosXls
 					   
 					   $sheet->setCellValueByColumnAndRow(1,$fila,'');
 				       $sheet->setCellValueByColumnAndRow(2,$fila,'');
-				       $sheet->setCellValueByColumnAndRow(3,$fila,$val['monto']);
+				       $sheet->setCellValueByColumnAndRow(3,$fila,$monto_str);
 				}
 				
 				$fila++;
