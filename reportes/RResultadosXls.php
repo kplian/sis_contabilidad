@@ -231,7 +231,7 @@ class RResultadosXls
 						$color = array('rgb'=>'FF00FF00');
 					}
 					else{
-						$color = array('rgb'=>'00000000');
+						$color = array('rgb'=>'FF000000');
 					}
 					$monto_str =  $val['monto'];
 				}
@@ -256,7 +256,7 @@ class RResultadosXls
 																	    'bold'=>false,
 																	    'size'=>9,
 																	    'name'=>Arial,
-																	    'color'=>array('rgb'=>'FF00FF00')));
+																	    'color'=>array('rgb'=>$color)));
 					   
 					   $sheet->getStyle(($this->equivalencias[2]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
 					   													
@@ -270,7 +270,7 @@ class RResultadosXls
 																	    'bold'=>true,
 																	    'size'=>10,
 																	    'name'=>Arial,
-																	    'color'=>array('rgb'=>'FF00FF00')));
+																	    'color'=>array('rgb'=>$color)));
 					   $sheet->getStyle(($this->equivalencias[3]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
 					   
 					   $sheet->setCellValueByColumnAndRow(1,$fila,'');
