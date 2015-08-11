@@ -222,6 +222,7 @@ class RResultadosXls
 				//definir monto
 				if ($val['origen'] == 'titulo'){
 					$monto_str = '';
+					$color = array('rgb'=>'FF000000');
 				}
 				else {
 					//si el monto es menor a cero color rojo codigo CMYK
