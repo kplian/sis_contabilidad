@@ -222,17 +222,15 @@ class RResultadosXls
 				//definir monto
 				if ($val['origen'] == 'titulo'){
 					$monto_str = '';
-					$color = array('rgb'=>'FF000000');
+					$color = array('rgb'=>'000000');
 				}
 				else {
 					//si el monto es menor a cero color rojo codigo CMYK
 					if($val['monto']*1 < 0){
-						//TODO cambiar el color del texto	
-						//$this->SetTextColor(0,100,100,0,false,'');
-						$color = array('rgb'=>'FF00FF00');
+						$color = array('rgb'=>'FF0000');
 					}
 					else{
-						$color = array('rgb'=>'FF000000');
+						$color = array('rgb'=>'000000');
 					}
 					$monto_str =  $val['monto'];
 				}
