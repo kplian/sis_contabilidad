@@ -330,14 +330,20 @@ class RResultadosXls
 				
 				
 				
-				if($val['monto']*1 < 0){
-						//TODO cambiar el color del texto	
-						//$this->SetTextColor(0,100,100,0,false,'');
-						$color = array('rgb'=>'FF00FF00');
+				if ($val['origen'] == 'titulo'){
+					$monto_str = '';
+					$color = array('rgb'=>'000000');
+				}
+				else {
+					//si el monto es menor a cero color rojo codigo CMYK
+					if($val['monto']*1 < 0){
+						$color = array('rgb'=>'FF0000');
 					}
 					else{
-						$color = array('rgb'=>'00000000');
+						$color = array('rgb'=>'000000');
 					}
+					$monto_str =  $val['monto'];
+				}
 				//registra el monto correspondiente
 				$sheet->getStyle(($this->equivalencias[$titulos_columnas[$val['plantilla']]]).$titulos_filas[$texto])->getFont()->applyFromArray(array(
 																	    'bold'=>false,

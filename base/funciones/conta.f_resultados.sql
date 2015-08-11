@@ -126,11 +126,7 @@ BEGIN
                               where rd.id_resultado_plantilla = v_parametros.id_resultado_plantilla 
                               order by prioridad asc ) LOOP
                 
-                IF v_multiple_col = true THEN
-                  v_forzar_visible = FALSE;
-                ELSE
-                  v_forzar_visible = TRUE;
-                END IF;
+                
                 -- procesa la plantilla dependientes ... 
                 IF  not conta.f_resultado_procesar_plantilla(
                                                             v_registros.plantilla,
@@ -139,7 +135,7 @@ BEGIN
                                                             v_parametros.hasta, 
                                                             v_parametros.id_deptos,
                                                             v_id_gestion,
-                                                            v_forzar_visible,
+                                                            TRUE,
                                                             v_multiple_col) THEN
                                                             
                      raise exception 'error al procesa la plantilla %', v_registros.codigo;                                       

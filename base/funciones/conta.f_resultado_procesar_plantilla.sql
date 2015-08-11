@@ -30,7 +30,7 @@ v_visible				varchar;
 v_nombre_variable		varchar;
 v_destino				varchar;
 v_id_cuenta				integer;
-v_forzar_visible		boolean;
+v_force_invisible		boolean;
 v_registros_plan		record;
 
 BEGIN
@@ -38,6 +38,8 @@ BEGIN
     
     v_nombre_funcion = 'conta.f_resultado_procesar_plantilla';
     
+    
+                        
    --revisar si tiene dependencias  y procesarlas primero
      IF p_force_invisible  THEN
          FOR v_registros in ( select 
@@ -49,10 +51,7 @@ BEGIN
                               where rd.id_resultado_plantilla = p_id_resultado_plantilla 
                               order by prioridad asc ) LOOP
                         
-                        v_forzar_visible = TRUE;
-                        IF p_multiple_col = true THEN
-                          v_forzar_visible = FALSE;
-                        END IF;
+                        
          
                       -- procesa la plantilla dependientes ... 
                       IF  not conta.f_resultado_procesar_plantilla(
@@ -62,10 +61,10 @@ BEGIN
                                                                   p_hasta, 
                                                                   p_id_deptos,
                                                                   p_id_gestion,
-                                                                  v_forzar_visible,
+                                                                  TRUE,
                                                                   p_multiple_col) THEN
                                                                   
-                           raise exception 'error al procesa la plantilla %', v_registros.codigo;                                       
+                           raise exception 'error al procesar la plantilla %', v_registros.codigo;                                       
                      END IF;
          END LOOP;
       END IF;
@@ -81,7 +80,11 @@ BEGIN
       
           
    -- listar el detalle de la plantilla
-         
+      v_force_invisible = p_force_invisible;
+      IF p_multiple_col = true THEN
+        v_force_invisible = FALSE;
+      END IF; 
+        
          FOR v_registros in (
                              SELECT
                                *                               
@@ -90,7 +93,7 @@ BEGIN
                   
                   
                   --   2.0)  determna visibilidad
-                  IF p_force_invisible THEN
+                  IF v_force_invisible THEN
                      v_visible = 'no';
                   ELSE
                      v_visible = v_registros.visible;   
