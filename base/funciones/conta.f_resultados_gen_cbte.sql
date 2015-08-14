@@ -105,6 +105,7 @@ BEGIN
           
          --  1) Crear una tabla temporal con los datos que se utilizaran 
          CREATE TEMPORARY TABLE temp_balancef (
+         							id SERIAL, 
                                     plantilla VARCHAR,
                                     subrayar VARCHAR(3) DEFAULT 'si'::character varying,
                                     font_size VARCHAR DEFAULT 10,
@@ -133,7 +134,8 @@ BEGIN
                                     id_auxiliar int4,
                                     destino  varchar,
                                     orden_cbte numeric,
-                                    nombre_columna  varchar
+                                    nombre_columna  varchar,
+                                    prioridad numeric
                                     ) ON COMMIT DROP;
              
          

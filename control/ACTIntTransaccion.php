@@ -133,6 +133,16 @@ class ACTIntTransaccion extends ACTbase{
 		$this->res->addLastRecDatos($temp);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+    function guardarDatosBancos(){
+		$this->objFunc=$this->create('MODIntTransaccion');	
+		if($this->objParam->insertar('id_int_transaccion')){
+			$this->res=$this->objFunc->guardarDatosBancos($this->objParam);			
+		} else{			
+			$this->res=$this->objFunc->guardarDatosBancos($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 			
 }
 

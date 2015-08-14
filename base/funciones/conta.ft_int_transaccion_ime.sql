@@ -141,6 +141,13 @@ BEGIN
                 null,
                 null
 			)RETURNING id_int_transaccion into v_id_int_transaccion;
+            
+            
+            -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
+            IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
+              raise exception 'Error al procesar transacciones';
+            END IF;
+            
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción almacenado(a) con exito (id_int_transaccion'||v_id_int_transaccion||')'); 
@@ -243,9 +250,47 @@ BEGIN
               importe_gasto_mb = v_importe_debe_mb,
               importe_recurso_mb = v_importe_haber_mb
 			where id_int_transaccion=v_parametros.id_int_transaccion;
+            
+            -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
+            IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
+              raise exception 'Error al procesar transacciones';
+            END IF;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;
+        
+        
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_SAVTRABAN_MOD'
+ 	#DESCRIPCION:	actuliza datos bancarios para la transaccion
+ 	#AUTOR:		rensi (kplian)	
+ 	#FECHA:		04-08-2015 18:10:12
+	***********************************/
+
+	elsif(p_transaccion='CONTA_SAVTRABAN_MOD')then
+
+		begin
+        
+		
+			--------------------------------
+			--MODIFICACION DE LA TRANSACCION
+			--------------------------------
+			update conta.tint_transaccion set
+             nombre_cheque_trans = v_parametros.nombre_cheque_trans,
+             forma_pago = v_parametros.forma_pago,
+             nro_cheque = v_parametros.nro_cheque,
+             nro_cuenta_bancaria_trans = v_parametros.nro_cuenta_bancaria
+			where id_int_transaccion=v_parametros.id_int_transaccion;
+            
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','datos bancarios actualizados para la transaccion del cbte)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
                
             --Devuelve la respuesta

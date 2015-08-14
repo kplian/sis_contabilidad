@@ -34,6 +34,7 @@ va_id_cuenta		INTEGER[];
 v_registros_plantilla	record;
 v_multiple_col 			boolean;
 v_forzar_visible		boolean;
+v_prioridad				integer;
  
 
 BEGIN
@@ -113,7 +114,8 @@ BEGIN
                                     id_auxiliar int4,
                                     destino  varchar,
                                     orden_cbte numeric,
-                                    nombre_columna varchar
+                                    nombre_columna varchar,
+                                    prioridad numeric
                                     ) ON COMMIT DROP;
              
          
@@ -184,7 +186,7 @@ BEGIN
                                     plantilla,
                                     nombre_columna
                                 FROM temp_balancef 
-                                    order by orden asc, codigo_cuenta asc, id asc) LOOP
+                                    order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
                    RETURN NEXT v_registros;
          END LOOP;
   

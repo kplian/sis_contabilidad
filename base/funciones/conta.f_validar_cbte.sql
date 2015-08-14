@@ -103,6 +103,12 @@ BEGIN
     
     --TODO igualar y validar ....
     
+    --------------------------------------------------
+    -- Validaciones sobre el cobte y sus transacciones
+    ----------------------------------------------------
+    IF not conta.f_int_trans_validar(p_id_int_comprobante) THEN
+      raise exception 'error al realizar validaciones en el combrobante';
+    END IF;
     
    -- raise exception 'variacion %', v_variacion ;
     

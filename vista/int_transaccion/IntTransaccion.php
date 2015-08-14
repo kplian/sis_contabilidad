@@ -40,6 +40,17 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				this.Cmp.importe_debe.resumeEvents();
 			  
 		   },this);
+		   
+		
+		this.addButton('btnBanco',
+            {
+                text: 'Detalle Pago',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.loadBanco,
+                tooltip: '<b>Detalle del Pago</b><br/>Si la transaccion afecta bancos esta opción permite regitrar datos relacioandos (forma de pago, etc) '
+            }
+        );
 		
 	},
 		
@@ -394,11 +405,24 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_cuenta', type: 'string'},
 		{name:'desc_auxiliar', type: 'string'},
 		{name:'desc_partida', type: 'string'},
-		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg'
+		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg',
+		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque'
 		
 	],
 	
-	
+	loadBanco:function() {
+            var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/BancoCbte.php',
+                    'Datos de la transacción.',
+                    {
+                        width:'40%',
+                        height:300
+                    },
+                    { detalle: rec.data,
+                      cbte: this.maestro },
+                    this.idContenedor,
+                    'BancoCbte');
+     },
 	rowExpander: new Ext.ux.grid.RowExpander({
 	        tpl : new Ext.Template(
 	            '<br>',
@@ -446,15 +470,30 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
+		console.log('datos.....',rec.data)
 		if(rec.data.tipo_reg != 'summary'){
+			if(rec.data.banco == 'si'){
+				this.getBoton('btnBanco').setDisabled(false);
+			}
+			
 			return Phx.vista.IntTransaccion.superclass.preparaMenu.call(this);
+			
 		}
 		else{
 			 tb.items.get('b-edit-' + this.idContenedor).disable();
 			 tb.items.get('b-del-' + this.idContenedor).disable();
+			 this.getBoton('btnBanco').setDisabled(true);
 		}
 		
+		
+		
 	},
+	
+	liberaMenu: function() {
+		var tb = Phx.vista.IntTransaccion.superclass.liberaMenu.call(this);
+		this.getBoton('btnBanco').setDisabled(true);
+	},
+	
 	getGestion:function(x){
 		if(Ext.isDate(x)){
 	        Ext.Ajax.request({ 

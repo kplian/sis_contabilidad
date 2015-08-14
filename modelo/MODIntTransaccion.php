@@ -61,6 +61,16 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('importe_gasto_mb','numeric');
 		$this->captura('importe_recurso_mb','numeric');
 		
+		$this->captura('banco','varchar');
+		$this->captura('forma_pago','varchar');
+		$this->captura('nombre_cheque_trans','varchar');
+		$this->captura('nro_cuenta_bancaria_trans','varchar');
+		$this->captura('nro_cheque','INTEGER');
+		
+		
+		
+                       
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -154,6 +164,29 @@ class MODIntTransaccion extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+   function guardarDatosBancos(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_transaccion_ime';
+		$this->transaccion='CONTA_SAVTRABAN_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_transaccion','id_int_transaccion','int4');
+		$this->setParametro('nombre_cheque_trans','nombre_cheque_trans','varchar');
+		$this->setParametro('forma_pago','forma_pago','varchar');
+		$this->setParametro('nro_cheque','nro_cheque','int4');		
+		$this->setParametro('nro_cuenta_bancaria','nro_cuenta_bancaria','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
 
    function listarIntTransaccionMayor(){
 		//Definicion de variables para ejecucion del procedimientp

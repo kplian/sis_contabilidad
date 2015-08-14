@@ -1656,3 +1656,30 @@ ALTER TABLE conta.tresultado_plantilla
 
 /***********************************F-SCP-RAC-CONTA-1-23/07/2015****************************************/
 
+
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-13/08/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN banco VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.banco
+IS 'si la trasaccion necesita el registro de banco y forma de apgo (para cbtes manuales)';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN origen VARCHAR(30);
+
+COMMENT ON COLUMN conta.tint_comprobante.origen
+IS 'identifica donde se origina el comprobante,  util para el caso de comprobantes provienietnes de la integracion regioanles';
+
+/***********************************F-SCP-RAC-CONTA-1-13/08/2015****************************************/
+

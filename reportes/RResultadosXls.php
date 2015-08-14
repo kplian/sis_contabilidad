@@ -251,7 +251,7 @@ class RResultadosXls
 				       $sheet->setCellValueByColumnAndRow(3,$fila,'');
 				}
 				elseif($val['montopos'] == 2){
-					 $sheet->getStyle(($this->equivalencias[2]).$fila)->getFont()->applyFromArray(array(
+					  $sheet->getStyle(($this->equivalencias[2]).$fila)->getFont()->applyFromArray(array(
 																	    'bold'=>false,
 																	    'size'=>9,
 																	    'name'=>Arial,
@@ -270,6 +270,8 @@ class RResultadosXls
 																	    'size'=>10,
 																	    'name'=>Arial,
 																	    'color'=>$color));
+																		
+																		
 					   $sheet->getStyle(($this->equivalencias[3]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
 					   
 					   $sheet->setCellValueByColumnAndRow(1,$fila,'');

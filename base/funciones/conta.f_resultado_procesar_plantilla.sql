@@ -32,6 +32,7 @@ v_destino				varchar;
 v_id_cuenta				integer;
 v_force_invisible		boolean;
 v_registros_plan		record;
+v_id_prioridad			integer;
 
 BEGIN
      
@@ -511,11 +512,23 @@ BEGIN
                   END IF;
           END LOOP;
         
+        --recuperamos la prioridad de la plantilla
+        
+        select 
+          id
+        into 
+          v_id_prioridad 
+        from temp_balancef 
+        where plantilla = v_registros_plan.plantilla 
+        order by id asc
+        offset 0 limit 1;
+      
         --update el nombrede columna para la plantilla
         
         
         UPDATE  temp_balancef set
-          nombre_columna = v_registros_plan.nombre_columna
+          nombre_columna = v_registros_plan.nombre_columna,
+          prioridad = v_id_prioridad
         WHERE plantilla = v_registros_plan.plantilla;
         
         

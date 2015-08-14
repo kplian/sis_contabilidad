@@ -981,3 +981,14 @@ select pxp.f_insert_testructura_gui ('BALGEN', 'REPCON');
 
 /***********************************F-DAT-RAC-CONTA-0-13/07/2015*****************************************/
 
+
+
+/***********************************I-DAT-RAC-CONTA-0-14/08/2015*****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_validar_forma_pago', E'no', E'al validar cbtes manuales verifica si la trasaccion es bancaria y exige los datos forma_pago, nro_cheque, etc');
+
+/***********************************F-DAT-RAC-CONTA-0-14/08/2015*****************************************/
+
+

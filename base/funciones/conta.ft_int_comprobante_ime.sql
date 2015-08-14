@@ -115,7 +115,8 @@ BEGIN
             id_int_comprobante_fks,
             cbte_cierre,
             cbte_apertura,
-            cbte_aitb
+            cbte_aitb,
+            manual
           	) values(
 			v_parametros.id_clase_comprobante,
 			
@@ -144,7 +145,8 @@ BEGIN
             (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
             v_parametros.cbte_cierre,
             v_parametros.cbte_apertura,
-            v_parametros.cbte_aitb
+            v_parametros.cbte_aitb,
+            'si'
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
@@ -231,6 +233,12 @@ BEGIN
             cbte_apertura = v_parametros.cbte_apertura,
             cbte_aitb = v_parametros.cbte_aitb
 			where id_int_comprobante=v_parametros.id_int_comprobante;
+            
+            
+             -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
+            IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
+              raise exception 'Error al procesar transacciones';
+            END IF;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante modificado(a)'); 

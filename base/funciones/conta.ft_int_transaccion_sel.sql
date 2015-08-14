@@ -85,8 +85,13 @@ BEGIN
 						transa.importe_debe_mb,	
 						transa.importe_haber_mb,
 						transa.importe_gasto_mb,
-						transa.importe_recurso_mb
-						from conta.tint_transaccion transa
+						transa.importe_recurso_mb,
+                        transa.banco,
+                        transa.forma_pago,
+                        transa.nombre_cheque_trans,
+                        transa.nro_cuenta_bancaria_trans,
+                        transa.nro_cheque
+                        from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
 						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
