@@ -755,11 +755,10 @@ BEGIN
                         and tra.forma_pago= 'cheque' and ctb.id_finalidad is not null and ctb.centro='no';
                         raise notice '% % %', p_id_usuario, p_id_int_comprobante,v_id_finalidad;
                         IF v_estado_cbte_pago = 'validado' THEN
-                        	if(v_prioridad_conta=0 and v_prioridad_libro != 0)then                        		
-                            	v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,array[p_id_int_comprobante],
-                                						v_id_finalidad,NULL,'','endesis');	
-							elseif(v_prioridad_conta!=0 and v_prioridad_libro!=0)then	
-                                v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,array[p_id_int_comprobante],
+                        	if(v_prioridad_conta=1 and v_prioridad_libro != 1)then                        		
+                            	v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,'','endesis');	
+							elseif(v_prioridad_conta!=1 and v_prioridad_libro!=1)then	
+                                v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante,
                             							v_id_finalidad,NULL,'','endesis');
                             end if;
                         END IF;
