@@ -454,7 +454,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		this.maestro.id_gestion = this.getGestion(fecha);
 		//Se setea el combo de moneda con el valor del padre
 		
-		 this.setColumnHeader('importe_debe', this.Cmp.importe_haber.fieldLabel +' '+this.maestro.desc_moneda);
+		 this.setColumnHeader('importe_debe', this.Cmp.importe_debe.fieldLabel +' '+this.maestro.desc_moneda);
 		 this.setColumnHeader('importe_haber', this.Cmp.importe_haber.fieldLabel +' '+this.maestro.desc_moneda);
 		 //si a moneda del comprobate es base ocultamos la columnas duplicadas
 		 if(this.maestro.id_moneda_base == this.maestro.id_moneda){

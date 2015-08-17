@@ -79,24 +79,24 @@ BEGIN
             -- si la moneda es distinto de la moneda base, calculamos segun tipo de cambio
             IF v_id_moneda_base != v_registros.id_moneda  THEN
                
+            
+                              
                  IF  v_registros.tipo_cambio is not  NULL THEN
-                                 
+                              
                    --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
                    v_importe_debe_mb  = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_debe, v_registros.fecha,'CUS',2, v_registros.tipo_cambio);
                    v_importe_haber_mb = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_haber, v_registros.fecha,'CUS',2, v_registros.tipo_cambio);
                               
                 ELSE
-                              
-                  --si no tenemso tipo de cambio convenido .....
-                   v_importe_debe_mb  = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_debe, v_registros.fecha,'O',2);
-                   v_importe_haber_mb = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_haber, v_registros.fecha,'O',2);
-                             
-                              
+                   --TODO si no hay tipo de cambio registramos solo en la moneda origen .... 
+                          
+                   v_importe_debe_mb = NULL;
+                   v_importe_haber_mb = NULL;      
                 END IF;
              
             END IF;
          
-        
+       
         	-----------------------------
         	--REGISTRO DE LA TRANSACCIÓN
         	-----------------------------
@@ -183,37 +183,29 @@ BEGIN
             
              -- Obtener la moneda base
              v_id_moneda_base = param.f_get_moneda_base();
-             
-             
-             
             
              v_importe_debe  =  v_parametros.importe_debe;
              v_importe_haber = v_parametros.importe_haber;          
              v_importe_debe_mb  =  v_parametros.importe_debe;
              v_importe_haber_mb = v_parametros.importe_haber;
              
-            -- si la moneda es distinto de la moneda base, calculamos segun tipo de cambio
+             -- si la moneda es distinto de la moneda base, calculamos segun tipo de cambio
             IF v_id_moneda_base != v_registros.id_moneda  THEN
-               
-                 IF  v_registros.tipo_cambio is not  NULL THEN
-                                 
+               IF  v_registros.tipo_cambio is not  NULL THEN
+                              
                    --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
                    v_importe_debe_mb  = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_debe, v_registros.fecha,'CUS',2, v_registros.tipo_cambio);
                    v_importe_haber_mb = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_haber, v_registros.fecha,'CUS',2, v_registros.tipo_cambio);
                               
                 ELSE
-                              
-                  --si no tenemso tipo de cambio convenido .....
-                   v_importe_debe_mb  = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_debe, v_registros.fecha,'O',2);
-                   v_importe_haber_mb = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_haber, v_registros.fecha,'O',2);
-                             
-                              
+                   --TODO si no hay tipo de cambio registramos solo en la moneda origen .... 
+                   v_importe_debe_mb = NULL;
+                   v_importe_haber_mb = NULL;      
                 END IF;
              
             END IF;
             
-            --raise exception '%, % , %',v_id_moneda_base, v_importe_debe_mb,v_importe_debe;
-			---------------
+            ---------------
         	--VALIDACIONES
         	---------------
         	--VerIfica el estado

@@ -150,6 +150,8 @@ BEGIN
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
+            
+            
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante almacenado(a) con exito (id_int_comprobante'||v_id_int_comprobante||')'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_id_int_comprobante::varchar);
@@ -224,7 +226,7 @@ BEGIN
 			fecha = v_parametros.fecha,
 			glosa2 = v_parametros.glosa2,
 			
-			--momento = v_parametros.momento,
+			-- momento = v_parametros.momento,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
             id_usuario_ai = v_parametros._id_usuario_ai,
@@ -232,10 +234,18 @@ BEGIN
             cbte_cierre = v_parametros.cbte_cierre,
             cbte_apertura = v_parametros.cbte_apertura,
             cbte_aitb = v_parametros.cbte_aitb
-			where id_int_comprobante=v_parametros.id_int_comprobante;
+			where id_int_comprobante = v_parametros.id_int_comprobante;
+            
+            -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones 
+            IF v_parametros.tipo_cambio is not NULL and (v_reg_cbte.tipo_cambio is null or v_parametros.tipo_cambio != v_reg_cbte.tipo_cambio) THEN
+              IF  not conta.f_int_trans_recalcular_tc(v_parametros.id_int_comprobante) THEN
+                raise exception 'Error al reprocesar el tipo de cambio';
+              END IF;
+            END IF;
+            
+            -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
             
             
-             -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
               raise exception 'Error al procesar transacciones';
             END IF;

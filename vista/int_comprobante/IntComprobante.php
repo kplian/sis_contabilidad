@@ -477,7 +477,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'tipo_cambio',
 				fieldLabel: 'Tipo Cambio',
-				allowBlank: false,
+				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:20,

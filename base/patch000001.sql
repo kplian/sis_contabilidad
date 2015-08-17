@@ -1681,5 +1681,16 @@ ALTER TABLE conta.tint_comprobante
 COMMENT ON COLUMN conta.tint_comprobante.origen
 IS 'identifica donde se origina el comprobante,  util para el caso de comprobantes provienietnes de la integracion regioanles';
 
+
+
+ALTER TABLE conta.tint_comprobante
+  DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
+  
+  
 /***********************************F-SCP-RAC-CONTA-1-13/08/2015****************************************/
+
+
+
+
+
 
