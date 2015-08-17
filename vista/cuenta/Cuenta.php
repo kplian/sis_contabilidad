@@ -56,10 +56,10 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 			  	params:{
 			  		id_gestion: this.cmbGestion.getValue()
 			      },
-			      success:this.successRep,
+			      success: this.successRep,
 			      failure: this.conexionFailure,
-			      timeout:this.timeout,
-			      scope:this
+			      timeout: this.timeout,
+			      scope: this
 			});
 		}
 		else{

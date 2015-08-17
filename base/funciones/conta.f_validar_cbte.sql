@@ -32,6 +32,7 @@ DECLARE
     v_variacion        				numeric;
     v_nombre_conexion				varchar;
     v_sincronizar					varchar;
+    v_pre_integrar_presupuestos		varchar;
      
 
 BEGIN
@@ -39,6 +40,7 @@ BEGIN
  
 
      v_nombre_funcion:='conta.f_validar_cbte';
+     v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
     --raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';	
 	v_errores = '';
     
@@ -80,8 +82,12 @@ BEGIN
     
     
     
-    
-    
+    --validar que el periodo al que se agregara este abierto
+    IF  p_origen != 'endesis' THEN
+      IF not param.f_periodo_subsistema_abierto(v_rec_cbte.fecha::date, 'CONTA') THEN
+        raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_rec_cbte.fecha;
+      END IF;
+    END IF;
     
     --Verificación de existencia de al menos 2 transacciones
     select coalesce(count(id_int_transaccion),0)
@@ -158,12 +164,11 @@ BEGIN
     --4. Verificación de igualdad del gasto y recurso
     
     
-    --5.  Validacion presupuestaria del comprobante
-         -- no se ejecuta solo verifica si el dinero comprometido o devengado es suficiente para proseguir con 
-         --la transaccion
-        
-     v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
-   
+    --5.  Validacion presupuestaria del comprobante no se ejecuta solo verifica 
+    --    si el dinero comprometido o devengado es suficiente para proseguir con la transaccion
+     IF v_pre_integrar_presupuestos = 'true' THEN    
+     	v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
+     END IF;
   
    
     --6. Numeración del comprobante
@@ -317,9 +322,9 @@ BEGIN
         -----------------------------------------------------------------------------------------------
         --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
         ------------------------------------------------------------------------------------------------
-        
-        v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
-       
+        IF v_pre_integrar_presupuestos = 'true' THEN 
+        	v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
+        END IF;
     
         --10.cerrar conexion dblink si es que existe 
         if p_origen  = 'endesis' then

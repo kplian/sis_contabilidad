@@ -66,11 +66,15 @@ BEGIN
     
       ELSE
          ---------------------------------------
-         -- Si el comprobante esta NO esta en borrador
+         -- Si el comprobante  NO esta en borrador
          --------------------------------------
        
-         --TODO validar que el periodo contable no este cerrado
       
+           --TODO validar que el periodo contable no este cerrado
+          IF not param.f_periodo_subsistema_abierto(v_rec_cbte.fecha::date, 'CONTA') THEN
+              raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_rec_cbte.fecha;
+          END IF;
+          
          
          --TODO validar que solo un usuario autorizado pueda elimar comprobantes
          

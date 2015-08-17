@@ -22,7 +22,7 @@ Phx.vista.PeriodoConta = {
        	Phx.vista.PeriodoConta.superclass.constructor.call(this,config);
 		this.init();
 		Ext.apply(this.store.baseParams,{codSist: this.codSist});
-		this.load({params:{start:0, limit:50}});
+		//this.load({params:{start:0, limit:50}});
 	},
 	
     codReporte:'S/C',
