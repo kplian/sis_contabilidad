@@ -82,8 +82,8 @@ DECLARE
     v_id_finalidad		integer;
     v_estado_cbte_pago	varchar;
     v_respuesta_libro_bancos varchar;
-    v_codigo_depto_conta	varchar;
-    v_codigo_depto_libro	varchar;
+    v_prioridad_conta		integer;
+    v_prioridad_libro		integer;
 
 BEGIN
 	
@@ -744,8 +744,8 @@ BEGIN
                         from tes.tfinalidad fin
                         where fin.nombre_finalidad ilike 'proveedores';
                         
-             			select cbt.estado_reg, dpc.codigo, dpl.codigo 
-                        into v_estado_cbte_pago, v_codigo_depto_conta, v_codigo_depto_libro       
+             			select cbt.estado_reg, dpc.prioridad, dpl.prioridad 
+                        into v_estado_cbte_pago, v_prioridad_conta, v_prioridad_libro       
                         from conta.tint_comprobante cbt
                         inner join conta.tint_transaccion tra on tra.id_int_comprobante=cbt.id_int_comprobante
                         inner join tes.tcuenta_bancaria ctb on ctb.id_cuenta_bancaria = tra.id_cuenta_bancaria
@@ -755,11 +755,11 @@ BEGIN
                         and tra.forma_pago= 'cheque' and ctb.id_finalidad is not null and ctb.centro='no';
                         raise notice '% % %', p_id_usuario, p_id_int_comprobante,v_id_finalidad;
                         IF v_estado_cbte_pago = 'validado' THEN
-                        	if(v_codigo_depto_conta='CON' and v_codigo_depto_libro != 'LB-CBB')then                        		
-                            	v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante,
+                        	if(v_prioridad_conta=0 and v_prioridad_libro != 0)then                        		
+                            	v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,array[p_id_int_comprobante],
                                 						v_id_finalidad,NULL,'','endesis');	
-							else	
-                                v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante,
+							elseif(v_prioridad_conta!=0 and v_prioridad_libro!=0)then	
+                                v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,array[p_id_int_comprobante],
                             							v_id_finalidad,NULL,'','endesis');
                             end if;
                         END IF;
