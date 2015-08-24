@@ -1683,14 +1683,126 @@ IS 'identifica donde se origina el comprobante,  util para el caso de comprobant
 
 
 
-ALTER TABLE conta.tint_comprobante
-  DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
-  
-  
+
 /***********************************F-SCP-RAC-CONTA-1-13/08/2015****************************************/
 
 
 
+/***********************************I-SCP-RAC-CONTA-1-18/08/2015****************************************/
+
+ALTER TABLE conta.tint_comprobante
+  DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
+  
+CREATE TABLE conta.tdoc_compra_venta (
+  id_doc_compra_venta BIGSERIAL,
+  id_plantilla INTEGER,
+  fecha DATE,
+  estado VARCHAR(30) DEFAULT 'registrado'::character varying,
+  tabla_origen VARCHAR(150),
+  id_origen INTEGER,
+  nro_autorizacion VARCHAR(200),
+  codigo_control VARCHAR(200),
+  nro_documento VARCHAR(100) NOT NULL,
+  id_depto_conta INTEGER,
+  nit VARCHAR(100),
+  razon_social VARCHAR,
+  sw_contabilizar VARCHAR(3) DEFAULT 'no'::character varying,
+  obs VARCHAR,
+  importe_excento NUMERIC(18,2),
+  importe_ice NUMERIC(18,2),
+  importe_it NUMERIC(18,2),
+  importe_iva NUMERIC(18,2),
+  importe_descuento NUMERIC(18,2),
+  importe_doc NUMERIC(18,2),
+  revisado VARCHAR(3) DEFAULT 'no'::character varying,
+  tipo VARCHAR(25) NOT NULL,
+  movil VARCHAR(3) DEFAULT 'no'::character varying,
+  manual VARCHAR(3) DEFAULT 'no'::character varying NOT NULL,
+  id_int_comprobante INTEGER,
+  importe_descuento_ley NUMERIC(18,2),
+  importe_pago_liquido NUMERIC(18,2),
+  CONSTRAINT tdoc_compra_venta_pkey PRIMARY KEY(id_doc_compra_venta)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.estado
+IS 'registrado, validado';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.tabla_origen
+IS 'esquema mas tabla donde se origina el documento';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_origen
+IS 'id de la tabla origen del documento';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.nro_documento
+IS 'nro de factura o depoliza o recibo segun plantilla';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.nit
+IS 'nro de identificacion de proveedor';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.sw_contabilizar
+IS 'si o no, se considera para generar cbte, por ejemplo los que venga de obligacion de pago tiene el valor NO, por que ese sistema se encarga de generar el cbte corespondiente';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.revisado
+IS 'si o no, si ya fue revisado fisicamente';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.tipo
+IS 'compra o venta';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.movil
+IS 'cargado desde aplicacion movil con codigo QR';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.manual
+IS 'si o no , si fue registrado a mano';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_int_comprobante
+IS 'identifica al comprobante donde fue contabilizado';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.importe_descuento_ley
+IS 'campo para registras descuentos de ley como el it o eiue o iuebe';
+
+/***********************************F-SCP-RAC-CONTA-1-18/08/2015****************************************/
 
 
+
+/***********************************I-SCP-RAC-CONTA-1-21/08/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_periodo INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_periodo
+IS 'id del periodo correpondiente con la fecha';
+
+
+
+/***********************************F-SCP-RAC-CONTA-1-21/08/2015****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-24/08/2015****************************************/
+
+CREATE TABLE conta.tperiodo_compra_venta (
+  id_periodo_compra_venta SERIAL,
+  id_depto INTEGER,
+  id_periodo INTEGER,
+  estado VARCHAR(20) DEFAULT 'abierto'::character varying NOT NULL,
+  CONSTRAINT tperiodo_compra_venta_pkey PRIMARY KEY(id_periodo_compra_venta)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tperiodo_compra_venta.id_depto
+IS 'depto de contabilidad';
+
+COMMENT ON COLUMN conta.tperiodo_compra_venta.id_periodo
+IS 'periodo general en parametros';
+
+COMMENT ON COLUMN conta.tperiodo_compra_venta.estado
+IS 'cerrado (no se permite mas el registro de facturas), cerrado_parcial (solo contabilidad puede registrar), abierto(todos peuden registrar)';
+/***********************************F-SCP-RAC-CONTA-1-24/08/2015****************************************/
 

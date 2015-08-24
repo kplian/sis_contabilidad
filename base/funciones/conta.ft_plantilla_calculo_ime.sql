@@ -151,7 +151,7 @@ BEGIN
     /*********************************    
  	#TRANSACCION:  'CONTA_GETDEC_IME'
  	#DESCRIPCION:	Recuperar decuetnos de la plantilla de calculo indicada
- 	#AUTOR:		admin	
+ 	#AUTOR:		rensi	
  	#FECHA:		28-08-2013 19:01:20
 	***********************************/
 
@@ -176,6 +176,86 @@ BEGIN
              v_resp = pxp.f_agrega_clave(v_resp,'descuento',v_registros.ps_descuento::varchar);
              v_resp = pxp.f_agrega_clave(v_resp,'observaciones',v_registros.ps_observaciones::varchar);
               
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_GETDETPLA_IME'
+ 	#DESCRIPCION:	Recuperar IVA-CF, IVA-DF, IT, DESCUENTOS, ICE
+ 	#AUTOR:		rensi	
+ 	#FECHA:		19-08-2015 19:01:20
+	***********************************/
+
+	elsif(p_transaccion='CONTA_GETDETPLA_IME')then
+
+		begin
+        
+             --Definicion de la respuesta
+             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de decuentos recuperados con exito'); 
+             v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla',v_parametros.id_plantilla::varchar);
+			
+            -- llamada a la funcion de recuperacion de descuento
+             select  
+               ps_descuento_porc,
+               ps_descuento,
+               ps_observaciones
+             into
+              v_registros
+             FROM  conta.f_get_descuento_plantilla_calculo(v_parametros.id_plantilla);
+            
+             v_resp = pxp.f_agrega_clave(v_resp,'descuento_porc',COALESCE(v_registros.ps_descuento_porc::varchar,'NO'));
+             v_resp = pxp.f_agrega_clave(v_resp,'descuento',v_registros.ps_descuento::varchar);
+             v_resp = pxp.f_agrega_clave(v_resp,'observaciones',v_registros.ps_observaciones::varchar);
+            
+            
+            --recupera IVA-CF
+            v_registros = NULL;
+            
+            select  
+               ps_monto_porc,
+               ps_observaciones
+             into
+              v_registros
+             FROM  conta.f_get_detalle_plantilla_calculo(v_parametros.id_plantilla, 'IVA-CF');
+             
+              v_resp = pxp.f_agrega_clave(v_resp,'porc_iva_cf', COALESCE(v_registros.ps_monto_porc::varchar,'NO'));
+            
+           
+            --recupera IVA-DF
+            v_registros = NULL;
+            
+             select  
+               ps_monto_porc,
+               ps_observaciones
+             into
+              v_registros
+             FROM  conta.f_get_detalle_plantilla_calculo(v_parametros.id_plantilla, 'IVA-DF');
+             v_resp = pxp.f_agrega_clave(v_resp,'porc_iva_df',COALESCE(v_registros.ps_monto_porc::varchar,'NO'));
+             
+           
+            --recupera IT
+            v_registros = NULL;
+            select  
+               ps_monto_porc,
+               ps_observaciones
+             into
+              v_registros
+             FROM  conta.f_get_detalle_plantilla_calculo(v_parametros.id_plantilla, 'IT');
+            v_resp = pxp.f_agrega_clave(v_resp,'porc_it',COALESCE(v_registros.ps_monto_porc::varchar,'NO'));
+            
+            --recupera ICE
+            v_registros = NULL;
+            select  
+               ps_monto_porc,
+               ps_observaciones
+             into
+              v_registros
+             FROM  conta.f_get_detalle_plantilla_calculo(v_parametros.id_plantilla, 'ICE');
+            v_resp = pxp.f_agrega_clave(v_resp,'porc_ice',COALESCE(v_registros.ps_monto_porc::varchar,'NO'));
+            
+            
+            
             --Devuelve la respuesta
             return v_resp;
 
