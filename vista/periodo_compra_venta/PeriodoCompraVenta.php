@@ -73,6 +73,7 @@ Phx.vista.PeriodoCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Gestion',
 				allowBlank: false,
 				emptyText:'Gestion...',
+				blankText: 'Año',
 				store:new Ext.data.JsonStore(
 				{
 					url: '../../sis_parametros/control/Gestion/listarGestion',

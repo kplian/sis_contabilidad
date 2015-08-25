@@ -166,6 +166,49 @@ class MODDocCompraVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+     function listarNroAutorizacion(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_doc_compra_venta_sel';
+		$this->transaccion='CONTA_DCVNA_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('nro_autorizacion','nro_autorizacion','varchar');
+		
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('nro_autorizacion','varchar');
+		$this->captura('nit','varchar');		
+		$this->captura('razon_social','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+   function listarNroNit(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_doc_compra_venta_sel';
+		$this->transaccion='CONTA_DCVNIT_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('nit','nit','varchar');
+		
+		//Definicion de la lista del resultado del query
+		$this->captura('nit','varchar');		
+		$this->captura('razon_social','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 			
 }
 ?>

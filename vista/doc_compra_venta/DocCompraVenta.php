@@ -10,11 +10,12 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
-    fheight: '60%',
+    fheight: '80%',
     fwidth: '70%',
+    tabEnter: true,
 	constructor:function(config){
 		this.maestro=config.maestro;
-		this.initButtons=[this.cmbGestion];
+		this.initButtons=[this.cmbGestion,this.cmbPeriodo];
 		var me = this;
 		this.Grupos = [
 		            {
@@ -27,7 +28,6 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		                              {
 		                                xtype: 'fieldset',
 		                                title: 'Datos del Documento',
-		                                autoHeight: true,
 		                                items: [],
 		                                id_grupo:0,
 		                                margins:'2 2 2 2'
@@ -36,8 +36,6 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		                            {
 		                                xtype: 'fieldset',
 		                                title: 'Detalle de Pago',
-		                                autoHeight: true,
-		                                //layout:'hbox',
 		                                items: [],
 		                                margins:'2 10 2 2',
 		                                id_grupo:1,
@@ -48,15 +46,55 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		
     	//llama al constructor de la clase padre
 		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
+		
+		this.cmbGestion.on('select', function(combo, record, index){
+			this.tmpGestion = record.data.gestion;
+		    this.cmbPeriodo.enable();
+		    this.cmbPeriodo.reset();
+		    this.store.removeAll();
+		    this.cmbPeriodo.store.baseParams = Ext.apply(this.cmbPeriodo.store.baseParams, {id_gestion: this.cmbGestion.getValue()});
+		    this.cmbPeriodo.modificado = true;
+        },this);
+        
+        this.cmbPeriodo.on('select', function( combo, record, index){
+			this.tmpPeriodo = record.data.periodo;
+			this.capturaFiltros();
+		    
+        },this);
+		
 		this.iniciarEventos();
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		//this.load({params:{start:0, limit:this.tam_pag}});
 	},
 	
+	capturaFiltros:function(combo, record, index){
+        this.desbloquearOrdenamientoGrid();
+        this.store.baseParams.id_gestion = this.cmbGestion.getValue();
+        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
+        this.load(); 
+    },
+    
+    validarFiltros:function(){
+        if(this.cmbGestion.validate() && this.cmbPeriodo.validate()){
+            return true;
+        }
+        else{
+            return false;
+        }
+    },
+    onButtonAct:function(){
+    	if(!this.validarFiltros()){
+            alert('Especifique los filtros antes')
+        }
+    },
+    
+    
+    
 	cmbGestion: new Ext.form.ComboBox({
 				fieldLabel: 'Gestion',
 				allowBlank: false,
 				emptyText:'Gestion...',
+				blankText: 'Año',
 				store:new Ext.data.JsonStore(
 				{
 					url: '../../sis_parametros/control/Gestion/listarGestion',
@@ -82,7 +120,41 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				listWidth:'280',
 				width:80
 			}),
-			
+	
+	
+     cmbPeriodo: new Ext.form.ComboBox({
+				fieldLabel: 'Periodo',
+				allowBlank: false,
+				blankText : 'Mes',
+				emptyText:'Periodo...',
+				store:new Ext.data.JsonStore(
+				{
+					url: '../../sis_parametros/control/Periodo/listarPeriodo',
+					id: 'id_periodo',
+					root: 'datos',
+					sortInfo:{
+						field: 'periodo',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_periodo','periodo','id_gestion'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams:{par_filtro:'gestion'}
+				}),
+				valueField: 'id_periodo',
+				triggerAction: 'all',
+				displayField: 'periodo',
+			    hiddenName: 'id_periodo',
+    			mode:'remote',
+				pageSize:50,
+				disabled: true,
+				queryDelay:500,
+				listWidth:'280',
+				width:80
+			}),
+	
+            		
 	Atributos:[
 		{
 			//configuracion del componente
@@ -169,7 +241,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
    			config:{
    				 name:'id_depto_conta',
    				 hiddenName: 'id_depto_conta',
-   				 qtip: 'Departamento contable dond ese contabiliza',
+   				 qtip: 'Departamento contable',
    				 url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
 	   				origen:'DEPTO',
 	   				allowBlank:false,
@@ -232,6 +304,24 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             grid: true,
             form: true
         },
+		{
+			config:{
+				name: 'dia',
+				fieldLabel: 'Dia',
+				allowBlank: true,
+				allowNEgative: false,
+				allowDecimal: false,
+				maxValue: 31,
+				minValue: 1,
+				width: 40,
+				
+				gwidth: 100
+			},
+				type:'NumberField',
+				id_grupo:0,
+				grid:false,
+				form: true
+		},
 		
 		{
 			config:{
@@ -240,8 +330,9 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				format: 'd/m/Y',
+				readOnly:true,
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
 				type:'DateField',
 				filters:{pfiltro:'dcv.fecha',type:'date'},
@@ -249,21 +340,94 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
-		{
-			config:{
-				name: 'nro_autorizacion',
-				fieldLabel: 'Autorizacion',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:200
-			},
-				type:'TextField',
-				filters:{pfiltro:'dcv.nro_autorizacion',type:'string'},
-				id_grupo:0,
-				grid:true,
-				form:true
-		},
+        {
+            config:{
+                name: 'nro_autorizacion',
+                fieldLabel: 'Autorización',
+                allowBlank: false,
+                emptyText:'autorización ...',
+                store:new Ext.data.JsonStore(
+                {
+                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroAutorizacion',
+                    id: 'nro_autorizacion',
+                    root:'datos',
+                    sortInfo:{
+                        field:'nro_autorizacion',
+                        direction:'ASC'
+                    },
+                    totalProperty:'total',
+                    fields: ['nro_autorizacion','nit','razon_social'],
+                    remoteSort: true
+                }),
+                valueField: 'nro_autorizacion',
+                hiddenValue: 'nro_autorizacion',
+                displayField: 'nro_autorizacion',
+                gdisplayField:'nro_autorizacion',
+                queryParam: 'nro_autorizacion',
+                listWidth:'280',
+                forceSelection:false,
+                hideTrigger:true,
+                typeAhead: false,
+                triggerAction: 'query',
+                lazyRender:false,
+                mode:'remote',
+                pageSize:20,
+                queryDelay:500,
+                gwidth: 250,
+                minChars:2
+            },
+            type:'ComboBox',
+            filters:{pfiltro:'dcv.nro_autorizacion',type:'string'},
+            id_grupo: 0,
+            grid: true,
+            form: true
+        },
+        
+        {
+            config:{
+                name: 'nit',
+                fieldLabel: 'NIT',
+                qtip: 'Número de indentificación del proveedor',
+                allowBlank: false,
+                emptyText:'nit ...',
+                store:new Ext.data.JsonStore(
+                {
+                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroNit',
+                    id: 'nit',
+                    root:'datos',
+                    sortInfo:{
+                        field:'nit',
+                        direction:'ASC'
+                    },
+                    totalProperty:'total',
+                    fields: ['nit','razon_social'],
+                    remoteSort: true
+                }),
+                valueField: 'nit',
+                hiddenValue: 'nit',
+                displayField: 'nit',
+                gdisplayField:'nit',
+                queryParam: 'nit',
+                listWidth:'280',
+                forceSelection:false,
+                hideTrigger:true,
+                typeAhead: false,
+                triggerAction: 'query',
+                lazyRender:false,
+                mode:'remote',
+                pageSize:20,
+                queryDelay:500,
+                gwidth: 250,
+                minChars:2
+            },
+            type:'ComboBox',
+            filters:{pfiltro:'dcv.nit',type:'string'},
+            id_grupo: 0,
+            grid: true,
+            form: true
+        },
+		
+		/*
 		{
 			config:{
 				name: 'nit',
@@ -278,7 +442,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:0,
 				grid:true,
 				form:true
-		},
+		},*/
 		{
 			config:{
 				name: 'razon_social',
@@ -323,6 +487,22 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:0,
 				grid:true,
 				form:true
+		},
+		
+		{
+			config:{
+				name: 'obs',
+				fieldLabel: 'Obs',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength: 400
+			},
+				type:'TextArea',
+				filters:{ pfiltro:'dcv.obs',type:'string' },
+				id_grupo:0,
+				grid: true,
+				form: true
 		},
 		{
 			config:{
@@ -439,22 +619,6 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'dcv.importe_pago_liquido',type:'numeric'},
 				id_grupo:1,
 				grid:true,
-				form: true
-		},
-		
-		{
-			config:{
-				name: 'obs',
-				fieldLabel: 'Obs',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength: 400
-			},
-				type:'TextArea',
-				filters:{ pfiltro:'dcv.obs',type:'string' },
-				id_grupo:0,
-				grid: true,
 				form: true
 		},
 		
@@ -658,12 +822,36 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_doc_compra_venta',
 		direction: 'ASC'
 	},
-	bdel:true,
-	bsave:true,
+	bdel: true,
+	bsave: false,
 	iniciarEventos: function(){
+		
+		this.Cmp.dia.on('change',function( cmp, newValue, oldValue){
+			
+			
+			var dia =  newValue>9?newValue:'0'+newValue, 
+			    mes =  this.tmpPeriodo>9?this.tmpPeriodo:'0'+this.tmpPeriodo,
+			    tmpFecha = dia+'/'+mes+'/'+this.tmpGestion;
+			    resp = this.Cmp.fecha.setValue(tmpFecha);
+			
+			
+		}, this);
+		
+		this.Cmp.nro_autorizacion.on('select', function(cmb,rec,i){
+			this.Cmp.nit.setValue(rec.data.nit);
+			this.Cmp.razon_social.setValue(rec.data.razon_social);
+		} ,this);
+		
+		this.Cmp.nit.on('select', function(cmb,rec,i){
+			this.Cmp.razon_social.setValue(rec.data.razon_social);
+		} ,this);
+		
+		
+		
+		
 		//this.Cmp.nro_autorizacion .on('blur',this.cargarRazonSocial,this);
 		this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
-			this.escoderImportes();
+			this.esconderImportes();
 			this.iniciarImportes();
             this.getDetallePorAplicar(rec.data.id_plantilla);
             this.Cmp.importe_excento.reset();
@@ -813,14 +1001,10 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             }
      },
      
-     onButtonNew: function(){
-         this.accionFormulario = 'NEW';
-         Phx.vista.DocCompraVenta.superclass.onButtonNew.call(this);
-         this.escoderImportes()
-    },
+    
     
      
-     escoderImportes:function(){
+     esconderImportes:function(){
      	this.ocultarComponente(this.Cmp.importe_descuento);
      	this.ocultarComponente(this.Cmp.nro_autorizacion);
      	this.ocultarComponente(this.Cmp.codigo_control);
@@ -861,6 +1045,27 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
      	
      	
      	
-     }
+     },
+     onButtonAct:function(){
+        if(!this.validarFiltros()){
+            alert('Especifique el año y el mes antes')
+         }
+        else{
+            this.store.baseParams.id_gestion=this.cmbGestion.getValue();
+            this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
+            Phx.vista.DocCompraVenta.superclass.onButtonAct.call(this);
+        }
+    },
+    
+     onButtonNew:function(){
+     	if(!this.validarFiltros()){
+            alert('Especifique el año y el mes antes')
+        }
+        else{
+        	this.accionFormulario = 'NEW';
+            Phx.vista.DocCompraVenta.superclass.onButtonNew.call(this);
+            this.esconderImportes();
+        }
+    },
 })
 </script>
