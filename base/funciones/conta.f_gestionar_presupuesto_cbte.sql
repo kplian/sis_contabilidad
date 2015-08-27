@@ -739,7 +739,8 @@ BEGIN
                                   where rd.id_int_rel_devengado  =  va_id_int_rel_devengado[v_cont];
                               
                        END LOOP;
-                		--gonzalo insercion de cheque en libro bancos
+                		/*
+						--gonzalo insercion de cheque en libro bancos
                         select fin.id_finalidad into v_id_finalidad
                         from tes.tfinalidad fin
                         where fin.nombre_finalidad ilike 'proveedores';
@@ -762,7 +763,7 @@ BEGIN
                             							v_id_finalidad,NULL,'','endesis');
                             end if;
                         END IF;
-                       
+                        */
              END IF; 
         
     END IF; -- fin del if de movimiento presupuestario
