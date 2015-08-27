@@ -67,6 +67,10 @@ BEGIN
     select * into v_plantilla
 	from conta.tplantilla_comprobante cbte
 	where cbte.codigo=p_codigo;
+	
+	if v_plantilla is null then
+    	raise exception 'Revisar la configuracion para la plantilla de comprobante con codigo %', p_codigo;
+    end if;
     
     --define los campos que se recuperarn de la plantilla
     v_def_campos = ARRAY['campo_depto',
