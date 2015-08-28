@@ -18,7 +18,7 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
+ DESCRIPCION:	 	
  AUTOR:			
  FECHA:		
 ***************************************************************************/
@@ -32,6 +32,8 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_doc_compra_venta	integer;
+    v_rec					record;
+    v_tmp_resp				boolean;
 			    
 BEGIN
 
@@ -48,67 +50,94 @@ BEGIN
 	if(p_transaccion='CONTA_DCV_INS')then
 					
         begin
-        	--Sentencia de la insercion
+        	
+            -- recuepra el periodo de la fecha ...
+            --Obtiene el periodo a partir de la fecha
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+            
+            -- valida que period de libro de compras y ventas este abierto
+            v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+              
+            --validar que no exitas una documento con el mismo nro y misma razon social  ...?
+            
+            --PARA COMPRAS
+            IF v_parametros.tipo = 'compra' THEN
+                IF EXISTS(select 
+                 1 
+                from conta.tdoc_compra_venta dcv
+                where    dcv.estado_reg = 'activo' and  dcv.nit = v_parametros.nit 
+                     and dcv.nro_autorizacion = v_parametros.nro_autorizacion
+                     and dcv.nro_documento = v_parametros.nro_documento
+                     and dcv.fecha = v_parametros.fecha
+                     and dcv.id_plantilla = v_parametros.id_plantilla
+                     and dcv.razon_social = upper(trim(v_parametros(dcv.razon_social)))) then
+                     
+                     raise exception 'Ya existe un documento registrado con el mismo nro,  razon social y fecha';
+                     
+                END IF;
+            END IF;      
+            
+            --validar que no exista un documentos con el mismo nro_autorizacion, nro_factura , y nit y razon social
+            
+            
+            
+            --Sentencia de la insercion
         	insert into conta.tdoc_compra_venta(
-			
-			
-			tipo,
-			importe_excento,
-			id_plantilla,
-			fecha,
-			nro_documento,
-			nit,
-			importe_ice,
-			nro_autorizacion,
-			importe_iva,
-			importe_descuento,
-			importe_doc,
-			sw_contabilizar,
-			
-			estado,
-			id_depto_conta,
-			
-			obs,
-			estado_reg,
-			codigo_control,
-			importe_it,
-			razon_social,
-			id_usuario_ai,
-			id_usuario_reg,
-			fecha_reg,
-			usuario_ai,
-            manual
+              tipo,
+              importe_excento,
+              id_plantilla,
+              fecha,
+              nro_documento,
+              nit,
+              importe_ice,
+              nro_autorizacion,
+              importe_iva,
+              importe_descuento,
+              importe_descuento_ley,
+              importe_pago_liquido,
+              importe_doc,
+              sw_contabilizar,
+              estado,
+              id_depto_conta,  			
+              obs,
+              estado_reg,
+              codigo_control,
+              importe_it,
+              razon_social,
+              id_usuario_ai,
+              id_usuario_reg,
+              fecha_reg,
+              usuario_ai,
+              manual,
+              id_periodo
           	) values(
-			
-			v_parametros.tipo,
-			v_parametros.importe_excento,
-			v_parametros.id_plantilla,
-			v_parametros.fecha,
-			v_parametros.nro_documento,
-			v_parametros.nit,
-			v_parametros.importe_ice,
-			v_parametros.nro_autorizacion,
-			v_parametros.importe_iva,
-			v_parametros.importe_descuento,
-			v_parametros.importe_doc,
-			'si', --sw_contabilizar,
-		
-			'registrado', --estado
-			v_parametros.id_depto_conta,
-			
-			v_parametros.obs,
-			'activo',
-			v_parametros.codigo_control,
-			v_parametros.importe_it,
-			v_parametros.razon_social,
-			v_parametros._id_usuario_ai,
-			p_id_usuario,
-			now(),
-			v_parametros._nombre_usuario_ai,
-            'si'
-							
-			
-			
+              v_parametros.tipo,
+              v_parametros.importe_excento,
+              v_parametros.id_plantilla,
+              v_parametros.fecha,
+              v_parametros.nro_documento,
+              v_parametros.nit,
+              v_parametros.importe_ice,
+              v_parametros.nro_autorizacion,
+              v_parametros.importe_iva,
+              v_parametros.importe_descuento,
+              v_parametros.importe_descuento_ley,
+              v_parametros.importe_pago_liquido,
+              v_parametros.importe_doc,
+              'si', --sw_contabilizar,  		
+              'registrado', --estado
+              v_parametros.id_depto_conta,  			
+              v_parametros.obs,
+              'activo',
+              v_parametros.codigo_control,
+              v_parametros.importe_it,
+              upper(trim(v_parametros.razon_social)),
+              v_parametros._id_usuario_ai,
+              p_id_usuario,
+              now(),
+              v_parametros._nombre_usuario_ai,
+              'si',
+              v_rec.po_id_periodo
 			)RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 			
 			--Definicion de la respuesta
@@ -130,34 +159,38 @@ BEGIN
 	elsif(p_transaccion='CONTA_DCV_MOD')then
 
 		begin
+        
+            -- recuepra el periodo de la fecha ...
+            --Obtiene el periodo a partir de la fecha
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+            
+            -- valida que period de libro de compras y ventas este abierto
+            v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+              
+            
+        
+        
 			--Sentencia de la modificacion
-			update conta.tdoc_compra_venta set
-			revisado = v_parametros.revisado,
-			movil = v_parametros.movil,
-			tipo = v_parametros.tipo,
-			importe_excento = v_parametros.importe_excento,
-			id_plantilla = v_parametros.id_plantilla,
-			fecha = v_parametros.fecha,
-			nro_documento = v_parametros.nro_documento,
-			nit = v_parametros.nit,
-			importe_ice = v_parametros.importe_ice,
-			nro_autorizacion = v_parametros.nro_autorizacion,
-			importe_iva = v_parametros.importe_iva,
-			importe_descuento = v_parametros.importe_descuento,
-			importe_doc = v_parametros.importe_doc,
-			sw_contabilizar = v_parametros.sw_contabilizar,
-			tabla_origen = v_parametros.tabla_origen,
-			estado = v_parametros.estado,
-			id_depto_conta = v_parametros.id_depto_conta,
-			id_origen = v_parametros.id_origen,
-			obs = v_parametros.obs,
-			codigo_control = v_parametros.codigo_control,
-			importe_it = v_parametros.importe_it,
-			razon_social = v_parametros.razon_social,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+			update conta.tdoc_compra_venta set			
+			  tipo = v_parametros.tipo,
+              importe_excento = v_parametros.importe_excento,
+              id_plantilla = v_parametros.id_plantilla,
+              fecha = v_parametros.fecha,
+              nro_documento = v_parametros.nro_documento,
+              nit = v_parametros.nit,
+              importe_ice = v_parametros.importe_ice,
+              nro_autorizacion = v_parametros.nro_autorizacion,
+              importe_iva = v_parametros.importe_iva,
+              importe_descuento = v_parametros.importe_descuento,
+              importe_descuento_ley = v_parametros.importe_descuento_ley,
+              importe_pago_liquido = v_parametros.importe_pago_liquido,
+              importe_doc = v_parametros.importe_doc,
+              id_depto_conta = v_parametros.id_depto_conta,  			
+              obs = v_parametros.obs,
+              codigo_control = v_parametros.codigo_control,
+              importe_it = v_parametros.importe_it,
+              razon_social = v_parametros.razon_social,
+              id_periodo = v_rec.po_id_periodo
 			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
                
 			--Definicion de la respuesta

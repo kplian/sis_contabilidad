@@ -1806,3 +1806,31 @@ COMMENT ON COLUMN conta.tperiodo_compra_venta.estado
 IS 'cerrado (no se permite mas el registro de facturas), cerrado_parcial (solo contabilidad puede registrar), abierto(todos peuden registrar)';
 /***********************************F-SCP-RAC-CONTA-1-24/08/2015****************************************/
 
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-26/08/2015****************************************/
+
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN nro_dui VARCHAR(16) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.nro_dui
+IS 'solo para polizas de impoestacion';
+
+--------------- SQL ---------------
+
+ALTER TABLE param.tplantilla
+  ADD COLUMN sw_nro_dui VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN param.tplantilla.sw_nro_dui
+IS 'si o no';
+
+
+
+/***********************************F-SCP-RAC-CONTA-1-26/08/2015****************************************/
+

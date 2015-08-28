@@ -19,26 +19,36 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		var me = this;
 		this.Grupos = [
 		            {
-		                layout: 'hbox',
+		                layout: 'column',
 		                border: false,
+		                autoHeight : true,
 		                defaults: {
-		                   border: true
+		                    border: false,
+                            bodyStyle: 'padding:4px'
 		                },            
 		                items: [
 		                              {
 		                                xtype: 'fieldset',
+		                                columnWidth: 0.5,
+		                                defaults: {
+								            anchor: '-20' // leave room for error icon
+								        },
 		                                title: 'Datos del Documento',
 		                                items: [],
-		                                id_grupo:0,
+		                                id_grupo: 0,
+		                                flex:1,
+		                                autoHeight : true,
 		                                margins:'2 2 2 2'
 		                             },
 		                              
 		                            {
 		                                xtype: 'fieldset',
+		                                columnWidth: 0.5,
 		                                title: 'Detalle de Pago',
 		                                items: [],
 		                                margins:'2 10 2 2',
 		                                id_grupo:1,
+		                                autoHeight : true,
 		                                flex:1
 		                             }
 		               ]   
@@ -366,15 +376,17 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
                 queryParam: 'nro_autorizacion',
                 listWidth:'280',
                 forceSelection:false,
+                autoSelect: false,
                 hideTrigger:true,
                 typeAhead: false,
-                triggerAction: 'query',
+                typeAheadDelay: 75,
+                //triggerAction: 'query',
                 lazyRender:false,
                 mode:'remote',
                 pageSize:20,
                 queryDelay:500,
                 gwidth: 250,
-                minChars:2
+                minChars:1
             },
             type:'ComboBox',
             filters:{pfiltro:'dcv.nro_autorizacion',type:'string'},
@@ -410,15 +422,17 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
                 queryParam: 'nit',
                 listWidth:'280',
                 forceSelection:false,
-                hideTrigger:true,
+                autoSelect: false,
                 typeAhead: false,
+                typeAheadDelay: 75,
+                hideTrigger:true,
                 triggerAction: 'query',
                 lazyRender:false,
                 mode:'remote',
                 pageSize:20,
                 queryDelay:500,
                 gwidth: 250,
-                minChars:2
+                minChars:1
             },
             type:'ComboBox',
             filters:{pfiltro:'dcv.nit',type:'string'},
@@ -448,6 +462,15 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				name: 'razon_social',
 				fieldLabel: 'Razón Social',
 				allowBlank: false,
+				maskRe: /[A-Za-z0-9]/,
+                fieldStyle: 'text-transform:uppercase',
+                listeners:{
+			          'keyup': function(field, newValue, oldValue){
+			          			  field.suspendEvents(true);
+			                      field.setValue(newValue.toUpperCase());
+			                      field.resumeEvents(true);
+			                  }
+			     },
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:180
@@ -851,38 +874,47 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		
 		//this.Cmp.nro_autorizacion .on('blur',this.cargarRazonSocial,this);
 		this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
-			this.esconderImportes();
-			this.iniciarImportes();
-            this.getDetallePorAplicar(rec.data.id_plantilla);
-            this.Cmp.importe_excento.reset();
-            if(rec.data.sw_monto_excento=='si'){
-               this.mostrarComponente(this.Cmp.importe_excento);
-            }
-            else{
-                this.ocultarComponente(this.Cmp.importe_excento);
-            }
-            this.Cmp.importe_descuento.reset();
-            if(rec.data.sw_descuento=='si'){
-               this.mostrarComponente(this.Cmp.importe_descuento);
-            }
-            else{
-                this.ocultarComponente(this.Cmp.importe_descuento);
-            }
-            this.Cmp.nro_autorizacion.reset();
-            if(rec.data.sw_autorizacion == 'si'){
-               this.mostrarComponente(this.Cmp.nro_autorizacion);
-            }
-            else{
-                this.ocultarComponente(this.Cmp.nro_autorizacion);
-            }
-            this.Cmp.codigo_control.reset();
-            if(rec.data.sw_codigo_control == 'si'){
-               this.mostrarComponente(this.Cmp.codigo_control);
-            }
-            else{
-                this.ocultarComponente(this.Cmp.codigo_control);
-            }
-            
+				
+				this.esconderImportes();
+				console.log('selecionar plantilla', rec.data)
+				//si es el formulario para nuevo reseteamos los valores ...
+				if(this.accionFormulario == 'NEW'){
+				    this.iniciarImportes();	
+					this.Cmp.importe_excento.reset();
+					
+					this.Cmp.nro_autorizacion.reset();
+					this.Cmp.codigo_control.reset();
+					this.Cmp.importe_descuento.reset();
+		         }     
+	            this.getDetallePorAplicar(rec.data.id_plantilla);
+	            if(rec.data.sw_monto_excento=='si'){
+	               this.mostrarComponente(this.Cmp.importe_excento);
+	            }
+	            else{
+	                this.ocultarComponente(this.Cmp.importe_excento);
+	            }
+	           
+	            if(rec.data.sw_descuento=='si'){
+	               this.mostrarComponente(this.Cmp.importe_descuento);
+	            }
+	            else{
+	                this.ocultarComponente(this.Cmp.importe_descuento);
+	            }
+	          
+	            if(rec.data.sw_autorizacion == 'si'){
+	               this.mostrarComponente(this.Cmp.nro_autorizacion);
+	            }
+	            else{
+	                this.ocultarComponente(this.Cmp.nro_autorizacion);
+	            }
+	            
+	            if(rec.data.sw_codigo_control == 'si'){
+	               this.mostrarComponente(this.Cmp.codigo_control);
+	            }
+	            else{
+	                this.ocultarComponente(this.Cmp.codigo_control);
+	            }
+			
         },this);
         
         this.Cmp.importe_doc.on('change',this.calculaMontoPago,this);
@@ -1067,5 +1099,43 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             this.esconderImportes();
         }
     },
+    
+    onButtonEdit:function(){
+     	if(!this.validarFiltros()){
+            alert('Especifique el año y el mes antes')
+        }
+        else{
+        	this.accionFormulario = 'EDIT';
+        	
+            Phx.vista.DocCompraVenta.superclass.onButtonEdit.call(this);
+            this.esconderImportes();
+            this.getPlantilla(this.Cmp.id_plantilla.getValue());
+        }
+    },
+    
+    getPlantilla: function(id_plantilla){
+    	Phx.CP.loadingShow();
+           
+           Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url: '../../sis_parametros/control/Plantilla/listarPlantilla',
+                params:{id_plantilla:id_plantilla,start:0,limit:1},
+                success:this.successPlantilla,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+    	
+    },
+    successPlantilla:function(resp){
+           Phx.CP.loadingHide();
+           var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(reg.total == 1){
+               	
+           	  this.Cmp.id_plantilla.fireEvent('select',this.Cmp.id_plantilla, {data:reg.datos[0] }, 0);
+           }else{
+                alert('error al recuperar la plantilla para editar, actulice su navegador');
+            }
+     }
 })
 </script>

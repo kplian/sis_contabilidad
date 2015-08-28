@@ -514,6 +514,9 @@ BEGIN
                                                             (v_this_hstore->'campo_porc_monto_excento_var')::numeric 
                                                             );
                                  
+								 IF(v_resp_doc is null)THEN
+                                 	raise exception 'Error en procesar la pantilla de calculo, revisar la configuracion de la plantilla';
+                                 END IF;
                              
                                   --si tiene funcion de actualizacion,  envia el id de la trasaccion generada para que se almacene 
                                   

@@ -123,7 +123,103 @@ BEGIN
 			return v_consulta;
 
 		end;
-					
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_DCVNA_SEL'
+ 	#DESCRIPCION:	colulta nit y razon social a parti del nro de autorizacion
+ 	#AUTOR:		Rensi Arteaga Copari	
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DCVNA_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+                          DISTINCT(dcv.nro_autorizacion),
+                          dcv.nit,
+                          dcv.razon_social
+                          from conta.tdoc_compra_venta dcv
+                        where dcv.nro_autorizacion like '''||COALESCE(v_parametros.nro_autorizacion,'-')||'%''';
+         
+         
+            v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_DCVNA_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DCVNA_CONT')then
+
+		begin
+			
+            v_consulta:='select
+                          count(DISTINCT(dcv.nro_autorizacion))
+                        from conta.tdoc_compra_venta dcv
+                        where dcv.nro_autorizacion like '''||COALESCE(v_parametros.nro_autorizacion,'-')||'%'' ';            
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+           
+		end;
+	
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_DCVNIT_SEL'
+ 	#DESCRIPCION:	colulta  razon social a partir del nro de nit
+ 	#AUTOR:		Rensi Arteaga Copari	
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DCVNIT_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+                           DISTINCT(dcv.nit),
+                           dcv.razon_social
+                          from conta.tdoc_compra_venta dcv
+                        where dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
+         
+         
+            v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_DCVNIT_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DCVNIT_CONT')then
+
+		begin
+			
+            v_consulta:='select
+                          count(DISTINCT(dcv.nit))
+                        from conta.tdoc_compra_venta dcv
+                        where dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%'' ';            
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+           
+		end;
+    				
 	else
 					     
 		raise exception 'Transaccion inexistente';
