@@ -1844,7 +1844,7 @@ ALTER TABLE param.tplantilla
 COMMENT ON COLUMN param.tplantilla.sw_ic
 IS 'si o no, si esta habilitado, es indispensable que el monto excento tambien lo este, ya que se copia el valor por que tienen el mismo comportamiento';
 
-/***********************************I-SCP-RAC-CONTA-1-31/08/2015****************************************/
+/***********************************F-SCP-RAC-CONTA-1-31/08/2015****************************************/
 
 
 /***********************************I-SCP-RAC-CONTA-1-01/09/2015****************************************/
