@@ -27,6 +27,7 @@ DECLARE
 
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
+    v_registros				record;
 	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
@@ -34,6 +35,7 @@ DECLARE
 	v_id_doc_compra_venta	integer;
     v_rec					record;
     v_tmp_resp				boolean;
+    v_importe_ice			numeric;
 			    
 BEGIN
 
@@ -50,6 +52,15 @@ BEGIN
 	if(p_transaccion='CONTA_DCV_INS')then
 					
         begin
+        
+            --recupera parametrizacion de la plantilla     
+            select 
+             *
+            into 
+             v_registros
+            from param.tplantilla pla 
+            where pla.id_plantilla = v_parametros.id_plantilla;
+            
         	
             -- recuepra el periodo de la fecha ...
             --Obtiene el periodo a partir de la fecha
@@ -59,27 +70,35 @@ BEGIN
             v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
               
             --validar que no exitas una documento con el mismo nro y misma razon social  ...?
+            --validar que no exista un documentos con el mismo nro_autorizacion, nro_factura , y nit y razon social
+            
             
             --PARA COMPRAS
             IF v_parametros.tipo = 'compra' THEN
+                
                 IF EXISTS(select 
                  1 
                 from conta.tdoc_compra_venta dcv
                 where    dcv.estado_reg = 'activo' and  dcv.nit = v_parametros.nit 
                      and dcv.nro_autorizacion = v_parametros.nro_autorizacion
                      and dcv.nro_documento = v_parametros.nro_documento
+                     and dcv.nro_dui = v_parametros.nro_dui
                      and dcv.fecha = v_parametros.fecha
                      and dcv.id_plantilla = v_parametros.id_plantilla
-                     and dcv.razon_social = upper(trim(v_parametros(dcv.razon_social)))) then
+                     and dcv.razon_social = upper(trim(v_parametros.razon_social))) then
                      
                      raise exception 'Ya existe un documento registrado con el mismo nro,  razon social y fecha';
                      
                 END IF;
-            END IF;      
-            
-            --validar que no exista un documentos con el mismo nro_autorizacion, nro_factura , y nit y razon social
+            END IF; 
             
             
+            --si tiene habilitado el ic copiamos el monto excento
+            v_importe_ice = NULL;
+            IF v_registros.sw_ic = 'si' then
+              v_importe_ice = v_parametros.importe_excento;
+            END IF;
+           
             
             --Sentencia de la insercion
         	insert into conta.tdoc_compra_venta(
@@ -109,7 +128,8 @@ BEGIN
               fecha_reg,
               usuario_ai,
               manual,
-              id_periodo
+              id_periodo,
+              nro_dui
           	) values(
               v_parametros.tipo,
               v_parametros.importe_excento,
@@ -117,7 +137,7 @@ BEGIN
               v_parametros.fecha,
               v_parametros.nro_documento,
               v_parametros.nit,
-              v_parametros.importe_ice,
+              v_importe_ice,
               v_parametros.nro_autorizacion,
               v_parametros.importe_iva,
               v_parametros.importe_descuento,
@@ -137,7 +157,8 @@ BEGIN
               now(),
               v_parametros._nombre_usuario_ai,
               'si',
-              v_rec.po_id_periodo
+              v_rec.po_id_periodo,
+              v_parametros.nro_dui
 			)RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 			
 			--Definicion de la respuesta
@@ -160,6 +181,15 @@ BEGIN
 
 		begin
         
+            --recupera parametrizacion de la plantilla     
+            select 
+             *
+            into 
+             v_registros
+            from param.tplantilla pla 
+            where pla.id_plantilla = v_parametros.id_plantilla;
+        
+        
             -- recuepra el periodo de la fecha ...
             --Obtiene el periodo a partir de la fecha
         	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
@@ -168,6 +198,11 @@ BEGIN
             v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
               
             
+            --si tiene habilitado el ic copiamos el monto excento
+            v_importe_ice = NULL;
+            IF v_registros.sw_ic = 'si' then
+              v_importe_ice = v_parametros.importe_excento;
+            END IF;
         
         
 			--Sentencia de la modificacion
@@ -178,7 +213,7 @@ BEGIN
               fecha = v_parametros.fecha,
               nro_documento = v_parametros.nro_documento,
               nit = v_parametros.nit,
-              importe_ice = v_parametros.importe_ice,
+              importe_ice = v_importe_ice,
               nro_autorizacion = v_parametros.nro_autorizacion,
               importe_iva = v_parametros.importe_iva,
               importe_descuento = v_parametros.importe_descuento,
@@ -189,8 +224,9 @@ BEGIN
               obs = v_parametros.obs,
               codigo_control = v_parametros.codigo_control,
               importe_it = v_parametros.importe_it,
-              razon_social = v_parametros.razon_social,
-              id_periodo = v_rec.po_id_periodo
+              razon_social = upper(trim(v_parametros.razon_social)),
+              id_periodo = v_rec.po_id_periodo,
+              nro_dui = v_parametros.nro_dui
 			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
                
 			--Definicion de la respuesta

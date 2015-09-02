@@ -119,7 +119,8 @@ BEGIN
                 id_usuario_reg,
                 fecha_reg,
                 id_usuario_mod,
-                fecha_mod
+                fecha_mod,
+                id_orden_trabajo
           	) values(
                 v_parametros.id_partida,
                 v_parametros.id_centro_costo,
@@ -139,7 +140,8 @@ BEGIN
                 p_id_usuario,
                 now(),
                 null,
-                null
+                null,
+                v_parametros.id_orden_trabajo
 			)RETURNING id_int_transaccion into v_id_int_transaccion;
             
             
@@ -227,6 +229,7 @@ BEGIN
 			update conta.tint_transaccion set
               id_partida = v_parametros.id_partida,
               id_centro_costo = v_parametros.id_centro_costo,
+              id_orden_trabajo = v_parametros.id_orden_trabajo,
               id_cuenta = v_parametros.id_cuenta,
               glosa = v_parametros.glosa,
               id_int_comprobante = v_parametros.id_int_comprobante,

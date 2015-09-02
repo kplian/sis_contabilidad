@@ -6,7 +6,8 @@ CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_usuario integer = NULL::integer,
   p_id_usuario_ai integer = NULL::integer,
   p_usuario_ai varchar = NULL::character varying,
-  p_conexion varchar = NULL::character varying
+  p_conexion varchar = NULL::character varying,
+  p_sincronizar_internacional boolean = false
 )
 RETURNS integer AS
 $body$
@@ -57,6 +58,7 @@ DECLARE
     v_sincronizar 			varchar;
     v_resp_int_endesis 		varchar;
     v_tipo_cambio			numeric;
+    v_temporal				varchar;
   
 BEGIN
 
@@ -67,8 +69,8 @@ BEGIN
     select * into v_plantilla
 	from conta.tplantilla_comprobante cbte
 	where cbte.codigo=p_codigo;
-	
-	if v_plantilla is null then
+    
+    if v_plantilla is null then
     	raise exception 'Revisar la configuracion para la plantilla de comprobante con codigo %', p_codigo;
     end if;
     
@@ -293,6 +295,11 @@ BEGIN
         v_tipo_cambio = v_this.columna_tipo_cambio;
     END IF;
     
+    --deterinar si es temporal
+    v_temporal = 'no';
+    IF p_sincronizar_internacional THEN
+     v_temporal = 'si';
+    END IF;
     
     --  genera tabla intermedia de comrobante
     
@@ -333,7 +340,8 @@ BEGIN
       nro_cuenta_bancaria_trans,
       nro_tramite,
       id_usuario_ai,
-      usuario_ai
+      usuario_ai,
+      temporal
              
     ) 
     VALUES (
@@ -368,7 +376,8 @@ BEGIN
       v_this.columna_nro_cuenta_bancaria_trans,
       v_this.columna_nro_tramite,
       p_id_usuario_ai,
-      p_usuario_ai
+      p_usuario_ai,
+      v_temporal
       
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
@@ -389,15 +398,23 @@ BEGIN
     
     -- migraciond e comprobante endesis  DBLINK
     
-    v_sincronizar=pxp.f_get_variable_global('sincronizar');
+    v_sincronizar = pxp.f_get_variable_global('sincronizar');
     
         
-    
+    --Si la sincronizacion esta habilitada
     IF(v_sincronizar='true')THEN
-  	
-     	v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante, p_conexion);
-    
+  	 	
+        -- si sincroniza locamente con endesis
+         IF(not p_sincronizar_internacional)THEN
+           v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante, p_conexion);
+        
+         ELSE
+         --   TODO si es necesario migrar a contabilidad internacional ....
+           v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante);
+         END IF;
     END IF;
+   
+     
    
     
     return v_id_int_comprobante;

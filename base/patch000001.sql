@@ -1834,3 +1834,42 @@ IS 'si o no';
 
 /***********************************F-SCP-RAC-CONTA-1-26/08/2015****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-1-31/08/2015****************************************/
+--------------- SQL ---------------
+
+ALTER TABLE param.tplantilla
+  ADD COLUMN sw_ic VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN param.tplantilla.sw_ic
+IS 'si o no, si esta habilitado, es indispensable que el monto excento tambien lo este, ya que se copia el valor por que tienen el mismo comportamiento';
+
+/***********************************I-SCP-RAC-CONTA-1-31/08/2015****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-01/09/2015****************************************/
+--------------- SQL ---------------
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN temporal VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.temporal
+IS 'para los comprobantes donde solo se utilicem la estructura como temporalmente(caso antes de migrar a contabilidad de la regional internacional o al contrario)';
+
+/***********************************F-SCP-RAC-CONTA-1-01/09/2015****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-02/09/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_int_comprobante_origen_central INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_int_comprobante_origen_central
+IS 'identifica los cbtes migrados desde la central hacia la regional';
+
+
+/***********************************F-SCP-RAC-CONTA-1-02/09/2015****************************************/
+
+

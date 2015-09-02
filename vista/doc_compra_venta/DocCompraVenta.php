@@ -14,7 +14,6 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
     fwidth: '70%',
     tabEnter: true,
 	constructor:function(config){
-		this.maestro=config.maestro;
 		this.initButtons=[this.cmbGestion,this.cmbPeriodo];
 		var me = this;
 		this.Grupos = [
@@ -184,7 +183,6 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 					name: 'tipo'
 			},
 			type:'Field',
-			valorInicial: 'compra',
 			form:true 
 		},
         {
@@ -264,8 +262,9 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
    			},
    			type:'ComboRec',
    			id_grupo:0,
-   			filters:{pfiltro:'desc_depto',type:'string'},
+   			filters:{pfiltro:'dep.nombre',type:'string'},
    		    grid:true,
+   		    bottom_filter: true,
    			form:true
        },
         {
@@ -286,7 +285,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
                     totalProperty:'total',
                     fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
                     'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
-                    'sw_autorizacion','sw_codigo_control','tipo_plantilla'],
+                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice'],
                     remoteSort: true,
                     baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
                 }),
@@ -312,6 +311,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'pla.desc_plantilla',type:'string'},
             id_grupo: 0,
             grid: true,
+            bottom_filter: true,
             form: true
         },
 		{
@@ -392,6 +392,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'dcv.nro_autorizacion',type:'string'},
             id_grupo: 0,
             grid: true,
+            bottom_filter: true,
             form: true
         },
         
@@ -438,34 +439,21 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'dcv.nit',type:'string'},
             id_grupo: 0,
             grid: true,
+            bottom_filter: true,
             form: true
         },
 		
-		/*
-		{
-			config:{
-				name: 'nit',
-				fieldLabel: 'NIT',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:100
-			},
-				type:'TextField',
-				filters:{pfiltro:'dcv.nit',type:'string'},
-				id_grupo:0,
-				grid:true,
-				form:true
-		},*/
+		
 		{
 			config:{
 				name: 'razon_social',
 				fieldLabel: 'Razón Social',
 				allowBlank: false,
-				maskRe: /[A-Za-z0-9]/,
+				maskRe: /[A-Za-z0-9 ]/,
                 fieldStyle: 'text-transform:uppercase',
                 listeners:{
-			          'keyup': function(field, newValue, oldValue){
+			          'change': function(field, newValue, oldValue){
+			          			  console.log('keyup ...  ')
 			          			  field.suspendEvents(true);
 			                      field.setValue(newValue.toUpperCase());
 			                      field.resumeEvents(true);
@@ -479,6 +467,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'dcv.razon_social',type:'string'},
 				id_grupo:0,
 				grid:true,
+				bottom_filter: true,
 				form:true
 		},
 		{
@@ -492,6 +481,23 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextField',
 				filters:{pfiltro:'dcv.nro_documento',type:'string'},
+				id_grupo:0,
+				grid:true,
+				bottom_filter: true,
+				form:true
+		},
+		{
+			config:{
+				name: 'nro_dui',
+				fieldLabel: 'DUI',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength :16,
+				minLength:16
+			},
+				type:'TextField',
+				filters:{pfiltro:'dcv.nro_dui',type:'string'},
 				id_grupo:0,
 				grid:true,
 				form:true
@@ -525,6 +531,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				filters:{ pfiltro:'dcv.obs',type:'string' },
 				id_grupo:0,
 				grid: true,
+				bottom_filter: true,
 				form: true
 		},
 		{
@@ -838,7 +845,8 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		'desc_depto','desc_plantilla',
-		'importe_descuento_ley','importe_pago_liquido'
+		'importe_descuento_ley',
+		'importe_pago_liquido','nro_dui'
 		
 	],
 	sortInfo:{
@@ -914,6 +922,20 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 	            else{
 	                this.ocultarComponente(this.Cmp.codigo_control);
 	            }
+	            
+	            console.log('NRO DUI', rec.data.sw_nro_dui)
+	            if(rec.data.sw_nro_dui == 'si'){
+	               this.Cmp.nro_dui.allowBlank =false;
+	               this.mostrarComponente(this.Cmp.nro_dui);
+	               this.Cmp.nro_documento.setValue(0);
+	               this.Cmp.nro_documento.setReadOnly(true);
+	               
+	            }
+	            else{
+	            	this.Cmp.nro_dui.allowBlank = true;
+	                this.ocultarComponente(this.Cmp.nro_dui);
+	                this.Cmp.nro_documento.setReadOnly(false);
+	            }
 			
         },this);
         
@@ -921,6 +943,20 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
         this.Cmp.importe_excento.on('change',this.calculaMontoPago,this);  
         this.Cmp.importe_descuento.on('change',this.calculaMontoPago,this);
         this.Cmp.importe_descuento_ley.on('change',this.calculaMontoPago,this);
+        
+        
+        this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
+        	if (newValue[3] == '4'){
+        		this.mostrarComponente(this.Cmp.codigo_control);
+	            this.Cmp.codigo_control.allowBlank = false;
+        	}
+        	else{
+        		this.Cmp.codigo_control.allowBlank = true;
+        		this.ocultarComponente(this.Cmp.codigo_control);
+        		
+        	};
+        	
+        },this);
         
         
         
@@ -1090,11 +1126,15 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
     },
     
      onButtonNew:function(){
+     	
+     	
      	if(!this.validarFiltros()){
             alert('Especifique el año y el mes antes')
         }
         else{
         	this.accionFormulario = 'NEW';
+        	this.Cmp.nit.modificado = true;
+     	    this.Cmp.nro_autorizacion.modificado = true;
             Phx.vista.DocCompraVenta.superclass.onButtonNew.call(this);
             this.esconderImportes();
         }
@@ -1105,6 +1145,8 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             alert('Especifique el año y el mes antes')
         }
         else{
+        	this.Cmp.nit.modificado = true;
+     	    this.Cmp.nro_autorizacion.modificado = true;
         	this.accionFormulario = 'EDIT';
         	
             Phx.vista.DocCompraVenta.superclass.onButtonEdit.call(this);

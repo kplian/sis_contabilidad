@@ -82,7 +82,8 @@ BEGIN
                         dep.nombre as desc_depto,
                         pla.desc_plantilla,
                         dcv.importe_descuento_ley,
-                        dcv.importe_pago_liquido
+                        dcv.importe_pago_liquido,
+                        dcv.nro_dui
 						from conta.tdoc_compra_venta dcv
 						inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                         inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
@@ -112,9 +113,11 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_doc_compra_venta)
 					    from conta.tdoc_compra_venta dcv
-					    inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+						inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+                        inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                        left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
 						left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
-					    where ';
+				        where ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -139,7 +142,7 @@ BEGIN
                           dcv.nit,
                           dcv.razon_social
                           from conta.tdoc_compra_venta dcv
-                        where dcv.nro_autorizacion like '''||COALESCE(v_parametros.nro_autorizacion,'-')||'%''';
+                        where  dcv.nro_autorizacion != '''' and dcv.nro_autorizacion like '''||COALESCE(v_parametros.nro_autorizacion,'-')||'%''';
          
          
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -164,7 +167,7 @@ BEGIN
             v_consulta:='select
                           count(DISTINCT(dcv.nro_autorizacion))
                         from conta.tdoc_compra_venta dcv
-                        where dcv.nro_autorizacion like '''||COALESCE(v_parametros.nro_autorizacion,'-')||'%'' ';            
+                        where dcv.nro_autorizacion != '''' and dcv.nro_autorizacion like '''||COALESCE(v_parametros.nro_autorizacion,'-')||'%'' ';            
 			
 			
 			--Devuelve la respuesta
@@ -187,7 +190,7 @@ BEGIN
                            DISTINCT(dcv.nit),
                            dcv.razon_social
                           from conta.tdoc_compra_venta dcv
-                        where dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
+                        where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
          
          
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -212,7 +215,7 @@ BEGIN
             v_consulta:='select
                           count(DISTINCT(dcv.nit))
                         from conta.tdoc_compra_venta dcv
-                        where dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%'' ';            
+                        where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%'' ';            
 			
 			
 			--Devuelve la respuesta

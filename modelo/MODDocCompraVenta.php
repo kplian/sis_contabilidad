@@ -57,6 +57,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('desc_plantilla','varchar');
 		$this->captura('importe_descuento_ley','numeric');
 		$this->captura('importe_pago_liquido','numeric');
+		$this->captura('nro_dui','varchar');
 
 
 		//Ejecuta la instruccion
@@ -99,6 +100,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->setParametro('razon_social','razon_social','varchar');
 		$this->setParametro('importe_descuento_ley','importe_descuento_ley','numeric');
 		$this->setParametro('importe_pago_liquido','importe_pago_liquido','numeric');
+		$this->setParametro('nro_dui','nro_dui','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -141,6 +143,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->setParametro('razon_social','razon_social','varchar');
 		$this->setParametro('importe_descuento_ley','importe_descuento_ley','numeric');
 		$this->setParametro('importe_pago_liquido','importe_pago_liquido','numeric');
+		$this->setParametro('nro_dui','nro_dui','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

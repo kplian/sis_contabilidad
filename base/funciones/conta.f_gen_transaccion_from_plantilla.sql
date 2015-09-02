@@ -192,7 +192,7 @@ BEGIN
                           
                           END IF;
                        
-                         
+                        
                        /******************************************* 
                        --   IF procesar relacion contable si existe
                        *********************************************/
@@ -230,7 +230,7 @@ BEGIN
                       END IF;
                       
                      
-                   
+                    
                       
                       /********************************
                       --Validaciones de cuenta y partida 
@@ -290,7 +290,7 @@ BEGIN
                        --  CALCULO SIMPLE
                        -----------------------
                        
-                     
+                    
                        
                        IF (p_reg_det_plantilla->'forma_calculo_monto') = 'simple' THEN
                        
@@ -487,7 +487,7 @@ BEGIN
                   
                 
               
-                
+               
                      
                       /**********************************************
                       -- IF , se  aplica el documento si esta activo --
@@ -514,10 +514,10 @@ BEGIN
                                                             (v_this_hstore->'campo_porc_monto_excento_var')::numeric 
                                                             );
                                  
-								 IF(v_resp_doc is null)THEN
+                             	 IF(v_resp_doc is null)THEN
                                  	raise exception 'Error en procesar la pantilla de calculo, revisar la configuracion de la plantilla';
                                  END IF;
-                             
+                                 
                                   --si tiene funcion de actualizacion,  envia el id de la trasaccion generada para que se almacene 
                                   
                                   IF (p_reg_det_plantilla->'func_act_transaccion') != ''  THEN
@@ -544,24 +544,27 @@ BEGIN
                            END IF;
                        ELSE
                        
-                          
+                            
                            --inserta transaccion en tabla solo si tiene un monto maor a cero y dintinto de NULL
                            
                               IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN
                              		raise notice  ' >>> gen inserta transaccion ..';
                       		 
-                                  v_reg_id_int_transaccion = conta.f_gen_inser_transaccion(hstore(v_record_int_tran), p_id_usuario);
+                                   
+                              
+                                     v_reg_id_int_transaccion = conta.f_gen_inser_transaccion(hstore(v_record_int_tran), p_id_usuario);
                                 
                                   
                                     --si tiene funcion de actualizacion,  envia el id de la trasaccion generada para que se almacene 
-                                  
-                                     IF (p_reg_det_plantilla->'func_act_transaccion') != ''  THEN
-                                    	
-                                        EXECUTE  'select ' || (p_reg_det_plantilla->'func_act_transaccion')  ||'('||v_reg_id_int_transaccion::varchar||' ,'||(v_this_hstore->'campo_id_tabla_detalle') ||' )';
+                                      IF (p_reg_det_plantilla->'func_act_transaccion') <> '' and  (p_reg_det_plantilla->'func_act_transaccion') is not null  THEN
+                                    	 IF ((v_this_hstore->'campo_id_tabla_detalle') is NULL) or (v_this_hstore->'campo_id_tabla_detalle')= ''   THEN
+                                            raise exception 'El campo_id_tabla_detalle para la funcion de actualizacion no puede ser nulo ni vacio (%)',(p_reg_det_plantilla->'func_act_transaccion');
+                                         END IF;     
+                                         EXECUTE  'select ' || (p_reg_det_plantilla->'func_act_transaccion')  ||'('||v_reg_id_int_transaccion::varchar||' ,'||(v_this_hstore->'campo_id_tabla_detalle') ||' )';
                                     
                                      END If;
                                     
-                                  
+                                 
                               
                               END IF;
                             

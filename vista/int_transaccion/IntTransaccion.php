@@ -174,6 +174,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			},
    		   
    			grid:false,
+   			
    			form:true
 	   	},
 	   	{
@@ -193,6 +194,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'cc.codigo_cc',type:'string'},
             id_grupo:1,
             grid:false,
+            bottom_filter: true,
             form:true
         },
         {
@@ -227,6 +229,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			filters: {pfiltro: 'transa.importe_debe',type: 'numeric'},
 			id_grupo: 1,
 			grid: true,
+			bottom_filter: true,
 			form: true
 		},
 		{
@@ -242,6 +245,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			filters: {pfiltro: 'transa.importe_haber',type: 'numeric'},
 			id_grupo: 1,
 			grid: true,
+			bottom_filter: true,
 			form: true
 		},
 		{
@@ -287,6 +291,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			type:'TextArea',
 			filters:{pfiltro:'transa.glosa',type:'string'},
 			id_grupo:1,
+			bottom_filter: true,
 			grid:true,
 			form:true
 		},

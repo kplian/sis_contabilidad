@@ -198,6 +198,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			filters:{pfiltro:'incbte.nro_cbte',type:'string'},
 			id_grupo:0,
+			bottom_filter: true,
 			grid:true,
 			form:false
 		},
@@ -499,6 +500,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			id_grupo: 0,
 			filters: {pfiltro: 'incbte.nro_tramite',type: 'string'},
 			grid: true,
+			bottom_filter: true,
 			form: false
 		},
 		{
@@ -513,6 +515,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			type:'TextArea',
 			filters: { pfiltro:'incbte.glosa1', type:'string' },
 			id_grupo: 0,
+			bottom_filter: true,
 			grid: true,
 			form: true
 		},
@@ -528,6 +531,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			type:'TextField',
 			filters:{pfiltro:'incbte.glosa2',type:'string'},
 			id_grupo:0,
+			bottom_filter: true,
 			grid:true,
 			form:true
 		},
@@ -543,6 +547,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			type:'TextField',
 			filters:{pfiltro:'incbte.beneficiario',type:'string'},
 			id_grupo:0,
+			bottom_filter: true,
 			grid:true,
 			form:true
 		},

@@ -992,3 +992,14 @@ VALUES (E'conta_validar_forma_pago', E'no', E'al validar cbtes manuales verifica
 /***********************************F-DAT-RAC-CONTA-0-14/08/2015*****************************************/
 
 
+
+/***********************************I-DAT-RAC-CONTA-0-01/09/2015*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'sincronizar_internacional', E'false', E'si tiene libro de banco internenacional  sincroniza ');
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_prioridad_depto_internacional', E'3', E'prioridad del depto de conta internacional');
+
+/***********************************F-DAT-RAC-CONTA-0-01/09/2015*****************************************/
+
