@@ -108,62 +108,62 @@ BEGIN
     
       IF (p_reg_det_plantilla->'rel_dev_pago') = 'si'  THEN
       
-              
-              -- raise exception '>>  %, %, % >>',p_reg_det_plantilla->'id_detalle_plantilla_fk',p_id_int_comprobante,v_this_hstore ->'campo_trasaccion_dev';
-             
-                 --obtener trasaccion pagado  (Puede ser uno mismo pago para varios devengados)
+               IF COALESCE((v_this_hstore -> 'campo_monto')::numeric,0) > 0  THEN
+                  -- raise exception '>>  %, %, % >>',p_reg_det_plantilla->'id_detalle_plantilla_fk',p_id_int_comprobante,v_this_hstore ->'campo_trasaccion_dev';
                  
-                 --raise exception 'DTI PRUEBA ... >> %', p_reg_det_plantilla->'id_detalle_plantilla_fk';
-                 
-                 select  
-                   t.id_int_transaccion
-                 into
-                   v_id_int_transaccion_pagado
-                 from   conta.tint_transaccion t
-                 where  
-                        t.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_fk')::integer
-                    and t.id_int_comprobante = p_id_int_comprobante 
-                    limit 1 OFFSET 0; 
-                 
-                
-              
-                  --validar que no sean lalves nulas
-                  IF v_id_int_transaccion_pagado is NULL THEN
-                     raise exception 'no existe una trasaccion de referencia para el pago, (ESto es para relacion el devengado con el pagado, puede que la trasaccion de referencia tenga valor cero y no se este creando)';
-                  END IF;
-                  
-                  --validar que no sean llaves  nulas
-                 
-                  IF (v_this_hstore ->'campo_trasaccion_dev') = '' or (v_this_hstore ->'campo_trasaccion_dev')='NULL' or (v_this_hstore ->'campo_trasaccion_dev') is NULL THEN
-                  
-                     raise exception 'no existe una trasaccion de referencia para el devengado revisa el campo de la plantilla, campo_trasaccion_dev para la plantilla: %',(p_reg_det_plantilla ->'descripcion');
-                   
-                  END IF;
-                  
-                  --  insertar rel_dev_pago
-                   
-                   
-                  INSERT INTO 
-                              conta.tint_rel_devengado
-                            (
-                              id_usuario_reg,
-                              fecha_reg,
-                              estado_reg,
-                              id_int_transaccion_dev,
-                              id_int_transaccion_pag,
-                              monto_pago
-                            ) 
-                            VALUES (
-                              p_id_usuario,
-                              now(),
-                              'activo',
-                              (v_this_hstore -> 'campo_trasaccion_dev')::integer,
-                               v_id_int_transaccion_pagado,
-                              (v_this_hstore -> 'campo_monto')::numeric
-                            );
+                     --obtener trasaccion pagado  (Puede ser uno mismo pago para varios devengados)
+                     
+                     --raise exception 'DTI PRUEBA ... >> %', p_reg_det_plantilla->'id_detalle_plantilla_fk';
+                     
+                     select  
+                       t.id_int_transaccion
+                     into
+                       v_id_int_transaccion_pagado
+                     from   conta.tint_transaccion t
+                     where  
+                            t.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_fk')::integer
+                        and t.id_int_comprobante = p_id_int_comprobante 
+                        limit 1 OFFSET 0; 
+                     
                     
+                  
+                      --validar que no sean lalves nulas
+                      IF v_id_int_transaccion_pagado is NULL THEN
+                         raise exception 'no existe una trasaccion de referencia para el pago, (ESto es para relacion el devengado con el pagado, puede que la trasaccion de referencia tenga valor cero y no se este creando)';
+                      END IF;
+                      
+                      --validar que no sean llaves  nulas
+                     
+                      IF (v_this_hstore ->'campo_trasaccion_dev') = '' or (v_this_hstore ->'campo_trasaccion_dev')='NULL' or (v_this_hstore ->'campo_trasaccion_dev') is NULL THEN
+                      
+                         raise exception 'no existe una trasaccion de referencia para el devengado revisa el campo de la plantilla, campo_trasaccion_dev para la plantilla: %',(p_reg_det_plantilla ->'descripcion');
+                       
+                      END IF;
+                      
+                      --  insertar rel_dev_pago
+                       
+                       
+                      INSERT INTO 
+                                  conta.tint_rel_devengado
+                                (
+                                  id_usuario_reg,
+                                  fecha_reg,
+                                  estado_reg,
+                                  id_int_transaccion_dev,
+                                  id_int_transaccion_pag,
+                                  monto_pago
+                                ) 
+                                VALUES (
+                                  p_id_usuario,
+                                  now(),
+                                  'activo',
+                                  (v_this_hstore -> 'campo_trasaccion_dev')::integer,
+                                   v_id_int_transaccion_pagado,
+                                  (v_this_hstore -> 'campo_monto')::numeric
+                                );
+                        
                    
-      
+                END IF;
       
       
       ELSE

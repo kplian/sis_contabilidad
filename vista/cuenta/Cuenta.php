@@ -21,14 +21,14 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		this.iniciarEventos();
 		
 		this.cmbGestion.on('select',this.capturaFiltros,this);
-		this.addButton('bAux',{text:'Interfaces',iconCls: 'blist',disabled:true,handler:this.onButonAux,tooltip: '<b>Iauxiliares de la cuenta</b><br/>Se habilita si esta cuenta tiene permitido el rgistro de auxiliares '});
+		this.addButton('bAux',{text:'Auxiliares',iconCls: 'blist',disabled:true,handler:this.onButonAux,tooltip: '<b>Auxiliares de la cuenta</b><br/>Se habilita si esta cuenta tiene permitido el rgistro de auxiliares '});
         this.addButton('btnImprimir',
 			{
 				text: 'Imprimir',
 				iconCls: 'bprint',
 				disabled: true,
 				handler: this.imprimirCbte,
-				tooltip: '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
+				tooltip: '<b>Imprimir Plan de Cuentas</b><br/>Imprime el Plan de Cuentas en el formato oficial.'
 			}
 		);
 		//Crea el botón para llamar a la replicación
@@ -405,7 +405,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 					root: 'datos',
 					sortInfo:{
 						field: 'gestion',
-						direction: 'ASC'
+						direction: 'DESC'
 					},
 					totalProperty: 'total',
 					fields: ['id_gestion','gestion'],

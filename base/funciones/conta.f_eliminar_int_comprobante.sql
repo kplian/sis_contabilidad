@@ -23,8 +23,10 @@ DECLARE
     v_rec_cbte_trans record;
  
 BEGIN
-  	v_nombre_funcion:='conta.f_eliminar_int_comprobante';
-	select * 
+  	
+    v_nombre_funcion := 'conta.f_eliminar_int_comprobante';
+	
+    select * 
     into v_rec_cbte
     from conta.tint_comprobante
     where id_int_comprobante = p_id_int_comprobante;
@@ -51,7 +53,13 @@ BEGIN
                         
                         
                 EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
-                                           
+             ELSE                              
+                --si no se tiene un aplantillad ecomprobante buscamos una funciona de eiliminacion en el cbte
+                
+                IF v_rec_cbte.funcion_comprobante_eliminado  is not NULL  THEN  
+                   EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
+                END IF;
+             
              END IF;
              
             

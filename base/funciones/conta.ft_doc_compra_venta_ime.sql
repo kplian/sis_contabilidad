@@ -36,6 +36,7 @@ DECLARE
     v_rec					record;
     v_tmp_resp				boolean;
     v_importe_ice			numeric;
+    v_revisado				varchar;
 			    
 BEGIN
 
@@ -53,15 +54,9 @@ BEGIN
 					
         begin
         
-            --recupera parametrizacion de la plantilla     
-            select 
-             *
-            into 
-             v_registros
-            from param.tplantilla pla 
-            where pla.id_plantilla = v_parametros.id_plantilla;
+           
             
-        	
+            
             -- recuepra el periodo de la fecha ...
             --Obtiene el periodo a partir de la fecha
         	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
@@ -72,6 +67,19 @@ BEGIN
             --validar que no exitas una documento con el mismo nro y misma razon social  ...?
             --validar que no exista un documentos con el mismo nro_autorizacion, nro_factura , y nit y razon social
             
+            
+            
+            
+           
+        
+        
+            --recupera parametrizacion de la plantilla     
+            select 
+             *
+            into 
+             v_registros
+            from param.tplantilla pla 
+            where pla.id_plantilla = v_parametros.id_plantilla;
             
             --PARA COMPRAS
             IF v_parametros.tipo = 'compra' THEN
@@ -129,7 +137,8 @@ BEGIN
               usuario_ai,
               manual,
               id_periodo,
-              nro_dui
+              nro_dui,
+              id_moneda
           	) values(
               v_parametros.tipo,
               v_parametros.importe_excento,
@@ -158,7 +167,8 @@ BEGIN
               v_parametros._nombre_usuario_ai,
               'si',
               v_rec.po_id_periodo,
-              v_parametros.nro_dui
+              v_parametros.nro_dui,
+              v_parametros.id_moneda
 			)RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 			
 			--Definicion de la respuesta
@@ -181,14 +191,9 @@ BEGIN
 
 		begin
         
-            --recupera parametrizacion de la plantilla     
-            select 
-             *
-            into 
-             v_registros
-            from param.tplantilla pla 
-            where pla.id_plantilla = v_parametros.id_plantilla;
         
+        
+           
         
             -- recuepra el periodo de la fecha ...
             --Obtiene el periodo a partir de la fecha
@@ -197,6 +202,24 @@ BEGIN
             -- valida que period de libro de compras y ventas este abierto
             v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
               
+             --revisa si el documento no esta marcado como revisado
+            select 
+             dcv.revisado
+            into 
+              v_registros
+            from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
+            
+            IF  v_registros.revisado = 'si' THEN
+               raise exception 'los documentos revisados no peuden modificarse';
+            END IF;
+            
+             --recupera parametrizacion de la plantilla     
+            select 
+             *
+            into 
+             v_registros
+            from param.tplantilla pla 
+            where pla.id_plantilla = v_parametros.id_plantilla;
             
             --si tiene habilitado el ic copiamos el monto excento
             v_importe_ice = NULL;
@@ -226,7 +249,8 @@ BEGIN
               importe_it = v_parametros.importe_it,
               razon_social = upper(trim(v_parametros.razon_social)),
               id_periodo = v_rec.po_id_periodo,
-              nro_dui = v_parametros.nro_dui
+              nro_dui = v_parametros.nro_dui,
+              id_moneda = v_parametros.id_moneda
 			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
                
 			--Definicion de la respuesta
@@ -248,9 +272,29 @@ BEGIN
 	elsif(p_transaccion='CONTA_DCV_ELI')then
 
 		begin
+        
+             --revisa si el documento no esta marcado como revisado
+            select 
+             dcv.revisado
+            into 
+              v_registros
+            from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
+            
+            IF  v_registros.revisado = 'si' THEN
+               raise exception 'los documentos revisados no peuden modificarse';
+            END IF;
+            
+            --TODO revisar si el archivo es manual o no
+            -- revisar si tiene conceptos de gasto
+            
+        
+        
+        
 			--Sentencia de la eliminacion
 			delete from conta.tdoc_compra_venta
             where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+            
+            
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta eliminado(a)'); 
@@ -260,6 +304,47 @@ BEGIN
             return v_resp;
 
 		end;
+   /*********************************    
+ 	#TRANSACCION:  'CONTA_CAMREV_IME'
+ 	#DESCRIPCION:	Cambia el estao de la revisón del documento de compra o venta
+ 	#AUTOR:		admin	
+ 	#FECHA:		09-09-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CAMREV_IME')then
+
+		begin
+			
+            
+            select 
+             dcv.revisado
+            into 
+              v_registros
+            from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
+            
+            
+            IF  v_registros.revisado = 'si' THEN
+             v_revisado = 'no';
+            ELSE
+             v_revisado = 'si';
+            END IF;
+            
+            
+            update conta.tdoc_compra_venta set			
+			  revisado = v_revisado
+            where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+            
+            
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cambio del documento a revisado '||v_revisado|| ' id: '||v_parametros.id_doc_compra_venta); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    
          
 	else
      

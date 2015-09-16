@@ -83,10 +83,13 @@ BEGIN
                         pla.desc_plantilla,
                         dcv.importe_descuento_ley,
                         dcv.importe_pago_liquido,
-                        dcv.nro_dui
+                        dcv.nro_dui,
+                        dcv.id_moneda,
+                        mon.codigo as desc_moneda
 						from conta.tdoc_compra_venta dcv
 						inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                         inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                        inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
                         left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
 						left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where  ';
@@ -115,6 +118,7 @@ BEGIN
 					    from conta.tdoc_compra_venta dcv
 						inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                         inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                        inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
                         left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
 						left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where ';

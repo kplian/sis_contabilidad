@@ -13,8 +13,9 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
     fheight: '80%',
     fwidth: '70%',
     tabEnter: true,
+    tipoDoc: 'venta',
 	constructor:function(config){
-		this.initButtons=[this.cmbGestion,this.cmbPeriodo];
+		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
 		var me = this;
 		this.Grupos = [
 		            {
@@ -70,21 +71,30 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 			this.capturaFiltros();
 		    
         },this);
+        
+        this.cmbDepto.on('select', function( combo, record, index){
+			this.capturaFiltros();
+		    
+        },this);
 		
 		this.iniciarEventos();
 		this.init();
-		//this.load({params:{start:0, limit:this.tam_pag}});
+		this.grid.addListener('cellclick', this.oncellclick,this);
 	},
 	
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
-        this.store.baseParams.id_gestion = this.cmbGestion.getValue();
-        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
-        this.load(); 
+        if(this.validarFiltros()){
+        	this.store.baseParams.id_gestion = this.cmbGestion.getValue();
+	        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
+	        this.store.baseParams.id_depto = this.cmbDepto.getValue();
+	        this.load(); 
+        }
+        
     },
     
     validarFiltros:function(){
-        if(this.cmbGestion.validate() && this.cmbPeriodo.validate()){
+        if(this.cmbDepto.getValue() && this.cmbGestion.validate() && this.cmbPeriodo.validate()){
             return true;
         }
         else{
@@ -97,7 +107,43 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
         }
     },
     
-    
+    cmbDepto: new Ext.form.ComboBox({
+                name: 'id_depto',
+                fieldLabel: 'Depto',
+                blankText: 'Depto',
+                typeAhead: false,
+                forceSelection: true,
+                allowBlank: false,
+                disableSearchButton: true,
+                emptyText: 'Depto Contable',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_parametros/control/Depto/listarDeptoFiltradoDeptoUsuario',
+                    id: 'id_depto',
+					root: 'datos',
+					sortInfo:{
+						field: 'deppto.nombre',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_depto','nombre','codigo'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: { par_filtro:'deppto.nombre#deppto.codigo', estado:'activo', codigo_subsistema: 'CONTA'}
+                }),
+                valueField: 'id_depto',
+   				displayField: 'nombre',
+   				hiddenName: 'id_depto',
+                enableMultiSelect: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 20,
+                queryDelay: 200,
+                anchor: '80%',
+                listWidth:'280',
+                resizable:true,
+                minChars: 2
+            }),
     
 	cmbGestion: new Ext.form.ComboBox({
 				fieldLabel: 'Gestion',
@@ -245,7 +291,44 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             type:'NumberField',
             form:true 
         },
+        
+        {
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_depto_conta'
+			},
+			type:'Field',
+			form:true 
+		},
 		{
+			config:{
+				name: 'revisado',
+				fieldLabel: 'Revisado',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:3,
+                renderer: function (value, p, record, rowIndex, colIndex){  
+                	     
+            	       //check or un check row
+            	       var checked = '',
+            	       	    momento = 'no';
+                	   if(value == 'si'){
+                	        	checked = 'checked';;
+                	   }
+            	       return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0}></div>',checked);
+            	        
+                 }
+			},
+			type: 'TextField',
+			filters: { pfiltro:'dcv.revisado',type:'string'},
+			id_grupo: 1,
+			grid: true,
+			form: false
+		},
+		/*{
    			config:{
    				 name:'id_depto_conta',
    				 hiddenName: 'id_depto_conta',
@@ -266,7 +349,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
    		    grid:true,
    		    bottom_filter: true,
    			form:true
-       },
+       },*/
         {
             config:{
                 name: 'id_plantilla',
@@ -313,6 +396,27 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             grid: true,
             bottom_filter: true,
             form: true
+        },
+		
+        {
+            config:{
+                name:'id_moneda',
+                origen:'MONEDA',
+                allowBlank:false,
+                fieldLabel:'Moneda',
+                gdisplayField:'desc_moneda',//mapea al store del grid
+                gwidth:70,
+                width:250,
+                renderer:function (value, p, record){return String.format('{0}', record.data['desc_moneda']);}
+             },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{   
+                pfiltro:'incbte.desc_moneda',
+                type:'string'
+            },
+            grid:true,
+            form:true
         },
 		{
 			config:{
@@ -669,21 +773,6 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'revisado',
-				fieldLabel: 'Revisado',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:3
-			},
-				type: 'TextField',
-				filters: { pfiltro:'dcv.revisado',type:'string'},
-				id_grupo: 1,
-				grid: true,
-				form: false
-		},
-		{
-			config:{
 				name: 'sw_contabilizar',
 				fieldLabel: 'Contabilizar',
 				allowBlank: true,
@@ -846,7 +935,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		'desc_depto','desc_plantilla',
 		'importe_descuento_ley',
-		'importe_pago_liquido','nro_dui'
+		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda'
 		
 	],
 	sortInfo:{
@@ -1121,10 +1210,12 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
         else{
             this.store.baseParams.id_gestion=this.cmbGestion.getValue();
             this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
+            this.store.baseParams.id_depto = this.cmbDepto.getValue();
+            
             Phx.vista.DocCompraVenta.superclass.onButtonAct.call(this);
         }
     },
-    
+    /*
      onButtonNew:function(){
      	
      	
@@ -1137,7 +1228,48 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
      	    this.Cmp.nro_autorizacion.modificado = true;
             Phx.vista.DocCompraVenta.superclass.onButtonNew.call(this);
             this.esconderImportes();
+            this.Cmp.id_depto_conta.setValue(this.cmbDepto.getValue())
         }
+    },*/
+   
+   onButtonNew:function(){
+	       //abrir formulario de solicitud
+	        if(!this.validarFiltros()){
+	            alert('Especifique el año y el mes antes')
+	        }
+	        else{
+	       
+			       var me = this;
+			       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVenta.php',
+			                                'Formulario de Documento Compra/Venta',
+			                                {
+			                                    modal:true,
+			                                    width:'100%',
+			                                    height:'100%'
+			                                }, { data: { 
+			                                	 objPadre: me ,
+			                                	 tipoDoc: me.tipoDoc,
+			                                	 id_gestion: me.cmbGestion.getValue(),
+			                                	 id_periodo: me.cmbPeriodo.getValue(),
+			                                	 id_depto: me.cmbDepto.getValue(),
+			                                	 tmpPeriodo: me.tmpPeriodo,
+			                                	 tmpGestion: me.tmpGestion
+			                                	}
+			                                }, 
+			                                this.idContenedor,
+			                                'FormCompraVenta',
+			                                {
+			                                    config:[{
+			                                              event:'successsave',
+			                                              delegate: this.onSaveForm,
+			                                              
+			                                            }],
+			                                    
+			                                    scope:this
+			                                 });    
+	    
+		
+          } 
     },
     
     onButtonEdit:function(){
@@ -1178,6 +1310,57 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
            }else{
                 alert('error al recuperar la plantilla para editar, actulice su navegador');
             }
-     }
+     },
+     oncellclick : function(grid, rowIndex, columnIndex, e) {
+     	var record = this.store.getAt(rowIndex),
+	        fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
+     	
+     	if(fieldName == 'revisado') {
+	       	//if(record.data['revisado'] == 'si'){
+	       	   this.cambiarRevision(record);
+	       //	}
+	    }
+     },
+     cambiarRevision: function(record){
+		Phx.CP.loadingShow();
+	    var d = record.data
+        Ext.Ajax.request({
+            url:'../../sis_contabilidad/control/DocCompraVenta/cambiarRevision',
+            params:{ id_doc_compra_venta: d.id_doc_compra_venta},
+            success: this.successRevision,
+            failure: this.conexionFailure,
+            timeout: this.timeout,
+            scope: this
+        }); 
+	},
+	successRevision: function(resp){
+       Phx.CP.loadingHide();
+       var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+       if(!reg.ROOT.error){
+         this.reload();
+       }
+    },
+    
+     preparaMenu:function(tb){
+        Phx.vista.DocCompraVenta.superclass.preparaMenu.call(this,tb)
+        var data = this.getSelectedData();
+        if(data['revisado'] ==  'no' ){
+            this.getBoton('edit').enable();
+            this.getBoton('del').enable();
+         
+         }
+         else{
+            this.getBoton('edit').disable();
+            this.getBoton('del').disable();
+         } 
+	        
+    },
+    
+    liberaMenu:function(tb){
+        Phx.vista.DocCompraVenta.superclass.liberaMenu.call(this,tb);
+                    
+    },
+    
+    
 })
 </script>

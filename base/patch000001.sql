@@ -1873,3 +1873,149 @@ IS 'identifica los cbtes migrados desde la central hacia la regional';
 /***********************************F-SCP-RAC-CONTA-1-02/09/2015****************************************/
 
 
+/***********************************I-SCP-FFP-CONTA-1-11/09/2015****************************************/
+
+CREATE TABLE conta.tbanca_compra_venta (
+  id_banca_compra_venta SERIAL,
+  tipo VARCHAR(255),
+  modalidad_transaccion INTEGER, 
+  fecha_documento date,
+  tipo_transaccion INTEGER,
+  nit_ci VARCHAR(255),
+  razon VARCHAR(255),
+  num_documento VARCHAR(255),
+  num_contrato VARCHAR(255),
+  importe_documento numeric(10,2),
+  autorizacion numeric,
+  num_cuenta_pago varchar(255),
+  monto_pagado numeric(10,2),
+  monto_acumulado numeric(10,2),
+  nit_entidad numeric,
+  num_documento_pago varchar(255),
+  tipo_documento_pago numeric,
+  fecha_de_pago date,
+  CONSTRAINT pk_tbanca_compra_venta__id_cuenta PRIMARY KEY(id_banca_compra_venta) 
+) INHERITS (pxp.tbase)
+WITHOUT OIDS;
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN id_depto_conta INTEGER;
+  
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN id_periodo INTEGER;
+  
+  
+COMMENT ON COLUMN conta.tbanca_compra_venta.tipo
+IS 'tipo puede ser compra o venta';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.modalidad_transaccion
+IS 'Consignar cuando corresponda: 1 Compras al contado , 2 Compras al crédito';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.fecha_documento
+IS 'Fecha del documento con el que se realizó la transacción por un importe mayor o igual a Bs50.000.-';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.tipo_transaccion
+IS 'Consignar uno de los siguientes números de acuerdo a lo que corresponda: 1. Compra con factura  2. Compra con retenciones 3. Compra de inmuebles';
+
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.nit_ci
+IS 'Consignar el dato del NIT del proveedor de la factura,  o  N° de identificación del beneficiario del pago retenido.';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.razon
+IS 'Consignar la razón social del proveedor o el nombre del beneficiario del pago realizado';
+
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.num_documento
+IS 'Consignar el N° de factura o el N° de documento  que corresponda  de acuerdo al tipo de  transacción';
+
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.num_contrato
+IS 'Consignar el número de contrato o cero en caso de no existir contrato.';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.importe_documento
+IS 'Consignar el monto total de la factura o de la transacción retenida';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.autorizacion
+IS 'Consignar el N° de autorización de la factura, o el   N° 4 para retenciones';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.num_cuenta_pago
+IS 'N° de cuenta de la Entidad Financiera de desembolso del pago o Nº de documento de depósito en cuenta';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.monto_pagado
+IS 'Monto Pagado';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.monto_acumulado
+IS 'Monto acumulado de pagos parciales';
+
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.nit_entidad
+IS 'NIT Entidad Financiera emisora del documento de pago.';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.num_documento_pago
+IS 'N° del documento utilizado para la realización del pago';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.tipo_documento_pago
+IS 'Consignar uno de los siguientes números de acuerdo a lo que corresponda:  
+1. Cheque de cualquier naturaleza 2. Orden de transferencia  3. Ordenes de transferencia electrónica de fondos 4. Transferencia de fondos 
+5. Tarjeta de débito 
+6. Tarjeta de crédito 7. Tarjeta prepagada 8. Depósito en cuenta. 9. Cartas de crédito 10. Otros';
+
+COMMENT ON COLUMN conta.tbanca_compra_venta.fecha_de_pago
+IS 'Fecha de la emisión del documento de pago';
+
+
+
+
+
+CREATE TABLE conta.tconfig_banca (
+  id_config_banca SERIAL,
+  tipo VARCHAR(255),
+  digito INTEGER, 
+  descripcion varchar(255),
+  CONSTRAINT pk_tconfig_banca__id_cuenta PRIMARY KEY(id_config_banca) 
+) INHERITS (pxp.tbase)
+WITHOUT OIDS;
+
+
+
+
+/***********************************F-SCP-FFP-CONTA-1-11/09/2015****************************************/
+
+
+
+
+/***********************************I-SCP-FFP-CONTA-1-15/09/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_moneda INTEGER  NOT NULL;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_moneda
+IS 'Moneda del documento';
+-------------- SQL ---------------
+
+CREATE TABLE conta.tdoc_concepto (
+  id_doc_concepto SERIAL NOT NULL,
+  id_orden_trabajo INTEGER,
+  id_centro_costo INTEGER,
+  id_concepto_ingas INTEGER,
+  descripcion TEXT,
+  cantidad NUMERIC,
+  precio_unitario NUMERIC(19,2) NOT NULL,
+  precio_total NUMERIC(19,2) NOT NULL,
+  PRIMARY KEY(id_doc_concepto)
+) INHERITS (pxp.tbase)
+;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_concepto
+  ADD COLUMN id_doc_compra_venta INTEGER NOT NULL;
+
+/***********************************F-SCP-FFP-CONTA-1-15/09/2015****************************************/
+
+
+
+

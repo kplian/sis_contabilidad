@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
   p_id_usuario integer,
   p_id_usuario_ai integer,
@@ -33,6 +31,7 @@ DECLARE
     v_nombre_conexion				varchar;
     v_sincronizar					varchar;
     v_pre_integrar_presupuestos		varchar;
+    v_conta_integrar_libro_bancos	varchar;
      
 
 BEGIN
@@ -109,12 +108,7 @@ BEGIN
     
     --TODO igualar y validar ....
     
-    --------------------------------------------------
-    -- Validaciones sobre el cobte y sus transacciones
-    ----------------------------------------------------
-    IF not conta.f_int_trans_validar(p_id_int_comprobante) THEN
-      raise exception 'error al realizar validaciones en el combrobante';
-    END IF;
+    
     
    -- raise exception 'variacion %', v_variacion ;
     
@@ -298,6 +292,13 @@ BEGIN
         -- v_resp = conta.f_replicar_cbte(p_id_usuario,p_id_int_comprobante);
         
         
+        --------------------------------------------------
+        -- Validaciones sobre el cobte y sus transacciones
+        ----------------------------------------------------
+        IF not conta.f_int_trans_validar(p_id_usuario,p_id_int_comprobante) THEN
+          raise exception 'error al realizar validaciones en el combrobante';
+        END IF; 
+        
        ----------------------------------------------------------------- 
        -- 8 si viene de una plantilla de comprobante busca la funcion de validacion configurada
        -----------------------------------------------------------------
@@ -313,23 +314,30 @@ BEGIN
           
           -- raise exception 'validar comprobante pxp %',v_funcion_comprobante_validado ;
         	 
-          EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '''||v_nombre_conexion||''')');
+          EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
                              
-		          
-       
+	   ELSE
+         -- si no tenemos plantilla de comprobante revisamos la funcin directamente	          
+          IF v_rec_cbte.funcion_comprobante_validado is not NULL THEN
+             EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+          END IF;
        
        END IF;
-        -----------------------------------------------------------------------------------------------
-        --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
-        ------------------------------------------------------------------------------------------------
-        IF v_pre_integrar_presupuestos = 'true' THEN 
+       
+        
+       
+      
+       -----------------------------------------------------------------------------------------------
+       --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
+       ------------------------------------------------------------------------------------------------
+       IF v_pre_integrar_presupuestos = 'true' THEN 
         	v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
-        END IF;
+       END IF;
     
-        --10.cerrar conexion dblink si es que existe 
-        if p_origen  = 'endesis' then
+       --10.cerrar conexion dblink si es que existe 
+       if p_origen  = 'endesis' then
         	select * into v_resp from migra.f_cerrar_conexion(v_nombre_conexion,'exito'); 
-        end if;
+       end if;
         
     else
     	

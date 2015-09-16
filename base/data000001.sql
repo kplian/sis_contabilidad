@@ -1003,3 +1003,28 @@ VALUES (E'conta_prioridad_depto_internacional', E'3', E'prioridad del depto de c
 
 /***********************************F-DAT-RAC-CONTA-0-01/09/2015*****************************************/
 
+
+/***********************************I-DAT-RAC-CONTA-0-03/09/2015*****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_integrar_libro_bancos', E'si', E'Si integra contabilidad con libro de bancos');
+
+
+/***********************************F-DAT-RAC-CONTA-0-03/09/2015*****************************************/
+
+
+/***********************************I-DAT-RAC-CONTA-0-16/09/2015*****************************************/
+
+select pxp.f_insert_tgui ('Periodos Compra Venta', 'Configuracion de periodos de compra  y venta', 'PCV', 'si', 1, 'sis_contabilidad/vista/periodo_compra_venta/DeptoConta.php', 3, '', 'DeptoConta', 'CONTA');
+select pxp.f_insert_testructura_gui ('PCV', 'CONF');
+
+/***********************************F-DAT-RAC-CONTA-0-16/09/2015*****************************************/
+
+
+
+
+
+
+
+

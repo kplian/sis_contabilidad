@@ -1,0 +1,1 @@
+Hola estoy escribiendo en un archivo creado con PHP 

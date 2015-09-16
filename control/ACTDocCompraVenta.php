@@ -22,6 +22,10 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.tipo = ''".$this->objParam->getParametro('tipo')."''");    
         }
 		
+		if($this->objParam->getParametro('id_depto')!=''){
+            $this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
+        }
+		
 		
 		
 		
@@ -60,12 +64,40 @@ class ACTDocCompraVenta extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	/*
+	 * Author:  		 RAC - KPLIAN
+	 * Date:   			 04/02/2015
+	 * Description		 insertar documentos de compra o venta con su detalle de conceptos
+	 * */
+	
+	function insertarDocCompleto(){
+		$this->objFunc=$this->create('MODDocCompraVenta');	
+		if($this->objParam->insertar('id_doc_compra_venta')){
+			$this->res=$this->objFunc->insertarDocCompleto($this->objParam);			
+		} else{
+			//TODO			
+			//$this->res=$this->objFunc->modificarSolicitud($this->objParam);
+			//trabajar en la modificacion compelta de solicitud ....
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+		
 						
 	function eliminarDocCompraVenta(){
 			$this->objFunc=$this->create('MODDocCompraVenta');	
 		$this->res=$this->objFunc->eliminarDocCompraVenta($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function cambiarRevision(){
+			$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->res=$this->objFunc->cambiarRevision($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	
+	
 			
 }
 

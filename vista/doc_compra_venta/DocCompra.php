@@ -17,19 +17,20 @@ Phx.vista.DocCompra = {
 	requireclase: 'Phx.vista.DocCompraVenta',
 	title: 'Libro de Compras',
 	nombreVista: 'DocCompra',
+	tipoDoc: 'compra',
 	
 	constructor: function(config) {
 	    Phx.vista.DocCompra.superclass.constructor.call(this,config);
-        this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:'compra'});
+        this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.tipoDoc});
     },
     
     loadValoresIniciales: function() {
     	Phx.vista.DocCompra.superclass.loadValoresIniciales.call(this);
-        this.Cmp.tipo.setValue('compra'); 
+        this.Cmp.tipo.setValue(this.tipoDoc); 
         
    },
    capturaFiltros:function(combo, record, index){
-        this.store.baseParams.tipo = 'compra';
+        this.store.baseParams.tipo = this.tipoDoc;
         Phx.vista.DocCompra.superclass.capturaFiltros.call(this,combo, record, index);
     },
     

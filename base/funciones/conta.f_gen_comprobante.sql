@@ -396,8 +396,14 @@ BEGIN
                            );
     
     
-    -- migraciond e comprobante endesis  DBLINK
     
+    
+    -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
+    IF not conta.f_int_trans_procesar(v_id_int_comprobante) THEN
+      raise exception 'Error al procesar transacciones';
+    END IF;
+    
+    -- migraciond e comprobante endesis  DBLINK
     v_sincronizar = pxp.f_get_variable_global('sincronizar');
     
         
@@ -410,7 +416,7 @@ BEGIN
         
          ELSE
          --   TODO si es necesario migrar a contabilidad internacional ....
-           v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante);
+           v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante, p_id_tabla_valor);
          END IF;
     END IF;
    

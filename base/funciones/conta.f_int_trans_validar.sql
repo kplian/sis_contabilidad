@@ -27,6 +27,7 @@ va_variables		varchar[];
 v_registros_cbte	record;
 v_id_cuenta_bancaria	integer;
 v_conta_validar_forma_pago		varchar;
+v_conta_integrar_libro_bancos		varchar;
  
 
 BEGIN
@@ -39,11 +40,14 @@ BEGIN
       per.id_gestion,
       ic.manual,
       ic.origen,
-      ic.tipo_cambio
+      ic.tipo_cambio,
+      ic.id_clase_comprobante,
+      cc.codigo
    into
       v_registros_cbte
    from conta.tint_comprobante ic 
    inner join param.tperiodo per on per.id_periodo = ic.id_periodo
+   inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = ic.id_clase_comprobante
    where ic.id_int_comprobante = p_id_int_comprobante;
    
    
@@ -55,9 +59,7 @@ BEGIN
    
   
    -- si es un cbte manual o viene de integracion con la central (cbts en regionales .... )
-   IF v_registros_cbte.manual = 'si' or (v_registros_cbte.manual ='no' and v_registros_cbte.origen = 'central' ) THEN
-   
-    
+  
            --listado de las transacciones del comprobante
            FOR v_registros in (select * 
                                from conta.tint_transaccion it 
@@ -74,14 +76,28 @@ BEGIN
                 v_id_cuenta_bancaria = NULL;
                 
                 IF v_conta_validar_forma_pago = 'si' THEN
-                    IF v_registros.importe_haber > 0 and v_registros.banco = 'si'  THEN   
+                   --si es un cbte de pago ...                
+                   IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON') THEN  
+                        IF v_registros.importe_haber > 0 and v_registros.banco = 'si'  THEN   
+                            
+                               IF v_registros.forma_pago = '' or v_registros.forma_pago is  null  THEN
+                                 raise exception 'defina la forma de pago para proceder con la validaci{on';
+                               END IF;
+                               
+                              --TODO verificar integracion con libro de bancos ....
+                              
+                               --ver si tiene libro de bancos ....
+                               v_conta_integrar_libro_bancos = pxp.f_get_variable_global('conta_integrar_libro_bancos');
+                               IF v_conta_integrar_libro_bancos = 'si' THEN 
+                                	
+                                    -- si alguna transaccion tiene banco habilitado para pago
+                                    IF  not tes.f_integracion_libro_bancos(v_nombre_conexion,'exito') THEN
+                                      raise exception 'error al registrar transacción en libro de bancos';
+                                    END IF;
+                                    
+                               END IF;
                         
-                       IF v_registros.forma_pago = '' or v_registros.forma_pago is  null  THEN
-                         raise exception 'defina la forma de pago para proceder con la validaci{on';
-                       END IF;
-                       
-                      --TODO verificar integracion con libro de bancos ....
-                    
+                        END IF;
                     END IF;
                 END IF;   
                
@@ -96,7 +112,7 @@ BEGIN
               
            END LOOP;
    
-   END IF;
+  
    
    --retorna resultado
    RETURN TRUE;

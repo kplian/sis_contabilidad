@@ -12,7 +12,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.DocVenta= {
-    
+    tipoDoc: 'venta',
 	require: '../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVenta.php',
 	requireclase: 'Phx.vista.DocCompraVenta',
 	title: 'Libro de Ventas',
@@ -26,11 +26,11 @@ Phx.vista.DocVenta= {
     
     loadValoresIniciales: function() {
     	Phx.vista.DocVenta.superclass.loadValoresIniciales.call(this);
-        this.Cmp.tipo.setValue('venta'); 
+        this.Cmp.tipo.setValue(me.tipoDoc); 
         
    },
    capturaFiltros:function(combo, record, index){
-        this.store.baseParams.tipo = 'venta';
+        this.store.baseParams.tipo = this.tipoDoc;
         Phx.vista.DocVenta.superclass.capturaFiltros.call(this,combo, record, index);
     },
     

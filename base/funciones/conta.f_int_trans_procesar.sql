@@ -37,71 +37,73 @@ BEGIN
       ic.id_periodo,
       per.id_gestion,
       ic.manual,
-      ic.origen
+      ic.origen,
+      ic.id_clase_comprobante,
+      cc.codigo 
    into
       v_registros_cbte
    from conta.tint_comprobante ic 
    inner join param.tperiodo per on per.id_periodo = ic.id_periodo
+   inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = ic.id_clase_comprobante
    where ic.id_int_comprobante = p_id_int_comprobante;
    
    
   
-   -- si es un cbte manual o viene de integracion con la central (cbts en regionales .... )
-   IF v_registros_cbte.manual = 'si' or (v_registros_cbte.manual ='no' and v_registros_cbte.origen = 'central' ) THEN
-   
     
-           --listado de las transacciones del comprobante
-           FOR v_registros in (select * 
-                               from conta.tint_transaccion it 
-                               where it.id_int_comprobante = p_id_int_comprobante) LOOP
+     --listado de las transacciones del comprobante
+     FOR v_registros in (select * 
+                         from conta.tint_transaccion it 
+                         where it.id_int_comprobante = p_id_int_comprobante) LOOP
               
-                ----------------------------------------------------------------------------------------------------
-                --  FORMA DE PAGO
-                --  analiza si la cuenta contable esta relacionada con una cuenta bancaria y esta al haber para pago
-                --  tipo relacion contable = CUEBANCEGRE;   cuenta bancaria egreso
-                ------------------------------------------------------------------------------------------------------
+          ----------------------------------------------------------------------------------------------------
+          --  FORMA DE PAGO, si es un cmprobante de pago
+          --  analiza si la cuenta contable esta relacionada con una cuenta bancaria y esta al haber para pago
+          --  tipo relacion contable = CUEBANCEGRE;   cuenta bancaria egreso
+          ------------------------------------------------------------------------------------------------------
                 
-                   
-                -- busca si alguna de las cuentas contables tiene relacion 
-                -- con una cuenta bancaria
-                v_id_cuenta_bancaria = NULL;
-                IF v_registros.importe_haber > 0   THEN   
-                    select 
-                       rc.id_tabla
-                    into
-                       v_id_cuenta_bancaria
-                    from  conta.trelacion_contable rc
-                    inner join conta.ttipo_relacion_contable trc on trc.id_tipo_relacion_contable = rc.id_tipo_relacion_contable
-                    where      trc.codigo_tipo_relacion = 'CUEBANCEGRE' 
-                           and rc.id_cuenta = v_registros.id_cuenta 
-                           and rc.id_gestion = v_registros_cbte.id_gestion
-                           and rc.id_auxiliar = v_registros.id_auxiliar
-                    offset 0 limit 1;
-                END IF;
-                   
-                IF v_id_cuenta_bancaria is not null  THEN
-                   UPDATE  conta.tint_transaccion it set
+          --si es un cbte de pago
+          IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON') THEN  
+              -- busca si alguna de las cuentas contables tiene relacion 
+              -- con una cuenta bancaria
+              v_id_cuenta_bancaria = NULL;
+                    
+              IF v_registros.importe_haber > 0   THEN   
+                  select 
+                     rc.id_tabla
+                  into
+                     v_id_cuenta_bancaria
+                  from  conta.trelacion_contable rc
+                  inner join conta.ttipo_relacion_contable trc on trc.id_tipo_relacion_contable = rc.id_tipo_relacion_contable
+                  where      trc.codigo_tipo_relacion = 'CUEBANCEGRE' 
+                         and rc.id_cuenta = v_registros.id_cuenta 
+                         and rc.id_gestion = v_registros_cbte.id_gestion
+                         and rc.id_auxiliar = v_registros.id_auxiliar
+                  offset 0 limit 1;
+              END IF;
+                       
+              IF v_id_cuenta_bancaria is not null  THEN
+                 UPDATE  conta.tint_transaccion it set
                    id_cuenta_bancaria =  v_id_cuenta_bancaria,
                    banco = 'si'   -- bandera que habilita boton de cheque  en la interface, y exige el registro en la validacion
-                  WHERE id_int_transaccion = v_registros.id_int_transaccion;
-                ELSE
-                 UPDATE  conta.tint_transaccion it set
-                   id_cuenta_bancaria =  NULL,
-                   banco = 'no'   
-                  WHERE id_int_transaccion = v_registros.id_int_transaccion;
-                END IF;
-               
+                 WHERE id_int_transaccion = v_registros.id_int_transaccion;
+                    
+              ELSE
+                     
+                UPDATE  conta.tint_transaccion it set
+                 id_cuenta_bancaria =  NULL,
+                 banco = 'no'   
+                WHERE id_int_transaccion = v_registros.id_int_transaccion;
+                    
+              END IF;
+         END IF;
               
-              -----------------------------------
-              --TODO agregar otras validaciones
-              -----------------------------------
+        -----------------------------------
+        --TODO agregar otras validaciones
+        -----------------------------------
               
-              
-              
-              
-           END LOOP;
+     END LOOP;
    
-   END IF;
+   
    
    --retorna resultado
    RETURN TRUE;
