@@ -10,7 +10,7 @@ $body$
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_banca_compra_venta_sel
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tbanca_compra_venta'
- AUTOR: 		 (favio figueroa)
+ AUTOR: 		 (admin)
  FECHA:	        11-09-2015 14:36:46
  COMENTARIOS:	
 ***************************************************************************

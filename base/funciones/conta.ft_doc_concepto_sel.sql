@@ -47,26 +47,35 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						docc.id_doc_concepto,
-						docc.estado_reg,
-						docc.id_orden_trabajo,
-						docc.id_centro_costo,
-						docc.id_concepto_ingas,
-						docc.descripcion,
-						docc.cantidad,
-						docc.precio_unitario,
-						docc.precio_total,
-						docc.id_usuario_reg,
-						docc.fecha_reg,
-						docc.id_usuario_ai,
-						docc.usuario_ai,
-						docc.id_usuario_mod,
-						docc.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	
+                            docc.id_doc_concepto,
+                            docc.estado_reg,
+                            docc.id_orden_trabajo,
+                            docc.id_centro_costo,
+                            docc.id_concepto_ingas,
+                            docc.descripcion,
+                            docc.cantidad_sol,
+                            docc.precio_unitario,
+                            docc.precio_total,
+                            docc.id_usuario_reg,
+                            docc.fecha_reg,
+                            docc.id_usuario_ai,
+                            docc.usuario_ai,
+                            docc.id_usuario_mod,
+                            docc.fecha_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            docc.id_doc_compra_venta,
+                            cc.codigo_cc as desc_centro_costo,
+                            cig.desc_ingas as desc_concepto_ingas,
+                            ot.desc_orden as desc_orden_trabajo,
+                            pre.id_presupuesto                        
 						from conta.tdoc_concepto docc
 						inner join segu.tusuario usu1 on usu1.id_usuario = docc.id_usuario_reg
+                        inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = docc.id_concepto_ingas
+                        inner join param.vcentro_costo cc on cc.id_centro_costo = docc.id_centro_costo
+                        inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo
 						left join segu.tusuario usu2 on usu2.id_usuario = docc.id_usuario_mod
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo = docc.id_orden_trabajo
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -91,9 +100,13 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_doc_concepto)
 					    from conta.tdoc_concepto docc
-					    inner join segu.tusuario usu1 on usu1.id_usuario = docc.id_usuario_reg
+						inner join segu.tusuario usu1 on usu1.id_usuario = docc.id_usuario_reg
+                        inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = docc.id_concepto_ingas
+                        inner join param.vcentro_costo cc on cc.id_centro_costo = docc.id_centro_costo
+                        inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo
 						left join segu.tusuario usu2 on usu2.id_usuario = docc.id_usuario_mod
-					    where ';
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo = docc.id_orden_trabajo
+				        where ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

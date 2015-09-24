@@ -2241,3 +2241,82 @@ ALTER TABLE conta.vint_comprobante
   
 /***********************************F-DEP-RAC-CONTA-0-05/08/2015*****************************************/
 
+
+
+
+/***********************************I-DEP-FFP-CONTA-0-16/09/2015*****************************************/
+
+select pxp.f_insert_testructura_gui ('banca', 'CONTA');
+select pxp.f_insert_testructura_gui ('CONFBA', 'banca');
+select pxp.f_insert_testructura_gui ('BACO', 'banca');
+select pxp.f_insert_testructura_gui ('BAVE', 'banca')
+
+/***********************************F-DEP-FFP-CONTA-0-16/09/2015*****************************************/
+
+
+
+
+/***********************************I-DEP-FFP-CONTA-0-24/09/2015*****************************************/
+
+
+CREATE VIEW conta.vagrupador
+AS
+  SELECT agr.id_agrupador,
+         agr.id_depto_conta,
+         agr.fecha_cbte,
+         agr.id_moneda,
+         agr.tipo,
+         agr.incluir_rev,
+         agr.id_gestion
+  FROM conta.tagrupador agr;
+
+
+--------------- SQL ---------------
+
+CREATE VIEW conta.vdoc_compra_venta_det
+AS
+  SELECT ad.id_agrupador_doc,
+         dcv.id_moneda,
+         dcv.id_int_comprobante,
+         dcv.id_plantilla,
+         dcv.importe_doc,
+         dcv.importe_excento,
+         COALESCE(dcv.importe_excento, 0::numeric) + COALESCE(dcv.importe_ice, 0
+           ::numeric) AS importe_total_excento,
+         dcv.importe_descuento,
+         dcv.importe_descuento_ley,
+         dcv.importe_ice,
+         dcv.importe_it,
+         dcv.importe_iva,
+         dcv.importe_pago_liquido,
+         dcv.nro_documento,
+         dcv.nro_dui,
+         dcv.nro_autorizacion,
+         dcv.razon_social,
+         dcv.revisado,
+         dcv.manual,
+         dcv.obs,
+         dcv.nit,
+         dcv.fecha,
+         dcv.codigo_control,
+         dcv.sw_contabilizar,
+         dcv.tipo,
+         ad.id_agrupador,
+         ad.id_doc_compra_venta,
+         dco.id_concepto_ingas,
+         dco.id_centro_costo,
+         dco.id_orden_trabajo,
+         dco.precio_total,
+         dco.id_doc_concepto,
+         cig.desc_ingas,
+         dcv.razon_social || ' - ' || cig.desc_ingas ||' ( ' || dco.descripcion || ' ) Nro Doc: '|| COALESCE(dcv.nro_documento) AS descripcion
+  FROM conta.tagrupador_doc ad
+       JOIN conta.tdoc_compra_venta dcv ON ad.id_doc_compra_venta =
+         dcv.id_doc_compra_venta
+       JOIN conta.tdoc_concepto dco ON dco.id_doc_compra_venta =
+         dcv.id_doc_compra_venta
+       JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas =
+         dco.id_concepto_ingas;
+
+
+/***********************************F-DEP-FFP-CONTA-0-24/09/2015*****************************************/

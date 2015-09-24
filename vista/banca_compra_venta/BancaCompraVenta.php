@@ -13,6 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.BancaCompraVenta=Ext.extend(Phx.gridInterfaz,{
 
 tabEnter: true,
+tipoBan: 'Compras',
 	constructor:function(config){
 		
 	
@@ -22,11 +23,79 @@ tabEnter: true,
 		var anio = 2015;
 		var fecha_fin = '01/01/2016';
 		
-		this.initButtons=[this.cmbDepto, this.cmbTipo, this.cmbGestion, this.cmbPeriodo];
+		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
+		
+		
+		
+		
+		this.Grupos = [
+		            {
+		                layout: 'column',
+		                border: false,
+		                autoHeight : true,
+		                defaults: {
+		                    border: false,
+                            bodyStyle: 'padding:4px'
+		                },            
+		                items: [
+		                              {
+		                                xtype: 'fieldset',
+		                                columnWidth: 0.5,
+		                                defaults: {
+								            anchor: '-20' // leave room for error icon
+								        },
+		                                title: 'Datos del Documento',
+		                                items: [],
+		                                id_grupo: 0,
+		                                flex:1,
+		                                autoHeight : true,
+		                                margins:'2 2 2 2'
+		                             },
+		                              
+		                            {
+		                                xtype: 'fieldset',
+		                                columnWidth: 0.5,
+		                                title: 'Detalle del Pago',
+		                                items: [],
+		                                margins:'2 10 2 2',
+		                                id_grupo:1,
+		                                autoHeight : true,
+		                                flex:1
+		                            },
+		                             {
+		                                xtype: 'fieldset',
+		                                columnWidth: 0.5,
+		                                title: 'Detalle del Pago2',
+		                                items: [],
+		                                margins:'2 10 2 2',
+		                                id_grupo:2,
+		                                autoHeight : true,
+		                                flex:1
+		                             }
+		               ]   
+		     }];
 		
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.BancaCompraVenta.superclass.constructor.call(this,config);
+		
+		 var fieldset = this.form.items.items[0].items.items[1];
+		
+		 
+		 fieldset.add({
+         	xtype:'button',
+         	text:'<i class="fa fa-file"></i> Ver Historial Acumulado',
+         	scope:this,
+         	handler:function(){
+         		alert('Ver Historial Acumulado');         	
+         	}
+         	
+         });
+         fieldset.doLayout(); 
+         
+		 console.log(fieldset);
+		 
+		
 		
 		this.cmbGestion.on('select', function(combo, record, index){
 			this.tmpGestion = record.data.gestion;
@@ -36,31 +105,31 @@ tabEnter: true,
 		    this.cmbPeriodo.store.baseParams = Ext.apply(this.cmbPeriodo.store.baseParams, {id_gestion: this.cmbGestion.getValue()});
 		    this.cmbPeriodo.modificado = true;
 		    
-		    anio = record.data.gestion;
+		    /*anio = record.data.gestion;
 		    var fecha = new Date(mes+'/'+dia+'/'+anio);
 			
 			this.getComponente('fecha_documento').setMinValue(fecha);
- 			this.getComponente('fecha_documento').setMaxValue(fecha_fin);
+ 			this.getComponente('fecha_documento').setMaxValue(fecha_fin);*/
 		    
 		    
         },this);
+        
         
         this.cmbPeriodo.on('select', function( combo, record, index){
 			this.tmpPeriodo = record.data.periodo;
 			this.capturaFiltros();
 			
-			 mes = record.data.periodo;
+			/* mes = record.data.periodo;
 			 console.log(mes);
 		    var fecha = new Date(mes+'/'+dia+'/'+anio);
 		    fecha_fin = new Date(mes+'/'+dia+'/'+anio);
-		    //fecha_fin.setDate(fecha_fin.getMonth() + 1);
 		    fecha_fin.setMonth(fecha_fin.getMonth() + 1);
 		    fecha_fin.setDate(fecha_fin.getDate() - 1);
 		    console.log(fecha);
 		    console.log(fecha_fin);
 			
 			this.getComponente('fecha_documento').setMinValue(fecha);
- 			this.getComponente('fecha_documento').setMaxValue(fecha_fin);
+ 			this.getComponente('fecha_documento').setMaxValue(fecha_fin);*/
 			
 			
 		    
@@ -71,7 +140,7 @@ tabEnter: true,
 		    
         },this);
         
-        this.cmbTipo.on('select', function( combo, record, index){
+        /*this.cmbTipo.on('select', function( combo, record, index){
 			if(this.cmbTipo.getValue() == 'Compras'){
 				console.log('compras');
 				this.Cmp.tipo_transaccion.show()
@@ -81,14 +150,13 @@ tabEnter: true,
 			}
 		    
         },this);
-        
+        */
         
       
         
        
         
-        this.getComponente('fecha_documento').setMinValue('01/02/2015');
- 		this.getComponente('fecha_documento').setMaxValue('10/03/2015');
+        
         
         
 		this.init();
@@ -96,7 +164,12 @@ tabEnter: true,
 		
 		this.iniciarEventos();
 		
-		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT',/*iconCls:'' ,*/disabled:false,handler:this.exportar});
+		 this.construyeVariablesContratos();
+		 
+		 
+		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT',/*iconCls:'' ,*/disabled:false,handler:this.generar_txt});
+
+		this.addButton('Importar',{argument: {imprimir: 'Importar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Importar TXT',/*iconCls:'' ,*/disabled:false,handler:this.importar_txt});
 
 		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
@@ -108,7 +181,7 @@ tabEnter: true,
         	this.store.baseParams.id_gestion = this.cmbGestion.getValue();
 	        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
 	        this.store.baseParams.id_depto = this.cmbDepto.getValue();
-	        this.store.baseParams.tipo = this.cmbTipo.getValue();
+	        this.store.baseParams.tipo = this.tipoBan;
 	        this.load(); 
         }
         
@@ -130,7 +203,7 @@ tabEnter: true,
     
     
     
-    cmbTipo : new Ext.form.ComboBox({
+    /*cmbTipo : new Ext.form.ComboBox({
     	
 				name: 'tipo',
 				fieldLabel: 'tipo',
@@ -144,7 +217,7 @@ tabEnter: true,
 				width: 200,
 				type: 'ComboBox',
 
-    }),
+    }),*/
     cmbDepto: new Ext.form.ComboBox({
                 name: 'id_depto',
                 fieldLabel: 'Depto',
@@ -253,7 +326,7 @@ tabEnter: true,
 			console.log(this.Cmp.tipo_documento_pago.getValue());
 		}, this);
 		
-		this.Cmp.autorizacion.on('change', function(combo, record, index){ 
+		/*this.Cmp.autorizacion.on('change', function(combo, record, index){ 
 			Ext.Ajax.request({
 				url: '../../sis_contabilidad/control/BancaCompraVenta/listarBancaCompraVenta',
 				params: {'autorizacion': ''+this.Cmp.autorizacion.getValue()+'','start':'0','limit':'1000',"sort":"id_banca_compra_venta","dir":"ASC"},
@@ -263,7 +336,79 @@ tabEnter: true,
 				scope: this
 			});
 		
+		}, this);*/
+		
+		
+		this.Cmp.id_proveedor.on('select', function(combo, record, index){ 
+			//console.log(record.data.desc_proveedor);
+			
+			var res = record.data.desc_proveedor.split("(");
+			console.log(res[0]);
+			this.Cmp.nit_ci.setValue(record.data.nit);
+			this.Cmp.razon.setValue(res[0]);
+			
+			
+			
+			this.Cmp.id_contrato.enable();
+			this.Cmp.id_contrato.reset();
+			this.Cmp.id_contrato.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+combo.getValue()+"\",\"field\":\"CON.id_proveedor\"}]";
+			this.Cmp.id_contrato.modificado = true;
+			
+			
 		}, this);
+		
+		this.Cmp.tipo_transaccion.on('select', function(combo, record, index){ 
+			//console.log(record.data.desc_proveedor);
+			if(record.data.digito == 2 || record.data.digito == 3){
+				this.Cmp.autorizacion.setValue(4);
+			}else{
+				this.Cmp.autorizacion.setValue('');
+			}
+			
+		}, this);
+		
+		
+		this.Cmp.id_cuenta_bancaria.on('select', function(combo, record, index){ 
+			console.log(record.data);
+			
+			if(this.Cmp.id_cuenta_bancaria.getValue() == 61){
+				this.Cmp.tipo_documento_pago.reset();
+				this.Cmp.tipo_documento_pago.store.baseParams.descripcion = "Transferencia de fondos";
+				this.Cmp.tipo_documento_pago.modificado = true;
+			}else{
+				this.Cmp.tipo_documento_pago.reset();
+				this.Cmp.tipo_documento_pago.store.baseParams.descripcion = "Cheque de cualquier naturaleza";
+				this.Cmp.tipo_documento_pago.modificado = true;
+			}
+			this.Cmp.num_cuenta_pago.setValue(record.data.nro_cuenta);
+			this.Cmp.nit_entidad.setValue(record.data.doc_id);
+			
+			
+			
+		}, this);
+		
+		this.Cmp.id_contrato.on('select', function(combo, record, index){ 
+			
+			
+			console.log(record.data)
+			
+			this.Cmp.id_contrato.setValue(record.data.id_contrato);
+			this.Cmp.num_contrato.setValue(record.data.numero);
+			
+			
+			
+		}, this);
+		
+		
+		
+		
+		
+		
+	
+		
+		
+		
+		
 		
 		
 	},
@@ -336,8 +481,8 @@ tabEnter: true,
                  }
 			},
 			type: 'TextField',
-			filters: { pfiltro:'dcv.revisado',type:'string'},
-			id_grupo: 1,
+			filters: { pfiltro:'banca.revisado',type:'string'},
+			id_grupo: 0,
 			grid: true,
 			form: false
 		},
@@ -347,7 +492,7 @@ tabEnter: true,
 		{
 			config: {
 				name: 'modalidad_transaccion',
-				fieldLabel: 'Modalidad transacción ',
+				fieldLabel: 'Modalidad Transacción ',
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
@@ -368,6 +513,7 @@ tabEnter: true,
 				valueField: 'digito',
 				displayField: 'descripcion',
 				gdisplayField: 'desc_modalidad_transaccion',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{digito}</b>. {descripcion} </p> </div></tpl>',
 
 				hiddenName: 'id_config_banca',
 				forceSelection: true,
@@ -396,7 +542,7 @@ tabEnter: true,
 		{
 			config:{
 				name: 'fecha_documento',
-				fieldLabel: 'Fecha factura /fecha documento ',
+				fieldLabel: 'Fecha Factura / Fecha Documento ',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -407,7 +553,7 @@ tabEnter: true,
 			},
 				type:'DateField',
 				filters:{pfiltro:'banca.fecha_documento',type:'date'},
-				id_grupo:1,
+				id_grupo:0,
 				grid:true,
 				form:true
 		},
@@ -415,7 +561,7 @@ tabEnter: true,
 		{
 			config: {
 				name: 'tipo_transaccion',
-				fieldLabel: 'Tipo de transacción',
+				fieldLabel: 'Tipo de Transacción',
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
@@ -436,6 +582,7 @@ tabEnter: true,
 				valueField: 'digito',
 				displayField: 'descripcion',
 				gdisplayField: 'desc_tipo_transaccion',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{digito} </b>. {descripcion} </p> </div></tpl>',
 
 				hiddenName: 'id_config_banca',
 				forceSelection: true,
@@ -462,22 +609,72 @@ tabEnter: true,
 		{
 			config:{
 				name: 'autorizacion',
-				fieldLabel: 'Nº autorización  factura/ documento ',
+				fieldLabel: 'Nro Autorización /Factura Documento ',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100
 			},
 				type:'NumberField',
 				filters:{pfiltro:'banca.autorizacion',type:'numeric'},
-				id_grupo:1,
+				id_grupo:0,
 				grid:true,
 				form:true
+		},
+		
+		{
+			config: {
+				name: 'id_proveedor',
+				fieldLabel: 'Proveedor',
+				allowBlank: false,
+				forceSelection: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_parametros/control/Proveedor/listarProveedorCombos',
+					id: 'id_proveedor',
+					root: 'datos',
+					sortInfo: {
+						field: 'id_proveedor',
+						direction: 'ASC'
+
+					},
+					totalProperty: 'total',
+					fields: ['id_proveedor','id_persona','id_institucion','desc_proveedor', 'rotulo_comercial', 'nit'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'provee.desc_proveedor#provee.nit'}
+				}),
+				valueField: 'id_proveedor',
+				displayField: 'desc_proveedor',
+				gdisplayField: 'desc_tipo_transaccion',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_proveedor}</b></p><p>NIT: {nit} </p> </div></tpl>',
+
+
+				hiddenName: 'id_proveedor',
+				forceSelection: true,
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '60%',
+				gwidth: 150,
+				minChars: 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_tipo_transaccion']);
+				}
 			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'provee.desc_proveedor',type: 'string'},
+			grid: false,
+			form: true
+		},
+		
 		
 		{
 			config:{
 				name: 'nit_ci',
-				fieldLabel: 'NIT/CI proveedor',
+				fieldLabel: 'NIT / CI Proveedor',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -485,7 +682,7 @@ tabEnter: true,
 			},
 				type:'TextField',
 				filters:{pfiltro:'banca.nit_ci',type:'string'},
-				id_grupo:1,
+				id_grupo:0,
 				grid:true,
 				form:true
 		},
@@ -493,7 +690,7 @@ tabEnter: true,
 		{
 			config:{
 				name: 'razon',
-				fieldLabel: 'Nombre/razón social proveedor',
+				fieldLabel: 'Nombre / Razón Social Proveedor',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -501,7 +698,7 @@ tabEnter: true,
 			},
 				type:'TextField',
 				filters:{pfiltro:'banca.razon',type:'string'},
-				id_grupo:1,
+				id_grupo:0,
 				grid:true,
 				form:true
 		},
@@ -509,7 +706,7 @@ tabEnter: true,
 		{
 			config:{
 				name: 'num_documento',
-				fieldLabel: 'Nº de factura/ N° documento ',
+				fieldLabel: 'Nro de Factura / Nro Documento ',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -517,15 +714,72 @@ tabEnter: true,
 			},
 				type:'TextField',
 				filters:{pfiltro:'banca.num_documento',type:'string'},
-				id_grupo:1,
+				id_grupo:0,
 				grid:true,
 				form:true
 		},
 		
 		{
+			config: {
+				name: 'id_contrato',
+				hiddenName: 'id_contrato',
+				fieldLabel: 'Obj Contrato',
+				typeAhead: false,
+				forceSelection: false,
+				allowBlank: false,
+				disabled: true,
+				emptyText: 'Contratos...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_workflow/control/Tabla/listarTablaCombo',
+					id: 'id_contrato',
+					root: 'datos',
+					sortInfo: {
+						field: 'id_contrato',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_contrato', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor','monto','moneda','fecha_inicio','fecha_fin'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: {par_filtro:'con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto', tipo_proceso:"CON",tipo_estado:"finalizado",id_tabla:3}
+				}),
+				valueField: 'id_contrato',
+				displayField: 'objeto',
+				gdisplayField: 'desc_contrato',
+				triggerAction: 'all',
+				lazyRender: true,
+				resizable:true,
+				mode: 'remote',
+				pageSize: 20,
+				queryDelay: 200,
+				listWidth:380,
+				minChars: 2,
+				gwidth: 100,
+				anchor: '80%',
+				renderer: function(value, p, record) {
+					if(record.data['desc_contrato']){
+						return String.format('{0}', record.data['desc_contrato']);
+					}
+					return '';
+					
+				},
+				tpl: '<tpl for="."><div class="x-combo-list-item"><p>Nro: {numero} ({tipo})</p><p>Obj: <strong><b>{objeto}</b></strong></p><p>Prov : {desc_proveedor}</p> <p>Monto: {monto} {moneda}</p><p>Rango: {fecha_inicio} al {fecha_fin}</p></div></tpl>'
+			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {
+				pfiltro: 'con.numero',
+				type: 'numeric'
+			},
+			grid: true,
+			form: true
+		},
+		
+		
+		{
 			config:{
 				name: 'num_contrato',
-				fieldLabel: 'Nº de contrato ',
+				fieldLabel: 'N de contrato ',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -533,7 +787,7 @@ tabEnter: true,
 			},
 				type:'TextField',
 				filters:{pfiltro:'banca.num_contrato',type:'string'},
-				id_grupo:1,
+				id_grupo:0,
 				grid:true,
 				form:true
 		},
@@ -541,7 +795,7 @@ tabEnter: true,
 		{
 			config:{
 				name: 'importe_documento',
-				fieldLabel: 'Importe factura/ importe documento',
+				fieldLabel: 'Importe Factura / Importe Documento',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -549,18 +803,67 @@ tabEnter: true,
 			},
 				type:'NumberField',
 				filters:{pfiltro:'banca.importe_documento',type:'numeric'},
-				id_grupo:1,
+				id_grupo:0,
 				grid:true,
 				form:true
 		},
 		
 		
 		{
+			config: {
+				name: 'id_cuenta_bancaria',
+				fieldLabel: 'Cuenta Bancaria TESORERIA',
+				allowBlank: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_tesoreria/control/CuentaBancaria/listarCuentaBancaria',
+					id: 'id_cuenta_bancaria',
+					root: 'datos',
+					sortInfo: {
+						field: 'id_cuenta_bancaria',
+						direction: 'ASC'
+
+					},
+					totalProperty: 'total',
+					fields: ['id_cuenta_bancaria', 'denominacion', 'nro_cuenta','nombre_institucion','doc_id'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'ctaban.denominacion#ctaban.nro_cuenta'}
+				}),
+				valueField: 'id_cuenta_bancaria',
+				displayField: 'denominacion',
+				gdisplayField: 'desc_tipo_transaccion',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{denominacion}</b></p><p>Nro Cuenta: {nro_cuenta} </p> <p>Institucion: {nombre_institucion} </p><p>nit Institucion: {doc_id} </p></div></tpl>',
+
+
+				hiddenName: 'id_cuenta_bancaria',
+				forceSelection: true,
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '90%',
+				gwidth: 150,
+				minChars: 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_tipo_transaccion']);
+				}
+			},
+			type: 'ComboBox',
+			id_grupo: 1,
+			filters: {pfiltro: 'ctaban.denominacion',type: 'string'},
+			grid: false,
+			form: true
+		},
+		
+		
+		{
 			config:{
 				name: 'num_cuenta_pago',
-				fieldLabel: 'N° de cuenta del documento de pago',
+				fieldLabel: 'Nro de Cuenta del Documento de Pago',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '90%',
 				gwidth: 100,
 				maxLength:255
 			},
@@ -573,9 +876,9 @@ tabEnter: true,
 		{
 			config:{
 				name: 'monto_pagado',
-				fieldLabel: 'Monto pagado en documento de pag',
+				fieldLabel: 'Monto Pagado en Documento de Pago',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '90%',
 				gwidth: 100,
 				maxLength:655362
 			},
@@ -590,7 +893,7 @@ tabEnter: true,
 				name: 'monto_acumulado',
 				fieldLabel: 'Monto Acumulado',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '90%',
 				gwidth: 100,
 				maxLength:655362
 			},
@@ -606,12 +909,12 @@ tabEnter: true,
 				name: 'nit_entidad',
 				fieldLabel: 'NIT Entidad Financiera ',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '90%',
 				gwidth: 100
 			},
 				type:'NumberField',
 				filters:{pfiltro:'banca.nit_entidad',type:'numeric'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:true
 		},
@@ -619,15 +922,15 @@ tabEnter: true,
 		{
 			config:{
 				name: 'num_documento_pago',
-				fieldLabel: 'N° documento de pago (Nº transacción u operación) ',
+				fieldLabel: 'Nro Documento de Pago (Nro Transacción u Operación) ',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '90%',
 				gwidth: 100,
 				maxLength:255
 			},
 				type:'TextField',
 				filters:{pfiltro:'banca.num_documento_pago',type:'string'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:true
 		},
@@ -645,7 +948,7 @@ tabEnter: true,
 		{
 			config: {
 				name: 'tipo_documento_pago',
-				fieldLabel: 'Tipo de documento de pago',
+				fieldLabel: 'Tipo de Documento de Pago',
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
@@ -666,6 +969,7 @@ tabEnter: true,
 				valueField: 'digito',
 				displayField: 'descripcion',
 				gdisplayField: 'desc_tipo_documento_pago',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{digito} </b>. {descripcion} </p> </div></tpl>',
 
 				hiddenName: 'id_config_banca',
 				forceSelection: true,
@@ -675,7 +979,7 @@ tabEnter: true,
 				mode: 'remote',
 				pageSize: 15,
 				queryDelay: 1000,
-				anchor: '60%',
+				anchor: '90%',
 				gwidth: 150,
 				minChars: 2,
 				renderer : function(value, p, record) {
@@ -683,7 +987,7 @@ tabEnter: true,
 				}
 			},
 			type: 'ComboBox',
-			id_grupo: 0,
+			id_grupo: 2,
 			filters: {pfiltro: 'confba.descripcion',type: 'string'},
 			grid: true,
 			form: true
@@ -693,36 +997,36 @@ tabEnter: true,
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '90%',
 				gwidth: 100,
 				maxLength:10
 			},
 				type:'TextField',
 				filters:{pfiltro:'banca.estado_reg',type:'string'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:false
 		},
 		{
 			config:{
 				name: 'fecha_de_pago',
-				fieldLabel: 'Fecha del documento de pago  ',
+				fieldLabel: 'Fecha del Documento de Pago  ',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '90%',
 				gwidth: 100,
 							format: 'd/m/Y', 
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
 				type:'DateField',
 				filters:{pfiltro:'banca.fecha_de_pago',type:'date'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:true
 		},
 		{
 			config:{
 				name: 'fecha_reg',
-				fieldLabel: 'Fecha creación',
+				fieldLabel: 'Fecha Creación',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -731,7 +1035,7 @@ tabEnter: true,
 			},
 				type:'DateField',
 				filters:{pfiltro:'banca.fecha_reg',type:'date'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:false
 		},
@@ -746,14 +1050,14 @@ tabEnter: true,
 			},
 				type:'TextField',
 				filters:{pfiltro:'banca.usuario_ai',type:'string'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:false
 		},
 		{
 			config:{
 				name: 'usr_reg',
-				fieldLabel: 'Creado por',
+				fieldLabel: 'Creado Por',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -761,7 +1065,7 @@ tabEnter: true,
 			},
 				type:'Field',
 				filters:{pfiltro:'usu1.cuenta',type:'string'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:false
 		},
@@ -776,7 +1080,7 @@ tabEnter: true,
 			},
 				type:'Field',
 				filters:{pfiltro:'banca.id_usuario_ai',type:'numeric'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:false,
 				form:false
 		},
@@ -791,7 +1095,7 @@ tabEnter: true,
 			},
 				type:'Field',
 				filters:{pfiltro:'usu2.cuenta',type:'string'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:false
 		},
@@ -807,7 +1111,7 @@ tabEnter: true,
 			},
 				type:'DateField',
 				filters:{pfiltro:'banca.fecha_mod',type:'date'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:false
 		}
@@ -885,14 +1189,17 @@ tabEnter: true,
             timeout: this.timeout,
             scope: this
         }); 
+        this.reload();
 	},
 	successRevision: function(resp){
        Phx.CP.loadingHide();
        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-       if(reg.datos = 'correcto'){
+       //this.reload();
+       /*if(reg.datos = 'correcto'){
          this.reload();
-       }
+       }*/
     },
+   
      
 	 onButtonAct:function(){
         if(!this.validarFiltros()){
@@ -902,7 +1209,7 @@ tabEnter: true,
             this.store.baseParams.id_gestion=this.cmbGestion.getValue();
             this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
             this.store.baseParams.id_depto = this.cmbDepto.getValue();
-            this.store.baseParams.tipo = this.cmbTipo.getValue();
+            this.store.baseParams.tipo = this.tipoBan;
             
             Phx.vista.BancaCompraVenta.superclass.onButtonAct.call(this);
         }
@@ -919,14 +1226,65 @@ tabEnter: true,
             Phx.vista.BancaCompraVenta.superclass.onButtonNew.call(this);//habilita el boton y se abre
             this.Cmp.id_depto_conta.setValue(this.cmbDepto.getValue()); 
             this.Cmp.id_periodo.setValue(this.cmbPeriodo.getValue()); 
-            this.Cmp.tipo.setValue(this.cmbTipo.getValue()); 
+            //this.Cmp.tipo.setValue(this.cmbTipo.getValue()); 
         }
     },
     
+     preparaMenu:function(tb){
+        Phx.vista.BancaCompraVenta.superclass.preparaMenu.call(this,tb)
+        var data = this.getSelectedData();
+        if(data['revisado'] ==  'no' ){
+            this.getBoton('edit').enable();
+            this.getBoton('del').enable();
+         
+         }
+         else{
+            this.getBoton('edit').disable();
+            this.getBoton('del').disable();
+         } 
+	        
+    },
     
-    exportar:function(){
+    liberaMenu:function(tb){
+        Phx.vista.BancaCompraVenta.superclass.liberaMenu.call(this,tb);
+                    
+    },
+    
+    
+     construyeVariablesContratos:function(){
+    	Phx.CP.loadingShow();
+    	Ext.Ajax.request({
+                url: '../../sis_workflow/control/Tabla/cargarDatosTablaProceso',
+                params: { "tipo_proceso": "CON", "tipo_estado": "finalizado" , "limit":"100","start":"0"},
+                success: this.successCotratos,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope:   this
+            });
+           
+    	
+    	
+    },
+    successCotratos:function(resp){
+           Phx.CP.loadingHide();
+           var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+           if(reg.datos){
+                
+              this.ID_CONT = reg.datos[0].atributos.id_tabla
+              
+              this.Cmp.id_contrato.store.baseParams.id_tabla = this.ID_CONT;
+             
+             }else{
+                alert('Error al cargar datos de contratos')
+            }
+     },
+     
+    
+    
+    
+    generar_txt:function(){
 			var rec = this.cmbPeriodo.getValue();
-			var tipo = this.cmbTipo.getValue();
+			var tipo = this.tipoBan;
 
 			console.log(rec);
 
@@ -934,14 +1292,14 @@ tabEnter: true,
 			
 			Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/exporta_txt',
-				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':150},
-				success: this.successExport,
+				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000},
+				success: this.successGeneracion_txt,
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
 			});
 		},
-		successExport: function (resp) {
+		successGeneracion_txt: function (resp) {
 			//Phx.CP.loadingHide();
 			console.log('resp' , resp)
 
@@ -955,7 +1313,7 @@ tabEnter: true,
 			  var link = document.createElement("a");
 			  link.download = texto;
 			  // Construct the uri
-			  link.href = "/kerp_capacitacion/sis_contabilidad/reportes/banca_periodos/"+texto+".txt";
+			  link.href = "/kerp_capacitacion/reportes_generados/"+texto+".txt";
 			  document.body.appendChild(link);
 			  link.click();
 			  // Cleanup the DOM
@@ -963,6 +1321,22 @@ tabEnter: true,
 			  delete link;
 
 
+		},
+		importar_txt:function(){
+			
+			
+			var misdatos = new Object();
+			misdatos.id_periodo = this.cmbPeriodo.getValue();
+			misdatos.tipo = this.tipoBan;
+			
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/banca_compra_venta/subirArchivo.php',
+	        'Subir',
+	        {
+	            modal:true,
+	            width:450,
+	            height:150
+	        },misdatos,this.idContenedor,'SubirArchivo');
+	        
 		},
 		verAutorizacion:function(resp){
 			
@@ -975,7 +1349,10 @@ tabEnter: true,
 				this.Cmp.razon.setValue(datos[0].razon);
 			}
 			
-		}
+		}/*,
+		onSubmit : function(o, x, force) {
+			alert(this.Cmp.id_contrato.getValue());
+		} */
     
     
 	}

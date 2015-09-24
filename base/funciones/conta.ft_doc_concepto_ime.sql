@@ -84,8 +84,8 @@ BEGIN
             ELSE
                v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
             END IF;
-            --recueprar la partida de la parametrizacion    que relacion contable??
-        
+            
+            --Validar si tiene relacion contable        
             SELECT 
               ps_id_cuenta
             into 
@@ -101,6 +101,7 @@ BEGIN
                raise exception 'no se encontro relacion contable ...';
            END IF;
         
+         
         
         	--Sentencia de la insercion
         	insert into conta.tdoc_concepto(
@@ -109,7 +110,7 @@ BEGIN
 			id_centro_costo,
 			id_concepto_ingas,
 			descripcion,
-			cantidad,
+			cantidad_sol,
 			precio_unitario,
 			precio_total,
 			id_usuario_reg,
@@ -123,7 +124,7 @@ BEGIN
 			v_parametros.id_centro_costo,
 			v_parametros.id_concepto_ingas,
 			v_parametros.descripcion,
-			v_parametros.cantidad,
+			v_parametros.cantidad_sol,
 			v_parametros.precio_unitario,
 			v_parametros.precio_total,
 			p_id_usuario,
@@ -156,19 +157,59 @@ BEGIN
 	elsif(p_transaccion='CONTA_DOCC_MOD')then
 
 		begin
+        
+              select
+              cig.desc_ingas
+              into
+              v_registros_cig
+              from param.tconcepto_ingas cig
+              where cig.id_concepto_ingas =  v_parametros.id_concepto_ingas;
+              
+            --obtiene datos del documento
+            
+             SELECT 
+              dcv.tipo,
+              dcv.id_periodo,
+              per.id_gestion
+             into
+              v_registros_doc
+             FROM conta.tdoc_compra_venta dcv 
+             inner join param.tperiodo per on per.id_periodo = dcv.id_periodo
+             where dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+             
+         
+             --obtener partida, cuenta auxiliar del concepto de gasto
+            IF v_registros_doc.tipo = 'compra' THEN
+               v_codigo_rel = 'CUECOMP';  --codigo de relacion contable para compras
+            ELSE
+               v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
+            END IF;
+            
+            --Validar si tiene relacion contable        
+            SELECT 
+              ps_id_cuenta
+            into 
+              v_id_cuenta
+            FROM conta.f_get_config_relacion_contable(v_codigo_rel, 
+                                                     v_registros_doc.id_gestion, 
+                                                     v_parametros.id_concepto_ingas, 
+                                                     v_parametros.id_centro_costo,  
+                                                     'No se encontro relación contable para el conceto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
+          
+        
+        
+        
 			--Sentencia de la modificacion
 			update conta.tdoc_concepto set
 			id_orden_trabajo = v_parametros.id_orden_trabajo,
 			id_centro_costo = v_parametros.id_centro_costo,
 			id_concepto_ingas = v_parametros.id_concepto_ingas,
 			descripcion = v_parametros.descripcion,
-			cantidad = v_parametros.cantidad,
+			cantidad_sol = v_parametros.cantidad_sol,
 			precio_unitario = v_parametros.precio_unitario,
 			precio_total = v_parametros.precio_total,
 			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+			fecha_mod = now()
 			where id_doc_concepto=v_parametros.id_doc_concepto;
                
 			--Definicion de la respuesta
@@ -205,15 +246,21 @@ BEGIN
         
    /*********************************    
  	#TRANSACCION:  'CONTA_VERCONCEP_IME'
- 	#DESCRIPCION:	Everifica conceptos de gasto
+ 	#DESCRIPCION:	recupera relacion contable para el concepto indicado
  	#AUTOR:		admin	
  	#FECHA:		15-09-2015 13:09:45
 	***********************************/
 
-	elsif(p_transaccion='CONTA_DOCC_ELI')then
+	elsif(p_transaccion='CONTA_VERCONCEP_IME')then
 
 		begin
-			
+            
+            --obtener partida, cuenta auxiliar del concepto de gasto
+            IF v_parametros.relacion = 'compra' THEN
+               v_codigo_rel = 'CUECOMP';  --codigo de relacion contable para compras
+            ELSE
+               v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
+            END IF;
             
             SELECT 
               ps_id_partida ,
@@ -223,13 +270,19 @@ BEGIN
               v_id_partida,
               v_id_cuenta, 
               v_id_auxiliar
-           FROM conta.f_get_config_relacion_contable('CUECOMP', v_parametros.id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo,  'No se encontro relación contable para el conceto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
+           FROM conta.f_get_config_relacion_contable(v_codigo_rel, 
+                                                     v_parametros.id_gestion, 
+                                                     v_parametros.id_concepto_ingas, 
+                                                     v_parametros.id_centro_costo,  
+                                                     'No se encontro relación contable este concepto <br> Mensaje: ');
           
 			
-               
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','CONCEPTO verificado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_concepto',v_parametros.id_doc_concepto::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_concepto_ingas',v_parametros.id_concepto_ingas::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_partida',v_id_partida::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_cuenta',v_id_cuenta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_auxiliar',v_id_auxiliar::varchar);
               
             --Devuelve la respuesta
             return v_resp;

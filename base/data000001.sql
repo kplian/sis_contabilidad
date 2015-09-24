@@ -1024,6 +1024,85 @@ select pxp.f_insert_testructura_gui ('PCV', 'CONF');
 
 
 
+/***********************************I-DAT-FFP-CONTA-0-16/09/2015*****************************************/
+
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 12:59:01.003', NULL, E'activo', NULL, E'NULL', 1, E'Tipo de documento de pago', 1, E'Cheque de cualquier naturaleza');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 12:59:11.145', NULL, E'activo', NULL, E'NULL', 2, E'Tipo de documento de pago', 2, E'Orden de transferencia');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 12:59:26.034', NULL, E'activo', NULL, E'NULL', 3, E'Tipo de documento de pago', 3, E'Ordenes de transferencia electrónica de fondos');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 12:59:39.608', NULL, E'activo', NULL, E'NULL', 4, E'Tipo de documento de pago', 4, E'Transferencia de fondos');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 12:59:54.119', NULL, E'activo', NULL, E'NULL', 5, E'Tipo de documento de pago', 5, E'Tarjeta de débito');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 13:00:04.007', NULL, E'activo', NULL, E'NULL', 6, E'Tipo de documento de pago', 6, E'Tarjeta de crédito');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 13:00:14.862', NULL, E'activo', NULL, E'NULL', 7, E'Tipo de documento de pago', 7, E'Tarjeta pre pagada');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 13:00:25.605', NULL, E'activo', NULL, E'NULL', 8, E'Tipo de documento de pago', 8, E'Depósito en cuenta');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 13:02:41.636', NULL, E'activo', NULL, E'NULL', 9, E'Tipo de documento de pago', 9, E'Cartas de crédito');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 13:02:51.083', NULL, E'activo', NULL, E'NULL', 10, E'Tipo de documento de pago', 10, E'Otros');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 14:10:25.099', NULL, E'activo', NULL, E'NULL', 11, E'Modalidad de transacción', 1, E'Compras al contado');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 14:10:49.594', NULL, E'activo', NULL, E'NULL', 12, E'Modalidad de transacción', 2, E'Compras al crédito');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 14:11:53.854', NULL, E'activo', NULL, E'NULL', 13, E'Tipo de transacción', 1, E'Compra con factura');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 14:12:07.869', NULL, E'activo', NULL, E'NULL', 14, E'Tipo de transacción', 2, E'Compra con retenciones');
+
+INSERT INTO conta.tconfig_banca ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_config_banca", "tipo", "digito", "descripcion")
+VALUES (1, NULL, E'2015-09-11 14:12:21.763', NULL, E'activo', NULL, E'NULL', 15, E'Tipo de transacción', 3, E'Compra con inmuebles');
+
+
+select pxp.f_insert_tgui ('Bancarizacion', 'banca', 'banca', 'si', 1, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Config. Bancarizacion', 'configuraciones', 'CONFBA', 'si', 2, 'sis_contabilidad/vista/config_banca/ConfigBanca.php', 3, '', 'ConfigBanca', 'CONTA');
+select pxp.f_insert_tgui ('Banca Compra', 'Banca Compra', 'BACO', 'si', 3, 'sis_contabilidad/vista/banca_compra_venta/BancaCompra.php', 3, '', 'BancaCompra', 'CONTA');
+select pxp.f_insert_tgui ('Banca Ventas', 'Banca Ventas', 'BAVE', 'si', 4, 'sis_contabilidad/vista/banca_compra_venta/BancaVenta.php', 3, '', 'BancaVenta', 'CONTA');
+
+/***********************************F-DAT-FFP-CONTA-0-16/09/2015*****************************************/
+
+
+
+/***********************************I-DAT-RAC-CONTA-0-17/09/2015*****************************************/
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES (1, 1, E'2015-09-17 10:06:28.544', E'2015-09-17 10:10:30.401', E'activo', NULL, NULL, E'Cuenta para realizar ventas', E'CUEVENT', E'si-general', E'si', E'si', 1, E'presupuestaria', E'recurso');
+
+/***********************************F-DAT-RAC-CONTA-0-17/09/2015*****************************************/
+
+
+
+
+/***********************************I-DAT-RAC-CONTA-0-24/09/2015*****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_cod_plan_venta', E'VENTADOC', E'codigo de plantilla de comprobante para generar un cbte desde el libro de ventas');
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_cod_plan_compra', E'COMPRADOC', E'codigo de plantilla de comprobante para generar un cbte desde el libro de compras');
+
+
+/***********************************F-DAT-RAC-CONTA-0-24/09/2015*****************************************/
 
 
 

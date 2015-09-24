@@ -32,6 +32,11 @@ DECLARE
 	v_id_banca_compra_venta	integer;
     
     v_registros				record;
+    
+     v_rec					record;
+    v_tmp_resp				boolean;
+     v_registros_json		record;
+     anoop					record;
 			    
 BEGIN
 
@@ -48,6 +53,15 @@ BEGIN
 	if(p_transaccion='CONTA_BANCA_INS')then
 					
         begin
+         
+            -- recuepra el periodo de la fecha ...
+            --Obtiene el periodo a partir de la fecha
+        	--v_rec = param.f_get_periodo_gestion(v_parametros.fecha_documento);
+            
+            -- valida que period de libro de compras y ventas este abierto
+            --v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+        
+        
         	--Sentencia de la insercion
         	insert into conta.tbanca_compra_venta(
 			num_cuenta_pago,
@@ -194,6 +208,101 @@ BEGIN
             return v_resp;
 
 		end;
+        
+        
+        
+        /*********************************    
+ 	#TRANSACCION:  'CONTA_BANCA_IMP'
+ 	#DESCRIPCION:	Importacion de archivo txt
+ 	#AUTOR:		admin	
+ 	#FECHA:		22-09-2015 14:36:46
+	***********************************/
+
+	elsif(p_transaccion='CONTA_BANCA_IMP')then
+
+		begin
+        
+        --select * into v_registros_json from json('{"name":"depesz","password":"super simple","grades":[1,3,1,1,1,2],"skills":{"a":"b", "c":[1,2,3]}}');
+        
+
+		
+        
+         FOR v_registros_json in ( select * from json_populate_recordset(null::conta.banca_compra_venta, v_parametros.arra_json::json)) LOOP
+			--raise exception '%',v_registros_json;
+            insert into conta.tbanca_compra_venta(
+			num_cuenta_pago,
+			tipo_documento_pago,
+			num_documento,
+			monto_acumulado,
+			estado_reg,
+			nit_ci,
+			importe_documento,
+			fecha_documento,
+			modalidad_transaccion,
+			tipo_transaccion,
+			autorizacion,
+			monto_pagado,
+			fecha_de_pago,
+			razon,
+			tipo,
+			num_documento_pago,
+			num_contrato,
+			nit_entidad,
+            id_periodo,
+			fecha_reg,
+			usuario_ai,
+			id_usuario_reg,
+			id_usuario_ai,
+			id_usuario_mod,
+			fecha_mod
+          	) values(
+			v_registros_json.num_cuenta_pago,
+			v_registros_json.tipo_documento_pago,
+			v_registros_json.num_documento,
+			v_registros_json.monto_acumulado,
+			'activo',
+			v_registros_json.nit_ci,
+			v_registros_json.importe_documento,
+			v_registros_json.fecha_documento,
+			v_registros_json.modalidad_transaccion,
+			v_registros_json.tipo_transaccion,
+			v_registros_json.autorizacion,
+			v_registros_json.monto_pagado,
+			v_registros_json.fecha_de_pago,
+			v_registros_json.razon,
+			v_parametros.tipo,
+			v_registros_json.num_documento_pago,
+			v_registros_json.num_contrato,
+			v_registros_json.nit_entidad,
+            v_parametros.id_periodo,
+			now(),
+			v_parametros._nombre_usuario_ai,
+			p_id_usuario,
+			v_parametros._id_usuario_ai,
+			null,
+			null
+							
+			
+			
+			);
+        end loop;
+      
+          
+        
+			
+       
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','bancarizacion eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_banca_compra_venta',10::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+        
+        
+        
          
 	else
      

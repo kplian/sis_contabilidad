@@ -26,7 +26,7 @@ class MODDocConcepto extends MODbase{
 		$this->captura('id_centro_costo','int4');
 		$this->captura('id_concepto_ingas','int4');
 		$this->captura('descripcion','text');
-		$this->captura('cantidad','numeric');
+		$this->captura('cantidad_sol','numeric');
 		$this->captura('precio_unitario','numeric');
 		$this->captura('precio_total','numeric');
 		$this->captura('id_usuario_reg','int4');
@@ -37,6 +37,14 @@ class MODDocConcepto extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('id_doc_compra_venta','int4');		
+		
+		$this->captura('desc_centro_costo','TEXT');
+		$this->captura('desc_concepto_ingas','VARCHAR');
+		$this->captura('desc_orden_trabajo','VARCHAR');
+		$this->captura('id_presupuesto','int4');
+		
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -54,6 +62,7 @@ class MODDocConcepto extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('estado_reg','estado_reg','varchar');
+		$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
 		$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
@@ -78,6 +87,7 @@ class MODDocConcepto extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_doc_concepto','id_doc_concepto','int4');
+		$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
@@ -111,6 +121,28 @@ class MODDocConcepto extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function verificarRelacionConcepto(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_doc_concepto_ime';
+		$this->transaccion='CONTA_VERCONCEP_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_centro_costo','id_centro_costo','int4');
+		$this->setParametro('relacion','relacion','varchar');
+		$this->setParametro('id_gestion','id_gestion','int4');
+		$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	
 			
 }
 ?>

@@ -1411,7 +1411,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
                         tipoDoc: this.tipoDoc
                     },
                     this.idContenedor,
-                    'WizardAgrupador')
+                    'WizardAgrupador');
         	
         }
             

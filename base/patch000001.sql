@@ -1904,6 +1904,8 @@ ALTER TABLE conta.tbanca_compra_venta
 ALTER TABLE conta.tbanca_compra_venta
   ADD COLUMN id_periodo INTEGER;
   
+
+  
   
 COMMENT ON COLUMN conta.tbanca_compra_venta.tipo
 IS 'tipo puede ser compra o venta';
@@ -1967,6 +1969,8 @@ IS 'Fecha de la emisión del documento de pago';
 
 
 
+
+
 CREATE TABLE conta.tconfig_banca (
   id_config_banca SERIAL,
   tipo VARCHAR(255),
@@ -1984,7 +1988,7 @@ WITHOUT OIDS;
 
 
 
-/***********************************I-SCP-FFP-CONTA-1-15/09/2015****************************************/
+/***********************************I-SCP-RAC-CONTA-1-15/09/2015****************************************/
 
 --------------- SQL ---------------
 
@@ -2014,8 +2018,148 @@ CREATE TABLE conta.tdoc_concepto (
 ALTER TABLE conta.tdoc_concepto
   ADD COLUMN id_doc_compra_venta INTEGER NOT NULL;
 
-/***********************************F-SCP-FFP-CONTA-1-15/09/2015****************************************/
+/***********************************F-SCP-RAC-CONTA-1-15/09/2015****************************************/
 
 
 
 
+
+/***********************************I-SCP-FFP-CONTA-1-16/09/2015****************************************/
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN revisado VARCHAR(2);
+
+ALTER TABLE conta.tbanca_compra_venta
+  ALTER COLUMN revisado SET DEFAULT 'no';
+  
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN id_proveedor INTEGER;
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN id_contrato INTEGER;
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN id_cuenta_bancaria INTEGER;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_concepto
+  RENAME COLUMN cantidad TO cantidad_sol;
+  
+   
+/***********************************F-SCP-FFP-CONTA-1-16/09/2015****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-22/09/2015****************************************/
+--------------- SQL ---------------
+
+CREATE TABLE conta.tagrupador (
+  id_agrupador INTEGER,
+  fecha_ini DATE,
+  fecha_fin DATE,
+  tipo INTEGER,
+  id_depto_conta INTEGER,
+  id_moneda INTEGER,
+  PRIMARY KEY(id_agrupador)
+) INHERITS (pxp.tbase)
+;
+
+ALTER TABLE conta.tagrupador
+  OWNER TO postgres;
+
+COMMENT ON COLUMN conta.tagrupador.tipo
+IS 'compra o venta';
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tagrupador_doc (
+  id_agrupador_doc INTEGER,
+  id_doc_compra_venta INTEGER,
+  id_agrupador INTEGER,
+  PRIMARY KEY(id_agrupador_doc)
+) INHERITS (pxp.tbase);
+
+
+ALTER TABLE conta.tagrupador_doc
+  OWNER TO postgres;
+
+
+
+--------------- SQL ---------------
+
+COMMENT ON COLUMN conta.tagrupador.fecha_ini
+IS 'fechade inicio para buscar documentos de compra venta';
+
+ALTER TABLE conta.tagrupador
+  ALTER COLUMN fecha_ini SET NOT NULL;
+
+--------------- SQL ---------------
+
+COMMENT ON COLUMN conta.tagrupador.fecha_fin
+IS 'fecha fin para buscar en rango de documentos';
+
+ALTER TABLE conta.tagrupador
+  ALTER COLUMN fecha_fin SET NOT NULL;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tagrupador
+  ADD COLUMN fecha_cbte DATE NOT NULL;
+
+COMMENT ON COLUMN conta.tagrupador.fecha_cbte
+IS 'fecha para colocar al comprobante';  
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tagrupador
+  ADD COLUMN incluir_rev VARCHAR(4) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN conta.tagrupador.incluir_rev
+IS 'inlucir solo documentos que esten marcados como revisados o de lo contrario todos los disponibles';
+
+
+/***********************************F-SCP-RAC-CONTA-1-22/09/2015****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-23/09/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tagrupador
+  ALTER COLUMN tipo TYPE VARCHAR(20);
+
+ALTER TABLE conta.tagrupador
+  ALTER COLUMN tipo SET NOT NULL;
+
+--------------- SQL ---------------
+
+CREATE SEQUENCE conta.tagrupador_id_agrupador_seq
+MAXVALUE 2147483647;
+
+ALTER TABLE conta.tagrupador
+  ALTER COLUMN id_agrupador TYPE INTEGER;
+
+ALTER TABLE conta.tagrupador
+  ALTER COLUMN id_agrupador SET DEFAULT nextval('conta.tagrupador_id_agrupador_seq'::text);
+
+--------------- SQL ---------------
+
+CREATE SEQUENCE conta.tagrupador_doc_id_agrupador_doc_seq
+MAXVALUE 2147483647;
+
+ALTER TABLE conta.tagrupador_doc
+  ALTER COLUMN id_agrupador_doc TYPE INTEGER;
+
+ALTER TABLE conta.tagrupador_doc
+  ALTER COLUMN id_agrupador_doc SET DEFAULT nextval('conta.tagrupador_doc_id_agrupador_doc_seq'::text);
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tagrupador
+  ADD COLUMN id_gestion INTEGER; 
+/***********************************F-SCP-RAC-CONTA-1-23/09/2015****************************************/

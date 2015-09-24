@@ -71,6 +71,13 @@ class ACTBancaCompraVenta extends ACTbase{
 		
 	}
 
+	function importar_txt(){
+		
+		$this->objFunc=$this->create('MODBancaCompraVenta');	
+		$this->res=$this->objFunc->importar_txt($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
 	function exporta_txt(){
 		
 		
@@ -81,6 +88,8 @@ class ACTBancaCompraVenta extends ACTbase{
 		
 		$this->objParam->addFiltro("banca.tipo = ''".$this->objParam->getParametro('tipo')."'' ");  
 		$this->objParam->addFiltro("banca.id_periodo = ''".$this->objParam->getParametro('id_periodo')."'' ");
+		$this->objParam->addFiltro("banca.revisado = ''si'' ");
+		
 		$this->objParam->addFiltro("confmo.tipo = ''Modalidad de transacción''
                         and conftt.tipo = ''Tipo de transacción''
                         and conftd.tipo = ''Tipo de documento de pago'' ");
@@ -120,15 +129,24 @@ class ACTBancaCompraVenta extends ACTbase{
 		
 		
 		
-		$MiDocumento = fopen("/var/www/html/kerp_capacitacion/sis_contabilidad/reportes/banca_periodos/".$tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa.".txt", "w+");
+		$MiDocumento = fopen("/var/www/html/kerp_capacitacion/reportes_generados/".$tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa.".txt", "w+");
 		$nombre_archivo = $tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa;
 		
 		
 		
 		foreach ($datos as $dato) {
-			$Escribo = "".$dato['modalidad_transaccion'] ."|".$dato['fecha_documento'] ."|".$dato['tipo_transaccion'] ."|".$dato['nit_ci'] ."|".$dato['razon'] ."|".$dato['num_documento'] ."|".$dato['num_contrato'] ."|".$dato['importe_documento'] ."|".$dato['autorizacion'] ."|".$dato['num_cuenta_pago'] ."|".$dato['monto_pagado'] ."|".$dato['monto_acumulado'] ."|".$dato['nit_entidad'] ."|".$dato['num_documento_pago'] ."|".$dato['tipo_documento_pago'] ."|".$dato['fecha_de_pago'] ."|\n";
+			if($this->objParam->getParametro('tipo') == 'Compras'){
+				
+				$Escribo = "".$dato['modalidad_transaccion'] ."|".$dato['fecha_documento'] ."|".$dato['tipo_transaccion'] ."|".$dato['nit_ci'] ."|".$dato['razon'] ."|".$dato['num_documento'] ."|".$dato['num_contrato'] ."|".$dato['importe_documento'] ."|".$dato['autorizacion'] ."|".$dato['num_cuenta_pago'] ."|".$dato['monto_pagado'] ."|".$dato['monto_acumulado'] ."|".$dato['nit_entidad'] ."|".$dato['num_documento_pago'] ."|".$dato['tipo_documento_pago'] ."|".$dato['fecha_de_pago'] ."| ";
+				
+			}else if($this->objParam->getParametro('tipo') == 'Ventas'){
+				
+				$Escribo = "".$dato['modalidad_transaccion'] ."|".$dato['fecha_documento'] ."|".$dato['num_documento'] ."|".$dato['importe_documento'] ."|".$dato['num_contrato'] ."|".$dato['autorizacion'] ."|".$dato['nit_ci'] ."|".$dato['razon'] ."|".$dato['num_cuenta_pago'] ."|".$dato['monto_pagado'] ."|".$dato['monto_acumulado'] ."|".$dato['nit_entidad'] ."|".$dato['num_documento_pago'] ."|".$dato['tipo_documento_pago'] ."|".$dato['fecha_de_pago'] ."| ";				
+			}
 	
 			fwrite($MiDocumento, $Escribo);
+			fwrite($MiDocumento, chr(13).chr(10)); //genera el salto de linea
+			
 		
 		}
 		fclose($MiDocumento);

@@ -76,6 +76,10 @@ BEGIN
     END IF;
   
 
+   IF p_id_plantilla is NULL THEN
+      raise exception 'no se encontro ningun id para la plantila de calculo';
+   END IF;
+     
      
     v_cont = 1;
      -- FOR obtener las plantillas calculos del documento(id_plantlla)
@@ -100,7 +104,7 @@ BEGIN
               v_sw_calcular_excento = FALSE;   
           END IF;             
                            
-      
+     
         --IF es registro primario o secundario  
         
         IF  p_proc_terci = 'si' or (v_registros.prioridad <= p_prioridad_documento )   THEN  -- p_prioridad_documento  por defecto tiene el valor de dos

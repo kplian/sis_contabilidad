@@ -13,6 +13,12 @@ class ACTDocConcepto extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_doc_concepto');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if($this->objParam->getParametro('id_doc_compra_venta')!=''){
+			$this->objParam->addFiltro("docc.id_doc_compra_venta = ".$this->objParam->getParametro('id_doc_compra_venta'));	
+		}
+		
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODDocConcepto','listarDocConcepto');
@@ -33,12 +39,20 @@ class ACTDocConcepto extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-						
+	
 	function eliminarDocConcepto(){
-			$this->objFunc=$this->create('MODDocConcepto');	
+		$this->objFunc=$this->create('MODDocConcepto');	
 		$this->res=$this->objFunc->eliminarDocConcepto($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+						
+	function verificarRelacionConcepto(){
+		$this->objFunc=$this->create('MODDocConcepto');	
+		$this->res=$this->objFunc->verificarRelacionConcepto($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+   
 			
 }
 

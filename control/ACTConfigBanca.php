@@ -15,6 +15,12 @@ class ACTConfigBanca extends ACTbase{
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
 		
+		
+		if($this->objParam->getParametro('descripcion')!=''){
+			$this->objParam->addFiltro("confba.descripcion = ''".$this->objParam->getParametro('descripcion')."''");
+		}
+		
+		
 		if($this->objParam->getParametro('tipo')!=''){
 			$this->objParam->addFiltro("confba.tipo = ''".$this->objParam->getParametro('tipo')."''");
 		}

@@ -50,7 +50,7 @@ class MODBancaCompraVenta extends MODbase{
 		$this->captura('id_usuario_ai','int4');
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('fecha_mod','timestamp');
-			$this->captura('id_periodo','int4');
+		$this->captura('id_periodo','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		
@@ -99,6 +99,11 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('nit_entidad','nit_entidad','numeric');
 		
 		$this->setParametro('id_periodo','id_periodo','int4');
+		
+		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+		
+	
+	
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -179,20 +184,171 @@ class MODBancaCompraVenta extends MODbase{
 	
 	
 	function cambiarRevision(){
+		
+		
 		$id_banca_compra_venta = $this->objParam->getParametro('id_banca_compra_venta');
 		$revisado = $this->objParam->getParametro('revisado');
-		if($revisado == 'si'){
-			$res = $this->link->prepare("update conta.tbanca_compra_venta set revisado = 'no' where id_banca_compra_venta = '$id_banca_compra_venta'");	
-		}else if($revisado == 'no'){
-			$res = $this->link->prepare("update conta.tbanca_compra_venta set revisado = 'si' where id_banca_compra_venta = '$id_banca_compra_venta'");	
-		}
-		$res->execute();
-		$result = $res->fetchAll(PDO::FETCH_ASSOC);
-		$this->respuesta = new Mensaje();
-			$this->respuesta->setMensaje('EXITO', $this->nombre_archivo, 'La consulta se ejecuto con exito de insercion de nota', 'La consulta se ejecuto con exito', 'base', 'no tiene', 'no tiene', 'SEL', '$this->consulta', 'no tiene');
-			$this->respuesta->setTotal(1);
-			$this->respuesta->setDatos("correcto");
+		
+		$this->procedimiento='conta.ft_verificar_banca_compra_venta';
+		$this->transaccion='CONTA_REVISAR_BANCA';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_banca_compra_venta','id_banca_compra_venta','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
 		return $this->respuesta;
+		
+
+	}
+	
+	function importar_txt(){
+		
+		
+
+
+			$arra = array();
+
+			$arregloFiles = $this->objParam->getArregloFiles();
+			$ext = pathinfo($arregloFiles['archivo']['name']);
+			$extension = $ext['extension'];
+	
+			$error = 'no';
+			$mensaje_completo = '';
+			//validar errores unicos del archivo: existencia, copia y extension
+			if(isset($arregloFiles['archivo']) && is_uploaded_file($arregloFiles['archivo']['tmp_name'])){
+				if ($extension != 'txt' && $extension != 'txt') {
+					$mensaje_completo = "La extensión del archivo debe ser TXT";
+					$error = 'error_fatal';
+				}  
+		  	    //upload directory  
+			    $upload_dir = "/tmp/";  
+			    //create file name  
+			    $file_path = $upload_dir . $arregloFiles['archivo']['name'];  
+			  	
+			    //move uploaded file to upload dir  
+			    if (!move_uploaded_file($arregloFiles['archivo']['tmp_name'], $file_path)) {	  
+			        //error moving upload file  
+			        $mensaje_completo = "Error al guardar el archivo txt en disco";
+					$error = 'error_fatal';	  
+			    }  
+				
+			} else {
+				$mensaje_completo = "No se subio el archivo";
+				$error = 'error_fatal';
+			}
+			
+			//armar respuesta en error fatal
+			if ($error == 'error_fatal') {
+				
+				$this->mensajeRes=new Mensaje();
+				$this->mensajeRes->setMensaje('ERROR','ATCBancaCompraVenta.php',$mensaje_completo,
+											$mensaje_completo,'control');
+			//si no es error fatal proceso el archivo
+			} else {
+				$lines = file($file_path);
+				
+				
+				foreach ($lines as $line_num => $line) {
+					$arr_temp = explode('|', $line);
+					
+					
+					if($this->aParam->getParametro('tipo')=='Compras'){
+						$arra[] = array(
+							"modalidad_transaccion" => $arr_temp[0],
+       						"fecha_documento" => $arr_temp[1],
+       						"tipo_transaccion" => $arr_temp[2],
+       						"nit_ci" => $arr_temp[3],
+       						"razon" => $arr_temp[4],
+       						"num_documento" => $arr_temp[5],
+       						"num_contrato" => $arr_temp[6],
+       						"importe_documento" => $arr_temp[7],
+       						"autorizacion" => $arr_temp[8],
+       						"num_cuenta_pago" => $arr_temp[9],
+       						"monto_pagado" => $arr_temp[10],
+       						"monto_acumulado" => $arr_temp[11],
+       						"nit_entidad" => $arr_temp[12],
+       						"num_documento_pago" => $arr_temp[13],
+       						"tipo_documento_pago" => $arr_temp[14],
+       						"fecha_de_pago" => $arr_temp[15],
+       						
+						);
+					}else if($this->aParam->getParametro('tipo')=='Ventas'){
+						$arra[] = array(
+							"modalidad_transaccion" => $arr_temp[0],
+       						"fecha_documento" => $arr_temp[1],
+       						"tipo_transaccion" => $arr_temp[2],
+       						"nit_ci" => $arr_temp[3],
+       						"razon" => $arr_temp[4],
+       						"num_documento" => $arr_temp[5],
+       						"num_contrato" => $arr_temp[6],
+       						"importe_documento" => $arr_temp[7],
+       						"autorizacion" => $arr_temp[8],
+       						"num_cuenta_pago" => $arr_temp[9],
+       						"monto_pagado" => $arr_temp[10],
+       						"monto_acumulado" => $arr_temp[11],
+       						"nit_entidad" => $arr_temp[12],
+       						"num_documento_pago" => $arr_temp[13],
+       						"tipo_documento_pago" => $arr_temp[14],
+       						"fecha_de_pago" => $arr_temp[15],
+       						
+						);
+					}
+					
+					
+					
+					if (count($arr_temp) != 16) {
+						$error = 'error';
+						$mensaje_completo .= "No se proceso la linea: $line_num, por un error en el formato \n";
+						
+					} else {
+						
+						
+						
+						/*$this->objParam->addParametro('ci',$arr_temp[0]);
+						$this->objParam->addParametro('valor',$arr_temp[1]);
+						$this->objFunc=$this->create('MODColumnaValor');
+						$this->res=$this->objFunc->modificarColumnaCsv($this->objParam);
+						if ($this->res->getTipo() == 'ERROR') {
+							$error = 'error';
+							$mensaje_completo .= $this->res->getMensaje() . " \n";
+						}*/
+					}
+				}
+			}
+			
+			
+		
+			$arra_json = json_encode($arra);
+		
+			$this->aParam->addParametro('arra_json', $arra_json);
+			$this->arreglo['arra_json'] = $arra_json;
+			
+			
+			$this->procedimiento='conta.ft_banca_compra_venta_ime';
+			$this->transaccion='CONTA_BANCA_IMP';
+			$this->tipo_procedimiento='IME';
+					
+			//Define los parametros para la funcion
+			$this->setParametro('arra_json','arra_json','text');
+			$this->setParametro('tipo','tipo','varchar');
+			$this->setParametro('id_periodo','id_periodo','int4');
+	
+			//Ejecuta la instruccion
+			$this->armarConsulta();
+			$this->ejecutarConsulta();
+	
+			//Devuelve la respuesta
+			return $this->respuesta;
+			
+			
+			
+			
+		
 	}
 	
 			

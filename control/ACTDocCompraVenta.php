@@ -22,10 +22,28 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.tipo = ''".$this->objParam->getParametro('tipo')."''");    
         }
 		
+		if($this->objParam->getParametro('sin_cbte')=='si'){
+            $this->objParam->addFiltro("dcv.id_int_comprobante is NULL");    
+        }
+		
+		if($this->objParam->getParametro('manual')!=''){
+            $this->objParam->addFiltro("dcv.manual = ''".$this->objParam->getParametro('manual')."''");    
+        }
+		
+		if($this->objParam->getParametro('fecha_cbte')!=''){
+            $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    
+        }
+		
+		
+		
+		
 		if($this->objParam->getParametro('id_depto')!=''){
             $this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
         }
 		
+		if($this->objParam->getParametro('id_agrupador')!=''){
+            $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
+        }
 		
 		
 		
@@ -79,19 +97,21 @@ class ACTDocCompraVenta extends ACTbase{
 			//TODO			
 			//$this->res=$this->objFunc->modificarSolicitud($this->objParam);
 			//trabajar en la modificacion compelta de solicitud ....
+			$this->res=$this->objFunc->modificarDocCompleto($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
 		
 						
 	function eliminarDocCompraVenta(){
-			$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->objFunc=$this->create('MODDocCompraVenta');	
 		$this->res=$this->objFunc->eliminarDocCompraVenta($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	
 	function cambiarRevision(){
-			$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->objFunc=$this->create('MODDocCompraVenta');	
 		$this->res=$this->objFunc->cambiarRevision($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}

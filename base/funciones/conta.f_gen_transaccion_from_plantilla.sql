@@ -169,9 +169,14 @@ BEGIN
       ELSE
       -- si no es una relacion devengado pago procesa la plantilla normalmente
            
+      
+          
+      
            --si el monto es cero saltamos el proceso, ya que no se generan transacciones
            
-           IF COALESCE((v_this_hstore -> 'campo_monto')::numeric,0) > 0  THEN
+           IF COALESCE((v_this_hstore -> 'campo_monto')::numeric,0) > 0 or (p_reg_det_plantilla->'forma_calculo_monto') = 'diferencia' THEN
+           
+           
                   
                       /******************************************************************  
                        -- si no tiene centro_costo lo obtiene a partir del depto de conta---
@@ -502,6 +507,8 @@ BEGIN
                            --inserta las trasaccion asociadas al documento
                            IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN
                                
+                           
+                         
                                  v_resp_doc =  conta.f_gen_proc_plantilla_calculo(
                                                             hstore(v_record_int_tran), 
                                                             (v_this_hstore->'campo_documento')::integer,--p_id_plantilla, 
@@ -515,7 +522,7 @@ BEGIN
                                                             );
                                  
                              	 IF(v_resp_doc is null)THEN
-                                 	raise exception 'Error en procesar la pantilla de calculo, revisar la configuracion de la plantilla';
+                                 	raise exception 'Error en procesar la pantilla de calculo, revisar la configuracion de la plantilla de calculo';
                                  END IF;
                                  
                                   --si tiene funcion de actualizacion,  envia el id de la trasaccion generada para que se almacene 

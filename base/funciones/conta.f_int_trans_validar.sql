@@ -1,6 +1,7 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_int_trans_validar (
+  p_id_usuario integer,
   p_id_int_comprobante integer
 )
 RETURNS boolean AS
@@ -33,7 +34,7 @@ v_conta_integrar_libro_bancos		varchar;
 BEGIN
 
    v_nombre_funcion = 'conta.f_int_trans_validar';
-   
+
    -- recuepra datos basicos del comprobante
    select 
       ic.id_periodo,
@@ -89,9 +90,8 @@ BEGIN
                                --ver si tiene libro de bancos ....
                                v_conta_integrar_libro_bancos = pxp.f_get_variable_global('conta_integrar_libro_bancos');
                                IF v_conta_integrar_libro_bancos = 'si' THEN 
-                                	
                                     -- si alguna transaccion tiene banco habilitado para pago
-                                    IF  not tes.f_integracion_libro_bancos(v_nombre_conexion,'exito') THEN
+                                    IF  not tes.f_integracion_libro_bancos(p_id_usuario,p_id_int_comprobante) THEN
                                       raise exception 'error al registrar transacción en libro de bancos';
                                     END IF;
                                     

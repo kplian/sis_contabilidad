@@ -37,6 +37,7 @@ DECLARE
     v_tmp_resp				boolean;
     v_importe_ice			numeric;
     v_revisado				varchar;
+    v_sum_total				numeric;
 			    
 BEGIN
 
@@ -345,6 +346,45 @@ BEGIN
 
 		end;
     
+    
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_CHKDOCSUM_IME'
+ 	#DESCRIPCION:	verifica si el detalle del documento cuadra con el total
+ 	#AUTOR:		admin	
+ 	#FECHA:		09-09-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CHKDOCSUM_IME')then
+
+		begin
+			
+            
+            select 
+             dcv.importe_doc
+            into 
+              v_registros
+            from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
+            
+            
+            select
+              sum (dc.precio_total)
+            into
+             v_sum_total
+            from conta.tdoc_concepto dc
+            where dc.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+            
+            IF v_sum_total != v_registros.importe_doc  THEN
+               raise exception 'el total del documento no iguala con el total detallado de conceptos';
+            END IF;
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cuadra el documento insertado'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'sum_total',v_sum_total::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
          
 	else
      

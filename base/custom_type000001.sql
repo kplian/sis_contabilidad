@@ -82,3 +82,31 @@ ALTER TYPE conta.maestro_comprobante
   ADD ATTRIBUTE columna_libro_banco INTEGER;
   
 /***********************************F-TYP-RAC-CONTA-0-16/04/2015****************************************/
+
+
+
+
+
+/***********************************I-TYP-FFP-CONTA-0-22/09/2015****************************************/
+
+CREATE TYPE conta.banca_compra_venta AS (
+  modalidad_transaccion INTEGER ,
+  fecha_documento  DATE,
+  tipo_transaccion INTEGER ,
+  nit_ci  VARCHAR(255),
+  razon VARCHAR(255) ,
+  num_documento VARCHAR(255),
+  num_contrato  VARCHAR(255),
+  importe_documento NUMERIC(10,2),
+  autorizacion  INTEGER,
+  num_cuenta_pago VARCHAR(255) ,
+  monto_pagado NUMERIC(10,2) ,
+  monto_acumulado NUMERIC(10,2) ,
+  nit_entidad  NUMERIC,
+  num_documento_pago VARCHAR(255) ,
+  tipo_documento_pago INTEGER ,
+  fecha_de_pago DATE 
+);
+
+/***********************************F-TYP-FFP-CONTA-0-22/09/2015****************************************/
+

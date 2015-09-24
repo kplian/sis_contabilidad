@@ -18,10 +18,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     layout: 'fit',
     autoScroll: false,
     breset: false,
+    conceptos_eliminados: [],
     //labelSubmit: '<i class="fa fa-check"></i> Siguiente',
     constructor:function(config)
     {   
     	
+    	Ext.apply(this,config);
     	//declaracion de eventos
         this.addEvents('beforesave');
         this.addEvents('successsave');
@@ -31,15 +33,27 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.buildGrupos();
         
         Phx.vista.FormCompraVenta.superclass.constructor.call(this,config);
+        
+        
+        
         this.init();    
         this.iniciarEventos();
         this.iniciarEventosDetalle();
-        this.onNew();
+        if(this.data.tipo_form == 'new'){
+        	this.onNew();
+        }
+        else{
+        	this.onEdit();
+        }
+        
+        
         this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.Cmp.tipo.getValue()});
         
     },
     buildComponentesDetalle: function(){
-    	this.detCmp = {
+    	var me = this,
+    	    bpar = (me.data.tipoDoc=='compra')?{par_filtro:'desc_ingas#par.codigo', movimiento: 'gasto'}:{par_filtro:'desc_ingas#par.codigo', movimiento: 'recurso'};
+    	me.detCmp = {
     		       'id_concepto_ingas': new Ext.form.ComboBox({
 							                name: 'id_concepto_ingas',
 							                msgTarget: 'title',
@@ -57,7 +71,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 							                            totalProperty: 'total',
 							                            fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
 							                            remoteSort: true,
-							                            baseParams:{par_filtro:'desc_ingas#par.codigo'}
+							                            baseParams: bpar
 							                }),
 							               valueField: 'id_concepto_ingas',
 							               displayField: 'desc_ingas',
@@ -83,7 +97,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						                    url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
 						                    emptyText : 'Centro Costo...',
 						                    allowBlank: false,
-						                    baseParams:{filtrar:'grupo_ep'}
+						                    baseParams: (me.data.tipoDoc == 'compra')?{tipo_pres:'gasto', filtrar:'grupo_ep'}:{tipo_pres:'recurso', filtrar:'grupo_ep'}
 						                }),
 	               'id_orden_trabajo': new Ext.form.ComboRec({
 						                    name:'id_orden_trabajo',
@@ -91,6 +105,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						                    sysorigen:'sis_contabilidad',
 						                    fieldLabel: 'Orden Trabajo',
 							       		    origen:'OT',
+							       		    baseParams: {tipo_pres: 'recurso'},
 						                    allowBlank:true
 						            }),
 						            
@@ -102,8 +117,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 										anchor: '80%',
 										maxLength:1200
 								}),
-					'cantidad': new Ext.form.NumberField({
-										name: 'cantidad',
+					'cantidad_sol': new Ext.form.NumberField({
+										name: 'cantidad_sol',
 										msgTarget: 'title',
 						                fieldLabel: 'Cantidad',
 						                allowBlank: false,
@@ -132,16 +147,18 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     		
     		
     }, 
+    
+    
     iniciarEventosDetalle: function(){
     	
         
         this.detCmp.precio_unitario.on('valid',function(field){
-             var pTot = this.detCmp.cantidad.getValue() *this.detCmp.precio_unitario.getValue();
+             var pTot = this.detCmp.cantidad_sol.getValue() * this.detCmp.precio_unitario.getValue();
              this.detCmp.precio_total.setValue(pTot);
             } ,this);
         
-       this.detCmp.cantidad.on('valid',function(field){
-            var pTot = this.detCmp.cantidad.getValue() * this.detCmp.precio_unitario.getValue();
+       this.detCmp.cantidad_sol.on('valid',function(field){
+            var pTot = this.detCmp.cantidad_sol.getValue() * this.detCmp.precio_unitario.getValue();
             this.detCmp.precio_total.setValue(pTot);
            
         } ,this);
@@ -167,14 +184,27 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			        	this.detCmp.id_orden_trabajo.setReadOnly(true);
 			        }
 			        this.detCmp.id_orden_trabajo.reset();
+			     console.log('rec data,', rec) 
+			    var idcc = this.detCmp.id_centro_costo.getValue();
+				if(idcc){
+				  this.checkRelacionConcepto({id_centro_costo: idcc , id_concepto_ingas: rec.data.id_concepto_ingas, id_gestion :  this.Cmp.id_gestion.getValue()});	
+				}
 			        
-        	
-             },this);
+			  },this);
+			  
+			  
+			this.detCmp.id_centro_costo.on('select',function( cmb, rec, ind){
+				var idc = this.detCmp.id_concepto_ingas.getValue();
+				if(idc){
+				  this.checkRelacionConcepto({id_centro_costo: rec.data.id_centro_costo , id_concepto_ingas: idc, id_gestion :  this.Cmp.id_gestion.getValue()});	
+				}
+				
+			},this);  
+			  
     },
     
     onInitAdd: function(){
-    	
-    	
+    	//return false
     },
     onCancelAdd: function(re,save){
     	if(this.sw_init_add){
@@ -183,9 +213,11 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     	
     	this.sw_init_add = false;
     	this.evaluaGrilla();
+    	
     },
     onUpdateRegister: function(){
     	this.sw_init_add = false;
+    	
     },
     
     onAfterEdit:function(re, o, rec, num){
@@ -221,9 +253,6 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     		}
     		i++;
     	}
-    	
-   
-    	
     	return sw
     },
     
@@ -263,7 +292,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     	
     	//cantidad,detalle,peso,totalo
         var Items = Ext.data.Record.create([{
-                        name: 'cantidad',
+                        name: 'cantidad_sol',
                         type: 'float'
                     }, {
                         name: 'id_concepto_ingas',
@@ -289,10 +318,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					root: 'datos',
 					totalProperty: 'total',
 					fields: ['id_doc_concepto','id_centro_costo','descripcion', 'precio_unitario',
-					         'id_doc_compra_venta','id_orden_trabajo','id_concepto_ingas','precio_total','cantidad',
+					         'id_doc_compra_venta','id_orden_trabajo','id_concepto_ingas','precio_total','cantidad_sol',
 							 'desc_centro_costo','desc_concepto_ingas','desc_orden_trabajo'
 					],remoteSort: true,
-					baseParams: {dir:'ASC',sort:'id_solicitud_det',limit:'50',start:'0'}
+					baseParams: {dir:'ASC',sort:'id_doc_concepto',limit:'50',start:'0'}
 				});
     	
     	this.editorDetail = new Ext.ux.grid.RowEditor({
@@ -339,7 +368,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                         		
 	                        		 var e = new Items({
 	                        		 	id_concepto_ingas: undefined,
-		                                cantidad: 1,
+		                                cantidad_sol: 1,
 		                                descripcion: '',
 		                                precio_total: 0,
 		                                precio_unitario: undefined
@@ -366,8 +395,17 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                             this.editorDetail.stopEditing();
                             var s = this.megrid.getSelectionModel().getSelections();
                             for(var i = 0, r; r = s[i]; i++){
+                                
+                                console.log('al eliminar ...', r);
+                                
+                                // si se edita el documento y el concepto esta registrado, marcarlo para eliminar de la base
+                                if(r.data.id_doc_concepto > 0){
+                                	this.conceptos_eliminados.push(r.data.id_doc_concepto);
+                                }
                                 this.mestore.remove(r);
                             }
+                            
+                            
                             this.evaluaGrilla();
                         }
                     }],
@@ -412,11 +450,11 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                     {
                        
                         header: 'Cantidad',
-                        dataIndex: 'cantidad',
+                        dataIndex: 'cantidad_sol',
                         align: 'center',
                         width: 50,
                         summaryType: 'sum',
-                        editor: this.detCmp.cantidad 
+                        editor: this.detCmp.cantidad_sol 
                     },
                     
                     
@@ -448,7 +486,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     	this.Grupos = [{
     	           	    layout: 'border',
     	           	    border: false,
-    	           	     frame:true,
+    	           	    frame:  true,
 	                    items:[
 	                      {
                         	xtype: 'fieldset',
@@ -460,6 +498,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                        autoHeight: true,
 	                        collapseFirst : false,
 	                        collapsible: true,
+	                        collapseMode : 'mini',
 	                        width: '100%',
 	                        //autoHeight: true,
 	                        padding: '0 0 0 10',
@@ -707,6 +746,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                 origen:'MONEDA',
                 allowBlank:false,
                 fieldLabel:'Moneda',
+                gdisplayField:'desc_moneda',
                 gwidth:100,
                 width:250
              },
@@ -1259,8 +1299,22 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.nit.modificado = true;
  	    this.Cmp.nro_autorizacion.modificado = true;
     	this.accionFormulario = 'EDIT';
+    	
+    	this.loadForm(this.data.datosOriginales);
+    	
     	this.esconderImportes();
+        //carga configuracion de plantilla
         this.getPlantilla(this.Cmp.id_plantilla.getValue());
+        
+        this.Cmp.id_depto_conta.setValue(this.data.id_depto);
+        this.Cmp.id_gestion.setValue(this.data.id_gestion);
+        this.Cmp.tipo.setValue(this.data.tipoDoc); 
+        //load detalle de conceptos
+        this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
+        this.mestore.load()
+        
+        
+        	
         
     },
     
@@ -1281,16 +1335,19 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
    
     onSubmit: function(o) {
     	//  validar formularios
-        var arra = [], i, me = this;
+        var arra = [], total_det = 0.0, i, me = this;
         for (i = 0; i < me.megrid.store.getCount(); i++) {
     		record = me.megrid.store.getAt(i);
     		arra[i] = record.data;
-    		arra[i].precio_ga = record.data.precio_total;
-    		arra[i].precio_sg = 0.0; 
+    		total_det = total_det + (record.data.precio_total)*1
+    		
 		}
 		
+		//si tiene conceptos eliminados es necesari oincluirlos ...
 		
-   	    me.argumentExtraSubmit = { 'json_new_records': JSON.stringify(arra, function replacer(key, value) {
+		
+		me.argumentExtraSubmit = { 'id_doc_conceto_elis': this.conceptos_eliminados.join(), 
+		                           'json_new_records': JSON.stringify(arra, function replacer(key, value) {
    	    	           if (typeof value === 'string') {
 							        return String(value).replace(/&/g, "%26")
 							    }
@@ -1298,7 +1355,18 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 							}) };
 							
    	    if( i > 0 &&  !this.editorDetail.isVisible()){
-   	    	Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
+   	    	
+   	    	
+   	    	console.log('doc', this.Cmp.importe_doc.getValue(), 'detalle', total_det);
+   	    	
+   	    	if (total_det*1 == this.Cmp.importe_doc.getValue()){
+   	    		Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
+   	    	}
+   	    	else{
+   	    		alert('El total del detalle no cuadra con el total del documento');
+   	    	}
+   	    	
+   	    	
    	    }
    	    else{
    	    	alert('no tiene ningun concepto  en el documento')
@@ -1310,10 +1378,59 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     {
         Phx.CP.loadingHide();
         Phx.CP.getPagina(this.idContenedorPadre).reload();
-        //var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-   	    //this.fireEvent('successsave',this,objRes);
         this.panel.close();
     },
+    
+     checkRelacionConcepto: function(cfg){
+    	var me = this;
+    	Phx.CP.loadingShow();
+		Ext.Ajax.request({
+			url:'../../sis_contabilidad/control/DocConcepto/verificarRelacionConcepto',
+			params:{ 
+				      id_centro_costo: cfg.id_centro_costo, 
+				      id_gestion: cfg.id_gestion, 
+				      id_concepto_ingas: cfg.id_concepto_ingas,
+				      relacion: me.data.tipoDoc
+				      },
+			success: function(resp){
+				Phx.CP.loadingHide();
+		        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+		        
+			},
+			failure: function(resp){
+				
+				this.conexionFailure(resp);
+				Phx.CP.loadingHide();
+			},
+			timeout: this.timeout,
+			scope: this
+		});
+    	
+    },
+    getPlantilla: function(id_plantilla){
+    	Phx.CP.loadingShow();
+           
+           Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url: '../../sis_parametros/control/Plantilla/listarPlantilla',
+                params: { id_plantilla: id_plantilla, start:0, limit:1 },
+                success:this.successPlantilla,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+    	
+    },
+    successPlantilla:function(resp){
+           Phx.CP.loadingHide();
+           var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(reg.total == 1){
+               	
+           	  this.Cmp.id_plantilla.fireEvent('select',this.Cmp.id_plantilla, {data:reg.datos[0] }, 0);
+           }else{
+                alert('error al recuperar la plantilla para editar, actualice su navegador');
+            }
+     }
     
    
     
