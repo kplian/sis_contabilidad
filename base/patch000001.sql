@@ -1289,10 +1289,7 @@ COMMENT ON COLUMN conta.tconfig_tipo_cuenta.eeff
 IS 'array que permite configurar el valor por defecto de la cuenta balance, resultado, ... otro que pudieran aparecer';
 
 
-ALTER TABLE conta.tcuenta
-  DROP COLUMN eeff;
-  
-  
+
  --------------- SQL ---------------
 
 ALTER TABLE conta.tcuenta
