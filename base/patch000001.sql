@@ -1687,8 +1687,8 @@ IS 'identifica donde se origina el comprobante,  util para el caso de comprobant
 
 /***********************************I-SCP-RAC-CONTA-1-18/08/2015****************************************/
 
-ALTER TABLE conta.tint_comprobante
-  DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
+--ALTER TABLE conta.tint_comprobante
+--  DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
   
 CREATE TABLE conta.tdoc_compra_venta (
   id_doc_compra_venta BIGSERIAL,
