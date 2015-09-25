@@ -1262,11 +1262,8 @@ IS 'positivo o negativo, caso depresiacion acumulado es negativo';
 
 --------------- SQL ---------------
 
-ALTER TABLE conta.tcuenta
-  ADD COLUMN eeff VARCHAR(15) DEFAULT 'defecto' NOT NULL;
 
-COMMENT ON COLUMN conta.tcuenta.eeff
-IS 'defecto, (toma valor de config del tipo), resultado o balance';
+
 
 --------------- SQL ---------------
 
@@ -1294,7 +1291,9 @@ IS 'array que permite configurar el valor por defecto de la cuenta balance, resu
 
 ALTER TABLE conta.tcuenta
   ADD COLUMN eeff VARCHAR(20)[] DEFAULT '{balance}' NOT NULL; 
- 
+
+COMMENT ON COLUMN conta.tcuenta.eeff
+IS 'defecto, (toma valor de config del tipo), resultado o balance'; 
 
 /***********************************F-SCP-RAC-CONTA-0-15/06/2015****************************************/
 
