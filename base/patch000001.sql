@@ -1262,11 +1262,8 @@ IS 'positivo o negativo, caso depresiacion acumulado es negativo';
 
 --------------- SQL ---------------
 
-ALTER TABLE conta.tcuenta
-  ADD COLUMN eeff VARCHAR(15) DEFAULT 'defecto' NOT NULL;
 
-COMMENT ON COLUMN conta.tcuenta.eeff
-IS 'defecto, (toma valor de config del tipo), resultado o balance';
+
 
 --------------- SQL ---------------
 
@@ -1289,15 +1286,14 @@ COMMENT ON COLUMN conta.tconfig_tipo_cuenta.eeff
 IS 'array que permite configurar el valor por defecto de la cuenta balance, resultado, ... otro que pudieran aparecer';
 
 
-ALTER TABLE conta.tcuenta
-  DROP COLUMN eeff;
-  
-  
+
  --------------- SQL ---------------
 
 ALTER TABLE conta.tcuenta
   ADD COLUMN eeff VARCHAR(20)[] DEFAULT '{balance}' NOT NULL; 
- 
+
+COMMENT ON COLUMN conta.tcuenta.eeff
+IS 'defecto, (toma valor de config del tipo), resultado o balance'; 
 
 /***********************************F-SCP-RAC-CONTA-0-15/06/2015****************************************/
 
@@ -1690,8 +1686,8 @@ IS 'identifica donde se origina el comprobante,  util para el caso de comprobant
 
 /***********************************I-SCP-RAC-CONTA-1-18/08/2015****************************************/
 
-ALTER TABLE conta.tint_comprobante
-  DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
+--ALTER TABLE conta.tint_comprobante
+--  DROP CONSTRAINT chk_tconfig_tipo_cuenta__tipo_cuenta RESTRICT;
   
 CREATE TABLE conta.tdoc_compra_venta (
   id_doc_compra_venta BIGSERIAL,

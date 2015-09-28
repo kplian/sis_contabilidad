@@ -2249,7 +2249,7 @@ ALTER TABLE conta.vint_comprobante
 select pxp.f_insert_testructura_gui ('banca', 'CONTA');
 select pxp.f_insert_testructura_gui ('CONFBA', 'banca');
 select pxp.f_insert_testructura_gui ('BACO', 'banca');
-select pxp.f_insert_testructura_gui ('BAVE', 'banca')
+select pxp.f_insert_testructura_gui ('BAVE', 'banca');
 
 /***********************************F-DEP-FFP-CONTA-0-16/09/2015*****************************************/
 
