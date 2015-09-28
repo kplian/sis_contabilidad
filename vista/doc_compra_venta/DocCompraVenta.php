@@ -342,6 +342,21 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: false
 		},
+		
+		{
+            config:{
+                name: 'desc_comprobante',
+                fieldLabel: 'Cbte',
+                allowBlank: false,
+                gwidth: 100
+            },
+            type:'Field',
+            filters:{ pfiltro:'ic.id_int_comprobante#ic.nro_cbte', type:'string'},
+            id_grupo: 0,
+            grid: true,
+            //bottom_filter: true,
+            form: false
+       },
 		/*{
    			config:{
    				 name:'id_depto_conta',
@@ -949,7 +964,8 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		'desc_depto','desc_plantilla',
 		'importe_descuento_ley',
-		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda'
+		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
+		'desc_comprobante','id_int_comprobante'
 		
 	],
 	sortInfo:{
@@ -1376,20 +1392,23 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
      preparaMenu:function(tb){
         Phx.vista.DocCompraVenta.superclass.preparaMenu.call(this,tb)
         var data = this.getSelectedData();
-        if(data['revisado'] ==  'no' ){
-            this.getBoton('edit').enable();
-            this.getBoton('del').enable();
+        if(data['revisado'] ==  'si' || data['id_int_comprobante'] > 0){
+            
+            
+             this.getBoton('edit').disable();
+             this.getBoton('del').disable();
          
          }
          else{
-            this.getBoton('edit').disable();
-            this.getBoton('del').disable();
+            this.getBoton('edit').enable();
+            this.getBoton('del').enable();
          } 
 	        
     },
     
     liberaMenu:function(tb){
         Phx.vista.DocCompraVenta.superclass.liberaMenu.call(this,tb);
+        
                     
     },
     

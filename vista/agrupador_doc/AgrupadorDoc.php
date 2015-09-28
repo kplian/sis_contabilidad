@@ -58,7 +58,7 @@ Phx.vista.AgrupadorDoc=Ext.extend(Phx.gridInterfaz,{
     	Phx.CP.loadingHide();
     	Phx.CP.getPagina(this.idContenedorAbuelo).reload();
     	//abrir interface con documentos abrupados
-    	//this.panel.destroy();
+    	this.panel.destroy();
     },
     
     Atributos:[

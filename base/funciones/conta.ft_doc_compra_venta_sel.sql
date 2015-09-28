@@ -85,11 +85,14 @@ BEGIN
                         dcv.importe_pago_liquido,
                         dcv.nro_dui,
                         dcv.id_moneda,
-                        mon.codigo as desc_moneda
+                        mon.codigo as desc_moneda,
+                        dcv.id_int_comprobante,
+                        COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante
 						from conta.tdoc_compra_venta dcv
 						inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                         inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                         inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                        left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
                         left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
 						left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where  ';
@@ -119,6 +122,7 @@ BEGIN
 						inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                         inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                         inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                        left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
                         left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
 						left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where ';

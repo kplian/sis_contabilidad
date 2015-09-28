@@ -202,16 +202,32 @@ BEGIN
             
             -- valida que period de libro de compras y ventas este abierto
             v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+            
+            
+          
+            
+            
+            
+            
+            
               
-             --revisa si el documento no esta marcado como revisado
+            --revisa si el documento no esta marcado como revisado
             select 
-             dcv.revisado
+             dcv.revisado,
+             dcv.id_int_comprobante
             into 
               v_registros
             from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
             
             IF  v_registros.revisado = 'si' THEN
                raise exception 'los documentos revisados no peuden modificarse';
+            END IF;
+            
+            
+             --validar que no tenga un comprobante asociado
+            
+            IF  v_registros.id_int_comprobante is not NULL THEN
+               raise exception 'No puede editar por que el documento esta acociado al cbte id(%), primero quite esta relacion', v_registros.id_int_comprobante; 
             END IF;
             
              --recupera parametrizacion de la plantilla     
@@ -276,7 +292,8 @@ BEGIN
         
              --revisa si el documento no esta marcado como revisado
             select 
-             dcv.revisado
+             dcv.revisado,
+             dcv.id_int_comprobante
             into 
               v_registros
             from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
@@ -287,7 +304,15 @@ BEGIN
             
             --TODO revisar si el archivo es manual o no
             -- revisar si tiene conceptos de gasto
+             
+             
+             
+             
+            --validar que no tenga un comprobante asociado
             
+            IF  v_registros.id_int_comprobante is not NULL THEN
+               raise exception 'No puede elimiar por que el documento esta acociado al cbte id(%), primero quite esta relacion', v_registros.id_int_comprobante; 
+            END IF;
         
         
         

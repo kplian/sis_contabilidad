@@ -23,7 +23,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
             {
                 text: 'Ver Detalle',
                 iconCls: 'brenew',
-                disabled: false,
+                disabled: true,
                 handler: this.showDoc,
                 tooltip: 'Muestra el detalle del documento'
             }
@@ -634,15 +634,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
    },
    
    
-    preparaMenu:function(tb){
-        Phx.vista.DocCompraVentaCbte.superclass.preparaMenu.call(this,tb)
-         
-    },
-    
-    liberaMenu:function(tb){
-        Phx.vista.DocCompraVentaCbte.superclass.liberaMenu.call(this,tb);
-                    
-    },
+   
 	
 	showDoc:  function() {
         this.abrirFormulario('edit', this.sm.getSelected());
@@ -664,7 +656,19 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
             	  manual: 'si'}); 
             	  
             this.Cmp.id_doc_compra_venta.modificado = true;
-    }
+    },
+    preparaMenu:function(tb){
+        
+        Phx.vista.DocCompraVentaCbte.superclass.preparaMenu.call(this,tb)
+        this.getBoton('btnShowDoc').enable();
+           
+    },
+    
+    liberaMenu:function(tb){
+        Phx.vista.DocCompraVentaCbte.superclass.liberaMenu.call(this,tb);
+        this.getBoton('btnShowDoc').disable();
+                    
+    },
    
     
     
