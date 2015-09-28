@@ -18,6 +18,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     layout: 'fit',
     autoScroll: false,
     breset: false,
+   
     conceptos_eliminados: [],
     //labelSubmit: '<i class="fa fa-check"></i> Siguiente',
     constructor:function(config)
@@ -44,6 +45,17 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         }
         else{
         	this.onEdit();
+        }
+        
+        if(this.data.readOnly===true){
+        	for(var index in this.Cmp) { 
+					if( this.Cmp[index].setReadOnly){
+					    	 this.Cmp[index].setReadOnly(true);
+					   }
+			}
+			
+			this.megrid.getTopToolbar().disable();
+					
         }
         
         
@@ -204,7 +216,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     },
     
     onInitAdd: function(){
-    	//return false
+    	if(this.data.readOnly===true){
+    		return false
+    	}
+    	
     },
     onCancelAdd: function(re,save){
     	if(this.sw_init_add){
@@ -816,6 +831,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                 lazyRender:false,
                 mode:'remote',
                 pageSize:20,
+                width: 200,
+                boxMinWidth: 200,
                 queryDelay:500,
                 minChars:1
             },
@@ -860,6 +877,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                 mode:'remote',
                 pageSize:20,
                 queryDelay:500,
+                anchor: '80%',
                 minChars:1
             },
             type:'ComboBox',

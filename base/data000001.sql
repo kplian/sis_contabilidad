@@ -1105,5 +1105,13 @@ VALUES (E'conta_cod_plan_compra', E'COMPRADOC', E'codigo de plantilla de comprob
 /***********************************F-DAT-RAC-CONTA-0-24/09/2015*****************************************/
 
 
+/***********************************I-DAT-RAC-CONTA-1-24/09/2015*****************************************/
 
+select pxp.f_insert_tgui ('Registros Contables', 'Comprobantes', 'CBTE.1', 'si', 3, '', 2, '', '', 'CONTA');
+
+select pxp.f_insert_tgui ('Registro de Compras', 'Registro de Compras', 'DOC', 'si', 3, 'sis_contabilidad/vista/doc_compra_venta/DocCompra.php', 3, '', 'DocCompra', 'CONTA');
+select pxp.f_insert_tgui ('Registro de Ventas', 'Registro de Ventas', 'LIBVEN', 'si', 2, 'sis_contabilidad/vista/doc_compra_venta/DocVenta.php', 3, '', 'DocVenta', 'CONTA');
+select pxp.f_insert_testructura_gui ('LIBVEN', 'CBTE.1');
+select pxp.f_insert_testructura_gui ('DOC', 'CBTE.1');
+/***********************************F-DAT-RAC-CONTA-1-24/09/2015*****************************************/
 

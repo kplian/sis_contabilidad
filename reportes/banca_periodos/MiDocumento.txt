@@ -1,2 +1,0 @@
-Hola estoy escribiendo en un archivo creado con PHP 
-datos 96 datos 96 datos 96 

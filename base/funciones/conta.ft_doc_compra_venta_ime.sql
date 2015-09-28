@@ -386,7 +386,69 @@ BEGIN
 
 		end;
          
-	else
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_QUITCBTE_ELI'
+ 	#DESCRIPCION:	quita el comprobante del documento
+ 	#AUTOR:		admin	
+ 	#FECHA:		25-09-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_QUITCBTE_ELI')then
+
+		begin
+        
+            
+            update conta.tdoc_compra_venta  set			
+			  id_int_comprobante = NULL
+            where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+            
+            
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se retiro el cbte del documento '||v_parametros.id_doc_compra_venta); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_ADDCBTE_IME'
+ 	#DESCRIPCION:	adiciona un documento al comprobante
+ 	#AUTOR:		admin	
+ 	#FECHA:		25-09-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_ADDCBTE_IME')then
+
+		begin
+        
+            -- validamos que el documento no tenga otro comprobante
+            
+            IF not EXISTS(select
+                           1 
+                          from conta.tdoc_compra_venta dcv 
+                          where dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta and dcv.id_int_comprobante is null) THEN
+            
+                raise exception 'El documento no existe o ya tiene un cbte relacionado';
+            END IF;
+            
+            update conta.tdoc_compra_venta  set			
+			  id_int_comprobante =  v_parametros.id_int_comprobante
+            where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+            
+            
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se adiciono el cbte del documento '||v_parametros.id_doc_compra_venta ||' cbte '||v_parametros.id_int_comprobante); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    
+    else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 

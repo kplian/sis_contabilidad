@@ -18,6 +18,10 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.id_periodo = ".$this->objParam->getParametro('id_periodo'));    
         }
 		
+		if($this->objParam->getParametro('id_int_comprobante')!=''){
+            $this->objParam->addFiltro("dcv.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));    
+        }
+		
 		if($this->objParam->getParametro('tipo')!=''){
             $this->objParam->addFiltro("dcv.tipo = ''".$this->objParam->getParametro('tipo')."''");    
         }
@@ -116,6 +120,17 @@ class ACTDocCompraVenta extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	
+	function quitarCbteDoc(){
+		$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->res=$this->objFunc->quitarCbteDoc($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	function agregarCbteDoc(){
+		$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->res=$this->objFunc->agregarCbteDoc($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 	
 	
 			

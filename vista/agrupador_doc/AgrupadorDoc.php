@@ -31,7 +31,7 @@ Phx.vista.AgrupadorDoc=Ext.extend(Phx.gridInterfaz,{
 		this.addButton('btnWizard',
             {
                 text: 'Generar Cbte',
-                iconCls: 'bchecklist',
+                iconCls: 'bpagar',
                 disabled: false,
                 handler: this.genCbte,
                 tooltip: '<b>Generar Comprobante</b><br/>Insertar el comprobante segun los documentos seleccionados'
@@ -650,15 +650,7 @@ Phx.vista.AgrupadorDoc=Ext.extend(Phx.gridInterfaz,{
             	  id_agrupador: this.id_agrupador}); 
             	  
             this.Cmp.id_doc_compra_venta.modificado = true;
-            
-            
-
-        
-    },
-	
-     
-
-     
+    }
    
    
     

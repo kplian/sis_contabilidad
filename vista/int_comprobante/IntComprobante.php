@@ -49,10 +49,20 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		this.addButton('btnWizard',
             {
                 text: 'Plantilla',
-                iconCls: 'bchecklist',
+                iconCls: 'bgear',
                 disabled: false,
                 handler: this.loadWizard,
                 tooltip: '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
+            }
+        );
+        
+        this.addButton('btnDocCmpVnt',
+            {
+                text: 'Doc Cmp/Vnt',
+                iconCls: 'brenew',
+                disabled: false,
+                handler: this.loadDocCmpVnt,
+                tooltip: '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
             }
         );
 		
@@ -87,6 +97,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
                     'WizardCbte'
         )
     },
+    
+    
 	
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
@@ -1026,9 +1038,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		
 	},
 	imprimirCbte: function(){
-		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
 			var rec = this.sm.getSelected();
-			
 			var data = rec.data;
 			if (data) {
 				Phx.CP.loadingShow();
@@ -1044,8 +1054,20 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 						scope : this
 					});
 			}
-		//}, this)
+		
 	},
+	loadDocCmpVnt:  function() {
+            var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCbte.php',
+                    'Documentos del Cbte',
+                    {
+                        width:'80%',
+                        height:'80%'
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DocCompraVentaCbte' );
+    }
 	
 })
 </script>
