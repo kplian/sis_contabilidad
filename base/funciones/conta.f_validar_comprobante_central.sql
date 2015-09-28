@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_validar_comprobante_central (
   p_id_usuario integer,
   p_id_usuario_ai integer,
@@ -9,9 +11,9 @@ RETURNS boolean AS
 $body$
 /*
 
-Autor: RAC KPLIAN
-Fecha:   6 junio de 2013
-Descripcion  Esta funcion cambia el estado de los planes de pago cuando los comprobantes son eliminados
+Autor: JRR KPLIAN (Todabia no sabe poner comentario)
+Fecha:   28 septiembre  de 2015
+Descripcion  Esta funcion corre despues de validar el cbte de la regionaly replica el resultado a la central
 
   
 
@@ -20,17 +22,14 @@ Descripcion  Esta funcion cambia el estado de los planes de pago cuando los comp
 
 DECLARE
   
-	v_nombre_funcion   	text;
-	v_resp				varchar; 
-    
+	v_nombre_funcion   		text;
+	v_resp					varchar; 
     v_int_comprobante 		record;
-    
-    v_nombre_conexion  varchar;
-    
-    
-    v_consulta varchar;
-    resultado	numeric;
-    v_respuesta_dblink	varchar;
+    v_nombre_conexion  		varchar;
+    v_codigo_estacion 		varchar;
+    v_consulta 				varchar;
+    resultado				numeric;
+    v_respuesta_dblink		varchar;
     v_funcion_comprobante_validado_central	text;
     
     
@@ -59,7 +58,13 @@ BEGIN
     	v_nombre_conexion = p_conexion;
     end if;
     
-     SELECT *
+    --mandamos el codigo de la estacion  y el idel del cbte de la regional
+    
+    v_codigo_estacion = pxp.f_get_variable_global('conta_codigo_estacion');
+    
+    
+    
+    SELECT *
     FROM dblink(v_nombre_conexion, 'select 
 							   	pc.funcion_comprobante_validado  	
 							  	from conta.tint_comprobante c
@@ -68,7 +73,7 @@ BEGIN
     AS t1(nombre_funcion text) into v_funcion_comprobante_validado_central;   
           
     if (v_funcion_comprobante_validado_central is not null) then
-    	v_consulta = 'select ' || v_funcion_comprobante_validado_central  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| v_int_comprobante.id_int_comprobante_origen_central::varchar||', NULL)'; 
+    	v_consulta = 'select ' || v_funcion_comprobante_validado_central  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| v_int_comprobante.id_int_comprobante_origen_central::varchar||', NULL, '||p_id_int_comprobante::varchar||', '''||v_codigo_estacion||''')'; 
                             
         --raise exception '%',v_consulta;
         select * FROM dblink(v_nombre_conexion,

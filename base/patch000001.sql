@@ -2159,3 +2159,34 @@ ALTER TABLE conta.tagrupador_doc
 ALTER TABLE conta.tagrupador
   ADD COLUMN id_gestion INTEGER; 
 /***********************************F-SCP-RAC-CONTA-1-23/09/2015****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-27/09/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN vbregional VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.vbregional
+IS 'cuando la regional valida el comprobante el de central queda en borrador,  pero con vbregional = si';
+
+
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN codigo_estacion_origen VARCHAR(30);
+
+COMMENT ON COLUMN conta.tint_comprobante.codigo_estacion_origen
+IS 'codigo de la estacion origen';
+
+
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_int_comprobante_origen_regional INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_int_comprobante_origen_regional
+IS 'identidica el id del comprobante en la regional se usa de manera combinada con el codigo de estacion';
+
+/***********************************F-SCP-RAC-CONTA-1-27/09/2015****************************************/
+

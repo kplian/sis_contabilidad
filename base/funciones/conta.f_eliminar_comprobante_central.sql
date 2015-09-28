@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_eliminar_comprobante_central (
   p_id_usuario integer,
   p_id_usuario_ai integer,

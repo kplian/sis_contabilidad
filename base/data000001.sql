@@ -1115,3 +1115,12 @@ select pxp.f_insert_testructura_gui ('LIBVEN', 'CBTE.1');
 select pxp.f_insert_testructura_gui ('DOC', 'CBTE.1');
 /***********************************F-DAT-RAC-CONTA-1-24/09/2015*****************************************/
 
+
+
+/***********************************I-DAT-RAC-CONTA-1-27/09/2015*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_codigo_estacion', E'CENTRAL', E'Codigo de la estacion, regioanl o central, setuiliza para las misgracion de cbtes');
+
+/***********************************F-DAT-RAC-CONTA-1-27/09/2015*****************************************/
+
