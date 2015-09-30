@@ -21,6 +21,8 @@ class ACTIntComprobante extends ACTbase{
 		
 		
 		
+		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    
+		
 		if($this->objParam->getParametro('id_deptos')!=''){
             $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
         }

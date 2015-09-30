@@ -209,8 +209,6 @@ class MODBancaCompraVenta extends MODbase{
 	function importar_txt(){
 		
 		
-
-
 			$arra = array();
 
 			$arregloFiles = $this->objParam->getArregloFiles();
