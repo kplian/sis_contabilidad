@@ -69,6 +69,17 @@ BEGIN
 			
 			)RETURNING id_grupo_ot_det into v_id_grupo_ot_det;
 			
+			if (pxp.f_get_variable_global('sincronizar') = 'true') then
+                	                    
+                    select * FROM dblink(migra.f_obtener_cadena_conexion(), 
+                        'SELECT * 
+                        FROM sci.f_tct_grupo_ot__det_iud(' || p_id_usuario || ',''' ||
+                        		pxp.f_get_variable_global('sincroniza_ip') || ''',''Sincronizacion'',''CT_GROTDET_INS'',NULL,' || v_id_grupo_ot_det ||
+                                ',' || v_parametros.id_grupo_ot || ',' || v_parametros.id_orden_trabajo || ',' || p_id_usuario||
+                                ')',TRUE)AS t1(resp varchar)
+                                into v_resp; 
+            end if;
+			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ordenes de Trabajo Agrupadas almacenado(a) con exito (id_grupo_ot_det'||v_id_grupo_ot_det||')'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_grupo_ot_det',v_id_grupo_ot_det::varchar);

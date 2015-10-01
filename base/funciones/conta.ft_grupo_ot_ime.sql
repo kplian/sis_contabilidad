@@ -67,6 +67,17 @@ BEGIN
 			
 			)RETURNING id_grupo_ot into v_id_grupo_ot;
 			
+			if (pxp.f_get_variable_global('sincronizar') = 'true') then
+                	                    
+                    select * FROM dblink(migra.f_obtener_cadena_conexion(), 
+                        'SELECT * 
+                        FROM sci.f_tct_grupo_ot_iud(' || p_id_usuario || ',''' ||
+                        		pxp.f_get_variable_global('sincroniza_ip') || ''',''Sincronizacion'',''CT_GRPOT_INS'',NULL,' || v_id_grupo_ot || ',' ||
+                                coalesce ('''' || v_parametros.descripcion::text || '''', 'NULL') || ',' || p_id_usuario||
+                                ')',TRUE)AS t1(resp varchar)
+                                into v_resp; 
+            end if;
+			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Grupo Ot almacenado(a) con exito (id_grupo_ot'||v_id_grupo_ot||')'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_grupo_ot',v_id_grupo_ot::varchar);
