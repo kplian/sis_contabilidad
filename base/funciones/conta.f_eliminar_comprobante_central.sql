@@ -49,31 +49,35 @@ BEGIN
     from conta.tint_comprobante c
     where c.id_int_comprobante = p_id_int_comprobante;
     
-    if (v_int_comprobante.id_int_comprobante_origen_central is null) then
-    	raise exception 'Error al eliminar el comprobante de la central, se llamo a la funcion para eliminar comprobante de la central, pero no se encontro el id_int_comprobante de la relacion';
-    end if;
+    --solo retrocede el plan de pagos en la central si el comprobante esta en borrador
+    IF v_int_comprobante.estado_reg = 'borrador' then
     
-    if p_conexion is null then
-    	select * into v_nombre_conexion from migra.f_crear_conexion();
-    else
-    	v_nombre_conexion = p_conexion;
-    end if;
-    
-    v_consulta = 'SELECT *
-                 FROM conta.f_eliminar_int_comprobante(' || 
-                 			coalesce(p_id_usuario::varchar, 'NULL') || ',' || 
-                 			coalesce(p_id_usuario_ai::varchar, 'NULL') || ',' ||
-                            coalesce( '''' || p_usuario_ai || '''', 'NULL') || ',' || 
-                            coalesce( v_int_comprobante.id_int_comprobante_origen_central::varchar, 'NULL') || ')'; 
-                            
-    --raise exception '%',v_consulta;
-    select * FROM dblink(v_nombre_conexion,
-                 v_consulta,TRUE)AS t1(resp varchar)
-                         into v_respuesta_dblink;
-    
-    if p_conexion is null then
-    	select * into v_resp from migra.f_cerrar_conexion(v_nombre_conexion,'exito'); 
-    end if; 
+      if (v_int_comprobante.id_int_comprobante_origen_central is null) then
+          raise exception 'Error al eliminar el comprobante de la central, se llamo a la funcion para eliminar comprobante de la central, pero no se encontro el id_int_comprobante de la relacion';
+      end if;
+      
+      if p_conexion is null then
+          select * into v_nombre_conexion from migra.f_crear_conexion();
+      else
+          v_nombre_conexion = p_conexion;
+      end if;
+      
+      v_consulta = 'SELECT *
+                   FROM conta.f_eliminar_int_comprobante(' || 
+                              coalesce(p_id_usuario::varchar, 'NULL') || ',' || 
+                              coalesce(p_id_usuario_ai::varchar, 'NULL') || ',' ||
+                              coalesce( '''' || p_usuario_ai || '''', 'NULL') || ',' || 
+                              coalesce( v_int_comprobante.id_int_comprobante_origen_central::varchar, 'NULL') || ')'; 
+                              
+      --raise exception '%',v_consulta;
+      select * FROM dblink(v_nombre_conexion,
+                   v_consulta,TRUE)AS t1(resp varchar)
+                           into v_respuesta_dblink;
+      
+      if p_conexion is null then
+          select * into v_resp from migra.f_cerrar_conexion(v_nombre_conexion,'exito'); 
+      end if; 
+    END IF;
 	RETURN  TRUE;
 
 

@@ -43,34 +43,30 @@ BEGIN
                --verifica que no tenga numero
                IF  v_rec_cbte.nro_cbte is not null and   v_rec_cbte.nro_cbte != '' THEN
                     raise exception 'No puede eliminar cbtes  que ya fueron validados, para no perder la numeración';
-               END IF;        
+               END IF; 
+               
+                -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
+                 IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+                             
+                    select 
+                    pc.funcion_comprobante_eliminado
+                    into v_funcion_comprobante_eliminado
+                    from conta.tplantilla_comprobante pc  
+                    where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+                                
+                                
+                    EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
+                 ELSE                              
+                    --si no se tiene una plantilla de comprobante buscamos una funciona de eliminacion  en el cbte
+                        
+                    IF v_rec_cbte.funcion_comprobante_eliminado  is not NULL  THEN  
+                       EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
+                    END IF;
+                     
+                 END IF;       
    
                IF v_rec_cbte.vbregional = 'no' THEN    -- los cbte temporales como  no son visible no pueden eliminarce antes de tener el vbregional = si
                       
-                      
-                      
-                      -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
-                     IF v_rec_cbte.id_plantilla_comprobante is not null THEN
-                             
-                        select 
-                        pc.funcion_comprobante_eliminado
-                        into v_funcion_comprobante_eliminado
-                        from conta.tplantilla_comprobante pc  
-                        where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
-                                
-                                
-                        EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
-                     ELSE                              
-                        --si no se tiene una plantilla de comprobante buscamos una funciona de eliminacion  en el cbte
-                        
-                        IF v_rec_cbte.funcion_comprobante_eliminado  is not NULL  THEN  
-                           EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
-                        END IF;
-                     
-                     END IF;
-                   
-                  
-                  
                     --delete transacciones del comprobante intermedio
                     delete from conta.tint_transaccion
                     where id_int_comprobante=p_id_int_comprobante;
@@ -111,10 +107,10 @@ BEGIN
                     
                     
                     --prepara consulta
-                    v_sql:=  'select migra.f_eliminar_int_comprobante('||
+                    v_sql:=  'select conta.f_eliminar_int_comprobante('||
                                        coalesce(p_id_usuario::varchar,'null')||','||
                                        coalesce(p_id_usuario_ai::varchar,'null')||','||
-                                       coalesce(|''''||p_usuario_ai||'''','null')||','||
+                                       coalesce(''''||p_usuario_ai||'''','null')||','||
                                        coalesce(v_rec_cbte.id_int_comprobante_origen_regional::varchar,'null')||')';
                     
                     
@@ -146,15 +142,35 @@ BEGIN
               raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_rec_cbte.fecha;
           END IF;
           
+          
+          
+          -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
+           IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+                             
+              select 
+              pc.funcion_comprobante_eliminado
+              into v_funcion_comprobante_eliminado
+              from conta.tplantilla_comprobante pc  
+              where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+                                
+                                
+              EXECUTE ( 'select ' || v_funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
+           ELSE                              
+              --si no se tiene una plantilla de comprobante buscamos una funciona de eliminacion  en el cbte
+                        
+              IF v_rec_cbte.funcion_comprobante_eliminado  is not NULL  THEN  
+                 EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_eliminado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||')');
+              END IF;
+                     
+           END IF;
+          
          
         
           
           -- si se integra con presupeustos, y tiene presupeusto es encesario revertir
-          IF v_pre_integrar_presupuestos = 'true' and v_rec_cbte.id_plantilla_comprobante is not null THEN 
+          IF v_pre_integrar_presupuestos = 'true'  THEN 
               --  TODO (si tiene presupuesto comprometido REVERTIR, retroceder los planes de pagos)
-              --incluir plantilla de funcion, para el caso de retroceder un comprobante validado
-              
-              raise exception 'no se programo la lógica para elimiar comprobantes validados que tiene presupeusto';
+               raise exception 'no se programo la lógica para eliminar comprobantes validados que tienen presupeusto';
          
           ELSE
             
