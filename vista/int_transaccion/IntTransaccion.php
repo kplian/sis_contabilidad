@@ -528,7 +528,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 					if (reg.ROOT.error) {
 						Ext.Msg.alert('Error','Error a recuperar la variable global')
 					} else {
-						if(reg.ROOT.datos.valor = 'no'){
+						if(reg.ROOT.datos.valor == 'no'){
 							this.ocultarComponente(this.Cmp.id_partida);
 						}
 					}

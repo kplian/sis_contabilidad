@@ -2190,3 +2190,17 @@ IS 'identidica el id del comprobante en la regional se usa de manera combinada c
 
 /***********************************F-SCP-RAC-CONTA-1-27/09/2015****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-1-02/10/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_int_transaccion_origen INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_int_transaccion_origen
+IS 'hace referencia a al id de la trasaccion original';
+
+/***********************************F-SCP-RAC-CONTA-1-02/10/2015****************************************/
+

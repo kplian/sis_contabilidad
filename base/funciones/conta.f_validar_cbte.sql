@@ -35,6 +35,7 @@ DECLARE
     v_pre_integrar_presupuestos		varchar;
     v_conta_integrar_libro_bancos	varchar;
     v_resp_int_endesis 				varchar;
+    v_conta_codigo_estacion			varchar;
      
 
 BEGIN
@@ -43,6 +44,7 @@ BEGIN
 
      v_nombre_funcion:='conta.f_validar_cbte';
      v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
+     v_conta_codigo_estacion = pxp.f_get_variable_global('conta_codigo_estacion');
     --raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';	
 	v_errores = '';
     
@@ -83,7 +85,10 @@ BEGIN
         c.vbregional,
         c.tipo_cambio,
         c.id_moneda,
-        p.id_gestion 
+        p.id_gestion ,
+        c.id_int_comprobante_origen_central,
+        c.origen
+        
 	  into 
         v_rec_cbte
     from conta.tint_comprobante c
@@ -311,26 +316,26 @@ BEGIN
            -- 8 si viene de una plantilla de comprobante busca la funcion de validacion configurada
            -----------------------------------------------------------------
            
-           IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+            IF v_rec_cbte.id_plantilla_comprobante is not null THEN
            
-              select 
-               pc.funcion_comprobante_validado
-              into v_funcion_comprobante_validado 
-              from conta.tplantilla_comprobante pc  
-              where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
-              
-              
-              -- raise exception 'validar comprobante pxp %',v_funcion_comprobante_validado ;
-            	 
-              EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
-                                 
-           ELSE
-             -- si no tenemos plantilla de comprobante revisamos la funcin directamente	          
-              IF v_rec_cbte.funcion_comprobante_validado is not NULL THEN
-                 EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
-              END IF;
+                select 
+                 pc.funcion_comprobante_validado
+                into v_funcion_comprobante_validado 
+                from conta.tplantilla_comprobante pc  
+                where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+                
+                
+                -- raise exception 'validar comprobante pxp %',v_funcion_comprobante_validado ;
+              	 
+                EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+                                   
+            ELSE
+                -- si no tenemos plantilla de comprobante revisamos la funcin directamente	          
+                IF v_rec_cbte.funcion_comprobante_validado is not NULL THEN
+                   EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+                END IF;
            
-           END IF;
+            END IF;
            
            
            
@@ -340,9 +345,21 @@ BEGIN
             IF not conta.f_int_trans_validar(p_id_usuario,p_id_int_comprobante) THEN
               raise exception 'error al realizar validaciones en el combrobante';
             END IF; 
+            
+            
+            
+           ---------------------------------------------------------------------------------------
+           -- SI estamos en una regional internacional y  el comprobante es propio de la estacion
+           -- migramos a contabilidad central
+           --------------------------------------------------------------------------------------- 
+           IF v_conta_codigo_estacion != 'CENTRAL' and v_rec_cbte.origen is NULL THEN
+               v_resp =  migra.f_migrar_cbte_a_central(p_id_int_comprobante);
+           END IF;
+           
+           raise exception 'pasa %, % ',   v_conta_codigo_estacion, v_rec_cbte.origen;
            
            -----------------------------------------------------------------------------------------------------------------------
-           -- SI el comprobante es de una regional internacional y la sincronizacion esta habilitada migramos el cbte a ENDESIS
+           -- SI el comprobante se valida en central y es de  una regional internacional y la sincronizacion esta habilitada migramos el cbte a ENDESIS
            ------------------------------------------------------------------------------------------------------------------------
            IF(v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'si' )THEN
                -- si sincroniza locamente con endesis, marcando la bandera que proviene de regional internacional
@@ -353,7 +370,7 @@ BEGIN
             -----------------------------------------------------------------------------------------------
             --9. Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
             ------------------------------------------------------------------------------------------------
-           IF v_pre_integrar_presupuestos = 'true' THEN 
+           IF v_pre_integrar_presupuestos = 'true' THEN  --en las regionales internacionales la sincro de presupeustos esta deshabilitada
                 v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
            END IF;
         
