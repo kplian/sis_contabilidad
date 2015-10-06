@@ -73,7 +73,7 @@ BEGIN
                 	                    
                     select * FROM dblink(migra.f_obtener_cadena_conexion(), 
                         'SELECT * 
-                        FROM sci.f_tct_grupo_ot__det_iud(' || p_id_usuario || ',''' ||
+                        FROM sci.f_tct_grupo_ot_det_iud(' || p_id_usuario || ',''' ||
                         		pxp.f_get_variable_global('sincroniza_ip') || ''',''Sincronizacion'',''CT_GROTDET_INS'',NULL,' || v_id_grupo_ot_det ||
                                 ',' || v_parametros.id_grupo_ot || ',' || v_parametros.id_orden_trabajo || ',' || p_id_usuario||
                                 ')',TRUE)AS t1(resp varchar)
