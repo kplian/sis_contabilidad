@@ -84,6 +84,11 @@ DECLARE
     v_respuesta_libro_bancos varchar;
     v_prioridad_conta		integer;
     v_prioridad_libro		integer;
+    v_id_moneda				integer;
+    v_id_moneda_base		integer;
+    v_sw_moneda_base		varchar;
+    v_importe_debe 			numeric;
+    v_importe_haber 			numeric;
 
 BEGIN
 	
@@ -107,7 +112,7 @@ BEGIN
     */
     -- revisar el tipo de comrpobante y su estado
     
-     v_retorno = 'exito';
+    v_retorno = 'exito';
     
     select    
       ic.momento,
@@ -119,17 +124,36 @@ BEGIN
       ic.momento_pagado,
       ic.estado_reg,
       ic.id_moneda,
-      ic.fecha
+      ic.fecha,
+      ic.vbregional,
+      ic.temporal
     into v_registros_comprobante
     from conta.tint_comprobante ic
     inner join conta.tclase_comprobante cl  on ic.id_clase_comprobante =  cl.id_clase_comprobante
     where ic.id_int_comprobante  =  p_id_int_comprobante;
     
+     ---------------------------------------------------
+     -- Determinar moneda de ejcucion presupeustaria
+     -- Si viene de una regional y la moneda no  es dolar  (dolar ... id_moneda = 2)
+     -- ejecutar moneda base
+     ------------------------------------------------
+     
+     --determinar moneda base
+     v_id_moneda_base = param.f_get_moneda_base();
+     v_id_moneda = v_registros_comprobante.id_moneda;
+     v_sw_moneda_base = 'no';
+     
+     
+     IF v_registros_comprobante.vbregional = 'si' and v_registros_comprobante.id_moneda != 2 THEN
+       v_id_moneda = v_id_moneda_base;
+       v_sw_moneda_base = 'si';
+     END IF;    
+    
       
      
      -- si el comprobante tiene efecto presupouestario'
-    
-    IF v_registros_comprobante.momento= 'presupuestario' THEN
+   
+    IF v_registros_comprobante.momento = 'presupuestario' THEN
     
             --recuepra el error maximo opr redondeo
             v_error_presupuesto=pxp.f_get_variable_global('error_presupuesto')::numeric;
@@ -141,36 +165,47 @@ BEGIN
            --rrecorrer todas las transacciones revisando las partidas presupuestarias
             v_i = 0;
            --Definir el momento 
-            IF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si' then
+           IF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si' then
                 
-                v_momento_presupeustario = 4; --pagado 
-                v_momento_aux='todo';
+                 v_momento_presupeustario = 4; --pagado 
+                 v_momento_aux='todo';
                 
-            ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
+           ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si'  THEN   
                  
-                v_momento_presupeustario = 3;  --ejecutado
-                v_momento_aux='todo';
+                  v_momento_presupeustario = 4;  --pagado  OJO verifica el mommento 
+                  v_momento_aux='todo';
+                 
+                    raise notice ' >>>> 1';
+            
+              --RAC, aumentado 5/10/2015
+    	   ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
+                 
+                  v_momento_presupeustario = 3;  --ejecutado
+                  v_momento_aux='todo';
+                 
+                    raise notice ' >>>> 1';      
+                
                 
            ELSIF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
                  
                 v_momento_presupeustario = 3;  --ejecutado
                 v_momento_aux='solo ejecutar';
                 
-            ELSIF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'si'  THEN   
+           ELSIF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'si'  THEN   
                  
                 v_momento_presupeustario = 4;  --pagado
                 v_momento_aux='solo pagar';  
                 
-            ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'no' then
+           ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'no' then
               
               raise exception 'Solo comprometer no esta implmentado';
               
-            ELSE 
+           ELSE 
             
              raise exception 'Combinacion de momentos no contemplada';  
        
        
-            END IF;
+           END IF;
             
             
           v_aux = '';
@@ -208,6 +243,10 @@ BEGIN
                                      it.importe_haber,
                                      it.importe_gasto,
                                      it.importe_recurso,
+                                     it.importe_debe_mb,
+                                     it.importe_haber_mb,
+                                     it.importe_gasto_mb,
+                                     it.importe_recurso_mb,
                                      it.id_centro_costo,
                                      par.sw_movimiento,  --  presupuestaria o  flujo
                                      par.sw_transaccional,  --titular o movimiento
@@ -222,7 +261,16 @@ BEGIN
                                         and it.estado_reg = 'activo'       )  LOOP
                 
                      
-                        
+                   IF v_sw_moneda_base = 'si' THEN
+                      v_importe_debe = v_registros.importe_debe_mb;
+                      v_importe_haber =  v_registros.importe_haber_mb;
+                   ELSE
+                      v_importe_debe = v_registros.importe_debe;
+                      v_importe_haber =  v_registros.importe_haber;
+                   END IF;     
+                   
+                   
+                   
                    IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
                           
                             -- si solo ejecutamos el presupuesto 
@@ -239,8 +287,7 @@ BEGIN
                                            raise exception 'EL comprobante no puede estar marcada para comprometer, si ya existe un comprometido';
                                        
                                        END IF;
-                                       
-                                       --TODO verificar si el alcanza el presuuesto para comprometer
+                                      
                                        
                                 END IF; --IF comprometido  
                                 
@@ -254,11 +301,21 @@ BEGIN
                                      -- determinamos el monto a comprometer
                                      IF v_registros.tipo = 'gasto'  THEN
                                          -- importe debe ejecucion
-                                         v_monto_cmp  = v_registros.importe_debe;
-                                         --TODO importe haber es reversion, multiplicar por -1
+                                         IF v_importe_debe > 0 THEN
+                                             v_monto_cmp  = v_importe_debe;
+                                         END IF;
+                                         --importe haber es reversion, multiplicar por -1
+                                         IF v_importe_haber > 0 THEN
+                                             v_monto_cmp  = v_importe_haber * (-1);
+                                         END IF;
                                      ELSE
-                                         v_monto_cmp  = v_registros.importe_haber;
-                                         --TODO importe haber es reversion, multiplicar por -1
+                                         IF v_importe_haber > 0 THEN
+                                           v_monto_cmp  = v_importe_haber;
+                                         END IF;
+                                         --importe debe es reversion, multiplicar por -1
+                                         IF v_importe_debe > 0 THEN
+                                             v_monto_cmp  = v_importe_debe * (-1);
+                                         END IF;
                                      END IF;
                                      
                                      
@@ -271,7 +328,7 @@ BEGIN
                                      va_id_partida[v_i]= v_registros.id_partida;
                                      va_momento[v_i]	= v_momento_presupeustario;
                                      va_monto[v_i]  = v_monto_cmp;
-                                     va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
+                                     va_id_moneda[v_i]  = v_id_moneda;
                                      va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
                                      va_columna_relacion[v_i]= 'id_int_transaccion';
                                      va_fk_llave[v_i] = v_registros.id_int_transaccion;
@@ -378,7 +435,7 @@ BEGIN
                                                    va_id_partida[v_i]= v_registros.id_partida;
                                                    va_momento[v_i]	= 2;  --momento revertido
                                                    va_monto[v_i]  = (v_registros.importe_reversion)*-1; --signo negativo para revertir
-                                                   va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
+                                                   va_id_moneda[v_i]  = v_id_moneda;
                                                    va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
                                                    va_columna_relacion[v_i]= 'id_int_transaccion';
                                                    va_fk_llave[v_i] = v_registros.id_int_transaccion;
@@ -561,7 +618,7 @@ BEGIN
                                                va_id_partida[v_i]= NULL;
                                                va_momento[v_i]	= 4;--momneto pago
                                                va_monto[v_i]  = v_monto_x_pagar;
-                                               va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
+                                               va_id_moneda[v_i]  = v_id_moneda;
                                                va_id_partida_ejecucion [v_i] = v_registros_dev.id_partida_ejecucion_dev;   
                                                va_columna_relacion[v_i]= 'id_int_transaccion';
                                                va_fk_llave[v_i] = v_registros.id_int_transaccion;
@@ -587,9 +644,7 @@ BEGIN
                                                
                                                -- chequeamos si el presupuesto devengado si alcanza para pagar, 
                                                -- si no,  pero la diferencia es minima pagamos   el monto disponible
-                                               v_respuesta_verificar = pre.f_verificar_com_eje_pag(
-                                                                                          va_id_partida_ejecucion[v_i],
-                                                                                          va_id_moneda[v_i]);
+                                               v_respuesta_verificar = pre.f_verificar_com_eje_pag(va_id_partida_ejecucion[v_i],va_id_moneda[v_i]);
                                                                                           
                                                
                                                 v_monto_previo_pagado = 0;                                        
@@ -668,6 +723,8 @@ BEGIN
                END LOOP; --end loop transacciones
                
              
+             
+             --raise exception '%, %', va_monto, va_id_moneda;
                
               -- llamar a la funcion de gestion presupuestaria incremeto presupuestario
                    
@@ -739,31 +796,7 @@ BEGIN
                                   where rd.id_int_rel_devengado  =  va_id_int_rel_devengado[v_cont];
                               
                        END LOOP;
-                		/*
-						--gonzalo insercion de cheque en libro bancos
-                        select fin.id_finalidad into v_id_finalidad
-                        from tes.tfinalidad fin
-                        where fin.nombre_finalidad ilike 'proveedores';
-                        
-             			select cbt.estado_reg, dpc.prioridad, dpl.prioridad 
-                        into v_estado_cbte_pago, v_prioridad_conta, v_prioridad_libro       
-                        from conta.tint_comprobante cbt
-                        inner join conta.tint_transaccion tra on tra.id_int_comprobante=cbt.id_int_comprobante
-                        inner join tes.tcuenta_bancaria ctb on ctb.id_cuenta_bancaria = tra.id_cuenta_bancaria
-                        inner join param.tdepto dpc on dpc.id_depto=cbt.id_depto
-					    inner join param.tdepto dpl on dpl.id_depto=cbt.id_depto_libro
-                        where cbt.id_int_comprobante = p_id_int_comprobante
-                        and tra.forma_pago= 'cheque' and ctb.id_finalidad is not null and ctb.centro='no';
-                        raise notice '% % %', p_id_usuario, p_id_int_comprobante,v_id_finalidad;
-                        IF v_estado_cbte_pago = 'validado' THEN
-                        	if(v_prioridad_conta=1 and v_prioridad_libro != 1)then                        		
-                            	v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,'','endesis');	
-							elseif(v_prioridad_conta!=1 and v_prioridad_libro!=1)then	
-                                v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante,
-                            							v_id_finalidad,NULL,'','endesis');
-                            end if;
-                        END IF;
-                        */
+                		
              END IF; 
         
     END IF; -- fin del if de movimiento presupuestario

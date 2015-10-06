@@ -13,7 +13,11 @@ $body$
 
 Autor: JRR KPLIAN (Todabia no sabe poner comentario)
 Fecha:   28 septiembre  de 2015
-Descripcion  Esta funcion corre despues de validar el cbte de la regionaly replica el resultado a la central
+Descripcion  
+
+
+        Esta funcion corre despues de validar el cbte de la regional  (solo en comprobantes migrados con origen = central) 
+        y replica el resultado a la central (por ejemplo pasa cambia el estado del plan de pagos)
 
   
 
@@ -73,7 +77,11 @@ BEGIN
     AS t1(nombre_funcion text) into v_funcion_comprobante_validado_central;   
           
     if (v_funcion_comprobante_validado_central is not null) then
-    	v_consulta = 'select ' || v_funcion_comprobante_validado_central  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| v_int_comprobante.id_int_comprobante_origen_central::varchar||', NULL, '||p_id_int_comprobante::varchar||', '''||v_codigo_estacion||''')'; 
+    	v_consulta = 'select ' || v_funcion_comprobante_validado_central  ||'('||p_id_usuario::varchar||','||
+                     COALESCE(p_id_usuario_ai::varchar,'NULL')||','||
+                     COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| 
+                     v_int_comprobante.id_int_comprobante_origen_central::varchar||', NULL, '||
+                     p_id_int_comprobante::varchar||', '''||v_codigo_estacion||''','''||v_int_comprobante.nro_cbte||''')'; 
                             
         --raise exception '%',v_consulta;
         select * FROM dblink(v_nombre_conexion,
@@ -81,6 +89,7 @@ BEGIN
                              into v_respuesta_dblink;
     end if;    	 
           
+    
     
     
     if p_conexion is null then

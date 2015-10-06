@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION conta.f_eliminar_int_comprobante (
   p_id_usuario integer,
   p_id_usuario_ai integer,
   p_usuario_ai varchar,
-  p_id_int_comprobante integer
+  p_id_int_comprobante integer,
+  p_borrado_manual varchar = 'no'::character varying
 )
 RETURNS varchar AS
 $body$
@@ -38,10 +39,15 @@ BEGIN
     ---------------------------------------
     -- Si el comprobante esta en borrador
     ---------------------------------------
+    
+    
     IF   v_rec_cbte.estado_reg = 'borrador'  THEN
     
-               --verifica que no tenga numero
-               IF  v_rec_cbte.nro_cbte is not null and   v_rec_cbte.nro_cbte != '' THEN
+   
+                  
+    
+               -- verifica que no tenga numero, solo si no es un cbte migrado de la regional
+               IF  v_rec_cbte.nro_cbte is not null and   v_rec_cbte.nro_cbte != '' and v_rec_cbte.vbregional != 'si' THEN
                     raise exception 'No puede eliminar cbtes  que ya fueron validados, para no perder la numeración';
                END IF; 
                
@@ -65,84 +71,95 @@ BEGIN
                      
                  END IF;       
    
-               IF v_rec_cbte.vbregional = 'no' THEN    -- los cbte temporales como  no son visible no pueden eliminarce antes de tener el vbregional = si
+              
+    
+             
+    
+              IF v_rec_cbte.vbregional = 'no'  and v_rec_cbte.temporal = 'no'   THEN    
                       
-                    --delete transacciones del comprobante intermedio
-                    delete from conta.tint_transaccion
-                    where id_int_comprobante=p_id_int_comprobante;
-                    
-                     --se borran las transacciones
-                    delete from conta.tint_comprobante
-                    where id_int_comprobante=p_id_int_comprobante;
-             ELSE
-                 -------------------------------------------------------
-                 -- si el comprobante es de una regional del exterior 
-                 ------------------------------------------------------
-                 
-                 
-                 IF  v_rec_cbte.id_int_comprobante_origen_regional is null THEN
-                   raise exception 'No se tiene identificado el cbte de la regional internacional';
-                 END IF;
-                 
-                 -- si el comprobante solo fue originado en la regional internacional
-                 IF  v_rec_cbte.temporal = 'no'  THEN 
-                      -- eliminamos el cbte en la central
+                      --delete transacciones del comprobante intermedio
                       delete from conta.tint_transaccion
                       where id_int_comprobante=p_id_int_comprobante;
                       
-                      -- Sentencia de la eliminacion
+                       --se borran las transacciones
                       delete from conta.tint_comprobante
                       where id_int_comprobante=p_id_int_comprobante;
-                 ELSE
-                      -- cambio el estado de la bandera de vbregional a no
-                      update   conta.tint_comprobante set
-                        vbregional = 'no'
-                      where id_int_comprobante =    p_id_int_comprobante;
                       
-                 END IF;
-                 
-                 -----------------------------------------------------------------
-                 -- retrocedemos a borrador el cbte de la regional internacional
-                 ----------------------------------------------------------------
-                    
-                    
-                    --prepara consulta
-                    v_sql:=  'select conta.f_eliminar_int_comprobante('||
-                                       coalesce(p_id_usuario::varchar,'null')||','||
-                                       coalesce(p_id_usuario_ai::varchar,'null')||','||
-                                       coalesce(''''||p_usuario_ai||'''','null')||','||
-                                       coalesce(v_rec_cbte.id_int_comprobante_origen_regional::varchar,'null')||')';
-                    
-                    
-                    -- llamda deblink de la funciona eliminar en la estacion desctino
-                    v_conexion =  migra.f_crear_conexion(NULL,'tes.testacion', v_rec_cbte.codigo_estacion_origen);
-       
-                   
-                    IF v_conexion is null or v_conexion = '' THEN
-                      raise exception 'No se pudo conectar con la base de datos destino';
-                    END IF;
-                    
-                    -- Ejecuta la fucion que recibe el CBTE en la estacion destino .....
-                    perform * from dblink(v_conexion, v_sql, true) as (respuesta varchar);
-                    
-                            
-                   select * into v_resp from migra.f_cerrar_conexion(v_conexion,'exito');
-                 
-                
+              ELSE   
+              
+                      -- si el comprobante solo fue originado en la regional internacional
+                     IF  v_rec_cbte.temporal = 'no'  THEN 
+                          -- eliminamos el cbte en la central
+                          delete from conta.tint_transaccion
+                          where id_int_comprobante=p_id_int_comprobante;
+                          
+                          -- Sentencia de la eliminacion
+                          delete from conta.tint_comprobante
+                          where id_int_comprobante=p_id_int_comprobante;
+                     ELSE
+                          -- cambio el estado de la bandera de vbregional a no
+                          update   conta.tint_comprobante set
+                            vbregional = 'no'
+                          where id_int_comprobante =    p_id_int_comprobante;
+                          
+                     END IF;
+                     
+                     
+                     --si es un cbte validao en la regioanl ...
+                     IF v_rec_cbte.vbregional = 'si' THEN
+                           -----------------------------------------------------------------
+                           -- retrocedemos a borrador el cbte de la regional internacional
+                           ----------------------------------------------------------------
+                           
+                           IF  v_rec_cbte.id_int_comprobante_origen_regional is null THEN
+                              raise exception 'No se tiene identificado el cbte de la regional internacional';
+                           END IF;
+                           --prepara consulta
+                           v_sql:=  'select conta.f_eliminar_int_comprobante('||
+                                             coalesce(p_id_usuario::varchar,'null')||','||
+                                             coalesce(p_id_usuario_ai::varchar,'null')||','||
+                                             coalesce(''''||p_usuario_ai||'''','null')||','||
+                                             coalesce(v_rec_cbte.id_int_comprobante_origen_regional::varchar,'null')||')';
+                          
+                          
+                           -- llamda deblink de la funciona eliminar en la estacion desctino
+                           v_conexion =  migra.f_crear_conexion(NULL,'tes.testacion', v_rec_cbte.codigo_estacion_origen);
+             
+                         
+                          IF v_conexion is null or v_conexion = '' THEN
+                            raise exception 'No se pudo conectar con la base de datos destino';
+                          END IF;
+                          
+                          -- Ejecuta la fucion que recibe el CBTE en la estacion destino .....
+                          perform * from dblink(v_conexion, v_sql, true) as (respuesta varchar);
+                          
+                          select * into v_resp from migra.f_cerrar_conexion(v_conexion,'exito');
+                   END IF;
              
              END IF;
       ELSE
-         ----------------------------------------------
-         -- Si el comprobante  NO esta en borrador
-         ---------------------------------------------
-           --TODO validar que solo un usuario autorizado pueda elimar comprobantes
-      
-           -- validar que el periodo contable no este cerrado
-          IF not param.f_periodo_subsistema_abierto(v_rec_cbte.fecha::date, 'CONTA') THEN
+         
+         
+         
+           ------------------------------------------
+           -- Si el comprobante  NO esta en borrador
+           ------------------------------------------
+           
+         
+           -- validar que no sea un cbte migrado
+           IF p_borrado_manual = 'si' and v_rec_cbte.id_int_comprobante_origen_central is not null THEN
+              raise exception 'No puede borrar cbtes manual transferidos a la central, solcite en central la eliminación';
+           END IF;
+         
+         
+         
+           
+           --TODO validar que solo un usuario autorizado pueda eliminar comprobantes
+          
+            -- validar que el periodo contable no este cerrado
+           IF not param.f_periodo_subsistema_abierto(v_rec_cbte.fecha::date, 'CONTA') THEN
               raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_rec_cbte.fecha;
-          END IF;
-          
-          
+           END IF;
           
           -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
            IF v_rec_cbte.id_plantilla_comprobante is not null THEN
@@ -165,7 +182,7 @@ BEGIN
            END IF;
           
          
-        
+       
           
           -- si se integra con presupeustos, y tiene presupeusto es encesario revertir
           IF v_pre_integrar_presupuestos = 'true'  THEN 
@@ -182,6 +199,8 @@ BEGIN
          END IF; 
       
       END IF;
+      
+     
     
     
      

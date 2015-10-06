@@ -26,9 +26,10 @@ DECLARE
     v_filas			bigint;
     v_resp			varchar;
     
-    v_nombre_funcion varchar;
-    v_registros_comprobante record;
-    v_registros record;
+    v_nombre_funcion 			varchar;
+    v_registros_comprobante 	record;
+    v_reg  						record;
+    v_registros 				record;
     
     v_i 					integer;
     v_cont 					integer;
@@ -48,34 +49,28 @@ DECLARE
     va_id_int_rel_devengado  integer[];
     
     
-    v_monto_cmp  numeric; 
-    
-    v_momento_presupeustario integer;
-    v_momento_aux varchar;
-    v_registros_dev record;
-    
-    v_aux  varchar;
-    
-    v_monto_x_pagar  numeric;
-    v_monto_rev  numeric;
-    
-    v_marca_reversion integer[];
-    
-    v_retorno varchar;
-    v_error_presupuesto  numeric;
-    v_respuesta_verificar	record;
-    va_tipo_partida   varchar[];
-    
-    v_mensaje_error_validacion varchar;
-    v_sw_error_validacion boolean;
-    
-    v_nombre_partida  varchar;
-    v_codigo_cc varchar;
-    v_estado    varchar;
-    
-    v_monto_previo_ejecutado   numeric;
-    v_monto_previo_revertido   numeric;
-    v_monto_previo_pagado      numeric;
+    v_monto_cmp  					numeric; 
+    v_momento_presupeustario 		integer;
+    v_momento_aux 					varchar;
+    v_registros_dev 				record;
+    v_aux  							varchar;
+    v_monto_x_pagar  				numeric;
+    v_monto_rev  					numeric;
+    v_marca_reversion 				integer[];
+    v_retorno 						varchar;
+    v_error_presupuesto  			numeric;
+    v_respuesta_verificar			record;
+    va_tipo_partida   				varchar[];
+    v_mensaje_error_validacion 		varchar;
+    v_sw_error_validacion 			boolean;
+    v_nombre_partida 				varchar;
+    v_codigo_cc 					varchar;
+    v_estado    					varchar;
+    v_monto_previo_ejecutado   		numeric;
+    v_monto_previo_revertido   		numeric;
+    v_monto_previo_pagado      		numeric;
+    v_resp_comp				   		varchar;
+    va_resp_comp			   		varchar[];
     
    
     
@@ -108,16 +103,8 @@ BEGIN
     v_retorno = 'exito';
     
     select    
-      ic.momento,
-      ic.id_clase_comprobante,
-      cl.codigo as codigo_clase_cbte,
-      ic.momento,
-      ic.momento_comprometido,
-      ic.momento_ejecutado,
-      ic.momento_pagado,
-      ic.estado_reg,
-      ic.id_moneda,
-      ic.fecha
+      ic.*,
+      cl.codigo as codigo_clase_cbte
     into v_registros_comprobante
     from conta.tint_comprobante ic
     inner join conta.tclase_comprobante cl  on ic.id_clase_comprobante =  cl.id_clase_comprobante
@@ -139,6 +126,14 @@ BEGIN
                 
                    raise notice ' >>>> 0';
                 
+            ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si'  THEN   
+                 
+                v_momento_presupeustario = 4;  --pagado  OJO verifica el mommento 
+                 v_momento_aux='todo';
+                 
+                    raise notice ' >>>> 1';
+            
+            --RAC, aumentado 5/10/2015
             ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
                  
                 v_momento_presupeustario = 3;  --ejecutado
@@ -523,19 +518,81 @@ BEGIN
           
         
       
-         
-          --si tenemos trasaccione y es un comprobante presupuestario
+         ---------------------------------------------------------------- 
+         --si tenemos trasaccione y es un comprobante presupuestario
+         -----------------------------------------------------------------
          IF v_i > 0 and v_registros_comprobante.momento= 'presupuestario' THEN
+                    
+                     IF (v_momento_aux='todo' or   v_momento_aux='solo ejecutar') and  v_registros_comprobante.momento_comprometido = 'si'  THEN
+                       --------------------------------
+                       -- Si comprometemos presupeusto
+                       ---------------------------------
+                           FOR v_reg in (select 
+                                               tipo_partida,
+                                               id_presupuesto,
+                                               id_partida,
+                                               sum(monto)  as monto
+                                        from tt_check_presu
+                                        group by tipo_partida, 
+                                                id_partida,
+                                                id_presupuesto)  LOOP
+                           
+                           
+                                   -- verifica si existe presupuesto
+                                   -- TODO si es un cbte de regional  y diferente a dolares convertir a BS
+                                   
+                                   v_resp_comp =  pre.f_verificar_presupuesto_partida(
+                                                                  v_reg.id_presupuesto, 
+                                                                  v_reg.id_partida, 
+                                                                  v_registros_comprobante.id_moneda, 
+                                                                  v_reg.monto,
+                                                                  'si');
+                                                                  
+                                   va_resp_comp = regexp_split_to_array(v_resp_comp, ',');  
+                                   
+                                   IF va_resp_comp[1] = 'false' THEN
+                                      v_retorno = 'falla';
+                                   ELSE
+                                      v_retorno = 'exito';
+                                   END IF;                            
+                                   
+                                   --si existe error recuperamos los datos del presupuesto y partida
+                                   IF v_retorno = 'falla' THEN 
+                                       v_sw_error_validacion = TRUE;
+                                                  
+                                         select
+                                          p.nombre_partida
+                                        into
+                                          v_nombre_partida 
+                                        from pre.tpartida p 
+                                        where p.id_partida = v_reg.id_partida; 
+                                                      
+                                                      
+                                                      
+                                        select 
+                                         cc.codigo_cc
+                                        into
+                                          v_codigo_cc 
+                                        from pre.tpresupuesto pre
+                                        inner join param.vcentro_costo cc on pre.id_centro_costo = cc.id_centro_costo
+                                        where pre.id_presupuesto = v_reg.id_presupuesto;
+                                                      
+                                       v_mensaje_error_validacion = v_mensaje_error_validacion|| COALESCE(v_nombre_partida,'');
+                                       v_mensaje_error_validacion = v_mensaje_error_validacion||'  ' || COALESCE(v_codigo_cc,'');
+                                       v_mensaje_error_validacion = v_mensaje_error_validacion||' Monto: ' ||COALESCE(v_reg.monto::varchar,'0')||' y el disponible '||va_resp_comp[2]||'<br>';
+                                                     
+                                    END IF;
+                           END LOOP;
+                    
          
-        
-                     
-                     IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
-                     
-                     
+                      ELSEIF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
+                      ---------------------------------------------
+                      --   Si ejecutamos y pagamos sin comprometer
+                     -------------------------------------------------
                                   
-                                    -- si solo ejecutamos el presupuesto 
-                                    --  o (compromentemos y ejecutamos) 
-                                    --  o (compromentemos, ejecutamos y pagamos)                              
+                                    -- si  
+                                    --  o (ejecutamos) 
+                                    --  o (ejecutamos y pagamos)                              
                           
                                    --verificamos todos lo montos si se tiene dinero suficiendete para proseguir
                                   
@@ -571,8 +628,34 @@ BEGIN
                                              -- y si es una partida de gasto      
                                              IF  va_tipo_partida[v_cont]='gasto' THEN
                                              
-                                                 IF va_momento[v_cont] != 2 THEN
+                                                 ----------------------------
+                                                 -- COMPROMETER 
+                                                 ---------------------------
                                                  
+                                                 IF va_momento[v_cont] = 1 THEN
+                                                 
+                                                         va_temp_array[v_cont] = 0;
+                                                         v_estado = 'ejecutado';
+                                                         
+                                                         --validamso que el monto a ejecutar sea menor o igual que el faltante por comprometer
+                                                          IF  va_monto[v_cont] <= va_temp_array[v_cont]  + v_error_presupuesto::numeric THEN
+                                                             v_retorno = 'exito';
+                                                              IF  va_monto[v_cont] > va_temp_array[v_cont] THEN
+                                                                  va_monto[v_cont] = va_temp_array[v_cont];
+                                                              END IF;
+                                                            
+                                                          ELSE
+                                                             v_retorno = 'falla';
+                                                             
+                                                          END IF;
+                                                 
+                                                 
+                                                 ------------------------------
+                                                 --  EJECUTAR O PAGAR
+                                                 ------------------------------
+                                                 ELSIF va_momento[v_cont] != 2 THEN
+                                                           
+                                                         --calcula el saldo
                                                          va_temp_array[v_cont] = COALESCE(v_respuesta_verificar.ps_comprometido,0.00::numeric) - COALESCE(v_monto_previo_ejecutado,0.0) + COALESCE((v_monto_previo_revertido*-1), 0.0)  - COALESCE(v_respuesta_verificar.ps_ejecutado,0.00::numeric);
                                                          v_estado = 'ejecutado';
                                                          
@@ -587,7 +670,9 @@ BEGIN
                                                              v_retorno = 'falla';
                                                              
                                                           END IF;  
-                                                 
+                                                  ----------------------------
+                                                  -- REVERTIR
+                                                  ---------------------------
                                                   ElSIF va_momento[v_cont] = 2  and va_monto[v_cont] < 0 THEN    --si es revertido el monto es negativo
                                                         
                                                         

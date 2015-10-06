@@ -38,8 +38,12 @@ DECLARE
     v_rec_cbte record;
     v_funcion_comprobante_eliminado varchar;
     v_id_subsistema_conta			integer;
-    v_resp2					varchar;
-    v_reg_cbte				record;
+    v_resp2							varchar;
+    v_reg_cbte						record;
+    v_momento_comprometido			varchar;
+    v_momento_ejecutado 			varchar;
+    v_momento_pagado 				varchar;
+    v_tipo_comprobante				varchar;
 			    
 BEGIN
 
@@ -78,6 +82,31 @@ BEGIN
         	ELSE
                 v_id_subsistema = v_id_subsistema_conta;
             end if;
+            
+            
+            v_momento_comprometido = 'si';
+            v_momento_ejecutado = 'no';
+            v_momento_pagado = 'no';
+            
+            --momentos presupeustarios
+            IF v_parametros.momento_ejecutado = 'true' THEN
+             v_momento_ejecutado = 'si';
+            END IF;
+            
+            IF v_parametros.momento_pagado = 'true' THEN
+             v_momento_pagado = 'si';
+            END IF;
+           
+            
+            --segun la calse del comprobante definir si es presupeustario o contable
+            
+            select 
+              cc.tipo_comprobante
+            into 
+              v_tipo_comprobante
+            from conta.tclase_comprobante cc 
+            where cc.id_clase_comprobante = v_parametros.id_clase_comprobante;
+            
         	
         	--PERIODO
         	--Obtiene el periodo a partir de la fecha
@@ -88,65 +117,73 @@ BEGIN
         	--REGISTRO DEL COMPROBANTE
         	-----------------------------
         	insert into conta.tint_comprobante(
-			id_clase_comprobante,
-		
-			id_subsistema,
-			id_depto,
-			id_moneda,
-			id_periodo,
-			id_funcionario_firma1,
-			id_funcionario_firma2,
-			id_funcionario_firma3,
-			tipo_cambio,
-			beneficiario,
-			
-			estado_reg,
-			glosa1,
-			fecha,
-			glosa2,
-			
-			--momento,
-			id_usuario_reg,
-			fecha_reg,
-			id_usuario_mod,
-			fecha_mod,
-            id_usuario_ai,
-            usuario_ai,
-            id_int_comprobante_fks,
-            cbte_cierre,
-            cbte_apertura,
-            cbte_aitb,
-            manual
+                id_clase_comprobante,
+    		
+                id_subsistema,
+                id_depto,
+                id_moneda,
+                id_periodo,
+                id_funcionario_firma1,
+                id_funcionario_firma2,
+                id_funcionario_firma3,
+                tipo_cambio,
+                beneficiario,
+    			
+                estado_reg,
+                glosa1,
+                fecha,
+                glosa2,
+    			
+                --momento,
+                id_usuario_reg,
+                fecha_reg,
+                id_usuario_mod,
+                fecha_mod,
+                id_usuario_ai,
+                usuario_ai,
+                id_int_comprobante_fks,
+                cbte_cierre,
+                cbte_apertura,
+                cbte_aitb,
+                manual,
+                momento_comprometido,
+                momento_ejecutado,
+                momento_pagado,
+                momento
           	) values(
-			v_parametros.id_clase_comprobante,
-			
-			v_id_subsistema,
-			v_parametros.id_depto,
-			v_parametros.id_moneda,
-			v_rec.po_id_periodo,
-			v_parametros.id_funcionario_firma1,
-			v_parametros.id_funcionario_firma2,
-			v_parametros.id_funcionario_firma3,
-			v_parametros.tipo_cambio,
-			v_parametros.beneficiario,
-			
-			'borrador',
-			v_parametros.glosa1,
-			v_parametros.fecha,
-			v_parametros.glosa2,
-			
-			--v_parametros.momento,
-			p_id_usuario,
-			now(),
-			null,
-			null,
-            v_parametros._id_usuario_ai,
-            v_parametros._nombre_usuario_ai,
-            (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
-            v_parametros.cbte_cierre,
-            v_parametros.cbte_apertura,
-            v_parametros.cbte_aitb,
-            'si'
+              v_parametros.id_clase_comprobante,
+  			
+              v_id_subsistema,
+              v_parametros.id_depto,
+              v_parametros.id_moneda,
+              v_rec.po_id_periodo,
+              v_parametros.id_funcionario_firma1,
+              v_parametros.id_funcionario_firma2,
+              v_parametros.id_funcionario_firma3,
+              v_parametros.tipo_cambio,
+              v_parametros.beneficiario,
+  			
+              'borrador',
+              v_parametros.glosa1,
+              v_parametros.fecha,
+              v_parametros.glosa2,
+  			
+              --v_parametros.momento,
+              p_id_usuario,
+              now(),
+              null,
+              null,
+              v_parametros._id_usuario_ai,
+              v_parametros._nombre_usuario_ai,
+              (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
+              v_parametros.cbte_cierre,
+              v_parametros.cbte_apertura,
+              v_parametros.cbte_aitb,
+              'si',
+              v_momento_comprometido,
+              v_momento_ejecutado,
+              v_momento_pagado,
+              v_tipo_comprobante
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
@@ -183,7 +220,10 @@ BEGIN
             where codigo = 'CONTA';
             
             
-            select * into v_reg_cbte
+            select 
+              * 
+            into 
+             v_reg_cbte
             from conta.tint_comprobante ic where ic.id_int_comprobante = v_parametros.id_int_comprobante;
             
             IF v_reg_cbte.estado_reg != 'borrador' THEN
@@ -206,34 +246,77 @@ BEGIN
         	--Obtiene el periodo a partir de la fecha
         	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
             
+            --segun la calse del comprobante definir si es presupeustario o contable
+            select 
+              cc.tipo_comprobante
+            into 
+              v_tipo_comprobante
+            from conta.tclase_comprobante cc 
+            where cc.id_clase_comprobante = v_parametros.id_clase_comprobante;
+            
+            --revisa momentos presupeustario
+            v_momento_comprometido = v_reg_cbte.momento_comprometido;
+            v_momento_ejecutado = v_reg_cbte.momento_ejecutado;
+            v_momento_pagado =  v_reg_cbte.momento_pagado;
+            
+            IF  v_reg_cbte.manual = 'si' THEN
+              --momentos presupeustarios
+              IF v_parametros.momento_ejecutado = 'true' THEN
+                v_momento_ejecutado = 'si';
+              ELSE
+                v_momento_ejecutado = 'no';
+              END IF;
+              
+              IF v_parametros.momento_pagado = 'true' THEN
+                v_momento_pagado = 'si';
+              ELSE
+                v_momento_pagado = 'no';
+              END IF;
+            ELSE
+            
+               IF v_momento_ejecutado != v_reg_cbte.momento_ejecutado  or  v_momento_pagado != v_reg_cbte.momento_pagado THEN
+                 raise exception 'No peude cambiar los momentos en cbte automaticos';
+               END IF;
+               
+                IF v_parametros.id_clase_comprobante != v_reg_cbte.id_clase_comprobante   THEN
+                 raise exception 'No peude cambiar el tipo de cbte automaticos';
+               END IF;
+                
+            END IF;
+            
+            
+            
 			------------------------------
 			--Sentencia de la modificacion
 			------------------------------
 			update conta.tint_comprobante set
-			id_clase_comprobante = v_parametros.id_clase_comprobante,
-			id_int_comprobante_fks =  (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
-			id_subsistema = v_id_subsistema,
-			id_depto = v_parametros.id_depto,
-			id_moneda = v_parametros.id_moneda,
-			id_periodo = v_rec.po_id_periodo,
-			id_funcionario_firma1 = v_parametros.id_funcionario_firma1,
-			id_funcionario_firma2 = v_parametros.id_funcionario_firma2,
-			id_funcionario_firma3 = v_parametros.id_funcionario_firma3,
-			tipo_cambio = v_parametros.tipo_cambio,
-			beneficiario = v_parametros.beneficiario,
-			
-			glosa1 = v_parametros.glosa1,
-			fecha = v_parametros.fecha,
-			glosa2 = v_parametros.glosa2,
-			
-			-- momento = v_parametros.momento,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-            id_usuario_ai = v_parametros._id_usuario_ai,
-            usuario_ai = v_parametros._nombre_usuario_ai,
-            cbte_cierre = v_parametros.cbte_cierre,
-            cbte_apertura = v_parametros.cbte_apertura,
-            cbte_aitb = v_parametros.cbte_aitb
+                id_clase_comprobante = v_parametros.id_clase_comprobante,
+                momento = v_tipo_comprobante,
+                id_int_comprobante_fks =  (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
+                id_subsistema = v_id_subsistema,
+                id_depto = v_parametros.id_depto,
+                id_moneda = v_parametros.id_moneda,
+                id_periodo = v_rec.po_id_periodo,
+                id_funcionario_firma1 = v_parametros.id_funcionario_firma1,
+                id_funcionario_firma2 = v_parametros.id_funcionario_firma2,
+                id_funcionario_firma3 = v_parametros.id_funcionario_firma3,
+                tipo_cambio = v_parametros.tipo_cambio,
+                beneficiario = v_parametros.beneficiario,
+    			
+                glosa1 = v_parametros.glosa1,
+                fecha = v_parametros.fecha,
+                glosa2 = v_parametros.glosa2,
+    			
+                -- momento = v_parametros.momento,
+                id_usuario_mod = p_id_usuario,
+                fecha_mod = now(),
+                id_usuario_ai = v_parametros._id_usuario_ai,
+                usuario_ai = v_parametros._nombre_usuario_ai,
+                cbte_cierre = v_parametros.cbte_cierre,
+                cbte_apertura = v_parametros.cbte_apertura,
+                momento_comprometido = 'si', 
+                momento_ejecutado = v_momento_ejecutado,
+                momento_pagado =  v_momento_pagado
 			where id_int_comprobante = v_parametros.id_int_comprobante;
             
             -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones 
@@ -273,7 +356,8 @@ BEGIN
             v_result = conta.f_eliminar_int_comprobante(p_id_usuario,
                                                         v_parametros._id_usuario_ai,
                                                         v_parametros._nombre_usuario_ai,
-                                                        v_parametros.id_int_comprobante);
+                                                        v_parametros.id_int_comprobante,
+                                                        'si');  --si indica borrado manualmente
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 

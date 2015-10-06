@@ -20,6 +20,7 @@ DECLARE
     v_id_concepto_ingas		integer;
     v_centro		varchar;
     v_denominacion	varchar;
+    v_id_cuenta_endesis	integer;
 		
 BEGIN
 
@@ -92,7 +93,7 @@ BEGIN
                                 COALESCE(''''||v_denominacion::varchar||'''','NULL')||','||
                                 COALESCE(''''||v_centro::varchar||'''','NULL')||','||
                                 COALESCE(v_id_institucion::varchar,'NULL')||')';
-
+				
 			end if;
 	
 		
@@ -134,8 +135,24 @@ BEGIN
 			--Error al abrir la conexión  
 			raise exception 'FALLA CONEXION A LA BASE DE DATOS CON DBLINK';
 		else
-			PERFORM * FROM dblink(v_consulta,true) AS (resp varchar);
-		    v_res_cone=(select dblink_disconnect());
+        	if (v_codigo_trel = 'CUEBANCEGRE') then
+            	select * FROM dblink(v_consulta,true) AS (id_cuenta_endesis integer) into v_id_cuenta_endesis;
+				if (TG_OP IN ('INSERT')) then
+                		insert into migra.tts_cuenta_bancaria (id_cuenta_bancaria, id_institucion,
+                        						id_cuenta, nro_cuenta_banco,nro_cheque,estado_cuenta,
+                                                centro,id_cuenta_bancaria_pxp)  
+                                                values (v_id_cuenta_endesis, v_id_institucion,
+                                                NEW.id_cuenta, v_nro_cuenta,0,1,
+                                                v_centro,NEW.id_tabla);
+                elsif (TG_OP IN ('DELETE')) then
+                	delete from migra.tts_cuenta_bancaria
+                    where id_cuenta_bancaria = v_id_cuenta_endesis;
+                end if;
+		    else
+            	PERFORM * FROM dblink(v_consulta,true) AS (resp varchar);
+            	
+            end if;
+            v_res_cone=(select dblink_disconnect());
 		end if;
 
 	end if; 
