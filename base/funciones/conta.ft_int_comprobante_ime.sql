@@ -314,7 +314,7 @@ BEGIN
                 usuario_ai = v_parametros._nombre_usuario_ai,
                 cbte_cierre = v_parametros.cbte_cierre,
                 cbte_apertura = v_parametros.cbte_apertura,
-                momento_comprometido = 'si', 
+                momento_comprometido = v_momento_comprometido, 
                 momento_ejecutado = v_momento_ejecutado,
                 momento_pagado =  v_momento_pagado
 			where id_int_comprobante = v_parametros.id_int_comprobante;

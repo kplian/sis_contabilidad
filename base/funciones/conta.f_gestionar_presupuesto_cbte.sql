@@ -181,7 +181,7 @@ BEGIN
     	   ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
                  
                   v_momento_presupeustario = 3;  --ejecutado
-                  v_momento_aux='todo';
+                  v_momento_aux='solo ejecutar';
                  
                     raise notice ' >>>> 1';      
                 
@@ -527,12 +527,7 @@ BEGIN
                                                      'revertido'
                                                  );
                                                   
-                                                    
-                                                  
-                                                
-                                                
-                                       
-                                     END IF;
+                                       END IF;
                                              
                                 END IF; -- if partida presupuestaria
                             

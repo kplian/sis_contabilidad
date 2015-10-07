@@ -71,6 +71,12 @@ DECLARE
     v_monto_previo_pagado      		numeric;
     v_resp_comp				   		varchar;
     va_resp_comp			   		varchar[];
+    v_id_moneda						integer;
+    v_id_moneda_base 				integer;
+    v_sw_moneda_base 				varchar;
+    
+    v_importe_debe   				numeric;
+    v_importe_haber			   		numeric;
     
    
     
@@ -110,6 +116,24 @@ BEGIN
     inner join conta.tclase_comprobante cl  on ic.id_clase_comprobante =  cl.id_clase_comprobante
     where ic.id_int_comprobante  =  p_id_int_comprobante;
     
+    
+     ---------------------------------------------------
+     -- Determinar moneda de ejcucion presupeustaria
+     -- Si viene de una regional y la moneda no  es dolar  (dolar ... id_moneda = 2)
+     -- ejecutar moneda base
+     ------------------------------------------------
+     
+     --determinar moneda base
+     v_id_moneda_base = param.f_get_moneda_base();
+     v_id_moneda = v_registros_comprobante.id_moneda;
+     v_sw_moneda_base = 'no';
+     
+     
+     IF v_registros_comprobante.vbregional = 'si' and v_registros_comprobante.id_moneda != 2 THEN
+       v_id_moneda = v_id_moneda_base;
+       v_sw_moneda_base = 'si';
+     END IF;
+    
       
      raise notice ' >>>> zzzzzzz';
      -- si el comprobante tiene efecto presupouestario'
@@ -137,7 +161,7 @@ BEGIN
             ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
                  
                 v_momento_presupeustario = 3;  --ejecutado
-                 v_momento_aux='todo';
+                 v_momento_aux='solo ejecutar';
                  
                     raise notice ' >>>> 1';
              
@@ -206,6 +230,10 @@ BEGIN
                                      it.importe_haber,
                                      it.importe_gasto,
                                      it.importe_recurso,
+                                     it.importe_debe_mb,
+                                     it.importe_haber_mb,
+                                     it.importe_gasto_mb,
+                                     it.importe_recurso_mb,
                                      it.id_centro_costo,
                                      par.sw_movimiento,  --  presupuestaria o  flujo
                                      par.sw_transaccional,  --titular o movimiento
@@ -219,7 +247,13 @@ BEGIN
                                   where it.id_int_comprobante = p_id_int_comprobante
                                         and it.estado_reg = 'activo'       )  LOOP
                 
-                     
+                        IF v_sw_moneda_base = 'si' THEN
+                            v_importe_debe = v_registros.importe_debe_mb;
+                            v_importe_haber =  v_registros.importe_haber_mb;
+                        ELSE
+                            v_importe_debe = v_registros.importe_debe;
+                            v_importe_haber =  v_registros.importe_haber;
+                        END IF;
                         
                         IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
                           
@@ -251,9 +285,9 @@ BEGIN
                                      v_i = v_i + 1;
                                      -- determinamos el monto a comprometer
                                      IF v_registros.tipo = 'gasto'  THEN
-                                         v_monto_cmp  = v_registros.importe_debe;
+                                         v_monto_cmp  = v_importe_debe;
                                      ELSE
-                                         v_monto_cmp  = v_registros.importe_haber;
+                                         v_monto_cmp  = v_importe_haber;
                                      END IF;
                                            
                                       
@@ -263,7 +297,7 @@ BEGIN
                                      va_id_partida[v_i]= v_registros.id_partida;
                                      va_momento[v_i]	= v_momento_presupeustario;
                                      va_monto[v_i]  = v_monto_cmp;
-                                     va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
+                                     va_id_moneda[v_i]  = v_id_moneda;
                                      va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
                                      va_columna_relacion[v_i]= 'id_int_transaccion';
                                      va_fk_llave[v_i] = v_registros.id_int_transaccion;
@@ -299,7 +333,7 @@ BEGIN
                                          v_registros.id_partida,
                                          v_momento_presupeustario,
                                          v_monto_cmp,
-                                         v_registros_comprobante.id_moneda,
+                                         v_id_moneda,
                                          v_registros.id_partida_ejecucion,
                                          'id_int_transaccion',
                                          v_registros.id_int_transaccion,
@@ -325,7 +359,7 @@ BEGIN
                                        va_id_partida[v_i]= v_registros.id_partida;
                                        va_momento[v_i]	= 2;  --momento revertido
                                        va_monto[v_i]  = (v_registros.importe_reversion)*-1; --signo negativo para revertir
-                                       va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
+                                       va_id_moneda[v_i]  = v_id_moneda;
                                        va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
                                        va_columna_relacion[v_i]= 'id_int_transaccion';
                                        va_fk_llave[v_i] = v_registros.id_int_transaccion;
@@ -358,7 +392,7 @@ BEGIN
                                          v_registros.id_partida,
                                          2,
                                          (v_registros.importe_reversion)*-1,
-                                         v_registros_comprobante.id_moneda,
+                                         v_id_moneda,
                                          v_registros.id_partida_ejecucion,
                                          'id_int_transaccion',
                                          v_registros.id_int_transaccion,
@@ -448,7 +482,7 @@ BEGIN
                                                va_id_partida[v_i]= NULL;
                                                va_momento[v_i]	= 4;--momneto pago
                                                va_monto[v_i]  = v_monto_x_pagar;
-                                               va_id_moneda[v_i]  = v_registros_comprobante.id_moneda;
+                                               va_id_moneda[v_i]  = v_id_moneda;
                                                va_id_partida_ejecucion [v_i] = v_registros_dev.id_partida_ejecucion_dev;   
                                                va_columna_relacion[v_i]= 'id_int_transaccion';
                                                va_fk_llave[v_i] = v_registros.id_int_transaccion;
@@ -479,7 +513,7 @@ BEGIN
                                                    NULL,
                                                    4,
                                                    v_monto_x_pagar,
-                                                   v_registros_comprobante.id_moneda,
+                                                   v_id_moneda,
                                                    v_registros_dev.id_partida_ejecucion_dev,
                                                    'id_int_transaccion',
                                                    v_registros.id_int_transaccion,
@@ -544,7 +578,7 @@ BEGIN
                                    v_resp_comp =  pre.f_verificar_presupuesto_partida(
                                                                   v_reg.id_presupuesto, 
                                                                   v_reg.id_partida, 
-                                                                  v_registros_comprobante.id_moneda, 
+                                                                  v_id_moneda, 
                                                                   v_reg.monto,
                                                                   'si');
                                                                   
@@ -785,7 +819,7 @@ BEGIN
                                 
                                       END IF;
                                       
-                                      --actualicemos ele stado y valor de retorno para el registro
+                                      --actualicemos el estado y valor de retorno para el registro
                                       UPDATE tt_check_presu set
                                          estado = v_estado,
                                          retorno = v_retorno,
@@ -795,7 +829,7 @@ BEGIN
                                       IF v_retorno = 'falla' THEN 
                                           
                                           v_sw_error_validacion = TRUE;
-                                          v_mensaje_error_validacion = v_mensaje_error_validacion||'al pagar el  Monto: ' ||COALESCE(va_monto[v_cont]::varchar,'0')||'y el disponible es '||va_temp_array[v_cont]||'<br>';
+                                          v_mensaje_error_validacion = v_mensaje_error_validacion||'al pagar el  Monto: ' ||COALESCE(va_monto[v_cont]::varchar,'0')||' y el disponible es '||va_temp_array[v_cont]||'<br>';
                                       END IF;                                           
                            
                                END LOOP;
