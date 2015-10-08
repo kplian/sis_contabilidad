@@ -927,30 +927,32 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	  cls:'IntTransaccion'
 	},
 	validarCbte: function(){
-		Ext.Msg.confirm('Confirmación','¿Está seguro de Validar el Comprobante?',function(btn){
-			var rec=this.sm.getSelected();
-			Phx.CP.loadingShow();
-			Ext.Ajax.request({
-				url:'../../sis_contabilidad/control/IntComprobante/validarIntComprobante',
-				params:{
-					id_int_comprobante: rec.data.id_int_comprobante,
-					igualar: 'no'
-				},
-				success: function(resp){
-					Phx.CP.loadingHide();
-					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-					if (reg.ROOT.error) {
-						Ext.Msg.alert('Error','Validación no realizada: '+reg.ROOT.error)
-					} else {
-						this.reload();
-						Ext.Msg.alert('Mensaje','Proceso ejecutado con éxito')
-					}
-				},
-				failure: this.conexionFailure,
-				timeout: this.timeout,
-				scope:this
-			});
-		}, this)
+		Ext.Msg.confirm('Confirmación','¿Está seguro de Validar el Comprobante?',function(btn,x,c){
+			if(btn == 'yes'){
+				var rec=this.sm.getSelected();
+				Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url:'../../sis_contabilidad/control/IntComprobante/validarIntComprobante',
+					params:{
+						id_int_comprobante: rec.data.id_int_comprobante,
+						igualar: 'no'
+					},
+					success: function(resp){
+						Phx.CP.loadingHide();
+						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+						if (reg.ROOT.error) {
+							Ext.Msg.alert('Error','Validación no realizada: '+reg.ROOT.error)
+						} else {
+							this.reload();
+							Ext.Msg.alert('Mensaje','Proceso ejecutado con éxito')
+						}
+					},
+					failure: this.conexionFailure,
+					timeout: this.timeout,
+					scope:this
+				});
+			}
+		}, this);
 	},
 	preparaMenu: function(n) {
 		var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
