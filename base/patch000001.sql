@@ -2204,3 +2204,31 @@ IS 'hace referencia a al id de la trasaccion original';
 
 /***********************************F-SCP-RAC-CONTA-1-02/10/2015****************************************/
 
+
+
+/***********************************I-SCP-RAC-CONTA-1-08/10/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_rel_devengado
+  ADD COLUMN monto_pago_mb NUMERIC(18,2);
+
+COMMENT ON COLUMN conta.tint_rel_devengado.monto_pago_mb
+IS 'la insertar la relacion se calcula segun el tc de cbte de pago';
+
+
+/***********************************F-SCP-RAC-CONTA-1-08/10/2015****************************************/
+
+/***********************************I-SCP-JRR-CONTA-0-09/10/2015****************************************/
+
+CREATE TABLE conta.toficina_ot (
+  id_oficina_ot SERIAL,
+  id_oficina INTEGER,
+  id_orden_trabajo INTEGER,
+  PRIMARY KEY(id_oficina_ot)
+) INHERITS (pxp.tbase);
+
+/***********************************F-SCP-JRR-CONTA-0-09/10/2015****************************************/
+
+

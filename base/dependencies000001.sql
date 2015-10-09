@@ -2436,3 +2436,197 @@ AS
          trc.id_tipo_relacion_comprobante = incbte.id_tipo_relacion_comprobante;
 /***********************************F-DEP-FFP-CONTA-0-29/09/2015*****************************************/
 
+
+/***********************************I-DEP-RAC-CONTA-0-09/10/2015*****************************************/
+
+
+CREATE OR REPLACE VIEW conta.vint_transaccion(
+    id_int_transaccion,
+    id_partida,
+    id_centro_costo,
+    id_partida_ejecucion,
+    estado_reg,
+    id_int_transaccion_fk,
+    id_cuenta,
+    glosa,
+    id_int_comprobante,
+    id_auxiliar,
+    id_usuario_reg,
+    fecha_reg,
+    id_usuario_mod,
+    fecha_mod,
+    desc_partida,
+    desc_centro_costo,
+    desc_cuenta,
+    desc_auxiliar,
+    tipo_partida,
+    id_orden_trabajo,
+    desc_orden,
+    importe_debe,
+    importe_haber,
+    importe_gasto,
+    importe_recurso,
+    importe_debe_mb,
+    importe_haber_mb,
+    importe_gasto_mb,
+    importe_recurso_mb,
+    banco,
+    forma_pago,
+    nombre_cheque_trans,
+    nro_cuenta_bancaria_trans,
+    nro_cheque)
+AS
+  SELECT transa.id_int_transaccion,
+         transa.id_partida,
+         transa.id_centro_costo,
+         transa.id_partida_ejecucion,
+         transa.estado_reg,
+         transa.id_int_transaccion_fk,
+         transa.id_cuenta,
+         transa.glosa,
+         transa.id_int_comprobante,
+         transa.id_auxiliar,
+         transa.id_usuario_reg,
+         transa.fecha_reg,
+         transa.id_usuario_mod,
+         transa.fecha_mod,
+         CASE par.sw_movimiento
+           WHEN 'flujo'::text THEN (('(F) '::text || par.codigo::text) || ' - '
+             ::text) || par.nombre_partida::text
+           ELSE (par.codigo::text || ' - '::text) || par.nombre_partida::text
+         END AS desc_partida,
+         cc.codigo_cc AS desc_centro_costo,
+         (cue.nro_cuenta::text || ' - '::text) || cue.nombre_cuenta::text AS
+           desc_cuenta,
+         (aux.codigo_auxiliar::text || ' - '::text) || aux.nombre_auxiliar::text
+           AS desc_auxiliar,
+         par.sw_movimiento AS tipo_partida,
+         ot.id_orden_trabajo,
+         ot.desc_orden,
+         transa.importe_debe,
+         transa.importe_haber,
+         transa.importe_gasto,
+         transa.importe_recurso,
+         transa.importe_debe_mb,
+         transa.importe_haber_mb,
+         transa.importe_gasto_mb,
+         transa.importe_recurso_mb,
+         transa.banco,
+         transa.forma_pago,
+         transa.nombre_cheque_trans,
+         transa.nro_cuenta_bancaria_trans,
+         transa.nro_cheque
+  FROM conta.tint_transaccion transa
+       JOIN conta.tcuenta cue ON cue.id_cuenta = transa.id_cuenta
+       LEFT JOIN pre.tpartida par ON par.id_partida = transa.id_partida
+       LEFT JOIN param.vcentro_costo cc ON cc.id_centro_costo =
+         transa.id_centro_costo
+       LEFT JOIN conta.tauxiliar aux ON aux.id_auxiliar = transa.id_auxiliar
+       LEFT JOIN conta.torden_trabajo ot ON ot.id_orden_trabajo =
+         transa.id_orden_trabajo;
+
+
+--  conta.vint_rel_devengado
+
+CREATE OR REPLACE VIEW conta.vint_rel_devengado(
+    id_int_rel_devengado,
+    id_int_transaccion_pag,
+    id_int_transaccion_dev,
+    monto_pago,
+    id_partida_ejecucion_pag,
+    monto_pago_mb,
+    estado_reg,
+    id_usuario_ai,
+    fecha_reg,
+    usuario_ai,
+    id_usuario_reg,
+    fecha_mod,
+    id_usuario_mod,
+    usr_reg,
+    usr_mod,
+    nro_cbte_dev,
+    desc_cuenta_dev,
+    desc_partida_dev,
+    desc_centro_costo_dev,
+    desc_orden_dev,
+    importe_debe_dev,
+    desc_cuenta_pag,
+    desc_partida_pag,
+    desc_centro_costo_pag,
+    desc_orden_pag,
+    importe_debe_pag,
+    id_cuenta_dev,
+    id_orden_trabajo_dev,
+    id_auxiliar_dev,
+    id_centro_costo_dev,
+    id_cuenta_pag,
+    id_orden_trabajo_pag,
+    id_auxiliar_pag,
+    id_centro_costo_pag)
+AS
+  SELECT rde.id_int_rel_devengado,
+         rde.id_int_transaccion_pag,
+         rde.id_int_transaccion_dev,
+         rde.monto_pago,
+         rde.id_partida_ejecucion_pag,
+         rde.monto_pago_mb,
+         rde.estado_reg,
+         rde.id_usuario_ai,
+         rde.fecha_reg,
+         rde.usuario_ai,
+         rde.id_usuario_reg,
+         rde.fecha_mod,
+         rde.id_usuario_mod,
+         usu1.cuenta AS usr_reg,
+         usu2.cuenta AS usr_mod,
+         cd.nro_cbte AS nro_cbte_dev,
+         td.desc_cuenta AS desc_cuenta_dev,
+         td.desc_partida AS desc_partida_dev,
+         td.desc_centro_costo AS desc_centro_costo_dev,
+         td.desc_orden AS desc_orden_dev,
+         td.importe_debe AS importe_debe_dev,
+         tp.desc_cuenta AS desc_cuenta_pag,
+         tp.desc_partida AS desc_partida_pag,
+         tp.desc_centro_costo AS desc_centro_costo_pag,
+         tp.desc_orden AS desc_orden_pag,
+         tp.importe_debe AS importe_debe_pag,
+         td.id_cuenta AS id_cuenta_dev,
+         td.id_orden_trabajo AS id_orden_trabajo_dev,
+         td.id_auxiliar AS id_auxiliar_dev,
+         td.id_centro_costo AS id_centro_costo_dev,
+         tp.id_cuenta AS id_cuenta_pag,
+         tp.id_orden_trabajo AS id_orden_trabajo_pag,
+         tp.id_auxiliar AS id_auxiliar_pag,
+         tp.id_centro_costo AS id_centro_costo_pag
+  FROM conta.tint_rel_devengado rde
+       JOIN conta.vint_transaccion tp ON tp.id_int_transaccion =
+         rde.id_int_transaccion_pag
+       JOIN conta.vint_transaccion td ON td.id_int_transaccion =
+         rde.id_int_transaccion_dev
+       JOIN conta.tint_comprobante cd ON cd.id_int_comprobante =
+         tp.id_int_comprobante
+       JOIN segu.tusuario usu1 ON usu1.id_usuario = rde.id_usuario_reg
+       LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = rde.id_usuario_mod;
+
+
+/***********************************F-DEP-RAC-CONTA-0-09/10/2015*****************************************/
+
+/***********************************I-DEP-JRR-CONTA-0-09/10/2015****************************************/
+
+ALTER TABLE conta.toficina_ot
+  ADD CONSTRAINT fk_toficina_ot__if_oficina FOREIGN KEY (id_oficina)
+    REFERENCES orga.toficina(id_oficina)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+ALTER TABLE conta.toficina_ot
+  ADD CONSTRAINT fk_toficina_ot__if_orden_trabajo FOREIGN KEY (id_orden_trabajo)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/***********************************F-DEP-JRR-CONTA-0-09/10/2015****************************************/
+
