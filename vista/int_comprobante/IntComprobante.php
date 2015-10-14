@@ -193,6 +193,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			//configuracion del componente
 			config:{
 					fieldLabel: 'ID.',
+					gwidth: 50,
 					name: 'id_int_comprobante'
 			},
 			type:'Field',
@@ -225,6 +226,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'nro_cbte',
 				fieldLabel: 'Nro.Cbte.',
+				gwidth: 135,
 				emptyText: 'Nro. de Cbte.'
 			},
 			type:'Field',
@@ -512,7 +514,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Tipo Cambio',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 70,
 				maxLength:20,
 				decimalPrecision:6
 			},
@@ -533,7 +535,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			filters: {pfiltro: 'incbte.nro_tramite',type: 'string'},
 			grid: true,
 			bottom_filter: true,
-			form: false
+			form: false,
+			grid: true,
 		},
 		{
 			config:{
