@@ -2232,3 +2232,40 @@ CREATE TABLE conta.toficina_ot (
 /***********************************F-SCP-JRR-CONTA-0-09/10/2015****************************************/
 
 
+
+/***********************************I-SCP-JRR-CONTA-0-14/10/2015****************************************/
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN fecha_costo_ini DATE;
+
+COMMENT ON COLUMN conta.tint_comprobante.fecha_costo_ini
+IS 'Cuando un concepto de gasto es del tipo servicio, esta fecha indica el inico del costo';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN fecha_costo_fin DATE;
+
+COMMENT ON COLUMN conta.tint_comprobante.fecha_costo_fin
+IS 'Cuando un concepto de gasto es del tipo servicio, esta fecha indica el fin del costo';
+
+
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_fecha_costo_ini TEXT;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.campo_fecha_costo_ini
+IS 'Cuando un concepto de gasto es del tipo servicio, esta fecha indica el inico del costo';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_fecha_costo_fin TEXT;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.campo_fecha_costo_fin
+IS 'Cuando un concepto de gasto es del tipo servicio, esta fecha indica el fin del costo';
+
+/***********************************F-SCP-JRR-CONTA-0-14/10/2015****************************************/
+
+
+
