@@ -2525,9 +2525,6 @@ AS
        LEFT JOIN conta.torden_trabajo ot ON ot.id_orden_trabajo =
          transa.id_orden_trabajo;
 
-
---  conta.vint_rel_devengado
-
 CREATE OR REPLACE VIEW conta.vint_rel_devengado(
     id_int_rel_devengado,
     id_int_transaccion_pag,
@@ -2562,7 +2559,13 @@ CREATE OR REPLACE VIEW conta.vint_rel_devengado(
     id_cuenta_pag,
     id_orden_trabajo_pag,
     id_auxiliar_pag,
-    id_centro_costo_pag)
+    id_centro_costo_pag,
+    id_int_comprobante_pago,
+    id_int_comprobante_dev,
+    tipo_partida_dev,
+    tipo_partida_pag,
+    desc_auxiliar_dev,
+    desc_auxiliar_pag)
 AS
   SELECT rde.id_int_rel_devengado,
          rde.id_int_transaccion_pag,
@@ -2597,7 +2600,13 @@ AS
          tp.id_cuenta AS id_cuenta_pag,
          tp.id_orden_trabajo AS id_orden_trabajo_pag,
          tp.id_auxiliar AS id_auxiliar_pag,
-         tp.id_centro_costo AS id_centro_costo_pag
+         tp.id_centro_costo AS id_centro_costo_pag,
+         tp.id_int_comprobante AS id_int_comprobante_pago,
+         td.id_int_comprobante AS id_int_comprobante_dev,
+         td.tipo_partida AS tipo_partida_dev,
+         tp.tipo_partida AS tipo_partida_pag,
+         td.desc_auxiliar AS desc_auxiliar_dev,
+         tp.desc_auxiliar AS desc_auxiliar_pag
   FROM conta.tint_rel_devengado rde
        JOIN conta.vint_transaccion tp ON tp.id_int_transaccion =
          rde.id_int_transaccion_pag
@@ -2607,7 +2616,7 @@ AS
          tp.id_int_comprobante
        JOIN segu.tusuario usu1 ON usu1.id_usuario = rde.id_usuario_reg
        LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = rde.id_usuario_mod;
-
+ 
 
 /***********************************F-DEP-RAC-CONTA-0-09/10/2015*****************************************/
 
@@ -2630,3 +2639,115 @@ ALTER TABLE conta.toficina_ot
 
 /***********************************F-DEP-JRR-CONTA-0-09/10/2015****************************************/
 
+
+
+/***********************************I-DEP-RAC-CONTA-0-14/10/2015****************************************/
+
+CREATE OR REPLACE VIEW conta.vint_comprobante (
+    id_int_comprobante,
+    id_clase_comprobante,
+    id_subsistema,
+    id_depto,
+    id_moneda,
+    id_periodo,
+    id_funcionario_firma1,
+    id_funcionario_firma2,
+    id_funcionario_firma3,
+    tipo_cambio,
+    beneficiario,
+    nro_cbte,
+    estado_reg,
+    glosa1,
+    fecha,
+    glosa2,
+    nro_tramite,
+    momento,
+    id_usuario_reg,
+    fecha_reg,
+    id_usuario_mod,
+    fecha_mod,
+    usr_reg,
+    usr_mod,
+    desc_clase_comprobante,
+    desc_subsistema,
+    desc_depto,
+    desc_moneda,
+    desc_firma1,
+    desc_firma2,
+    desc_firma3,
+    momento_comprometido,
+    momento_ejecutado,
+    momento_pagado,
+    manual,
+    id_int_comprobante_fks,
+    id_tipo_relacion_comprobante,
+    desc_tipo_relacion_comprobante,
+    codigo_depto,
+    cbte_cierre,
+    cbte_apertura,
+    cbte_aitb,
+    temporal,
+    vbregional,
+    fecha_costo_ini,
+    fecha_costo_fin)
+AS
+ SELECT incbte.id_int_comprobante,
+    incbte.id_clase_comprobante,
+    incbte.id_subsistema,
+    incbte.id_depto,
+    incbte.id_moneda,
+    incbte.id_periodo,
+    incbte.id_funcionario_firma1,
+    incbte.id_funcionario_firma2,
+    incbte.id_funcionario_firma3,
+    incbte.tipo_cambio,
+    incbte.beneficiario,
+    incbte.nro_cbte,
+    incbte.estado_reg,
+    incbte.glosa1,
+    incbte.fecha,
+    incbte.glosa2,
+    incbte.nro_tramite,
+    incbte.momento,
+    incbte.id_usuario_reg,
+    incbte.fecha_reg,
+    incbte.id_usuario_mod,
+    incbte.fecha_mod,
+    usu1.cuenta AS usr_reg,
+    usu2.cuenta AS usr_mod,
+    ccbte.descripcion AS desc_clase_comprobante,
+    sis.nombre AS desc_subsistema,
+    (dpto.codigo::text || '-'::text) || dpto.nombre::text AS desc_depto,
+    mon.codigo::text AS desc_moneda,
+    fir1.desc_funcionario2 AS desc_firma1,
+    fir2.desc_funcionario2 AS desc_firma2,
+    fir3.desc_funcionario2 AS desc_firma3,
+    pxp.f_iif(incbte.momento_comprometido::text = 'si'::text, 'true'::character varying, 'false'::character varying) AS momento_comprometido,
+    pxp.f_iif(incbte.momento_ejecutado::text = 'si'::text, 'true'::character varying, 'false'::character varying) AS momento_ejecutado,
+    pxp.f_iif(incbte.momento_pagado::text = 'si'::text, 'true'::character varying, 'false'::character varying) AS momento_pagado,
+    incbte.manual,
+    array_to_string(incbte.id_int_comprobante_fks, ','::text) AS id_int_comprobante_fks,
+    incbte.id_tipo_relacion_comprobante,
+    trc.nombre AS desc_tipo_relacion_comprobante,
+    dpto.codigo AS codigo_depto,
+    incbte.cbte_cierre,
+    incbte.cbte_apertura,
+    incbte.cbte_aitb,
+    incbte.temporal,
+    incbte.vbregional,
+    incbte.fecha_costo_ini,
+    incbte.fecha_costo_fin
+   FROM conta.tint_comprobante incbte
+   JOIN segu.tusuario usu1 ON usu1.id_usuario = incbte.id_usuario_reg
+   LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = incbte.id_usuario_mod
+   JOIN conta.tclase_comprobante ccbte ON ccbte.id_clase_comprobante = incbte.id_clase_comprobante
+   JOIN segu.tsubsistema sis ON sis.id_subsistema = incbte.id_subsistema
+   JOIN param.tdepto dpto ON dpto.id_depto = incbte.id_depto
+   JOIN param.tmoneda mon ON mon.id_moneda = incbte.id_moneda
+   LEFT JOIN orga.vfuncionario fir1 ON fir1.id_funcionario = incbte.id_funcionario_firma1
+   LEFT JOIN orga.vfuncionario fir2 ON fir2.id_funcionario = incbte.id_funcionario_firma2
+   LEFT JOIN orga.vfuncionario fir3 ON fir3.id_funcionario = incbte.id_funcionario_firma3
+   LEFT JOIN conta.ttipo_relacion_comprobante trc ON trc.id_tipo_relacion_comprobante = incbte.id_tipo_relacion_comprobante;
+
+
+/***********************************F-DEP-RAC-CONTA-0-14/10/2015****************************************/

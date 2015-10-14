@@ -450,6 +450,38 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         },
 		{
 			config:{
+				name: 'campo_fecha_costo_ini',
+				fieldLabel: 'Fecha Costo Ini',
+				qtip: 'identifca el origen de fecha inicial para el costo',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:200
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_fecha_costo_ini',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_fecha_costo_fin',
+				fieldLabel: 'Fecha Costo Fin',
+				qtip: 'identifca el origen de fecha final para el costo',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:200
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_fecha_costo_fin',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
@@ -564,7 +596,9 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'campo_id_cuenta_bancaria_mov', type: 'string'},
 		{name:'campo_nro_cheque', type: 'string'},
 		'campo_nro_cuenta_bancaria_trans',
-		'campo_nro_tramite','campo_tipo_cambio','campo_depto_libro'
+		'campo_nro_tramite','campo_tipo_cambio','campo_depto_libro',
+	    'campo_fecha_costo_ini',
+	    'campo_fecha_costo_fin'
         
 		
 	],

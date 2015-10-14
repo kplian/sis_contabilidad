@@ -140,30 +140,26 @@ BEGIN
                        
                       END IF;
                       
+                      
                       --  insertar rel_dev_pago
+                      IF not  conta.f_gen_inser_rel_devengado(p_id_usuario, 
+                                                              (v_this_hstore -> 'campo_trasaccion_dev')::integer, 
+                                                              v_id_int_transaccion_pagado, 
+                                                              (v_this_hstore -> 'campo_monto')::numeric, 
+                                                              p_id_int_comprobante) THEN
+                           raise exception 'error';                                   
+                      END IF;
+                        
                        
-                       
-                      INSERT INTO 
-                                  conta.tint_rel_devengado
-                                (
-                                  id_usuario_reg,
-                                  fecha_reg,
-                                  estado_reg,
-                                  id_int_transaccion_dev,
-                                  id_int_transaccion_pag,
-                                  monto_pago
-                                ) 
-                                VALUES (
-                                  p_id_usuario,
-                                  now(),
-                                  'activo',
-                                  (v_this_hstore -> 'campo_trasaccion_dev')::integer,
-                                   v_id_int_transaccion_pagado,
-                                  (v_this_hstore -> 'campo_monto')::numeric
-                                );
                         
                    
                 END IF;
+                -- RAC 08/10/2015
+                -- Almacenar el  tipo de relacion entre cbte de devengado y cbte de pago (... si no existe!)
+                IF not   conta.f_gen_relaciona_cbte((v_this_hstore -> 'campo_trasaccion_dev')::integer, v_id_int_transaccion_pagado) THEN
+                  raise exception 'error'; 
+                END IF;
+                
       
       
       ELSE

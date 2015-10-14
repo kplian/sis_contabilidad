@@ -69,6 +69,8 @@ class MODIntTransaccion extends MODbase{
 		
 		
 		
+		
+		
                        
 		
 		//Ejecuta la instruccion

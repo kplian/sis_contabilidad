@@ -111,7 +111,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			   				if(record.data['desc_orden']){
 			   					retorno = retorno + '<b>Ot.:</b> '+record.data['desc_orden'];
 			   				}	
-		   				return retorno;	
+		   				return String.format('<div class="gridmultiline">{0}</div>',retorno);
 	   			    	
 	   			    }
 	   			    else{
@@ -163,8 +163,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				gdisplayField:'desc_partida',//mapea al store del grid
    				gwidth:200,
    				width: 350,
-   				listWidth: 350,
-	   			renderer:function (value, p, record){return String.format('{0}',record.data['desc_partida']);}
+   				listWidth: 350
        	     },
    			type:'ComboRec',
    			id_grupo:0,
@@ -187,8 +186,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                 gdisplayField: 'desc_centro_costo',
                 width: 350,
    				listWidth: 350,
-                gwidth: 300,
-                renderer:function (value, p, record){return String.format('{0}',record.data['desc_centro_costo']);}
+                gwidth: 300
             },
             type:'ComboRec',
             filters:{pfiltro:'cc.codigo_cc',type:'string'},
@@ -206,8 +204,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                     allowBlank:true,
                     gwidth:200,
                     width: 350,
-   				    listWidth: 350,
-                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden']);}
+   				    listWidth: 350
             
             },
             type:'ComboRec',
@@ -286,7 +283,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 300,
-				maxLength:1000
+				maxLength:1000,
+				renderer: function(val){if (val != ''){return '<div class="gridmultiline">'+val+'</div>';}}
 			},
 			type:'TextArea',
 			filters:{pfiltro:'transa.glosa',type:'string'},

@@ -149,7 +149,10 @@ BEGIN
                 momento_comprometido,
                 momento_ejecutado,
                 momento_pagado,
-                momento
+                momento,
+                id_tipo_relacion_comprobante,
+                fecha_costo_ini,
+                fecha_costo_fin
           	) values(
               v_parametros.id_clase_comprobante,
   			
@@ -183,7 +186,10 @@ BEGIN
               v_momento_comprometido,
               v_momento_ejecutado,
               v_momento_pagado,
-              v_tipo_comprobante
+              v_tipo_comprobante,
+              v_parametros.id_tipo_relacion_comprobante,
+              v_parametros.fecha_costo_ini,
+              v_parametros.fecha_costo_fin
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
@@ -291,6 +297,7 @@ BEGIN
 			------------------------------
 			update conta.tint_comprobante set
                 id_clase_comprobante = v_parametros.id_clase_comprobante,
+                id_tipo_relacion_comprobante = v_parametros.id_tipo_relacion_comprobante,
                 momento = v_tipo_comprobante,
                 id_int_comprobante_fks =  (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
                 id_subsistema = v_id_subsistema,
@@ -316,7 +323,9 @@ BEGIN
                 cbte_apertura = v_parametros.cbte_apertura,
                 momento_comprometido = v_momento_comprometido, 
                 momento_ejecutado = v_momento_ejecutado,
-                momento_pagado =  v_momento_pagado
+                momento_pagado =  v_momento_pagado,
+                fecha_costo_ini = v_parametros.fecha_costo_ini,
+                fecha_costo_fin = v_parametros.fecha_costo_fin
 			where id_int_comprobante = v_parametros.id_int_comprobante;
             
             -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones 

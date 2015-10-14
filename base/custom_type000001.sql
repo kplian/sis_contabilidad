@@ -110,3 +110,12 @@ CREATE TYPE conta.banca_compra_venta AS (
 
 /***********************************F-TYP-FFP-CONTA-0-22/09/2015****************************************/
 
+
+
+/***********************************I-TYP-RAC-CONTA-0-14/10/2015****************************************/
+
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_fecha_costo_ini DATE,
+  ADD ATTRIBUTE columna_fecha_costo_fin DATE;
+  
+/***********************************F-TYP-RAC-CONTA-0-14/10/2015****************************************/

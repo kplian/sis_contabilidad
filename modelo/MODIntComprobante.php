@@ -64,6 +64,8 @@ class MODIntComprobante extends MODbase{
 		$this->captura('cbte_apertura','varchar');
 		$this->captura('cbte_aitb','varchar');
 		
+		$this->captura('fecha_costo_ini','date');
+        $this->captura('fecha_costo_fin','date');
 		
 		
 		//Ejecuta la instruccion
@@ -137,6 +139,11 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('cbte_cierre','cbte_cierre','varchar');
 		$this->setParametro('cbte_apertura','cbte_apertura','varchar');
 		$this->setParametro('cbte_aitb','cbte_aitb','varchar');
+		
+		$this->setParametro('fecha_costo_ini','fecha_costo_ini','date');
+		$this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
+		
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -179,6 +186,10 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('cbte_cierre','cbte_cierre','varchar');
 		$this->setParametro('cbte_apertura','cbte_apertura','varchar');
 		$this->setParametro('cbte_aitb','cbte_aitb','varchar');
+		
+		$this->setParametro('fecha_costo_ini','fecha_costo_ini','date');
+		$this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

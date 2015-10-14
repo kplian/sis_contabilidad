@@ -54,6 +54,8 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('campo_nro_tramite','varchar');
 		$this->captura('campo_tipo_cambio','varchar');
 		$this->captura('campo_depto_libro','text');
+		$this->captura('campo_fecha_costo_ini','text');
+		$this->captura('campo_fecha_costo_fin','text');
 		
         
 		
@@ -101,6 +103,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_nro_cuenta_bancaria_trans','campo_nro_cuenta_bancaria_trans','varchar');
 		$this->setParametro('campo_tipo_cambio','campo_tipo_cambio','varchar');
 		$this->setParametro('campo_depto_libro','campo_depto_libro','text');
+		
+		$this->setParametro('campo_fecha_costo_ini','campo_fecha_costo_ini','text');
+		$this->setParametro('campo_fecha_costo_fin','campo_fecha_costo_fin','text');
 		
 		
 		
@@ -150,6 +155,8 @@ class MODPlantillaComprobante extends MODbase{
         $this->setParametro('campo_nro_tramite','campo_nro_tramite','varchar');
 		$this->setParametro('campo_tipo_cambio','campo_tipo_cambio','varchar');
         $this->setParametro('campo_depto_libro','campo_depto_libro','text');
+		$this->setParametro('campo_fecha_costo_ini','campo_fecha_costo_ini','text');
+		$this->setParametro('campo_fecha_costo_fin','campo_fecha_costo_fin','text');
         
 		//Ejecuta la instruccion
 		$this->armarConsulta();

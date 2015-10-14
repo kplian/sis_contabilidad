@@ -167,7 +167,7 @@ BEGIN
               -- solo permite validar comprobante en el pxp si viene de las regionales, o
               -- apesar de la sincronizacion este activada
               IF(v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'no' )THEN
-                  raise exception 'No se pueden validar comprobantes desde PXP en BOA';
+                 -- raise exception 'No se pueden validar comprobantes desde PXP en BOA';
               END IF;
           
           

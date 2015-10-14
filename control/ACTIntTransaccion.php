@@ -17,6 +17,19 @@ class ACTIntTransaccion extends ACTbase{
 			$this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));	
 		}
 		
+		
+		if($this->objParam->getParametro('id_int_comprobante_fks')!=''){
+			$this->objParam->addFiltro("transa.id_int_comprobante in (".$this->objParam->getParametro('id_int_comprobante_fks').")");	
+		}
+		
+		if($this->objParam->getParametro('solo_debe')=='si'){
+			$this->objParam->addFiltro("transa.importe_debe > 0 ");	
+		}
+		
+		if($this->objParam->getParametro('solo_haber')=='si'){
+			$this->objParam->addFiltro("transa.importe_haber > 0 ");	
+		}
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarIntTransaccion');
@@ -25,19 +38,22 @@ class ACTIntTransaccion extends ACTbase{
 			
 			$this->res=$this->objFunc->listarIntTransaccion($this->objParam);
 		}
-		//adicionar una fila al resultado con el summario
-		$temp = Array();
-		$temp['importe_debe'] = $this->res->extraData['total_debe'];
-		$temp['importe_haber'] = $this->res->extraData['total_haber'];
-		$temp['importe_debe_mb'] = $this->res->extraData['total_debe_mb'];
-		$temp['importe_haber_mb'] = $this->res->extraData['total_haber_mb'];
-		$temp['glosa'] = 'Sumas iguales';
-		$temp['tipo_reg'] = 'summary';
-		$temp['id_int_transaccion'] = 0;
 		
-		$this->res->total++;
-		
-		$this->res->addLastRecDatos($temp);
+		if($this->objParam->getParametro('resumen')!='no'){
+			//adicionar una fila al resultado con el summario
+			$temp = Array();
+			$temp['importe_debe'] = $this->res->extraData['total_debe'];
+			$temp['importe_haber'] = $this->res->extraData['total_haber'];
+			$temp['importe_debe_mb'] = $this->res->extraData['total_debe_mb'];
+			$temp['importe_haber_mb'] = $this->res->extraData['total_haber_mb'];
+			$temp['glosa'] = 'Sumas iguales';
+			$temp['tipo_reg'] = 'summary';
+			$temp['id_int_transaccion'] = 0;
+			
+			$this->res->total++;
+			
+			$this->res->addLastRecDatos($temp);
+		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 				

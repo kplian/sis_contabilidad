@@ -6,12 +6,11 @@
 *@date 29-08-2013 00:28:30
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
-    fheight:500,
+    fheight: 500,
     fwidth: 850,
     nombreVista: 'IntComprobante',
 	constructor:function(config){
@@ -63,6 +62,16 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
                 disabled: false,
                 handler: this.loadDocCmpVnt,
                 tooltip: '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
+            }
+        );
+        
+        this.addButton('btnRelDev',
+            {
+                text: 'Rel Dev',
+                iconCls: 'brenew',
+                disabled: false,
+                handler: this.loadRelDev,
+                tooltip: '<b>Relación con el devengado</b><br/>Solo para comprobantes de pago presupeustario'
             }
         );
 		
@@ -154,9 +163,9 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 					inputType:'hidden',
 					name: 'id_int_comprobante'
 			},
-			type:'Field',
-			id_grupo: 0,
-			form:true 
+			type: 'Field',
+			form: true ,
+			grid: false
 		},
 		{
 			//configuracion del componente
@@ -179,6 +188,17 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			id_grupo: 0,
 			form: true 
+		},
+		{
+			//configuracion del componente
+			config:{
+					fieldLabel: 'ID.',
+					name: 'id_int_comprobante'
+			},
+			type:'Field',
+			bottom_filter: true,
+			form: false ,
+			grid: true
 		},
 		
 		{
@@ -413,7 +433,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 	   {
 			config: {
 				name: 'id_int_comprobante_fks',
-				enableMultiSelect:true,
+				enableMultiSelect: true,
 				fieldLabel: 'Cbte rels.',
 				qtip: 'Comprobantes relacionados',
 				allowBlank: true,
@@ -427,19 +447,18 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: [ 'id_int_comprobante','nro_cbte','nro_tramite',
-                               'fecha','glosa1','glosa2','id_clase_comprobante', 'codigo', 'descripcion'],
+					fields: [ 'id_int_comprobante','nro_cbte','nro_tramite','fecha','glosa1','glosa2','id_clase_comprobante', 'codigo', 'descripcion'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'inc.nro_cbte#inc.fecha#inc.glosa1#inc.glosa2#inc.nro_tramite'}
+					baseParams: {par_filtro: 'inc.id_int_comprobante#inc.nro_cbte#inc.fecha#inc.glosa1#inc.glosa2#inc.nro_tramite'}
 				}),
-				//tpl: '<tpl for="."><div class="awesomecombo-item {checked}"><p>{nro_cbte}</p>Fecha: <strong>{fecha}</strong>{nro_tramite}<p>{glosa1}<p> </div></tpl>',
-				
 				tpl: new Ext.XTemplate(
-				'<tpl for="."><div class="awesomecombo-3item {checked}">',
-				'<p>{nro_cbte}</p>Fecha: <strong>{fecha}</strong>{nro_tramite}<p>{glosa1}<p>',
-				
-				'</div></tpl>'),
-				itemSelector: 'div.awesomecombo-3item',
+										'<tpl for="."><div class="awesomecombo-5item {checked}">',
+										'<p>(ID: {id_int_comprobante}), Nro: {nro_cbte}</p>',
+										'<p>Fecha: <strong>{fecha}</strong></p>',
+										'<p>TR: {nro_tramite}</p>',
+										'<p>GLS: {glosa1}</p>',	
+										'</div></tpl>'),
+				itemSelector: 'div.awesomecombo-5item',
 				
 				valueField: 'id_int_comprobante',
 				displayField: 'nro_cbte',
@@ -453,6 +472,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 				queryDelay: 1000,
 				width:250,
 				anchor: '100%',
+				listWidth:'320',
 				gwidth: 150,
 				minChars: 2,
 				resizable:true,				
@@ -695,6 +715,38 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'fecha_costo_ini',
+				fieldLabel: 'Fecha Inicial',
+				allowBlank: true,
+				width: 100,
+				gwidth: 100,
+				format: 'd/m/Y', 
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'incbte.fecha_costo_ini',type:'date'},
+			id_grupo:3,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'fecha_costo_fin',
+				fieldLabel: 'Fecha Final',
+				allowBlank: true,
+				width: 100,
+				gwidth: 100,
+				format: 'd/m/Y', 
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'incbte.fecha_costo_fin',type:'date'},
+			id_grupo:3,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado',
 				emptyText: 'Estado Reg.'
@@ -791,7 +843,6 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 					        items: [{
 					            xtype: 'fieldset',
 					            columns: 2,
-					            //layout: 'hbox',
 					            title: 'Tipo  Comprobante',
 					            autoHeight: true,
 					            items: [],
@@ -802,11 +853,20 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 					        items: [{
 					            xtype: 'fieldset',
 					            columns: 2,
-					            //layout: 'hbox',
 					            title: 'Tipo de Cambio',
 					            autoHeight: true,
 					            items: [],
 						        id_grupo:2
+					        }]
+					    }, {
+					        bodyStyle: 'padding-left:5px;',
+					        items: [{
+					            xtype: 'fieldset',
+					            columns: 2,
+					            title: 'Periodo del Costo',
+					            autoHeight: true,
+					            items: [],
+						        id_grupo:3
 					        }]
 					    }]
             }
@@ -850,9 +910,12 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_firma1', type: 'string'},
 		{name:'desc_firma2', type: 'string'},
 		{name:'desc_firma3', type: 'string'},
+		{name:'fecha_costo_ini', type: 'date',dateFormat:'Y-m-d'},
+		{name:'fecha_costo_fin', type: 'date',dateFormat:'Y-m-d'},
 		'momento_comprometido',
         'momento_ejecutado','id_moneda_base','cbte_cierre','cbte_apertura','cbte_aitb',
-        'momento_pagado','manual','desc_tipo_relacion_comprobante','id_int_comprobante_fks','manual','id_tipo_relacion_comprobante'
+        'momento_pagado','manual','desc_tipo_relacion_comprobante','id_int_comprobante_fks','manual',
+        'id_tipo_relacion_comprobante'
 	],
 	
 	rowExpander: new Ext.ux.grid.RowExpander({
@@ -958,6 +1021,10 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
 	   	this.getBoton('btnValidar').setDisabled(false);
 	   	this.getBoton('btnImprimir').setDisabled(false);
+	   	this.getBoton('btnRelDev').setDisabled(false);
+	   	
+	   	
+	   	
 	   	
 	   	
   		return tb;
@@ -966,6 +1033,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
 		var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
 		this.getBoton('btnValidar').setDisabled(true);
 		this.getBoton('btnImprimir').setDisabled(true);
+		this.getBoton('btnRelDev').setDisabled(true);
 	},
 	getTipoCambio: function(){
 		//Verifica que la fecha y la moneda hayan sido elegidos
@@ -1069,6 +1137,19 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz,{
                     rec.data,
                     this.idContenedor,
                     'DocCompraVentaCbte' );
+   },
+    
+    loadRelDev:  function() {
+            var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_rel_devengado/IntRelDevengado.php',
+                    'Documentos del Cbte',
+                    {
+                        width:'80%',
+                        height:'80%'
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'IntRelDevengado' );
     }
 	
 })

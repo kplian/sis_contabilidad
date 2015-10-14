@@ -90,7 +90,9 @@ BEGIN
                             '||v_id_moneda_base::VARCHAR||'::integer as id_moneda_base,
                             incbte.cbte_cierre,
                             incbte.cbte_apertura,
-                            incbte.cbte_aitb
+                            incbte.cbte_aitb,
+                            incbte.fecha_costo_ini,
+                            incbte.fecha_costo_fin
                           from conta.vint_comprobante incbte
                           
                           where  ';

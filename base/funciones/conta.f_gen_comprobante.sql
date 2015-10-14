@@ -88,7 +88,9 @@ BEGIN
                         'campo_nro_tramite',
                         'campo_nro_cuenta_bancaria_trans',
                         'campo_tipo_cambio',
-                        'campo_depto_libro'];
+                        'campo_depto_libro',
+                        'campo_fecha_costo_ini',
+                        'campo_fecha_costo_fin'];
     
     v_tamano:=array_upper(v_def_campos,1);
     
@@ -182,15 +184,30 @@ BEGIN
                                                 hstore(v_tabla));   
 	end if; 
     
+    --guardo campo_fecha_costo_ini
+    if (v_plantilla.campo_fecha_costo_ini != '' AND v_plantilla.campo_fecha_costo_ini is not null) then
+    	v_this.columna_fecha_costo_ini = conta.f_get_columna(	'maestro', 
+        										v_plantilla.campo_fecha_costo_ini::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla));   
+	end if;
     
-      --guardo fecha
+    --guardo campo_fecha_costo_fin
+    if (v_plantilla.campo_fecha_costo_fin != '' AND v_plantilla.campo_fecha_costo_fin is not null) then
+    	v_this.columna_fecha_costo_fin = conta.f_get_columna(	'maestro', 
+        										v_plantilla.campo_fecha_costo_fin::text, 
+                                                hstore(v_this), 
+                                                hstore(v_tabla));   
+	end if; 
+    
+    
+    
+    
+    
+      --guardo gestion_relacion
     if (v_plantilla.campo_gestion_relacion != '' AND v_plantilla.campo_gestion_relacion is not null) then
     	
-       /*raise notice '??????  %, %',v_plantilla.campo_gestion_relacion,
-                                                conta.f_get_columna('maestro', 
-        										v_plantilla.campo_gestion_relacion::text, 
-                                                hstore(v_this), 
-                                                hstore(v_tabla));*/
+       
         
         v_this.columna_gestion = conta.f_get_columna('maestro', 
         										v_plantilla.campo_gestion_relacion::text, 
@@ -341,7 +358,9 @@ BEGIN
       nro_tramite,
       id_usuario_ai,
       usuario_ai,
-      temporal
+      temporal,
+      fecha_costo_ini,
+      fecha_costo_fin
              
     ) 
     VALUES (
@@ -377,7 +396,9 @@ BEGIN
       v_this.columna_nro_tramite,
       p_id_usuario_ai,
       p_usuario_ai,
-      v_temporal
+      v_temporal,
+      v_this.columna_fecha_costo_ini,
+      v_this.columna_fecha_costo_fin
       
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     

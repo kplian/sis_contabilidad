@@ -25,11 +25,13 @@ v_i					integer;
 v_k					integer;
 va_variables		varchar[];
 v_registros_cbte	record;
+v_registros_rel		record;
 v_id_cuenta_bancaria	integer;
 v_conta_validar_forma_pago		varchar;
 v_id_moneda_base				integer;
 v_importe_debe_mb				numeric;
 v_importe_haber_mb				numeric;
+v_importe_rel					numeric;
  
 
 BEGIN
@@ -77,6 +79,27 @@ BEGIN
              importe_gasto_mb = v_importe_debe_mb,
              importe_recurso_mb = v_importe_haber_mb
             where it.id_int_transaccion = v_registros.id_int_transaccion; 
+            
+            
+            --Si es comprobante de pago, revisamos si tienen relaciones con devengado 
+            --listado de las transacciones del comprobante
+             FOR v_registros_rel in (
+                                      select 
+                                         r.monto_pago, 
+                                         r.monto_pago_mb,
+                                         r.id_int_rel_devengado
+                                     from conta.tint_rel_devengado r 
+                                     where r.id_int_transaccion_pag = v_registros.id_int_transaccion and r.estado_reg = 'activo' ) LOOP
+             
+                   v_importe_rel  = param.f_convertir_moneda (v_registros_cbte.id_moneda, v_id_moneda_base, v_registros_rel.monto_pago, v_registros_cbte.fecha,'CUS',2, v_registros_cbte.tipo_cambio);
+                   
+                   
+                   update conta.tint_rel_devengado r set
+                     monto_pago_mb = v_importe_rel
+                   where r.id_int_rel_devengado = v_registros_rel.id_int_rel_devengado;
+                     
+                
+             END LOOP;
             
             
               
