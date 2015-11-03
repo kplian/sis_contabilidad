@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_int_trans_procesar (
   p_id_int_comprobante integer
 )
@@ -39,7 +37,8 @@ BEGIN
       ic.manual,
       ic.origen,
       ic.id_clase_comprobante,
-      cc.codigo 
+      cc.codigo,
+      ic.nro_tramite 
    into
       v_registros_cbte
    from conta.tint_comprobante ic 
@@ -62,7 +61,7 @@ BEGIN
           ------------------------------------------------------------------------------------------------------
                 
           --si es un cbte de pago
-          IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON') THEN  
+          IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON') and v_registros_cbte.nro_tramite not like 'RRHH%' THEN  
               -- busca si alguna de las cuentas contables tiene relacion 
               -- con una cuenta bancaria
               v_id_cuenta_bancaria = NULL;
