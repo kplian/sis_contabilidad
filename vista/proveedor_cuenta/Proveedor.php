@@ -16,14 +16,30 @@ Phx.vista.ProveedorCuenta = {
 	constructor: function(config) {
     	Phx.vista.ProveedorCuenta.superclass.constructor.call(this,config);    	
 	},    
-	east : { 
+	/*east : { 
           url:'../../../sis_contabilidad/vista/relacion_contable/RelacionContableTabla.php',
           title:'Relacion Contable', 
           width:'50%',
           cls:'RelacionContableTabla',
           params:{nombre_tabla:'param.tproveedor',tabla_id : 'id_proveedor'}
-   },
-   bedit:false,
+   },*/
+   tabeast:[
+	{
+	  url:'../../../sis_contabilidad/vista/relacion_contable/RelacionContableTabla.php',
+	  title:'Relacion Contable', 
+	  width:'50%',
+	  cls:'RelacionContableTabla',
+	  params:{nombre_tabla:'param.tproveedor',tabla_id : 'id_proveedor'}
+	},
+	{
+	  url:'../../../sis_parametros/vista/proveedor_cta_bancaria/ProveedorCtaBancaria.php',
+	  title:'Cta Bancaria', 
+	  width:'50%',
+	  cls:'ProveedorCtaBancaria',
+	  params:{nombre_tabla:'param.tproveedor',tabla_id : 'id_proveedor'}
+	}],
+	
+   bedit:true,
    bnew:false,
    bdel:false,
    bsave:false,
