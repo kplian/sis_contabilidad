@@ -51,7 +51,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Detalle del Pago</b><br/>Si la transaccion afecta bancos esta opción permite regitrar datos relacioandos (forma de pago, etc) '
             }
         );
-		
+		//alert('aaa')
 	},
 		
 	Atributos:[
@@ -277,6 +277,75 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		},
 		
 		{
+			config: {
+				name: 'importe_debe_mt',
+				fieldLabel: 'Debe MT',
+				allowBlank: true,
+				width: '100%',
+				gwidth: 100,
+				maxLength: 100
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_debe_mt', type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			form: false
+		},
+		{
+			config: {
+				name: 'importe_haber_mt',
+				fieldLabel: 'Haber MT',
+				allowBlank: true,
+				width: '100%',
+				gwidth: 100,
+				maxLength: 100
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_haber_mt',type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			form: false
+		},
+		
+		{
+			config : {
+				name : 'tipo_cambio',
+				fieldLabel : 'TC 1',
+				allowBlank : false,
+				anchor : '80%',
+				gwidth : 70,
+				maxLength : 20,
+				decimalPrecision : 6
+			},
+			type : 'NumberField',
+			filters : {
+				pfiltro : 'incbte.tipo_cambio',
+				type : 'numeric'
+			},
+			id_grupo : 2,
+			grid : true,
+			form : true
+		}, {
+			config : {
+				name : 'tipo_cambio_2',
+				fieldLabel : 'TC 2',
+				allowBlank : false,
+				anchor : '80%',
+				gwidth : 70,
+				maxLength : 20,
+				decimalPrecision : 6
+			},
+			type : 'NumberField',
+			filters : {
+				pfiltro : 'incbte.tipo_cambio_2',
+				type : 'numeric'
+			},
+			id_grupo : 2,
+			grid : true,
+			form : true
+		},
+		
+		{
 			config:{
 				name: 'glosa',
 				fieldLabel: 'Glosa',
@@ -409,7 +478,9 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_auxiliar', type: 'string'},
 		{name:'desc_partida', type: 'string'},
 		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg',
-		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque'
+		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque',
+		'importe_debe_mt',	'importe_haber_mt','importe_gasto_mt','importe_recurso_mt',
+		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2'
 		
 	],
 	
@@ -459,6 +530,9 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		
 		 this.setColumnHeader('importe_debe', this.Cmp.importe_debe.fieldLabel +' '+this.maestro.desc_moneda);
 		 this.setColumnHeader('importe_haber', this.Cmp.importe_haber.fieldLabel +' '+this.maestro.desc_moneda);
+		 
+		 this.mostrarColumnaByName('importe_debe_mt');
+		 this.mostrarColumnaByName('importe_haber_mt');
 		 //si a moneda del comprobate es base ocultamos la columnas duplicadas
 		 if(this.maestro.id_moneda_base == this.maestro.id_moneda){
 		 	this.ocultarColumnaByName('importe_debe_mb');
@@ -468,12 +542,15 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		 	this.mostrarColumnaByName('importe_debe_mb');
 		 	this.mostrarColumnaByName('importe_haber_mb');
 		 }
+		 
+		 this.getConfigCambiaria();
+		 
+		 
 	},
 	
 	preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
-		console.log('datos.....',rec.data)
 		if(rec.data.tipo_reg != 'summary'){
 			if(rec.data.banco == 'si'){
 				this.getBoton('btnBanco').setDisabled(false);
@@ -483,9 +560,13 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			
 		}
 		else{
-			 tb.items.get('b-edit-' + this.idContenedor).disable();
-			 tb.items.get('b-del-' + this.idContenedor).disable();
-			 this.getBoton('btnBanco').setDisabled(true);
+			 this.getBoton('edit').disable();
+			 this.getBoton('del').disable();
+			 this.getBoton('btnBanco').disable();
+		}
+		
+		if(rec.data.actualizacion == 'si'){
+			this.getBoton('edit').disable();
 		}
 		
 		
@@ -549,7 +630,74 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
         } else{
             alert('Error al obtener la gestión. Cierre y vuelva a intentarlo')
         } 
-	}
+	},
+	
+	getConfigCambiaria : function() {
+
+			var localidad = this.maestro.localidad;
+			
+			Phx.CP.loadingShow();
+				Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/ConfigCambiaria/getConfigCambiaria',
+				params:{
+					fecha: this.maestro.fecha,
+					id_moneda: this.maestro.id_moneda,
+					localidad: localidad,
+					sw_valores: 'no',
+					tipo: 'O'
+				}, success: function(resp) {
+					
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error', 'Validación no realizada: ' + reg.ROOT.error)
+					} else {
+						
+						//cambia labels
+						this.labeTc1 = reg.ROOT.datos.v_tc1 +' (tc)';
+						this.labeTc2 = reg.ROOT.datos.v_tc2 +' (tc)';
+						
+						this.setColumnHeader('tipo_cambio', this.labeTc1);
+		                this.setColumnHeader('tipo_cambio_2', this.labeTc2);
+						
+					}
+					
+
+				}, failure: function(a,b,c,d){
+					this.conexionFailure(a,b,c,d)
+				},
+				timeout: this.timeout,
+				scope:this
+				});
+			
+
+		},
+		
+		setLabelsTc: function(){
+			this.Cmp.tipo_cambio.label.update(this.labeTc1);
+			this.Cmp.tipo_cambio_2.label.update(this.labeTc2);
+						
+		},
+		
+		onButtonEdit:function(){
+	         this.swButton = 'EDIT';
+	         var rec = this.sm.getSelected().data;
+	         Phx.vista.IntTransaccion.superclass.onButtonEdit.call(this); 
+	         this.setLabelsTc();
+	       
+	         
+         
+       },
+       
+       onButtonNew: function(){
+          this.swButton = 'NEW';
+          this.sw_valores = 'si';
+          Phx.vista.IntTransaccion.superclass.onButtonNew.call(this); 
+          this.Cmp.tipo_cambio.setValue(this.maestro.tipo_cambio);
+          this.Cmp.tipo_cambio_2.setValue(this.maestro.tipo_cambio_2);
+          this.setLabelsTc();
+          
+       }
 })
 </script>
 		

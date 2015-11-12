@@ -2269,3 +2269,184 @@ IS 'Cuando un concepto de gasto es del tipo servicio, esta fecha indica el fin d
 
 
 
+/***********************************I-SCP-RAC-CONTA-0-03/11/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_moneda_tri INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_moneda_tri
+IS 'identifica la moneda de triangulacion';
+
+--------------- SQL ---------------
+
+DROP VIEW  IF EXISTS  conta.vint_comprobante;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ALTER COLUMN tipo_cambio TYPE NUMERIC;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN tipo_cambio_2 NUMERIC;
+
+COMMENT ON COLUMN conta.tint_comprobante.tipo_cambio_2
+IS 'tipo de cambio para la segunda operacion, (la triangulacion requiere dos oepraciones)';
+
+ 
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_moneda INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_moneda
+IS 'id moneda de la transaccion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_moneda_tri INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_moneda_tri
+IS 'id de la moenda de triangulacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN tipo_cambio NUMERIC;
+
+COMMENT ON COLUMN conta.tint_transaccion.tipo_cambio
+IS 'tipo de cambio para la primera operacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN tipo_cambio_2 NUMERIC;
+
+COMMENT ON COLUMN conta.tint_transaccion.tipo_cambio_2
+IS 'tipo de cambio para la segunda operación';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN triangulacion VARCHAR(5) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.triangulacion
+IS 'si,  si para esta transaccion se aplica la triangulacion con la moneda base';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN actualizacion VARCHAR(5) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.actualizacion
+IS 'si, si esta transacion solo afecta una moenda y no tiene que convertir  su equivalente en otra moenda';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_rel_devengado
+  ADD COLUMN monto_pago_mt NUMERIC(18,2);
+
+COMMENT ON COLUMN conta.tint_rel_devengado.monto_pago_mt
+IS 'monto de pago en la moneda de triangulacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_debe_mt NUMERIC(18,2);
+
+COMMENT ON COLUMN conta.tint_transaccion.importe_debe_mt
+IS 'monto en moneda de triangulacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_haber_mt NUMERIC(18,2);
+
+COMMENT ON COLUMN conta.tint_transaccion.importe_haber_mt
+IS 'monto haber en la moneda de triangulacion';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_gasto_mt NUMERIC(18,2);
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_recurso_mt NUMERIC(18,2);
+  
+  
+ --------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN sw_tipo_cambio VARCHAR(5) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.sw_tipo_cambio
+IS 'no,  la transaccion no son diferentes de la cabecera, si, las trasaccion son diferente de la cabecera (no podemos actulizar todo en uno)';
+/***********************************F-SCP-RAC-CONTA-0-03/11/2015****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-04/11/2015****************************************/
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tconfig_cambiaria (
+  id_config_cambiaria SERIAL,
+  origen VARCHAR(20) DEFAULT 'nacional' NOT NULL,
+  ope_1 VARCHAR NOT NULL,
+  ope_2 VARCHAR NOT NULL,
+  obs VARCHAR,
+  habilitado VARCHAR(5) DEFAULT 'no' NOT NULL,
+  fecha_habilitado DATE,
+  PRIMARY KEY(id_config_cambiaria)
+) INHERITS (pxp.tbase)
+;
+
+ALTER TABLE conta.tconfig_cambiaria
+  OWNER TO postgres;
+
+COMMENT ON COLUMN conta.tconfig_cambiaria.origen
+IS 'nacional o internacional';
+
+COMMENT ON COLUMN conta.tconfig_cambiaria.habilitado
+IS 'sio o no, esta habilitado para ser usado';
+
+COMMENT ON COLUMN conta.tconfig_cambiaria.fecha_habilitado
+IS 'fecha en que se modifica si esta habilitado o no';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_config_cambiaria INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_config_cambiaria
+IS 'define la configuracion cambiaria utilizada para este comprobante';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN localidad VARCHAR(20) DEFAULT 'nacional' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.localidad
+IS 'nacional o internacional, sirve para definir la configuracion cambiaria aplicada en el comprobante';
+
+
+/***********************************F-SCP-RAC-CONTA-0-04/11/2015****************************************/

@@ -46,6 +46,8 @@ class ACTIntTransaccion extends ACTbase{
 			$temp['importe_haber'] = $this->res->extraData['total_haber'];
 			$temp['importe_debe_mb'] = $this->res->extraData['total_debe_mb'];
 			$temp['importe_haber_mb'] = $this->res->extraData['total_haber_mb'];
+			$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
+			$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
 			$temp['glosa'] = 'Sumas iguales';
 			$temp['tipo_reg'] = 'summary';
 			$temp['id_int_transaccion'] = 0;

@@ -102,7 +102,6 @@ BEGIN
     
     
     
-    
     --validar que el periodo al que se agregara este abierto
     IF  p_origen != 'endesis' THEN
       IF not param.f_periodo_subsistema_abierto(v_rec_cbte.fecha::date, 'CONTA') THEN
@@ -128,9 +127,16 @@ BEGIN
     
     v_variacion = v_debe - v_haber;
     
-    ------------------------------------------
-    --TODO igualar y validar ....
-    ----------------------------------------
+    ---------------------------------------------------------------------------
+    -- TODO .....  si es un comprobante de pago , validar que la relacion devengado pago cuadre
+    ---------------------------------------------------------------------------
+    
+    
+    --------------------------------------------------------------------------
+    --TODO Verificar igualdad entre todas las monedas
+    --  transaccional, base y triangulacion 
+    --  detectar diferencia por redondedo o por diferencia de cambio
+    --------------------------------------------------------------------------
     
     
     
@@ -144,7 +150,7 @@ BEGIN
     if p_origen != 'endesis' then
         
         if p_igualar = 'no' and  v_variacion != 0  then
-            v_errores = 'El comprobante no iguala: Diferencia '||v_haber-v_debe;
+            v_errores = 'El comprobante no iguala: Diferencia '||v_haber - v_debe;
         else
          
               -- TODO obtener la ventana de error de las variables globales

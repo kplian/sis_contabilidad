@@ -49,48 +49,56 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						transa.id_int_transaccion,
-						transa.id_partida,
-						transa.id_centro_costo,
-						transa.id_partida_ejecucion,
-						transa.estado_reg,
-						transa.id_int_transaccion_fk,
-						transa.id_cuenta,
-						transa.glosa,
-						transa.id_int_comprobante,
-						transa.id_auxiliar,
-						transa.id_usuario_reg,
-						transa.fecha_reg,
-						transa.id_usuario_mod,
-						transa.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-						CASE par.sw_movimiento
-                        	WHEN ''flujo'' THEN
-								''(F) ''||par.codigo || '' - '' || par.nombre_partida 
-                            ELSE
-                            	par.codigo || '' - '' || par.nombre_partida 
-                        	END  as desc_partida,
-                        
-						cc.codigo_cc as desc_centro_costo,
-						cue.nro_cuenta || '' - '' || cue.nombre_cuenta as desc_cuenta,
-						aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar,
-                        par.sw_movimiento as tipo_partida,
-                        ot.id_orden_trabajo,
-                        ot.desc_orden,
-						transa.importe_debe,	
-						transa.importe_haber,
-						transa.importe_gasto,
-						transa.importe_recurso,
-						transa.importe_debe_mb,	
-						transa.importe_haber_mb,
-						transa.importe_gasto_mb,
-						transa.importe_recurso_mb,
-                        transa.banco,
-                        transa.forma_pago,
-                        transa.nombre_cheque_trans,
-                        transa.nro_cuenta_bancaria_trans,
-                        transa.nro_cheque
+                            transa.id_int_transaccion,
+                            transa.id_partida,
+                            transa.id_centro_costo,
+                            transa.id_partida_ejecucion,
+                            transa.estado_reg,
+                            transa.id_int_transaccion_fk,
+                            transa.id_cuenta,
+                            transa.glosa,
+                            transa.id_int_comprobante,
+                            transa.id_auxiliar,
+                            transa.id_usuario_reg,
+                            transa.fecha_reg,
+                            transa.id_usuario_mod,
+                            transa.fecha_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            CASE par.sw_movimiento
+                                WHEN ''flujo'' THEN
+                                    ''(F) ''||par.codigo || '' - '' || par.nombre_partida 
+                                ELSE
+                                    par.codigo || '' - '' || par.nombre_partida 
+                                END  as desc_partida,
+                            
+                            cc.codigo_cc as desc_centro_costo,
+                            cue.nro_cuenta || '' - '' || cue.nombre_cuenta as desc_cuenta,
+                            aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar,
+                            par.sw_movimiento as tipo_partida,
+                            ot.id_orden_trabajo,
+                            ot.desc_orden,
+                            transa.importe_debe,	
+                            transa.importe_haber,
+                            transa.importe_gasto,
+                            transa.importe_recurso,
+                            transa.importe_debe_mb,	
+                            transa.importe_haber_mb,
+                            transa.importe_gasto_mb,
+                            transa.importe_recurso_mb,
+                            transa.banco,
+                            transa.forma_pago,
+                            transa.nombre_cheque_trans,
+                            transa.nro_cuenta_bancaria_trans,
+                            transa.nro_cheque,
+                            transa.importe_debe_mt,	
+                            transa.importe_haber_mt,
+                            transa.importe_gasto_mt,
+                            transa.importe_recurso_mt,
+                            transa.id_moneda_tri,
+                            transa.id_moneda,
+                            transa.tipo_cambio,
+                            transa.tipo_cambio_2
                         from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
@@ -99,6 +107,7 @@ BEGIN
 						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
+                        
 				        where ';
 			
 			--Definicion de la respuesta
@@ -126,7 +135,9 @@ BEGIN
                         sum(transa.importe_debe) as total_debe,
                         sum(transa.importe_haber) as total_haber,
                         sum(transa.importe_debe_mb) as total_debe_mb,
-                        sum(transa.importe_haber_mb) as total_haber_mb
+                        sum(transa.importe_haber_mb) as total_haber_mb,
+                        sum(transa.importe_debe_mt) as total_debe_mt,
+                        sum(transa.importe_haber_mt) as total_haber_mt
 					    from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
@@ -146,7 +157,7 @@ BEGIN
 		end;
 	/*********************************    
  	#TRANSACCION:  'CONTA_INTMAY_SEL'
- 	#DESCRIPCION:	lsitado de transaciones para el mayor
+ 	#DESCRIPCION:	listado de transacicones para el mayor
  	#AUTOR:		admin	
  	#FECHA:		24-04-2015 18:10:12
 	***********************************/

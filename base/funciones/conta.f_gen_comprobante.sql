@@ -32,6 +32,7 @@ Descripcion:   Esta funciona inicia la generacion de comprobantes contables,
 DECLARE
 	v_this					conta.maestro_comprobante;
     v_tabla					record;
+    v_registros_cc			record;
     v_nombre_funcion        text;
     v_plantilla				record;        
     v_resp 					varchar;
@@ -39,7 +40,8 @@ DECLARE
     v_posicion				integer;
     v_columnas				varchar;
     v_columna_requerida		varchar;
-    r 						record;  --  esta variable no se usa
+   -- r 						record;  --  esta variable no se usa
+    v_registros_config      record;
     v_valor					varchar;
     
     v_id_int_comprobante    integer;
@@ -59,6 +61,22 @@ DECLARE
     v_resp_int_endesis 		varchar;
     v_tipo_cambio			numeric;
     v_temporal				varchar;
+    v_localidad				varchar;
+    
+    v_id_moneda_base 		integer;
+    v_id_moneda_tri 		integer;
+    
+    v_total_monto_pago      numeric;
+    
+    v_factor 				numeric;
+    v_parcial 				numeric;
+    v_tipo_cambio_rel_2		numeric;
+    v_tipo_cambio_rel_1		numeric;
+    v_glosa_tran 			varchar; 
+    v_sw_tipo_cambio 		varchar;
+    v_registros 			record;
+    v_registros_rel 		record;
+    v_glosa 		varchar;
   
 BEGIN
 
@@ -314,8 +332,10 @@ BEGIN
     
     --deterinar si es temporal
     v_temporal = 'no';
+    v_localidad = 'nacional';
     IF p_sincronizar_internacional THEN
-     v_temporal = 'si';
+      v_temporal = 'si';
+      v_localidad = 'internacional';
     END IF;
     
     --  genera tabla intermedia de comrobante
@@ -360,7 +380,8 @@ BEGIN
       usuario_ai,
       temporal,
       fecha_costo_ini,
-      fecha_costo_fin
+      fecha_costo_fin,
+      localidad
              
     ) 
     VALUES (
@@ -398,7 +419,8 @@ BEGIN
       p_usuario_ai,
       v_temporal,
       v_this.columna_fecha_costo_ini,
-      v_this.columna_fecha_costo_fin
+      v_this.columna_fecha_costo_fin,
+      v_localidad
       
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
@@ -406,8 +428,6 @@ BEGIN
     raise notice '=====> AL INSERTAR  v_id_int_comprobante= %',  v_id_int_comprobante;
     -- genera transacciones del comprobante
     
-    
-  
     resp_det =  conta.f_gen_transaccion(hstore(v_this), 
                             hstore(v_tabla),
                             hstore(v_plantilla),
@@ -419,17 +439,164 @@ BEGIN
     
     
     
-    -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
+    -- procesar las trasaaciones (con diversos propositos, ejm validar  cuentas bancarias)
     IF not conta.f_int_trans_procesar(v_id_int_comprobante) THEN
       raise exception 'Error al procesar transacciones';
     END IF;
     
-    -- migraciond e comprobante endesis  DBLINK
+    ----------------------------------------------------------------
+    -- definir tipos de cambio para comprobantes no temporales
+    ----------------------------------------------------------------
+     IF   v_temporal = 'no' THEN
+     
+         --recupera configuracion activa
+         SELECT  
+           po_id_config_cambiaria ,
+           po_valor_tc1 ,
+           po_valor_tc2 ,
+           po_tc1 ,
+           po_tc2 
+         into
+          v_registros_config
+         FROM conta.f_get_tipo_cambio_segu_config(v_this.columna_moneda::integer, 
+                                                  v_this.columna_fecha,
+                                                  v_localidad,
+                                                  'si');
+               
+    
+        v_id_moneda_base = param.f_get_moneda_base();
+        v_id_moneda_tri  = param.f_get_moneda_triangulacion();
+     
+     
+       IF v_tipo_cambio is NULL THEN
+         v_tipo_cambio = v_registros_config.po_valor_tc1;
+       END IF;
+       
+       IF  v_registros_config.po_valor_tc1 is NULL THEN
+         raise exception 'no tenemos tipo de cambio % para la fecha %',v_registros_config.po_tc1 , v_this.columna_fecha;
+       END IF;
+       
+       
+       IF  v_registros_config.po_valor_tc2 is NULL THEN
+         raise exception 'no tenemos tipo de cambio % para la fecha %',v_registros_config.po_tc2 , v_this.columna_fecha;
+       END IF;
+       
+       
+       update conta.tint_comprobante cbt set
+         tipo_cambio = v_tipo_cambio,
+         tipo_cambio_2 = v_registros_config.po_valor_tc2,
+         id_moneda_tri = v_id_moneda_tri,
+         id_config_cambiaria = v_registros_config.po_id_config_cambiaria
+       where cbt.id_int_comprobante = v_id_int_comprobante;
+      
+      
+       
+       
+       FOR  v_registros in (
+                           select 
+                             * 
+                           from conta.tint_transaccion it
+                           where it.id_int_comprobante = v_id_int_comprobante)LOOP
+      
+          
+       
+          --  si tiene relacion con un devengado calcular tipo de cambio ponderado para la trasacción
+           select 
+               sum(r.monto_pago)
+           into
+              v_total_monto_pago
+           from conta.tint_rel_devengado r 
+           inner join conta.tint_transaccion it on it.id_int_transaccion = r.id_int_transaccion_dev and it.estado_reg = 'activo'
+           where r.id_int_transaccion_pag = v_registros.id_int_transaccion and r.estado_reg = 'activo';
+           
+           
+         v_total_monto_pago = 0;
+         v_tipo_cambio_rel_1 = 0;
+         v_tipo_cambio_rel_2 = 0;
+         v_glosa_tran = '';
+        
+         v_sw_tipo_cambio = 'no';                          
+          
+            IF v_total_monto_pago > 0  THEN
+            
+                  v_glosa_tran = 'TC: ';
+                  FOR v_registros_rel in (
+                                              select 
+                                                 it.tipo_cambio,
+                                                  it.tipo_cambio_2,
+                                                  r.monto_pago,
+                                                  cb.id_int_comprobante,
+                                                  cb.nro_cbte
+                                             from conta.tint_rel_devengado r 
+                                             inner join conta.tint_transaccion it on it.id_int_transaccion = r.id_int_transaccion_dev and it.estado_reg = 'activo'
+                                             inner join conta.tint_comprobante cb on cb.id_int_comprobante = it.id_int_comprobante
+                                             where r.id_int_transaccion_pag = v_registros.id_int_transaccion and r.estado_reg = 'activo' ) LOOP
+                  
+                  
+                   
+                   v_parcial = (v_registros_rel.monto_pago/v_total_monto_pago)*v_registros_rel.tipo_cambio;
+                   v_tipo_cambio_rel_1 = v_tipo_cambio_rel_1 + v_parcial;
+                   
+                   
+                   v_parcial = (v_registros_rel.monto_pago/v_total_monto_pago)*v_registros_rel.tipo_cambio_2;
+                   v_tipo_cambio_rel_2 = v_tipo_cambio_rel_2 + v_parcial;	
+                   
+                   v_glosa =  v_glosa|| '('||v_registros_rel.nro_cbte||'  '||v_registros_config.po_tc1 ||':'||v_registros_rel.tipo_cambio::varchar;
+                   v_glosa =  v_glosa||' '||v_registros_config.po_tc2 ||':'||v_registros_rel.tipo_cambio::varchar||')';
+                     
+                  END  LOOP;
+                
+                  IF v_tipo_cambio_rel_1 != v_tipo_cambio  or   v_tipo_cambio_rel_2 != v_registros_config.po_valor_tc2 THEN
+                    v_sw_tipo_cambio = 'si';
+                  END IF;
+            ELSE
+            
+                  -- si no toma los valores de tipos de la cabecera
+                  v_tipo_cambio_rel_1 = v_tipo_cambio;
+                  v_tipo_cambio_rel_2 = v_registros_config.po_valor_tc2;
+                
+            
+            END IF;
+          -- determina tipos de cambio en las transacciones (incluidas las que tienen dependecia en devengado pago)
+          
+         -- raise exception '%',v_this.columna_moneda;
+         
+         IF v_tipo_cambio_rel_1 is null or v_tipo_cambio_rel_2 is null or v_id_moneda_tri is null or v_this.columna_moneda is null THEN
+           raise exception 't1,t2,it,id .. %,%,%,%',v_tipo_cambio_rel_1, v_tipo_cambio_rel_2, v_id_moneda_tri ,v_this.columna_monedais ;
+         END IF;
+           
+           
+           update conta.tint_transaccion t set
+             tipo_cambio =   v_tipo_cambio_rel_1,
+             tipo_cambio_2 = v_tipo_cambio_rel_2,
+             id_moneda_tri = v_id_moneda_tri,
+             id_moneda =  v_this.columna_moneda::integer,
+             glosa = trim(glosa ||' '||v_glosa),
+             importe_debe = COALESCE(importe_debe,0),
+             importe_haber = COALESCE(importe_haber,0)
+          where t.id_int_transaccion = v_registros.id_int_transaccion;
+          
+          -- calcular  equivalencias para todas las trasacciones en moneda base y de triangulacion
+          
+           PERFORM  conta.f_calcular_monedas_transaccion(v_registros.id_int_transaccion);
+      
+      END LOOP;
+      
+      -- si el tipo de cambio de alguna transaccion varia con respecto a la cabacera la marcamos
+      IF v_sw_tipo_cambio = 'si' THEN
+         update conta.tint_comprobante cbt set
+           cbt.sw_tipo_cambio = 'si'
+         where cbt.id_int_comprobante = v_id_int_comprobante;
+      END IF;
+    
+    END IF;
+    
+    -- migracion de comprobante endesis  DBLINK
     v_sincronizar = pxp.f_get_variable_global('sincronizar');
     
         
     --Si la sincronizacion esta habilitada
-    IF(v_sincronizar='true')THEN
+    IF(v_sincronizar = 'true')THEN
   	 	
         -- si sincroniza locamente con endesis
          IF(not p_sincronizar_internacional)THEN

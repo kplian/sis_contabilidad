@@ -44,6 +44,9 @@ DECLARE
     v_momento_ejecutado 			varchar;
     v_momento_pagado 				varchar;
     v_tipo_comprobante				varchar;
+    v_id_moneda_tri					integer;
+    v_tc_1							numeric;
+    v_tc_2							numeric;
 			    
 BEGIN
 
@@ -84,6 +87,19 @@ BEGIN
             end if;
             
             
+            v_id_moneda_tri  = param.f_get_moneda_triangulacion();
+            
+            --validacion de tipos de cambios
+            IF v_parametros.tipo_cambio is NULL or  v_parametros.tipo_cambio_2 is NULL THEN
+              raise exception 'no se definieron los tipos de cambio';
+            END IF;
+            
+            IF  v_parametros.id_config_cambiaria is NULL  THEN
+              raise exception 'la configuracion cambiara no puede ser nula';
+            END IF;
+            
+            
+            
             v_momento_comprometido = 'si';
             v_momento_ejecutado = 'no';
             v_momento_pagado = 'no';
@@ -98,7 +114,7 @@ BEGIN
             END IF;
            
             
-            --segun la calse del comprobante definir si es presupeustario o contable
+            --segun la clase  del comprobante definir si es presupeustario o contable
             
             select 
               cc.tipo_comprobante
@@ -106,6 +122,10 @@ BEGIN
               v_tipo_comprobante
             from conta.tclase_comprobante cc 
             where cc.id_clase_comprobante = v_parametros.id_clase_comprobante;
+            
+            
+            
+            
             
         	
         	--PERIODO
@@ -117,8 +137,7 @@ BEGIN
         	--REGISTRO DEL COMPROBANTE
         	-----------------------------
         	insert into conta.tint_comprobante(
-                id_clase_comprobante,
-    		
+                id_clase_comprobante,    		
                 id_subsistema,
                 id_depto,
                 id_moneda,
@@ -127,13 +146,11 @@ BEGIN
                 id_funcionario_firma2,
                 id_funcionario_firma3,
                 tipo_cambio,
-                beneficiario,
-    			
+                beneficiario,    			
                 estado_reg,
                 glosa1,
                 fecha,
-                glosa2,
-    			
+                glosa2,    			
                 --momento,
                 id_usuario_reg,
                 fecha_reg,
@@ -152,10 +169,13 @@ BEGIN
                 momento,
                 id_tipo_relacion_comprobante,
                 fecha_costo_ini,
-                fecha_costo_fin
+                fecha_costo_fin,
+                id_config_cambiaria,
+                tipo_cambio_2,
+                localidad,
+                id_moneda_tri
           	) values(
-              v_parametros.id_clase_comprobante,
-  			
+              v_parametros.id_clase_comprobante,  			
               v_id_subsistema,
               v_parametros.id_depto,
               v_parametros.id_moneda,
@@ -164,13 +184,11 @@ BEGIN
               v_parametros.id_funcionario_firma2,
               v_parametros.id_funcionario_firma3,
               v_parametros.tipo_cambio,
-              v_parametros.beneficiario,
-  			
+              v_parametros.beneficiario,  			
               'borrador',
               v_parametros.glosa1,
               v_parametros.fecha,
-              v_parametros.glosa2,
-  			
+              v_parametros.glosa2,  			
               --v_parametros.momento,
               p_id_usuario,
               now(),
@@ -189,7 +207,11 @@ BEGIN
               v_tipo_comprobante,
               v_parametros.id_tipo_relacion_comprobante,
               v_parametros.fecha_costo_ini,
-              v_parametros.fecha_costo_fin
+              v_parametros.fecha_costo_fin,
+              v_parametros.id_config_cambiaria,
+              v_parametros.tipo_cambio_2,
+              'nacional',
+              v_id_moneda_tri
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
@@ -252,7 +274,7 @@ BEGIN
         	--Obtiene el periodo a partir de la fecha
         	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
             
-            --segun la calse del comprobante definir si es presupeustario o contable
+            --segun la clase del comprobante definir si es presupeustario o contable
             select 
               cc.tipo_comprobante
             into 
@@ -268,29 +290,47 @@ BEGIN
             IF  v_reg_cbte.manual = 'si' THEN
               --momentos presupeustarios
               IF v_parametros.momento_ejecutado = 'true' THEN
-                v_momento_ejecutado = 'si';
+                 v_momento_ejecutado = 'si';
               ELSE
-                v_momento_ejecutado = 'no';
+                 v_momento_ejecutado = 'no';
               END IF;
               
               IF v_parametros.momento_pagado = 'true' THEN
-                v_momento_pagado = 'si';
+                 v_momento_pagado = 'si';
               ELSE
-                v_momento_pagado = 'no';
+                 v_momento_pagado = 'no';
               END IF;
             ELSE
             
                IF v_momento_ejecutado != v_reg_cbte.momento_ejecutado  or  v_momento_pagado != v_reg_cbte.momento_pagado THEN
-                 raise exception 'No peude cambiar los momentos en cbte automaticos';
+                   raise exception 'No puede cambiar los momentos en cbte automaticos';
                END IF;
                
                 IF v_parametros.id_clase_comprobante != v_reg_cbte.id_clase_comprobante   THEN
-                 raise exception 'No peude cambiar el tipo de cbte automaticos';
-               END IF;
+                   raise exception 'No puede cambiar el tipo de cbte automaticos';
+                END IF;
                 
             END IF;
             
             
+            
+            
+            --  el tipo de cambio puede variar solo si sw_tipo_cambio = 'no' ... 
+            IF  v_reg_cbte.sw_tipo_cambio = 'si' THEN
+            
+              v_tc_1 = v_reg_cbte.tipo_cambio;
+              v_tc_2 = v_reg_cbte.tipo_cambio_2;
+            
+            ELSE
+            
+              IF v_parametros.tipo_cambio is  NULL or v_parametros.tipo_cambio_2 is  NULL  THEN
+                raise exception 'No se definieron los tipos de cambio para cbte';
+              END IF;
+              
+              v_tc_1 = v_parametros.tipo_cambio;
+              v_tc_2 = v_parametros.tipo_cambio_2;
+            
+            END IF;
             
 			------------------------------
 			--Sentencia de la modificacion
@@ -307,7 +347,7 @@ BEGIN
                 id_funcionario_firma1 = v_parametros.id_funcionario_firma1,
                 id_funcionario_firma2 = v_parametros.id_funcionario_firma2,
                 id_funcionario_firma3 = v_parametros.id_funcionario_firma3,
-                tipo_cambio = v_parametros.tipo_cambio,
+                tipo_cambio = v_tc_1,
                 beneficiario = v_parametros.beneficiario,
     			
                 glosa1 = v_parametros.glosa1,
@@ -325,17 +365,21 @@ BEGIN
                 momento_ejecutado = v_momento_ejecutado,
                 momento_pagado =  v_momento_pagado,
                 fecha_costo_ini = v_parametros.fecha_costo_ini,
-                fecha_costo_fin = v_parametros.fecha_costo_fin
+                fecha_costo_fin = v_parametros.fecha_costo_fin,
+                tipo_cambio_2 = v_tc_2
 			where id_int_comprobante = v_parametros.id_int_comprobante;
             
+            
+            
+            
             -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones 
-            IF v_parametros.tipo_cambio is not NULL and (v_reg_cbte.tipo_cambio is null or v_parametros.tipo_cambio != v_reg_cbte.tipo_cambio) THEN
+            IF v_parametros.tipo_cambio != v_reg_cbte.tipo_cambio or v_parametros.tipo_cambio_2 != v_reg_cbte.tipo_cambio_2 THEN
               IF  not conta.f_int_trans_recalcular_tc(v_parametros.id_int_comprobante) THEN
                 raise exception 'Error al reprocesar el tipo de cambio';
               END IF;
             END IF;
             
-            -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
+            -- procesar las trasaaciones (con diversos propositos, ejm validar  cuentas bancarias)
             
             
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN

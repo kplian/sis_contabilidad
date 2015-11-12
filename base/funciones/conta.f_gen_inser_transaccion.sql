@@ -50,22 +50,12 @@ BEGIN
 
        v_nombre_funcion = 'conta.f_gen_inser_transaccion';
         
-       
-           select 
-            c.fecha,
-            c.tipo_cambio,
-            c.id_moneda
-          into
-           v_registros_con
-          from conta.tint_comprobante  c
-          where c.id_int_comprobante = (p_hstore_transaccion->'id_int_comprobante')::integer;
+      
           
          
        ----------------------------
        --CALCULA LA MONEDA BASE 
        ---------------------------
-          -- Obtener la moneda base
-          v_id_moneda_base = param.f_get_moneda_base();
           
           
           
@@ -75,37 +65,7 @@ BEGIN
           v_importe_recurso = (p_hstore_transaccion->'importe_recurso')::numeric;
           v_importe_gasto	= (p_hstore_transaccion->'importe_gasto')::numeric;
           
-          v_importe_debe_mb  =  v_importe_debe;
-          v_importe_haber_mb 	= v_importe_haber;
-          v_importe_recurso_mb = v_importe_recurso;
-          v_importe_gasto_mb	= v_importe_gasto;
-       
-          
-          -- si la moneda es distinto de la moneda base, calculamos segun tipo de cambio
-          IF v_id_moneda_base != v_registros_con.id_moneda  THEN
-             
-               IF  v_registros_con.tipo_cambio is not  NULL THEN
-                               
-                 --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
-                 v_importe_debe_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_debe, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
-                 v_importe_haber_mb = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_haber, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
-                 v_importe_recurso_mb =  param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_recurso, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
-                 v_importe_gasto_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_gasto, v_registros_con.fecha,'CUS',2, v_registros_con.tipo_cambio);
-                            
-              ELSE
-                            
-                --si no tenemso tipo de cambio convenido .....
-                 v_importe_debe_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_debe, v_registros_con.fecha,'O',2);
-                 v_importe_haber_mb = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_haber, v_registros_con.fecha,'O',2);
-                 v_importe_recurso_mb =  param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base, v_importe_recurso, v_registros_con.fecha,'O',2);
-                 v_importe_gasto_mb  = param.f_convertir_moneda (v_registros_con.id_moneda, v_id_moneda_base,  v_importe_gasto, v_registros_con.fecha,'O',2);
-                           
-                            
-              END IF;
-           
-          END IF;
-          
-       
+         
        
        --inserta trasaccion
         INSERT INTO 
@@ -126,10 +86,7 @@ BEGIN
           importe_haber,
           importe_recurso,
           importe_gasto,
-          importe_debe_mb,
-          importe_haber_mb,
-          importe_recurso_mb,
-          importe_gasto_mb,
+          
           id_detalle_plantilla_comprobante,
           importe_reversion,
           factor_reversion,
@@ -158,10 +115,7 @@ BEGIN
           v_importe_haber,
           v_importe_recurso,
           v_importe_gasto,
-          v_importe_debe_mb,
-          v_importe_haber_mb,
-          v_importe_recurso_mb,
-          v_importe_gasto_mb,
+         
           (p_hstore_transaccion->'id_detalle_plantilla_comprobante')::integer,
           COALESCE((p_hstore_transaccion->'importe_reversion')::numeric,0),
           COALESCE((p_hstore_transaccion->'factor_reversion')::numeric,0),

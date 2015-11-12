@@ -27,9 +27,11 @@ DECLARE
 
 	v_consulta    		varchar;
 	v_parametros  		record;
+    v_registro_moneda	record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
     v_id_moneda_base	integer;
+    v_id_moneda_tri	    integer;
 			    
 BEGIN
 
@@ -47,6 +49,14 @@ BEGIN
     	begin
         
             v_id_moneda_base=param.f_get_moneda_base();
+            
+            select 
+             *
+            into
+             v_registro_moneda
+            from param.tmoneda m 
+            where m.id_moneda = v_id_moneda_base;
+            
     		--Sentencia de la consulta
 			v_consulta := 'select
                             incbte.id_int_comprobante,
@@ -88,11 +98,21 @@ BEGIN
                             incbte.id_tipo_relacion_comprobante,
                             incbte.desc_tipo_relacion_comprobante,
                             '||v_id_moneda_base::VARCHAR||'::integer as id_moneda_base,
+                            '''||v_registro_moneda.codigo::TEXT||'''::TEXT as desc_moneda_base,
                             incbte.cbte_cierre,
                             incbte.cbte_apertura,
                             incbte.cbte_aitb,
                             incbte.fecha_costo_ini,
-                            incbte.fecha_costo_fin
+                            incbte.fecha_costo_fin,
+                            incbte.tipo_cambio_2,
+                            incbte.id_moneda_tri,
+                            incbte.sw_tipo_cambio,
+                            incbte.id_config_cambiaria,
+                            incbte.ope_1,
+                            incbte.ope_2,
+                            incbte.desc_moneda_tri,
+                            incbte.origen,
+   							incbte.localidad
                           from conta.vint_comprobante incbte
                           
                           where  ';

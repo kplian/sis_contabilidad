@@ -39,6 +39,8 @@ DECLARE
      v_importe_debe_mb 		numeric;
      v_importe_haber_mb		numeric;
      v_id_moneda_base		integer;
+     v_tc_1 				numeric;
+     v_tc_2 				numeric;
  
 BEGIN
 
@@ -58,7 +60,9 @@ BEGIN
         
              select
                cbt.id_moneda,
+               cbt.id_moneda_tri,
                cbt.tipo_cambio,
+               cbt.tipo_cambio_2,
                cbt.fecha
              into
                v_registros
@@ -76,25 +80,17 @@ BEGIN
              v_importe_debe_mb  =  v_parametros.importe_debe;
              v_importe_haber_mb = v_parametros.importe_haber;
              
-            -- si la moneda es distinto de la moneda base, calculamos segun tipo de cambio
-            IF v_id_moneda_base != v_registros.id_moneda  THEN
-               
             
-                              
-                 IF  v_registros.tipo_cambio is not  NULL THEN
-                              
-                   --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
-                   v_importe_debe_mb  = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_debe, v_registros.fecha,'CUS',2, v_registros.tipo_cambio);
-                   v_importe_haber_mb = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_haber, v_registros.fecha,'CUS',2, v_registros.tipo_cambio);
-                              
-                ELSE
-                   --TODO si no hay tipo de cambio registramos solo en la moneda origen .... 
-                          
-                   v_importe_debe_mb = NULL;
-                   v_importe_haber_mb = NULL;      
-                END IF;
-             
+            --si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
+            -- para que no actulice automaricamente las transacciones si es modificada
+            IF  v_registros.tipo_cambio !=  v_parametros.tipo_cambio or v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 THEN
+              
+              update conta.tint_comprobante set
+                sw_tipo_cambio = 'si'
+              where id_int_comprobante =  v_parametros.id_int_comprobante;
+            
             END IF;
+          
          
        
         	-----------------------------
@@ -112,15 +108,16 @@ BEGIN
                 importe_haber,
                 importe_gasto,
                 importe_recurso,
-                importe_debe_mb,
-                importe_haber_mb,
-                importe_gasto_mb,
-                importe_recurso_mb,
                 id_usuario_reg,
                 fecha_reg,
                 id_usuario_mod,
                 fecha_mod,
-                id_orden_trabajo
+                id_orden_trabajo,
+                tipo_cambio,
+                tipo_cambio_2,
+                id_moneda,
+                id_moneda_tri
+                
           	) values(
                 v_parametros.id_partida,
                 v_parametros.id_centro_costo,
@@ -133,17 +130,23 @@ BEGIN
                 v_parametros.importe_haber,
                 v_parametros.importe_debe,
                 v_parametros.importe_haber,
-                v_importe_debe_mb,
-                v_importe_haber_mb,
-                v_importe_debe_mb,
-                v_importe_haber_mb,
+               
                 p_id_usuario,
                 now(),
                 null,
                 null,
-                v_parametros.id_orden_trabajo
+                v_parametros.id_orden_trabajo,
+                v_parametros.tipo_cambio,
+                v_parametros.tipo_cambio_2,
+                v_registros.id_moneda,
+                v_registros.id_moneda_tri
 			)RETURNING id_int_transaccion into v_id_int_transaccion;
             
+            
+            
+            -- calcular moneda base y triangulacion
+            
+            PERFORM  conta.f_calcular_monedas_transaccion(v_id_int_transaccion);
             
             -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
@@ -174,40 +177,26 @@ BEGIN
               select
                cbt.id_moneda,
                cbt.tipo_cambio,
-               cbt.fecha
+               cbt.fecha,
+               cbt.id_moneda_tri,
+               cbt.tipo_cambio_2,
+               cbt.id_moneda
              into
                v_registros
              from conta.tint_comprobante cbt
              where  cbt.id_int_comprobante = v_parametros.id_int_comprobante;
-        	----------------------------------------------
-        	--  si la moneda es diferente de la base
-        	----------------------------------------------
-            
-             -- Obtener la moneda base
-             v_id_moneda_base = param.f_get_moneda_base();
-            
-             v_importe_debe  =  v_parametros.importe_debe;
-             v_importe_haber = v_parametros.importe_haber;          
-             v_importe_debe_mb  =  v_parametros.importe_debe;
-             v_importe_haber_mb = v_parametros.importe_haber;
              
-             -- si la moneda es distinto de la moneda base, calculamos segun tipo de cambio
-            IF v_id_moneda_base != v_registros.id_moneda  THEN
-               IF  v_registros.tipo_cambio is not  NULL THEN
-                              
-                   --si es la moenda base   base utilizamos el tipo de cambio del comprobante, ...solicitamos C  (CUSTOM)
-                   v_importe_debe_mb  = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_debe, v_registros.fecha,'CUS',2, v_registros.tipo_cambio);
-                   v_importe_haber_mb = param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_base, v_importe_haber, v_registros.fecha,'CUS',2, v_registros.tipo_cambio);
-                              
-                ELSE
-                   --TODO si no hay tipo de cambio registramos solo en la moneda origen .... 
-                   v_importe_debe_mb = NULL;
-                   v_importe_haber_mb = NULL;      
-                END IF;
-             
+            -- si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
+            -- para que no actulice automaricamente las transacciones si es modificada
+            IF  v_registros.tipo_cambio !=  v_parametros.tipo_cambio or v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 THEN
+              
+              update conta.tint_comprobante set
+                sw_tipo_cambio = 'si'
+              where id_int_comprobante =  v_parametros.id_int_comprobante;
+            
             END IF;
             
-            ---------------
+        	------------
         	--VALIDACIONES
         	---------------
         	--VerIfica el estado
@@ -221,8 +210,6 @@ BEGIN
             
             
             
-            
-		
 			--------------------------------
 			--MODIFICACION DE LA TRANSACCION
 			--------------------------------
@@ -239,12 +226,14 @@ BEGIN
               importe_debe = v_parametros.importe_debe,
               importe_haber = v_parametros.importe_haber,
               importe_gasto = v_parametros.importe_debe,
-              importe_recurso = v_parametros.importe_haber,
-              importe_debe_mb = v_importe_debe_mb,
-              importe_haber_mb = v_importe_haber_mb,
-              importe_gasto_mb = v_importe_debe_mb,
-              importe_recurso_mb = v_importe_haber_mb
-			where id_int_transaccion=v_parametros.id_int_transaccion;
+              importe_recurso = v_parametros.importe_haber
+             
+			where id_int_transaccion = v_parametros.id_int_transaccion;
+            
+            
+             -- calcular moneda base y triangulacion
+            
+            PERFORM  conta.f_calcular_monedas_transaccion(v_parametros.id_int_transaccion);
             
             -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN

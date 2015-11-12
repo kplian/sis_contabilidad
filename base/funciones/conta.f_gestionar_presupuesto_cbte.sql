@@ -542,6 +542,7 @@ BEGIN
                                                           select 
                                                             ird.id_int_rel_devengado,
                                                             ird.monto_pago,
+                                                            ird.monto_pago_mb,
                                                             ird.id_int_transaccion_dev,
                                                             it.id_partida_ejecucion_dev,
                                                             it.importe_reversion,
@@ -558,21 +559,25 @@ BEGIN
                                                          ) LOOP  
                                                          
                                               
-                                               
-                                              v_monto_x_pagar = v_registros_dev.monto_pago;
+                                              IF v_sw_moneda_base = 'si' THEN
+                                                 v_monto_x_pagar = v_registros_dev.monto_pago_mb;
+                                              ELSE
+                                                 v_monto_x_pagar = v_registros_dev.monto_pago;
+                                              END IF; 
+                                             
                                                -- revisar la reversion del devengado para ajustar el monto a pagar
                                                
-                                               ----------------------------------------------------------------------------
-                                               --   Obtener el factor de reversion de la transaccion de devengado      ---
-                                               --   Ejeplo fue comprometido 100  se devego 87 por el IVA se revirtio 13 ---  
-                                               --   presupeustariamente solo pagamos el 87                              ---
-                                               ----------------------------------------------------------------------------
+                                               -----------------------------------------------------------------------------
+                                               --   Obtener el factor de reversion de la transaccion de devengado        ---
+                                               --   Ejemplo fue comprometido 100  se devego 87 por el IVA se revirtio 13 ---  
+                                               --   presupeustariamente solo pagamos el 87                               ---
+                                               -----------------------------------------------------------------------------
                                                
                                               IF  v_registros_dev.factor_reversion > 0   THEN
                                                 
-                                                    v_monto_rev = round(v_monto_x_pagar * v_registros_dev.factor_reversion,2);
+                                                    v_monto_rev =  COALESCE(round(v_monto_x_pagar * v_registros_dev.factor_reversion,2), 0);
                                                     
-                                                    v_monto_x_pagar = v_monto_x_pagar - v_monto_rev;
+                                                    v_monto_x_pagar = v_monto_x_pagar -v_monto_rev;
                                                     
                                                     
                                                     --si el monto a revertir es mayor que la diferencia de lo que sobra  puede ser un problema d redondeo

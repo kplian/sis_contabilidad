@@ -26,6 +26,8 @@ class MODIntTransaccion extends MODbase{
 		$this->capturaCount('total_haber','numeric');
 		$this->capturaCount('total_debe_mb','numeric');
 		$this->capturaCount('total_haber_mb','numeric');
+		$this->capturaCount('total_debe_mt','numeric');
+		$this->capturaCount('total_haber_mt','numeric');
 		
 				
 		//Definicion de la lista del resultado del query
@@ -66,6 +68,15 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('nombre_cheque_trans','varchar');
 		$this->captura('nro_cuenta_bancaria_trans','varchar');
 		$this->captura('nro_cheque','INTEGER');
+		
+		$this->captura('importe_debe_mt','numeric');	
+        $this->captura('importe_haber_mt','numeric');
+        $this->captura('importe_gasto_mt','numeric');
+        $this->captura('importe_recurso_mt','numeric');
+        $this->captura('id_moneda_tri','INTEGER');
+        $this->captura('id_moneda','INTEGER');
+        $this->captura('tipo_cambio','numeric');
+        $this->captura('tipo_cambio_2','numeric');
 		
 		
 		

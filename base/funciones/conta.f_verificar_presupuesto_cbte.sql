@@ -118,7 +118,7 @@ BEGIN
     
     
      ---------------------------------------------------
-     -- Determinar moneda de ejcucion presupeustaria
+     -- Determinar moneda de ejecucion presupeustaria
      -- Si viene de una regional y la moneda no  es dolar  (dolar ... id_moneda = 2)
      -- ejecutar moneda base
      ------------------------------------------------
@@ -414,6 +414,8 @@ BEGIN
                            
                           --si es solo pagar debemos identificar las transacciones del devengado 
                            
+                          --TODO verificar si existe diferencia por tipo de cambio
+                          
                           
                               v_aux = v_aux || ','||v_registros.id_int_transaccion;
                            
@@ -421,6 +423,7 @@ BEGIN
                                                           select 
                                                             ird.id_int_rel_devengado,
                                                             ird.monto_pago,
+                                                            ird.monto_pago_mb, 
                                                             ird.id_int_transaccion_dev,
                                                             it.id_partida_ejecucion_dev,
                                                             it.importe_reversion,
@@ -434,9 +437,15 @@ BEGIN
                                                                  and ird.estado_reg = 'activo'
                                                          ) LOOP  
                                                          
-                                              
-                                               
-                                              v_monto_x_pagar = v_registros_dev.monto_pago;
+                                                -- RAC 14/10/2015 
+                                                -- OJO para sw a moneda base no estamos considerando las reversiones, 
+                                                -- si hubieran tendriamso datos inconsistentes
+                                                
+                                                v_monto_x_pagar = v_registros_dev.monto_pago;
+                                                IF v_sw_moneda_base = 'si' THEN
+                                                  v_monto_x_pagar  = v_registros_dev.monto_pago_mb;
+                                                END IF;
+                                             
                                                
                                                -- revisar la reversion del devengado para ajustar el monto a pagar
                                                ----------------------------------------------------------------------------
@@ -784,8 +793,11 @@ BEGIN
                                    
                                    --COALESCE(v_respuesta_verificar.ps_pagado,0.00::numeric)
                            
-                   ELSIF  v_momento_aux='solo pagar'  THEN 
+                   ELSIF  v_momento_aux = 'solo pagar'  THEN 
                           
+                                --TODO, al pagar, verificar si alcanza el monto devengado
+                                -- considerando diferencia diferencia por tipos de cambio
+                                
                                 FOR v_cont IN 1..v_i LOOP 
                                 
                                       v_respuesta_verificar = pre.f_verificar_com_eje_pag(
@@ -857,10 +869,7 @@ BEGIN
     
     END IF; -- fin del if de movimiento presupuestario
     
-    
-  -- raise exception 'prueba error controlado, comunicarce con glober';
-    
-   return v_retorno; 
+    return v_retorno; 
 
     
 EXCEPTION
