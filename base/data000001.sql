@@ -1124,3 +1124,13 @@ VALUES (E'conta_codigo_estacion', E'CENTRAL', E'Codigo de la estacion, regioanl 
 
 /***********************************F-DAT-RAC-CONTA-1-27/09/2015*****************************************/
 
+
+
+/***********************************I-SCP-RAC-CONTA-0-12/11/2015****************************************/
+
+select pxp.f_insert_tgui ('Configuración Cambiaria', 'para configurar moneda de triangulacion', 'CFCA', 'si', 1, 'sis_contabilidad/vista/config_cambiaria/ConfigCambiaria.php', 3, '', 'ConfigCambiaria', 'CONTA');
+select pxp.f_insert_testructura_gui ('CFCA', 'CONF');
+
+/***********************************F-SCP-RAC-CONTA-0-12/11/2015****************************************/
+
+

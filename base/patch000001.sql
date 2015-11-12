@@ -2450,3 +2450,8 @@ IS 'nacional o internacional, sirve para definir la configuracion cambiaria apli
 
 
 /***********************************F-SCP-RAC-CONTA-0-04/11/2015****************************************/
+
+
+
+
+
