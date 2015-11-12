@@ -2809,7 +2809,8 @@ CREATE OR REPLACE VIEW conta.vint_comprobante(
     ope_1,
     ope_2,
     desc_moneda_tri,
-    origen)
+    origen,
+    localidad)
 AS
   SELECT incbte.id_int_comprobante,
          incbte.id_clase_comprobante,
@@ -2869,7 +2870,8 @@ AS
          ccam.ope_1,
          ccam.ope_2,
          mont.codigo::text AS desc_moneda_tri,
-         incbte.origen
+         incbte.origen,
+         incbte.localidad
   FROM conta.tint_comprobante incbte
        JOIN segu.tusuario usu1 ON usu1.id_usuario = incbte.id_usuario_reg
        JOIN conta.tclase_comprobante ccbte ON ccbte.id_clase_comprobante =
