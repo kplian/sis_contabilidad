@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION conta.f_act_trans_cbte_generados (
   p_id_int_comprobante integer,
   p_estacion varchar = 'Local'::character varying
 )
-RETURNS void AS
+RETURNS boolean AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
@@ -57,8 +57,11 @@ BEGIN
      v_registros_cbte
    FROM conta.tint_comprobante cbte
    where cbte.id_int_comprobante = p_id_int_comprobante;
-   
+    
+    -------------------------------------------------------
     --recupera configuracion activa, y tipos de cambio
+    ------------------------------------------------------
+         
          SELECT  
            po_id_config_cambiaria ,
            po_valor_tc1 ,
@@ -107,7 +110,7 @@ BEGIN
                            from conta.tint_transaccion it
                            where it.id_int_comprobante = p_id_int_comprobante)LOOP
       
-          
+                    
        
           --  si tiene relacion con un devengado calcular tipo de cambio ponderado para la trasacción
            select 
@@ -196,7 +199,7 @@ BEGIN
   
   
    
-    
+    return true;
 
 
 EXCEPTION

@@ -448,7 +448,9 @@ BEGIN
     -- definir tipos de cambio para comprobantes no temporales
     ----------------------------------------------------------------
      IF   v_temporal = 'no' THEN
-         PERFORM conta.f_act_trans_cbte_generados(v_id_int_comprobante);
+         IF not  conta.f_act_trans_cbte_generados(v_id_int_comprobante) THEN
+           raise exception 'error al generar comprobante';
+         END IF;
      END IF;
     
     --------------------------------------------------------------
