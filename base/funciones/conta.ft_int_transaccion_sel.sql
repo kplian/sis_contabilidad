@@ -98,7 +98,9 @@ BEGIN
                             transa.id_moneda_tri,
                             transa.id_moneda,
                             transa.tipo_cambio,
-                            transa.tipo_cambio_2
+                            transa.tipo_cambio_2,
+                            transa.actualizacion,
+                            transa.triangulacion
                         from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta

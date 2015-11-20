@@ -37,6 +37,14 @@ DECLARE
     v_resp_int_endesis 				varchar;
     v_conta_codigo_estacion			varchar;
     v_sincornizar_central			varchar;
+    
+    
+    v_debe_mb						numeric;
+    v_haber_mb						numeric;
+    v_debe_mt						numeric;
+    v_haber_mt						numeric;
+    v_variacion_mb					numeric;
+    v_variacion_mt					numeric;
      
 
 BEGIN
@@ -119,13 +127,7 @@ BEGIN
     	raise exception 'Validación no realizada: el comprobante debe tener al menos dos transacciones';
     end if;
     
-    --3. Verifica igualdad del debe y del haber
-    select sum(tra.importe_debe), sum(tra.importe_haber)
-    into v_debe, v_haber
-    from conta.tint_transaccion tra
-    where tra.id_int_comprobante = p_id_int_comprobante;
     
-    v_variacion = v_debe - v_haber;
     
     ---------------------------------------------------------------------------
     -- TODO .....  si es un comprobante de pago , validar que la relacion devengado pago cuadre
@@ -138,53 +140,72 @@ BEGIN
     --  detectar diferencia por redondedo o por diferencia de cambio
     --------------------------------------------------------------------------
     
+    --3. Verifica igualdad del debe y del haber
+    select 
+         sum(tra.importe_debe), 
+         sum(tra.importe_haber),
+         sum(tra.importe_debe_mb), 
+         sum(tra.importe_haber_mb),
+         sum(tra.importe_debe_mt), 
+         sum(tra.importe_haber_mt)
+    into 
+       v_debe, 
+       v_haber,
+       v_debe_mb, 
+       v_haber_mb,
+       v_debe_mt, 
+       v_haber_mt
+    from conta.tint_transaccion tra
+    where tra.id_int_comprobante = p_id_int_comprobante;
     
-    
+ 
     if v_debe < v_haber then
        v_variacion = v_haber - v_debe;
     elsif v_debe > v_haber then
        v_variacion = v_debe - v_haber;
     end if;
     
+    if v_debe_mb < v_haber_mb then
+       v_variacion_mb = v_haber_mb - v_debe_mb;
+    elsif v_debe > v_haber then
+       v_variacion_mb =  - v_haber_mb;
+    end if;
+    
+     if v_debe_mt < v_haber_mt then
+       v_variacion_mt = v_haber_mt - v_debe_mt;
+    elsif v_debe > v_haber then
+       v_variacion_mt = v_debe_mt -  v_haber_mt;
+    end if;
+    
+    -- raise exception '....%, %, %.....',v_variacion, v_variacion_mb,v_variacion_mt;
+   
+    
     --si el origen es endesis confiamos en las validaciones
     if p_origen != 'endesis' then
         
-        if p_igualar = 'no' and  v_variacion != 0  then
-            v_errores = 'El comprobante no iguala: Diferencia '||v_haber - v_debe;
-        else
-         
-              -- TODO obtener la ventana de error de las variables globales
-              if  v_variacion  > 0.3 then
-                 v_errores = 'No podemos igualar un comprobante con una variación mayor a: '||v_haber-v_debe;
-              else
-              
-              IF v_variacion != 0 THEN
-                 -- TODO --  funcion que agrega  transacciones de diferencia por redondeo 
-                  v_errores = 'no implementado';
-              
-              ELSE 
-              
-              
-              
-              END IF;
-              
-              v_sincronizar = pxp.f_get_variable_global('sincronizar');
-              
-              -- solo permite validar comprobante en el pxp si viene de las regionales, o
-              -- apesar de la sincronizacion este activada
-              IF(v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'no' )THEN
-                 -- raise exception 'No se pueden validar comprobantes desde PXP en BOA';
-              END IF;
-          
-          
-          end if;
-        end if;
+            if  v_variacion > 0  then
+                v_errores = 'El comprobante no iguala: Diferencia '||v_variacion::varchar;
+            end if;
+            
+            if  v_variacion_mb > 0  then
+                v_errores = 'El comprobante no iguala en moneda base: Diferencia '||v_variacion_mb::varchar;
+            end if;
+            
+            if  v_variacion_mt > 0  then
+                v_errores = 'El comprobante no iguala en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
+            end if;
+                  
+            
+            v_sincronizar = pxp.f_get_variable_global('sincronizar');
+            
+            IF(v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'no' )THEN
+                           -- raise exception 'No se pueden validar comprobantes desde PXP en BOA';
+            END IF;
         
-       
      
      end if;
     
-  
+ 
     --4. Verificación de igualdad del gasto y recurso
     
     ------------------------------------------------------------------------------------------------

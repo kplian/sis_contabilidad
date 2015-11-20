@@ -27,6 +27,7 @@ DECLARE
 
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
+    
 	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
@@ -47,6 +48,8 @@ DECLARE
     v_id_moneda_tri					integer;
     v_tc_1							numeric;
     v_tc_2							numeric;
+   
+   
 			    
 BEGIN
 
@@ -458,7 +461,32 @@ BEGIN
 
 		end;
          
-	else
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_IGUACBTE_IME'
+ 	#DESCRIPCION:	Igual el cbte por diferencias de tipo de cambio o redondeo
+ 	#AUTOR:		admin	
+ 	#FECHA:		29-08-2013 00:28:30
+	***********************************/
+
+	elsif(p_transaccion='CONTA_IGUACBTE_IME')then
+
+		begin
+        
+             IF not conta.f_igualar_cbte(v_parametros.id_int_comprobante, p_id_usuario) THEN
+               raise exception 'error al igualar';
+             END IF;                     
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','validar e igualar cbte'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    
+    
+    else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 

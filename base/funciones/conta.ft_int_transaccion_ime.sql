@@ -77,9 +77,7 @@ BEGIN
             
              v_importe_debe  =  v_parametros.importe_debe;
              v_importe_haber = v_parametros.importe_haber;          
-             v_importe_debe_mb  =  v_parametros.importe_debe;
-             v_importe_haber_mb = v_parametros.importe_haber;
-             
+           
             
             --si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
             -- para que no actulice automaricamente las transacciones si es modificada
@@ -223,6 +221,8 @@ BEGIN
               id_auxiliar = v_parametros.id_auxiliar,
               id_usuario_mod = p_id_usuario,
               fecha_mod = now(),
+              tipo_cambio = v_parametros.tipo_cambio,
+              tipo_cambio_2 = v_parametros.tipo_cambio_2,
               importe_debe = v_parametros.importe_debe,
               importe_haber = v_parametros.importe_haber,
               importe_gasto = v_parametros.importe_debe,

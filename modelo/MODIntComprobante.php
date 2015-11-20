@@ -234,6 +234,25 @@ class MODIntComprobante extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function igualarComprobante(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_IGUACBTE_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
 	
 	
 	

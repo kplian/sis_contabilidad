@@ -78,6 +78,9 @@ class MODIntTransaccion extends MODbase{
         $this->captura('tipo_cambio','numeric');
         $this->captura('tipo_cambio_2','numeric');
 		
+		$this->captura('actualizacion','varchar');
+		$this->captura('triangulacion','varchar');
+		
 		
 		
 		
@@ -117,6 +120,12 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('importe_haber_mb','importe_haber','numeric');
 		$this->setParametro('importe_gasto_mb','importe_gasto','numeric');
 		$this->setParametro('importe_recurso_mb','importe_recurso','numeric');
+		
+		$this->setParametro('id_moneda_tri','id_moneda_tri','INTEGER');
+        $this->setParametro('id_moneda','id_moneda','INTEGER');
+        $this->setParametro('tipo_cambio','tipo_cambio','numeric');
+        $this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -152,6 +161,13 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('importe_haber_mb','importe_haber','numeric');
 		$this->setParametro('importe_gasto_mb','importe_gasto','numeric');
 		$this->setParametro('importe_recurso_mb','importe_recurso','numeric');
+		
+		$this->setParametro('id_moneda_tri','id_moneda_tri','INTEGER');
+        $this->setParametro('id_moneda','id_moneda','INTEGER');
+        $this->setParametro('tipo_cambio','tipo_cambio','numeric');
+        $this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
+		
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

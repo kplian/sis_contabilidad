@@ -18,9 +18,6 @@ class ACTIntComprobante extends ACTbase{
 	function listarIntComprobante(){
 		$this->objParam->defecto('ordenacion','id_int_comprobante');
 		$this->objParam->defecto('dir_ordenacion','asc');
-		
-		
-		
 		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    
 		
 		if($this->objParam->getParametro('id_deptos')!=''){
@@ -391,6 +388,13 @@ class ACTIntComprobante extends ACTbase{
 	        exit;
 	    }
     }	
+
+
+    function igualarComprobante(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->igualarComprobante($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 		
 }
 

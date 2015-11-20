@@ -51,7 +51,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Detalle del Pago</b><br/>Si la transaccion afecta bancos esta opción permite regitrar datos relacioandos (forma de pago, etc) '
             }
         );
-		//alert('aaa')
+		
 	},
 		
 	Atributos:[
@@ -66,7 +66,6 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
 		{
-			//configuracion del componente
 			config: {
 					labelSeparator:'',
 					inputType:'hidden',
@@ -480,7 +479,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg',
 		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque',
 		'importe_debe_mt',	'importe_haber_mt','importe_gasto_mt','importe_recurso_mt',
-		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2'
+		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2','actualizacion','triangulacion'
 		
 	],
 	
@@ -556,7 +555,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				this.getBoton('btnBanco').setDisabled(false);
 			}
 			
-			return Phx.vista.IntTransaccion.superclass.preparaMenu.call(this);
+			Phx.vista.IntTransaccion.superclass.preparaMenu.call(this);
 			
 		}
 		else{
@@ -565,6 +564,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			 this.getBoton('btnBanco').disable();
 		}
 		
+		console.log('>>>>>>>>>>>>>>', rec.data.actualizacion)
 		if(rec.data.actualizacion == 'si'){
 			this.getBoton('edit').disable();
 		}

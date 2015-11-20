@@ -116,9 +116,14 @@ Phx.vista.RelacionContableGeneral = {
 	},
 	habilitarCampos : function () {
 		
-		if (this.maestro.tiene_centro_costo == 'si') {
+		if (this.maestro.tiene_centro_costo == 'si' || this.maestro.tiene_centro_costo == 'si-unico') {
 			this.mostrarComponente(this.Cmp.id_centro_costo);
 			this.setAllowBlank(this.Cmp.id_centro_costo, false);
+			
+		} else if (this.maestro.tiene_centro_costo == 'si-general') {
+			this.mostrarComponente(this.Cmp.id_centro_costo);
+			this.setAllowBlank(this.Cmp.id_centro_costo, true);
+				
 		} else {
 			this.Cmp.id_centro_costo.reset();
 			this.ocultarComponente(this.Cmp.id_centro_costo);
@@ -126,8 +131,7 @@ Phx.vista.RelacionContableGeneral = {
 		}
 		//partida
 		if (this.maestro.tiene_partida == 'si') {
-			this.mostrarComponente(this.Cmp.id_partida);
-			
+			this.mostrarComponente(this.Cmp.id_partida);			
 			this.setAllowBlank(this.Cmp.id_partida, false);			
 		} else {
 			this.Cmp.id_partida.reset();

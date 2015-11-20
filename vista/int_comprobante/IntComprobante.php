@@ -58,10 +58,18 @@ header("content-type: text/javascript; charset=UTF-8");
 
 			this.addButton('btnRelDev', {
 				text : 'Rel Dev',
-				iconCls : 'brenew',
+				iconCls : 'btag_accept',
 				disabled : false,
 				handler : this.loadRelDev,
-				tooltip : '<b>Relación con el devengado</b><br/>Solo para comprobantes de pago presupeustario'
+				tooltip : '<b>Relación con el devengado</b><br/>Solo para comprobantes de pago presupuestario'
+			});
+			
+			this.addButton('btnIgualarCbte', {
+				text : 'Igualar',
+				iconCls : 'bengineadd',
+				disabled : false,
+				handler : this.igualarCbte,
+				tooltip : '<b>Igualar comprobante</b><br/>Si existe diferencia por redondeo o por tipo de cambio inserta una transacción para igualar'
 			});
 
 			this.bloquearOrdenamientoGrid();
@@ -1141,6 +1149,9 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.getBoton('btnValidar').setDisabled(false);
 			this.getBoton('btnImprimir').setDisabled(false);
 			this.getBoton('btnRelDev').setDisabled(false);
+			this.getBoton('btnIgualarCbte').setDisabled(false);
+			
+			
 
 			return tb;
 		},
@@ -1149,6 +1160,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.getBoton('btnValidar').setDisabled(true);
 			this.getBoton('btnImprimir').setDisabled(true);
 			this.getBoton('btnRelDev').setDisabled(true);
+			this.getBoton('btnIgualarCbte').setDisabled(true);
 		},
 		getTipoCambio : function() {
 			//Verifica que la fecha y la moneda hayan sido elegidos
@@ -1342,7 +1354,34 @@ header("content-type: text/javascript; charset=UTF-8");
           this.Cmp.fecha.setReadOnly(false);
           this.mostrarComponente(this.Cmp.tipo_cambio);
           this.mostrarComponente(this.Cmp.tipo_cambio_2);
-       }
+       },
+       
+       igualarCbte: function() {
+			   
+			    var rec = this.sm.getSelected().data;
+			    Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/IntComprobante/igualarComprobante',
+					params : {
+						id_int_comprobante : rec.id_int_comprobante
+					},
+					success : function(resp) {
+						Phx.CP.loadingHide();
+						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+						if (reg.ROOT.error) {
+							Ext.Msg.alert('Error', 'No se pudo igualar el cbte: ' + reg.ROOT.error)
+						} else {
+							this.reload();
+						}
+					},
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			
+
+		},
+       
 		
 		
 		

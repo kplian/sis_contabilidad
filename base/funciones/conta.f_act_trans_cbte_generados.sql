@@ -62,6 +62,8 @@ BEGIN
     --recupera configuracion activa, y tipos de cambio
     ------------------------------------------------------
          
+   -- raise exception 'localidad %',  v_registros_cbte.localidad;
+    
          SELECT  
            po_id_config_cambiaria ,
            po_valor_tc1 ,
@@ -79,12 +81,14 @@ BEGIN
         v_id_moneda_base = param.f_get_moneda_base();
         v_id_moneda_tri  = param.f_get_moneda_triangulacion();
      
+   
+       v_tipo_cambio = v_registros_cbte.tipo_cambio;
      
        IF v_tipo_cambio is NULL THEN
          v_tipo_cambio = v_registros_config.po_valor_tc1;
        END IF;
        
-       IF  v_registros_config.po_valor_tc1 is NULL THEN
+       IF  v_tipo_cambio is NULL THEN
          raise exception 'no tenemos tipo de cambio % para la fecha % en la estación %',v_registros_config.po_tc1 , v_registros_cbte.fecha, p_estacion;
        END IF;
        

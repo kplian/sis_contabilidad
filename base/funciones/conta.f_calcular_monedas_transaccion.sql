@@ -224,7 +224,7 @@ BEGIN
                    update conta.tint_rel_devengado r set
                      monto_pago_mb  =   param.f_convertir_moneda (v_id_moneda_tri, 
                                                                   v_id_moneda_base,    
-                                                                  v_registros.monto_pago_mt,  
+                                                                  v_registros_rel.monto_pago_mt,  
                                                                   v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_2, 'no')
                   where r.id_int_rel_devengado = v_registros_rel.id_int_rel_devengado;
                      

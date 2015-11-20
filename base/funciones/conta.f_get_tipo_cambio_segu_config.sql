@@ -125,8 +125,11 @@ BEGIN
                  va_tc2 = regexp_split_to_array(po_tc2, '->');
               
                 -- calcula tipo de cambio 1 para la fecha
+                if p_localidad != 'internacional' then
                  po_valor_tc1 = conta.f_determinar_tipo_cambio(va_tc1[1], va_tc1[2],  p_fecha);
-                
+                else
+                  po_valor_tc1 = NULL; --el tipo de cambio 1 ya viene con el cbte
+                end if;
                 -- calcula tipo de cambio 2 para la fecha
                 
                  po_valor_tc2 = conta.f_determinar_tipo_cambio(va_tc2[1], va_tc2[2],  p_fecha);

@@ -250,7 +250,9 @@ BEGIN
                         and rc.estado_reg = 'activo'
                         LIMIT 1  OFFSET 0;  
                         
-              
+                      IF ps_id_centro_costo  is NULL THEN
+                        raise exception 'No se encontro la relación contable %, %',p_codigo, v_registros.nombre_tipo_relacion;
+                      END IF;
                   
                       
                  ELSE

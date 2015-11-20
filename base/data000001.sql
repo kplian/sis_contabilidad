@@ -1134,3 +1134,32 @@ select pxp.f_insert_testructura_gui ('CFCA', 'CONF');
 /***********************************F-SCP-RAC-CONTA-0-12/11/2015****************************************/
 
 
+
+
+/***********************************I-SCP-RAC-CONTA-0-19/11/2015****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_error_limite_redondeo', E'0.1', E'error limite de redondeo que se peude igualar automaticamente');
+
+
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES (1, NULL, E'2015-11-19 15:16:50.261', NULL, E'activo', NULL, NULL, E'Perdida por redondeo', E'PER-RD', E'si-unico', E'si', E'no', NULL, E'presupuestaria', E'gasto');
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES (1, 1, E'2015-11-19 15:17:58.896', E'2015-11-19 15:18:17.232', E'activo', NULL, NULL, E'Ganancia por redondeo', E'GAN-RD', E'si-unico', E'si', E'no', NULL, E'presupuestaria', E'recurso');
+
+
+
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES (1, NULL, E'2015-11-19 15:16:50.261', NULL, E'activo', NULL, NULL, E'Perdida por tipo de cambio', E'PER-DCB', E'si-unico', E'si', E'no', NULL, E'presupuestaria', E'gasto');
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES (1, 1, E'2015-11-19 15:17:58.896', E'2015-11-19 15:18:17.232', E'activo', NULL, NULL, E'Ganancia por tipo de cambio', E'GAN-DCB', E'si-unico', E'si', E'no', NULL, E'presupuestaria', E'recurso');
+
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-19/11/2015****************************************/
