@@ -104,7 +104,8 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 350,
 				minChars: 2,
 				
-			    tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item"><b>CC:</b>{desc_centro_costo}<br>'+
+			    tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item">'+
+			          '<b>CC:</b>{desc_centro_costo}<br>'+
 			          '<b>Cta.:</b>{desc_cuenta}<br>'+
 					  '<b>Aux.:</b>{desc_auxiliar}</br>'+
                       '<b>Ptda.:</b> <font color="black">{desc_partida}</font><br>'+
@@ -119,7 +120,7 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 		   			    }
 		   			    
 		   					
-		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo_pag'], record.data['desc_cuenta_pag']);	
+		   				var retorno =  String.format('<b>(id Cbte: {0})</b><br><b>CC:</b>{1}, <br><b>Cta.:</b>{1}<br>',record.data['id_int_comprobante_pago'],record.data['desc_centro_costo_pag'], record.data['desc_cuenta_pag']);	
 		   					
 		   					if(record.data['desc_auxiliar_pag']){
 			   					retorno = retorno + String.format('<b>Aux.:</b>{0}</br>', record.data['desc_auxiliar_pag']);
@@ -213,7 +214,7 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 		   			    }
 		   			    
 		   					
-		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo_dev'], record.data['desc_cuenta_dev']);	
+		   				var retorno =  String.format('<b>Cbte: {0} (id: {1})</b><br><b>CC:</b>{2}, <br><b>Cta.:</b>{3}<br>',record.data['nro_cbte_dev'], record.data['id_int_comprobante_dev'], record.data['desc_centro_costo_dev'], record.data['desc_cuenta_dev']);	
 		   					
 		   					if(record.data['desc_auxiliar_dev']){
 			   					retorno = retorno + String.format('<b>Aux.:</b>{0}</br>', record.data['desc_auxiliar_dev']);

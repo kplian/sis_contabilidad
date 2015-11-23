@@ -24,7 +24,7 @@ class ACTIntComprobante extends ACTbase{
             $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
         }
 		
-		if($this->objParam->getParametro('nombreVista')=='IntComprobanteLd'){
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'){
             $this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
         }
 		else{

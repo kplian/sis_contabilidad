@@ -19,7 +19,7 @@ Phx.vista.IntComprobanteReg = {
 	require: '../../../sis_contabilidad/vista/int_comprobante/IntComprobante.php',
 	requireclase: 'Phx.vista.IntComprobante',
 	title: 'Libro Diario',
-	nombreVista: 'IntComprobanteLd',
+	nombreVista: 'IntComprobanteReg',
 	
 	constructor: function(config) {
 	    Phx.vista.IntComprobanteReg.superclass.constructor.call(this,config);
