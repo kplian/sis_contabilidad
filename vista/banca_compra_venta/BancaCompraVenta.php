@@ -17,6 +17,7 @@ tipoBan: 'Compras',
 	constructor:function(config){
 		
 	
+	
 		
 		var dia = 01;
 		var mes = 01;
@@ -28,6 +29,7 @@ tipoBan: 'Compras',
 		
 		
 		
+		this.monto_acumulado_aux = 0;
 		this.Grupos = [
 		            {
 		                layout: 'column',
@@ -414,6 +416,21 @@ tipoBan: 'Compras',
 			
 			
 		}, this);
+		
+		
+		
+		
+		this.Cmp.monto_pagado.on('valid', function(combo, record, index){ 
+			
+			console.log(this.Cmp.monto_pagado.getValue())
+			console.log(this.Cmp.monto_acumulado.getValue())
+			console.log('aux',parseFloat(this.monto_acumulado_aux) + parseFloat(this.Cmp.monto_pagado.getValue()))
+			this.Cmp.monto_acumulado.setValue(parseFloat(this.monto_acumulado_aux) + parseFloat(this.Cmp.monto_pagado.getValue()));
+				
+			
+		}, this);
+		
+		
 		
 		
 		
@@ -1359,6 +1376,11 @@ tipoBan: 'Compras',
 		successMontoAcumulado:function(resp){
 			
 			console.log(resp);
+			var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+
+			console.log(objRes.datos);
+			this.monto_acumulado_aux = objRes.datos[0].monto_acumulado;
+			this.Cmp.monto_acumulado.setValue(objRes.datos[0].monto_acumulado);
 		},
 		importar_txt:function(){
 			

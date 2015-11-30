@@ -52,7 +52,7 @@ Phx.vista.IntComprobanteReg = {
 			
 			this.addButton('btnSwEditble', {
 				text : 'Editable',
-				iconCls : 'bengineadd',
+				iconCls : 'balert',
 				disabled : true,
 				handler : this.swEditable,
 				tooltip : '<b>Hacer editable</b><br/>Si la edición esta deshabilitada toma un backup y la habilita'
@@ -121,7 +121,7 @@ Phx.vista.IntComprobanteReg = {
 		},
 		
 		
-	    swEditable function() {
+	    swEditable: function() {
 			   
 			    var rec = this.sm.getSelected().data;
 			    Phx.CP.loadingShow();
@@ -148,11 +148,32 @@ Phx.vista.IntComprobanteReg = {
 		},
        preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
-			this.getBoton('btnValidar').setDisabled(false);
-			this.getBoton('btnImprimir').setDisabled(false);
-			this.getBoton('btnRelDev').setDisabled(false);
-			this.getBoton('btnIgualarCbte').setDisabled(false);
-			this.getBoton('btnDocCmpVnt').setDisabled(false);
+			var rec = this.sm.getSelected();
+		
+		    if(rec.data.tipo_reg == 'summary'){
+		    	this.getBoton('btnSwEditble').setDisabled(true);
+				this.getBoton('btnValidar').setDisabled(true);
+				this.getBoton('btnImprimir').setDisabled(true);
+				this.getBoton('btnRelDev').setDisabled(true);
+				this.getBoton('btnIgualarCbte').setDisabled(true);
+				this.getBoton('btnDocCmpVnt').setDisabled(true);
+			}
+			else{
+				if(rec.data.sw_editable == 'no'){
+				  this.getBoton('btnSwEditble').setDisabled(false);
+		        }
+		        else{
+		        	 this.getBoton('btnSwEditble').setDisabled(true);
+		        }
+		        this.getBoton('btnValidar').setDisabled(false);
+				this.getBoton('btnImprimir').setDisabled(false);
+				this.getBoton('btnRelDev').setDisabled(false);
+				this.getBoton('btnIgualarCbte').setDisabled(false);
+				this.getBoton('btnDocCmpVnt').setDisabled(false);
+			}
+			
+			
+			
 			
 			
 			
@@ -161,11 +182,15 @@ Phx.vista.IntComprobanteReg = {
 		},
 		liberaMenu : function() {
 			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
-			this.getBoton('btnValidar').setDisabled(true);
-			this.getBoton('btnImprimir').setDisabled(true);
-			this.getBoton('btnRelDev').setDisabled(true);
-			this.getBoton('btnIgualarCbte').setDisabled(true);
-			this.getBoton('btnDocCmpVnt').setDisabled(true);
+			
+				this.getBoton('btnValidar').setDisabled(true);
+				this.getBoton('btnImprimir').setDisabled(true);
+				this.getBoton('btnRelDev').setDisabled(true);
+				this.getBoton('btnIgualarCbte').setDisabled(true);
+				this.getBoton('btnDocCmpVnt').setDisabled(true);
+			
+			
+			
 		},
 		getTipoCambio : function() {
 			//Verifica que la fecha y la moneda hayan sido elegidos
@@ -277,7 +302,7 @@ Phx.vista.IntComprobanteReg = {
 					});
 				}
 			}, this);
-		},
+		}
 		
 	
 };
