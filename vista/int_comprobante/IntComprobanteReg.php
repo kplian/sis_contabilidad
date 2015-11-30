@@ -12,10 +12,8 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.IntComprobanteReg = {
-    bedit:false,
-    bnew:false,
     bsave:false,
-    bdel:true,
+   
 	require: '../../../sis_contabilidad/vista/int_comprobante/IntComprobante.php',
 	requireclase: 'Phx.vista.IntComprobante',
 	title: 'Libro Diario',
@@ -47,9 +45,17 @@ Phx.vista.IntComprobanteReg = {
 			this.addButton('btnIgualarCbte', {
 				text : 'Igualar',
 				iconCls : 'bengineadd',
-				disabled : false,
+				disabled : true,
 				handler : this.igualarCbte,
 				tooltip : '<b>Igualar comprobante</b><br/>Si existe diferencia por redondeo o por tipo de cambio inserta una transacción para igualar'
+			});
+			
+			this.addButton('btnSwEditble', {
+				text : 'Editable',
+				iconCls : 'bengineadd',
+				disabled : true,
+				handler : this.swEditable,
+				tooltip : '<b>Hacer editable</b><br/>Si la edición esta deshabilitada toma un backup y la habilita'
 			});
     
     },
@@ -113,12 +119,41 @@ Phx.vista.IntComprobanteReg = {
 			
 
 		},
+		
+		
+	    swEditable function() {
+			   
+			    var rec = this.sm.getSelected().data;
+			    Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/IntComprobante/swEditable',
+					params : {
+						id_int_comprobante : rec.id_int_comprobante
+					},
+					success : function(resp) {
+						Phx.CP.loadingHide();
+						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+						if (reg.ROOT.error) {
+							Ext.Msg.alert('Error', 'Al  cambiar el modo de edición: ' + reg.ROOT.error)
+						} else {
+							this.reload();
+						}
+					},
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			
+
+		},
        preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
 			this.getBoton('btnValidar').setDisabled(false);
 			this.getBoton('btnImprimir').setDisabled(false);
 			this.getBoton('btnRelDev').setDisabled(false);
 			this.getBoton('btnIgualarCbte').setDisabled(false);
+			this.getBoton('btnDocCmpVnt').setDisabled(false);
+			
 			
 			
 
@@ -130,6 +165,7 @@ Phx.vista.IntComprobanteReg = {
 			this.getBoton('btnImprimir').setDisabled(true);
 			this.getBoton('btnRelDev').setDisabled(true);
 			this.getBoton('btnIgualarCbte').setDisabled(true);
+			this.getBoton('btnDocCmpVnt').setDisabled(true);
 		},
 		getTipoCambio : function() {
 			//Verifica que la fecha y la moneda hayan sido elegidos

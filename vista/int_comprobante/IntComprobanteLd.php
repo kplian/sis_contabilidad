@@ -32,6 +32,22 @@ Phx.vista.IntComprobanteLd = {
 	  height:'50%',	//altura de la ventana hijo
 	  cls:'IntTransaccionLd'
 	},
+	preparaMenu : function(n) {
+			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
+			this.getBoton('btnImprimir').setDisabled(false);
+			this.getBoton('btnRelDev').setDisabled(false);
+			this.getBoton('btnDocCmpVnt').setDisabled(false);
+			
+			
+
+			return tb;
+	},
+	liberaMenu : function() {
+			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
+			this.getBoton('btnImprimir').setDisabled(true);
+			this.getBoton('btnRelDev').setDisabled(true);
+			this.getBoton('btnDocCmpVnt').setDisabled(true);
+	}
 	
 	
 };

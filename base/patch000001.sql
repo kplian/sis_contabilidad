@@ -2454,4 +2454,299 @@ IS 'nacional o internacional, sirve para definir la configuracion cambiaria apli
 
 
 
+/***********************************I-SCP-RAC-CONTA-0-27/11/2015****************************************/
+
+CREATE TABLE conta.tint_comprobante_bk (
+  id_int_comprobante_bk serial,
+  id_int_comprobante integer,
+  id_clase_comprobante INTEGER,
+  id_subsistema INTEGER,
+  id_depto INTEGER,
+  id_moneda INTEGER,
+  id_periodo INTEGER,
+  nro_cbte VARCHAR(30),
+  momento VARCHAR(30) DEFAULT 'contable'::character varying NOT NULL,
+  glosa1 VARCHAR(1500),
+  glosa2 VARCHAR(400),
+  beneficiario VARCHAR(500),
+  tipo_cambio NUMERIC,
+  id_funcionario_firma1 INTEGER,
+  id_funcionario_firma2 INTEGER,
+  id_funcionario_firma3 INTEGER,
+  fecha DATE,
+  nro_tramite VARCHAR(70),
+  funcion_comprobante_eliminado VARCHAR(200),
+  funcion_comprobante_validado VARCHAR(200),
+  momento_comprometido VARCHAR(4) DEFAULT 'no'::character varying NOT NULL,
+  momento_ejecutado VARCHAR(4) DEFAULT 'no'::character varying NOT NULL,
+  momento_pagado VARCHAR(4) DEFAULT 'no'::character varying NOT NULL,
+  id_cuenta_bancaria INTEGER,
+  id_cuenta_bancaria_mov INTEGER,
+  nro_cheque INTEGER,
+  nro_cuenta_bancaria_trans VARCHAR(255),
+  id_plantilla_comprobante INTEGER,
+  manual VARCHAR(5) DEFAULT 'no'::character varying NOT NULL,
+  id_int_comprobante_fks INTEGER[],
+  id_tipo_relacion_comprobante INTEGER,
+  id_depto_libro INTEGER,
+  cbte_cierre VARCHAR(20) DEFAULT 'no'::character varying NOT NULL,
+  cbte_apertura VARCHAR(10) DEFAULT 'no'::character varying NOT NULL,
+  cbte_aitb VARCHAR(10) DEFAULT 'no'::character varying NOT NULL,
+  origen VARCHAR(30),
+  temporal VARCHAR(3) DEFAULT 'no'::character varying NOT NULL,
+  id_int_comprobante_origen_central INTEGER,
+  vbregional VARCHAR(4) DEFAULT 'no'::character varying NOT NULL,
+  codigo_estacion_origen VARCHAR(30),
+  id_int_comprobante_origen_regional INTEGER,
+  fecha_costo_ini DATE,
+  fecha_costo_fin DATE,
+  id_moneda_tri INTEGER,
+  tipo_cambio_2 NUMERIC,
+  sw_tipo_cambio VARCHAR(5) DEFAULT 'no'::character varying NOT NULL,
+  id_config_cambiaria INTEGER,
+  localidad VARCHAR(20) DEFAULT 'nacional'::character varying NOT NULL,
+  CONSTRAINT tint_comprobante_bk_pk_tcomprobante__id_int_comprobante_bk PRIMARY KEY(id_int_comprobante_bk)
+ 
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.momento
+IS 'contable o presupuestario';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.manual
+IS 'si o no, es un comprobante manual o generado por otros sistemas, los comprobantes generados tienen edicion limitada ..';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.id_tipo_relacion_comprobante
+IS 'define el tipo de relacion en tre so comprobantes que sen encuentran en el array id_int_comprobante_fks';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.id_depto_libro
+IS 'departamento de libro de bancos';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.cbte_cierre
+IS 'no, balance, resultado, si es o no un comprobante de cierres, (peude ser ciere de balance o cierre de resutlados), los comprobantes de cierre netean las cuentas, por esto es encesario identificarlo para incluirlos o no en algunos reportes';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.cbte_apertura
+IS 'si o no, es un comprobante de apertura ...';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.cbte_aitb
+IS 'no o si, (si en un futuro es necesario disgregar dejar el NO)';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.origen
+IS 'identifica donde se origina el comprobante,  util para el caso de comprobantes provienietnes de la integracion regioanles';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.temporal
+IS 'para los comprobantes donde solo se utilicem la estructura como temporalmente(caso antes de migrar a contabilidad de la regional internacional o al contrario)';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.id_int_comprobante_origen_central
+IS 'identifica los cbtes migrados desde la central hacia la regional';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.vbregional
+IS 'cuando la regional valida el comprobante el de central queda en borrador,  pero con vbregional = si';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.codigo_estacion_origen
+IS 'codigo de la estacion origen';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.id_int_comprobante_origen_regional
+IS 'identidica el id del comprobante en la regional se usa de manera combinada con el codigo de estacion';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.fecha_costo_ini
+IS 'Identifica el inicio del periodo del costo';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.fecha_costo_fin
+IS 'identifica el fin del periodo de costo';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.id_moneda_tri
+IS 'identifica la moneda de triangulacion';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.tipo_cambio_2
+IS 'tipo de cambio para la segunda operacion, (la triangulacion requiere dos oepraciones)';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.sw_tipo_cambio
+IS 'no,  la transaccion no son diferentes de la cabecera, si, las trasaccion son diferente de la cabecera (no podemos actulizar todo en uno)';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.id_config_cambiaria
+IS 'define la configuracion cambiaria utilizada para este comprobante';
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.localidad
+IS 'nacional o internacional,  sirve para definir la configuracion cambiaria aplicada en el comprobante';
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tint_transaccion_bk (
+  id_int_transaccion_bk SERIAL,
+  id_int_transaccion INTEGER,
+  id_int_comprobante INTEGER NOT NULL,
+  id_cuenta INTEGER NOT NULL,
+  id_auxiliar INTEGER,
+  id_centro_costo INTEGER NOT NULL,
+  id_partida INTEGER,
+  id_partida_ejecucion INTEGER,
+  id_int_transaccion_fk INTEGER,
+  glosa VARCHAR,
+  importe_debe NUMERIC(18,2),
+  importe_haber NUMERIC(18,2),
+  importe_recurso NUMERIC(18,2),
+  importe_gasto NUMERIC(18,2),
+  importe_debe_mb NUMERIC(18,2),
+  importe_haber_mb NUMERIC(18,2),
+  importe_recurso_mb NUMERIC(18,2),
+  importe_gasto_mb NUMERIC(18,2),
+  id_detalle_plantilla_comprobante INTEGER,
+  id_partida_ejecucion_dev INTEGER,
+  importe_reversion NUMERIC(18,2) DEFAULT 0 NOT NULL,
+  monto_pagado_revertido NUMERIC(18,2) DEFAULT 0 NOT NULL,
+  id_partida_ejecucion_rev INTEGER,
+  id_cuenta_bancaria INTEGER,
+  id_cuenta_bancaria_mov INTEGER,
+  nro_cheque INTEGER,
+  nro_cuenta_bancaria_trans VARCHAR(300),
+  porc_monto_excento_var NUMERIC(1000,8),
+  nombre_cheque_trans VARCHAR(200),
+  factor_reversion NUMERIC DEFAULT 0 NOT NULL,
+  id_orden_trabajo INTEGER,
+  forma_pago VARCHAR(100),
+  banco VARCHAR(3) DEFAULT 'no'::character varying NOT NULL,
+  id_int_transaccion_origen INTEGER,
+  id_moneda INTEGER,
+  id_moneda_tri INTEGER,
+  tipo_cambio NUMERIC,
+  tipo_cambio_2 NUMERIC,
+  actualizacion VARCHAR(5) DEFAULT 'no'::character varying NOT NULL,
+  triangulacion VARCHAR(5) DEFAULT 'no'::character varying NOT NULL,
+  importe_debe_mt NUMERIC(18,2),
+  importe_haber_mt NUMERIC(18,2),
+  importe_gasto_mt NUMERIC(18,2),
+  importe_recurso_mt NUMERIC(18,2),
+  CONSTRAINT tint_transaccion_bk_pk_tint_transaccion__id_int_transaccion_bk PRIMARY KEY(id_int_transaccion_bk)
+  
+) INHERITS (pxp.tbase)
+
+WITH (oids = true);
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.id_detalle_plantilla_comprobante
+IS 'Hace referencia a la a la plantilla que origino esta transaccion, tambien sirve para agrupar transacciones de la misma clase';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.importe_reversion
+IS 'este importe se revierte del comprometido si es mayor a 0, por ejm. util para facturas que solo ejecutan 87 %';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.monto_pagado_revertido
+IS 'Este campo  acumula el monto que falta por descontar en el momento pagado, nuca debe ser mayor que el importe_reversion';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.id_partida_ejecucion_rev
+IS 'elmacena la partida ejecucion del monto revertido';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.nro_cuenta_bancaria_trans
+IS 'Nro de cuenta destino para transferencias bancarias';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.porc_monto_excento_var
+IS 'Porcentaje para el calculo de montos excentos variable, emeplo utilizado para las facturas electrica dondel no se conoce con exactiud el porcentaje excento de antemoano (antes de la emision del factura)';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.nombre_cheque_trans
+IS 'Nombre a la cual se emitirá el cheque o transferencia';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.forma_pago
+IS 'cheque o transferencia';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.banco
+IS 'si la trasaccion necesita el registro de banco y forma de apgo (para cbtes manuales)';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.id_int_transaccion_origen
+IS 'hace referencia a al id de la trasaccion original';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.id_moneda
+IS 'id moneda de la transaccion';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.id_moneda_tri
+IS 'id de la moenda de triangulacion';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.tipo_cambio
+IS 'tipo de cambio para la primera operacion';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.tipo_cambio_2
+IS 'tipo de cambio para la segunda operación';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.actualizacion
+IS 'si, si esta transacion solo afecta una moenda y no tiene que convertir  su equivalente en otra moenda';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.triangulacion
+IS 'si,  si para esta transaccion se aplica la triangulacion con la moneda base';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.importe_debe_mt
+IS 'monto en moneda de triangulacion';
+
+COMMENT ON COLUMN conta.tint_transaccion_bk.importe_haber_mt
+IS 'monto haber en la moneda de triangulacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion_bk
+  ADD COLUMN id_int_comprobante_bk INTEGER NOT NULL;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante_bk
+  ADD COLUMN fecha_bk TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante_bk.fecha_bk
+IS 'fecha en que fue generado el backup';
+
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tint_rel_devengado_bk (
+  id_int_rel_devengado_bk SERIAL,
+  id_int_rel_devengado INTEGER,
+  id_int_transaccion_dev INTEGER,
+  id_int_transaccion_pag INTEGER,
+  id_int_transaccion_bk_dev INTEGER,
+  id_int_transaccion_bk_pag INTEGER,
+  monto_pago NUMERIC(18,2),
+  id_partida_ejecucion_pag INTEGER,
+  monto_pago_mb NUMERIC(18,2),
+  monto_pago_mt NUMERIC(18,2),
+  CONSTRAINT tint_rel_devengado_bk_pkey PRIMARY KEY(id_int_rel_devengado_bk)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tint_rel_devengado_bk.monto_pago_mb
+IS 'la insertar la relacion se calcula segun el tc de cbte de pago';
+
+COMMENT ON COLUMN conta.tint_rel_devengado_bk.monto_pago_mt
+IS 'monto de pago en la moneda de triangulacion';
+
+/***********************************F-SCP-RAC-CONTA-0-27/11/2015****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-30/11/2015****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN sw_editable VARCHAR(4) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.sw_editable
+IS 'por defecto los cbte en borrador se peude editar , pero no los internacionales,
+cuando se habilita la edicion se genera un backup del cbte';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_int_comprobante_bk INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_int_comprobante_bk
+IS 'idetifica el ulitmo backup de este comprobante';
+
+/***********************************F-SCP-RAC-CONTA-0-30/11/2015****************************************/
+
+
+
 

@@ -84,8 +84,10 @@ BEGIN
      -------------------------------------
      
     v_consulta = 'update conta.tint_comprobante set 
-    				sw_tipo_cambio = '''||v_int_comprobante.sw_tipo_cambio||'''
-                    localidad = ''internacional'' 
+    				sw_tipo_cambio = '''||v_int_comprobante.sw_tipo_cambio||''',
+                    localidad = ''internacional'' ,
+                    sw_editabe = ''no'' ,
+                    tipo_cambio = '||v_int_comprobante.tipo_cambio_2::varchar||'
                   where id_int_comprobante = '||v_int_comprobante.id_int_comprobante_origen_central::varchar; 
                             
    
@@ -112,7 +114,7 @@ BEGIN
                    
                    v_consulta = 'update conta.tint_transaccion set
                                    id_moneda_tri =  '||COALESCE(v_registros_tran.id_moneda_tri::varchar,'NULL')||',
-                                   tipo_cambio  =  '||COALESCE(v_registros_tran.tipo_cambio::varchar,'NULL')||',
+                                   tipo_cambio  =  '||COALESCE(v_registros_tran.tipo_cambio_2::varchar,'NULL')||',
                                    id_moneda  =  '||COALESCE(v_registros_tran.id_moneda::varchar,'NULL')||',
                                    importe_debe =  '||COALESCE(v_registros_tran.importe_debe::varchar,'NULL')||',
                                    importe_haber =  '||COALESCE(v_registros_tran.importe_haber::varchar,'NULL')||',
@@ -206,7 +208,7 @@ BEGIN
                                                      COALESCE(v_registros_tran.id_int_transaccion_fk::varchar,'NULL')||','||
                                                      COALESCE(''''||v_registros_tran.glosa::varchar||'''','NULL')||','||
                                                      
-                                                     COALESCE(v_registros_tran.tipo_cambio::varchar,'NULL')||','||
+                                                     COALESCE(v_registros_tran.tipo_cambio_2::varchar,'NULL')||','||
                                                      COALESCE(v_registros_tran.id_moneda::varchar,'NULL')||','||
                                                      COALESCE(v_registros_tran.id_moneda_tri::varchar,'NULL')||','||
                                                      

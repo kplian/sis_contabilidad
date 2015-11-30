@@ -329,7 +329,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:150
+				maxLength:500
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpbdet.campo_monto',type:'string'},

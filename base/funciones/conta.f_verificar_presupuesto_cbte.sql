@@ -97,13 +97,9 @@ BEGIN
           presupuestario
          
           
-             
-    
-    
     */
     -- revisar el tipo de comrpobante y su estado
     
-     raise notice ' >>>> yyyyyyyyyyyyy';
     
     
     v_retorno = 'exito';
@@ -136,11 +132,11 @@ BEGIN
     
       
      raise notice ' >>>> zzzzzzz';
-     -- si el comprobante tiene efecto presupouestario'
+     -- si el comprobante tiene efecto presupuestario'
     
     IF v_registros_comprobante.momento= 'presupuestario' THEN
    
-           --rrecorrer todas las transacciones revisando las partidas presupuestarias
+           --recorrer todas las transacciones revisando las partidas presupuestarias
             v_i = 0;
            --Definir el momento 
             IF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si' then
@@ -153,49 +149,32 @@ BEGIN
             ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si'  THEN   
                  
                 v_momento_presupeustario = 4;  --pagado  OJO verifica el mommento 
-                 v_momento_aux='todo';
-                 
-                    raise notice ' >>>> 1';
+                v_momento_aux='todo';
+              
             
             --RAC, aumentado 5/10/2015
             ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
                  
                 v_momento_presupeustario = 3;  --ejecutado
-                 v_momento_aux='solo ejecutar';
-                 
-                    raise notice ' >>>> 1';
-             
-       
+                v_momento_aux='solo ejecutar';
+                
             ELSIF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'no'  THEN   
                  
                 v_momento_presupeustario = 3;  --ejecutado
                 v_momento_aux='solo ejecutar';
-                
-                   raise notice ' >>>> 2';
                 
             ELSIF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'si'  THEN   
                  
                 v_momento_presupeustario = 4;  --pagado
                 v_momento_aux='solo pagar';  
                 
-                raise notice ' >>>> 3';   
-           
-            
             ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'no' then
-              
               raise exception 'Solo comprometer no esta implmentado';
-              
             ELSE 
-            
-             raise exception 'Combinacion de momentos no contemplada';  
-       
-       
+                raise exception 'Combinacion de momentos no contemplada';  
             END IF;
           
-            raise notice ' >>>> 4';
-      
-      
-           v_aux = '';
+            v_aux = '';
            
            DROP TABLE IF EXISTS tt_check_presu;
            create temp table tt_check_presu(

@@ -59,27 +59,22 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_tipo_relacion_comprobante','int');
 		$this->captura('desc_tipo_relacion_comprobante','varchar');
 		$this->captura('id_moneda_base','int4');
-		$this->captura('desc_moneda_base','text');
-		
+		$this->captura('desc_moneda_base','text');		
 		$this->captura('cbte_cierre','varchar');
 		$this->captura('cbte_apertura','varchar');
-		$this->captura('cbte_aitb','varchar');
-		
+		$this->captura('cbte_aitb','varchar');		
 		$this->captura('fecha_costo_ini','date');
-        $this->captura('fecha_costo_fin','date');
-		
-		
+        $this->captura('fecha_costo_fin','date');		
 		$this->captura('tipo_cambio_2','numeric');
         $this->captura('id_moneda_tri','int4');
         $this->captura('sw_tipo_cambio','varchar');
         $this->captura('id_config_cambiaria','int4');
         $this->captura('ope_1','varchar');
         $this->captura('ope_2','varchar');
-        $this->captura('desc_moneda_tri','text');
-		
+        $this->captura('desc_moneda_tri','text');		
 		$this->captura('origen','varchar');
-		$this->captura('localidad','varchar');
-		
+		$this->captura('localidad','varchar');		
+		$this->captura('sw_editable','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -235,22 +230,7 @@ class MODIntComprobante extends MODbase{
 		return $this->respuesta;
 	}
 
-    function igualarComprobante(){
-		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.ft_int_comprobante_ime';
-		$this->transaccion='CONTA_IGUACBTE_IME';
-		$this->tipo_procedimiento='IME';
-				
-		//Define los parametros para la funcion
-		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
-
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
-
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
+    
 
 
 	
@@ -389,6 +369,40 @@ class MODIntComprobante extends MODbase{
 		//echo $this->consulta;exit;
 		$this->ejecutarConsulta();
 		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+   function igualarComprobante(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_IGUACBTE_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+   function swEditable(){
+		//swEditable de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_SWEDIT_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

@@ -564,9 +564,18 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			 this.getBoton('btnBanco').disable();
 		}
 		
-		console.log('>>>>>>>>>>>>>>', rec.data.actualizacion)
 		if(rec.data.actualizacion == 'si'){
 			this.getBoton('edit').disable();
+		}
+		
+		
+		
+		if(this.maestro.sw_editable == 'no'){
+			this.getBoton('edit').disable();
+			this.getBoton('edit').disable();
+			this.getBoton('del').disable();
+			this.getBoton('btnBanco').disable();
+			this.getBoton('new').disable();
 		}
 		
 		
@@ -576,6 +585,10 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	liberaMenu: function() {
 		var tb = Phx.vista.IntTransaccion.superclass.liberaMenu.call(this);
 		this.getBoton('btnBanco').setDisabled(true);
+		
+		if(this.maestro.sw_editable == 'no'){
+			this.getBoton('new').disable();
+		}
 	},
 	
 	getGestion:function(x){

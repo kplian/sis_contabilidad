@@ -15,7 +15,7 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
-		Phx.vista.IntRelDevengado.superclass.constructor.call(this,config);
+    	Phx.vista.IntRelDevengado.superclass.constructor.call(this,config);
 		this.init();
 		this.store.baseParams={id_int_comprobante_pago: this.id_int_comprobante}; 
         this.load({params:{start:0, limit:this.tam_pag}});
@@ -416,9 +416,31 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+	preparaMenu : function(n) {
+			var tb = Phx.vista.IntRelDevengado.superclass.preparaMenu.call(this);
+			
+			
+			if(this.estado_reg != 'borrador'){
+				this.getBoton('new').setDisabled(true);
+			    this.getBoton('edit').setDisabled(true);
+			    this.getBoton('del').setDisabled(true);
+			}
+			
+			
+			
+
+			return tb;
+	},
+	liberaMenu : function() {
+			var tb = Phx.vista.IntRelDevengado.superclass.liberaMenu.call(this);
+			if(this.estado_reg != 'borrador'){
+				this.getBoton('new').setDisabled(true);
+			    this.getBoton('edit').setDisabled(true);
+			    this.getBoton('del').setDisabled(true);
+			}
 	}
-)
+});
 </script>
 		
 		

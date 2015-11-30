@@ -36,6 +36,11 @@ class ACTBancaCompraVenta extends ACTbase{
 		}
 		
 		
+		if($this->objParam->getParametro('id_contrato') != ''){
+			$this->objParam->addFiltro("banca.id_contrato = ".$this->objParam->getParametro('id_contrato'));  
+		}
+		
+		
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);

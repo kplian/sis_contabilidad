@@ -395,6 +395,13 @@ class ACTIntComprobante extends ACTbase{
 		$this->res=$this->objFunc->igualarComprobante($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function swEditable(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->swEditable($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+		
 		
 }
 

@@ -2,7 +2,8 @@
 
 CREATE OR REPLACE FUNCTION conta.f_igualar_cbte (
   p_id_int_comprobante integer,
-  p_id_usuario integer
+  p_id_usuario integer,
+  p_show_errors boolean = true
 )
 RETURNS boolean AS
 $body$
@@ -106,7 +107,7 @@ BEGIN
                  v_monto_haber =  0;
                  
               elsif v_debe > v_haber then
-                 v_variacion = v_debe - v_haber;
+                 v_variacion =  v_debe - v_haber;
                  v_monto_debe =  0;
                  v_monto_haber =  v_variacion;
               else
@@ -119,8 +120,8 @@ BEGIN
                  v_variacion_mb = v_haber_mb - v_debe_mb;
                  v_monto_debe_mb =  v_variacion_mb;
                  v_monto_haber_mb =  0;
-              elsif v_debe > v_haber then
-                 v_variacion_mb =  - v_haber_mb;
+              elsif v_debe_mb > v_haber_mb then
+                 v_variacion_mb =  v_debe_mb - v_haber_mb;
                  v_monto_debe_mb =  0;
                  v_monto_haber_mb =  v_variacion_mb;
               else
@@ -130,10 +131,13 @@ BEGIN
               
               
               if v_debe_mt < v_haber_mt then
+                 
                  v_variacion_mt = v_haber_mt - v_debe_mt;
-                  v_monto_debe_mt =  v_variacion_mt;
+                 v_monto_debe_mt =  v_variacion_mt;
                  v_monto_haber_mt =  0;
-              elsif v_debe > v_haber then
+              
+              elsif v_debe_mt > v_haber_mt then
+                 
                  v_variacion_mt = v_debe_mt -  v_haber_mt;
                   v_monto_debe_mt =  0;
                  v_monto_haber_mt =  v_variacion_mt;
@@ -146,6 +150,7 @@ BEGIN
               --determina si exiten diferencias
               ----------------------------------------
               
+             
               v_errores='';
               if  v_variacion > 0  then
                   v_errores = 'El comprobante no iguala: Diferencia '||v_variacion::varchar;
@@ -160,15 +165,15 @@ BEGIN
               end if;
                   
               IF v_errores = '' THEN
-                 raise exception 'No existen diferencias para igualar';
+              
+                 IF p_show_errors THEN
+                 	raise exception 'No existen diferencias para igualar';
+                 ELSE
+                    RETURN TRUE;
+                 END IF;
               END IF; 
               
-              
-                 
-                 
-              
-              
-              
+             
               -------------------------------------------------------
               -- detectar si existe diferencia por tipo de cambio
               -----------------------------------------------------
@@ -195,7 +200,7 @@ BEGIN
                
               v_conta_error_limite_redondeo  = pxp.f_get_variable_global('conta_error_limite_redondeo')::numeric;
                
-               
+            
                
               if  v_variacion > 0  then
                   IF v_conta_error_limite_redondeo < v_variacion THEN
@@ -269,7 +274,7 @@ BEGIN
                        PERFORM  conta.f_calcular_monedas_transaccion(v_id_int_transaccion);
                           
                       --llamada recursiva para igualar por redondeo o tipo de cambio
-                       IF not conta.f_igualar_cbte(p_id_int_comprobante, p_id_usuario) THEN
+                       IF not conta.f_igualar_cbte(p_id_int_comprobante, p_id_usuario, FALSE) THEN
                          raise exception 'error al igual recursivamente';
                        END IF;
                        

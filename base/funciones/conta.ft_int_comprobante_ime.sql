@@ -48,6 +48,7 @@ DECLARE
     v_id_moneda_tri					integer;
     v_tc_1							numeric;
     v_tc_2							numeric;
+    v_id_int_comprobante_bk			integer;
    
    
 			    
@@ -484,6 +485,58 @@ BEGIN
             return v_resp;
 
 		end;
+        
+   /*********************************    
+ 	#TRANSACCION:  'CONTA_SWEDIT_IME'
+ 	#DESCRIPCION:	Cambia el cbte a modo de edición
+ 	#AUTOR:		admin	
+ 	#FECHA:		29-08-2013 00:28:30
+	***********************************/
+
+	elsif(p_transaccion='CONTA_SWEDIT_IME')then
+
+		begin
+        
+          select 
+            *
+          into
+           v_reg_cbte 
+          from conta.tint_comprobante set            
+          where id_int_comprobante = v_parametros.id_int_comprobante;  
+          
+          
+          IF  v_reg_cbte.estado_reg = 'borrador'  THEN
+             raise exception 'El cbte debe estar en borrador para habilitar la edición';
+          END IF;
+          
+          IF  v_reg_cbte.sw_editable = 'si'  THEN
+             raise exception 'La edición ya se encuentra habilitada ....';
+          END IF;
+          
+          
+          --obtenemos un backup del cbte
+          v_id_int_comprobante_bk = conta.f_backup_int_comprobante(v_parametros.id_int_comprobante);
+          
+        
+          --modificamos la bandera para habilitar la edicion
+          update conta.tint_comprobante set            
+               sw_editable = 'si',
+               id_usuario_mod = p_id_usuario,
+               fecha_mod = now(),
+               id_int_comprobante_bk = v_id_int_comprobante_bk
+          where id_int_comprobante = v_parametros.id_int_comprobante; 
+          
+          
+                       
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cbte habilitado para edición'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;     
     
     
     else

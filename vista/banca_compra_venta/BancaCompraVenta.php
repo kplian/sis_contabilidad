@@ -395,6 +395,22 @@ tipoBan: 'Compras',
 			this.Cmp.id_contrato.setValue(record.data.id_contrato);
 			this.Cmp.num_contrato.setValue(record.data.numero);
 			
+			if(record.data.tipo_plazo == 'tiempo_indefinido' ){
+				this.Cmp.acumulado.setValue('si');
+				
+				Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/listarBancaCompraVenta',
+				params:{'id_contrato':record.data.id_contrato,'sort':'id_banca_compra_venta','dir':'DESC','start':0,'limit':1},
+				success: this.successMontoAcumulado,
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+				});
+			
+			}else{
+				this.Cmp.acumulado.setValue('no');
+			}
+			
 			
 			
 		}, this);
@@ -738,7 +754,7 @@ tipoBan: 'Compras',
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_contrato', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor','monto','moneda','fecha_inicio','fecha_fin'],
+					fields: ['id_contrato', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor','monto','moneda','fecha_inicio','fecha_fin','tipo_plazo'],
 					// turn on remote sorting
 					remoteSort: true,
 					baseParams: {par_filtro:'con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto', tipo_proceso:"CON",tipo_estado:"finalizado",id_tabla:3}
@@ -757,6 +773,7 @@ tipoBan: 'Compras',
 				gwidth: 100,
 				anchor: '80%',
 				renderer: function(value, p, record) {
+					
 					if(record.data['desc_contrato']){
 						return String.format('{0}', record.data['desc_contrato']);
 					}
@@ -789,6 +806,22 @@ tipoBan: 'Compras',
 				filters:{pfiltro:'banca.num_contrato',type:'string'},
 				id_grupo:0,
 				grid:true,
+				form:true
+		},
+		
+		{
+			config:{
+				name: 'acumulado',
+				fieldLabel: 'acumulado',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				
+				id_grupo:0,
+				grid:false,
 				form:true
 		},
 		
@@ -1321,6 +1354,11 @@ tipoBan: 'Compras',
 			  delete link;
 
 
+		},
+		
+		successMontoAcumulado:function(resp){
+			
+			console.log(resp);
 		},
 		importar_txt:function(){
 			

@@ -101,7 +101,7 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('id_periodo','id_periodo','int4');
 		
 		$this->setParametro('id_depto_conta','id_depto_conta','int4');
-		
+		$this->setParametro('id_contrato','id_contrato','int4');
 	
 	
 
