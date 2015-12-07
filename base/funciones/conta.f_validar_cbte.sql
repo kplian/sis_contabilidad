@@ -30,8 +30,10 @@ DECLARE
     v_resp			varchar;
     v_nombre_funcion   				varchar;
     v_funcion_comprobante_validado  varchar;
+    v_funcion_comprobante_editado   varchar;
     v_variacion        				numeric;
     v_nombre_conexion				varchar;
+    v_conexion_int_act				varchar;
     v_sincronizar					varchar;
     v_pre_integrar_presupuestos		varchar;
     v_conta_integrar_libro_bancos	varchar;
@@ -70,16 +72,17 @@ BEGIN
         c.id_moneda,
         p.id_gestion ,
         c.id_int_comprobante_origen_central,
-        c.origen
+        c.origen,
+        c.sw_editable,
+        c.nro_cbte,
+        c.codigo_estacion_origen
         
 	  into 
         v_rec_cbte
     from conta.tint_comprobante c
     inner join param.tperiodo p on p.id_periodo = c.id_periodo
     where id_int_comprobante = p_id_int_comprobante;
-    
-    
-    --raise exception 'datos ... %, %', v_conta_codigo_estacion, v_rec_cbte.origen;
+   
     
     --  si el origen es endesis  o es un comprobante que se migrara a la central, abrimos conexion
     if p_origen  = 'endesis' or v_sincornizar_central = 'true' then
@@ -97,7 +100,14 @@ BEGIN
          select * into v_nombre_conexion from migra.f_crear_conexion(); 
     
     end if;
-	
+    
+    -- si es un comprobante editado internacionales , abrimos una segunda conexion 
+    
+    IF v_rec_cbte.sw_editable = 'si' and v_rec_cbte.localidad = 'internacional'  THEN
+         v_conexion_int_act = migra.f_crear_conexion(v_id_depto_lb,'tes.testacion', v_rec_cbte.codigo_estacion_origen);
+    END IF;
+    
+    
 	
     --1. Verificar existencia del comprobante
     if not exists(select 1 from conta.tint_comprobante
@@ -193,9 +203,35 @@ BEGIN
         
      
      end if;
+     
     
- 
-    --4. Verificación de igualdad del gasto y recurso
+    ---------------------------------------------------------------------------------------------------------
+    --  Llamar a funcion de comprobante editado, 
+    --  es la pirmera vez que se valida solo si no tenemos numero de cbte
+    --  (por ejm esta llamada se usa en tesorera para revertir el presupuesto comprometido originamente)
+    ---------------------------------------------------------------------------------------------------------
+    
+    IF   v_rec_cbte.sw_editable = 'si' and  (v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte = '' )    THEN
+          
+          IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+          
+                --obtener configuracion de la plantillasi existe 
+                select 
+                  pc.funcion_comprobante_editado
+                into 
+                  v_funcion_comprobante_editado 
+                from conta.tplantilla_comprobante pc  
+                where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante; 
+               
+              IF v_funcion_comprobante_editado is not null and v_funcion_comprobante_editado != '' THEN 
+                  EXECUTE ( 'select ' ||v_funcion_comprobante_editado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+              END IF; 
+                                        
+         END IF;
+    
+    END IF;
+   
+   
     
     ------------------------------------------------------------------------------------------------
     --  Validacion presupuestaria del comprobante no se ejecuta solo verifica 
@@ -330,7 +366,7 @@ BEGIN
           --  Si es solo un cbte de pago  validar la relacion con el devengado
           ----------------------------------------------------------------------
           
-          IF v_rec_cbte.momento_comprometido = 'no'  and  v_rec_cbte.momento_ejecutado = 'no'  and    v_rec_cbte.momento_pagado = 'si'  THEN   
+          IF v_rec_cbte.sw_editable = 'si' and v_rec_cbte.momento_comprometido = 'no'  and  v_rec_cbte.momento_ejecutado = 'no'  and    v_rec_cbte.momento_pagado = 'si'  THEN   
              v_sw_rel = TRUE;
              FOR v_registros in  (
                                        select 
@@ -373,9 +409,9 @@ BEGIN
          
             
             
-         ----------------------------------------------------------------- 
+         ----------------------------------------------------------------------------------- 
          -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
-         -----------------------------------------------------------------
+         ----------------------------------------------------------------------------------------
            
          IF v_rec_cbte.id_plantilla_comprobante is not null THEN
            
@@ -417,19 +453,22 @@ BEGIN
              v_resp =  migra.f_migrar_cbte_a_central(p_id_int_comprobante, v_nombre_conexion);
          END IF;
          
+         
+         
          ---------------------------------------------------------------------------
-         --  Se estamos en la CENTRAL y el comprobante de migrado debemos  actualizar las modificaciones
+         --  Se estamos en la CENTRAL y el comprobante es  internacional  debemos  actualizar las modificaciones
          --  que pudieran haber sido realizadas al cbte en la estación regioanl
          ----------------------------------------------------------------------------
          
-         -- TODO
+          IF v_conta_codigo_estacion != 'CENTRAL' and v_rec_cbte.origen is not NULL THEN
+             v_resp =  migra.f_migrar_act_cbte_a_regional(p_id_int_comprobante, p_id_usuario ,v_conexion_int_act);
+          END IF;
          
          
            
-          --raise exception 'pasa';
          -----------------------------------------------------------------------------------------------------------------------
          -- SI el comprobante se valida en central y es de  una regional internacional y la sincronizacion esta habilitada migramos el cbte a ENDESIS
-         --  TODO si la moneda  no es dolares debemos convertir a Bolivianos
+         -- si la moneda  no es dolares debemos convertir a Bolivianos
          ------------------------------------------------------------------------------------------------------------------------
          IF (v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'si' )THEN
              -- si sincroniza locamente con endesis, marcando la bandera que proviene de regional internacional
@@ -439,13 +478,24 @@ BEGIN
           
          -----------------------------------------------------------------------------------------------
          --  Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
-         -- TODO si es de uan regioanl internacion y es moenda diferente de doalres convertimos a Bolivianos
+         --   si es de uan regioanl internacion y es moenda diferente de doalres convertimos a Bolivianos
          ------------------------------------------------------------------------------------------------
          IF v_pre_integrar_presupuestos = 'true' THEN  --en las regionales internacionales la sincro de presupeustos esta deshabilitada
               v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
          END IF;
-          
-         --10.cerrar conexion dblink si es que existe 
+         
+         
+         
+         -------------------------------------------------- 
+         --10.cerrars conexiones dblink si es que existe 
+         -------------------------------------------------
+         
+         --cerrar la conexion de actulizacion (que peude ser paralela a la de jecucion de presupesutos)  central -> regional
+         if  v_conexion_int_act is not null then
+              select * into v_resp from migra.f_cerrar_conexion(v_conexion_int_act,'exito'); 
+         end if;
+         
+         --cerrar la conexion comun (central-> endesis,  regional -> central)
          if  v_nombre_conexion is not null then
               select * into v_resp from migra.f_cerrar_conexion(v_nombre_conexion,'exito'); 
          end if;

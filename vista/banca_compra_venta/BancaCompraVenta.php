@@ -14,8 +14,12 @@ Phx.vista.BancaCompraVenta=Ext.extend(Phx.gridInterfaz,{
 
 tabEnter: true,
 tipoBan: 'Compras',
+fheight: '80%',
+    fwidth: '95%',
 	constructor:function(config){
 		
+	
+	
 	
 	
 		
@@ -30,6 +34,7 @@ tipoBan: 'Compras',
 		
 		
 		this.monto_acumulado_aux = 0;
+		this.contrato;
 		this.Grupos = [
 		            {
 		                layout: 'column',
@@ -88,9 +93,7 @@ tipoBan: 'Compras',
          	xtype:'button',
          	text:'<i class="fa fa-file"></i> Ver Historial Acumulado',
          	scope:this,
-         	handler:function(){
-         		alert('Ver Historial Acumulado');         	
-         	}
+         	handler:this.acumulado
          	
          });
          fieldset.doLayout(); 
@@ -350,6 +353,8 @@ tipoBan: 'Compras',
 			this.Cmp.razon.setValue(res[0]);
 			
 			
+			this.Cmp.id_documento.store.setBaseParam('nro_nit', record.data.nit);
+			
 			
 			this.Cmp.id_contrato.enable();
 			this.Cmp.id_contrato.reset();
@@ -377,6 +382,15 @@ tipoBan: 'Compras',
 				this.Cmp.tipo_documento_pago.reset();
 				this.Cmp.tipo_documento_pago.store.baseParams.descripcion = "Transferencia de fondos";
 				this.Cmp.tipo_documento_pago.modificado = true;
+				
+				
+				this.Cmp.tipo_documento_pago.store.load({params:{start:0,limit:10},
+					callback:function(){
+					
+					this.Cmp.tipo_documento_pago.setValue(4);
+				 	}, scope : this
+				}); 
+				
 			}else{
 				this.Cmp.tipo_documento_pago.reset();
 				this.Cmp.tipo_documento_pago.store.baseParams.descripcion = "Cheque de cualquier naturaleza";
@@ -396,6 +410,7 @@ tipoBan: 'Compras',
 			
 			this.Cmp.id_contrato.setValue(record.data.id_contrato);
 			this.Cmp.num_contrato.setValue(record.data.numero);
+			this.contrato = record.data;
 			
 			if(record.data.tipo_plazo == 'tiempo_indefinido' ){
 				this.Cmp.acumulado.setValue('si');
@@ -429,6 +444,43 @@ tipoBan: 'Compras',
 				
 			
 		}, this);
+		
+		
+		this.Cmp.tipo_transaccion.on('select', function(combo, record, index){
+			
+			 this.Cmp.id_documento.modificado = true;
+			if(this.Cmp.tipo_transaccion.getValue() == 1){
+				this.Cmp.id_documento.store.setBaseParam('sw_libro_compras', 'libro_compras');
+			} else if(this.Cmp.tipo_transaccion.getValue() == 2){
+				this.Cmp.id_documento.store.setBaseParam('sw_libro_compras', 'retenciones');
+			} else if(this.Cmp.tipo_transaccion.getValue() == 3){
+				//this.Cmp.id_documento.store.reset();
+				this.Cmp.id_documento.store.setBaseParam('sw_libro_compras', undefined);
+				
+			}
+			
+			
+
+			
+		}, this);
+		
+		this.Cmp.id_documento.on('select', function(combo, record, index){
+			
+			console.log(record)
+			this.Cmp.fecha_documento.setValue(record.data.fecha_documento);
+			this.Cmp.autorizacion.setValue(record.data.nro_autorizacion);
+			this.Cmp.nit_ci.setValue(record.data.nro_nit);
+			this.Cmp.razon.setValue(record.data.razon_social);
+			this.Cmp.num_documento.setValue(record.data.nro_documento);
+			this.Cmp.importe_documento.setValue(record.data.importe_total);
+			
+			
+
+			
+		}, this);
+		
+		
+		
 		
 		
 		
@@ -570,26 +622,57 @@ tipoBan: 'Compras',
 			form: true
 		},
 		
-	
+		
 		
 		{
-			config:{
-				name: 'fecha_documento',
-				fieldLabel: 'Fecha Factura / Fecha Documento ',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''},
-							
-						    
+			config: {
+				name: 'id_proveedor',
+				fieldLabel: 'Proveedor',
+				allowBlank: false,
+				forceSelection: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_parametros/control/Proveedor/listarProveedorCombos',
+					id: 'id_proveedor',
+					root: 'datos',
+					sortInfo: {
+						field: 'id_proveedor',
+						direction: 'ASC'
+
+					},
+					totalProperty: 'total',
+					fields: ['id_proveedor','id_persona','id_institucion','desc_proveedor', 'rotulo_comercial', 'nit'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'provee.desc_proveedor#provee.nit'}
+				}),
+				valueField: 'id_proveedor',
+				displayField: 'desc_proveedor',
+				gdisplayField: 'desc_proveedor2',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_proveedor}</b></p><p>NIT: {nit} </p> </div></tpl>',
+
+
+				hiddenName: 'id_proveedor',
+				forceSelection: true,
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '60%',
+				gwidth: 150,
+				minChars: 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_proveedor2']);
+				}
 			},
-				type:'DateField',
-				filters:{pfiltro:'banca.fecha_documento',type:'date'},
-				id_grupo:0,
-				grid:true,
-				form:true
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'provee.desc_proveedor',type: 'string'},
+			grid: true,
+			form: true
 		},
+		
 		
 		{
 			config: {
@@ -639,6 +722,83 @@ tipoBan: 'Compras',
 			form: true
 		},
 		
+		
+	
+	
+	{
+			config: {
+				name: 'id_documento',
+				fieldLabel: 'documento',
+				allowBlank: true,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/BancaCompraVenta/listarDocumento',
+					id: 'id_documento',
+					root: 'datos',
+					sortInfo: {
+						field: 'id_documento',
+						direction: 'DESC'
+
+					},
+					totalProperty: 'total',
+					fields: ['id_documento', 'razon_social', 'nro_documento','nro_autorizacion','fecha_documento','nro_nit','sw_libro_compras','importe_total'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'doc.razon_social#doc.nro_documento#doc.nro_autorizacion#doc.nro_nit'}
+				}),
+				valueField: 'id_documento',
+				displayField: 'razon_social',
+				gdisplayField: 'desc_documento',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{sw_libro_compras}</b></p><p><b>{razon_social}</b></p><p>Nro fac: {nro_documento} </p> <p>Aut: {nro_autorizacion} </p><p>Importe: {importe_total}</p><p> Nit: {nro_nit} </p><p>fecha : {fecha_documento}</p></div></tpl>',
+
+
+				hiddenName: 'id_documento',
+				forceSelection: true,
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '90%',
+				gwidth: 150,
+				minChars: 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_documento']);
+				}
+			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'd.razon_social',type: 'string'},
+			grid: true,
+			form: true
+		},
+		
+		
+		{
+			config:{
+				name: 'fecha_documento',
+				fieldLabel: 'Fecha Factura / Fecha Documento ',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+							format: 'd/m/Y', 
+							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''},
+							
+						    
+			},
+				type:'DateField',
+				filters:{pfiltro:'banca.fecha_documento',type:'date'},
+				id_grupo:0,
+				grid:true,
+				form:true
+		},
+		
+		
+		
+		
+		
+		
+		
 		{
 			config:{
 				name: 'autorizacion',
@@ -654,54 +814,7 @@ tipoBan: 'Compras',
 				form:true
 		},
 		
-		{
-			config: {
-				name: 'id_proveedor',
-				fieldLabel: 'Proveedor',
-				allowBlank: false,
-				forceSelection: false,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_parametros/control/Proveedor/listarProveedorCombos',
-					id: 'id_proveedor',
-					root: 'datos',
-					sortInfo: {
-						field: 'id_proveedor',
-						direction: 'ASC'
-
-					},
-					totalProperty: 'total',
-					fields: ['id_proveedor','id_persona','id_institucion','desc_proveedor', 'rotulo_comercial', 'nit'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'provee.desc_proveedor#provee.nit'}
-				}),
-				valueField: 'id_proveedor',
-				displayField: 'desc_proveedor',
-				gdisplayField: 'desc_tipo_transaccion',
-				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_proveedor}</b></p><p>NIT: {nit} </p> </div></tpl>',
-
-
-				hiddenName: 'id_proveedor',
-				forceSelection: true,
-				typeAhead: true,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '60%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_tipo_transaccion']);
-				}
-			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'provee.desc_proveedor',type: 'string'},
-			grid: false,
-			form: true
-		},
+		
 		
 		
 		{
@@ -733,7 +846,8 @@ tipoBan: 'Compras',
 				filters:{pfiltro:'banca.razon',type:'string'},
 				id_grupo:0,
 				grid:true,
-				form:true
+				form:true,
+				bottom_filter : true
 		},
 		
 		{
@@ -759,7 +873,7 @@ tipoBan: 'Compras',
 				fieldLabel: 'Obj Contrato',
 				typeAhead: false,
 				forceSelection: false,
-				allowBlank: false,
+				allowBlank: true,
 				disabled: true,
 				emptyText: 'Contratos...',
 				store: new Ext.data.JsonStore({
@@ -863,7 +977,7 @@ tipoBan: 'Compras',
 			config: {
 				name: 'id_cuenta_bancaria',
 				fieldLabel: 'Cuenta Bancaria TESORERIA',
-				allowBlank: false,
+				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
 					url: '../../sis_tesoreria/control/CuentaBancaria/listarCuentaBancaria',
@@ -881,7 +995,7 @@ tipoBan: 'Compras',
 				}),
 				valueField: 'id_cuenta_bancaria',
 				displayField: 'denominacion',
-				gdisplayField: 'desc_tipo_transaccion',
+				gdisplayField: 'desc_cuenta_bancaria',
 				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{denominacion}</b></p><p>Nro Cuenta: {nro_cuenta} </p> <p>Institucion: {nombre_institucion} </p><p>nit Institucion: {doc_id} </p></div></tpl>',
 
 
@@ -897,13 +1011,13 @@ tipoBan: 'Compras',
 				gwidth: 150,
 				minChars: 2,
 				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_tipo_transaccion']);
+					return String.format('{0}', record.data['desc_cuenta_bancaria']);
 				}
 			},
 			type: 'ComboBox',
 			id_grupo: 1,
 			filters: {pfiltro: 'ctaban.denominacion',type: 'string'},
-			grid: false,
+			grid: true,
 			form: true
 		},
 		
@@ -1014,7 +1128,7 @@ tipoBan: 'Compras',
 					totalProperty: 'total',
 					fields: ['id_config_banca', 'digito', 'descripcion','tipo'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'confba.descripcion#confba.tipo',tipo:'Tipo de documento de pago'}
+					baseParams: {par_filtro: 'confba.descripcion#confba.tipo#confba.digito',tipo:'Tipo de documento de pago'}
 				}),
 				valueField: 'digito',
 				displayField: 'descripcion',
@@ -1031,7 +1145,7 @@ tipoBan: 'Compras',
 				queryDelay: 1000,
 				anchor: '90%',
 				gwidth: 150,
-				minChars: 2,
+				minChars: 1,
 				renderer : function(value, p, record) {
 					return String.format('{0}', record.data['desc_tipo_documento_pago']);
 				}
@@ -1206,7 +1320,17 @@ tipoBan: 'Compras',
 		{name:'desc_tipo_documento_pago', type: 'string'},
 		{name:'revisado', type: 'string'},
 	
+		{name:'id_contrato', type: 'numeric'},
+		{name:'id_proveedor', type: 'numeric'},
+		{name:'id_cuenta_bancaria', type: 'numeric'},
 		
+		{name:'desc_proveedor2', type: 'string'},
+		{name:'desc_contrato', type: 'string'},
+		{name:'desc_cuenta_bancaria', type: 'string'},
+		
+		
+		{name:'id_documento', type: 'numeric'},
+		{name:'desc_documento', type: 'string'},
 		
 	],
 	sortInfo:{
@@ -1375,12 +1499,20 @@ tipoBan: 'Compras',
 		
 		successMontoAcumulado:function(resp){
 			
+			
+			//console.log(this.form.getForm().items.items)
+			//console.log(this.form.getForm().reset())
+			
+			this.monto_acumulado_aux=0;
 			console.log(resp);
 			var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 
 			console.log(objRes.datos);
-			this.monto_acumulado_aux = objRes.datos[0].monto_acumulado;
-			this.Cmp.monto_acumulado.setValue(objRes.datos[0].monto_acumulado);
+			for(var i=0; i<objRes.datos.length;i++){
+				console.log('dat',objRes.datos[i]);
+				this.monto_acumulado_aux = this.monto_acumulado_aux + objRes.datos[i].monto_acumulado
+			}
+			this.Cmp.monto_acumulado.setValue(this.monto_acumulado_aux);
 		},
 		importar_txt:function(){
 			
@@ -1409,7 +1541,17 @@ tipoBan: 'Compras',
 				this.Cmp.razon.setValue(datos[0].razon);
 			}
 			
-		}/*,
+		},
+		acumulado : function (){
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/banca_compra_venta/Acumulado.php',
+				'Acumulado',
+				{
+					width:900,
+					height:400
+				},this.contrato,this.idContenedor,'Acumulado')
+		}
+		
+		/*,
 		onSubmit : function(o, x, force) {
 			alert(this.Cmp.id_contrato.getValue());
 		} */

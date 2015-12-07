@@ -2745,6 +2745,14 @@ ALTER TABLE conta.tint_comprobante
 COMMENT ON COLUMN conta.tint_comprobante.id_int_comprobante_bk
 IS 'idetifica el ulitmo backup de este comprobante';
 
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN funcion_comprobante_editado TEXT;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.funcion_comprobante_editado
+IS 'esta funcion se ejecuta al momento de vlaidar un comprobante que a sido editado (por ejem para revirt el comprometido original del plan de pagos)';
+
 /***********************************F-SCP-RAC-CONTA-0-30/11/2015****************************************/
 
 

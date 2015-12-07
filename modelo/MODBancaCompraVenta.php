@@ -59,10 +59,18 @@ class MODBancaCompraVenta extends MODbase{
 		$this->captura('desc_tipo_documento_pago','varchar');
 		
 		$this->captura('revisado','varchar');
+		$this->captura('id_contrato','int4');
+		$this->captura('id_proveedor','int4');
 		
-		
-
-                        
+		$this->captura('desc_proveedor2','varchar');
+         $this->captura('desc_contrato','text');     
+		 
+		 $this->captura('id_cuenta_bancaria','int4'); 
+		 $this->captura('desc_cuenta_bancaria','varchar'); 
+		 
+		 $this->captura('id_documento','int4'); 
+		 $this->captura('desc_documento','varchar'); 
+		          
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -101,7 +109,13 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('id_periodo','id_periodo','int4');
 		
 		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+		
+		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('id_contrato','id_contrato','int4');
+		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
+		$this->setParametro('id_documento','id_documento','int4');
+		
+		
 	
 	
 
@@ -141,6 +155,13 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('nit_entidad','nit_entidad','numeric');
 		
 		$this->setParametro('id_periodo','id_periodo','int4');
+		
+		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+		
+		$this->setParametro('id_proveedor','id_proveedor','int4');
+		$this->setParametro('id_contrato','id_contrato','int4');
+		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
+		$this->setParametro('id_documento','id_documento','int4');
 		
 		$this->setParametro('revisado','revisado','varchar');
 
@@ -248,12 +269,29 @@ class MODBancaCompraVenta extends MODbase{
 											$mensaje_completo,'control');
 			//si no es error fatal proceso el archivo
 			} else {
+				
+				
+				$nombre_archivo = $arregloFiles['archivo']['name'];
+				$partes = explode('_',$nombre_archivo);
+				$fecha_archivo = $this->str_osplit($partes[2], 2);
+				$fecha_archivo = '01/'.$fecha_archivo[0].'/'.$fecha_archivo[1];
+				
+				
+				$this->aParam->addParametro('nombre_archivo', $nombre_archivo);
+				$this->arreglo['nombre_archivo'] = $nombre_archivo;
+				$this->aParam->addParametro('fecha_archivo', $fecha_archivo);
+				$this->arreglo['fecha_archivo'] = $fecha_archivo;
+				
 				$lines = file($file_path);
+				
+				
+				
 				
 				
 				foreach ($lines as $line_num => $line) {
 					$arr_temp = explode('|', $line);
 					
+					$arr_temp = $this->remove_utf8_bom($arr_temp);
 					
 					if($this->aParam->getParametro('tipo')=='Compras'){
 						$arra[] = array(
@@ -263,16 +301,16 @@ class MODBancaCompraVenta extends MODbase{
        						"nit_ci" => $arr_temp[3],
        						"razon" => $arr_temp[4],
        						"num_documento" => $arr_temp[5],
-       						"num_contrato" => $arr_temp[6],
-       						"importe_documento" => $arr_temp[7],
-       						"autorizacion" => $arr_temp[8],
-       						"num_cuenta_pago" => $arr_temp[9],
-       						"monto_pagado" => $arr_temp[10],
-       						"monto_acumulado" => $arr_temp[11],
-       						"nit_entidad" => $arr_temp[12],
-       						"num_documento_pago" => $arr_temp[13],
-       						"tipo_documento_pago" => $arr_temp[14],
-       						"fecha_de_pago" => $arr_temp[15],
+       						//"num_contrato" => $arr_temp[6],
+       						"importe_documento" => $arr_temp[6],
+       						"autorizacion" => $arr_temp[7],
+       						"num_cuenta_pago" => $arr_temp[8],
+       						"monto_pagado" => $arr_temp[9],
+       						"monto_acumulado" => $arr_temp[10],
+       						"nit_entidad" => $arr_temp[11],
+       						"num_documento_pago" => $arr_temp[12],
+       						"tipo_documento_pago" => $arr_temp[13],
+       						"fecha_de_pago" => $arr_temp[14],
        						
 						);
 					}else if($this->aParam->getParametro('tipo')=='Ventas'){
@@ -283,16 +321,16 @@ class MODBancaCompraVenta extends MODbase{
        						"nit_ci" => $arr_temp[3],
        						"razon" => $arr_temp[4],
        						"num_documento" => $arr_temp[5],
-       						"num_contrato" => $arr_temp[6],
-       						"importe_documento" => $arr_temp[7],
-       						"autorizacion" => $arr_temp[8],
-       						"num_cuenta_pago" => $arr_temp[9],
-       						"monto_pagado" => $arr_temp[10],
-       						"monto_acumulado" => $arr_temp[11],
-       						"nit_entidad" => $arr_temp[12],
-       						"num_documento_pago" => $arr_temp[13],
-       						"tipo_documento_pago" => $arr_temp[14],
-       						"fecha_de_pago" => $arr_temp[15],
+       						//"num_contrato" => $arr_temp[6],
+       						"importe_documento" => $arr_temp[6],
+       						"autorizacion" => $arr_temp[7],
+       						"num_cuenta_pago" => $arr_temp[8],
+       						"monto_pagado" => $arr_temp[9],
+       						"monto_acumulado" => $arr_temp[10],
+       						"nit_entidad" => $arr_temp[11],
+       						"num_documento_pago" => $arr_temp[12],
+       						"tipo_documento_pago" => $arr_temp[13],
+       						"fecha_de_pago" => $arr_temp[14],
        						
 						);
 					}
@@ -320,6 +358,7 @@ class MODBancaCompraVenta extends MODbase{
 			}
 			
 			
+			
 		
 			$arra_json = json_encode($arra);
 		
@@ -335,6 +374,9 @@ class MODBancaCompraVenta extends MODbase{
 			$this->setParametro('arra_json','arra_json','text');
 			$this->setParametro('tipo','tipo','varchar');
 			$this->setParametro('id_periodo','id_periodo','int4');
+			
+			$this->setParametro('fecha_archivo','fecha_archivo','date');
+			$this->setParametro('nombre_archivo','nombre_archivo','varchar');
 	
 			//Ejecuta la instruccion
 			$this->armarConsulta();
@@ -348,6 +390,54 @@ class MODBancaCompraVenta extends MODbase{
 			
 		
 	}
+
+	function remove_utf8_bom($text)
+	{
+	    $bom = pack('H*','EFBBBF');
+	    $text = preg_replace("/^$bom/", '', $text);
+	    return $text;
+	}
+
+
+	function str_osplit($string, $offset){
+    return isset($string[$offset]) ? array(substr($string, 0, $offset), substr($string, $offset)) : false;
+    }
+
+
+
+	function listarDocumento(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_documento_endesis';
+		$this->transaccion='FAC_DOC_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		//$this->setCount(false);
+        
+        $this->setTipoRetorno('record');
+			
+		
+		//Definicion de la lista del resultado del query
+		$this->captura('id_documento','int4');
+		$this->captura('nro_autorizacion','varchar');
+		$this->captura('nro_documento','bigint');
+		$this->captura('fecha_documento','date');
+		$this->captura('razon_social','varchar');
+		$this->captura('nro_nit','varchar');
+		
+      $this->captura('sw_libro_compras','varchar');
+	  $this->captura('importe_total','numeric');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
+
+
 	
 			
 }

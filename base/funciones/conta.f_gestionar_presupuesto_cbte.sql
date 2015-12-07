@@ -89,6 +89,12 @@ DECLARE
     v_sw_moneda_base		varchar;
     v_importe_debe 			numeric;
     v_importe_haber 			numeric;
+    v_importe_debe_mb			numeric;
+    v_importe_haber_mb 			numeric;
+    v_monto_cmp_mb 			numeric;
+    va_monto_mb 			numeric[];
+    v_monto_previo_ejecutado_mb	numeric;
+    v_monto_previo_revertido_mb	numeric;
 
 BEGIN
 	
@@ -126,7 +132,8 @@ BEGIN
       ic.id_moneda,
       ic.fecha,
       ic.vbregional,
-      ic.temporal
+      ic.temporal,
+      ic.nro_tramite
     into v_registros_comprobante
     from conta.tint_comprobante ic
     inner join conta.tclase_comprobante cl  on ic.id_clase_comprobante =  cl.id_clase_comprobante
@@ -151,18 +158,18 @@ BEGIN
     
       
      
-     -- si el comprobante tiene efecto presupouestario'
+     -- si el comprobante tiene efecto presupuestario'
    
     IF v_registros_comprobante.momento = 'presupuestario' THEN
     
-            --recuepra el error maximo opr redondeo
+            --recuepra el error maximo por  redondeo
             v_error_presupuesto=pxp.f_get_variable_global('error_presupuesto')::numeric;
             IF v_error_presupuesto is NULL THEN
              raise exception 'No se encontro el valor de la variable global : error_presupuesto';
             END IF;
     
    
-           --rrecorrer todas las transacciones revisando las partidas presupuestarias
+           --recorrer todas las transacciones revisando las partidas presupuestarias
             v_i = 0;
            --Definir el momento 
            IF v_registros_comprobante.momento_comprometido = 'no'  and  v_registros_comprobante.momento_ejecutado = 'si'  and    v_registros_comprobante.momento_pagado = 'si' then
@@ -267,11 +274,13 @@ BEGIN
                    ELSE
                       v_importe_debe = v_registros.importe_debe;
                       v_importe_haber =  v_registros.importe_haber;
-                   END IF;     
+                   END IF; 
+                   
+                 
                    
                    
                    
-                   IF    v_momento_aux='todo' or   v_momento_aux='solo ejecutar'  THEN
+                   IF    v_momento_aux = 'todo' or   v_momento_aux='solo ejecutar'  THEN
                           
                             -- si solo ejecutamos el presupuesto 
                             --  o (compromentemos y ejecutamos) 
@@ -297,12 +306,14 @@ BEGIN
                                 IF v_registros.sw_movimiento = 'presupuestaria' THEN
                                      
                                      v_monto_cmp = 0;
+                                    
                                      v_i = v_i + 1;
                                      -- determinamos el monto a comprometer
+                                     
                                      IF v_registros.tipo = 'gasto'  THEN
                                          -- importe debe ejecucion
                                          IF v_importe_debe > 0 THEN
-                                             v_monto_cmp  = v_importe_debe;
+                                             v_monto_cmp  = v_importe_debe;                                            
                                          END IF;
                                          --importe haber es reversion, multiplicar por -1
                                          IF v_importe_haber > 0 THEN
@@ -310,17 +321,15 @@ BEGIN
                                          END IF;
                                      ELSE
                                          IF v_importe_haber > 0 THEN
-                                           v_monto_cmp  = v_importe_haber;
+                                           v_monto_cmp  = v_importe_haber;                                           
                                          END IF;
                                          --importe debe es reversion, multiplicar por -1
                                          IF v_importe_debe > 0 THEN
-                                             v_monto_cmp  = v_importe_debe * (-1);
+                                             v_monto_cmp  = v_importe_debe * (-1);                                             
                                          END IF;
                                      END IF;
                                      
-                                     
-                                    
-                                           
+                                          
                                       
                                      --  armamos los array para enviar a presupuestos          
                                      va_tipo_partida[v_i] = v_registros.tipo;
@@ -328,6 +337,7 @@ BEGIN
                                      va_id_partida[v_i]= v_registros.id_partida;
                                      va_momento[v_i]	= v_momento_presupeustario;
                                      va_monto[v_i]  = v_monto_cmp;
+                                   
                                      va_id_moneda[v_i]  = v_id_moneda;
                                      va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
                                      va_columna_relacion[v_i]= 'id_int_transaccion';
@@ -342,18 +352,18 @@ BEGIN
                                      END IF;
                                      
                                      --chequeamos si el presupuesto alcanza, 
-                                     --si no,  pero la diferencia es minima ajustamos el monto a ejecutar
+                                     --si no alcanza,  pero la diferencia es minima ajustamos el monto a ejecutar
                                      v_respuesta_verificar = pre.f_verificar_com_eje_pag(
                                                                                   va_id_partida_ejecucion[v_i],
                                                                                   va_id_moneda[v_i]);
                                                                                   
                                     
                                     v_monto_previo_ejecutado = 0;
-                                    v_monto_previo_revertido = 0; 
+                                    v_monto_previo_revertido = 0;
                                                                                   
-                                    --antes de validar el monto,  calculamos en la tabla temporal los montos previos ya ejecutados
+                                    -- antes de validar el monto,  calculamos en la tabla temporal los montos previos ya ejecutados
                                     select
-                                      sum(tt.monto) 
+                                      sum(tt.monto)
                                     into 
                                      v_monto_previo_ejecutado
                                     from tt_check_presu tt 
@@ -361,9 +371,9 @@ BEGIN
                                       and id_partida_ejecucion =  va_id_partida_ejecucion[v_i]
                                       and estado = 'ejecutado';
                                                             
-                                  --caculamos los montos previos revertidos    
+                                  -- caculamos los montos previos revertidos    
                                   select
-                                      sum(tt.monto) 
+                                      sum(tt.monto)
                                     into 
                                      v_monto_previo_revertido
                                     from tt_check_presu tt 
@@ -382,7 +392,9 @@ BEGIN
                                       
                                     END IF;
                                     
+                                    ----------------------------------------------------
                                     --insertamos el nuevo valor en la tabla temporal
+                                    ----------------------------------------------------
                                     
                                     INSERT INTO tt_check_presu(
                                          id,
@@ -391,6 +403,7 @@ BEGIN
                                          id_partida,
                                          momento,
                                          monto ,
+                                       
                                          id_moneda ,
                                          id_partida_ejecucion ,
                                          columna_relacion ,
@@ -407,6 +420,7 @@ BEGIN
                                          va_id_partida[v_i],
                                          va_momento[v_i],
                                          va_monto[v_i] ,
+                                        
                                          va_id_moneda[v_i] ,
                                          va_id_partida_ejecucion[v_i] ,
                                          va_columna_relacion[v_i] ,
@@ -420,9 +434,9 @@ BEGIN
                                 
                                 
                                 
-                                   -------------------------------------------------------  
+                                   -------------------------------------------------------------------------------  
                                    --   si existe monto a revertir y tenememos el id_partida_ejecucion, revertimos
-                                   -------------------------------------------------------
+                                   -----------------------------------------------------------------------------
                                    
                                    IF v_registros.importe_reversion > 0 and v_registros.id_partida_ejecucion is not null THEN
                                               
@@ -437,9 +451,9 @@ BEGIN
                                                    va_monto[v_i]  = (v_registros.importe_reversion)*-1; --signo negativo para revertir
                                                    va_id_moneda[v_i]  = v_id_moneda;
                                                    va_id_partida_ejecucion [v_i] = v_registros.id_partida_ejecucion ;   
-                                                   va_columna_relacion[v_i]= 'id_int_transaccion';
+                                                   va_columna_relacion[v_i] = 'id_int_transaccion';
                                                    va_fk_llave[v_i] = v_registros.id_int_transaccion;
-                                                   va_id_transaccion[v_i]= v_registros.id_int_transaccion;
+                                                   va_id_transaccion[v_i] = v_registros.id_int_transaccion;
                                                    
                                                    -- fechaejecucion presupuestaria  
                                                    IF p_fecha_ejecucion is NULL THEN
@@ -500,7 +514,7 @@ BEGIN
                                                      id_presupuesto,
                                                      id_partida,
                                                      momento,
-                                                     monto ,
+                                                     monto,                                                   
                                                      id_moneda ,
                                                      id_partida_ejecucion ,
                                                      columna_relacion ,
@@ -516,7 +530,7 @@ BEGIN
                                                      va_id_presupuesto[v_i],
                                                      va_id_partida[v_i],
                                                      va_momento[v_i],
-                                                     va_monto[v_i] ,
+                                                     va_monto[v_i] ,                                                    
                                                      va_id_moneda[v_i] ,
                                                      va_id_partida_ejecucion[v_i] ,
                                                      va_columna_relacion[v_i] ,
@@ -644,7 +658,7 @@ BEGIN
                                                
                                                -- chequeamos si el presupuesto devengado si alcanza para pagar, 
                                                -- si no,  pero la diferencia es minima pagamos   el monto disponible
-                                               v_respuesta_verificar = pre.f_verificar_com_eje_pag(va_id_partida_ejecucion[v_i],va_id_moneda[v_i]);
+                                                v_respuesta_verificar = pre.f_verificar_com_eje_pag(va_id_partida_ejecucion[v_i],va_id_moneda[v_i]);
                                                                                           
                                                
                                                 v_monto_previo_pagado = 0;                                        
@@ -730,17 +744,20 @@ BEGIN
                    
                IF v_i > 0 THEN 
                  
-                         va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
-                                                                       va_id_partida, 
-                                                                       va_id_moneda, 
-                                                                       va_monto, 
-                                                                       va_fecha, --p_fecha
-                                                                       va_momento, 
-                                                                       va_id_partida_ejecucion,--  p_id_partida_ejecucion 
-                                                                       va_columna_relacion, 
-                                                                       va_fk_llave,
-                                                                       p_id_int_comprobante,
-                                                                       p_conexion);
+                         va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
+                                                                    NULL, --tipo cambio
+                                                                    va_id_presupuesto, 
+                                                                    va_id_partida, 
+                                                                    va_id_moneda, 
+                                                                    va_monto, 
+                                                                    va_fecha, --p_fecha
+                                                                    va_momento, 
+                                                                    va_id_partida_ejecucion,--  p_id_partida_ejecucion 
+                                                                    va_columna_relacion, 
+                                                                    va_fk_llave,
+                                                                    v_registros_comprobante.nro_tramite,
+                                                                    p_id_int_comprobante,
+                                                                    p_conexion);
                                 
                END IF;
                  

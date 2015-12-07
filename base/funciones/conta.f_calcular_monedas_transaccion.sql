@@ -30,7 +30,6 @@ v_nombre_funcion		varchar;
 v_resp					varchar;
 v_id_moneda_base		integer;
 v_id_moneda_tri			integer;
-
 v_id_m1					integer;
 v_id_m2					integer;
 va_tc1 					varchar[];
@@ -39,11 +38,8 @@ v_tmp1 					varchar;
 v_tmp2 					varchar;
 va_id_tc1 				varchar[];
 va_id_tc2 				varchar[];
- 
 v_valor_mb 				numeric;
 v_valor_mt 				numeric;
-
-
 v_valor_debe_mt 		numeric;
 v_valor_haber_mt 		numeric;
 v_valor_debe_mb 		numeric;
@@ -51,11 +47,6 @@ v_valor_haber_mb 		numeric;
 v_temp_debe  			numeric;
 v_temp_haber  			numeric; 
 va_montos 				numeric[];
- 
- 
-
-
-
 v_registros				record;
 v_registros_rel			record; 
 
@@ -78,7 +69,8 @@ BEGIN
         cc.ope_1,
         cc.ope_2,
         c.localidad,
-        c.fecha
+        c.fecha,
+        c.sw_editable
        into 
         v_registros
        from conta.tint_transaccion it 
@@ -88,17 +80,15 @@ BEGIN
        
       
        
-     --si no tenemos noenda de transaccion mostramos el error
+     --si no tenemos moneda  de la transaccion mostramos el error
     
      IF v_registros.importe_debe is NULL or  v_registros.importe_haber is NULL  THEN
        raise exception 'esta transaccion no tiene importe transaccional o es cero';
      END IF;
     
     -- si no tenemos  tipo de cambio lanzamos un error
-      IF v_registros.tipo_cambio is NULL or v_registros.tipo_cambio_2 is NULL THEN
-      
-        raise exception 'No tenemos tipo de cambio registrado en el comprobante';
-        
+      IF v_registros.tipo_cambio is NULL or v_registros.tipo_cambio_2 is NULL THEN      
+        raise exception 'No tenemos tipo de cambio registrado en el comprobante';        
       END IF;
     
     --2) IF ... si la transaccion es de ajuste  no se hacen cambios (actualizacion = si)
@@ -140,7 +130,7 @@ BEGIN
               where id_int_transaccion = p_id_int_transaccion;
            
      
-             -- Si es comprobante de devengado, revisamos si tienen relaciones con pagos 
+             -- Si es comprobante de pago, revisamos si tienen relaciones con pagos 
              -- listado de las transacciones del comprobante
              FOR v_registros_rel in (
                                       select 
@@ -179,13 +169,34 @@ BEGIN
            
            ELSE
              --  2.3) ELSE...  si es internacional
-             --   si es extranjera triangulamos la moneda base  ..????????????
-           
+             --   si es extranjera triangulamos la moneda base  
+               
+              --si es un comprobante con edición habilitada (calculamos moenda de triangulacion)
+              IF v_registros.sw_editable = 'si' THEN
+                   
+                   v_valor_debe_mt =  param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_tri,   v_registros.importe_debe, v_registros.fecha,'CUS',50, v_registros.tipo_cambio, 'no');
+                   v_valor_haber_mt =  param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_tri,   v_registros.importe_haber, v_registros.fecha,'CUS',50, v_registros.tipo_cambio, 'no');
+                   
+                   v_registros.importe_debe_mt = v_valor_debe_mt;
+                   v_registros.importe_haber_mt = v_valor_haber_mt;
+                  
+                  
+                   --modificamos transaccion 
+                   update conta.tint_transaccion t set
+                    importe_debe_mt = v_valor_debe_mt,
+                    importe_haber_mt = v_valor_haber_mt,
+                    importe_gasto_mt = v_valor_debe_mt,
+                    importe_recurso_mt = v_valor_haber_mt
+                  where id_int_transaccion = p_id_int_transaccion;
+              
+              END IF;
+               
+              --  si no tenemos moneda de triangulacion msotramor el error
               IF   v_registros.importe_debe_mt is null and v_registros.importe_haber_mt is null  THEN
                 raise exception 'No tenemos moneda de triangulacion para la triangulación, es obligatorio para transacciones internacionales';
               END IF; 
            
-              --si no tenemos moneda de triangulacion msotramor el error
+             
            
                v_valor_debe_mb =   param.f_convertir_moneda (v_id_moneda_tri, v_id_moneda_base,    v_registros.importe_debe_mt,  v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_2, 'no');
                v_valor_haber_mb =  param.f_convertir_moneda (v_id_moneda_tri, v_id_moneda_base,    v_registros.importe_haber_mt, v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_2, 'no');
@@ -200,7 +211,7 @@ BEGIN
               where id_int_transaccion = p_id_int_transaccion;
               
               
-              -- Si es comprobante de devengado, revisamos si tienen relaciones con pagos 
+              -- Si es comprobante de pago, revisamos si tienen relaciones con pagos 
               -- listado de las transacciones del comprobante
               FOR v_registros_rel in (
                                       select 

@@ -82,7 +82,8 @@ BEGIN
                 campo_tipo_cambio,
                 campo_depto_libro,
                 campo_fecha_costo_ini,
-                campo_fecha_costo_fin
+                campo_fecha_costo_fin,
+                funcion_comprobante_editado
              
           	) values(
                 v_parametros.codigo,
@@ -117,7 +118,8 @@ BEGIN
                 v_parametros.campo_tipo_cambio,
                 v_parametros.campo_depto_libro,
                 v_parametros.campo_fecha_costo_ini,
-                v_parametros.campo_fecha_costo_fin
+                v_parametros.campo_fecha_costo_fin,
+                v_parametros.funcion_comprobante_editado
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -171,7 +173,8 @@ BEGIN
               campo_tipo_cambio = v_parametros.campo_tipo_cambio,
               campo_depto_libro = v_parametros.campo_depto_libro,
               campo_fecha_costo_ini = v_parametros.campo_fecha_costo_ini,
-              campo_fecha_costo_fin = v_parametros.campo_fecha_costo_fin
+              campo_fecha_costo_fin = v_parametros.campo_fecha_costo_fin,
+              funcion_comprobante_editado = v_parametros.funcion_comprobante_editado
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta

@@ -164,6 +164,30 @@ class ACTBancaCompraVenta extends ACTbase{
 			
 		//$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function listarDocumento(){
+		
+		
+		
+		
+		if($this->objParam->getParametro('sw_libro_compras') != ''){
+			$this->objParam->addFiltro("pla.sw_libro_compras = ''".$this->objParam->getParametro('sw_libro_compras')."'' ");  
+						
+		}
+		
+		if($this->objParam->getParametro('nro_nit') != ''){
+			$this->objParam->addFiltro("doc.nro_nit = ''".$this->objParam->getParametro('nro_nit')."'' ");  
+			
+		}
+		
+		
+		$this->objFunc=$this->create('MODBancaCompraVenta');	
+		$this->res=$this->objFunc->listarDocumento($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+
+
 			
 }
 

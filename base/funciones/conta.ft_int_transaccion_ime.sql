@@ -28,6 +28,7 @@ DECLARE
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
     v_registros				record;
+    v_registros_trans		record;
 	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
@@ -41,6 +42,8 @@ DECLARE
      v_id_moneda_base		integer;
      v_tc_1 				numeric;
      v_tc_2 				numeric;
+     v_monto 				numeric;
+     v_factor				numeric;
  
 BEGIN
 
@@ -184,6 +187,11 @@ BEGIN
              from conta.tint_comprobante cbt
              where  cbt.id_int_comprobante = v_parametros.id_int_comprobante;
              
+             
+         
+             
+             
+             
             -- si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
             -- para que no actulice automaricamente las transacciones si es modificada
             IF  v_registros.tipo_cambio !=  v_parametros.tipo_cambio or v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 THEN
@@ -202,9 +210,27 @@ BEGIN
 			        	inner join conta.tint_comprobante cbte
 			        	on cbte.id_int_comprobante = tra.id_int_comprobante
 			        	where tra.id_int_transaccion = v_parametros.id_int_transaccion
-        				and cbte.estado_reg = 'borrador') then
-        		raise exception 'Modificación no realizada: el comprobante no está en estado Borrador';
+        				and cbte.estado_reg = 'borrador'  and cbte.sw_editable = 'si') then
+        		raise exception 'Modificación no realizada: el comprobante no está en estado Borrador o no es editable';
         	end if;
+            
+            
+            
+           ------------------------------------------------------------------------------ 
+           -- si tiene relacion de devengado se limina la relacion
+           --------------------------------------------------------------------------------- 
+            FOR v_registros in (
+                                    select 
+                                       rd.id_int_rel_devengado,
+                                       rd.monto_pago 
+                                    from conta.tint_rel_devengado rd
+                                    where   (rd.id_int_transaccion_dev = v_parametros.id_int_transaccion
+                                         or rd.id_int_transaccion_pag = v_parametros.id_int_transaccion)
+                                         and rd.estado_reg = 'activo' )LOOP
+                      DELETE FROM 
+                        conta.tint_rel_devengado 
+                      WHERE id_int_rel_devengado = v_registros.id_int_rel_devengado;
+            END LOOP;
             
             
             
@@ -301,15 +327,32 @@ BEGIN
 			        	inner join conta.tint_comprobante cbte
 			        	on cbte.id_int_comprobante = tra.id_int_comprobante
 			        	where tra.id_int_transaccion = v_parametros.id_int_transaccion
-        				and cbte.estado_reg = 'borrador') then
-        		raise exception 'Eliminación no realizada: el comprobante no está en estado Borrador';
+        				and cbte.estado_reg = 'borrador' and cbte.sw_editable = 'si') then
+        		raise exception 'Eliminación no realizada: el comprobante no está en estado Borrador o no es editable';
         	end if;
-
+            
+          
+            --si tiene relacion de devengado es necesario eliminarlas
+            
+            FOR v_registros in (
+                                    select 
+                                       rd.id_int_rel_devengado 
+                                    from conta.tint_rel_devengado rd
+                                    where   (rd.id_int_transaccion_dev = v_parametros.id_int_transaccion
+                                         or rd.id_int_transaccion_pag = v_parametros.id_int_transaccion)
+                                         and rd.estado_reg = 'activo' )LOOP
+                                         
+                      DELETE FROM 
+                        conta.tint_rel_devengado 
+                      WHERE id_int_rel_devengado = v_registros.id_int_rel_devengado;
+            END LOOP;
+            
+            
             --------------------------
 			--ELIMINACIÓN TRANSACCIÓN 
 			--------------------------
 			delete from conta.tint_transaccion
-            where id_int_transaccion=v_parametros.id_int_transaccion;
+            where id_int_transaccion = v_parametros.id_int_transaccion;
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción eliminado(a)'); 

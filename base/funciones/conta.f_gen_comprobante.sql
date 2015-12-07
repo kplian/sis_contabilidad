@@ -371,6 +371,7 @@ BEGIN
       fecha,
       funcion_comprobante_validado,
       funcion_comprobante_eliminado,
+      --funcion_comprobante_editado,
       id_cuenta_bancaria, 
       id_cuenta_bancaria_mov, 
       nro_cheque, 
@@ -381,7 +382,8 @@ BEGIN
       temporal,
       fecha_costo_ini,
       fecha_costo_fin,
-      localidad
+      localidad,
+      sw_editable
              
     ) 
     VALUES (
@@ -410,6 +412,7 @@ BEGIN
       v_this.columna_fecha,
       v_plantilla.funcion_comprobante_validado,
       v_plantilla.funcion_comprobante_eliminado,
+      --v_plantilla.funcion_comprobante_editado,
       v_this.columna_id_cuenta_bancaria, 
       v_this.columna_id_cuenta_bancaria_mov, 
       v_this.columna_nro_cheque, 
@@ -420,7 +423,8 @@ BEGIN
       v_temporal,
       v_this.columna_fecha_costo_ini,
       v_this.columna_fecha_costo_fin,
-      v_localidad
+      v_localidad,
+      'no'
       
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
@@ -459,17 +463,20 @@ BEGIN
     
     v_sincronizar = pxp.f_get_variable_global('sincronizar');
     
-        
+       
+    
+    -- TODO ver el problema de conexion en estaciones internacioanles para tener rooback
+     
     --Si la sincronizacion esta habilitada
     IF(v_sincronizar = 'true')THEN
   	 	
-        -- si sincroniza locamente con endesis
+        -- si sincroniza localmente con endesis
          IF(not p_sincronizar_internacional)THEN
            v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante, p_conexion);
         
          ELSE
-         --   TODO si es necesario migrar a contabilidad internacional ....
-           v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante, p_id_tabla_valor);
+         -- si es necesario migrar a contabilidad internacional (soo comprobante temporales)....
+            v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante, p_id_tabla_valor);
          END IF;
     END IF;
    

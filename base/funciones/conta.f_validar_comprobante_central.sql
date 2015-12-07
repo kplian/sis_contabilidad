@@ -26,18 +26,18 @@ Descripcion
 
 DECLARE
   
-	v_nombre_funcion   		text;
-	v_resp					varchar; 
-    v_int_comprobante 		record;
-    v_nombre_conexion  		varchar;
-    v_codigo_estacion 		varchar;
-    v_consulta 				varchar;
-    resultado				numeric;
-    v_respuesta_dblink		varchar;
+	v_nombre_funcion			   		text;
+	v_resp								varchar; 
+    v_int_comprobante			 		record;
+    v_nombre_conexion			  		varchar;
+    v_codigo_estacion			 		varchar;
+    v_consulta			 				varchar;
+    resultado							numeric;
+    v_respuesta_dblink					varchar;
     v_funcion_comprobante_validado_central	text;
-    v_registros_tran		record;
-    v_resp_dblink_tra_rel	record;
-    v_resp_dblink_tra       record;
+    v_registros_tran					record;
+    v_resp_dblink_tra_rel				record;
+    v_resp_dblink_tra			       record;
    
     
     
@@ -94,7 +94,7 @@ BEGIN
    PERFORM  dblink(v_nombre_conexion,v_consulta, true);
                             
   
-    --------------------------------------------------------------------------------
+    -----------------------------------------------------------------------------------
     -- actulizar TC1 , moneda de triangulacón y transacciones faltantes en la central
     -----------------------------------------------------------------------------------
     
@@ -125,6 +125,7 @@ BEGIN
                                    importe_gasto_mt =  '||COALESCE(v_registros_tran.importe_gasto_mt::varchar,'NULL')||',
                                    importe_recurso_mt =  '||COALESCE(v_registros_tran.importe_recurso_mt::varchar,'NULL')||',
                                    id_partida =  '||COALESCE(v_registros_tran.id_partida::varchar,'NULL')||',
+                                   id_partida =  '||COALESCE(v_registros_tran.id_partida::varchar,'NULL')||',
                                    id_cuenta =  '||COALESCE(v_registros_tran.id_cuenta::varchar,'NULL')||',
                                    id_centro_costo =  '||COALESCE(v_registros_tran.id_centro_costo::varchar,'NULL')||',
                                    id_auxiliar =  '||COALESCE(v_registros_tran.id_auxiliar::varchar,'NULL')||'
@@ -135,7 +136,7 @@ BEGIN
                    PERFORM dblink(v_nombre_conexion,v_consulta, true);
                             
                ELSE --si no existe en al central
-                   raise exception 'tras nueva';
+                  
                    -- insertar trasacciones solo si tienen valor para M o MT (no se considera si solo tiene valor en MB)
                    IF  v_registros_tran.importe_debe_mt > 0 or v_registros_tran.importe_haber_mt > 0 THEN
                    

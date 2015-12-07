@@ -355,7 +355,24 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
+		},				
+		{
+			config:{
+				name: 'funcion_comprobante_editado',
+				fieldLabel: 'Funcion Comprobante Editado',
+				qtip:'Funcion que se ejecuta al validar un cbte que ha sido editado',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.funcion_comprobante_editado',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
 		},
+		
 		{
 			config:{
 				name: 'campo_id_cuenta_bancaria',
@@ -598,7 +615,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		'campo_nro_cuenta_bancaria_trans',
 		'campo_nro_tramite','campo_tipo_cambio','campo_depto_libro',
 	    'campo_fecha_costo_ini',
-	    'campo_fecha_costo_fin'
+	    'campo_fecha_costo_fin','funcion_comprobante_editado'
         
 		
 	],

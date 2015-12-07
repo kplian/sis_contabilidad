@@ -505,7 +505,7 @@ BEGIN
           where id_int_comprobante = v_parametros.id_int_comprobante;  
           
           
-          IF  v_reg_cbte.estado_reg = 'borrador'  THEN
+          IF  v_reg_cbte.estado_reg != 'borrador'  THEN
              raise exception 'El cbte debe estar en borrador para habilitar la edición';
           END IF;
           

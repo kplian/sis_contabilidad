@@ -77,12 +77,15 @@ BEGIN
                raise exception 'No puede insertar esta relación por que el cbte esta validado';
             END IF;
             
-            -- Obtener la moneda base
+         -- Obtener la moneda base
           v_id_moneda_base = param.f_get_moneda_base();
           v_id_moneda_tri  = param.f_get_moneda_triangulacion();
          
         
-         --calculo de equivalentes
+         --validacion de comprobante editable
+         IF v_registros.sw_editable = 'no' THEN
+              raise exception 'no puede insertar relaciones en comprobantes no editables';  
+         END IF;
          
           IF v_registros.localidad = 'nacional'  THEN
             
@@ -99,18 +102,18 @@ BEGIN
             v_monto_pago_mt = va_montos[2];
           
           ELSE
-             -- si es origen internacional de  la moneda  se  triangula
-            
-            raise exception 'no puede insertar relaciones en comprobantes internacionales';
+          
                
+              v_monto_pago_mt =  param.f_convertir_moneda (v_registros.id_moneda_t, v_id_moneda_tri,   v_parametros.monto_pago, v_registros.fecha,'CUS',50, v_registros.tipo_cambio_t, 'no');
+              v_monto_pago_mb =  param.f_convertir_moneda (v_id_moneda_tri, v_id_moneda_base,  v_monto_pago_mt, v_registros.fecha,'CUS',50,v_registros.tipo_cambio_2_t, 'no');
+                 
+             -- si es origen internacional de  la moneda  se  triangula            
+                        
           END IF;
           
           
-          
-       
-          
           --  validar que el monto a pagar  no sobre pase el monto ejecutado
-        
+                  
            SELECT
              sum(rd.monto_pago)
            into
@@ -120,44 +123,52 @@ BEGIN
            and rd.estado_reg = 'activo'; 
            
            
+           IF v_registros.importe_haber = 0 and (v_registros.importe_debe <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_registros.importe_debe, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           END IF;
            
            
-           IF v_registros.importe_debe <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago THEN
-             raise exception 'El monto ejecutado (%) es menor al monto que se quiere pagar (%)', v_registros.importe_debe, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           IF v_registros.importe_debe = 0 and (v_registros.importe_haber <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_registros.importe_haber, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
            END IF;
            
            
         	--Sentencia de la insercion
         	insert into conta.tint_rel_devengado(
-              id_int_transaccion_pag,
-              id_int_transaccion_dev,
-              monto_pago,
-              monto_pago_mb,
-              monto_pago_mt,
-              estado_reg,
-              id_usuario_ai,
-              fecha_reg,
-              usuario_ai,
-              id_usuario_reg,
-              fecha_mod,
-              id_usuario_mod
-              ) values(
-              v_parametros.id_int_transaccion_pag,
-              v_parametros.id_int_transaccion_dev,
-              v_parametros.monto_pago,
-              v_monto_pago_mb,
-              v_monto_pago_mt,
-              'activo',
-              v_parametros._id_usuario_ai,
-              now(),
-              v_parametros._nombre_usuario_ai,
-              p_id_usuario,
-              null,
-              null
-			)RETURNING id_int_rel_devengado into v_id_int_rel_devengado;
+                id_int_transaccion_pag,
+                id_int_transaccion_dev,
+                monto_pago,
+                monto_pago_mb,
+                monto_pago_mt,
+                estado_reg,
+                id_usuario_ai,
+                fecha_reg,
+                usuario_ai,
+                id_usuario_reg,
+                fecha_mod,
+                id_usuario_mod
+             ) values(
+                v_parametros.id_int_transaccion_pag,
+                v_parametros.id_int_transaccion_dev,
+                v_parametros.monto_pago,
+                v_monto_pago_mb,
+                v_monto_pago_mt,
+                'activo',
+                v_parametros._id_usuario_ai,
+                now(),
+                v_parametros._nombre_usuario_ai,
+                p_id_usuario,
+                null,
+                null
+			) RETURNING id_int_rel_devengado into v_id_int_rel_devengado;
 			
             
-          
+            -- TODO recalcular tipo de cambio en transacciones  de pago
+            -- calcular moneda base y triangulacion
+            
+            PERFORM  conta.f_calcular_monedas_transaccion(v_parametros.id_int_transaccion_pag);
+            
+            
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','RELDEV almacenado(a) con exito (id_int_rel_devengado'||v_id_int_rel_devengado||')'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_rel_devengado',v_id_int_rel_devengado::varchar);
@@ -192,7 +203,10 @@ BEGIN
             inner join conta.tint_transaccion it on it.id_int_comprobante = ic.id_int_comprobante
             where it.id_int_transaccion = v_parametros.id_int_transaccion_pag;
             
-            
+            --validacion de comprobante editable
+            IF v_registros.sw_editable = 'no' THEN
+              raise exception 'no puede insertar relaciones en comprobantes no editables';  
+            END IF;
             
             IF v_registros.estado_reg = 'validado' THEN
                raise exception 'No puede modificar esta relación por que el cbte esta validado';
@@ -219,9 +233,14 @@ BEGIN
            
            
            
-           IF v_registros.importe_debe <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago) THEN
-             raise exception 'El monto ejecutado (%) es menor al monto que se quiere pagar (%)', v_registros.importe_debe, (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago);
-           END IF;   
+           IF v_registros.importe_haber = 0 and (v_registros.importe_debe <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_registros.importe_debe, (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago);
+           END IF; 
+           
+           
+           IF v_registros.importe_debe = 0 and (v_registros.importe_haber <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
+              raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_registros.importe_haber, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           END IF;  
             
             
             -- Obtener la moneda base
@@ -242,7 +261,10 @@ BEGIN
                 v_monto_pago_mt = va_montos[2];                                               
                                                                
             ELSE
-               raise exception 'no peude aditar montos en cbte internacionales';
+               
+               v_monto_pago_mt =  param.f_convertir_moneda (v_registros.id_moneda_t, v_id_moneda_tri,   v_parametros.monto_pago, v_registros.fecha,'CUS',50, v_registros.tipo_cambio_t, 'no');
+               v_monto_pago_mb =  param.f_convertir_moneda (v_id_moneda_tri, v_id_moneda_base,  v_monto_pago_mt, v_registros.fecha,'CUS',50,v_registros.tipo_cambio_2_t, 'no');
+                 
             END IF;   
             
          
@@ -259,6 +281,11 @@ BEGIN
               id_usuario_ai = v_parametros._id_usuario_ai,
               usuario_ai = v_parametros._nombre_usuario_ai
 			where id_int_rel_devengado=v_parametros.id_int_rel_devengado;
+            
+            -- TODO recalcular tipo de cambio en transacciones  de pago
+            -- calcular moneda base y triangulacion
+            
+            PERFORM  conta.f_calcular_monedas_transaccion(v_parametros.id_int_transaccion_pag);
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','RELDEV modificado(a)'); 
@@ -287,12 +314,18 @@ BEGIN
              v_registros
             from conta.tint_comprobante ic
             inner join conta.tint_transaccion it on it.id_int_comprobante = ic.id_int_comprobante
-            where it.id_int_transaccion = v_parametros.id_int_transaccion_pag;
+            inner join conta.tint_rel_devengado rd on rd.id_int_transaccion_pag = it.id_int_transaccion
+            where rd.id_int_rel_devengado = v_parametros.id_int_rel_devengado;
+            
             
             IF v_registros.estado_reg = 'validado' THEN
                raise exception 'No puede eliminar  esta relación por que el cbte esta validado';
             END IF;
             
+            --  validacion de comprobante editable
+            IF v_registros.sw_editable = 'no' THEN
+               raise exception 'no puede insertar relaciones en comprobantes no editables';  
+            END IF;
             
             IF v_registros.localidad != 'nacional' THEN
                raise exception 'No puede eliminar  relaciones en cbtes internacionales';

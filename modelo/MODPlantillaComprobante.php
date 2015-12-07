@@ -56,6 +56,7 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('campo_depto_libro','text');
 		$this->captura('campo_fecha_costo_ini','text');
 		$this->captura('campo_fecha_costo_fin','text');
+		$this->captura('funcion_comprobante_editado','text');
 		
         
 		
@@ -106,6 +107,8 @@ class MODPlantillaComprobante extends MODbase{
 		
 		$this->setParametro('campo_fecha_costo_ini','campo_fecha_costo_ini','text');
 		$this->setParametro('campo_fecha_costo_fin','campo_fecha_costo_fin','text');
+		$this->setParametro('funcion_comprobante_editado','funcion_comprobante_editado','text');
+		
 		
 		
 		
@@ -157,6 +160,8 @@ class MODPlantillaComprobante extends MODbase{
         $this->setParametro('campo_depto_libro','campo_depto_libro','text');
 		$this->setParametro('campo_fecha_costo_ini','campo_fecha_costo_ini','text');
 		$this->setParametro('campo_fecha_costo_fin','campo_fecha_costo_fin','text');
+		$this->setParametro('funcion_comprobante_editado','funcion_comprobante_editado','text');
+		
         
 		//Ejecuta la instruccion
 		$this->armarConsulta();
