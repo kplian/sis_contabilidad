@@ -59,6 +59,7 @@ BEGIN
     v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
     v_conta_codigo_estacion = pxp.f_get_variable_global('conta_codigo_estacion');
     v_sincornizar_central = pxp.f_get_variable_global('sincronizar_central');
+    v_sincronizar = pxp.f_get_variable_global('sincronizar');
     --raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';	
 	v_errores = '';
     
@@ -95,20 +96,24 @@ BEGIN
               where id_int_comprobante = p_id_int_comprobante;
          
          END IF;
-         
-         --abrimo conexion dblink
-         select * into v_nombre_conexion from migra.f_crear_conexion(); 
-    
     end if;
     
+    
+    -- TODO revisar cuando abrir conexion ....
+    --abrimo conexion dblink
+    IF v_conta_codigo_estacion != 'CENTRAL'  or v_sincronizar = 'true' or p_origen  = 'endesis' THEN
+        select * into v_nombre_conexion from migra.f_crear_conexion(); 
+    END IF;
+     
+    
+	
     -- si es un comprobante editado internacionales , abrimos una segunda conexion 
     
     IF v_rec_cbte.sw_editable = 'si' and v_rec_cbte.localidad = 'internacional'  THEN
-         v_conexion_int_act = migra.f_crear_conexion(v_id_depto_lb,'tes.testacion', v_rec_cbte.codigo_estacion_origen);
+         v_conexion_int_act = migra.f_crear_conexion(NULL,'tes.testacion', v_rec_cbte.codigo_estacion_origen);
     END IF;
     
     
-	
     --1. Verificar existencia del comprobante
     if not exists(select 1 from conta.tint_comprobante
     			where id_int_comprobante = p_id_int_comprobante
@@ -195,7 +200,6 @@ BEGIN
             end if;
                   
             
-            v_sincronizar = pxp.f_get_variable_global('sincronizar');
             
             IF(v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'no' )THEN
                -- raise exception 'No se pueden validar comprobantes desde PXP en BOA';
@@ -231,8 +235,6 @@ BEGIN
     
     END IF;
    
-   
-    
     ------------------------------------------------------------------------------------------------
     --  Validacion presupuestaria del comprobante no se ejecuta solo verifica 
     --  si el dinero comprometido o devengado es suficiente para proseguir con la transaccion

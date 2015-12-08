@@ -551,7 +551,7 @@ BEGIN
                            
                           
                                 v_aux = v_aux || ','||v_registros.id_int_transaccion;
-                           
+                          
                                 FOR  v_registros_dev in (
                                                           select 
                                                             ird.id_int_rel_devengado,
@@ -562,14 +562,18 @@ BEGIN
                                                             it.importe_reversion,
                                                             it.factor_reversion,
                                                             it.monto_pagado_revertido,
-                                                            ic.fecha
+                                                            ic.fecha,
+                                                            it.id_partida_ejecucion_rev
                                                             
                                                           from  conta.tint_rel_devengado ird
                                                           inner join conta.tint_transaccion it 
                                                             on it.id_int_transaccion = ird.id_int_transaccion_dev
+                                                          inner join pre.tpartida p on p.id_partida = it.id_partida 
+                                                          
                                                           inner join conta.tint_comprobante ic on ic.id_int_comprobante = it.id_int_comprobante
                                                           where  ird.id_int_transaccion_pag = v_registros.id_int_transaccion
                                                                  and ird.estado_reg = 'activo'
+                                                                 and p.sw_movimiento = 'presupuestaria'
                                                          ) LOOP  
                                                          
                                               
@@ -587,7 +591,7 @@ BEGIN
                                                --   presupeustariamente solo pagamos el 87                               ---
                                                -----------------------------------------------------------------------------
                                                
-                                              IF  v_registros_dev.factor_reversion > 0   THEN
+                                              IF  v_registros_dev.factor_reversion > 0 and v_registros_dev.id_partida_ejecucion_rev is not null   THEN
                                                 
                                                     v_monto_rev =  COALESCE(round(v_monto_x_pagar * v_registros_dev.factor_reversion,2), 0);
                                                     

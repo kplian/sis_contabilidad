@@ -395,15 +395,14 @@ BEGIN
                            
                           --TODO verificar si existe diferencia por tipo de cambio
                           
-                          
                               v_aux = v_aux || ','||v_registros.id_int_transaccion;
-                           
                                  FOR  v_registros_dev in (
                                                           select 
                                                             ird.id_int_rel_devengado,
                                                             ird.monto_pago,
                                                             ird.monto_pago_mb, 
                                                             ird.id_int_transaccion_dev,
+                                                            it.id_partida_ejecucion_rev,
                                                             it.id_partida_ejecucion_dev,
                                                             it.importe_reversion,
                                                             it.factor_reversion,
@@ -412,9 +411,14 @@ BEGIN
                                                           from  conta.tint_rel_devengado ird
                                                           inner join conta.tint_transaccion it 
                                                             on it.id_int_transaccion = ird.id_int_transaccion_dev
+                                                          inner join pre.tpartida p on p.id_partida = it.id_partida 
                                                           where  ird.id_int_transaccion_pag = v_registros.id_int_transaccion
                                                                  and ird.estado_reg = 'activo'
+                                                                 and p.sw_movimiento = 'presupuestaria'
                                                          ) LOOP  
+                                                         
+                                                 
+                                                 
                                                          
                                                 -- RAC 14/10/2015 
                                                 -- OJO para sw a moneda base no estamos considerando las reversiones, 
@@ -434,23 +438,23 @@ BEGIN
                                                ----------------------------------------------------------------------------
                                                
                                                
-                                              IF  v_registros_dev.factor_reversion > 0   THEN
+                                              IF  v_registros_dev.factor_reversion > 0 and v_registros_dev.id_partida_ejecucion_rev is not null   THEN
                                                 
                                                     v_monto_rev = round(v_monto_x_pagar * v_registros_dev.factor_reversion,2);
                                                     
                                                     v_monto_x_pagar = v_monto_x_pagar - v_monto_rev;
                                                     
-                                                    
                                                     --si el monto a revertir es mayor que la diferencia de lo que sobra  puede ser un problema d redondeo
                                                     --y forzamos que iguale si la fiderencia no es mayor que 1
                                                     
                                                      IF (v_registros_dev.importe_reversion - v_registros_dev.monto_pagado_revertido) <  v_monto_rev THEN
-                                                    
                                                            IF (v_monto_rev - (v_registros_dev.importe_reversion - v_registros_dev.monto_pagado_revertido)) > 1 THEN
                                                            
-                                                              raise exception ' La diferencia por redondeo al determinar el monto a pagar presupuestariamente es mayor a 1, (%)',(v_monto_rev - (importe_reversion - monto_pagado_revertido));
+                                                              raise exception ' La diferencia por redondeo al determinar el monto a pagar presupuestariamente es mayor a 1, (%)',(v_monto_rev - (v_registros_dev.importe_reversion - v_registros_dev.monto_pagado_revertido));
                                                            
                                                            ELSE
+                                                               
+                                                    
                                                                --si el factor es mayor a cero reducrie el monto a pagar en esa proporcion
                                                               v_monto_rev = v_registros_dev.importe_reversion - v_registros_dev.monto_pagado_revertido;
                                                            
@@ -463,7 +467,6 @@ BEGIN
                                               END IF;
                                                
                                               
-                                               
                                                v_i = v_i + 1;         
                                                --armamos los array para enviar a presupuestos          
                                                va_id_presupuesto[v_i] = NULL; 
@@ -545,7 +548,7 @@ BEGIN
          -----------------------------------------------------------------
          IF v_i > 0 and v_registros_comprobante.momento= 'presupuestario' THEN
                     
-                     IF (v_momento_aux='todo' or   v_momento_aux='solo ejecutar') and  v_registros_comprobante.momento_comprometido = 'si'  THEN
+                     IF (v_momento_aux='todo' or   v_momento_aux='solo ejecutar') and  (v_registros_comprobante.momento_comprometido = 'si' or v_registros_comprobante.sw_editable = 'si') THEN
                        --------------------------------
                        -- Si comprometemos presupeusto
                        ---------------------------------
@@ -847,6 +850,7 @@ BEGIN
        
     
     END IF; -- fin del if de movimiento presupuestario
+    
     
     return v_retorno; 
 
