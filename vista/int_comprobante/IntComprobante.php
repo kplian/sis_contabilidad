@@ -499,7 +499,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				anchor : '80%',
 				gwidth : 70,
 				maxLength : 20,
-				decimalPrecision : 6
+				decimalPrecision : 10
 			},
 			type : 'NumberField',
 			filters : {

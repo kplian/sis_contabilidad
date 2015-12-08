@@ -2758,3 +2758,4 @@ IS 'esta funcion se ejecuta al momento de vlaidar un comprobante que a sido edit
 
 
 
+
