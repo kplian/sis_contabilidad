@@ -2745,7 +2745,6 @@ ALTER TABLE conta.tint_comprobante
 COMMENT ON COLUMN conta.tint_comprobante.id_int_comprobante_bk
 IS 'idetifica el ulitmo backup de este comprobante';
 
---------------- SQL ---------------
 
 ALTER TABLE conta.tplantilla_comprobante
   ADD COLUMN funcion_comprobante_editado TEXT;
