@@ -25,6 +25,7 @@ v_mayor					numeric;
 v_id_gestion  			integer;
 v_id_cuentas			integer[];
 v_monto					numeric;
+v_monto_mayor			numeric[];
 v_reg_cuenta			record;
 v_visible				varchar; 
 v_nombre_variable		varchar;
@@ -117,7 +118,7 @@ BEGIN
                         
                         --raise exception '%, %', v_registros.codigo_cuenta, p_id_gestion;
                 		--   2.1.2)  calculamos el balance de la cuenta para las fechas indicadas
-                        v_monto = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, 
+                         v_monto_mayor = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, 
                         								p_desde, 
                                                         p_hasta, 
                                                         p_id_deptos, 
@@ -126,6 +127,9 @@ BEGIN
                                                         v_registros.incluir_aitb,
                                                         v_registros.signo_balance,
                                                         v_registros.tipo_saldo);
+                                                        
+                                                        
+                        v_monto   = v_monto_mayor[1];                           
                  		
                         --	 2.1.3)  insertamos en la tabla temporal
                         insert into temp_balancef (
@@ -226,7 +230,7 @@ BEGIN
                         
                         ELSE
                           --  si es una cuenta de movimiento
-                              v_monto = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, 
+                            v_monto_mayor = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, 
                   								 p_desde, 
                                                  p_hasta, 
                                                  p_id_deptos, 
@@ -235,6 +239,8 @@ BEGIN
                                                   v_registros.incluir_aitb,
                                                   v_registros.signo_balance,
                                                   v_registros.tipo_saldo);
+                                                  
+                            v_monto = v_monto_mayor[1];                    
                        
                           --	insertamos en la tabla temporal
                           insert into temp_balancef (

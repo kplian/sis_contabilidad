@@ -36,6 +36,7 @@ DECLARE
     v_tipo_rel  record;
     v_defecto varchar;
     v_resp_rep			varchar;
+    v_id_deptos_lbs			varchar;
 			    
 BEGIN
 
@@ -311,7 +312,43 @@ BEGIN
             return v_resp;
 
 		end;
-    
+   
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_GDLB_IME'
+ 	#DESCRIPCION:	recupera los departamentos de libro de bancos relacionados al departamento de contabilidad
+ 	#AUTOR:		admin	
+ 	#FECHA:		16-05-2013 21:52:14
+	***********************************/
+
+	elsif(p_transaccion='CONTA_GDLB_IME')then
+
+		begin
+			
+            select
+             pxp.list(dd.id_depto_origen::varchar)
+            into
+             v_id_deptos_lbs
+            
+            from param.tdepto_depto dd
+            inner join param.tdepto d on d.id_depto = dd.id_depto_origen
+            inner join segu.tsubsistema s on s.id_subsistema = d.id_subsistema and s.codigo = 'TES'
+            where  dd.id_depto_destino = v_parametros.id_depto_conta and  d.modulo = 'LB';
+        
+        
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','relacion depto lb - conta)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_depto_conta',v_parametros.id_depto_conta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_deptos_lbs',v_id_deptos_lbs::varchar);
+            
+            
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+
+ 
     
          
 	else

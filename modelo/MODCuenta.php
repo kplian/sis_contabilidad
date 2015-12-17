@@ -44,6 +44,7 @@ class MODCuenta extends MODbase{
         $this->captura('usr_mod','varchar');
         $this->captura('desc_moneda','varchar');
         $this->captura('gestion','int4');
+		$this->captura('sw_control_efectivo','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -81,6 +82,8 @@ class MODCuenta extends MODbase{
 	 $this->captura('id_gestion','integer');
 	 $this->captura('valor_incremento','varchar');
 	 $this->captura('eeff','varchar');
+	 $this->captura('sw_control_efectivo','varchar');
+	 
 	 
 
     
@@ -111,6 +114,9 @@ class MODCuenta extends MODbase{
 		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('eeff','eeff','varchar');
 		$this->setParametro('valor_incremento','evalor_incrementoeff','varchar');
+		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
+		
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -140,6 +146,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('eeff','eeff','varchar');
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
+		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

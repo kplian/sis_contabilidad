@@ -76,7 +76,8 @@ BEGIN
         c.origen,
         c.sw_editable,
         c.nro_cbte,
-        c.codigo_estacion_origen
+        c.codigo_estacion_origen,
+        c.localidad
         
 	  into 
         v_rec_cbte
@@ -108,11 +109,14 @@ BEGIN
     
 	
     -- si es un comprobante editado internacionales , abrimos una segunda conexion 
-    
-    IF v_rec_cbte.sw_editable = 'si' and v_rec_cbte.localidad = 'internacional'  THEN
+  
+   
+    IF v_rec_cbte.sw_editable = 'si' and  v_rec_cbte.vbregional = 'si' and  v_conta_codigo_estacion = 'CENTRAL' and v_rec_cbte.localidad != 'nacional'  THEN
          v_conexion_int_act = migra.f_crear_conexion(NULL,'tes.testacion', v_rec_cbte.codigo_estacion_origen);
     END IF;
     
+    --raise exception '% . % ,% ,%', v_rec_cbte.sw_editable,v_rec_cbte.vbregional,v_conta_codigo_estacion ,v_rec_cbte.localidad ;
+   
     
     --1. Verificar existencia del comprobante
     if not exists(select 1 from conta.tint_comprobante
@@ -462,12 +466,11 @@ BEGIN
          --  que pudieran haber sido realizadas al cbte en la estación regioanl
          ----------------------------------------------------------------------------
          
-          IF v_conta_codigo_estacion != 'CENTRAL' and v_rec_cbte.origen is not NULL THEN
+          IF  v_rec_cbte.sw_editable = 'si' and  v_rec_cbte.vbregional = 'si' and  v_conta_codigo_estacion = 'CENTRAL' and v_rec_cbte.localidad != 'nacional'  THEN
              v_resp =  migra.f_migrar_act_cbte_a_regional(p_id_int_comprobante, p_id_usuario ,v_conexion_int_act);
           END IF;
          
          
-           
          -----------------------------------------------------------------------------------------------------------------------
          -- SI el comprobante se valida en central y es de  una regional internacional y la sincronizacion esta habilitada migramos el cbte a ENDESIS
          -- si la moneda  no es dolares debemos convertir a Bolivianos

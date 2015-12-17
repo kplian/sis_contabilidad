@@ -95,7 +95,8 @@ BEGIN
                         usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         mon.codigo as desc_moneda,
-                        ges.gestion
+                        ges.gestion,
+                        cta.sw_control_efectivo
                         from conta.tcuenta cta
 						inner join segu.tusuario usu1 on usu1.id_usuario = cta.id_usuario_reg
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
@@ -153,7 +154,8 @@ BEGIN
                         cta.sw_transaccional,
                         cta.id_gestion,
                         cta.valor_incremento,
-                        array_to_string( cta.eeff, '','',''null'')::varchar	 as eeff                    
+                        array_to_string( cta.eeff, '','',''null'')::varchar	 as eeff     ,
+                        cta.sw_control_efectivo               
                         from conta.tcuenta cta
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         where  '||v_where|| ' 

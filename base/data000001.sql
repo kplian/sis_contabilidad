@@ -1175,3 +1175,33 @@ select pxp.f_insert_testructura_gui ('LIBVEN', 'CBTE.1');
 select pxp.f_insert_testructura_gui ('DOC', 'CBTE.1');
 
 /***********************************F-SCP-RAC-CONTA-0-23/11/2015****************************************/
+
+
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-10/12/2015****************************************/
+
+
+select pxp.f_insert_tgui ('Ajuste TC', 'Ajuste por diferencia de tipo de cambio', 'AJST', 'si', 1, 'sis_contabilidad/vista/ajuste/Ajuste.php', 3, '', 'Ajuste', 'CONTA');
+select pxp.f_insert_testructura_gui ('AJST', 'CAJT');
+
+
+select pxp.f_delete_testructura_gui ('RELACON', 'CONTA');
+select pxp.f_delete_testructura_gui ('RELCONGEN', 'RELACON');
+
+select pxp.f_insert_testructura_gui ('RELACON', 'DEFRECONCAR');
+select pxp.f_insert_testructura_gui ('RELCONGEN', 'DEFRECONCAR');
+
+
+/* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'conta_prioridad_depto_inter', E'3', E'prioridad depto de contabilidad internacional');
+
+/***********************************F-SCP-RAC-CONTA-0-10/12/2015****************************************/
+
+
+
+

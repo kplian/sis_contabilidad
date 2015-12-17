@@ -9,9 +9,10 @@ CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
   p_incluir_apertura varchar = 'todos'::character varying,
   p_incluir_aitb varchar = 'todos'::character varying,
   p_signo_balance varchar = 'defecto_cuenta'::character varying,
-  p_tipo_saldo varchar = 'balance'::character varying
+  p_tipo_saldo varchar = 'balance'::character varying,
+  p_id_auxiliar integer = NULL::integer
 )
-RETURNS numeric AS
+RETURNS numeric [] AS
 $body$
 /*
 Autor: RCM
@@ -26,11 +27,22 @@ DECLARE
     v_resp							varchar;
     v_nombre_funcion   				varchar;
     v_rec_cbte_trans 				record;
+     v_registros						record;
     
+    
+    v_resp_final  					numeric[];
+    v_resp_aux  					numeric[];
     v_resp_mayor   					numeric;
-    v_registros						record;
+   
     v_sum_debe						numeric;
     v_sum_haber						numeric;
+    
+    v_resp_mayor_mt   					numeric;
+   
+    v_sum_debe_mt						numeric;
+    v_sum_haber_mt						numeric;
+    
+    
     va_id_deptos					integer[];
     va_cbte_cierre					varchar[];
     va_cbte_apertura				varchar[];
@@ -51,6 +63,7 @@ BEGIN
         va_cbte_cierre[2] = 'resultado';
      end if;
      IF p_incluir_cierre = 'solo_cierre' THEN
+         
          --sobreexribe la posicion uno ... 
          va_cbte_cierre[1] = 'resultado';
          va_cbte_cierre[2] = 'balance';
@@ -76,11 +89,14 @@ BEGIN
         va_cbte_aitb[1] = 'no';
      END IF;
      
+   
+     
      
      
 	
      --iniciamos acumulador en cero
      v_resp_mayor = 0;
+     v_resp_mayor_mt = 0;
      
      va_id_deptos = string_to_array(p_id_deptos,',')::INTEGER[];
      
@@ -110,10 +126,14 @@ BEGIN
           -- sumar el debe y el haber para la cuenta
           select 
              sum(t.importe_debe_mb),
-             sum(t.importe_haber_mb)
+             sum(t.importe_haber_mb),
+             sum(t.importe_debe_mt),
+             sum(t.importe_haber_mt)
           into
              v_sum_debe,
-             v_sum_haber
+             v_sum_haber,
+             v_sum_debe_mt,
+             v_sum_haber_mt
           from conta.tint_transaccion t
           inner join conta.tint_comprobante c on t.id_int_comprobante = c.id_int_comprobante
           where 
@@ -124,7 +144,12 @@ BEGIN
               c.cbte_apertura = ANY(va_cbte_apertura) AND
               c.cbte_aitb = ANY(va_cbte_aitb) AND
               c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin AND
-              c.id_depto::integer = ANY(va_id_deptos);
+              c.id_depto::integer = ANY(va_id_deptos) AND 
+              (CASE WHEN p_id_auxiliar is NULL  THEN  
+                         0=0 
+                    ELSE
+                       t.id_auxiliar = p_id_auxiliar 
+                    END);
           
         --------------------------------
         --  calculo de tipo de resultado
@@ -135,29 +160,39 @@ BEGIN
                     -- si el incremento es debe 
                     IF  v_registros.incremento = 'debe'   THEN
                        v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
+                       v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0);
                     ELSE
                     --si el incremento de haber 
                        v_resp_mayor = COALESCE(v_sum_haber,0) - COALESCE(v_sum_debe,0); 
+                       v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0) - COALESCE(v_sum_debe_mt,0); 
                     END IF;  
                    
               
                 ELSIF   p_signo_balance = 'deudor' THEN
                   --forzar saldo deudor
-                  v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);  
+                  v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
+                  v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0);    
                 ELSE
                   --forzar saldo acredor 
                   v_resp_mayor = COALESCE(v_sum_haber,0) - COALESCE(v_sum_debe,0);
+                  v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0) - COALESCE(v_sum_debe_mt,0);
                 END IF;
                 
                 -- raise exception 'bal %, %, %,--- % ,%', v_resp_mayor, p_signo_balance, p_tipo_saldo,  COALESCE(v_sum_debe,0),  COALESCE(v_sum_debe,0);
          
           ELSEIF  p_tipo_saldo = 'deudor' THEN
                 v_resp_mayor = COALESCE(v_sum_debe,0);
+                v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0);
           ELSEIF  p_tipo_saldo = 'acreedor' THEN
                v_resp_mayor = COALESCE(v_sum_haber,0);
+               v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0);
           END IF; 
-          -- retornamos el resultado   
-          return v_resp_mayor;
+          -- retornamos el resultado 
+          v_resp_final[1] = v_resp_mayor;
+          v_resp_final[2] = v_resp_mayor_mt;
+        
+          return v_resp_final;  
+          
           
      ELSE
      -- si no es una cuenta titular
@@ -167,32 +202,38 @@ BEGIN
                              from conta.tcuenta c 
                              where c.id_cuenta_padre = p_id_cuenta and c.estado_reg = 'activo') LOOP
                --    llamada recursiva
-               v_resp_mayor = v_resp_mayor + conta.f_mayor_cuenta(v_registros.id_cuenta, p_fecha_ini, p_fecha_fin, p_id_deptos, p_incluir_cierre, p_incluir_apertura, p_incluir_aitb, p_signo_balance, p_tipo_saldo);
-         
+               
+               v_resp_aux = conta.f_mayor_cuenta(v_registros.id_cuenta, p_fecha_ini, p_fecha_fin, p_id_deptos, p_incluir_cierre, p_incluir_apertura, p_incluir_aitb, p_signo_balance, p_tipo_saldo);
+               
+               
+               v_resp_mayor = v_resp_mayor + v_resp_aux[1];
+               
+               v_resp_mayor_mt = v_resp_mayor_mt + v_resp_aux[2];
+               
          END LOOP;
+         
+         v_resp_final[1] = v_resp_mayor;
+         v_resp_final[2] = v_resp_mayor_mt;
         
-         return v_resp_mayor;
+         return v_resp_final;
          
      END IF;     
           
-           
+     v_resp_final[1] = 0;
+     v_resp_final[2] = 0;    
      
-     return 0;
+     return v_resp_final;
+     
+     
 EXCEPTION
 WHEN OTHERS THEN
-	if (current_user like '%dblink_%') then
-    	v_resp = pxp.f_obtiene_clave_valor(SQLERRM,'mensaje','','','valor');
-        if v_resp = '' then        	
-        	v_resp = SQLERRM;
-        end if;
-    	return 'error' || '#@@@#' || v_resp;        
-    else
+	
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
-    end if;
+   
 END;
 $body$
 LANGUAGE 'plpgsql'

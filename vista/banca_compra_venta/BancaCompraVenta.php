@@ -395,6 +395,14 @@ fheight: '80%',
 				this.Cmp.tipo_documento_pago.reset();
 				this.Cmp.tipo_documento_pago.store.baseParams.descripcion = "Cheque de cualquier naturaleza";
 				this.Cmp.tipo_documento_pago.modificado = true;
+				
+				this.Cmp.tipo_documento_pago.store.load({params:{start:0,limit:10},
+					callback:function(){
+					
+					this.Cmp.tipo_documento_pago.setValue(1);
+				 	}, scope : this
+				}); 
+				
 			}
 			this.Cmp.num_cuenta_pago.setValue(record.data.nro_cuenta);
 			this.Cmp.nit_entidad.setValue(record.data.doc_id);
@@ -570,6 +578,24 @@ fheight: '80%',
 			id_grupo: 0,
 			grid: true,
 			form: false
+		},
+		
+		
+		{
+			config:{
+				name: 'periodo',
+				fieldLabel: 'periodo',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255,
+				disabled:true,
+			},
+				type:'TextField',
+				
+				id_grupo:0,
+				form:true,
+				grid: true
 		},
 		
 		
@@ -1156,6 +1182,9 @@ fheight: '80%',
 			grid: true,
 			form: true
 		},
+		
+		
+		
 		{
 			config:{
 				name: 'estado_reg',
@@ -1278,7 +1307,41 @@ fheight: '80%',
 				id_grupo:2,
 				grid:true,
 				form:false
-		}
+		},
+		
+		{
+                config: {
+                    name: 'periodo_servicio',
+                    fieldLabel: 'Periodo de servicio ',
+                    allowBlank: true,
+                    emptyText: 'Tipo...',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'local',
+                    store: ['ENERO', 'FEBRERO', 'MARZO','ABRIL','MAYO','JUNIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
+                    width: 200
+                },
+                type: 'ComboBox',
+                id_grupo: 2,
+                form: true
+        },
+                
+		{
+			config:{
+				name: 'numero_cuota',
+				fieldLabel: 'Numero de Cuota',
+				allowBlank: true,
+				anchor: '90%',
+				gwidth: 100,
+				maxLength:655362
+			},
+				type:'NumberField',
+				filters:{pfiltro:'banca.numero_cuota',type:'numeric'},
+				id_grupo:2,
+				form:true
+		},
+		
 	],
 	tam_pag:50,	
 	title:'bancarizacion',
@@ -1331,6 +1394,7 @@ fheight: '80%',
 		
 		{name:'id_documento', type: 'numeric'},
 		{name:'desc_documento', type: 'string'},
+		{name:'periodo', type: 'string'},
 		
 	],
 	sortInfo:{
@@ -1380,6 +1444,8 @@ fheight: '80%',
             alert('Especifique el año y el mes antes')
          }
         else{
+        	
+        	
             this.store.baseParams.id_gestion=this.cmbGestion.getValue();
             this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
             this.store.baseParams.id_depto = this.cmbDepto.getValue();
@@ -1398,11 +1464,35 @@ fheight: '80%',
         else{
         	this.accionFormulario = 'NEW';
             Phx.vista.BancaCompraVenta.superclass.onButtonNew.call(this);//habilita el boton y se abre
+            
+            
+            
+            
             this.Cmp.id_depto_conta.setValue(this.cmbDepto.getValue()); 
             this.Cmp.id_periodo.setValue(this.cmbPeriodo.getValue()); 
             //this.Cmp.tipo.setValue(this.cmbTipo.getValue()); 
+            
+            Ext.Ajax.request({
+                url: '../../sis_parametros/control/Periodo/literalPeriodo',
+                params: { "id_periodo":this.cmbPeriodo.getValue()},
+                success: this.successLiteralPeriodo,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope:   this
+            });
+            
+            
+            
         }
     },
+    
+    successLiteralPeriodo:function(resp){
+    	 var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+    	 
+    	this.Cmp.periodo.setValue(reg.datos[0].f_literal_periodo);
+    },
+    
+    
     
      preparaMenu:function(tb){
         Phx.vista.BancaCompraVenta.superclass.preparaMenu.call(this,tb)

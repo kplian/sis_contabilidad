@@ -24,7 +24,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
 							direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_cuenta','nombre_cuenta','desc_cuenta','nro_cuenta'],
+					fields: ['id_cuenta','nombre_cuenta','desc_cuenta','nro_cuenta','gestion','desc_moneda'],
 					// turn on remote sorting
 					remoteSort: true,
 					baseParams:Ext.apply({par_filtro:'nro_cuenta#nombre_cuenta#desc_cuenta',sw_transaccional:'movimiento'}, config.baseParams)
@@ -32,7 +32,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
 				valueField: 'id_cuenta',
  				displayField: 'nombre_cuenta',
  				hiddenName: 'id_cuenta',
-				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p><p>Nombre:{nombre_cuenta}</p> </div></tpl>',
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p><p>Nombre:{nombre_cuenta}</p> <p>({desc_moneda}) - {gestion}</p></div></tpl>',
 				forceSelection:true,
  				typeAhead: false,
                 triggerAction: 'all',

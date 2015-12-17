@@ -86,7 +86,7 @@ BEGIN
     v_consulta = 'update conta.tint_comprobante set 
     				sw_tipo_cambio = '''||v_int_comprobante.sw_tipo_cambio||''',
                     localidad = ''internacional'' ,
-                    sw_editabe = ''no'' ,
+                    sw_editable = ''no'' ,
                     tipo_cambio = '||v_int_comprobante.tipo_cambio_2::varchar||'
                   where id_int_comprobante = '||v_int_comprobante.id_int_comprobante_origen_central::varchar; 
                             
@@ -125,7 +125,7 @@ BEGIN
                                    importe_gasto_mt =  '||COALESCE(v_registros_tran.importe_gasto_mt::varchar,'NULL')||',
                                    importe_recurso_mt =  '||COALESCE(v_registros_tran.importe_recurso_mt::varchar,'NULL')||',
                                    id_partida =  '||COALESCE(v_registros_tran.id_partida::varchar,'NULL')||',
-                                   id_partida =  '||COALESCE(v_registros_tran.id_partida::varchar,'NULL')||',
+                                   id_orden_trabajo =  '||COALESCE(v_registros_tran.id_orden_trabajo::varchar,'NULL')||',
                                    id_cuenta =  '||COALESCE(v_registros_tran.id_cuenta::varchar,'NULL')||',
                                    id_centro_costo =  '||COALESCE(v_registros_tran.id_centro_costo::varchar,'NULL')||',
                                    id_auxiliar =  '||COALESCE(v_registros_tran.id_auxiliar::varchar,'NULL')||'

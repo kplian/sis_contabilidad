@@ -19,7 +19,7 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.RelacionContable.superclass.constructor.call(this,config);
 		this.init();
 		this.iniciarEventos();
-		this.addButton('clonarConf',{ text: 'Clonar cnfiguración', iconCls: 'blist',disabled: false, handler: this.clonarConf, tooltip: 'Clonar la configuración para la siguiente gestión'});
+		this.addButton('clonarConf',{ text: 'Clonar configuración', iconCls: 'blist',disabled: false, handler: this.clonarConf, tooltip: 'Clonar la configuración para la siguiente gestión'});
         
 		
 	},

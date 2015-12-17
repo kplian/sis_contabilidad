@@ -91,43 +91,45 @@ BEGIN
         
         	--Sentencia de la insercion
         	insert into conta.tcuenta(
-            id_cuenta_padre,
-			nombre_cuenta,
-			sw_auxiliar,
-			nivel_cuenta,
-			tipo_cuenta,
-			desc_cuenta,
-			tipo_cuenta_pat,
-			nro_cuenta,
-			id_moneda,
-			sw_transaccional,
-			id_gestion,
-            estado_reg,
-			fecha_reg,
-			id_usuario_reg,
-			fecha_mod,
-			id_usuario_mod,
-            eeff,
-            valor_incremento
+                id_cuenta_padre,
+                nombre_cuenta,
+                sw_auxiliar,
+                nivel_cuenta,
+                tipo_cuenta,
+                desc_cuenta,
+                tipo_cuenta_pat,
+                nro_cuenta,
+                id_moneda,
+                sw_transaccional,
+                id_gestion,
+                estado_reg,
+                fecha_reg,
+                id_usuario_reg,
+                fecha_mod,
+                id_usuario_mod,
+                eeff,
+                valor_incremento,
+                sw_control_efectivo
           	) values(
-			v_id_cuenta_padre,
-			v_parametros.nombre_cuenta,
-			v_parametros.sw_auxiliar,
-			NULL,
-			v_parametros.tipo_cuenta,
-			v_parametros.desc_cuenta,
-			v_tipo_cuenta_pat,
-			v_parametros.nro_cuenta,
-			v_parametros.id_moneda,
-			v_parametros.sw_transaccional,
-			v_parametros.id_gestion,
-            'activo',
-            now(),
-			p_id_usuario,
-			null,
-			null,
-            string_to_array(v_parametros.eeff,',')::varchar[],
-            v_parametros.valor_incremento
+                v_id_cuenta_padre,
+                v_parametros.nombre_cuenta,
+                v_parametros.sw_auxiliar,
+                NULL,
+                v_parametros.tipo_cuenta,
+                v_parametros.desc_cuenta,
+                v_tipo_cuenta_pat,
+                v_parametros.nro_cuenta,
+                v_parametros.id_moneda,
+                v_parametros.sw_transaccional,
+                v_parametros.id_gestion,
+                'activo',
+                now(),
+                p_id_usuario,
+                null,
+                null,
+                string_to_array(v_parametros.eeff,',')::varchar[],
+                v_parametros.valor_incremento,
+                v_parametros.sw_control_efectivo
 							
 			)RETURNING id_cuenta into v_id_cuenta;
 			
@@ -188,7 +190,8 @@ BEGIN
               fecha_mod = now(),
               id_usuario_mod = p_id_usuario,
               eeff = string_to_array(v_parametros.eeff,',')::varchar[],
-              valor_incremento = v_parametros.valor_incremento
+              valor_incremento = v_parametros.valor_incremento,
+              sw_control_efectivo =  v_parametros.sw_control_efectivo
 			where id_cuenta = v_parametros.id_cuenta;
              
             --raise exception '% ', v_parametros.id_cuenta;
@@ -293,7 +296,9 @@ BEGIN
                    raise exception 'no se encontró una siguiente gestión preparada (primero cree  gestión siguiente)';
           END IF;
           v_conta = 0;
-          --  consulta recursia de cuentas de la gestion origen
+          
+          
+          --  consulta recursiva de cuentas de la gestion origen
           FOR v_registros_cuenta in  (
                      WITH RECURSIVE cuenta_inf(id_cuenta, id_cuenta_padre) AS (
                           select 
@@ -315,74 +320,80 @@ BEGIN
             
                --  busca si ya existe la relacion en la tablas de cuentas ids
                   IF NOT EXISTS(select 1 from conta.tcuenta_ids i where i.id_cuenta_uno =  v_registros_cuenta.id_cuenta) THEN
-                     IF v_registros_cuenta.id_cuenta_padre is not null THEN
-                        --  busca la cuenta del padre en cuetaids
-                         v_id_cuenta_padre_des  = NULL;
-                         select
-                           cid.id_cuenta_dos
-                         into
-                           v_id_cuenta_padre_des
-                         from conta.tcuenta_ids cid
-                         where  cid.id_cuenta_uno = v_registros_cuenta.id_cuenta_padre;
-                     END IF;
-                     --obtiene los dastos de la cuenta origen
-                     v_reg_cuenta_ori = NULL;
-                     select * into v_reg_cuenta_ori from conta.tcuenta c where c.id_cuenta = v_registros_cuenta.id_cuenta;
-                     --  inserta la cuenta para la nueva gestion
-                    
-                    INSERT INTO conta.tcuenta
-                            (
-                              id_usuario_reg,
-                              fecha_reg,
-                              estado_reg,
-                              id_empresa,
-                              id_parametro,
-                              id_cuenta_padre,
-                              nro_cuenta,
-                              id_gestion,
-                              id_moneda,
-                              nombre_cuenta,
-                              desc_cuenta,
-                              nivel_cuenta,
-                              tipo_cuenta,
-                              sw_transaccional,
-                              sw_oec,
-                              sw_auxiliar,
-                              tipo_cuenta_pat,
-                              cuenta_sigma,
-                              sw_sigma,                              
-                              cuenta_flujo_sigma,
-                              valor_incremento,
-                              eeff
-                            )
-                            VALUES (
-                              p_id_usuario,
-                              now(),
-                              'activo',
-                              v_reg_cuenta_ori.id_empresa,
-                              v_reg_cuenta_ori.id_parametro,
-                              v_id_cuenta_padre_des,
-                              v_reg_cuenta_ori.nro_cuenta,
-                              v_id_gestion_destino,  --gestion destino
-                              v_reg_cuenta_ori.id_moneda,
-                              v_reg_cuenta_ori.nombre_cuenta,
-                              v_reg_cuenta_ori.desc_cuenta,
-                              v_reg_cuenta_ori.nivel_cuenta,
-                              v_reg_cuenta_ori.tipo_cuenta,
-                              v_reg_cuenta_ori.sw_transaccional,
-                              v_reg_cuenta_ori.sw_oec,
-                              v_reg_cuenta_ori.sw_auxiliar,
-                              v_reg_cuenta_ori.tipo_cuenta_pat,
-                              v_reg_cuenta_ori.cuenta_sigma,
-                              v_reg_cuenta_ori.sw_sigma,                              
-                              v_reg_cuenta_ori.cuenta_flujo_sigma,
-                              v_reg_cuenta_ori.valor_incremento,
-                              v_reg_cuenta_ori.eeff
-                            ) RETURNING id_cuenta into v_id_cuenta;
-                      
-                      --insertar relacion en tre ambas gestion
-                      INSERT INTO conta.tcuenta_ids (id_cuenta_uno,id_cuenta_dos, sw_cambio_gestion ) VALUES ( v_registros_cuenta.id_cuenta,v_id_cuenta, 'gestion');
-                      v_conta = v_conta + 1;
+                     
+                         
+                         IF v_registros_cuenta.id_cuenta_padre is not null THEN
+                            --  busca la cuenta del padre en cuetaids
+                             v_id_cuenta_padre_des  = NULL;
+                             select
+                               cid.id_cuenta_dos
+                             into
+                               v_id_cuenta_padre_des
+                             from conta.tcuenta_ids cid
+                             where  cid.id_cuenta_uno = v_registros_cuenta.id_cuenta_padre;
+                         END IF;
+                         
+                         
+                         --obtiene los dastos de la cuenta origen
+                         v_reg_cuenta_ori = NULL;
+                         select * into v_reg_cuenta_ori from conta.tcuenta c where c.id_cuenta = v_registros_cuenta.id_cuenta;
+                         --  inserta la cuenta para la nueva gestion
+                        
+                        INSERT INTO conta.tcuenta
+                                (
+                                  id_usuario_reg,
+                                  fecha_reg,
+                                  estado_reg,
+                                  id_empresa,
+                                  id_parametro,
+                                  id_cuenta_padre,
+                                  nro_cuenta,
+                                  id_gestion,
+                                  id_moneda,
+                                  nombre_cuenta,
+                                  desc_cuenta,
+                                  nivel_cuenta,
+                                  tipo_cuenta,
+                                  sw_transaccional,
+                                  sw_oec,
+                                  sw_auxiliar,
+                                  tipo_cuenta_pat,
+                                  cuenta_sigma,
+                                  sw_sigma,                              
+                                  cuenta_flujo_sigma,
+                                  valor_incremento,
+                                  eeff,
+                                  sw_control_efectivo
+                                )
+                                VALUES (
+                                  p_id_usuario,
+                                  now(),
+                                  'activo',
+                                  v_reg_cuenta_ori.id_empresa,
+                                  v_reg_cuenta_ori.id_parametro,
+                                  v_id_cuenta_padre_des,
+                                  v_reg_cuenta_ori.nro_cuenta,
+                                  v_id_gestion_destino,  --gestion destino
+                                  v_reg_cuenta_ori.id_moneda,
+                                  v_reg_cuenta_ori.nombre_cuenta,
+                                  v_reg_cuenta_ori.desc_cuenta,
+                                  v_reg_cuenta_ori.nivel_cuenta,
+                                  v_reg_cuenta_ori.tipo_cuenta,
+                                  v_reg_cuenta_ori.sw_transaccional,
+                                  v_reg_cuenta_ori.sw_oec,
+                                  v_reg_cuenta_ori.sw_auxiliar,
+                                  v_reg_cuenta_ori.tipo_cuenta_pat,
+                                  v_reg_cuenta_ori.cuenta_sigma,
+                                  v_reg_cuenta_ori.sw_sigma,                              
+                                  v_reg_cuenta_ori.cuenta_flujo_sigma,
+                                  v_reg_cuenta_ori.valor_incremento,
+                                  v_reg_cuenta_ori.eeff,
+                                  v_reg_cuenta_ori.sw_control_efectivo
+                                ) RETURNING id_cuenta into v_id_cuenta;
+                          
+                          --insertar relacion en tre ambas gestion
+                          INSERT INTO conta.tcuenta_ids (id_cuenta_uno,id_cuenta_dos, sw_cambio_gestion ) VALUES ( v_registros_cuenta.id_cuenta,v_id_cuenta, 'gestion');
+                          v_conta = v_conta + 1;
                   END IF; 
             
                

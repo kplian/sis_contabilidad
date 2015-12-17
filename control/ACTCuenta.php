@@ -23,6 +23,10 @@ class ACTCuenta extends ACTbase{
             $this->objParam->addFiltro("cta.id_gestion = ".$this->objParam->getParametro('id_gestion'));    
         }
 		
+		if($this->objParam->getParametro('sw_control_efectivo')!=''){
+            $this->objParam->addFiltro("cta.sw_control_efectivo = ''".$this->objParam->getParametro('sw_control_efectivo')."''");    
+        }
+		
 		if($this->objParam->getParametro('id_partida')!=''){
             $this->objParam->addFiltro("cta.id_cuenta IN (select id_cuenta 
             							from conta.tcuenta_partida where id_partida = ".$this->objParam->getParametro('id_partida') . ") ");    

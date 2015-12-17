@@ -21,7 +21,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		this.iniciarEventos();
 		
 		this.cmbGestion.on('select',this.capturaFiltros,this);
-		this.addButton('bAux',{text:'Auxiliares',iconCls: 'blist',disabled:true,handler:this.onButonAux,tooltip: '<b>Auxiliares de la cuenta</b><br/>Se habilita si esta cuenta tiene permitido el rgistro de auxiliares '});
+		this.addButton('bAux',{text:'Auxiliares',iconCls: 'blist',disabled:true,handler:this.onButonAux,tooltip: '<b>Auxiliares de la cuenta</b><br/>Se habilita si esta cuenta tiene permitido el registro de auxiliares '});
         this.addButton('btnImprimir',
 			{
 				text: 'Imprimir',
@@ -313,8 +313,27 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	       		id_grupo:0,
 	       		grid:true,
 	       		form:true
-	       	},
-   	      
+	       },
+	       {
+	       		config:{
+	       			name:'sw_control_efectivo',
+	       			fieldLabel:'Control Efectivo',
+	       			qtip: 'Para identificar la cuentas contables que manejas efectivo, como bancos y cajas',
+	       			allowBlank:false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['si','no']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		grid:true,
+	       		form:true
+	       	}, 	
+	      
    	      {
 	       		config:{
 	       			name:'valor_incremento',
@@ -391,7 +410,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'nro_cuenta', type: 'string'},
 		{name:'id_moneda', type: 'numeric'},
 		{name:'sw_transaccional', type: 'string'},
-		{name:'id_gestion', type: 'numeric'},'desc_moneda','valor_incremento','eeff'
+		{name:'id_gestion', type: 'numeric'},'desc_moneda','valor_incremento','eeff','sw_control_efectivo'
 		
 	],
 	cmbGestion: new Ext.form.ComboBox({

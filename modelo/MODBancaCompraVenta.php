@@ -71,7 +71,7 @@ class MODBancaCompraVenta extends MODbase{
 		 $this->captura('id_documento','int4'); 
 		 $this->captura('desc_documento','varchar'); 
 		          
-		
+		$this->captura('periodo','varchar'); 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -114,6 +114,11 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('id_contrato','id_contrato','int4');
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 		$this->setParametro('id_documento','id_documento','int4');
+		
+		$this->setParametro('periodo_servicio','periodo_servicio','varchar');
+
+		$this->setParametro('numero_cuota','numero_cuota','int4');
+		
 		
 		
 	

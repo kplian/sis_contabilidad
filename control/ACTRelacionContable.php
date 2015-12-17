@@ -61,6 +61,18 @@ class ACTRelacionContable extends ACTbase{
 		$this->res=$this->objFunc->clonarConfig($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	/*
+	 *   Auto:  RAC
+	 *   Desc:  Recuepra los departamentos delibro de bancos asociados al departamento contable
+	 * 
+	 * */
+	
+	function getDlbXDconta(){
+		$this->objFunc=$this->create('MODRelacionContable');	
+		$this->res=$this->objFunc->getDlbXDconta($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 			
 }
 

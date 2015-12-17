@@ -78,6 +78,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 	       		config:{
 	       			name:'tiene_centro_costo',
 	       			fieldLabel:'Tiene Centro de Costo',
+	       			qtip: '(SI o NO): La configuración de la cuentas puede variar por centro de costos.  (SI-Único):  se utiliza para recuperar el centro de costo  a partir de código del tipo de relación. (Si.- Gen): Sí general,  permite la configuración sea general si el centro de costo no se especifica  (Es igual a una configuración por defecto sin importar el valor del centro de costos, pero si exiten tiene prioridad sobre la general)',
 	       			allowBlank:false,
 	       			emptyText:'Tiene...',
 	       			typeAhead: true,
@@ -85,13 +86,13 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 	       		    lazyRender:true,
 	       		    mode: 'local',
 	       		    gwidth: 150,
-	       		    anchor: '80%',
+	       		    anchor: '100%',
 	       		    store:new Ext.data.ArrayStore({
 		        	fields: ['ID', 'valor'],
 		        	data :	[['si','Si'],	
 		        			['no','No'],
-		        			['si-unico','Si, solo permite centro de costo'],
-		        			['si-general','Si, permitir configuración general cuando el centor de costo es vacio']]
+		        			['si-unico','Si-Unico, solo permite centro de costo'],
+		        			['si-general','Si-Gen, permitir configuración general cuando el centor de costo es vacio']]
 		        				
 		    		}),
 					valueField:'ID',
@@ -246,6 +247,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 	       		config:{
 	       			name:'tiene_auxiliar',
 	       			fieldLabel:'Tiene Auxiliar',
+	       			qtip: ' (SI o NO) Si tiene o no  que especificar el auxiliar contable. (Dinámico) en caso de ser dinámico,   estos valores  ID AUXILIAR o CÓDIGO AUXILIAR tiene que estar registros en el Maestro ',
 	       			allowBlank:false,
 	       			emptyText:'Tiene...',
 	       			typeAhead: true,

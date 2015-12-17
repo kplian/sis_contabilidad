@@ -2758,3 +2758,166 @@ IS 'esta funcion se ejecuta al momento de vlaidar un comprobante que a sido edit
 
 
 
+/***********************************I-SCP-RAC-CONTA-0-10/12/2015****************************************/
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tajuste (
+  id_ajuste SERIAL,
+  fecha DATE DEFAULT now() NOT NULL,
+  id_depto_conta INTEGER NOT NULL,
+  obs TEXT,
+  estado VARCHAR(20) DEFAULT 'borrador' NOT NULL,
+  PRIMARY KEY(id_ajuste)
+) INHERITS (pxp.tbase)
+;
+
+ALTER TABLE conta.tajuste
+  OWNER TO postgres;
+
+COMMENT ON COLUMN conta.tajuste.id_depto_conta
+IS 'identificador del depto de contabilidad';
+
+COMMENT ON COLUMN conta.tajuste.estado
+IS 'borrador ,  procesado';
+
+
+CREATE TABLE conta.tajuste_det (
+  id_ajuste_det SERIAL NOT NULL,
+  id_cuenta INTEGER NOT NULL,
+  mayor NUMERIC DEFAULT 0 NOT NULL,
+  mayor_mb NUMERIC DEFAULT 0 NOT NULL,
+  mayor_mt NUMERIC DEFAULT 0 NOT NULL,
+  act_mb NUMERIC,
+  act_mt NUMERIC,
+  dif_mb NUMERIC,
+  dif_mt NUMERIC,
+  tipo_cambio_1 NUMERIC,
+  tipo_cambio_2 NUMERIC,
+  id_ajuste INTEGER NOT NULL,
+  CONSTRAINT tajuste_pkey PRIMARY KEY(id_ajuste_det)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tajuste_det.id_cuenta
+IS 'indetica la cuenta contable a ser ajustada';
+
+COMMENT ON COLUMN conta.tajuste_det.mayor
+IS 'mayor de la cuenta, en la moenda de la cuenta';
+
+COMMENT ON COLUMN conta.tajuste_det.mayor_mb
+IS 'mayor de la cuenta en moneda base';
+
+COMMENT ON COLUMN conta.tajuste_det.mayor_mt
+IS 'mayor de la cuenta en moneda de triangulacion';
+
+COMMENT ON COLUMN conta.tajuste_det.act_mb
+IS 'actulizacion de la cuenta en moneda base a la fache del ajuste';
+
+COMMENT ON COLUMN conta.tajuste_det.act_mt
+IS 'actulizacion de la cuenta en moneda de triangulación a la fecha del ajuste';
+
+COMMENT ON COLUMN conta.tajuste_det.dif_mb
+IS 'difenrecia en mb de la actulizacion y el mayor  en moenda base';
+
+COMMENT ON COLUMN conta.tajuste_det.dif_mt
+IS 'difenrecia en mb de la actulizacion y el mayor  en moenda de triangulación';
+
+COMMENT ON COLUMN conta.tajuste_det.tipo_cambio_1
+IS 'tipo de cambio 1 entre  la moneda de la cuenta y moneda base';
+
+COMMENT ON COLUMN conta.tajuste_det.tipo_cambio_2
+IS 'tipo de cambio 2,   entre la moneda de la cuenta y moneda de triangulacion';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  ADD COLUMN sw_control_efectivo VARCHAR(6) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tcuenta.sw_control_efectivo
+IS 'la cuenta realiza control de efectivo se marca en si la cuentas de bancos y cajas para sabe que estan tienen que ser actulizadas';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tajuste_det
+  ADD COLUMN revisado VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tajuste_det.revisado
+IS 'solo los registros revisados se inlcuyen en el cbte de ajuste';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tajuste_det
+  ADD COLUMN dif_manual VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tajuste_det.dif_manual
+IS 'si la diferencia a sido modificado manaulamente queda marcado como si';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tajuste_det
+  ADD COLUMN id_cuenta_bancaria INTEGER;
+
+COMMENT ON COLUMN conta.tajuste_det.id_cuenta_bancaria
+IS 'hace referancia a la cuenta bancaria';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tajuste_det
+  ADD COLUMN id_auxiliar INTEGER;
+
+COMMENT ON COLUMN conta.tajuste_det.id_auxiliar
+IS 'auxiliar contable';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tajuste_det
+  ADD COLUMN id_partida_ingreso INTEGER;
+
+COMMENT ON COLUMN conta.tajuste_det.id_partida_ingreso
+IS 'id partida para el ingreso en caso de ganancia';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tajuste_det
+  ADD COLUMN id_partida_egreso INTEGER;
+
+COMMENT ON COLUMN conta.tajuste_det.id_partida_egreso
+IS 'partida para el egreso en caso de perdida';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tajuste
+  ADD COLUMN tipo VARCHAR(30) DEFAULT 'bancos' NOT NULL;
+
+COMMENT ON COLUMN conta.tajuste.tipo
+IS 'tipo de ajuste , puede ser bancos, cajas o manual';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_ajuste INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_ajuste
+IS 'idnetifica el ajuste de tipo de cambio que origino el comprobante';
+
+
+/***********************************F-SCP-RAC-CONTA-0-10/12/2015****************************************/
+
+
+
+
+
+
+
+

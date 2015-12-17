@@ -27,6 +27,7 @@ v_resp				varchar;
 v_nivel				integer;
 v_suma				numeric;
 v_mayor				numeric;
+va_mayor			numeric[];
 v_id_gestion  		integer;
 v_id_cuentas		integer[];
 v_monto				numeric;
@@ -49,7 +50,7 @@ BEGIN
                      where cue.id_cuenta_padre = p_id_cuenta and cue.estado_reg = 'activo') LOOP
                      
                   --calculamos el balance de la cuenta para las fechas indicadas
-                  v_monto = conta.f_mayor_cuenta(v_registros.id_cuenta, 
+                   va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
                   								 p_desde, 
                                                  p_hasta, 
                                                  p_id_deptos, 
@@ -59,7 +60,7 @@ BEGIN
                                                  p_signo_balance,
                                                  p_tipo_balance);
                  		
-                  
+                  v_monto  =  va_mayor[1];
                   
                   --	insertamos en la tabla temporal
                   insert into temp_balancef (
@@ -101,7 +102,7 @@ BEGIN
                 
                      IF  v_registros.sw_transaccional = 'movimiento'  THEN
                          
-                         v_monto = conta.f_mayor_cuenta(v_registros.id_cuenta, 
+                          va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
                   								 p_desde, 
                                                  p_hasta, 
                                                  p_id_deptos, 
@@ -110,6 +111,8 @@ BEGIN
                                                  p_incluir_aitb,
                                                  p_signo_balance,
                                                  p_tipo_balance);
+                                                 
+                          v_monto =  va_mayor[1];
                        
                           --	insertamos en la tabla temporal
                           insert into temp_balancef (
