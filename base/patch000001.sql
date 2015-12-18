@@ -2750,7 +2750,7 @@ ALTER TABLE conta.tplantilla_comprobante
   ADD COLUMN funcion_comprobante_editado TEXT;
 
 COMMENT ON COLUMN conta.tplantilla_comprobante.funcion_comprobante_editado
-IS 'esta funcion se ejecuta al momento de vlaidar un comprobante que a sido editado (por ejem para revirt el comprometido original del plan de pagos)';
+IS 'esta funcion se ejecuta al momento de validar un comprobante que a sido editado (por ejem para revirt el comprometido original del plan de pagos)';
 
 /***********************************F-SCP-RAC-CONTA-0-30/11/2015****************************************/
 
@@ -2783,7 +2783,7 @@ IS 'borrador ,  procesado';
 
 
 CREATE TABLE conta.tajuste_det (
-  id_ajuste_det SERIAL NOT NULL,
+  id_ajuste_det SERIAL,
   id_cuenta INTEGER NOT NULL,
   mayor NUMERIC DEFAULT 0 NOT NULL,
   mayor_mb NUMERIC DEFAULT 0 NOT NULL,
@@ -2795,7 +2795,7 @@ CREATE TABLE conta.tajuste_det (
   tipo_cambio_1 NUMERIC,
   tipo_cambio_2 NUMERIC,
   id_ajuste INTEGER NOT NULL,
-  CONSTRAINT tajuste_pkey PRIMARY KEY(id_ajuste_det)
+  PRIMARY KEY(id_ajuste_det)
 ) INHERITS (pxp.tbase)
 
 WITH (oids = false);
