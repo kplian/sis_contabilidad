@@ -70,6 +70,7 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
             config: {
                 name: 'prioridad',
                 fieldLabel: 'Prioridad',
+                qtip: '(1) el registro de entrada que trae el importe del documento , (2) calcula sobre el importe en uno,  (3) es solo referencial',
                 anchor: '40%',
                 tinit: false,
                 allowBlank: false,
@@ -92,6 +93,7 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
             config: {
                 name: 'codigo_tipo_relacion',
                 fieldLabel: 'Relación Contable',
+                qtip: 'Si para esta transacción recupera (cuentas,partida auxiliar) a partir de una relación contable.  Generalmente se usa en prioridad 2, la prioridad 1 ya viene con estos parámetros, y la 3 no se procesa',
                 allowBlank: true,
                 emptyText: 'Elija Relación Contable...',
                 store: new Ext.data.JsonStore({
@@ -134,7 +136,8 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         {
             config: {
                 name: 'debe_haber',
-                fieldLabel: 'Debe/Haber',
+                fieldLabel: 'Debe / Haber',
+                qtip: 'si la transacción se mueve al debe o al haber',
                 anchor: '60%',
                 tinit: false,
                 allowBlank: false,
@@ -157,6 +160,7 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
             config: {
                 name: 'tipo_importe',
                 fieldLabel: 'Tipo Importe',
+                qtip: 'si el importe es un porcentaje sobre el importe del documento o un monto fijo',
                 anchor: '60%',
                 tinit: false,
                 allowBlank: false,
@@ -178,7 +182,8 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'importe',
-                fieldLabel: 'Importe/Porcen.',
+                fieldLabel: 'Importe / Porcen.',
+                qtip: 'valor del  importe o porcentaje para mover en el debe o haber (contable)',
                 decimalPrecision:12,
                 allowBlank: false,
                 anchor: '80%',
@@ -195,7 +200,8 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'importe_presupuesto',
-                fieldLabel: 'Presup.Importe/Porcen.',
+                fieldLabel: 'Presup. Importe / Porcen.',
+                qtip: 'valor del importe o porcentaje para mover en recurso o gasto (presupuestos)',
                 allowBlank: false,
                 decimalPrecision:12,
                 anchor: '80%',
@@ -213,6 +219,7 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
             config: {
                 name: 'descuento',
                 fieldLabel: 'Descuento',
+                qtip: 'si la transacción tiene que considerar el descuento o no',
                 anchor: '60%',
                 tinit: false,
                 allowBlank: false,

@@ -85,7 +85,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 			   				baseParams: {sw_control_efectivo: 'si'},
 			   				renderer:function (value, p, record){
 				   			    	
-				   			     	var retorno =  String.format('<b>Cta.:</b>({0}) - {1} ({2})<br>', record.data['nro_cuenta'],record.data['nombre_cuenta'],record.data['codigo_moneda']);	
+				   			     	var retorno =  String.format('<b>Cta.:</b>({0}) - {1} <br><b>Moneda Ajuste: ({2})</b><br>', record.data['nro_cuenta'],record.data['nombre_cuenta'],record.data['codigo_moneda']);	
 					   					
 				   					if(record.data['desc_auxiliar']){
 					   					retorno = retorno + String.format('<b>Aux.:</b>{0}</br>', record.data['desc_auxiliar']);
@@ -125,7 +125,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 			   			type:'ComboRec',
 			   			id_grupo:0,
 			   			filters:{	
-					        pfiltro:'au.codigo_auxiliar#au.nombre_auxiliar',
+					        pfiltro:'a.codigo_auxiliar#a.nombre_auxiliar',
 							type:'string'
 						},
 			   		   
@@ -147,7 +147,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 			   			type:'ComboRec',
 			   			id_grupo:0,
 			   			filters:{	
-					        pfiltro: 'par.codigo_partida#par.nombre_partida',
+					        pfiltro: 'pin.codigo_partida#pin.nombre_partida',
 							type: 'string'
 						},			   		   
 			   			grid:false,			   			
@@ -169,12 +169,31 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 			   			type:'ComboRec',
 			   			id_grupo:0,
 			   			filters:{	
-					        pfiltro: 'par.codigo_partida#par.nombre_partida',
+					        pfiltro: 'peg.codigo_partida#peg.nombre_partida',
 							type: 'string'
 						},
 			   		   
 			   			grid:false,
-				   	},
+				   	}, 
+				   	{
+							config : {
+								name : 'id_moneda_ajuste',
+								origen : 'MONEDA',
+								allowBlank : false,
+								fieldLabel : 'Moneda',
+								gdisplayField : 'codigo_moneda', //mapea al store del grid
+								gwidth : 100,
+								width : 250
+							},
+							type : 'ComboRec',
+							id_grupo : 2,
+							filters : {
+								pfiltro : 'm.desc_moneda',
+								type : 'string'
+							},
+							grid : false,
+							form : true
+					},
 					{
 						config:{
 							name: 'tipo_cambio_1',
@@ -519,7 +538,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		'dif_manual',
 		'nro_cuenta','nombre_cuenta','codigo_moneda','ajuste',
 		'revisado','id_partida_ingreso','id_partida_egreso',
-		'desc_auxiliar','desc_cuenta_bancaria','desc_partida_ingreso','desc_partida_egreso'
+		'desc_auxiliar','desc_cuenta_bancaria','desc_partida_ingreso','desc_partida_egreso','id_moneda_ajuste'
 		
 	],
 	
@@ -680,14 +699,16 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
         	this.ocultarComponente(this.Cmp.id_auxiliar);
         	this.ocultarComponente(this.Cmp.id_partida_ingreso);        	
         	this.ocultarComponente(this.Cmp.id_partida_egreso);
+        	this.ocultarComponente(this.Cmp.id_moneda_ajuste);
         }
         else{
         	this.mostrarComponente(this.Cmp.id_cuenta);
         	this.mostrarComponente(this.Cmp.id_auxiliar);
         	this.mostrarComponente(this.Cmp.id_partida_ingreso);        	
         	this.mostrarComponente(this.Cmp.id_partida_egreso);
+        	this.mostrarComponente(this.Cmp.id_moneda_ajuste);
         	this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
-        	
+        
         	
         }
     

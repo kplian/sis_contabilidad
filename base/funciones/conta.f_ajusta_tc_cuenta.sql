@@ -9,6 +9,7 @@ CREATE OR REPLACE FUNCTION conta.f_ajusta_tc_cuenta (
   p_id_partida_ingreso integer,
   p_id_partida_egreso integer,
   p_id_cuenta_bancaria integer,
+  p_id_moneda_ajuste integer,
   p_id_moneda_base integer,
   p_id_moneda_tri integer,
   p_fecha date,
@@ -65,6 +66,7 @@ v_id_gestion			integer;
 v_nro_cuenta_banc		varchar;
 v_rel_egre	varchar;
 v_rel_ingre	varchar;
+v_id_moneda_ajuste  	integer;
 
  
 
@@ -135,6 +137,8 @@ BEGIN
                                                           NULL);                                          
                
                
+               
+               
                IF p_mostrar_errores  THEN
                   IF v_id_cuenta is null THEN                  
                       select  c.nro_cuenta 
@@ -144,6 +148,13 @@ BEGIN
                       raise exception 'no se encontro relacion contable % para la cuenta  %',v_rel_ingre, v_nro_cuenta_banc;
                   END IF;               
                END IF;
+               
+               select
+                 c.id_moneda
+               into
+                v_id_moneda_ajuste
+               from conta.tcuenta c
+               where c.id_cuenta = v_id_cuenta;
            
           
            
@@ -153,6 +164,7 @@ BEGIN
                 v_id_auxiliar =	p_id_auxiliar;
                 v_id_partida_egreso = p_id_partida_egreso;
                 v_id_partida_ingreso = p_id_partida_ingreso;
+                v_id_moneda_ajuste = p_id_moneda_ajuste;
            
            ELSE             
                raise exception 'Tipo no reconocido';           
@@ -192,9 +204,9 @@ BEGIN
               
              
                                         
-              IF v_reg_cuenta.id_moneda =  p_id_moneda_base THEN
+              IF v_id_moneda_ajuste =  p_id_moneda_base THEN
                  v_mayor = va_mayor[1];
-               ELSEIF v_reg_cuenta.id_moneda = p_id_moneda_tri   THEN
+               ELSEIF v_id_moneda_ajuste = p_id_moneda_tri   THEN
                  v_mayor = va_mayor[2];
                ELSE
                  v_mayor = 0;
@@ -227,12 +239,12 @@ BEGIN
                       --  si es depto nacional convertimos la mayor en la moneda  directamente a bzse y triangulacion
                       
                            -- definir tipo de cambio de la moneda de la cuenta segun fecha hacia   MB  y MT
-                           v_tc_mb =  param.f_get_tipo_cambio_v2(v_reg_cuenta.id_moneda, p_id_moneda_base, p_fecha, 'O');
-                           v_tc_mt =  param.f_get_tipo_cambio_v2(v_reg_cuenta.id_moneda, p_id_moneda_tri, p_fecha, 'O');
+                           v_tc_mb =  param.f_get_tipo_cambio_v2(v_id_moneda_ajuste, p_id_moneda_base, p_fecha, 'O');
+                           v_tc_mt =  param.f_get_tipo_cambio_v2(v_id_moneda_ajuste, p_id_moneda_tri, p_fecha, 'O');
                            
                            -- calcular valor en mb y mt a la fecha
-                           v_act_mb =   param.f_convertir_moneda (v_reg_cuenta.id_moneda, p_id_moneda_base, v_mayor, p_fecha,'O',2,v_tc_mb);
-                           v_act_mt =   param.f_convertir_moneda (v_reg_cuenta.id_moneda, p_id_moneda_tri, v_mayor, p_fecha,'O',2,v_tc_mt);
+                           v_act_mb =   param.f_convertir_moneda (v_id_moneda_ajuste, p_id_moneda_base, v_mayor, p_fecha,'O',2,v_tc_mb);
+                           v_act_mt =   param.f_convertir_moneda (v_id_moneda_ajuste, p_id_moneda_tri, v_mayor, p_fecha,'O',2,v_tc_mt);
                          
                     END IF;     
                      
@@ -265,7 +277,8 @@ BEGIN
                       act_mt,
                       dif_mb,
                       dif_mt,
-                      id_cuenta_bancaria
+                      id_cuenta_bancaria,
+                      id_moneda_ajuste
                     ) values(
                      'activo',
                       p_id_ajuste,
@@ -286,7 +299,8 @@ BEGIN
                       v_act_mt,
                       v_dif_mb,
                       v_dif_mt,
-                      p_id_cuenta_bancaria
+                      p_id_cuenta_bancaria,
+                      v_id_moneda_ajuste
                       
                     )RETURNING id_ajuste_det into v_id_ajuste_det;
                     

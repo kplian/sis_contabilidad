@@ -77,12 +77,14 @@ BEGIN
                             ''(''||a.codigo_auxiliar||'') ''||a.nombre_auxiliar as desc_auxiliar,
                             ''(''||cb.nro_cuenta||'') ''||cb.denominacion as desc_cuenta_bancaria,
                             ''(''|| pin.codigo||'') ''||pin.nombre_partida as desc_partida_ingreso,       
-                            ''(''|| peg.codigo||'') ''||peg.nombre_partida as desc_partida_egreso
+                            ''(''|| peg.codigo||'') ''||peg.nombre_partida as desc_partida_egreso,
+                             ajtd.id_moneda_ajuste
                           
                     from conta.tajuste_det ajtd
                          inner join segu.tusuario usu1 on usu1.id_usuario = ajtd.id_usuario_reg
                          inner join conta.tcuenta c on c.id_cuenta = ajtd.id_cuenta
-                         inner join param.tmoneda m on m.id_moneda = c.id_moneda
+                         inner join param.tmoneda m on m.id_moneda = ajtd.id_moneda_ajuste
+                       
                          LEFT join pre.tpartida  pin on pin.id_partida = ajtd.id_partida_ingreso
                          LEFT join pre.tpartida  peg on peg.id_partida = ajtd.id_partida_egreso
                          left join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria = ajtd.id_cuenta_bancaria
@@ -115,7 +117,8 @@ BEGIN
                          from conta.tajuste_det ajtd
                          inner join segu.tusuario usu1 on usu1.id_usuario = ajtd.id_usuario_reg
                          inner join conta.tcuenta c on c.id_cuenta = ajtd.id_cuenta
-                         inner join param.tmoneda m on m.id_moneda = c.id_moneda
+                         inner join param.tmoneda m on m.id_moneda = ajtd.id_moneda_ajuste
+                       
                          LEFT join pre.tpartida  pin on pin.id_partida = ajtd.id_partida_ingreso
                          LEFT join pre.tpartida  peg on peg.id_partida = ajtd.id_partida_egreso
                          left join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria = ajtd.id_cuenta_bancaria

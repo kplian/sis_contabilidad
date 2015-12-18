@@ -615,6 +615,16 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
+					name: 'id_solicitud_efectivo'
+			},
+			type:'Field',
+			form:true 
+		},
+		{
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
 					name: 'id_gestion'
 			},
 			type:'Field',

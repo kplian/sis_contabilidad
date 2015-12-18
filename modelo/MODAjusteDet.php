@@ -56,6 +56,11 @@ class MODAjusteDet extends MODbase{
 		$this->captura('desc_partida_egreso','text');
 		
 		
+		$this->captura('id_moneda_ajuste','integer');
+		
+		
+		
+		
 		
 		
 		
@@ -94,6 +99,8 @@ class MODAjusteDet extends MODbase{
 		$this->setParametro('id_auxiliar','id_auxiliar','int4');
 		$this->setParametro('id_partida_ingreso','id_partida_ingreso','int4');
 		$this->setParametro('id_partida_egreso','id_partida_egreso','int4');
+		
+		$this->setParametro('id_moneda_ajuste','id_moneda_ajuste','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

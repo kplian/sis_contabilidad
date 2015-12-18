@@ -27,6 +27,8 @@ DECLARE
 
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
+    v_registros_config   	record;
+    v_sw_trans				boolean;
 	v_id_requerimiento     	integer;
     v_id_centro_costo_depto integer;
     v_id_partida  integer;
@@ -175,12 +177,15 @@ BEGIN
                                                               NULL, --id_partida_ingreso,
                                                               NULL, --id_partida_egreso,
                                                               v_registros.id_cuenta_bancaria,
+                                                              NULL,                                                             
                                                               v_id_moneda_base, 
                                                               v_id_moneda_tri, 
                                                               v_parametros.fecha,
                                                               v_parametros.id_depto_conta,
                                                               v_depto_inter,
                                                               true);
+                                                              
+                                                                   
                                                               
                   END LOOP;
                   
@@ -334,6 +339,8 @@ BEGIN
                  v_depto_inter =  false;
                   v_codigo_clase_cbte = 'DIARIO';
               END IF;
+              
+          
            
            --  array de monedas para los que se va generar el cbte
            
@@ -377,7 +384,23 @@ BEGIN
                     ELSE
                       v_tipo_cambio_1 = 0;
                       v_tipo_cambio_2 = 1;
-                    END IF;  
+                    END IF; 
+                    
+                    -- recuepra configuracion cambiaria,  no se usas 
+                    -- es solo apra cumplir con el inner join ya qu elos valores son cambiados mas adelante
+                      
+                      SELECT  
+                         po_id_config_cambiaria ,
+                         po_valor_tc1 ,
+                         po_valor_tc2 ,
+                         po_tc1 ,
+                         po_tc2 
+                       into
+                        v_registros_config
+                       FROM conta.f_get_tipo_cambio_segu_config(v_id_moneda, 
+                                                                v_registros.fecha,
+                                                                'nacional',
+                                                                'si'); 
                       
                       
                       
@@ -418,7 +441,11 @@ BEGIN
                               fecha_costo_ini,
                               fecha_costo_fin,
                               localidad,
-                              sw_editable
+                              sw_editable,
+                              id_config_cambiaria,
+                              id_moneda_tri,
+                              sw_tipo_cambio,
+                              id_ajuste
                                      
                             ) 
                             VALUES (
@@ -453,7 +480,12 @@ BEGIN
                               NULL, -- fecha_costo_ini,
                               NULL, -- fecha_costo_fin,
                               'nacional',
-                              'no'                              
+                              'no',
+                              v_registros_config.po_id_config_cambiaria,
+                              v_id_moneda_tri,
+                              'si',
+                              v_registros.id_ajuste
+                                                            
                             ) RETURNING id_int_comprobante into v_id_int_comprobante;
                     
                
@@ -462,6 +494,7 @@ BEGIN
                     -------------------------------------
                        v_tipo_trans = 'ganacia';
                        
+                       v_sw_trans = false;
                       
                     --   For listado de ajuste  según moneda del cbte solo los ajustes diferentes de cero
                        FOR v_registros_det in (
@@ -478,6 +511,7 @@ BEGIN
                                                 inner join conta.tcuenta c on c.id_cuenta = ad.id_cuenta
                                                 inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = c.tipo_cuenta
                                                 where      ad.id_ajuste = v_registros.id_ajuste
+                                                      and ad.revisado = 'si'
                                                       and  
                                                           CASE 
                                                            WHEN v_id_moneda =  v_id_moneda_base THEN
@@ -488,6 +522,8 @@ BEGIN
                                                       
                        							) LOOP
                                
+                                    
+                                    v_sw_trans = true;
                                     v_monto_debe_mb = 0;
                                     v_monto_haber_mb = 0;
                                     v_monto_debe_mt = 0;
@@ -498,38 +534,7 @@ BEGIN
                                   --  define si es  perdida o ganancia 
                                   IF  v_registros_det.incremento = 'debe'   THEN
                                    
-                                       if  v_registros_det.diferencia < 0 then
-                                            
-                                            v_tipo_trans = 'ganacia';
-                                            
-                                            IF v_id_moneda =  v_id_moneda_base  THEN
-                                                  v_monto_debe_mb = (v_registros_det.diferencia)*(-1);
-                                            ELSE  
-                                                  v_monto_debe_mt =  (v_registros_det.diferencia)*(-1);                                                  
-                                            END IF;
-                                            
-                                            v_monto_debe =  (v_registros_det.diferencia)*(-1); 
-                                            
-                                       else
-                                            v_tipo_trans = 'perdida';
-                                            IF v_id_moneda =  v_id_moneda_base  THEN
-                                                  v_monto_haber_mb = (v_registros_det.diferencia);
-                                            ELSE  
-                                                  v_monto_haber_mt =  (v_registros_det.diferencia);                                                  
-                                            END IF;
-                                            
-                                            v_monto_haber =  (v_registros_det.diferencia); 
-                                       end if;
-                                  ELSE
-                                       if  v_registros_det.diferencia < 0 then
-                                            v_tipo_trans = 'perdida';
-                                            IF v_id_moneda =  v_id_moneda_base  THEN
-                                                  v_monto_haber_mb = (v_registros_det.diferencia)*(-1);
-                                            ELSE  
-                                                  v_monto_haber_mt =  (v_registros_det.diferencia)*(-1);                                                  
-                                            END IF;
-                                            v_monto_haber =  (v_registros_det.diferencia)*(-1); 
-                                       else
+                                       if  v_registros_det.diferencia > 0 then
                                             
                                             v_tipo_trans = 'ganacia';
                                             
@@ -538,7 +543,38 @@ BEGIN
                                             ELSE  
                                                   v_monto_debe_mt =  (v_registros_det.diferencia);                                                  
                                             END IF;
+                                            
                                             v_monto_debe =  (v_registros_det.diferencia); 
+                                            
+                                       else
+                                            v_tipo_trans = 'perdida';
+                                            IF v_id_moneda =  v_id_moneda_base  THEN
+                                                  v_monto_haber_mb = (v_registros_det.diferencia)*(-1);
+                                            ELSE  
+                                                  v_monto_haber_mt =  (v_registros_det.diferencia)*(-1);                                                  
+                                            END IF;
+                                            
+                                            v_monto_haber =  (v_registros_det.diferencia)*(-1); 
+                                       end if;
+                                  ELSE
+                                       if  v_registros_det.diferencia > 0 then
+                                            v_tipo_trans = 'perdida';
+                                            IF v_id_moneda =  v_id_moneda_base  THEN
+                                                  v_monto_haber_mb = (v_registros_det.diferencia);
+                                            ELSE  
+                                                  v_monto_haber_mt =  (v_registros_det.diferencia);                                                  
+                                            END IF;
+                                            v_monto_haber =  (v_registros_det.diferencia); 
+                                       else
+                                            
+                                            v_tipo_trans = 'ganacia';
+                                            
+                                            IF v_id_moneda =  v_id_moneda_base  THEN
+                                                  v_monto_debe_mb = (v_registros_det.diferencia)*(-1);
+                                            ELSE  
+                                                  v_monto_debe_mt =  (v_registros_det.diferencia)*(-1);                                                  
+                                            END IF;
+                                            v_monto_debe =  (v_registros_det.diferencia)*(-1); 
                                        end if;
                                   END IF;                 
                                 
@@ -704,23 +740,33 @@ BEGIN
                               
                                 
                       END LOOP;
+                      
+                      
+                     if not  v_sw_trans then                     
+                        delete from conta.tint_comprobante where id_int_comprobante = v_id_int_comprobante;
+                     end if;
                      
                      
              END LOOP;
            
              -- TODO  cambiar estado del ajuste  
+             
+             update conta.tajuste set
+               estado = 'procesado'
+             where id_ajuste = v_registros.id_ajuste;
                
              
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cbtes generados para ajuste por mayores)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_ajuste',v_parametros.id_ajuste::varchar);
               
+        
             --Devuelve la respuesta
             return v_resp;
 
 		end;
     
-         
+        
 	else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;

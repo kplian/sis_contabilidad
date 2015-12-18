@@ -2915,9 +2915,21 @@ IS 'idnetifica el ajuste de tipo de cambio que origino el comprobante';
 /***********************************F-SCP-RAC-CONTA-0-10/12/2015****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-17/12/2015****************************************/
 
 
 
 
+--------------- SQL ---------------
+
+ALTER TABLE conta.tajuste_det
+  ADD COLUMN id_moneda_ajuste INTEGER;
+
+COMMENT ON COLUMN conta.tajuste_det.id_moneda_ajuste
+IS 'moenda sobre la que se realiza el ajuste, por defecto es la moneda de la cuenta, pero en ajsutes manaules puede variar segun la necesidad';
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-17/12/2015****************************************/
 
 
