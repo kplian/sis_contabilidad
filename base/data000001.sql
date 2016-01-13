@@ -1339,6 +1339,18 @@ select pxp.f_insert_tgui ('Periodos Compra Venta', 'Configuracion de periodos de
 select pxp.f_insert_tgui ('Tipo de relación en comprobantes', 'Tipo de relación en comprobantes', 'TRECOM', 'si', 4, 'sis_contabilidad/vista/tipo_relacion_comprobante/TipoRelacionComprobante.php', 3, '', 'TipoRelacionComprobante', 'CONTA');
 select pxp.f_insert_tgui ('Configuraciones', 'Configuraciones', 'CONF', 'si', 1, '', 2, '', '', 'CONTA');
 
+
+
+/* Data for the 'conta.ttipo_relacion_comprobante' table  (Records 1 - 4) */
+
+INSERT INTO conta.ttipo_relacion_comprobante ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "codigo", "nombre")
+VALUES 
+  (1, NULL, E'2014-12-17 16:13:43.521', NULL, E'activo', NULL, NULL, E'AJUSTE', E'Ajuste del comprobante'),
+  (1, NULL, E'2014-12-17 16:14:06.581', NULL, E'activo', NULL, NULL, E'PAGODEV', E'Pago del devengado'),
+  (1, NULL, E'2014-12-17 16:14:25.580', NULL, E'activo', NULL, NULL, E'REVERSION', E'Reversion del comprobante'),
+  (1, NULL, E'2014-12-17 16:15:09.388', NULL, E'activo', NULL, NULL, E'APLICACIONANT', E'Aplicación del anticipo');
+
+
 /***********************************F-SCP-RAC-CONTA-0-12/01/2016****************************************/
 
 
