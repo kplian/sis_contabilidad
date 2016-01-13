@@ -3092,5 +3092,10 @@ select pxp.f_insert_testructura_gui ('PLADOC', 'CBONF');
 select pxp.f_insert_testructura_gui ('RELACON', 'DEFRECONCAR');
 
 
+select pxp.f_insert_testructura_gui ('REPCON', 'CONTA');
+select pxp.f_insert_testructura_gui ('BALCON', 'REPCON');
+select pxp.f_insert_testructura_gui ('REPRES', 'REPCON');
+select pxp.f_insert_testructura_gui ('BALGEN', 'REPCON');
+
 /***********************************F-DEP-RAC-CONTA-0-12/01/2016****************************************/
 
