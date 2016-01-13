@@ -2933,3 +2933,11 @@ IS 'moenda sobre la que se realiza el ajuste, por defecto es la moneda de la cue
 /***********************************F-SCP-RAC-CONTA-0-17/12/2015****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-12/01/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  DROP CONSTRAINT chk_tcuenta__tipo_cuenta_pat RESTRICT;
+  
+/***********************************F-SCP-RAC-CONTA-12/01/2016****************************************/
