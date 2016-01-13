@@ -3044,6 +3044,10 @@ AS
 
 /***********************************I-DEP-RAC-CONTA-0-12/01/2016****************************************/
 
+----------------------------------
+--COPY LINES TO dependencies.sql FILE  
+---------------------------------
+
 select pxp.f_insert_testructura_gui ('CONTA', 'SISTEMA');
 select pxp.f_delete_testructura_gui ('CTA', 'CONTA');
 select pxp.f_delete_testructura_gui ('AUXCTA', 'CONTA');
@@ -3084,18 +3088,24 @@ select pxp.f_insert_testructura_gui ('AUXCTA', 'CNOM');
 select pxp.f_delete_testructura_gui ('ODT', 'CNOM');
 select pxp.f_delete_testructura_gui ('ODT', 'CTIP');
 select pxp.f_insert_testructura_gui ('ODT', 'CNOM');
-select pxp.f_insert_testructura_gui ('CBONF', 'CONTA');
-select pxp.f_insert_testructura_gui ('CONPER', 'CBONF');
-select pxp.f_insert_testructura_gui ('CMPB', 'CBONF');
-select pxp.f_insert_testructura_gui ('CCBT', 'CBONF');
-select pxp.f_insert_testructura_gui ('PLADOC', 'CBONF');
+select pxp.f_delete_testructura_gui ('CBONF', 'CONTA');
+select pxp.f_delete_testructura_gui ('CONPER', 'CBONF');
+select pxp.f_delete_testructura_gui ('CMPB', 'CBONF');
+select pxp.f_delete_testructura_gui ('CCBT', 'CBONF');
+select pxp.f_delete_testructura_gui ('PLADOC', 'CBONF');
 select pxp.f_insert_testructura_gui ('RELACON', 'DEFRECONCAR');
-
-
 select pxp.f_insert_testructura_gui ('REPCON', 'CONTA');
 select pxp.f_insert_testructura_gui ('BALCON', 'REPCON');
 select pxp.f_insert_testructura_gui ('REPRES', 'REPCON');
 select pxp.f_insert_testructura_gui ('BALGEN', 'REPCON');
+select pxp.f_insert_testructura_gui ('CONF', 'CONTA');
+select pxp.f_insert_testructura_gui ('PLANRES', 'CONF');
+select pxp.f_insert_testructura_gui ('PCV', 'CONF');
+select pxp.f_insert_testructura_gui ('TRECOM', 'CONF');
+select pxp.f_insert_testructura_gui ('PLADOC', 'CONF');
+select pxp.f_insert_testructura_gui ('CCBT', 'CONF');
+select pxp.f_insert_testructura_gui ('CMPB', 'CONF');
+select pxp.f_insert_testructura_gui ('CONPER', 'CONF');
 
 /***********************************F-DEP-RAC-CONTA-0-12/01/2016****************************************/
 
