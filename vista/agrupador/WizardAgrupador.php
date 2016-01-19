@@ -38,7 +38,7 @@ Phx.vista.WizardAgrupador=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.fecha_cbte.setMinValue(d1);
         this.Cmp.fecha_cbte.setMaxValue(d2);
         this.Cmp.fecha_ini.setMinValue(d1);
-		this.Cmp.fecha_fin.setMinValue(d2);
+		this.Cmp.fecha_fin.setMinValue(d1);
         
         
         this.iniciarEventos();   
