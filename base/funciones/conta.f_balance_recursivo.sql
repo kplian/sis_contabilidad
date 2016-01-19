@@ -23,6 +23,7 @@ v_resp				varchar;
 v_nivel				integer;
 v_suma				numeric;
 v_mayor				numeric;
+va_mayor			numeric[];
 v_id_gestion  		integer;
 va_tipo_cuenta		varchar[];
 v_gestion 			integer;
@@ -89,8 +90,8 @@ BEGIN
                                     )   LOOP
                    
                    -- caculamos el mayor
-                    v_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
-                   
+                    va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
+                    v_mayor = va_mayor[1];
                    -- insetamos en tabla temporal 
                     insert  into temp_balancef (
                                     id_cuenta,
@@ -141,8 +142,8 @@ BEGIN
                                         and c.id_gestion = v_id_gestion and c.estado_reg = 'activo' )   LOOP
                        
                        -- caculamos el mayor
-                        v_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
-                       
+                        va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
+                        v_mayor = va_mayor[1];
                        -- insetamos en tabla temporal 
                         insert  into temp_balancef (
                                         id_cuenta,

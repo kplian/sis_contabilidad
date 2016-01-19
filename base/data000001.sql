@@ -1183,8 +1183,11 @@ select pxp.f_insert_testructura_gui ('DOC', 'CBTE.1');
 
 /***********************************I-SCP-RAC-CONTA-0-10/12/2015****************************************/
 
-
+select pxp.f_insert_tgui ('Ajustes', 'diferentes proceso de ajuste', 'CAJT', 'si', 4, '', 2, '', '', 'CONTA');
 select pxp.f_insert_tgui ('Ajuste TC', 'Ajuste por diferencia de tipo de cambio', 'AJST', 'si', 1, 'sis_contabilidad/vista/ajuste/Ajuste.php', 3, '', 'Ajuste', 'CONTA');
+
+
+select pxp.f_insert_testructura_gui ('CAJT', 'CONTA');
 select pxp.f_insert_testructura_gui ('AJST', 'CAJT');
 
 

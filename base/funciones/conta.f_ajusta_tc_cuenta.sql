@@ -95,6 +95,7 @@ BEGIN
                  v_rel_egre = 'CUEBANCEGRE';
                  v_rel_ingre = 'CUEBANCING';
                ELSE
+               --TODO  cambiar relaciones contables de cajas
                  v_rel_egre = 'CUEBANCEGRE';
                  v_rel_ingre = 'CUEBANCING';
                END IF;
@@ -210,10 +211,23 @@ BEGIN
                  v_mayor = va_mayor[2];
                ELSE
                  v_mayor = 0;
-                  -- TODO  Si la cuenta no esta en moneda base ni moneda de triangualcion
-                  -- obtener la cuenta bancaria a partir de la cuenta
+                 
+                 --si noe sun depto internacional ...
+                  IF not p_depto_inter  THEN
+                       -- TODO  Si la cuenta no esta en moneda base ni moneda de triangualcion
+                      IF p_tipo = 'bancos' THEN
                               
-                  -- calcular mayor de la cuenta por libro de bancos
+                         -- calcular mayor de la cuenta por libro de bancos
+                         v_mayor =   tes.f_obtener_saldo_cuenta_bancaria(p_id_cuenta_bancaria,p_fecha);
+                     
+                      ELSEIF p_tipo = 'cajas' THEN
+                      
+                          raise exception 'TODO no se implemento el arqueo de caja';
+                      ELSE 
+                          raise exception 'TODO como hacer esto en cuentas manuales ...???';
+                      END IF;   
+                  
+                  END IF; 
                            
                END IF;                                
                 
@@ -231,7 +245,7 @@ BEGIN
                            v_tc_mb =  param.f_get_tipo_cambio_v2(p_id_moneda_tri, p_id_moneda_base, p_fecha, 'O');
                            v_tc_mt = NULL;
                            
-                           v_act_mb =   param.f_convertir_moneda (p_id_moneda_tri, p_id_moneda_base, va_mayor[2], p_fecha,'O',50,v_tc_mb);
+                           v_act_mb =   param.f_convertir_moneda (p_id_moneda_tri, p_id_moneda_base, va_mayor[2], p_fecha,'O',2,v_tc_mb);
                            v_act_mt =  va_mayor[2];
                       
                       ELSE

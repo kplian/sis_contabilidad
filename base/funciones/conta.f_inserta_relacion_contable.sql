@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_inserta_relacion_contable (
   p_hstore_transaccion public.hstore,
   p_id_usuario integer
@@ -29,7 +27,7 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_tipo_relacion_contable	    integer;
+	v_id_relacion_contable	    integer;
     v_retorno				varchar[];
 			    
 BEGIN
@@ -63,10 +61,10 @@ BEGIN
             (p_hstore_transaccion->'id_gestion')::integer,
             (p_hstore_transaccion->'id_tabla')::integer,
             (p_hstore_transaccion->'defecto')::varchar
-          )  RETURNING id_tipo_relacion_contable into v_id_tipo_relacion_contable;
+          )  RETURNING id_relacion_contable into v_id_relacion_contable;
 			
 		   v_retorno[1] = 'exito';
-           v_retorno[2] = v_id_tipo_relacion_contable::varchar;
+           v_retorno[2] = v_id_relacion_contable::varchar;
           
             --Devuelve la respuesta
             return v_retorno;

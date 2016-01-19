@@ -456,6 +456,26 @@ BEGIN
            raise exception 'error al generar comprobante';
          END IF;
      END IF;
+     
+     
+    ----------------------------------------------------------------------
+    --   Si la gestion de la fecha no correponde con la gestion del pago
+    --   se tiene que actulizar las cuentas, centros de costos y partidas
+    ------------------------------------------------------------------- --
+    
+    
+     IF v_this.columna_gestion !=  v_rec_periodo.po_id_gestion THEN
+         
+         IF not  conta.f_act_gestion_transaccion(
+                          v_id_int_comprobante, 
+                          v_rec_periodo.po_id_gestion, 
+                          v_this.columna_gestion::integer) THEN
+                          
+                 raise exception 'error al actulizar gestion';         
+          END IF;
+        
+      
+     END IF;
     
     --------------------------------------------------------------
     -- migracion de comprobante a endesis o regionales  DBLINK

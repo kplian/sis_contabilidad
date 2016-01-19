@@ -77,7 +77,8 @@ BEGIN
         c.sw_editable,
         c.nro_cbte,
         c.codigo_estacion_origen,
-        c.localidad
+        c.localidad,
+        c.id_ajuste
         
 	  into 
         v_rec_cbte
@@ -191,15 +192,15 @@ BEGIN
     --si el origen es endesis confiamos en las validaciones
     if p_origen != 'endesis' then
         
-            if  v_variacion > 0  then
+            if  v_variacion != 0  then
                 v_errores = 'El comprobante no iguala: Diferencia '||v_variacion::varchar;
             end if;
             
-            if  v_variacion_mb > 0  then
+            if  v_variacion_mb != 0  then
                 v_errores = 'El comprobante no iguala en moneda base: Diferencia '||v_variacion_mb::varchar;
             end if;
             
-            if  v_variacion_mt > 0  then
+            if  v_variacion_mt != 0  then
                 v_errores = 'El comprobante no iguala en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
             end if;
                   
@@ -475,7 +476,7 @@ BEGIN
          -- SI el comprobante se valida en central y es de  una regional internacional y la sincronizacion esta habilitada migramos el cbte a ENDESIS
          -- si la moneda  no es dolares debemos convertir a Bolivianos
          ------------------------------------------------------------------------------------------------------------------------
-         IF (v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'si' )THEN
+         IF (v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'si' and  v_rec_cbte.id_ajuste is null)THEN
              -- si sincroniza locamente con endesis, marcando la bandera que proviene de regional internacional
              v_resp_int_endesis =  migra.f_migrar_cbte_endesis(p_id_int_comprobante, v_nombre_conexion, 'si');
                

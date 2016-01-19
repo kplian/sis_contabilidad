@@ -49,6 +49,8 @@ DECLARE
     v_tc_1							numeric;
     v_tc_2							numeric;
     v_id_int_comprobante_bk			integer;
+    v_ges_1		record;
+    v_ges_2		record;
    
    
 			    
@@ -389,6 +391,32 @@ BEGIN
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
               raise exception 'Error al procesar transacciones';
             END IF;
+            
+            -- si la fecha varia revisar si es necesario cambiar de gestion
+            
+            IF v_parametros.fecha != v_reg_cbte.fecha THEN
+               
+               --revisamos si son de diferente gestión
+               SELECT * into v_ges_1 FROM param.f_get_limites_gestion(v_reg_cbte.fecha);
+               SELECT * into v_ges_2 FROM param.f_get_limites_gestion(v_parametros.fecha);
+               
+               --sin son diferentes gestiones
+               IF v_ges_1.po_id_gestion  != v_ges_2.po_id_gestion THEN
+                  
+                  IF not  conta.f_act_gestion_transaccion(
+                          v_parametros.id_int_comprobante, 
+                          v_ges_2.po_id_gestion, 
+                          v_ges_1.po_id_gestion) THEN
+                          
+                            raise exception 'error al actulizar gestion';         
+                   END IF;
+                   
+               END IF;
+               
+            
+            END IF;
+            
+            
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante modificado(a)'); 

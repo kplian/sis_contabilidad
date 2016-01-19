@@ -2191,6 +2191,9 @@ IS 'identidica el id del comprobante en la regional se usa de manera combinada c
 /***********************************F-SCP-RAC-CONTA-1-27/09/2015****************************************/
 
 
+
+
+
 /***********************************I-SCP-RAC-CONTA-1-02/10/2015****************************************/
 
 
@@ -2755,6 +2758,59 @@ IS 'esta funcion se ejecuta al momento de validar un comprobante que a sido edit
 /***********************************F-SCP-RAC-CONTA-0-30/11/2015****************************************/
 
 
+
+
+/***********************************I-SCP-FFP-CONTA-1-30/11/2015****************************************/
+
+ALTER TABLE conta.tbanca_compra_venta
+  ALTER COLUMN monto_acumulado SET NOT NULL;
+
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN id_documento INTEGER;
+
+
+
+CREATE TYPE conta.json_imp_banca_compra_venta AS (
+  modalidad_transaccion INTEGER,
+  fecha_documento DATE,
+  tipo_transaccion INTEGER,
+  nit_ci VARCHAR(255),
+  razon VARCHAR(255),
+  num_documento VARCHAR(255),
+  importe_documento NUMERIC(10,2),
+  autorizacion numeric,
+  num_cuenta_pago VARCHAR(255),
+  monto_pagado NUMERIC(10,2),
+  monto_acumulado NUMERIC(10,2),
+  nit_entidad NUMERIC,
+  num_documento_pago VARCHAR(255),
+  tipo_documento_pago INTEGER,
+  fecha_de_pago DATE
+);
+
+
+CREATE TABLE conta.ttxt_importacion_bcv (
+ id_txt_importacion_bcv SERIAL,
+  nombre_archivo varchar(255),
+  id_periodo INTEGER,
+  CONSTRAINT pk_ttxt_importacion_bcv__id_txt_importacion_bcv PRIMARY KEY(id_txt_importacion_bcv)
+) INHERITS (pxp.tbase)
+WITHOUT OIDS; 
+
+
+ALTER TABLE conta.ttxt_importacion_bcv
+  ADD UNIQUE (nombre_archivo);
+
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN periodo_servicio VARCHAR(255);
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN numero_cuota INTEGER;
+
+
+/***********************************F-SCP-FFP-CONTA-0-30/11/2015****************************************/
 
 
 

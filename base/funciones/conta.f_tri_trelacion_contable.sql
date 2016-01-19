@@ -21,6 +21,7 @@ DECLARE
     v_centro		varchar;
     v_denominacion	varchar;
     v_id_cuenta_endesis	integer;
+    v_nombre_conexion	varchar;
 		
 BEGIN
 
@@ -63,6 +64,9 @@ BEGIN
                 from migra.tconcepto_ids ci
                 where id_gestion = (select id_gestion from param.tcentro_costo where id_centro_costo = NEW.id_centro_costo) and
                 	ci.id_concepto_ingas_pxp = NEW.id_tabla;
+                if (v_id_concepto_ingas is null) then
+                	raise exception 'El concepto con id: % no existe  en la tabla de relacion con endesis',NEW.id_tabla;
+                end if;
 
 				v_consulta = 'select migracion.f_mig_relacion_contable__tpr_concepto_cta('''||
 								TG_OP ||''',' ||
@@ -129,14 +133,20 @@ BEGIN
 		END IF;
 
 		--Abre una conexion con dblink para ejecutar la consulta
-        v_resp =  (SELECT dblink_connect(v_cadena_cnx));
+        if ('conexion_relaciones_endesis' = ANY(dblink_get_connections())) then
+        	v_nombre_conexion = 'conexion_relaciones_endesis';
+        else
+        	v_nombre_conexion =  migra.f_crear_conexion();
+        end if;
+        
+        
 			            
 		if (v_resp!='OK') THEN
 			--Error al abrir la conexión  
 			raise exception 'FALLA CONEXION A LA BASE DE DATOS CON DBLINK';
 		else
         	if (v_codigo_trel = 'CUEBANCEGRE') then
-            	select * FROM dblink(v_consulta,true) AS (id_cuenta_endesis integer) into v_id_cuenta_endesis;
+            	select * FROM dblink(v_nombre_conexion,v_consulta,true) AS (id_cuenta_endesis integer) into v_id_cuenta_endesis;
 				if (TG_OP IN ('INSERT')) then
                 		insert into migra.tts_cuenta_bancaria (id_cuenta_bancaria, id_institucion,
                         						id_cuenta, nro_cuenta_banco,nro_cheque,estado_cuenta,
@@ -149,10 +159,13 @@ BEGIN
                     where id_cuenta_bancaria = v_id_cuenta_endesis;
                 end if;
 		    else
-            	PERFORM * FROM dblink(v_consulta,true) AS (resp varchar);
+            	PERFORM * FROM dblink(v_nombre_conexion,v_consulta,true) AS (resp varchar);
             	
             end if;
-            v_res_cone=(select dblink_disconnect());
+             if ('conexion_relaciones_endesis' = ANY(dblink_get_connections())) then
+             else
+            	v_res_cone=migra.f_cerrar_conexion(v_nombre_conexion ,'exito');
+             end if;
 		end if;
 
 	end if; 

@@ -60,7 +60,7 @@ BEGIN
 
      v_nombre_funcion = 'conta.f_igualar_cbte';
    
-   --solo igualar cbtes en borrador
+      --solo igualar cbtes en borrador
               
  
    
@@ -75,11 +75,11 @@ BEGIN
               where c.id_int_comprobante = p_id_int_comprobante;
     			
            
-           
-              IF v_registros.estado_reg != 'borrador' THEN
+            IF p_show_errors THEN
+              IF v_registros.estado_reg != 'borrador'  THEN
                 raise exception 'Solo puede igualar cbtes en borrador';
               END IF;
-              
+            END IF;  
                 -- sumar las transacciones en todas las monedas
              select 
                    sum(tra.importe_debe), 
@@ -231,12 +231,13 @@ BEGIN
                      
                     insert into conta.tint_transaccion(
                         id_partida,
+                        id_auxiliar,
                         id_centro_costo,
                         estado_reg,
                         id_cuenta,
                         glosa,
                         id_int_comprobante,
-                        id_auxiliar,
+                      
                         importe_debe,
                         importe_haber,
                         importe_gasto,
@@ -250,12 +251,13 @@ BEGIN
                         
                     ) values(
                         v_registros_rel.ps_id_partida,
+                        v_registros_rel.ps_id_auxiliar,
                         v_registros_rel.ps_id_centro_costo,
                         'activo',
                         v_registros_rel.ps_id_cuenta,
                         'Igualación por diferencia de redondeo',
                         v_registros.id_int_comprobante,
-                        NULL,
+                      
                         
                         v_monto_debe,
                         v_monto_haber,
@@ -332,12 +334,13 @@ BEGIN
    
              insert into conta.tint_transaccion(
                         id_partida,
+                        id_auxiliar,
                         id_centro_costo,
                         estado_reg,
                         id_cuenta,
                         glosa,
                         id_int_comprobante,
-                        id_auxiliar,
+                       
                         
                         importe_debe,
                         importe_haber,
@@ -364,12 +367,13 @@ BEGIN
                         
                     ) values(
                         v_registros_rel.ps_id_partida,
+                        v_registros_rel.ps_id_auxiliar,
                         v_registros_rel.ps_id_centro_costo,
                         'activo',
                         v_registros_rel.ps_id_cuenta,
                         v_glosa,
                         v_registros.id_int_comprobante,
-                        NULL,
+                      
                         
                         0,
                         0,

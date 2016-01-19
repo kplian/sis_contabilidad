@@ -20,20 +20,31 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     breset: false,
    
     conceptos_eliminados: [],
+    listadoConcepto: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
     //labelSubmit: '<i class="fa fa-check"></i> Siguiente',
+    
     constructor:function(config)
+    {
+         //declaracion de eventos
+         this.addEvents('beforesave');
+         this.addEvents('successsave');
+         Ext.apply(this,config);
+         this.obtenerVariableGlobal();
+    
+    }
+    
+    constructorEtapa2:function(config)
     {   
     	
-    	Ext.apply(this,config);
-    	//declaracion de eventos
-        this.addEvents('beforesave');
-        this.addEvents('successsave');
+    	
+    	
     	
     	this.buildComponentesDetalle();
         this.buildDetailGrid();
         this.buildGrupos();
         
         Phx.vista.FormCompraVenta.superclass.constructor.call(this,config);
+        
         
         
         
@@ -73,7 +84,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 							                allowBlank: false,
 							                emptyText : 'Concepto...',
 							                store : new Ext.data.JsonStore({
-							                            url:'../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
+							                            url: me.listadoConcepto,
 							                            id : 'id_concepto_ingas',
 							                            root: 'datos',
 							                            sortInfo:{
@@ -1458,7 +1469,34 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
            }else{
                 alert('error al recuperar la plantilla para editar, actualice su navegador');
             }
-     }
+     },
+     
+     obtenerVariableGlobal: function(){
+     	var me = this;
+		//Verifica que la fecha y la moneda hayan sido elegidos
+		Phx.CP.loadingShow();
+		Ext.Ajax.request({
+				url:'../../sis_seguridad/control/Subsistema/obtenerVariableGlobal',
+				params:{
+					codigo: 'conta_partidas'  
+				},
+				success: function(resp){
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error','Error a recuperar la variable global')
+					} else {
+						
+						me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
+					}
+				},
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope:this
+			});
+		
+	},
     
    
     

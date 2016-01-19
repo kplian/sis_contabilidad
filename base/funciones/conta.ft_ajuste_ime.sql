@@ -63,6 +63,7 @@ DECLARE
     v_tipo_cambio_2			numeric;
     v_monto_debe 			numeric;
     v_monto_haber	 		numeric;
+    v_sw_cambio				boolean;
     
 			    
 BEGIN
@@ -119,6 +120,9 @@ BEGIN
              
              v_id_moneda_base = param.f_get_moneda_base();
              v_id_moneda_tri  = param.f_get_moneda_triangulacion();
+             
+             
+          
              
              
              select
@@ -300,6 +304,8 @@ BEGIN
 
 		begin
         
+        
+              v_sw_cambio = true;
              --recuperamos datos del ajuste 
              
              select 
@@ -495,6 +501,8 @@ BEGIN
                        v_tipo_trans = 'ganacia';
                        
                        v_sw_trans = false;
+                       
+                      
                       
                     --   For listado de ajuste  según moneda del cbte solo los ajustes diferentes de cero
                        FOR v_registros_det in (
@@ -522,7 +530,7 @@ BEGIN
                                                       
                        							) LOOP
                                
-                                    
+                                  
                                     v_sw_trans = true;
                                     v_monto_debe_mb = 0;
                                     v_monto_haber_mb = 0;
@@ -672,7 +680,7 @@ BEGIN
                                 --------------------------------------------------
                                 --  insertar transaccion para la cuenta ajustada
                                 --------------------------------------------------
-                                
+                                v_sw_cambio = false;
                                  insert into conta.tint_transaccion(
                                                                   id_partida,
                                                                   id_centro_costo,
@@ -748,12 +756,18 @@ BEGIN
                      
                      
              END LOOP;
+             
+             
+            
+             IF  v_sw_cambio  then
+               raise exception 'No tiene ningun ajuste habilitado';
+             end if;
            
              -- TODO  cambiar estado del ajuste  
-             
+             /*
              update conta.tajuste set
                estado = 'procesado'
-             where id_ajuste = v_registros.id_ajuste;
+             where id_ajuste = v_registros.id_ajuste;*/
                
              
             --Definicion de la respuesta
