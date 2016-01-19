@@ -29,11 +29,11 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
          this.addEvents('beforesave');
          this.addEvents('successsave');
          Ext.apply(this,config);
-         this.obtenerVariableGlobal();
+         this.obtenerVariableGlobal(config);
     
     }, 
     
-    constructorEtapa2:function()
+    constructorEtapa2:function(config)
     {   
     	
     	
@@ -1471,7 +1471,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
             }
      },
      
-     obtenerVariableGlobal: function(){
+     obtenerVariableGlobal: function(config){
      	var me = this;
 		//Verifica que la fecha y la moneda hayan sido elegidos
 		Phx.CP.loadingShow();
@@ -1489,7 +1489,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					} else {
 						
 						me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
-					    me.constructorEtapa2();
+					    me.constructorEtapa2(config);
 					
 					}
 				},
