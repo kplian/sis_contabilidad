@@ -31,9 +31,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
          Ext.apply(this,config);
          this.obtenerVariableGlobal();
     
-    }
+    }, 
     
-    constructorEtapa2:function(config)
+    constructorEtapa2:function()
     {   
     	
     	
@@ -1489,6 +1489,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					} else {
 						
 						me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
+					    me.constructorEtapa2();
+					
 					}
 				},
 				failure: this.conexionFailure,
