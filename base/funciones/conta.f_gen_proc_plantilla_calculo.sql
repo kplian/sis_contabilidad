@@ -55,6 +55,7 @@ DECLARE
     v_porc_monto_imponible numeric;
     v_porc_importe numeric;
     v_porc_importe_presupuesto numeric;
+     v_conta_partidas				varchar;
 			    
 BEGIN
 
@@ -223,24 +224,19 @@ BEGIN
                
                     
                     IF(v_record_rel_con.ps_id_cuenta is NULL) THEN
-                    
                        raise exception 'Revisar la ps_id_cuenta para la relacion contable:  % (%)',  v_record_rel_con.ps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;
-                    
-                    
                     END IF;
                     
-                    IF(v_record_rel_con.ps_id_partida is NULL) THEN
+                    v_conta_partidas = pxp.f_get_variable_global('conta_partidas');
                     
+                    IF v_conta_partidas = 'si' THEN                    
+                      IF(v_record_rel_con.ps_id_partida is NULL) THEN
                         raise exception 'Revisar la partida para la relacion contable:  % (%)',  v_record_rel_con.ps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;
-                    
-                    
+                      END IF;
                     END IF;
                     
-                    IF(v_record_rel_con.ps_id_auxiliar is NULL) THEN
                     
-                       raise exception 'Revisar el auxiliar para la relacion contable:  % (%)',  v_record_rel_conps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;
-                    
-                    END IF;
+                  
                     
                     
                     --replanza las cuenta, partida y auxiliar obtenidos 

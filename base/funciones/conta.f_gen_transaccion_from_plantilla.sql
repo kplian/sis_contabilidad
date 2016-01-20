@@ -33,7 +33,7 @@ DECLARE
     v_record_int_tran       conta.tint_transaccion;
     v_tabla					record;
     v_nombre_funcion        text;
-    v_plantilla_det				record;        
+    v_plantilla_det			record;        
     v_resp 					varchar;
     v_consulta				varchar;
     v_posicion				integer;
@@ -41,34 +41,34 @@ DECLARE
     v_columna_requerida		varchar;
     v_valor					varchar;
     
-     v_id_int_comprobante    integer;
+     v_id_int_comprobante    	integer;
     
-     v_consulta_tab  varchar;
+     v_consulta_tab  			varchar;
     
-     v_def_campos      varchar[];
-     v_campo_tempo     varchar;
-     v_i integer;
-     v_tamano integer;
+     v_def_campos      			varchar[];
+     v_campo_tempo     			varchar;
+     v_i 						integer;
+     v_tamano 					integer;
      
      
-     v_record_rel_con record;
-     v_reg_id_int_transaccion integer;
-     v_resp_doc integer[];
-     v_id_centro_costo_depto integer;
-     v_sum_debe numeric;
-     v_sum_haber numeric;
-     v_registros_aux   record;
-     v_consulta_aux varchar;
-     v_factor_aux   numeric;
-     v_descuento_debe  numeric;
-     v_descuento_haber  numeric;
-     v_id_int_transaccion_pagado  integer;
+     v_record_rel_con 				record;
+     v_reg_id_int_transaccion 		integer;
+     v_resp_doc 					integer[];
+     v_id_centro_costo_depto 		integer;
+     v_sum_debe 					numeric;
+     v_sum_haber 					numeric;
+     v_registros_aux   				record;
+     v_consulta_aux 				varchar;
+     v_factor_aux  					numeric;
+     v_descuento_debe  				numeric;
+     v_descuento_haber  			numeric;
+     v_id_int_transaccion_pagado  	integer;
+     v_conta_partidas				varchar;
 BEGIN
 	
     v_nombre_funcion:='conta.f_gen_transaccion_from_plantilla';
     
     
-   
     
      /*******************************************************************************************
      --      obtener la definicion de las variablles y los valores segun la plantilla del detalle
@@ -244,11 +244,16 @@ BEGIN
                                 
                         END IF;
                         
-                        --validar si existe  partida 
-                        IF (v_this_hstore->'campo_partida') = '' or (v_this_hstore->'campo_partida') = 'NULL' or (v_this_hstore->'campo_partida') is NULL THEN 
-                            
-                              raise exception 'No se encontro una partida  para la transaccion: %',(p_reg_det_plantilla->'descripcion');
-                                
+                        
+                        
+                        
+                        v_conta_partidas = pxp.f_get_variable_global('conta_partidas');
+                        
+                        IF v_conta_partidas = 'si' THEN
+                          --validar si existe  partida 
+                          IF (v_this_hstore->'campo_partida') = '' or (v_this_hstore->'campo_partida') = 'NULL' or (v_this_hstore->'campo_partida') is NULL THEN 
+                               raise exception 'No se encontro una partida  para la transaccion: %',(p_reg_det_plantilla->'descripcion');
+                          END IF;
                         END IF;
                         
                       /************************************************  
