@@ -329,7 +329,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:500
+				maxLength:150
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpbdet.campo_monto',type:'string'},
@@ -429,7 +429,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'nom_fk_tabla_maestro',
                 fieldLabel: 'Fk Tabla Maestro',
-                qtip:'Hace referencia al nombre del campo en la Tabla Detalle que se usa como llave foranea',
+                qtip:'Hace referencia al nombre del campo en la Tabla Detalle que se usa como llave foranea, debe conincidir con el campo "Id Tabla" configurado en el maestro',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
