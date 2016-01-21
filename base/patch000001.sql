@@ -1820,27 +1820,9 @@ IS 'solo para polizas de impoestacion';
 
 --------------- SQL ---------------
 
-ALTER TABLE param.tplantilla
-  ADD COLUMN sw_nro_dui VARCHAR(3) DEFAULT 'no' NOT NULL;
-
-COMMENT ON COLUMN param.tplantilla.sw_nro_dui
-IS 'si o no';
-
-
-
 /***********************************F-SCP-RAC-CONTA-1-26/08/2015****************************************/
 
 
-/***********************************I-SCP-RAC-CONTA-1-31/08/2015****************************************/
---------------- SQL ---------------
-
-ALTER TABLE param.tplantilla
-  ADD COLUMN sw_ic VARCHAR(3) DEFAULT 'no' NOT NULL;
-
-COMMENT ON COLUMN param.tplantilla.sw_ic
-IS 'si o no, si esta habilitado, es indispensable que el monto excento tambien lo este, ya que se copia el valor por que tienen el mismo comportamiento';
-
-/***********************************F-SCP-RAC-CONTA-1-31/08/2015****************************************/
 
 
 /***********************************I-SCP-RAC-CONTA-1-01/09/2015****************************************/
