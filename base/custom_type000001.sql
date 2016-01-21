@@ -55,7 +55,7 @@ ALTER TYPE conta.maestro_comprobante
 --------------- SQL ---------------
 
 ALTER TYPE conta.maestro_comprobante
-  ALTER ATTRIBUTE columna_descripcion TYPE VARCHAR(500),
+  ALTER ATTRIBUTE columna_descripcion TYPE VARCHAR(1000),
   ALTER ATTRIBUTE columna_acreedor TYPE VARCHAR(500),
   ALTER ATTRIBUTE columna_nro_tramite TYPE VARCHAR(500),
   ALTER ATTRIBUTE columna_nro_cuenta_bancaria_trans TYPE VARCHAR(500);
