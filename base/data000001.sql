@@ -1206,20 +1206,20 @@ VALUES (E'conta_prioridad_depto_inter', E'3', E'prioridad depto de contabilidad 
 /***********************************F-SCP-RAC-CONTA-0-10/12/2015****************************************/
 
 
-/***********************************I-SCP-RAC-CONTA-0-12/01/2016****************************************/
+/***********************************I-DAT-RAC-CONTA-0-12/01/2016****************************************/
 
 ----------------------------------
 --COPY LINES TO data.sql FILE  
 ---------------------------------
 
 select pxp.f_insert_tgui ('SISTEMA DE CONTABILIDAD', '', 'CONTA', 'si', 1, '', 1, '', '', 'CONTA');
-select pxp.f_insert_tgui ('Plan de Cuentas', 'Cuentas', 'CTA', 'si', , 'sis_contabilidad/vista/cuenta/Cuenta.php', 2, '', 'Cuenta', 'CONTA');
-select pxp.f_insert_tgui ('Auxiliares de Cuentas', 'Auxiliares de cuenta', 'AUXCTA', 'si', , 'sis_contabilidad/vista/auxiliar/Auxiliar.php', 2, '', 'Auxiliar', 'CONTA');
-select pxp.f_insert_tgui ('Ordenes de Trabajo', 'ordenes de trabajo', 'ODT', 'si', , 'sis_contabilidad/vista/orden_trabajo/OrdenTrabajo.php', 2, '', 'OrdenTrabajo', 'CONTA');
-select pxp.f_insert_tgui ('Config Tipo Cuenta', 'Configuracion de numero para los tipos de cuenta', 'CTIP', 'si', , 'sis_contabilidad/vista/config_tipo_cuenta/ConfigTipoCuenta.php', 2, '', 'ConfigTipoCuenta', 'CONTA');
+select pxp.f_insert_tgui ('Plan de Cuentas', 'Cuentas', 'CTA', 'si', 0, 'sis_contabilidad/vista/cuenta/Cuenta.php', 2, '', 'Cuenta', 'CONTA');
+select pxp.f_insert_tgui ('Auxiliares de Cuentas', 'Auxiliares de cuenta', 'AUXCTA', 'si', 0, 'sis_contabilidad/vista/auxiliar/Auxiliar.php', 2, '', 'Auxiliar', 'CONTA');
+select pxp.f_insert_tgui ('Ordenes de Trabajo', 'ordenes de trabajo', 'ODT', 'si', 0, 'sis_contabilidad/vista/orden_trabajo/OrdenTrabajo.php', 2, '', 'OrdenTrabajo', 'CONTA');
+select pxp.f_insert_tgui ('Config Tipo Cuenta', 'Configuracion de numero para los tipos de cuenta', 'CTIP', 'si', 0, 'sis_contabilidad/vista/config_tipo_cuenta/ConfigTipoCuenta.php', 2, '', 'ConfigTipoCuenta', 'CONTA');
 select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'CCBT', 'si', 6, 'sis_contabilidad/vista/clase_comprobante/ClaseComprobante.php', 2, '', 'ClaseComprobante', 'CONTA');
 select pxp.f_insert_tgui ('Relaciones Contables por Tabla', 'Relaciones Contables por Tabla', 'RELCON', 'si', 1, 'sis_contabilidad/vista/tabla_relacion_contable/TablaRelacionContable.php', 2, '', 'TablaRelacionContable', 'CONTA');
-select pxp.f_insert_tgui ('Relaciones Contables', 'Relaciones Contables', 'RELACON', 'si', , '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Relaciones Contables', 'Relaciones Contables', 'RELACON', 'si', 0, '', 2, '', '', 'CONTA');
 select pxp.f_insert_tgui ('Proveedor', 'Proveedor', 'PROVCUEN', 'si', 1, 'sis_contabilidad/vista/proveedor_cuenta/Proveedor.php', 3, '', 'ProveedorCuenta', 'CONTA');
 select pxp.f_insert_tgui ('Definición de Relaciones Contables', 'Definición de Relaciones Contables', 'DEFRECONCAR', 'si', 1, '', 2, '', '', 'CONTA');
 select pxp.f_insert_tgui ('Relaciones Contables Generales', 'Relaciones Contables Generales', 'RELCONGEN', 'si', 2, 'sis_contabilidad/vista/tipo_relacion_contable/TipoRelacionContableGeneral.php', 3, '', 'TipoRelacionContableGeneral', 'CONTA');
@@ -1341,6 +1341,7 @@ select pxp.f_insert_tgui ('Plantilla de Resultados', 'Plantilla  para reporte de
 select pxp.f_insert_tgui ('Periodos Compra Venta', 'Configuracion de periodos de compra  y venta', 'PCV', 'si', 1, 'sis_contabilidad/vista/periodo_compra_venta/DeptoConta.php', 3, '', 'DeptoConta', 'CONTA');
 select pxp.f_insert_tgui ('Tipo de relación en comprobantes', 'Tipo de relación en comprobantes', 'TRECOM', 'si', 4, 'sis_contabilidad/vista/tipo_relacion_comprobante/TipoRelacionComprobante.php', 3, '', 'TipoRelacionComprobante', 'CONTA');
 select pxp.f_insert_tgui ('Configuraciones', 'Configuraciones', 'CONF', 'si', 1, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Configuración Cambiaria', 'para configurar moneda de triangulacion', 'CFCA', 'si', 1, 'sis_contabilidad/vista/config_cambiaria/ConfigCambiaria.php', 3, '', 'ConfigCambiaria', 'CONTA');
 
 
 
@@ -1354,7 +1355,7 @@ VALUES
   (1, NULL, E'2014-12-17 16:15:09.388', NULL, E'activo', NULL, NULL, E'APLICACIONANT', E'Aplicación del anticipo');
 
 
-/***********************************F-SCP-RAC-CONTA-0-12/01/2016****************************************/
+/***********************************F-DAT-RAC-CONTA-0-12/01/2016****************************************/
 
 
 

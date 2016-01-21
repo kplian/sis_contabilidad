@@ -2274,6 +2274,11 @@ IS 'Cuando un concepto de gasto es del tipo servicio, esta fecha indica el fin d
 
 /***********************************I-SCP-RAC-CONTA-0-03/11/2015****************************************/
 
+
+--------------- SQL ---------------
+
+DROP VIEW  IF EXISTS  conta.vint_comprobante;
+
 --------------- SQL ---------------
 
 ALTER TABLE conta.tint_comprobante
@@ -2281,10 +2286,6 @@ ALTER TABLE conta.tint_comprobante
 
 COMMENT ON COLUMN conta.tint_comprobante.id_moneda_tri
 IS 'identifica la moneda de triangulacion';
-
---------------- SQL ---------------
-
-DROP VIEW  IF EXISTS  conta.vint_comprobante;
 
 
 --------------- SQL ---------------
@@ -2991,9 +2992,6 @@ IS 'moenda sobre la que se realiza el ajuste, por defecto es la moneda de la cue
 
 /***********************************I-SCP-RAC-CONTA-12/01/2016****************************************/
 
---------------- SQL ---------------
-
-ALTER TABLE conta.tcuenta
-  DROP CONSTRAINT chk_tcuenta__tipo_cuenta_pat RESTRICT;
+ALTER TABLE conta.tcuenta DROP CONSTRAINT chk_tcuenta__tipo_cuenta_pat RESTRICT;
   
 /***********************************F-SCP-RAC-CONTA-12/01/2016****************************************/
