@@ -21,6 +21,16 @@ class MODBancaCompraVenta extends MODbase{
 		$this->procedimiento='conta.ft_banca_compra_venta_sel';
 		$this->transaccion='CONTA_BANCA_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		
+		if($_SESSION["BANCA_DOCUMENTOS"] == NULL){
+			$_SESSION["BANCA_DOCUMENTOS"] = "pxp"; // si no tiene esa variable entrara por defecto en las tablas del pxp
+		}
+		
+		$this->aParam->addParametro('banca_documentos', $_SESSION["BANCA_DOCUMENTOS"]);
+		$this->arreglo['banca_documentos'] = $_SESSION["BANCA_DOCUMENTOS"];
+		$this->setParametro('banca_documentos','banca_documentos','varchar');	
+		
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_banca_compra_venta','int4');
@@ -418,7 +428,16 @@ class MODBancaCompraVenta extends MODbase{
 		//$this->setCount(false);
         
         $this->setTipoRetorno('record');
+		
+		//BANCA_DOCUMENTOS
+		if($_SESSION["BANCA_DOCUMENTOS"] == NULL){
+			$_SESSION["BANCA_DOCUMENTOS"] = "pxp"; // si no tiene esa variable entrara por defecto en las tablas del pxp
+		}
+		
+		$this->aParam->addParametro('banca_documentos', $_SESSION["BANCA_DOCUMENTOS"]);
+		$this->arreglo['banca_documentos'] = $_SESSION["BANCA_DOCUMENTOS"];
 			
+		$this->setParametro('banca_documentos','banca_documentos','varchar');	
 		
 		//Definicion de la lista del resultado del query
 		$this->captura('id_documento','int4');

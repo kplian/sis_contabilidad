@@ -169,16 +169,20 @@ class ACTBancaCompraVenta extends ACTbase{
 		
 		
 		
-		
-		if($this->objParam->getParametro('sw_libro_compras') != ''){
+		if($_SESSION["BANCA_DOCUMENTOS"] == NULL){
+			
+			if($this->objParam->getParametro('sw_libro_compras') != ''){
 			$this->objParam->addFiltro("pla.sw_libro_compras = ''".$this->objParam->getParametro('sw_libro_compras')."'' ");  
-						
-		}
-		
-		if($this->objParam->getParametro('nro_nit') != ''){
+			}
+			
+			if($this->objParam->getParametro('nro_nit') != ''){
 			$this->objParam->addFiltro("doc.nro_nit = ''".$this->objParam->getParametro('nro_nit')."'' ");  
+			}
 			
 		}
+		
+		
+		
 		
 		
 		$this->objFunc=$this->create('MODBancaCompraVenta');	

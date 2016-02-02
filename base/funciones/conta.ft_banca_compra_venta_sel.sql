@@ -49,15 +49,23 @@ BEGIN
 
     begin
 
-      --creacion de tabla temporal del endesis 
-      v_consulta:='WITH tabla_temporal_documentos AS (
-          SELECT * FROM dblink('''||v_host||''',
-      ''SELECT id_documento,razon_social FROM sci.tct_documento''
-               ) AS d (id_documento integer,razon_social varchar(255))
-          )';
-
+      
       --Sentencia de la consulta
-      v_consulta:=v_consulta||' select
+      
+                        
+                        
+      
+       if v_parametros.banca_documentos = 'endesis'
+        then
+        
+        --creacion de tabla temporal del endesis 
+          v_consulta:='WITH tabla_temporal_documentos AS (
+              SELECT * FROM dblink('''||v_host||''',
+          ''SELECT id_documento,razon_social FROM sci.tct_documento''
+                   ) AS d (id_documento integer,razon_social varchar(255))
+              )';
+              
+              v_consulta:=v_consulta||' select
 						banca.id_banca_compra_venta,
 						banca.num_cuenta_pago,
 						banca.tipo_documento_pago,
@@ -111,13 +119,79 @@ BEGIN
                         left join tabla_temporal_documentos doc on doc.id_documento = banca.id_documento
                         where ';
 
+                        
+       
+       elsif v_parametros.banca_documentos = 'pxp'
+       then
+       
+       v_consulta:='select
+						banca.id_banca_compra_venta,
+						banca.num_cuenta_pago,
+						banca.tipo_documento_pago,
+						banca.num_documento,
+						banca.monto_acumulado,
+						banca.estado_reg,
+						banca.nit_ci,
+						banca.importe_documento,
+						banca.fecha_documento,
+						banca.modalidad_transaccion,
+						banca.tipo_transaccion,
+						banca.autorizacion,
+						banca.monto_pagado,
+						banca.fecha_de_pago,
+						banca.razon,
+						banca.tipo,
+						banca.num_documento_pago,
+						banca.num_contrato,
+						banca.nit_entidad,
+						banca.fecha_reg,
+						banca.usuario_ai,
+						banca.id_usuario_reg,
+						banca.id_usuario_ai,
+						banca.id_usuario_mod,
+						banca.fecha_mod,
+                        banca.id_periodo,
+						usu1.cuenta as usr_reg,
+						usu2.cuenta as usr_mod,
+                        confmo.descripcion as desc_modalidad_transaccion,
+                        conftt.descripcion as desc_tipo_transaccion,
+                        conftd.descripcion as desc_tipo_documento_pago,
+                        banca.revisado,
+                        banca.id_contrato,
+                        banca.id_proveedor,
+                        provee.desc_proveedor as desc_proveedor2,
+                        contra.objeto as desc_contrato,
+                        banca.id_cuenta_bancaria,
+                        cuenta.denominacion as desc_cuenta_bancaria,
+                        banca.id_documento,
+                        doc.razon_social::varchar as desc_documento,
+                        param.f_literal_periodo(banca.id_periodo) as periodo	
+						from conta.tbanca_compra_venta banca
+						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
+                        left join conta.tconfig_banca confmo on confmo.digito = banca.modalidad_transaccion
+                        left join conta.tconfig_banca conftt on conftt.digito = banca.tipo_transaccion
+                        left join conta.tconfig_banca conftd on conftd.digito = banca.tipo_documento_pago
+                        inner join param.vproveedor provee on provee.id_proveedor = banca.id_proveedor
+                        left join leg.tcontrato contra on contra.id_contrato = banca.id_contrato                        
+                        left join tes.tcuenta_bancaria cuenta on cuenta.id_cuenta_bancaria = banca.id_cuenta_bancaria                        
+                        left join conta.tdoc_compra_venta doc on doc.id_doc_compra_venta = banca.id_documento
+                        where ';
+                        
+       
+        end if;
+        
+     
       --Definicion de la respuesta
       v_consulta:=v_consulta||v_parametros.filtro;
-
+      
+      
+       
       v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' ||
         v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad ||
         ' offset ' || v_parametros.puntero;
         
+       
       
 
       --Devuelve la respuesta

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_cuenta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -258,13 +256,13 @@ BEGIN
 		end;
     
     /*********************************    
- 	#TRANSACCION:  'CONTA_CLONAR_IME'
+ 	#TRANSACCION:  'CONTA_CLONARCUE_IME'
  	#DESCRIPCION:	Clona el plan de cuentas para la gestion indicada
  	#AUTOR:	    Rensi Arteaga Copari
  	#FECHA:		03-08-2015 15:04:03
 	***********************************/
 
-	elsif(p_transaccion='CONTA_CLONAR_IME')then
+	elsif(p_transaccion='CONTA_CLONARCUE_IME')then
 
 		begin
 			

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_ajuste_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -294,13 +292,13 @@ BEGIN
 		end;
     
     /*********************************    
- 	#TRANSACCION:  'CONTA_GENCBTE_IME'
+ 	#TRANSACCION:  'CONTA_GENCBTEAJU_IME'
  	#DESCRIPCION:	Genera comprobante de ajuste
  	#AUTOR:		admin	
  	#FECHA:		10-12-2015 15:16:16
 	***********************************/
 
-	elsif(p_transaccion='CONTA_GENCBTE_IME')then
+	elsif(p_transaccion='CONTA_GENCBTEAJU_IME')then
 
 		begin
         
