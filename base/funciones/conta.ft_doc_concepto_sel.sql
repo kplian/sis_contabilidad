@@ -68,7 +68,8 @@ BEGIN
                             cc.codigo_cc as desc_centro_costo,
                             cig.desc_ingas as desc_concepto_ingas,
                             ot.desc_orden as desc_orden_trabajo,
-                            pre.id_presupuesto                        
+                            pre.id_presupuesto,
+                            docc.precio_total_final                      
 						from conta.tdoc_concepto docc
 						inner join segu.tusuario usu1 on usu1.id_usuario = docc.id_usuario_reg
                         inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = docc.id_concepto_ingas

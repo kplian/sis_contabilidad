@@ -14,6 +14,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     ActSave:'../../sis_contabilidad/control/DocCompraVenta/insertarDocCompleto',
     tam_pag: 10,
     tabEnter: true,
+    mostrarFormaPago : true,
     //layoutType: 'wizard',
     layout: 'fit',
     autoScroll: false,
@@ -21,6 +22,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
    
     conceptos_eliminados: [],
     listadoConcepto: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
+    parFilConcepto:'desc_ingas#par.codigo',
     //labelSubmit: '<i class="fa fa-check"></i> Siguiente',
     
     constructor:function(config)
@@ -30,24 +32,16 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
          this.addEvents('successsave');
          Ext.apply(this,config);
          this.obtenerVariableGlobal(config);
+         this.generarAtributos();
     
     }, 
     
     constructorEtapa2:function(config)
     {   
-    	
-    	
-    	
-    	
     	this.buildComponentesDetalle();
         this.buildDetailGrid();
-        this.buildGrupos();
-        
+        this.buildGrupos();        
         Phx.vista.FormCompraVenta.superclass.constructor.call(this,config);
-        
-        
-        
-        
         this.init();    
         this.iniciarEventos();
         this.iniciarEventosDetalle();
@@ -63,19 +57,15 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					if( this.Cmp[index].setReadOnly){
 					    	 this.Cmp[index].setReadOnly(true);
 					   }
-			}
-			
+			}			
 			this.megrid.getTopToolbar().disable();
-					
         }
-        
-        
         this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.Cmp.tipo.getValue()});
         
     },
     buildComponentesDetalle: function(){
     	var me = this,
-    	    bpar = (me.data.tipoDoc=='compra')?{par_filtro:'desc_ingas#par.codigo', movimiento: 'gasto'}:{par_filtro:'desc_ingas#par.codigo', movimiento: 'recurso'};
+    	    bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto'}:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
     	me.detCmp = {
     		       'id_concepto_ingas': new Ext.form.ComboBox({
 							                name: 'id_concepto_ingas',
@@ -112,6 +102,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 							               qtip:'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
 							               tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
 							             }),
+							             
 	              'id_centro_costo': new Ext.form.ComboRec({
 						                    name:'id_centro_costo',
 						                    msgTarget: 'title',
@@ -122,6 +113,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						                    allowBlank: false,
 						                    baseParams: (me.data.tipoDoc == 'compra')?{tipo_pres:'gasto', filtrar:'grupo_ep'}:{tipo_pres:'recurso', filtrar:'grupo_ep'}
 						                }),
+						                
 	               'id_orden_trabajo': new Ext.form.ComboRec({
 						                    name:'id_orden_trabajo',
 						                    msgTarget: 'title',
@@ -164,27 +156,48 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 									    msgTarget: 'title',
 									    readOnly: true,
 									    allowBlank: true
+                      		 	}),			
+					'precio_total_final': new Ext.form.NumberField({
+									    name: 'precio_total_final',
+									    msgTarget: 'title',
+									    readOnly: true,
+									    allowBlank: true
                       		 	})
+					
 					
 			  }
     		
     		
     }, 
     
+    calcularTotales: function(){
+    	 var pTot = this.detCmp.cantidad_sol.getValue() * this.detCmp.precio_unitario.getValue();
+    	 this.detCmp.precio_total.setValue(pTot);
+    	 
+    	 if(this.Cmp.porc_descuento.getValue() > 0){
+    	 	 this.detCmp.precio_total_final.setValue(pTot - (pTot * this.Cmp.porc_descuento.getValue()));
+    	 	
+    	 	 
+    	 }
+    	 else{
+    	 	 this.detCmp.precio_total_final.setValue(pTot);
+    	 }
+    	
+    	 
+    },
     
     iniciarEventosDetalle: function(){
     	
         
         this.detCmp.precio_unitario.on('valid',function(field){
-             var pTot = this.detCmp.cantidad_sol.getValue() * this.detCmp.precio_unitario.getValue();
-             this.detCmp.precio_total.setValue(pTot);
+               this.calcularTotales()
             } ,this);
         
        this.detCmp.cantidad_sol.on('valid',function(field){
-            var pTot = this.detCmp.cantidad_sol.getValue() * this.detCmp.precio_unitario.getValue();
-            this.detCmp.precio_total.setValue(pTot);
-           
+             this.calcularTotales()           
         } ,this);
+        
+        
         
         this.detCmp.id_concepto_ingas.on('change',function( cmb, rec, ind){
 	        	    this.detCmp.id_orden_trabajo.reset();
@@ -207,7 +220,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			        	this.detCmp.id_orden_trabajo.setReadOnly(true);
 			        }
 			        this.detCmp.id_orden_trabajo.reset();
-			     console.log('rec data,', rec) 
+			    
 			    var idcc = this.detCmp.id_centro_costo.getValue();
 				if(idcc){
 				  this.checkRelacionConcepto({id_centro_costo: idcc , id_concepto_ingas: rec.data.id_concepto_ingas, id_gestion :  this.Cmp.id_gestion.getValue()});	
@@ -335,6 +348,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                     },{
                         name: 'precio_total',
                         type: 'float'
+                    },{
+                        name: 'precio_total_final',
+                        type: 'float'
                     }
                     ]);
         
@@ -345,7 +361,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					totalProperty: 'total',
 					fields: ['id_doc_concepto','id_centro_costo','descripcion', 'precio_unitario',
 					         'id_doc_compra_venta','id_orden_trabajo','id_concepto_ingas','precio_total','cantidad_sol',
-							 'desc_centro_costo','desc_concepto_ingas','desc_orden_trabajo'
+							 'desc_centro_costo','desc_concepto_ingas','desc_orden_trabajo','precio_total_final'
 					],remoteSort: true,
 					baseParams: {dir:'ASC',sort:'id_doc_concepto',limit:'50',start:'0'}
 				});
@@ -397,6 +413,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 		                                cantidad_sol: 1,
 		                                descripcion: '',
 		                                precio_total: 0,
+		                                precio_total_final: 0,
 		                                precio_unitario: undefined
 	                            });
 	                            this.editorDetail.stopEditing();
@@ -422,7 +439,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                             var s = this.megrid.getSelectionModel().getSelections();
                             for(var i = 0, r; r = s[i]; i++){
                                 
-                                console.log('al eliminar ...', r);
+                             
                                 
                                 // si se edita el documento y el concepto esta registrado, marcarlo para eliminar de la base
                                 if(r.data.id_doc_concepto > 0){
@@ -501,10 +518,20 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                         header: 'Importe Total',
                         dataIndex: 'precio_total',
                         format: '$0,0.00',
-                        width: 50,
+                        width: 75,
                         sortable: false,
                         summaryType: 'sum',
                         editor: this.detCmp.precio_total 
+                    },
+                    {
+                        xtype: 'numbercolumn',
+                        header: 'Importe Neto',
+                        dataIndex: 'precio_total_final',
+                        format: '$0,0.00',
+                        width: 75,
+                        sortable: false,
+                        summaryType: 'sum',
+                        editor: this.detCmp.precio_total_final 
                     }]
                 });
     },
@@ -552,7 +579,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			                     },
 			                     {
 			                      bodyStyle: 'padding-right:5px;',
-			                     width: '33%',
+			                      width: '33%',
 			                      border: true,
 			                      autoHeight: true,
 							      items: [{
@@ -578,7 +605,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			                            xtype: 'fieldset',
 			                            frame: true,
 			                            layout: 'form',
-			                            title: 'Tiempo',
+			                            title: 'Detalle de pago',
 			                            width: '100%',
 			                            border: false,
 			                            //margins: '0 0 0 5',
@@ -608,485 +635,583 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     
    
                 
-    
-    
-	Atributos:[
-		{
-			//configuracion del componente
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_doc_compra_venta'
+    generarAtributos: function(){
+        var me = this;
+		this.Atributos=[
+			{
+				//configuracion del componente
+				config:{
+						labelSeparator:'',
+						inputType:'hidden',
+						name: 'id_doc_compra_venta'
+				},
+				type:'Field',
+				form:true 
 			},
-			type:'Field',
-			form:true 
-		},
-		{
-			//configuracion del componente
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_solicitud_efectivo'
+			{
+				//configuracion del componente
+				config:{
+						labelSeparator:'',
+						inputType:'hidden',
+						name: 'id_solicitud_efectivo'
+				},
+				type:'Field',
+				form:true 
 			},
-			type:'Field',
-			form:true 
-		},
-		{
-			//configuracion del componente
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_gestion'
+			{
+				//configuracion del componente
+				config:{
+						labelSeparator:'',
+						inputType:'hidden',
+						name: 'id_gestion'
+				},
+				type:'Field',
+				form:true 
 			},
-			type:'Field',
-			form:true 
-		},
-		{
-			//configuracion del componente
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'tipo'
+			{
+				//configuracion del componente
+				config:{
+						labelSeparator:'',
+						inputType:'hidden',
+						name: 'tipo'
+				},
+				type:'Field',
+				form:true 
 			},
-			type:'Field',
-			form:true 
-		},
-        {
-            //configuracion del componente
-            config:{
-                    labelSeparator:'',
-                    inputType:'hidden',
-                    name: 'porc_descuento_ley',
-                    allowDecimals: true,
-                    decimalPrecision: 10
-            },
-            type:'NumberField',
-            form:true 
-        },
-        {
-            //configuracion del componente
-            config:{
-                    labelSeparator:'',
-                    inputType:'hidden',
-                    name: 'porc_iva_cf',
-                    allowDecimals: true,
-                    decimalPrecision: 10
-            },
-            type:'NumberField',
-            form:true 
-        },
-        {
-            //configuracion del componente
-            config:{
-                    labelSeparator:'',
-                    inputType:'hidden',
-                    name: 'porc_iva_df',
-                    allowDecimals: true,
-                    decimalPrecision: 10
-            },
-            type:'NumberField',
-            form:true 
-        },
-        {
-            //configuracion del componente
-            config:{
-                    labelSeparator:'',
-                    inputType:'hidden',
-                    name: 'porc_it',
-                    allowDecimals: true,
-                    decimalPrecision: 10
-            },
-            type:'NumberField',
-            form:true 
-        },
-        {
-            //configuracion del componente
-            config:{
-                    labelSeparator:'',
-                    inputType:'hidden',
-                    name: 'porc_ice',
-                    allowDecimals: true,
-                    decimalPrecision: 10
-            },
-            type:'NumberField',
-            form:true 
-        },
-        
-        {
-			//configuracion del componente
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_depto_conta'
+	        {
+	            //configuracion del componente
+	            config:{
+	                    labelSeparator:'',
+	                    inputType:'hidden',
+	                    name: 'porc_descuento',
+	                    allowDecimals: true,
+	                    decimalPrecision: 10
+	            },
+	            type: 'NumberField',
+	            form: true 
+	        },
+	        {
+	            //configuracion del componente
+	            config:{
+	                    labelSeparator:'',
+	                    inputType:'hidden',
+	                    name: 'porc_descuento_ley',
+	                    allowDecimals: true,
+	                    decimalPrecision: 10
+	            },
+	            type:'NumberField',
+	            form:true 
+	        },
+	        {
+	            //configuracion del componente
+	            config:{
+	                    labelSeparator:'',
+	                    inputType:'hidden',
+	                    name: 'porc_iva_cf',
+	                    allowDecimals: true,
+	                    decimalPrecision: 10
+	            },
+	            type:'NumberField',
+	            form:true 
+	        },
+	        {
+	            //configuracion del componente
+	            config:{
+	                    labelSeparator:'',
+	                    inputType:'hidden',
+	                    name: 'porc_iva_df',
+	                    allowDecimals: true,
+	                    decimalPrecision: 10
+	            },
+	            type:'NumberField',
+	            form:true 
+	        },
+	        {
+	            //configuracion del componente
+	            config:{
+	                    labelSeparator:'',
+	                    inputType:'hidden',
+	                    name: 'porc_it',
+	                    allowDecimals: true,
+	                    decimalPrecision: 10
+	            },
+	            type:'NumberField',
+	            form:true 
+	        },
+	        {
+	            //configuracion del componente
+	            config:{
+	                    labelSeparator:'',
+	                    inputType:'hidden',
+	                    name: 'porc_ice',
+	                    allowDecimals: true,
+	                    decimalPrecision: 10
+	            },
+	            type:'NumberField',
+	            form:true 
+	        },
+	        
+	        {
+				//configuracion del componente
+				config:{
+						labelSeparator:'',
+						inputType:'hidden',
+						name: 'id_depto_conta'
+				},
+				type:'Field',
+				form:true 
 			},
-			type:'Field',
-			form:true 
-		},
-		{
-			config:{
-				name: 'revisado',
-				fieldLabel: 'Revisado',
-				allowBlank: true,
-				anchor: '80%',
-				maxLength:3
+			{
+				config:{
+					name: 'revisado',
+					fieldLabel: 'Revisado',
+					allowBlank: true,
+					anchor: '80%',
+					maxLength:3
+				},
+				type: 'TextField',
+				id_grupo: 1,
+				form: false
 			},
-			type: 'TextField',
-			id_grupo: 1,
-			form: false
-		},
-		
-        {
-            config:{
-                name: 'id_plantilla',
-                fieldLabel: 'Tipo Documento',
-                allowBlank: false,
-                emptyText:'Elija una plantilla...',
-                store:new Ext.data.JsonStore(
-                {
-                    url: '../../sis_parametros/control/Plantilla/listarPlantilla',
-                    id: 'id_plantilla',
-                    root:'datos',
-                    sortInfo:{
-                        field:'desc_plantilla',
-                        direction:'ASC'
-                    },
-                    totalProperty:'total',
-                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
-                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
-                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice'],
-                    remoteSort: true,
-                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
-                }),
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_plantilla}</p></div></tpl>',
-                valueField: 'id_plantilla',
-                hiddenValue: 'id_plantilla',
-                displayField: 'desc_plantilla',
-                gdisplayField:'desc_plantilla',
-                listWidth:'280',
-                forceSelection:true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender:true,
-                mode:'remote',
-                pageSize:20,
-                queryDelay:500,
-                minChars:2
-            },
-            type:'ComboBox',
-            id_grupo: 0,
-            form: true
-        },
-		{
-            config:{
-                name:'id_moneda',
-                origen:'MONEDA',
-                allowBlank:false,
-                fieldLabel:'Moneda',
-                gdisplayField:'desc_moneda',
-                gwidth:100,
-                width:250
-             },
-            type:'ComboRec',
-            id_grupo:0,
-            form:true
-        },
-		{
-			config:{
-				name: 'dia',
-				fieldLabel: 'Dia',
-				allowBlank: true,
-				allowNEgative: false,
-				allowDecimal: false,
-				maxValue: 31,
-				minValue: 1,
-				width: 40
+			
+	        {
+	            config:{
+	                name: 'id_plantilla',
+	                fieldLabel: 'Tipo Documento',
+	                allowBlank: false,
+	                emptyText:'Elija una plantilla...',
+	                store:new Ext.data.JsonStore(
+	                {
+	                    url: '../../sis_parametros/control/Plantilla/listarPlantilla',
+	                    id: 'id_plantilla',
+	                    root:'datos',
+	                    sortInfo:{
+	                        field:'desc_plantilla',
+	                        direction:'ASC'
+	                    },
+	                    totalProperty:'total',
+	                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
+	                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
+	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice'],
+	                    remoteSort: true,
+	                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
+	                }),
+	                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_plantilla}</p></div></tpl>',
+	                valueField: 'id_plantilla',
+	                hiddenValue: 'id_plantilla',
+	                displayField: 'desc_plantilla',
+	                gdisplayField:'desc_plantilla',
+	                listWidth:'280',
+	                forceSelection:true,
+	                typeAhead: false,
+	                triggerAction: 'all',
+	                lazyRender:true,
+	                mode:'remote',
+	                pageSize:20,
+	                queryDelay:500,
+	                minChars:2
+	            },
+	            type:'ComboBox',
+	            id_grupo: 0,
+	            form: true
+	        },
+			{
+	            config:{
+	                name:'id_moneda',
+	                origen:'MONEDA',
+	                allowBlank:false,
+	                fieldLabel:'Moneda',
+	                gdisplayField:'desc_moneda',
+	                gwidth:100,
+	                width:250
+	             },
+	            type:'ComboRec',
+	            id_grupo:0,
+	            form:true
+	        },
+			{
+				config:{
+					name: 'dia',
+					fieldLabel: 'Dia',
+					allowBlank: true,
+					allowNEgative: false,
+					allowDecimal: false,
+					maxValue: 31,
+					minValue: 1,
+					width: 40
+				},
+					type:'NumberField',
+					id_grupo:0,
+					form: true
 			},
-				type:'NumberField',
-				id_grupo:0,
-				form: true
-		},
-		
-		{
-			config:{
-				name: 'fecha',
-				fieldLabel: 'Fecha',
-				allowBlank: false,
-				anchor: '80%',
-				format: 'd/m/Y',
-				readOnly:true,
-				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			
+			{
+				config:{
+					name: 'fecha',
+					fieldLabel: 'Fecha',
+					allowBlank: false,
+					anchor: '80%',
+					format: 'd/m/Y',
+					readOnly:true,
+					renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				},
+					type:'DateField',
+					id_grupo:0,
+					form:true
 			},
-				type:'DateField',
-				id_grupo:0,
-				form:true
-		},
-        {
-            config:{
-                name: 'nro_autorizacion',
-                fieldLabel: 'Autorización',
-                allowBlank: false,
-                emptyText:'autorización ...',
-                store:new Ext.data.JsonStore(
-                {
-                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroAutorizacion',
-                    id: 'nro_autorizacion',
-                    root:'datos',
-                    sortInfo:{
-                        field:'nro_autorizacion',
-                        direction:'ASC'
-                    },
-                    totalProperty:'total',
-                    fields: ['nro_autorizacion','nit','razon_social'],
-                    remoteSort: true
-                }),
-                valueField: 'nro_autorizacion',
-                hiddenValue: 'nro_autorizacion',
-                displayField: 'nro_autorizacion',
-                queryParam: 'nro_autorizacion',
-                listWidth:'280',
-                forceSelection:false,
-                autoSelect: false,
-                hideTrigger:true,
-                typeAhead: false,
-                typeAheadDelay: 75,
-                lazyRender:false,
-                mode:'remote',
-                pageSize:20,
-                width: 200,
-                boxMinWidth: 200,
-                queryDelay:500,
-                minChars:1
-            },
-            type:'ComboBox',
-            id_grupo: 0,
-            form: true
-        },
-        
-        {
-            config:{
-                name: 'nit',
-                fieldLabel: 'NIT',
-                qtip: 'Número de indentificación del proveedor',
-                allowBlank: false,
-                emptyText:'nit ...',
-                store:new Ext.data.JsonStore(
-                {
-                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroNit',
-                    id: 'nit',
-                    root:'datos',
-                    sortInfo:{
-                        field:'nit',
-                        direction:'ASC'
-                    },
-                    totalProperty:'total',
-                    fields: ['nit','razon_social'],
-                    remoteSort: true
-                }),
-                valueField: 'nit',
-                hiddenValue: 'nit',
-                displayField: 'nit',
-                gdisplayField:'nit',
-                queryParam: 'nit',
-                listWidth:'280',
-                forceSelection:false,
-                autoSelect: false,
-                typeAhead: false,
-                typeAheadDelay: 75,
-                hideTrigger:true,
-                triggerAction: 'query',
-                lazyRender:false,
-                mode:'remote',
-                pageSize:20,
-                queryDelay:500,
-                anchor: '80%',
-                minChars:1
-            },
-            type:'ComboBox',
-            id_grupo: 0,
-            form: true
-        },
-		
-		
-		{
-			config:{
-				name: 'razon_social',
-				fieldLabel: 'Razón Social',
-				allowBlank: false,
-				maskRe: /[A-Za-z0-9 ]/,
-                fieldStyle: 'text-transform:uppercase',
-                listeners:{
-			          'change': function(field, newValue, oldValue){
-			          			  console.log('keyup ...  ')
-			          			  field.suspendEvents(true);
-			                      field.setValue(newValue.toUpperCase());
-			                      field.resumeEvents(true);
-			                  }
-			     },
-				anchor: '80%',
-				maxLength:180
+	        {
+	            config:{
+	                name: 'nro_autorizacion',
+	                fieldLabel: 'Autorización',
+	                allowBlank: false,
+	                emptyText:'autorización ...',
+	                store:new Ext.data.JsonStore(
+	                {
+	                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroAutorizacion',
+	                    id: 'nro_autorizacion',
+	                    root:'datos',
+	                    sortInfo:{
+	                        field:'nro_autorizacion',
+	                        direction:'ASC'
+	                    },
+	                    totalProperty:'total',
+	                    fields: ['nro_autorizacion','nit','razon_social'],
+	                    remoteSort: true
+	                }),
+	                valueField: 'nro_autorizacion',
+	                hiddenValue: 'nro_autorizacion',
+	                displayField: 'nro_autorizacion',
+	                queryParam: 'nro_autorizacion',
+	                listWidth:'280',
+	                forceSelection:false,
+	                autoSelect: false,
+	                hideTrigger:true,
+	                typeAhead: false,
+	                typeAheadDelay: 75,
+	                lazyRender:false,
+	                mode:'remote',
+	                pageSize:20,
+	                width: 200,
+	                boxMinWidth: 200,
+	                queryDelay:500,
+	                minChars:1
+	            },
+	            type:'ComboBox',
+	            id_grupo: 0,
+	            form: true
+	        },
+	        
+	        {
+	            config:{
+	                name: 'nit',
+	                fieldLabel: 'NIT',
+	                qtip: 'Número de indentificación del proveedor',
+	                allowBlank: false,
+	                emptyText:'nit ...',
+	                store:new Ext.data.JsonStore(
+	                {
+	                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroNit',
+	                    id: 'nit',
+	                    root:'datos',
+	                    sortInfo:{
+	                        field:'nit',
+	                        direction:'ASC'
+	                    },
+	                    totalProperty:'total',
+	                    fields: ['nit','razon_social'],
+	                    remoteSort: true
+	                }),
+	                valueField: 'nit',
+	                hiddenValue: 'nit',
+	                displayField: 'nit',
+	                gdisplayField:'nit',
+	                queryParam: 'nit',
+	                listWidth:'280',
+	                forceSelection:false,
+	                autoSelect: false,
+	                typeAhead: false,
+	                typeAheadDelay: 75,
+	                hideTrigger:true,
+	                triggerAction: 'query',
+	                lazyRender:false,
+	                mode:'remote',
+	                pageSize:20,
+	                queryDelay:500,
+	                anchor: '80%',
+	                minChars:1
+	            },
+	            type:'ComboBox',
+	            id_grupo: 0,
+	            form: true
+	        },
+			
+			
+			{
+				config:{
+					name: 'razon_social',
+					fieldLabel: 'Razón Social',
+					allowBlank: false,
+					maskRe: /[A-Za-z0-9 ]/,
+	                fieldStyle: 'text-transform:uppercase',
+	                listeners:{
+				          'change': function(field, newValue, oldValue){
+				          			 
+				          			  field.suspendEvents(true);
+				                      field.setValue(newValue.toUpperCase());
+				                      field.resumeEvents(true);
+				                  }
+				     },
+					anchor: '80%',
+					maxLength:180
+				},
+					type:'TextField',
+					id_grupo:0,
+					form:true
 			},
-				type:'TextField',
-				id_grupo:0,
-				form:true
-		},
-		{
-			config:{
-				name: 'nro_documento',
-				fieldLabel: 'Nro Doc',
-				allowBlank: false,
-				anchor: '80%',
-				maxLength:100
+			{
+				config:{
+					name: 'nro_documento',
+					fieldLabel: 'Nro Doc',
+					allowBlank: false,
+					anchor: '80%',
+					maxLength:100
+				},
+					type:'TextField',
+					id_grupo:1,
+					form:true
 			},
-				type:'TextField',
-				id_grupo:1,
-				form:true
-		},
-		{
-			config:{
-				name: 'nro_dui',
-				fieldLabel: 'DUI',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength :16,
-				minLength:16
+			{
+				config:{
+					name: 'nro_dui',
+					fieldLabel: 'DUI',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength :16,
+					minLength:16
+				},
+					type:'TextField',
+					id_grupo:1,
+					form:true
 			},
-				type:'TextField',
-				id_grupo:1,
-				form:true
-		},
-		{
-			config:{
-				name: 'codigo_control',
-				fieldLabel: 'Código de Control',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:200
+			{
+				config:{
+					name: 'codigo_control',
+					fieldLabel: 'Código de Control',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:200
+				},
+					type:'TextField',
+					id_grupo:1,
+					form:true
 			},
-				type:'TextField',
-				id_grupo:1,
-				form:true
-		},
-		
-		{
-			config:{
-				name: 'obs',
-				fieldLabel: 'Obs',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength: 400
+			
+			{
+				config:{
+					name: 'obs',
+					fieldLabel: 'Obs',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength: 400
+				},
+					type:'TextArea',
+					id_grupo:1,
+					bottom_filter: true,
+					form: true
 			},
-				type:'TextArea',
-				id_grupo:1,
-				bottom_filter: true,
-				form: true
-		},
-		{
-			config:{
-				name: 'importe_doc',
-				fieldLabel: 'Monto',
-				allowBlank: false,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:1179650
+			{
+				config:{
+					name: 'importe_doc',
+					fieldLabel: 'Monto',
+					allowBlank: false,
+					allowNegative :false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:1179650
+				},
+					type:'NumberField',
+					id_grupo:2,
+					form:true
 			},
-				type:'NumberField',
-				id_grupo:2,
-				form:true
-		},
-		{
-			config:{
-				name: 'importe_excento',
-				fieldLabel: 'Excento',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100
+			{
+				config:{
+					name: 'importe_descuento',
+					fieldLabel: 'Descuento',
+					allowBlank: true,
+					allowNegative :false,
+					anchor: '80%',
+					gwidth: 100
+				},
+					type:'NumberField',
+					id_grupo:2,
+					form:true
 			},
-				type: 'NumberField',
-				id_grupo:2,
-				form: true
-		},
-		{
-			config:{
-				name: 'importe_descuento',
-				fieldLabel: 'Descuento',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100
+			{
+				config:{
+					name: 'importe_neto',
+					qtip: 'Importe del documento menos descuentos, sobre este monto se calcula el iva',
+					fieldLabel: 'Monto Neto',
+					allowBlank: false,
+					allowNegative :false,
+					readOnly: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:1179650
+				},
+					type:'NumberField',
+					id_grupo:2,
+					form:true
 			},
-				type:'NumberField',
-				id_grupo:2,
-				form:true
-		},
-		{
-			config:{
-				name: 'importe_descuento_ley',
-				fieldLabel: 'Descuentos de Ley',
-				allowBlank: true,
-				readOnly:true,
-				anchor: '80%',
-				gwidth: 100
+			{
+				config:{
+					name: 'importe_excento',
+					qtip: 'sobre el importe ento, ¿que monto es exento de impuestos?',
+					fieldLabel: 'Exento',
+					allowNegative :false,
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100
+				},
+					type: 'NumberField',
+					id_grupo:2,
+					form: true
 			},
-				type:'NumberField',
-				id_grupo:2,
-				form:true
-		},
-		{
-			config:{
-				name: 'importe_ice',
-				fieldLabel: 'ICE',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100
+			{
+				config:{
+					name: 'importe_pendiente',
+					fieldLabel:  (me.data.tipoDoc == 'compra')?'Cuentas por  Pagar':'Cuentas por Cobrar',
+					qtip: 'Usualmente una cuenta pendiente de  cobrar o  pagar, si la cuenta se aplica posterior a la emisión del documento',
+					allowBlank: true,
+					allowNegative :false,
+					anchor: '80%',
+					gwidth: 100
+				},
+					type:'NumberField',
+					filters:{pfiltro:'dcv.importe_pendiente',type:'numeric'},
+					id_grupo:2,
+					form:true
 			},
-				type:'NumberField',
-				id_grupo:2,
-				form:true
-		},
-		{
-			config:{
-				name: 'importe_iva',
-				fieldLabel: 'IVA',
-				allowBlank: true,
-				readOnly:true,
-				anchor: '80%',
-				gwidth: 100
+			{
+				config:{
+					name: 'importe_anticipo',
+					fieldLabel: 'Anticipo',
+					qtip: 'Importe pagado por anticipado al documento',
+					allowBlank: true,
+					allowNegative :false,
+					anchor: '80%'
+				},
+					type:'NumberField',
+					filters: { pfiltro: 'dcv.importe_anticipo', type: 'numeric' },
+					id_grupo: 2,
+					form: true
 			},
-				type: 'NumberField',
-				id_grupo: 2,
-				form: true
-		},
-		{
-			config:{
-				name: 'importe_it',
-				fieldLabel: 'IT',
-				allowBlank: true,
-				anchor: '80%',
-				readOnly:true,
-				gwidth: 100
+			{
+				config:{
+					name: 'importe_retgar',
+					fieldLabel: 'Ret. Garantia',
+					qtip: 'Importe retenido por garantia',
+					allowBlank: true,
+					allowNegative: false,
+					anchor: '80%'
+				},
+					type: 'NumberField',
+					filters: { pfiltro:'dcv.importe_retgar',type:'numeric'},
+					id_grupo: 2,
+					form: true
 			},
-				type:'NumberField',
-				id_grupo:2,
-				form: true
-		},
-		{
-			config:{
-				name: 'importe_pago_liquido',
-				fieldLabel: 'Liquido Pagado',
-				allowBlank: true,
-				readOnly:true,
-				anchor: '80%',
-				gwidth: 100
+		   	{
+	   			config:{
+	   				sysorigen: 'sis_contabilidad',
+	       		    name: 'id_auxiliar',
+	       		    origen: 'AUXILIAR',
+	   				readOnly: true,
+	   				allowBlank: true,
+	   				fieldLabel: 'Cuenta Corriente',
+	   				baseParams :  {corriente: 'si'},
+	   				gdisplayField: 'codigo_auxiliar',//mapea al store del grid
+	   				anchor: '80%',
+	   				listWidth: 350
+	       	     },
+	   			type: 'ComboRec',
+	   			id_grupo: 2,
+	   		    form: true
+		   	},
+			{
+				config:{
+					name: 'importe_descuento_ley',
+					fieldLabel: 'Descuentos de Ley',
+					allowBlank: true,
+					readOnly:true,
+					anchor: '80%',
+					allowNegative :false,
+					gwidth: 100
+				},
+					type:'NumberField',
+					id_grupo:2,
+					form:true
 			},
-				type:'NumberField',
-				id_grupo:2,
-				form: true
-		}
-		
-		
-	],
+			{
+				config:{
+					name: 'importe_ice',
+					fieldLabel: 'ICE',
+					allowBlank: true,
+					allowNegative :false,
+					anchor: '80%',
+					gwidth: 100
+				},
+					type:'NumberField',
+					id_grupo:2,
+					form:true
+			},
+			{
+				config:{
+					name: 'importe_iva',
+					fieldLabel: 'IVA',
+					allowBlank: true,
+					readOnly:true,
+					allowNegative :false,
+					anchor: '80%',
+					gwidth: 100
+				},
+					type: 'NumberField',
+					id_grupo: 2,
+					form: true
+			},
+			{
+				config:{
+					name: 'importe_it',
+					fieldLabel: 'IT',
+					allowBlank: true,
+					allowNegative :false,
+					anchor: '80%',
+					readOnly:true,
+					gwidth: 100
+				},
+					type:'NumberField',
+					id_grupo:2,
+					form: true
+			},
+			{
+				config:{
+					name: 'importe_pago_liquido',
+					fieldLabel: 'Liquido Pagado',
+					allowBlank: true,
+					allowNegative :false,
+					readOnly:true,
+					anchor: '80%',
+					gwidth: 100
+				},
+					type:'NumberField',
+					id_grupo:2,
+					form: true
+			}
+			
+			
+		];
+	},
 	title: 'Frm solicitud',
 	iniciarEventos: function(){
 		
@@ -1110,16 +1235,21 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 		this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
 				
 				this.esconderImportes();
-				console.log('selecionar plantilla', rec.data)
 				//si es el formulario para nuevo reseteamos los valores ...
 				if(this.accionFormulario == 'NEW'){
-				    this.iniciarImportes();	
-					this.Cmp.importe_excento.reset();
 					
+				    this.iniciarImportes();	
+					this.Cmp.importe_excento.reset();					
 					this.Cmp.nro_autorizacion.reset();
 					this.Cmp.codigo_control.reset();
 					this.Cmp.importe_descuento.reset();
-		         }     
+					
+		        } 
+		        else{
+		        	//calcula porcentaje descuento
+		        	this.Cmp.porc_descuento.setValue(this.Cmp.importe_descuento.getValue()/this.Cmp.importe_doc.getValue());
+		        }    
+	            
 	            this.getDetallePorAplicar(rec.data.id_plantilla);
 	            if(rec.data.sw_monto_excento=='si'){
 	               this.mostrarComponente(this.Cmp.importe_excento);
@@ -1130,13 +1260,18 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	           
 	            if(rec.data.sw_descuento=='si'){
 	               this.mostrarComponente(this.Cmp.importe_descuento);
+	               this.mostrarComponente(this.Cmp.importe_neto);
 	            }
 	            else{
 	                this.ocultarComponente(this.Cmp.importe_descuento);
+	                this.ocultarComponente(this.Cmp.importe_neto);
+	           
+	                this.Cmp.porc_descuento.setValue(0);
+	                this.Cmp.importe_descuento.setValue(0);
 	            }
 	          
 	            if(rec.data.sw_autorizacion == 'si'){
-	               this.mostrarComponente(this.Cmp.nro_autorizacion);
+	                this.mostrarComponente(this.Cmp.nro_autorizacion);
 	            }
 	            else{
 	                this.ocultarComponente(this.Cmp.nro_autorizacion);
@@ -1149,7 +1284,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                this.ocultarComponente(this.Cmp.codigo_control);
 	            }
 	            
-	            console.log('NRO DUI', rec.data.sw_nro_dui)
+	         
 	            if(rec.data.sw_nro_dui == 'si'){
 	               this.Cmp.nro_dui.allowBlank =false;
 	               this.mostrarComponente(this.Cmp.nro_dui);
@@ -1170,6 +1305,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.importe_descuento.on('change',this.calculaMontoPago,this);
         this.Cmp.importe_descuento_ley.on('change',this.calculaMontoPago,this);
         
+        this.Cmp.importe_pendiente.on('change',this.calculaMontoPago,this);
+        this.Cmp.importe_anticipo.on('change',this.calculaMontoPago,this);
+        this.Cmp.importe_retgar.on('change',this.calculaMontoPago,this);
+        
         
         this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
         	if (newValue[3] == '4'){
@@ -1186,33 +1325,56 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
        
 	},
+	 
+	 resetearMontos: function(){
+	 	this.Cmp.importe_doc.setValue(0);
+		this.Cmp.importe_neto.setValue(0);
+		this.Cmp.importe_pago_liquido.setValue(0);
+		this.iniciarImportes();
+	 },
 	
 	calculaMontoPago:function(){
-        var descuento_ley = 0.00;
-            
+        var me = this, 
+            descuento_ley = 0.00;  
+                 
+        if(this.Cmp.importe_descuento.getValue() > 0 ){        	
+        	if( this.Cmp.importe_descuento.getValue() > this.Cmp.importe_doc.getValue()){
+        		alert("el descuento no puede ser mayor que monto del documento");
+        		this.resetearMontos();
+        		return;
+        	}
+        	this.Cmp.importe_neto.setValue(this.Cmp.importe_doc.getValue() -  this.Cmp.importe_descuento.getValue());        	
+        	this.Cmp.porc_descuento.setValue(this.Cmp.importe_descuento.getValue()/this.Cmp.importe_doc.getValue());
+        	
+        	
+        }else{
+        	this.Cmp.importe_neto.setValue(this.Cmp.importe_doc.getValue());
+        	this.Cmp.porc_descuento.setValue(0);
+        }
+        
+        var porc_descuento = this.Cmp.porc_descuento.getValue();
+        
+    	for (i = 0; i < me.megrid.store.getCount(); i++) {
+		    		record = me.megrid.store.getAt(i);		    		
+		    		record.set('precio_total_final', record.data.precio_total - (record.data.precio_total * porc_descuento) );
+		}
+        
         if(this.tmp_porc_monto_excento_var){
-        	this.Cmp.importe_excento.setValue(this.Cmp.importe_doc.getValue()*this.tmp_porc_monto_excento_var)
+        	this.Cmp.importe_excento.setValue(this.Cmp.importe_neto.getValue()*this.tmp_porc_monto_excento_var)
         }
        
         if(this.Cmp.importe_excento.getValue() == 0){
-        	descuento_ley = this.Cmp.importe_doc.getValue()*this.Cmp.porc_descuento_ley.getValue()*1.00;
+        	descuento_ley = this.Cmp.importe_neto.getValue()*this.Cmp.porc_descuento_ley.getValue()*1.00;
             this.Cmp.importe_descuento_ley.setValue(descuento_ley);
         }
         else{
-        	if(this.Cmp.importe_excento.getValue() > 0 ){
-        	  descuento_ley = (this.Cmp.importe_doc.getValue()*1.00 - this.Cmp.importe_excento.getValue()*1.00)*this.Cmp.porc_descuento_ley.getValue();
-              this.Cmp.importe_descuento_ley.setValue(descuento_ley);	
-        	}
-        	else{
-        		alert('El monto exento no puede ser menor que cero');
-        		return; 
-        	}
-        	
+        	descuento_ley = (this.Cmp.importe_neto.getValue()*1.00 - this.Cmp.importe_excento.getValue()*1.00)*this.Cmp.porc_descuento_ley.getValue();
+            this.Cmp.importe_descuento_ley.setValue(descuento_ley);	
         }
         
         //calculo it
         if(this.Cmp.porc_it.getValue() > 0){
-        	this.Cmp.importe_it.setValue(this.Cmp.porc_it.getValue()*this.Cmp.importe_doc.getValue())
+        	this.Cmp.importe_it.setValue(this.Cmp.porc_it.getValue()*this.Cmp.importe_neto.getValue())
         }
         
         //calculo iva cf
@@ -1222,15 +1384,26 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         		excento = this.Cmp.importe_excento.getValue();
         	}
         	if(this.Cmp.porc_iva_cf.getValue() > 0){
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_doc.getValue() - excento));
+        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
         	}
         	else {
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_doc.getValue() - excento));
+        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
         	}
         }	
-        	
         
-        var liquido =  this.Cmp.importe_doc.getValue()   -  this.Cmp.importe_descuento.getValue() -  this.Cmp.importe_descuento_ley.getValue();
+        if(this.mostrarFormaPago){
+	        if(this.Cmp.importe_retgar.getValue() > 0 || this.Cmp.importe_anticipo.getValue() > 0 ||  this.Cmp.importe_pendiente.getValue() > 0){
+	        	this.Cmp.id_auxiliar.allowBlank = false;
+	        	this.Cmp.id_auxiliar.setReadOnly(false);
+	        }
+	        else{
+	        	this.Cmp.id_auxiliar.allowBlank = true;
+	        	this.Cmp.id_auxiliar.setReadOnly(true);
+	        	this.Cmp.id_auxiliar.reset();
+	        }	
+	        this.Cmp.id_auxiliar.validate();
+        }
+        var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
         this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
      }, 
 	cargarRazonSocial: function(obj){
@@ -1243,7 +1416,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 				success: function(resp){
 					Phx.CP.loadingHide();
 			        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-			        console.log(objRes);
+			       
 			        var razonSocial=objRes.ROOT.datos.razon_social;
 			        this.getComponente('razon_social').setValue(razonSocial);
 				},
@@ -1271,6 +1444,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
            Phx.CP.loadingHide();
            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
            if(!reg.ROOT.error){
+           	
+           	    this.Cmp.porc_descuento.setValue(0);
                //aplica descuentos 
                this.Cmp.porc_descuento_ley.setValue(reg.ROOT.datos.descuento_porc*1);
                 //aplica iva-cf
@@ -1292,6 +1467,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
      
     esconderImportes:function(){
      	this.ocultarComponente(this.Cmp.importe_descuento);
+     	this.ocultarComponente(this.Cmp.importe_neto);
      	this.ocultarComponente(this.Cmp.nro_autorizacion);
      	this.ocultarComponente(this.Cmp.codigo_control);
      	this.ocultarComponente(this.Cmp.importe_excento);
@@ -1300,6 +1476,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
      	this.ocultarComponente(this.Cmp.importe_ice);
      	this.ocultarComponente(this.Cmp.importe_descuento_ley);
      	
+     	this.ocultarComponente(this.Cmp.importe_pendiente);
+     	this.ocultarComponente(this.Cmp.importe_anticipo);
+     	this.ocultarComponente(this.Cmp.importe_retgar);
+     	this.ocultarComponente(this.Cmp.id_auxiliar);
+     	
+     	
      },
      iniciarImportes:function(){
      	this.Cmp.importe_excento.setValue(0);
@@ -1307,6 +1489,11 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
      	this.Cmp.importe_it.setValue(0);
      	this.Cmp.importe_ice.setValue(0);
      	this.Cmp.importe_descuento_ley.setValue(0);
+     	this.Cmp.importe_descuento.setValue(0);
+     	
+     	this.Cmp.importe_pendiente.setValue(0);
+     	this.Cmp.importe_anticipo.setValue(0);
+     	this.Cmp.importe_retgar.setValue(0);
      },
      
      mostrarImportes: function(datos){
@@ -1327,6 +1514,13 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
      	}
      	if( datos.descuento_porc !== '0'){
      		this.mostrarComponente(this.Cmp.importe_descuento_ley);
+     	}
+     	
+     	if(this.mostrarFormaPago){
+     		this.mostrarComponente(this.Cmp.importe_pendiente);
+     	    this.mostrarComponente(this.Cmp.importe_anticipo);
+     	    this.mostrarComponente(this.Cmp.importe_retgar);
+     	    this.mostrarComponente(this.Cmp.id_auxiliar);
      	}
      	
      	
@@ -1363,7 +1557,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     	this.Cmp.nit.modificado = true;
  	    this.Cmp.nro_autorizacion.modificado = true;
         this.esconderImportes();
-         console.log('datos del padre....',this, this.data)
+       
         
         this.Cmp.id_depto_conta.setValue(this.data.id_depto);
         this.Cmp.id_gestion.setValue(this.data.id_gestion);
@@ -1396,7 +1590,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
    	    if( i > 0 &&  !this.editorDetail.isVisible()){
    	    	
    	    	
-   	    	console.log('doc', this.Cmp.importe_doc.getValue(), 'detalle', total_det);
+   	    
    	    	
    	    	if (total_det*1 == this.Cmp.importe_doc.getValue()){
    	    		Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
@@ -1487,9 +1681,11 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					if (reg.ROOT.error) {
 						Ext.Msg.alert('Error','Error a recuperar la variable global')
 					} else {
-						
-						me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
-					    me.constructorEtapa2(config);
+						if(reg.ROOT.conta_partidas == 'si'){
+						   me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas';
+						   parFilConcepto = 'desc_ingas';
+					    }
+						me.constructorEtapa2(config);
 					
 					}
 				},

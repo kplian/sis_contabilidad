@@ -34,6 +34,7 @@ class MODAuxiliar extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('corriente','varchar');
 		
 		
 		//Ejecuta la instruccion
@@ -55,6 +56,8 @@ class MODAuxiliar extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('codigo_auxiliar','codigo_auxiliar','varchar');
 		$this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
+		$this->setParametro('corriente','corriente','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -76,6 +79,8 @@ class MODAuxiliar extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('codigo_auxiliar','codigo_auxiliar','varchar');
 		$this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
+		$this->setParametro('corriente','corriente','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

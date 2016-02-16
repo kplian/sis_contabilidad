@@ -42,6 +42,39 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		{
+			config:{
+				name: 'codigo',
+				fieldLabel: 'Código',
+				qtip:'Código único para indetificar la transacción',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextField',
+			filters:{pfiltro:'cmpbdet.codigo',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+        {
+            config:{
+                name: 'descripcion',
+                fieldLabel: 'Desc. Trans.',
+                qtip:'Descripciond en la transaccion se utiliza para mostrar mejores mensajes de error',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.descripcion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+		
+		{
            config:{
             	name:'debe_haber',
             	fieldLabel: 'Debe Haber',
@@ -96,11 +129,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             form:true
         },
           
-          
-          
-          
-          
-          {
+        {
            config:{
             	name:'agrupar',
             	fieldLabel: 'Agrupar',
@@ -459,22 +488,6 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'descripcion',
-                fieldLabel: 'Desc. Trans.',
-                qtip:'Descripciond e la transaccion se utiliza para mostrar mejores mensajes de error',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:100
-            },
-            type:'TextArea',
-            filters:{pfiltro:'cmpbdet.descripcion',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
-        {
-            config:{
                 name: 'campo_monto_pres',
                 fieldLabel: 'Campo Monto Presu.',
                 allowBlank: true,
@@ -819,7 +832,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_porc_monto_excento_var',
         {name:'campo_nombre_cheque_trans', type: 'string'},
         'prioridad_documento',
-        'campo_orden_trabajo','campo_forma_pago'
+        'campo_orden_trabajo','campo_forma_pago','codigo'
 		
 	],
 	sortInfo:{

@@ -86,12 +86,20 @@ BEGIN
                             dcv.importe_pago_liquido,
                             dcv.nro_dui,
                             dcv.id_moneda,
-                            mon.codigo as desc_moneda
+                            mon.codigo as desc_moneda,
+                            dcv.importe_pendiente,
+                            dcv.importe_anticipo,
+                            dcv.importe_retgar,
+                            dcv.importe_neto,
+                            aux.id_auxiliar,
+                            aux.codigo_auxiliar,
+                            aux.nombre_auxiliar
                           from conta.tagrupador_doc agd 
                           inner join  conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = agd.id_doc_compra_venta
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
                           WHERE  ';
@@ -118,14 +126,15 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='SELECT 
                              count(id_agrupador_doc)
-					     FROM conta.tagrupador_doc agd 
+					     from conta.tagrupador_doc agd 
                           inner join  conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = agd.id_doc_compra_venta
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
-                        WHERE ';
+                         WHERE ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

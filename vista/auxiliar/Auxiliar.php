@@ -98,7 +98,7 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Nombre Auxiliar',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 230,
 				maxLength:300
 			},
 			type:'TextField',
@@ -107,6 +107,25 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		{
+	       		config:{
+	       			name:'corriente',
+	       			fieldLabel:'Corriente',
+	       			qtip: '¿Es cuenta corriente?',
+	       			allowBlank:false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['si','no']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		grid:true,
+	       		form:true
+	     },
 		{
 			config:{
 				name: 'estado_reg',
@@ -203,7 +222,7 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'corriente'
 		
 	],
 	sortInfo:{

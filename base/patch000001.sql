@@ -2977,3 +2977,108 @@ IS 'moenda sobre la que se realiza el ajuste, por defecto es la moneda de la cue
 ALTER TABLE conta.tcuenta DROP CONSTRAINT chk_tcuenta__tipo_cuenta_pat RESTRICT;
   
 /***********************************F-SCP-RAC-CONTA-12/01/2016****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-05/02/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN importe_retgar NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.importe_retgar
+IS 'importe de retencion de garantia';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN importe_anticipo NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.importe_anticipo
+IS 'importe anticipo ya sea apra compras o ventas';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN importe_pendiente NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.importe_pendiente
+IS 'cuentas por pagar o cuentas por cobrar';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_concepto
+  ADD COLUMN precio_total_final NUMERIC(19,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tdoc_concepto.precio_total_final
+IS 'precio final con que incluye los descuentos';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN importe_neto NUMERIC(19,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.importe_neto
+IS 'importe neto = importe doc - descuentos,
+sobre este monto se ejecuta presupuesto y hacen las mayoria de los calculos';
+
+
+/***********************************F-SCP-RAC-CONTA-05/02/2016****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-11/02/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN codigo VARCHAR;
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.codigo
+IS 'codigo';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_proveedor INTEGER;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_cliente INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_cliente
+IS 'identifica el cliente en ventas';  
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_auxiliar INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_auxiliar
+IS 'si la retencion de garantia, ancitipo, o pago pendiente son diferentes de cero es necesario indicar el auxiliar contable para identificar el provedor o cliente en contabilidad';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tauxiliar
+  ADD COLUMN corriente VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tauxiliar.corriente
+IS 'indetifica que auxiliar son usados para acumular cuenta corriente en cotabilidad';
+
+
+/***********************************F-SCP-RAC-CONTA-11/02/2016****************************************/
+
+
+
+

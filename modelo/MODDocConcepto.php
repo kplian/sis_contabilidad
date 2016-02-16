@@ -43,6 +43,7 @@ class MODDocConcepto extends MODbase{
 		$this->captura('desc_concepto_ingas','VARCHAR');
 		$this->captura('desc_orden_trabajo','VARCHAR');
 		$this->captura('id_presupuesto','int4');
+		$this->captura('precio_total_final','numeric');
 		
 		
 		
@@ -70,6 +71,8 @@ class MODDocConcepto extends MODbase{
 		$this->setParametro('cantidad','cantidad','numeric');
 		$this->setParametro('precio_unitario','precio_unitario','numeric');
 		$this->setParametro('precio_total','precio_total','numeric');
+		
+		$this->setParametro('precio_total_final','precio_total_final','numeric');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -96,6 +99,8 @@ class MODDocConcepto extends MODbase{
 		$this->setParametro('cantidad','cantidad','numeric');
 		$this->setParametro('precio_unitario','precio_unitario','numeric');
 		$this->setParametro('precio_total','precio_total','numeric');
+		$this->setParametro('precio_total_final','precio_total_final','numeric');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

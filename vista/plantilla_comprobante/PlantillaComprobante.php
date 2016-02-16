@@ -16,9 +16,35 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.PlantillaComprobante.superclass.constructor.call(this,config);
+		
+		this.addButton('btnWizard',
+            {
+                text: 'Exportar Plantilla',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expProceso,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo SQL la plantilla'
+            }
+        );
+		
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.load({params:{start:0, limit:this.tam_pag}});
 	},
+	
+	expProceso : function(resp){
+			var data=this.sm.getSelected().data;
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url: '../../sis_contabilidad/control/PlantillaComprobante/exportarDatos',
+				params: { 'id_plantilla_comprobante' : data.id_plantilla_comprobante },
+				success: this.successExport,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});
+			
+	},
+	
 	tam_pag:50,
 			
 	Atributos:[

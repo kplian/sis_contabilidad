@@ -38,6 +38,8 @@ DECLARE
     v_importe_ice			numeric;
     v_revisado				varchar;
     v_sum_total				numeric;
+    v_id_proveedor			integer;
+    v_id_cliente			integer;
 			    
 BEGIN
 
@@ -64,15 +66,21 @@ BEGIN
             
             -- valida que period de libro de compras y ventas este abierto
             v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-              
-            --validar que no exitas una documento con el mismo nro y misma razon social  ...?
-            --validar que no exista un documentos con el mismo nro_autorizacion, nro_factura , y nit y razon social
             
             
+            --TODO
+            --validar que no exsita un documento con el mismo nro y misma razon social  ...?
+            --validar que no exista un documento con el mismo nro_autorizacion, nro_factura , y nit y razon social
             
             
-           
-        
+            IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
+            
+               IF v_parametros.id_auxiliar is null THEN
+                 raise EXCEPTION 'es necesario indicar una cuenta corriente';
+               END IF;
+            
+            END IF;
+            
         
             --recupera parametrizacion de la plantilla     
             select 
@@ -99,6 +107,15 @@ BEGIN
                      raise exception 'Ya existe un documento registrado con el mismo nro,  razon social y fecha';
                      
                 END IF;
+               
+               -- chequear si el proveedor esta registrado
+                v_id_proveedor = param.f_check_proveedor(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social)));
+                
+            ELSE  
+               --TODO  chequear que la factura de venta no este duplicada
+            
+               -- chequear el el cliente esta registrado 
+                v_id_cliente = vef.f_check_cliente(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social))); 
             END IF; 
             
             
@@ -139,7 +156,14 @@ BEGIN
               manual,
               id_periodo,
               nro_dui,
-              id_moneda
+              id_moneda,
+              importe_pendiente,
+              importe_anticipo,
+              importe_retgar,
+              importe_neto,
+              id_proveedor,
+              id_cliente,
+              id_auxiliar
           	) values(
               v_parametros.tipo,
               v_parametros.importe_excento,
@@ -169,7 +193,14 @@ BEGIN
               'si',
               v_rec.po_id_periodo,
               v_parametros.nro_dui,
-              v_parametros.id_moneda
+              v_parametros.id_moneda,
+              v_parametros.importe_pendiente,
+              v_parametros.importe_anticipo,
+              v_parametros.importe_retgar,
+              v_parametros.importe_neto,
+              v_id_proveedor,
+              v_id_cliente,
+              v_parametros.id_auxiliar
 			)RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 			
 			--Definicion de la respuesta
@@ -192,10 +223,6 @@ BEGIN
 
 		begin
         
-        
-        
-           
-        
             -- recuepra el periodo de la fecha ...
             --Obtiene el periodo a partir de la fecha
         	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
@@ -203,14 +230,6 @@ BEGIN
             -- valida que period de libro de compras y ventas este abierto
             v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
             
-            
-          
-            
-            
-            
-            
-            
-              
             --revisa si el documento no esta marcado como revisado
             select 
              dcv.revisado,
@@ -224,13 +243,25 @@ BEGIN
             END IF;
             
             
-             --validar que no tenga un comprobante asociado
+            IF v_parametros.tipo = 'compra' THEN
+                -- chequear si el proveedor esta registrado
+                v_id_proveedor = param.f_check_proveedor(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social)));
+                
+            ELSE  
+                 --TODO  chequear que la factura de venta no este duplicada
+                 -- chequear el el cliente esta registrado 
+                v_id_cliente = vef.f_check_cliente(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social))); 
+            END IF; 
+            
+           
+            
+            -- validar que no tenga un comprobante asociado
             
             IF  v_registros.id_int_comprobante is not NULL THEN
                raise exception 'No puede editar por que el documento esta acociado al cbte id(%), primero quite esta relacion', v_registros.id_int_comprobante; 
             END IF;
             
-             --recupera parametrizacion de la plantilla     
+            -- recupera parametrizacion de la plantilla     
             select 
              *
             into 
@@ -242,6 +273,14 @@ BEGIN
             v_importe_ice = NULL;
             IF v_registros.sw_ic = 'si' then
               v_importe_ice = v_parametros.importe_excento;
+            END IF;
+            
+            IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
+            
+               IF v_parametros.id_auxiliar is null THEN
+                 raise EXCEPTION 'es necesario indicar una cuenta corriente';
+               END IF;
+            
             END IF;
         
         
@@ -267,7 +306,14 @@ BEGIN
               razon_social = upper(trim(v_parametros.razon_social)),
               id_periodo = v_rec.po_id_periodo,
               nro_dui = v_parametros.nro_dui,
-              id_moneda = v_parametros.id_moneda
+              id_moneda = v_parametros.id_moneda,
+              importe_pendiente = v_parametros.importe_pendiente,
+              importe_anticipo = v_parametros.importe_anticipo,
+              importe_retgar = v_parametros.importe_retgar,
+              importe_neto = v_parametros.importe_neto,
+              id_proveedor = v_id_proveedor,
+              id_cliente = v_id_cliente,
+              id_auxiliar = v_parametros.id_auxiliar
 			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
                
 			--Definicion de la respuesta

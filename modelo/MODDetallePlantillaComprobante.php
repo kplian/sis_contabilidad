@@ -70,6 +70,7 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('prioridad_documento','integer');
 		$this->captura('campo_orden_trabajo','varchar');
 		$this->captura('campo_forma_pago','varchar');
+		$this->captura('codigo','varchar');
 		
 		
 		
@@ -130,8 +131,8 @@ class MODDetallePlantillaComprobante extends MODbase{
         $this->setParametro('campo_nombre_cheque_trans','campo_nombre_cheque_trans','consulta_select');
 		$this->setParametro('prioridad_documento','prioridad_documento','integer');
 		$this->setParametro('campo_orden_trabajo','campo_orden_trabajo','varchar');
-		
 		$this->setParametro('campo_forma_pago','campo_forma_pago','varchar');
+		$this->setParametro('codigo','codigo','varchar');
 		
 		
         
@@ -192,6 +193,7 @@ class MODDetallePlantillaComprobante extends MODbase{
         $this->setParametro('prioridad_documento','prioridad_documento','integer');
 		$this->setParametro('campo_orden_trabajo','campo_orden_trabajo','varchar');
         $this->setParametro('campo_forma_pago','campo_forma_pago','varchar');
+		$this->setParametro('codigo','codigo','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

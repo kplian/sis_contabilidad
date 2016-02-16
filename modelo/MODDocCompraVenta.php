@@ -62,6 +62,16 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('desc_moneda','varchar');
 		$this->captura('id_int_comprobante','int4');
 		$this->captura('desc_comprobante','varchar');
+		
+		
+		$this->captura('importe_pendiente','numeric');
+		$this->captura('importe_anticipo','numeric');
+		$this->captura('importe_retgar','numeric');
+		$this->captura('importe_neto','numeric');
+		
+		$this->captura('id_auxiliar','integer');
+		$this->captura('codigo_auxiliar','varchar');
+		$this->captura('nombre_auxiliar','varchar');
 
 
 		//Ejecuta la instruccion
@@ -106,6 +116,12 @@ class MODDocCompraVenta extends MODbase{
 		$this->setParametro('importe_pago_liquido','importe_pago_liquido','numeric');
 		$this->setParametro('nro_dui','nro_dui','varchar');
 		$this->setParametro('id_moneda','id_moneda','int4');
+		
+		$this->setParametro('importe_pendiente','importe_pendiente','numeric');
+		$this->setParametro('importe_anticipo','importe_anticipo','numeric');
+		$this->setParametro('importe_retgar','importe_retgar','numeric');
+		$this->setParametro('importe_neto','importe_neto','numeric');
+		$this->setParametro('id_auxiliar','id_auxiliar','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -150,6 +166,13 @@ class MODDocCompraVenta extends MODbase{
 		$this->setParametro('importe_pago_liquido','importe_pago_liquido','numeric');
 		$this->setParametro('nro_dui','nro_dui','varchar');
 		$this->setParametro('id_moneda','id_moneda','int4');
+		
+		$this->setParametro('importe_pendiente','importe_pendiente','numeric');
+		$this->setParametro('importe_anticipo','importe_anticipo','numeric');
+		$this->setParametro('importe_retgar','importe_retgar','numeric');
+		$this->setParametro('importe_neto','importe_neto','numeric');
+		
+		$this->setParametro('id_auxiliar','id_auxiliar','integer');
 		
 		
 
@@ -286,6 +309,13 @@ class MODDocCompraVenta extends MODbase{
 			$this->setParametro('nro_dui','nro_dui','varchar');
 			$this->setParametro('id_moneda','id_moneda','int4');
 			
+			$this->setParametro('importe_pendiente','importe_pendiente','numeric');
+			$this->setParametro('importe_anticipo','importe_anticipo','numeric');
+			$this->setParametro('importe_retgar','importe_retgar','numeric');
+			$this->setParametro('importe_neto','importe_neto','numeric');			
+		    $this->setParametro('id_auxiliar','id_auxiliar','integer');
+			
+			
 			//Ejecuta la instruccion
             $this->armarConsulta();
 			$stmt = $link->prepare($this->consulta);		  
@@ -330,6 +360,7 @@ class MODDocCompraVenta extends MODbase{
 				$this->arreglo['id_orden_trabajo'] = $f['id_orden_trabajo'];
 				$this->arreglo['id_concepto_ingas'] = $f['id_concepto_ingas'];
 				$this->arreglo['precio_total'] = $f['precio_total'];
+				$this->arreglo['precio_total_final'] = $f['precio_total_final'];
 				$this->arreglo['cantidad_sol'] = $f['cantidad_sol'];
 				
 				//throw new Exception("cantidad ...modelo...".$f['cantidad'], 1);
@@ -344,6 +375,7 @@ class MODDocCompraVenta extends MODbase{
 				$this->setParametro('cantidad_sol','cantidad_sol','numeric');
 				$this->setParametro('precio_unitario','precio_unitario','numeric');
 				$this->setParametro('precio_total','precio_total','numeric');
+				$this->setParametro('precio_total_final','precio_total_final','numeric');
 				
 				//Ejecuta la instruccion
 	            $this->armarConsulta();
@@ -454,6 +486,12 @@ class MODDocCompraVenta extends MODbase{
 			$this->setParametro('importe_pago_liquido','importe_pago_liquido','numeric');
 			$this->setParametro('nro_dui','nro_dui','varchar');
 			$this->setParametro('id_moneda','id_moneda','int4');
+			$this->setParametro('importe_pendiente','importe_pendiente','numeric');
+			$this->setParametro('importe_anticipo','importe_anticipo','numeric');
+			$this->setParametro('importe_retgar','importe_retgar','numeric');
+			$this->setParametro('importe_neto','importe_neto','numeric');
+			$this->setParametro('id_auxiliar','id_auxiliar','integer');
+			
 			
 			//Ejecuta la instruccion
             $this->armarConsulta();
@@ -497,6 +535,7 @@ class MODDocCompraVenta extends MODbase{
 				$this->arreglo['id_orden_trabajo'] = (isset($f['id_orden_trabajo'])?$f['id_orden_trabajo']:'null');
 				$this->arreglo['id_concepto_ingas'] = $f['id_concepto_ingas'];
 				$this->arreglo['precio_total'] = $f['precio_total'];
+				$this->arreglo['precio_total_final'] = $f['precio_total_final'];
 				$this->arreglo['cantidad_sol'] = $f['cantidad_sol'];
 				
 				
@@ -526,6 +565,7 @@ class MODDocCompraVenta extends MODbase{
 				$this->setParametro('cantidad_sol','cantidad_sol','numeric');
 				$this->setParametro('precio_unitario','precio_unitario','numeric');
 				$this->setParametro('precio_total','precio_total','numeric');
+				$this->setParametro('precio_total_final','precio_total_final','numeric');
 				$this->setParametro('id_doc_concepto','id_doc_concepto','numeric');
 				
 				

@@ -117,7 +117,8 @@ BEGIN
 			fecha_reg,
 			id_usuario_mod,
 			fecha_mod,
-            id_doc_compra_venta
+            id_doc_compra_venta,
+            precio_total_final
           	) values(
 			'activo',
 			v_parametros.id_orden_trabajo,
@@ -128,14 +129,11 @@ BEGIN
 			v_parametros.precio_unitario,
 			v_parametros.precio_total,
 			p_id_usuario,
-			now(),
-			
+			now(),			
 			null,
-			null,
-            v_parametros.id_doc_compra_venta
-							
-			
-			
+			null,            
+            v_parametros.id_doc_compra_venta,
+            v_parametros.precio_total_final
 			)RETURNING id_doc_concepto into v_id_doc_concepto;
 			
 			--Definicion de la respuesta
@@ -201,15 +199,16 @@ BEGIN
         
 			--Sentencia de la modificacion
 			update conta.tdoc_concepto set
-			id_orden_trabajo = v_parametros.id_orden_trabajo,
-			id_centro_costo = v_parametros.id_centro_costo,
-			id_concepto_ingas = v_parametros.id_concepto_ingas,
-			descripcion = v_parametros.descripcion,
-			cantidad_sol = v_parametros.cantidad_sol,
-			precio_unitario = v_parametros.precio_unitario,
-			precio_total = v_parametros.precio_total,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now()
+                id_orden_trabajo = v_parametros.id_orden_trabajo,
+                id_centro_costo = v_parametros.id_centro_costo,
+                id_concepto_ingas = v_parametros.id_concepto_ingas,
+                descripcion = v_parametros.descripcion,
+                cantidad_sol = v_parametros.cantidad_sol,
+                precio_unitario = v_parametros.precio_unitario,
+                precio_total = v_parametros.precio_total,
+                id_usuario_mod = p_id_usuario,
+                fecha_mod = now(),
+                precio_total_final = v_parametros.precio_total_final
 			where id_doc_concepto=v_parametros.id_doc_concepto;
                
 			--Definicion de la respuesta

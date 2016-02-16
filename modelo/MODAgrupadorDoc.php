@@ -61,6 +61,14 @@ class MODAgrupadorDoc extends MODbase{
 		$this->captura('nro_dui','varchar');
 		$this->captura('id_moneda','int4');
 		$this->captura('desc_moneda','varchar');
+		
+		$this->captura('importe_pendiente','numeric');
+        $this->captura('importe_anticipo','numeric');
+        $this->captura('importe_retgar','numeric');
+        $this->captura('importe_neto','numeric');
+        $this->captura('id_auxiliar','int4');
+        $this->captura('codigo_auxiliar','varchar');
+        $this->captura('nombre_auxiliar','varchar');
 
 		
 		//Ejecuta la instruccion

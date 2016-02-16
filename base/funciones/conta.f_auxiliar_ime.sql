@@ -57,7 +57,8 @@ BEGIN
 			fecha_reg,
 			id_usuario_reg,
 			id_usuario_mod,
-			fecha_mod
+			fecha_mod,
+            corriente
           	) values(
 			--v_parametros.id_empresa,
 			'activo',
@@ -66,7 +67,8 @@ BEGIN
 			now(),
 			p_id_usuario,
 			null,
-			null
+			null,
+            v_parametros.corriente
 							
 			)RETURNING id_auxiliar into v_id_auxiliar;
 			
@@ -95,7 +97,8 @@ BEGIN
 			codigo_auxiliar = v_parametros.codigo_auxiliar,
 			nombre_auxiliar = v_parametros.nombre_auxiliar,
 			id_usuario_mod = p_id_usuario,
-			fecha_mod = now()
+			fecha_mod = now(),
+            corriente = v_parametros.corriente
 			where id_auxiliar=v_parametros.id_auxiliar;
                
 			--Definicion de la respuesta

@@ -9,7 +9,7 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
+Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
     fheight: '80%',
     fwidth: '70%',
     tabEnter: true,
@@ -56,6 +56,8 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		
     	//llama al constructor de la clase padre
 		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
+		
+		this.bloquearOrdenamientoGrid();
 		
 		this.cmbGestion.on('select', function(combo, record, index){
 			this.tmpGestion = record.data.gestion;
@@ -109,9 +111,11 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
     
     validarFiltros:function(){
         if(this.cmbDepto.getValue() && this.cmbGestion.validate() && this.cmbPeriodo.validate()){
+            this.desbloquearOrdenamientoGrid();
             return true;
         }
         else{
+            this.bloquearOrdenamientoGrid();
             return false;
         }
     },
@@ -328,11 +332,16 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
                 	     
             	       //check or un check row
             	       var checked = '',
-            	       	    momento = 'no';
+            	           state = '',
+            	       	   momento = 'no';
                 	   if(value == 'si'){
-                	        	checked = 'checked';;
+                	      checked = 'checked';
                 	   }
-            	       return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0}></div>',checked);
+                	   if(record.data.id_int_comprobante){
+                	      state = 'disabled';
+                	   }
+                	   
+            	       return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
             	        
                  }
 			},
@@ -357,29 +366,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             //bottom_filter: true,
             form: false
        },
-		/*{
-   			config:{
-   				 name:'id_depto_conta',
-   				 hiddenName: 'id_depto_conta',
-   				 qtip: 'Departamento contable',
-   				 url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
-	   				origen:'DEPTO',
-	   				allowBlank:false,
-	   				fieldLabel: 'Depto',
-	   				gdisplayField:'desc_depto',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
-	   				width:250,
-   			        gwidth:180,
-	   				baseParams:{estado:'activo',codigo_subsistema:'CONTA'},//parametros adicionales que se le pasan al store
-	      			renderer:function (value, p, record){return String.format('{0}', record.data['desc_depto']);}
-   			},
-   			type:'ComboRec',
-   			id_grupo:0,
-   			filters:{pfiltro:'dep.nombre',type:'string'},
-   		    grid:true,
-   		    bottom_filter: true,
-   			form:true
-       },*/
-        {
+	   {
             config:{
                 name: 'id_plantilla',
                 fieldLabel: 'Tipo Documento',
@@ -684,6 +671,35 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'importe_descuento',
+				fieldLabel: 'Descuento',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100
+			},
+				type:'NumberField',
+				filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+		{
+			config:{
+				name: 'importe_neto',
+				fieldLabel: 'Neto',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:1179650
+			},
+				type:'NumberField',
+				filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+		{
+			config:{
 				name: 'importe_excento',
 				fieldLabel: 'Excento',
 				allowBlank: true,
@@ -698,14 +714,45 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'importe_descuento',
-				fieldLabel: 'Descuento',
+				name: 'importe_pendiente',
+				fieldLabel: 'Cuenta Pendiente',
+				qtip: 'Usualmente una cuenta pendiente de  cobrar o  pagar (dependiendo si es compra o venta), posterior a la emisión del documento',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100
 			},
 				type:'NumberField',
-				filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
+				filters:{pfiltro:'dcv.importe_pendiente',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+		{
+			config:{
+				name: 'importe_anticipo',
+				fieldLabel: 'Anticipo',
+				qtip: 'Importe pagado por anticipado al documento',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100
+			},
+				type:'NumberField',
+				filters:{pfiltro:'dcv.importe_anticipo',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+		{
+			config:{
+				name: 'importe_retgar',
+				fieldLabel: 'Ret. Garantia',
+				qtip: 'Importe retenido por garantia',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100
+			},
+				type:'NumberField',
+				filters:{pfiltro:'dcv.importe_retgar',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				form:true
@@ -817,6 +864,28 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'nombre_auxiliar',
+				fieldLabel: 'Cuenta Corriente',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 150,
+				maxLength:180, 
+				renderer:function (value,p,record){
+					if(value){
+					  return  String.format('({0}) - {1}',record.data.codigo_auxiliar, record.data.nombre_auxiliar);
+					}
+            	}   
+			
+			},
+				type:'TextField',
+				filters:{pfiltro:'aux.codigo_auxiliar#aux.nombre_auxiliar',type:'string'},
+				id_grupo:0,
+				grid: true,
+				bottom_filter: true,
+				form: false
+		},
+		{
+			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
@@ -852,8 +921,8 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+				format: 'd/m/Y', 
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
 				filters:{pfiltro:'dcv.fecha_reg',type:'date'},
@@ -898,8 +967,8 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+				format: 'd/m/Y', 
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
 				filters:{pfiltro:'dcv.fecha_mod',type:'date'},
@@ -962,10 +1031,14 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		{name:'importe_pendiente', type: 'numeric'},
+		{name:'importe_anticipo', type: 'numeric'},
+		{name:'importe_retgar', type: 'numeric'},
+		{name:'importe_neto', type: 'numeric'},
 		'desc_depto','desc_plantilla',
 		'importe_descuento_ley',
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
-		'desc_comprobante','id_int_comprobante'
+		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar'
 		
 	],
 	sortInfo:{
@@ -1043,6 +1116,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 	            }
 	            
 	            console.log('NRO DUI', rec.data.sw_nro_dui)
+	            
 	            if(rec.data.sw_nro_dui == 'si'){
 	               this.Cmp.nro_dui.allowBlank =false;
 	               this.mostrarComponente(this.Cmp.nro_dui);
@@ -1062,6 +1136,10 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
         this.Cmp.importe_excento.on('change',this.calculaMontoPago,this);  
         this.Cmp.importe_descuento.on('change',this.calculaMontoPago,this);
         this.Cmp.importe_descuento_ley.on('change',this.calculaMontoPago,this);
+        
+        this.Cmp.importe_pendiente.on('change',this.calculaMontoPago,this);
+        this.Cmp.importe_anticipo.on('change',this.calculaMontoPago,this);
+        this.Cmp.importe_retgar.on('change',this.calculaMontoPago,this);
         
         
         this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
@@ -1125,7 +1203,7 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
         }	
         	
         
-        var liquido =  this.Cmp.importe_doc.getValue()   -  this.Cmp.importe_descuento.getValue() -  this.Cmp.importe_descuento_ley.getValue();
+        var liquido =  this.Cmp.importe_doc.getValue()  -  this.Cmp.importe_pendiente.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_descuento.getValue() -  this.Cmp.importe_descuento_ley.getValue();
         this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
      }, 
 	cargarRazonSocial: function(obj){
@@ -1245,27 +1323,12 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             Phx.vista.DocCompraVenta.superclass.onButtonAct.call(this);
         }
     },
-    /*
-     onButtonNew:function(){
-     	
-     	
-     	if(!this.validarFiltros()){
-            alert('Especifique el año y el mes antes')
-        }
-        else{
-        	this.accionFormulario = 'NEW';
-        	this.Cmp.nit.modificado = true;
-     	    this.Cmp.nro_autorizacion.modificado = true;
-            Phx.vista.DocCompraVenta.superclass.onButtonNew.call(this);
-            this.esconderImportes();
-            this.Cmp.id_depto_conta.setValue(this.cmbDepto.getValue())
-        }
-    },*/
+   
    
    abrirFormulario: function(tipo, record){
    	       var me = this;
 	       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVenta.php',
-	                                'Formulario de Documento Compra/Venta',
+	                                (me.tipoDoc == 'compra')?'Formulario de Documento Compra':'Formulario de Documento Venta',
 	                                {
 	                                    modal:true,
 	                                    width:'100%',
@@ -1317,24 +1380,6 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
         }
     },
     
-    
-    
-    /*
-    onButtonEdit:function(){
-     	if(!this.validarFiltros()){
-            alert('Especifique el año y el mes antes')
-        }
-        else{
-        	this.Cmp.nit.modificado = true;
-     	    this.Cmp.nro_autorizacion.modificado = true;
-        	this.accionFormulario = 'EDIT';
-        	
-            Phx.vista.DocCompraVenta.superclass.onButtonEdit.call(this);
-            this.esconderImportes();
-            this.getPlantilla(this.Cmp.id_plantilla.getValue());
-        }
-    },*/
-    
     getPlantilla: function(id_plantilla){
     	Phx.CP.loadingShow();
            
@@ -1364,9 +1409,9 @@ Phx.vista.DocCompraVenta=Ext.extend(Phx.gridInterfaz,{
 	        fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
      	
      	if(fieldName == 'revisado') {
-	       	//if(record.data['revisado'] == 'si'){
+	       	if(!record.data['id_int_comprobante']){
 	       	   this.cambiarRevision(record);
-	       //	}
+	       	}
 	    }
      },
      cambiarRevision: function(record){

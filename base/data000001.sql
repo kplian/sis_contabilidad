@@ -1358,5 +1358,60 @@ VALUES
 /***********************************F-DAT-RAC-CONTA-0-12/01/2016****************************************/
 
 
+/***********************************I-DAT-RAC-CONTA-0-10/02/2016****************************************/
+
+/* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 42) */
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "fecha_reg", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES 
+
+  (1, E'2015-08-20 10:20:21.948', E'activo', NULL, NULL, E'IVA-DF', E'IVA-DF', E'no', E'si', E'si', NULL, E'presupuestaria', E'recurso'),
+  (1, E'2015-08-20 10:22:29.125', E'activo', NULL, NULL, E'IT', E'IT', E'no', E'si', E'si', NULL, E'presupuestaria', E'gasto'),
+  (1, E'2015-08-20 10:24:29.179', E'activo', NULL, NULL, E'IT por pagar', E'ITxPagar', E'no', E'si', E'si', NULL, E'flujo', E'recurso'),
+  (1, E'2015-09-24 13:20:42.111', E'activo', NULL, NULL, E'Compras por defecto', E'CMPDEF', E'no', E'si', E'si', NULL, E'flujo', E'gasto'),
+  (1, E'2015-09-24 14:03:20.381', E'activo', NULL, NULL, E'Cuenta de Banco para ventas por defecto', E'VENDEF', E'si-unico', E'si', E'si', NULL, E'flujo', E'recurso'),
+  (175, E'2015-10-20 10:12:43.844', E'activo', NULL, NULL, E'Cuentas Bancarias Ingresos', E'CUEBANCING', E'no', E'si', E'si', 2, E'flujo', E'recurso_gasto');
+  
+
+/* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 6) */
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES 
+  (1, NULL, E'2016-02-15 17:30:01.038', NULL, E'activo', NULL, NULL, E'Cuentas por Pagar por defecto', E'CXPDF', E'no', E'si', E'no', NULL, E'flujo', E'recurso'),
+  (1, NULL, E'2016-02-15 17:27:50.168', NULL, E'activo', NULL, NULL, E'Cuentas por Cobrar defecto', E'CXCDF', E'no', E'si', E'no', NULL, E'flujo', E'gasto'),
+  (1, NULL, E'2016-02-15 17:10:03.802', NULL, E'activo', NULL, NULL, E'Retención de anticipos en ventas por defecto', E'VRETANTD', E'no', E'si', E'no', NULL, E'flujo', E'recurso'),
+  (1, NULL, E'2016-02-15 17:07:04.488', NULL, E'activo', NULL, NULL, E'Retencion de anticipo en compras por defecto', E'CMRETANTD', E'no', E'si', E'no', NULL, E'flujo', E'recurso'),
+  (1, NULL, E'2016-02-15 17:04:27.022', NULL, E'activo', NULL, NULL, E'Retención de garantía en ventas por defecto', E'VRETGARDF', E'no', E'si', E'no', NULL, E'flujo', E'gasto'),
+  (1, NULL, E'2016-02-15 17:02:12.003', NULL, E'activo', NULL, NULL, E'Retencion de garantia en compras por defecto', E'CMRETGARDF', E'no', E'si', E'no', NULL, E'flujo', E'recurso');
+  
+  
+
+----------------------------------
+--comprobante de compras
+---------------------------------
+
+select conta.f_import_tplantilla_comprobante ('insert','COMPRADOC','conta.f_ges_cbte_eliminacion_doc_compra_venta',NULL,'CONTA','Varias Compras','','{$tabla.fecha_cbte}','activo','','{$tabla.id_depto_conta}','contable','','conta.vagrupador','DIARIO','{$tabla.id_moneda}','{$tabla.id_gestion}','{$tabla.id_moneda},{$tabla.id_gestion},{$tabla.id_depto_conta},{id_agrupador}','no','no','no','','','','','','','','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','COMPRADOC','COMPRADOC.3','haber','no','si','','','CMRETGARDF','','{$tabla.importe_retgar}','','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','retencion de garantia','{$tabla.importe_retgar}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','COMPRADOC','COMPRADOC.1','debe','si','si','','{$tabla.descripcion}','CUECOMP','','{$tabla.precio_total_final}','{$tabla.id_concepto_ingas}','{$tabla.id_plantilla}','si','{$tabla.id_centro_costo}','','','si','','id_agrupador','','Concepto de Gasto','{$tabla.precio_total_final}',NULL,'simple','','{$tabla.id_doc_concepto}','no','','','','','','{$tabla.importe_total_excento}','','2','{$tabla.id_orden_trabajo}','conta.vdoc_compra_venta_det',NULL,'');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','COMPRADOC','COMPRADOC.2','haber','no','si','','','CMPDEF','','{$tabla.importe_pago_liquido}','','','no','','','','si','','id_agrupador','','cuenta para bancos','{$tabla.importe_pago_liquido}','39','simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','COMPRADOC','COMPRADOC.4','haber','no','si','','','CMRETANTD','','{$tabla.importe_anticipo}','','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','retención de anticipos','{$tabla.importe_anticipo}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','COMPRADOC','COMPRADOC.5','haber','no','si','','','CXPDF','','{$tabla.importe_pendiente}','','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','cuentas por pagar','{$tabla.importe_pendiente}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'');
+
+
+----------------------------------
+-- Comprobante de ventas
+---------------------------------
+
+
+select conta.f_import_tplantilla_comprobante ('insert','VENTADOC','conta.f_ges_cbte_eliminacion_doc_compra_venta',NULL,'CONTA','Ventas según LCV','','{$tabla.fecha_cbte}','activo','','{$tabla.id_depto_conta}','contable','','conta.vagrupador','DIARIO','{$tabla.id_moneda}','{$tabla.id_gestion}','{$tabla.id_moneda},{$tabla.id_gestion},{$tabla.id_depto_conta},{id_agrupador}','no','no','no','','','','','','','','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','VENTADOC','VENTADOC.2','debe','si','si','','','VENDEF','','{$tabla.importe_pago_liquido}','','','no','','','','si','','id_agrupador','','ingreso a bancos','{$tabla.importe_pago_liquido}','41','simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta','PAGRRHH.2','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','VENTADOC','VENTADOC.1','haber','si','si','','{$tabla.descripcion}','CUEVENT','','{$tabla.precio_total_final}','{$tabla.id_concepto_ingas}','{$tabla.id_plantilla}','si','{$tabla.id_centro_costo}','','','si','','id_agrupador','','Venta concepto de gasto','{$tabla.precio_total_final}',NULL,'simple','','{$tabla.id_doc_concepto}','no','','','','','','{$tabla.importe_total_excento}','','2','{$tabla.id_orden_trabajo}','conta.vdoc_compra_venta_det',NULL,'');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','VENTADOC','VENTADOC.3','debe','si','si','','','VRETGARDF','','{$tabla.importe_retgar}','','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','Retencion de garantías por cobrar','{$tabla.importe_retgar}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','VENTADOC','VENTADOC.4','debe','no','si','','','VRETANTD','','{$tabla.importe_anticipo}','','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','descuento de anticipo pagados por adelantado','{$tabla.importe_anticipo}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','VENTADOC','VENTADOC.5','debe','no','si','','','CXCDF','','{$tabla.importe_pendiente}','','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','cuentas por cobrar','{$tabla.importe_pendiente}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'');
+
+
+/***********************************F-DAT-RAC-CONTA-0-10/02/2016****************************************/
+
 
 

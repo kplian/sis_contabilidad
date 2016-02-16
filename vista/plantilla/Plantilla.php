@@ -21,8 +21,35 @@ Phx.vista.PlantillaConta = {
        	Phx.vista.PlantillaConta.superclass.constructor.call(this,config);
 		this.init();
 		this.load({params:{start:0, limit:50}});
+		
+		this.addButton('btnWizard',
+            {
+                text: 'Exportar Plantilla',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expProceso,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo SQL la plantilla de calculo'
+            }
+        );
+        
+		
+		
 	},
 	
+	
+	expProceso : function(resp){
+			var data=this.sm.getSelected().data;
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url: '../../sis_contabilidad/control/PlantillaCalculo/exportarDatos',
+				params: { 'id_plantilla' : data.id_plantilla },
+				success: this.successExport,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});
+			
+	},
 	south:{
 		  url:'../../../sis_contabilidad/vista/plantilla_calculo/PlantillaCalculo.php',
 		  title:'Plantilla Cálculo', 

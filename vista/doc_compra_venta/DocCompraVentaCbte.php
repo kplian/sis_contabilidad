@@ -311,6 +311,35 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'importe_descuento',
+				fieldLabel: 'Descuento',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100
+			},
+				type:'NumberField',
+				filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
+		{
+			config:{
+				name: 'importe_neto',
+				fieldLabel: 'Neto',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:1179650
+			},
+				type:'NumberField',
+				filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+		{
+			config:{
 				name: 'importe_excento',
 				fieldLabel: 'Excento',
 				allowBlank: true,
@@ -325,17 +354,48 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'importe_descuento',
-				fieldLabel: 'Descuento',
+				name: 'importe_pendiente',
+				fieldLabel: 'Cuenta Pendiente',
+				qtip: 'Usualmente una cuenta pendiente de  cobrar o  pagar (dependiendo si es compra o venta), posterior a la emisión del documento',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100
 			},
 				type:'NumberField',
-				filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
+				filters:{pfiltro:'dcv.importe_pendiente',type:'numeric'},
 				id_grupo:1,
 				grid:true,
-				form:false
+				form:true
+		},
+		{
+			config:{
+				name: 'importe_anticipo',
+				fieldLabel: 'Anticipo',
+				qtip: 'Importe pagado por anticipado al documento',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100
+			},
+				type:'NumberField',
+				filters:{pfiltro:'dcv.importe_anticipo',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+		{
+			config:{
+				name: 'importe_retgar',
+				fieldLabel: 'Ret. Garantia',
+				qtip: 'Importe retenido por garantia',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100
+			},
+				type:'NumberField',
+				filters:{pfiltro:'dcv.importe_retgar',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:true
 		},
 		{
 			config:{
@@ -440,6 +500,28 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 				filters: { pfiltro:'dcv.sw_contabilizar', type:'string' },
 				id_grupo: 1,
 				grid: true,
+				form: false
+		},
+		{
+			config:{
+				name: 'nombre_auxiliar',
+				fieldLabel: 'Cuenta Corriente',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 150,
+				maxLength:180, 
+				renderer:function (value,p,record){
+					if(value){
+					  return  String.format('({0}) - {1}',record.data.codigo_auxiliar, record.data.nombre_auxiliar);
+					}
+            	}   
+			
+			},
+				type:'TextField',
+				filters:{pfiltro:'aux.codigo_auxiliar#aux.nombre_auxiliar',type:'string'},
+				id_grupo:0,
+				grid: true,
+				bottom_filter: true,
 				form: false
 		},
 		{
@@ -589,9 +671,13 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		{name:'importe_pendiente', type: 'numeric'},
+		{name:'importe_anticipo', type: 'numeric'},
+		{name:'importe_retgar', type: 'numeric'},
+		{name:'importe_neto', type: 'numeric'},
 		'desc_depto','desc_plantilla',
 		'importe_descuento_ley',
-		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda'
+		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda','id_auxiliar','codigo_auxiliar','nombre_auxiliar'
 		
 	],
 	sortInfo:{
