@@ -2972,7 +2972,7 @@ IS 'moenda sobre la que se realiza el ajuste, por defecto es la moneda de la cue
 /***********************************F-SCP-RAC-CONTA-0-17/12/2015****************************************/
 
 
-/***********************************I-SCP-RAC-CONTA-12/01/2016****************************************/
+/***********************************I-SCP-RAC-CONTA-0-12/01/2016****************************************/
 
 ALTER TABLE conta.tcuenta DROP CONSTRAINT chk_tcuenta__tipo_cuenta_pat RESTRICT;
   
@@ -2980,7 +2980,7 @@ ALTER TABLE conta.tcuenta DROP CONSTRAINT chk_tcuenta__tipo_cuenta_pat RESTRICT;
 
 
 
-/***********************************I-SCP-RAC-CONTA-05/02/2016****************************************/
+/***********************************I-SCP-RAC-CONTA-0-05/02/2016****************************************/
 
 --------------- SQL ---------------
 
@@ -3029,12 +3029,12 @@ IS 'importe neto = importe doc - descuentos,
 sobre este monto se ejecuta presupuesto y hacen las mayoria de los calculos';
 
 
-/***********************************F-SCP-RAC-CONTA-05/02/2016****************************************/
+/***********************************F-SCP-RAC-CONTA-0-05/02/2016****************************************/
 
 
 
 
-/***********************************I-SCP-RAC-CONTA-11/02/2016****************************************/
+/***********************************I-SCP-RAC-CONTA-0-11/02/2016****************************************/
 
 --------------- SQL ---------------
 
@@ -3077,7 +3077,7 @@ COMMENT ON COLUMN conta.tauxiliar.corriente
 IS 'indetifica que auxiliar son usados para acumular cuenta corriente en cotabilidad';
 
 
-/***********************************F-SCP-RAC-CONTA-11/02/2016****************************************/
+/***********************************F-SCP-RAC-CONTA-0-11/02/2016****************************************/
 
 
 
