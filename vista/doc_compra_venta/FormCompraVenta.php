@@ -1681,7 +1681,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					if (reg.ROOT.error) {
 						Ext.Msg.alert('Error','Error a recuperar la variable global')
 					} else {
-						if(reg.ROOT.conta_partidas == 'si'){
+						if(reg.ROOT.conta_partidas != 'si'){
 						   me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas';
 						   parFilConcepto = 'desc_ingas';
 					    }

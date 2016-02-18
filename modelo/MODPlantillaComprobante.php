@@ -202,7 +202,7 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('id_plantilla_comprobante','int4');
 			$this->captura('codigo','varchar');
 			$this->captura('funcion_comprobante_eliminado','text');
-			$this->captura('idtabla','varchar');
+			$this->captura('id_tabla','varchar');
 			$this->captura('campo_subsistema','text');
 			$this->captura('campo_descripcion','text');
 			$this->captura('funcion_comprobante_validado','text');
