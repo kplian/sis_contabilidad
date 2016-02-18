@@ -1683,7 +1683,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					} else {
 						if(reg.ROOT.conta_partidas != 'si'){
 						   me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas';
-						   parFilConcepto = 'desc_ingas';
+						   me.parFilConcepto = 'desc_ingas';
 					    }
 						me.constructorEtapa2(config);
 					
