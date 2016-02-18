@@ -59,6 +59,32 @@ class ACTDocCompraVenta extends ACTbase{
 			
 			$this->res=$this->objFunc->listarDocCompraVenta($this->objParam);
 		}
+		
+		$temp = Array();
+			$temp['importe_ice'] = $this->res->extraData['total_importe_ice'];
+			$temp['importe_excento'] = $this->res->extraData['total_importe_excento'];
+			$temp['importe_it'] = $this->res->extraData['total_importe_it'];
+			$temp['importe_iva'] = $this->res->extraData['total_importe_iva'];
+			$temp['importe_descuento'] = $this->res->extraData['total_importe_descuento'];
+			$temp['importe_doc'] = $this->res->extraData['total_importe_doc'];			
+			$temp['importe_retgar'] = $this->res->extraData['total_importe_retgar'];
+			$temp['importe_anticipo'] = $this->res->extraData['total_importe_anticipo'];
+			$temp['importe_pendiente'] = $this->res->extraData['tota_importe_pendiente'];
+			$temp['importe_neto'] = $this->res->extraData['total_importe_neto'];
+			$temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
+			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];
+			
+			$temp['tipo_reg'] = 'summary';
+			$temp['id_int_doc_compra_venta'] = 0;
+			
+			
+			
+			
+			$this->res->total++;
+			
+			$this->res->addLastRecDatos($temp);
+		
+		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	

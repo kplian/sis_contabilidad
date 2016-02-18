@@ -661,7 +661,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:1179650
+				maxLength:1179650,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
@@ -675,7 +684,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Descuento',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
@@ -690,7 +708,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:1179650
+				maxLength:1179650,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
@@ -704,7 +731,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Excento',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type: 'NumberField',
 				filters: {pfiltro:'dcv.importe_excento',type:'numeric'},
@@ -719,7 +755,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				qtip: 'Usualmente una cuenta pendiente de  cobrar o  pagar (dependiendo si es compra o venta), posterior a la emisión del documento',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_pendiente',type:'numeric'},
@@ -734,7 +779,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				qtip: 'Importe pagado por anticipado al documento',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_anticipo',type:'numeric'},
@@ -749,7 +803,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				qtip: 'Importe retenido por garantia',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_retgar',type:'numeric'},
@@ -764,7 +827,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				readOnly:true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_descuento_ley',type:'numeric'},
@@ -778,7 +850,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'ICE',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_ice',type:'numeric'},
@@ -793,7 +874,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				readOnly:true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type: 'NumberField',
 				filters: { pfiltro:'dcv.importe_iva',type:'numeric'},
@@ -808,7 +898,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				readOnly:true,
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_it',type:'numeric'},
@@ -823,7 +922,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				readOnly:true,
 				anchor: '80%',
-				gwidth: 100
+				gwidth: 100,
+				renderer:function (value,p,record){
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return  String.format('<b><font size=2 >{0}</font><b>', value);
+					}
+					
+				}
 			},
 				type:'NumberField',
 				filters:{pfiltro:'dcv.importe_pago_liquido',type:'numeric'},
@@ -1038,7 +1146,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'desc_depto','desc_plantilla',
 		'importe_descuento_ley',
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
-		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar'
+		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg'
 		
 	],
 	sortInfo:{

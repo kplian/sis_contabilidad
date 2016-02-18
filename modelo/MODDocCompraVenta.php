@@ -18,6 +18,24 @@ class MODDocCompraVenta extends MODbase{
 		$this->procedimiento='conta.ft_doc_compra_venta_sel';
 		$this->transaccion='CONTA_DCV_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		//captura parametros adicionales para el count
+		$this->capturaCount('total_importe_ice','numeric');
+		$this->capturaCount('total_importe_excento','numeric');
+		$this->capturaCount('total_importe_it','numeric');
+		$this->capturaCount('total_importe_iva','numeric');
+		$this->capturaCount('total_importe_descuento','numeric');
+		$this->capturaCount('total_importe_doc','numeric');
+		
+		$this->capturaCount('total_importe_retgar','numeric');
+		$this->capturaCount('total_importe_anticipo','numeric');
+		$this->capturaCount('tota_importe_pendiente','numeric');
+		$this->capturaCount('total_importe_neto','numeric');
+		$this->capturaCount('total_importe_descuento_ley','numeric');
+		$this->capturaCount('tota_importe_pago_liquido','numeric');
+		
+		
+		
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_doc_compra_venta','int8');
