@@ -750,6 +750,30 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	            type:'NumberField',
 	            form:true 
 	        },
+	        {
+	            //configuracion del componente
+	            config:{
+	                    labelSeparator:'',
+	                    inputType:'hidden',
+	                    name: 'tipo_excento',
+	                    allowDecimals: true,
+	                    decimalPrecision: 10
+	            },
+	            type: 'TextField',
+	            form: true 
+	        },
+	        {
+	            //configuracion del componente
+	            config:{
+	                    labelSeparator:'',
+	                    inputType:'hidden',
+	                    name: 'valor_excento',
+	                    allowDecimals: true,
+	                    decimalPrecision: 10
+	            },
+	            type: 'NumberField',
+	            form: true 
+	        },
 	        
 	        {
 				//configuracion del componente
@@ -792,7 +816,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                    totalProperty:'total',
 	                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
 	                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
-	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice'],
+	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice','tipo_excento','valor_excento'],
 	                    remoteSort: true,
 	                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
 	                }),
@@ -1253,9 +1277,22 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	            this.getDetallePorAplicar(rec.data.id_plantilla);
 	            if(rec.data.sw_monto_excento=='si'){
 	               this.mostrarComponente(this.Cmp.importe_excento);
+	               this.Cmp.tipo_excento.setValue(rec.data.tipo_excento);
+	               this.Cmp.valor_excento.setValue(rec.data.valor_excento);
+	               if(rec.data.tipo_excento == 'variable'){
+	               	   this.Cmp.importe_excento.setReadOnly(false);
+	               }else{
+	               	   this.Cmp.importe_excento.setReadOnly(true);
+	               }
+	               
 	            }
 	            else{
 	                this.ocultarComponente(this.Cmp.importe_excento);
+	                this.Cmp.importe_excento.setReadOnly(false);
+	                this.Cmp.tipo_excento.setValue('variable');
+	                this.Cmp.importe_excento.setValue(0);
+	                this.Cmp.valor_excento.setValue(0);
+	                
 	            }
 	           
 	            if(rec.data.sw_descuento=='si'){
@@ -1360,8 +1397,19 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 		}
         
         if(this.tmp_porc_monto_excento_var){
+        	alert('ENTRA ...')
         	this.Cmp.importe_excento.setValue(this.Cmp.importe_neto.getValue()*this.tmp_porc_monto_excento_var)
         }
+        
+        if(this.Cmp.tipo_excento.getValue() == 'constante' ){
+        	this.Cmp.importe_excento.setValue(this.Cmp.valor_excento.getValue())
+        }
+        
+        if(this.Cmp.tipo_excento.getValue() == 'porcentual' ){
+        	this.Cmp.importe_excento.setValue(this.Cmp.importe_neto.getValue()*this.Cmp.valor_excento.getValue())
+        }
+        
+        
        
         if(this.Cmp.importe_excento.getValue() == 0){
         	descuento_ley = this.Cmp.importe_neto.getValue()*this.Cmp.porc_descuento_ley.getValue()*1.00;

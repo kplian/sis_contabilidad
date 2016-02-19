@@ -3082,3 +3082,26 @@ IS 'indetifica que auxiliar son usados para acumular cuenta corriente en cotabil
 
 
 
+/***********************************I-SCP-RAC-CONTA-0-19/02/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE param.tplantilla
+  ADD COLUMN tipo_excento VARCHAR(20) DEFAULT 'variable' NOT NULL;
+
+COMMENT ON COLUMN param.tplantilla.tipo_excento
+IS 'peuden ser variable, porcentual, constante. En caso de constante o porcentual toma el valor del campo valor_excento';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE param.tplantilla
+  ADD COLUMN valor_excento NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN param.tplantilla.valor_excento
+IS 'valor que se aplica al excento ya porcentual o constante';
+
+/***********************************F-SCP-RAC-CONTA-0-19/02/2016****************************************/
+
+
+

@@ -340,9 +340,12 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
                 	   if(record.data.id_int_comprobante){
                 	      state = 'disabled';
                 	   }
-                	   
-            	       return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
-            	        
+                	   if(record.data.tipo_reg != 'summary'){
+            	         return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
+            	       }
+            	       else{
+            	       	  return '';
+            	       } 
                  }
 			},
 			type: 'TextField',
@@ -1518,7 +1521,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
      	
      	if(fieldName == 'revisado') {
 	       	if(!record.data['id_int_comprobante']){
-	       	   this.cambiarRevision(record);
+	       	   if(record.data.tipo_reg != 'summary'){
+	       	     this.cambiarRevision(record);
+	       	   }
 	       	}
 	    }
      },
@@ -1545,9 +1550,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
      preparaMenu:function(tb){
         Phx.vista.DocCompraVenta.superclass.preparaMenu.call(this,tb)
         var data = this.getSelectedData();
-        if(data['revisado'] ==  'si' || data['id_int_comprobante'] > 0){
-            
-            
+        if(data['revisado'] ==  'si' || data['id_int_comprobante'] > 0 || data.tipo_reg == 'summary'){
+             
              this.getBoton('edit').disable();
              this.getBoton('del').disable();
          
@@ -1556,7 +1560,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             this.getBoton('edit').enable();
             this.getBoton('del').enable();
          } 
-	        
+	       
     },
     
     liberaMenu:function(tb){
