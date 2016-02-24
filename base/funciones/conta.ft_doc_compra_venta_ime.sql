@@ -40,6 +40,7 @@ DECLARE
     v_sum_total				numeric;
     v_id_proveedor			integer;
     v_id_cliente			integer;
+    v_id_tipo_doc_compra_venta integer;
 			    
 BEGIN
 
@@ -58,7 +59,32 @@ BEGIN
         begin
         
            
-            
+        
+           --  calcula valores pode defecto para el tipo de doc compra venta
+           
+           
+           IF v_parametros.tipo = 'compra' THEN
+                 -- paracompras por defecto es 
+                 -- Compras para mercado interno con destino a actividades gravadas
+                 select 
+                   td.id_tipo_doc_compra_venta
+                 into
+                   v_id_tipo_doc_compra_venta
+                 from conta.ttipo_doc_compra_venta td
+                 where td.codigo = '1';
+           
+           ELSE
+                 -- para ventas por defecto es 
+                 -- facturas valida
+                 select 
+                   td.id_tipo_doc_compra_venta
+                 into
+                   v_id_tipo_doc_compra_venta
+                 from conta.ttipo_doc_compra_venta td
+                 where td.codigo = 'V';
+           
+           END IF;
+                        
             
             -- recuepra el periodo de la fecha ...
             --Obtiene el periodo a partir de la fecha
@@ -163,7 +189,8 @@ BEGIN
               importe_neto,
               id_proveedor,
               id_cliente,
-              id_auxiliar
+              id_auxiliar,
+              id_tipo_doc_compra_venta
           	) values(
               v_parametros.tipo,
               v_parametros.importe_excento,
@@ -194,13 +221,14 @@ BEGIN
               v_rec.po_id_periodo,
               v_parametros.nro_dui,
               v_parametros.id_moneda,
-              v_parametros.importe_pendiente,
-              v_parametros.importe_anticipo,
-              v_parametros.importe_retgar,
+              COALESCE(v_parametros.importe_pendiente,0),
+              COALESCE(v_parametros.importe_anticipo,0),
+              COALESCE(v_parametros.importe_retgar,0),
               v_parametros.importe_neto,
               v_id_proveedor,
               v_id_cliente,
-              v_parametros.id_auxiliar
+              v_parametros.id_auxiliar,
+              v_id_tipo_doc_compra_venta
 			)RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 			
 			--Definicion de la respuesta
@@ -307,9 +335,9 @@ BEGIN
               id_periodo = v_rec.po_id_periodo,
               nro_dui = v_parametros.nro_dui,
               id_moneda = v_parametros.id_moneda,
-              importe_pendiente = v_parametros.importe_pendiente,
-              importe_anticipo = v_parametros.importe_anticipo,
-              importe_retgar = v_parametros.importe_retgar,
+              importe_pendiente = COALESCE(v_parametros.importe_pendiente,0),
+              importe_anticipo = COALESCE(v_parametros.importe_anticipo,0),
+              importe_retgar = COALESCE(v_parametros.importe_retgar,0),
               importe_neto = v_parametros.importe_neto,
               id_proveedor = v_id_proveedor,
               id_cliente = v_id_cliente,
@@ -326,6 +354,33 @@ BEGIN
 		end;
 
 	/*********************************    
+ 	#TRANSACCION:  'CONTA_DCVBASIC_MOD'
+ 	#DESCRIPCION:	Modificacion basica de documento de compra venta
+ 	#AUTOR:		admin	
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DCVBASIC_MOD')then
+
+		begin
+        
+            --Sentencia de la modificacion
+			update conta.tdoc_compra_venta set			
+			  id_tipo_doc_compra_venta = v_parametros.id_tipo_doc_compra_venta
+			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','estado del documento modificado'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;
+    
+    
+    
+    /*********************************    
  	#TRANSACCION:  'CONTA_DCV_ELI'
  	#DESCRIPCION:	Eliminacion de registros
  	#AUTOR:		admin	

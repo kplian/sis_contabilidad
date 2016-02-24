@@ -89,17 +89,17 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 							               valueField: 'id_concepto_ingas',
 							               displayField: 'desc_ingas',
 							               hiddenName: 'id_concepto_ingas',
-							               forceSelection:true,
+							               forceSelection: true,
 							               typeAhead: false,
 							               triggerAction: 'all',
-							               listWidth:500,
-							               resizable:true,
-							               lazyRender:true,
-							               mode:'remote',
-							               pageSize:10,
-							               queryDelay:1000,
-							               minChars:2,
-							               qtip:'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
+							               listWidth: 500,
+							               resizable: true,
+							               lazyRender: true,
+							               mode: 'remote',
+							               pageSize: 10,
+							               queryDelay: 1000,
+							               minChars: 2,
+							               qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
 							               tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
 							             }),
 							             
@@ -200,11 +200,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
         
         this.detCmp.id_concepto_ingas.on('change',function( cmb, rec, ind){
+					console.log('concepto_gasto ' + rec);
 	        	    this.detCmp.id_orden_trabajo.reset();
 	           },this);
 	        
 	    this.detCmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
-	        	
+					console.log('concepto_gasto ' + rec);
 	        	    this.detCmp.id_orden_trabajo.store.baseParams = {
 			        		                                           filtro_ot:rec.data.filtro_ot,
 			        		 										   requiere_ot:rec.data.requiere_ot,
@@ -230,6 +231,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			  
 			  
 			this.detCmp.id_centro_costo.on('select',function( cmb, rec, ind){
+				console.log('centro_costo ' + rec);
 				var idc = this.detCmp.id_concepto_ingas.getValue();
 				if(idc){
 				  this.checkRelacionConcepto({id_centro_costo: rec.data.id_centro_costo , id_concepto_ingas: idc, id_gestion :  this.Cmp.id_gestion.getValue()});	
@@ -261,7 +263,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     
     onAfterEdit:function(re, o, rec, num){
     	//set descriptins values ...  in combos boxs
-    	
+    	console.log('edit ' + rec);
     	var cmb_rec = this.detCmp['id_concepto_ingas'].store.getById(rec.get('id_concepto_ingas'));
     	if(cmb_rec){
     		rec.set('desc_concepto_ingas', cmb_rec.get('desc_ingas')); 
@@ -1247,17 +1249,19 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 		}, this);
 		
 		this.Cmp.nro_autorizacion.on('select', function(cmb,rec,i){
+			console.log('nro_autorizacion ' + rec);
 			this.Cmp.nit.setValue(rec.data.nit);
 			this.Cmp.razon_social.setValue(rec.data.razon_social);
 		} ,this);
 		
 		this.Cmp.nit.on('select', function(cmb,rec,i){
+			console.log('razon_social ' + rec);
 			this.Cmp.razon_social.setValue(rec.data.razon_social);
 		} ,this);
 		
 		//this.Cmp.nro_autorizacion .on('blur',this.cargarRazonSocial,this);
 		this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
-				
+				console.log('id_plantilla ' + rec);
 				this.esconderImportes();
 				//si es el formulario para nuevo reseteamos los valores ...
 				if(this.accionFormulario == 'NEW'){

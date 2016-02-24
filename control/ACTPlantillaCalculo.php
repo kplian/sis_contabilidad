@@ -100,7 +100,7 @@ class ACTPlantillaCalculo extends ACTbase{
 				if ($row['estado_reg'] == 'inactivo') {
 					fwrite ($file, 
 					"select conta.f_import_tplantilla ('delete','".							 
-							$row['desc_plantilla']."',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);\r\n");
+							$row['desc_plantilla']."',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);\r\n");
 							
 						
 					
@@ -118,7 +118,10 @@ class ACTPlantillaCalculo extends ACTbase{
 							 (is_null($row['sw_codigo_control'])?'NULL':"'".$row['sw_codigo_control']."'") ."," .
 							 (is_null($row['tipo_plantilla'])?'NULL':"'".$row['tipo_plantilla']."'") ."," .
 							 (is_null($row['sw_nro_dui'])?'NULL':"'".$row['sw_nro_dui']."'") ."," .
-							 (is_null($row['sw_ic'])?'NULL':"'".$row['sw_ic']."'").");\r\n");		
+							 (is_null($row['sw_ic'])?'NULL':"'".$row['sw_ic']."'") ."," .
+							 (is_null($row['tipo_excento'])?'NULL':"'".$row['tipo_excento']."'") ."," .
+							 (is_null($row['valor_excento'])?'NULL':"'".$row['valor_excento']."'") ."," .
+							 (is_null($row['tipo_informe'])?'NULL':"'".$row['tipo_informe']."'").");\r\n");		
 							 
 							 	
 				}

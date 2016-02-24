@@ -13,7 +13,10 @@ CREATE OR REPLACE FUNCTION conta.f_import_tplantilla (
   p_sw_codigo_control varchar,
   p_tipo_plantilla varchar,
   p_sw_nro_dui varchar,
-  p_sw_ic varchar
+  p_sw_ic varchar,
+  p_tipo_excento varchar,
+  p_valor_excento varchar,
+  p_tipo_informe varchar
 )
 RETURNS varchar AS
 $body$
@@ -51,7 +54,10 @@ BEGIN
                   sw_codigo_control,
                   tipo_plantilla,
                   sw_nro_dui,
-                  sw_ic
+                  sw_ic,
+                  tipo_excento,
+                  valor_excento,
+                  tipo_informe
               ) values(
                   'activo',
                   p_desc_plantilla,
@@ -69,7 +75,10 @@ BEGIN
                   p_sw_codigo_control,
                   p_tipo_plantilla,
                   p_sw_nro_dui,
-                  p_sw_ic
+                  p_sw_ic,
+                  p_tipo_excento,
+                  p_valor_excento,
+                  p_tipo_informe
   							
               );
               
@@ -88,7 +97,10 @@ BEGIN
                 sw_codigo_control=p_sw_codigo_control,
                 tipo_plantilla=p_tipo_plantilla, 
                 sw_nro_dui = p_sw_nro_dui,
-                sw_ic = p_sw_ic
+                sw_ic = p_sw_ic,
+                tipo_excento = p_tipo_excento,
+                valor_excento =   p_valor_excento,
+                tipo_informe =  p_tipo_informe
 			where id_plantilla=v_id_plantilla;       	
         end if;
     

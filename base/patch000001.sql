@@ -3099,9 +3099,37 @@ ALTER TABLE param.tplantilla
   ADD COLUMN valor_excento NUMERIC DEFAULT 0 NOT NULL;
 
 COMMENT ON COLUMN param.tplantilla.valor_excento
-IS 'valor que se aplica al excento ya porcentual o constante';
+IS 'valor que se aplica al excento cuando es  porcentual o constante';
 
 /***********************************F-SCP-RAC-CONTA-0-19/02/2016****************************************/
 
 
+
+/***********************************I-SCP-RAC-CONTA-0-22/02/2016****************************************/
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.ttipo_doc_compra_venta (
+  id_tipo_doc_compra_venta SERIAL NOT NULL,
+  codigo VARCHAR(5),
+  nombre VARCHAR,
+  tipo VARCHAR(13) DEFAULT 'compra' NOT NULL,
+  obs VARCHAR,
+  PRIMARY KEY(id_tipo_doc_compra_venta)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.ttipo_doc_compra_venta.tipo
+IS 'es para compra o venta';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_tipo_doc_compra_venta INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_tipo_doc_compra_venta
+IS 'dato para el reporte LCD de impuestos';
+/***********************************F-SCP-RAC-CONTA-0-22/02/2016****************************************/
 

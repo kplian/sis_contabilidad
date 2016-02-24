@@ -29,6 +29,10 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
+    v_id_entidad		integer;
+    v_id_deptos			varchar;
+    v_registros 		record;
+    v_reg_entidad		record;
 			    
 BEGIN
 
@@ -94,12 +98,15 @@ BEGIN
                             COALESCE(dcv.importe_neto,0)::numeric as importe_neto,
                             aux.id_auxiliar,
                             aux.codigo_auxiliar,
-                            aux.nombre_auxiliar
+                            aux.nombre_auxiliar,
+                            dcv.id_tipo_doc_compra_venta,
+                            (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta
                         
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
                           left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
@@ -141,14 +148,15 @@ BEGIN
                               COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
                               COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as tota_importe_pago_liquido
                               
-					    from conta.tdoc_compra_venta dcv
-						inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
-                        inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
-                        inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
-                        left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
-                        left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
-                        left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
-						left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
+					   from conta.tdoc_compra_venta dcv
+                          inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                          inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
+                          left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                          left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where  ';
 			
 			--Definicion de la respuesta		    
@@ -254,8 +262,85 @@ BEGIN
 			return v_consulta;
            
 		end;
-    				
-	else
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_REPLCV_SEL'
+ 	#DESCRIPCION:	listado para reporte de libro de compras y ventas
+ 	#AUTOR:		admin	
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	ELSEIF(p_transaccion='CONTA_REPLCV_SEL')then
+     				
+    	begin
+        
+            
+           
+            
+            select 
+              d.id_entidad,
+              d.id_subsistema
+            into
+              v_registros
+            from param.tdepto  d
+            where  d.id_depto = v_parametros.id_depto;
+            
+           
+            IF v_registros.id_entidad is null THEN
+              raise exception 'El departamento contable no tiene definido la entidad a la que pertenece';
+            END IF;
+             
+            select
+              pxp.list(d.id_depto::varchar)
+            into
+              v_id_deptos            
+            from param.tdepto d
+            where d.id_entidad  = v_registros.id_entidad 
+                  and  d.id_subsistema = v_registros.id_subsistema ;
+                  
+           
+             
+    		--Sentencia de la consulta
+			v_consulta:='SELECT 
+                              id_doc_compra_venta,
+                              tipo,
+                              fecha,
+                              nit,
+                              razon_social,
+                              COALESCE(nro_documento,''0'')::Varchar,
+                              COALESCE(nro_dui,''0'')::Varchar,
+                              nro_autorizacion,
+                              importe_doc,
+                              total_excento,
+                              sujeto_cf,
+                              importe_descuento,
+                              subtotal,
+                              credito_fiscal,
+                              importe_iva,
+                              codigo_control,
+                              tipo_doc,
+                              id_plantilla,
+                              id_moneda,
+                              codigo_moneda,
+                              id_periodo,
+                              id_gestion,
+                              periodo,
+                              gestion
+                        FROM 
+                          conta.vlcv lcv
+                        where      lcv.tipo = '''||v_parametros.tipo||'''
+                               and lcv.id_periodo = '||v_parametros.id_periodo||'
+                               and id_depto_conta in ( '||v_id_deptos||')
+                        order by fecha';
+			
+			raise notice '%', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;				
+	
+    
+    
+    else
 					     
 		raise exception 'Transaccion inexistente';
 					         

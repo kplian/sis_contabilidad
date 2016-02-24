@@ -90,7 +90,11 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('id_auxiliar','integer');
 		$this->captura('codigo_auxiliar','varchar');
 		$this->captura('nombre_auxiliar','varchar');
-
+		
+		$this->captura('id_tipo_doc_compra_venta','integer');
+		$this->captura('desc_tipo_doc_compra_venta','varchar');
+		
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -191,6 +195,29 @@ class MODDocCompraVenta extends MODbase{
 		$this->setParametro('importe_neto','importe_neto','numeric');
 		
 		$this->setParametro('id_auxiliar','id_auxiliar','integer');
+		
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+    function modificarBasico(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_doc_compra_venta_ime';
+		$this->transaccion='CONTA_DCVBASIC_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int8');
+		$this->setParametro('fecha','fecha','date');
+		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+		
+		$this->setParametro('id_tipo_doc_compra_venta','id_tipo_doc_compra_venta','integer');
 		
 		
 
@@ -707,6 +734,54 @@ class MODDocCompraVenta extends MODbase{
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
+     function listarRepLCV(){
+		  //Definicion de variables para ejecucion del procedimientp
+		  $this->procedimiento='conta.ft_doc_compra_venta_sel';
+		  $this->transaccion='CONTA_REPLCV_SEL';
+		  $this->tipo_procedimiento='SEL';//tipo de transaccion
+		  $this->setCount(false);	
+		
+		  //captura parametros adicionales para el count
+		  $this->setParametro('tipo','tipo','VARCHAR');
+		  $this->setParametro('id_periodo','id_periodo','VARCHAR');
+		  $this->setParametro('id_depto','id_depto','INTEGER');
+		
+		  //Definicion de la lista del resultado del query
+		  $this->captura('id_doc_compra_venta','BIGINT');
+		  $this->captura('tipo','VARCHAR');
+		  $this->captura('fecha','DATE');
+		  $this->captura('nit','VARCHAR');
+		  $this->captura('razon_social','VARCHAR');
+		  $this->captura('nro_documento','VARCHAR');
+		  $this->captura('nro_dui','VARCHAR');
+		  $this->captura('nro_autorizacion','VARCHAR');
+		  $this->captura('importe_doc','NUMERIC');
+		  $this->captura('total_excento','NUMERIC');
+		  $this->captura('sujeto_cf','NUMERIC');
+		  $this->captura('importe_descuento','NUMERIC');
+		  $this->captura('subtotal','NUMERIC');
+		  $this->captura('credito_fiscal','NUMERIC');
+		  $this->captura('importe_iva','NUMERIC');
+		  $this->captura('codigo_control','VARCHAR');
+		  $this->captura('tipo_doc','VARCHAR');
+		  $this->captura('id_plantilla','INTEGER');
+		  $this->captura('id_moneda','INTEGER');
+		  $this->captura('codigo_moneda','VARCHAR');
+		  $this->captura('id_periodo','INTEGER');
+		  $this->captura('id_gestion','INTEGER');
+		  $this->captura('periodo','INTEGER');
+		  $this->captura('gestion','INTEGER');
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

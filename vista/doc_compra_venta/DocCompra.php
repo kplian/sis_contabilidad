@@ -21,12 +21,12 @@ Phx.vista.DocCompra = {
 	
 	constructor: function(config) {
 	    Phx.vista.DocCompra.superclass.constructor.call(this,config);
-        this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.tipoDoc});
+        //this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.tipoDoc});
     },
     
     loadValoresIniciales: function() {
     	Phx.vista.DocCompra.superclass.loadValoresIniciales.call(this);
-        this.Cmp.tipo.setValue(this.tipoDoc); 
+        //this.Cmp.tipo.setValue(this.tipoDoc); 
         
    },
    capturaFiltros:function(combo, record, index){

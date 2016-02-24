@@ -1412,3 +1412,32 @@ select conta.f_import_tdetalle_plantilla_comprobante ('insert','VENTADOC','VENTA
 
 
 
+/***********************************I-DAT-RAC-CONTA-0-22/02/2016****************************************/
+
+/* Data for the 'conta.ttipo_doc_compra_venta' table  (Records 1 - 10) */
+
+INSERT INTO conta.ttipo_doc_compra_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "codigo", "nombre", "tipo", "obs")
+VALUES 
+  (1, NULL, E'2016-02-22 12:45:59.328', NULL, E'activo', NULL, E'NULL', E'1', E'mercado interno con destino a actividades gravadas', E'compra', E'Compras para mercado interno con destino a actividades gravadas'),
+  (1, NULL, E'2016-02-22 12:46:17.472', NULL, E'activo', NULL, E'NULL', E'2', E'mercado interno con destino a actividades no gravadas,', E'compra', E'Compras para mercado interno con destino a actividades no gravadas'),
+  (1, NULL, E'2016-02-22 12:46:51.278', NULL, E'activo', NULL, E'NULL', E'3', E'sujetas a proporcionalidad', E'compra', E'Compras sujetas a proporcionalidad, no se puede determinar si es 1  o 2'),
+  (1, 1, E'2016-02-22 12:47:12.068', E'2016-02-22 12:47:37.274', E'activo', NULL, E'NULL', E'4', E'para exportaciones', E'compra', E'Compras para exportaciones'),
+  (1, NULL, E'2016-02-22 12:47:30.322', NULL, E'activo', NULL, E'NULL', E'5', E'para el mercado interno como para exportaciones', E'compra', E'Compras tanto para el mercado interno como para exportaciones'),
+  (1, NULL, E'2016-02-22 12:49:33.293', NULL, E'activo', NULL, E'NULL', E'A', E'ANULADA', E'venta', E'facturas anuladas'),
+  (1, NULL, E'2016-02-22 12:49:46.540', NULL, E'activo', NULL, E'NULL', E'V', E'VALIDA', E'venta', E'facturas calida'),
+  (1, NULL, E'2016-02-22 12:50:00.442', NULL, E'activo', NULL, E'NULL', E'E', E'EXTRAVIADA', E'venta', E'facturas extraviada'),
+  (1, NULL, E'2016-02-22 12:50:14.012', NULL, E'activo', NULL, E'NULL', E'N', E'NO UTILIZADA', E'venta', E'NO UTILIZADA'),
+  (1, 1, E'2016-02-22 12:50:25.858', E'2016-02-22 12:51:08.179', E'activo', NULL, E'NULL', E'C', E'EMITIDA POR CONTINGENCIA', E'venta', E'EMITIDA POR CONTINGENCIA, por corte de energía por ejemplo en el caso de ser emitida manualmente, necesitara un informe de justificación');
+  
+  
+  
+ select pxp.f_insert_tgui ('Tipo Doc LCV', 'Tipo de documentos compra y venta', 'TIPLCV', 'si', 5, 'sis_contabilidad/vista/tipo_doc_compra_venta/TipoDocCompraVenta.php', 3, '', 'TipoDocCompraVenta', 'CONTA'); 
+ select pxp.f_insert_testructura_gui ('TIPLCV', 'CONF');
+  
+  
+/***********************************F-DAT-RAC-CONTA-0-22/02/2016****************************************/
+
+  
+
+
+

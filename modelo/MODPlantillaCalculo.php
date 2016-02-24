@@ -180,6 +180,10 @@ class MODPlantillaCalculo extends MODbase{
 	        $this->captura('tipo_plantilla','varchar');
 			$this->captura('sw_ic','varchar');
 			$this->captura('sw_nro_dui','varchar');
+			
+			$this->captura('tipo_excento','varchar');
+			$this->captura('valor_excento','numeric');
+			$this->captura('tipo_informe','varchar');
 		
 		$this->armarConsulta();	
 		
