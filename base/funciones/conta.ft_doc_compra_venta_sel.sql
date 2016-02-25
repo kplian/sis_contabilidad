@@ -324,7 +324,10 @@ BEGIN
                               id_periodo,
                               id_gestion,
                               periodo,
-                              gestion
+                              gestion,
+                              venta_gravada_cero,
+                              subtotal_venta,
+                              sujeto_df
                         FROM 
                           conta.vlcv lcv
                         where      lcv.tipo = '''||v_parametros.tipo||'''

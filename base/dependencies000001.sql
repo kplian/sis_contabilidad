@@ -3304,7 +3304,11 @@ CREATE OR REPLACE VIEW conta.vlcv(
     id_gestion,
     periodo,
     gestion,
-    id_depto_conta)
+    id_depto_conta,
+    importe_ice,
+    venta_gravada_cero,
+    subtotal_venta,
+    sujeto_df)
 AS
   SELECT dcv.id_doc_compra_venta,
          dcv.tipo,
@@ -3338,7 +3342,15 @@ AS
          per.id_gestion,
          per.periodo,
          ges.gestion,
-         dcv.id_depto_conta
+         dcv.id_depto_conta,
+         round(COALESCE(dcv.importe_ice, 0::numeric), 2) AS importe_ice,
+         0.00 AS venta_gravada_cero,
+         round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_ice,
+           0::numeric) - COALESCE(dcv.importe_excento, 0::numeric), 2) AS
+           subtotal_venta,
+         round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_ice,
+           0::numeric) - COALESCE(dcv.importe_excento, 0::numeric) - COALESCE(
+           dcv.importe_descuento, 0::numeric), 2) AS sujeto_df
   FROM conta.tdoc_compra_venta dcv
        JOIN param.tplantilla pla ON pla.id_plantilla = dcv.id_plantilla
        JOIN param.tperiodo per ON per.id_periodo = dcv.id_periodo

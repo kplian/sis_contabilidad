@@ -9,6 +9,7 @@
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 require_once(dirname(__FILE__).'/../reportes/RLcv.php');
+require_once(dirname(__FILE__).'/../reportes/RLcvVentas.php');
 
 class ACTDocCompraVenta extends ACTbase{    
 			
@@ -228,8 +229,14 @@ class ACTDocCompraVenta extends ACTbase{
 		$this->objParam->addParametro('titulo_archivo',$titulo);	
         
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		
 		//Instancia la clase de pdf
-		$reporte = new RLcv($this->objParam);   
+		if($this->objParam->getParametro('tipo')=='compra'){
+		   $reporte = new RLcv($this->objParam);  
+		}
+		else{
+			$reporte = new RLcvVentas($this->objParam);  
+		} 
          
 		$reporte->datosHeader($dataSource->getDatos(),  $dataSource->extraData, $dataEntidad->getDatos() , $dataPeriodo->getDatos() );
 		//$this->objReporteFormato->renderDatos($this->res2->datos);

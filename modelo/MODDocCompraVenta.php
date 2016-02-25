@@ -776,6 +776,9 @@ class MODDocCompraVenta extends MODbase{
 		  $this->captura('id_gestion','INTEGER');
 		  $this->captura('periodo','INTEGER');
 		  $this->captura('gestion','INTEGER');
+		  $this->captura('venta_gravada_cero','NUMERIC');
+          $this->captura('subtotal_venta','NUMERIC');
+          $this->captura('sujeto_df','NUMERIC');
 		
 
 		//Ejecuta la instruccion
