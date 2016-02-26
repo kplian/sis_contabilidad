@@ -1031,7 +1031,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					gwidth: 100,
 					maxLength:200,
 					validator: function(v) {
-				      return /0|([0-9ABCDEF]{2}\-])*[0-9ABCDEF]{2}$/gi.test(v)? true : 'Entered text must be of the form xx-xx, where x represent digits 0-9.';
+				      return /^0|^([A-Fa-f0-9]{2,2}\-)*[A-Fa-f0-9]{2,2}$/i.test(v)? true : 'Entered text must be of the form xx-xx, where x represent digits 0-9.';
 				    },
 					maskRe: /[0-9ABCDFG/-]+/i,
 					regex: /[0-9ABCDFG/-]+/i
@@ -1605,6 +1605,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         //load detalle de conceptos
         this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
         this.mestore.load()
+       
         
         
         	
@@ -1720,6 +1721,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
             if(reg.total == 1){
                	
            	  this.Cmp.id_plantilla.fireEvent('select',this.Cmp.id_plantilla, {data:reg.datos[0] }, 0);
+           	  this.Cmp.nro_autorizacion.fireEvent('change',this.Cmp.nro_autorizacion,this.data.datosOriginales.data.nro_autorizacion)
+        
+           	  
            }else{
                 alert('error al recuperar la plantilla para editar, actualice su navegador');
             }
