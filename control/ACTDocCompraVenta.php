@@ -250,6 +250,88 @@ class ACTDocCompraVenta extends ACTbase{
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		
 	}
+
+    function exportarTxtLcvLCV(){
+		
+		//crea el objetoFunProcesoMacro que contiene todos los metodos del sistema de workflow
+		$this->objFun=$this->create('MODDocCompraVenta');		
+		
+		$this->res = $this->objFun->listarRepLCV();
+		
+		if($this->res->getTipo()=='ERROR'){
+			$this->res->imprimirRespuesta($this->res->generarJson());
+			exit;
+		}
+		
+		$nombreArchivo = $this->crearArchivoExportacion($this->res, $this->objParam);
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Se genero con exito el archivo LCV'.$nombreArchivo,
+										'Se genero con exito el archivo LCV'.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		
+		$this->res->imprimirRespuesta($this->mensajeExito->generarJson());
+
+	}
+	
+	function crearArchivoExportacion($res, $Obj) {
+		$data = $res -> getDatos();
+		$fileName = 'LCV-'.$Obj->getParametro('tipo').'.txt';
+		//create file
+		$file = fopen("../../../reportes_generados/$fileName", 'w');
+		$ctd = 1;
+		
+		foreach ($data as $val) {			
+			
+			 $newDate = date("d/m/Y", strtotime( $val['fecha']));			 
+			 if($Obj->getParametro('tipo') == 'compra'){
+			 	
+					fwrite ($file,  "1|".
+				 	                $ctd."|".
+			                        $newDate."|".
+			                        $val['nit']."|".
+			                        $val['razon_social']."|".
+			                        $val['nro_documento']."|".
+									$val['nro_dui']."|".
+			                        $val['nro_autorizacion']."|".
+			                        $val['importe_doc']."|".
+			                        $val['total_excento']."|".
+									$val['subtotal']."|".
+									$val['importe_descuento']."|".
+									$val['sujeto_cf']."|".
+									$val['importe_iva']."|".
+									$val['codigo_control']."|".
+			                        $val['tipo_doc']."\r\n");
+		              			
+			 }
+			 else{
+				 	fwrite ($file,  "3|".
+	                        $newDate."|".
+	                        $val['nro_documento']."|".
+	                        $val['nro_autorizacion']."|".         
+							$val['tipo_doc']."|".
+	                        $val['nit']."|".        
+	                        $val['razon_social']."|".       
+	                        $val['importe_doc']."|".
+	                        $val['importe_ice']."|".            
+	                        $val['importe_excento']."|".
+	                        $val['venta_gravada_cero']."|".       
+	                        $val['subtotal_venta']."|".     
+	                        $val['importe_descuento']."|".      
+	                        $val['sujeto_df']."|".     
+	                        $val['importe_iva']."|".    
+	                        $val['codigo_control']."\r\n");
+						
+				
+			 }
+			 
+			 	  		
+			 $ctd = $ctd + 1;
+         } //end for
+		
+		
+		return $fileName;
+	}
 	
 	
 	

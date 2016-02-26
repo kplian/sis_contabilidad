@@ -327,7 +327,9 @@ BEGIN
                               gestion,
                               venta_gravada_cero,
                               subtotal_venta,
-                              sujeto_df
+                              sujeto_df,
+                              importe_ice,
+                              importe_excento
                         FROM 
                           conta.vlcv lcv
                         where      lcv.tipo = '''||v_parametros.tipo||'''

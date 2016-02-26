@@ -920,7 +920,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                width: 200,
 	                boxMinWidth: 200,
 	                queryDelay:500,
-	                minChars:1
+	                minChars:1,
+					maskRe: /[0-9/-]+/i,
+					regex: /[0-9/-]+/i
 	            },
 	            type:'ComboBox',
 	            id_grupo: 0,
@@ -1027,7 +1029,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
-					maxLength:200
+					maxLength:200,
+					validator: function(v) {
+				      return /0|([0-9ABCDEF]{2}\-])*[0-9ABCDEF]{2}$/gi.test(v)? true : 'Entered text must be of the form xx-xx, where x represent digits 0-9.';
+				    },
+					maskRe: /[0-9ABCDFG/-]+/i,
+					regex: /[0-9ABCDFG/-]+/i
 				},
 					type:'TextField',
 					id_grupo:1,
@@ -1358,6 +1365,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         	}
         	else{
         		this.Cmp.codigo_control.allowBlank = true;
+        		this.Cmp.codigo_control.setValue('0');
         		this.ocultarComponente(this.Cmp.codigo_control);
         		
         	};

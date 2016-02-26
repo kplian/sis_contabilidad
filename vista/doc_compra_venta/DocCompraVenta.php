@@ -995,6 +995,16 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				handler : this.imprimirLCV,
 				tooltip : '<b>Imprimir LCV en PDF</b><br/>Imprime el LCV en formato PDF para archivo'
 		});
+		
+		this.addButton('btnExpTxt',
+            {
+                text: 'Exportar TXT',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expTxt,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo TXT para LCV'
+            }
+        );
         
         
         
@@ -1004,29 +1014,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		this.grid.addListener('cellclick', this.oncellclick,this);
 	},
 	
-	imprimirLCV : function() {
-		
-				if(this.validarFiltros){
-					    var me = this;
-					    Phx.CP.loadingShow();
-						Ext.Ajax.request({
-							//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
-							url : '../../sis_contabilidad/control/DocCompraVenta/reporteLCV',
-							params : {
-								'id_periodo' : me.cmbPeriodo.getValue(),
-								'id_depto' : me.cmbDepto.getValue(),
-								'tipo' : me.tipoDoc
-							},
-							success : me.successExport,
-							failure : me.conexionFailure,
-							timeout : me.timeout,
-							scope : me
-						});
-					
-				}
-			
-
-		},
+	
 	
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
@@ -1362,7 +1350,61 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
         	
         }
             
-    }
+    },
+    imprimirLCV : function() {
+		
+				if(this.validarFiltros){
+					    var me = this;
+					    Phx.CP.loadingShow();
+						Ext.Ajax.request({
+							//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
+							url : '../../sis_contabilidad/control/DocCompraVenta/reporteLCV',
+							params : {
+								'id_periodo' : me.cmbPeriodo.getValue(),
+								'id_depto' : me.cmbDepto.getValue(),
+								'tipo' : me.tipoDoc
+							},
+							success : me.successExport,
+							failure : me.conexionFailure,
+							timeout : me.timeout,
+							scope : me
+						});
+					
+				}
+			
+
+		},
+    expTxt : function(resp){
+			
+			if(this.validarFiltros){
+					    var me = this;
+					    Phx.CP.loadingShow();
+						Ext.Ajax.request({
+							url : '../../sis_contabilidad/control/DocCompraVenta/exportarTxtLcvLCV',
+							params : {
+								'id_periodo' : me.cmbPeriodo.getValue(),
+								'id_depto' : me.cmbDepto.getValue(),
+								'tipo' : me.tipoDoc
+							},
+							success : me.successExport,
+							failure : me.conexionFailure,
+							timeout : me.timeout,
+							scope : me
+						});
+					
+				}
+			
+			
+	},
+	successExport:function(resp){
+		Phx.CP.loadingHide();
+        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+        var nomRep = objRes.ROOT.detalle.archivo_generado;
+        if(Phx.CP.config_ini.x==1){  			
+        	nomRep = Phx.CP.CRIPT.Encriptar(nomRep);
+        }
+        window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
+	}
     
    
     
