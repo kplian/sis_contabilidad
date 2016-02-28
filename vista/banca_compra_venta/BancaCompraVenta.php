@@ -914,7 +914,7 @@ fheight: '80%',
 					fields: ['id_contrato', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor','monto','moneda','fecha_inicio','fecha_fin','tipo_plazo'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams: {par_filtro:'con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto', tipo_proceso:"CON",tipo_estado:"finalizado",id_tabla:3}
+					baseParams: {par_filtro:'con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto', tipo_proceso:"CON",tipo_estado:"revision",id_tabla:3}
 				}),
 				valueField: 'id_contrato',
 				displayField: 'objeto',
@@ -1558,11 +1558,22 @@ fheight: '80%',
 				url:'../../sis_contabilidad/control/BancaCompraVenta/exporta_txt',
 				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000},
 				success: this.successGeneracion_txt,
+			
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
 			});
 		},
+		
+		successGeneracion_txt:function(resp){
+			Phx.CP.loadingHide();
+	        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+	        
+	        var texto = objRes.datos;
+	        window.open('../../../reportes_generados/'+texto+'.txt')
+		}, 
+	
+	/*
 		successGeneracion_txt: function (resp) {
 			//Phx.CP.loadingHide();
 			console.log('resp' , resp)
@@ -1585,7 +1596,7 @@ fheight: '80%',
 			  delete link;
 
 
-		},
+		},*/
 		
 		successMontoAcumulado:function(resp){
 			

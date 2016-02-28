@@ -134,7 +134,7 @@ class ACTBancaCompraVenta extends ACTbase{
 		
 		
 		
-		$MiDocumento = fopen("/var/www/html/kerp_capacitacion/reportes_generados/".$tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa.".txt", "w+");
+		$MiDocumento = fopen("/var/www/html/erpkplian/reportes_generados/".$tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa.".txt", "w+");
 		$nombre_archivo = $tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa;
 		
 		

@@ -283,8 +283,8 @@ class RLcvVentas extends  ReportePDF {
 		$this->s4 = $this->s4 + $val['venta_gravada_cero'];
 		$this->s5 = $this->s5 + $val['subtotal_venta'];
 		$this->s6 = $this->s6 + $val['importe_descuento'];
-		$this->s7 = $this->s5 + $val['sujeto_df'];
-		$this->s8 = $this->s6 + $val['importe_iva'];
+		$this->s7 = $this->s7 + $val['sujeto_df'];
+		$this->s8 = $this->s8 + $val['importe_iva'];
 		
 		
 		$this->t1 = $this->t1 + $val['importe_doc'];
@@ -293,8 +293,8 @@ class RLcvVentas extends  ReportePDF {
 		$this->t4 = $this->t4 + $val['venta_gravada_cero'];
 		$this->t5 = $this->t5 + $val['subtotal_venta'];
 		$this->t6 = $this->t6 + $val['importe_descuento'];
-		$this->t7 = $this->t5 + $val['sujeto_df'];
-		$this->t8 = $this->t6 + $val['importe_iva'];
+		$this->t7 = $this->t7 + $val['sujeto_df'];
+		$this->t8 = $this->t8 + $val['importe_iva'];
 		
 		
 		
