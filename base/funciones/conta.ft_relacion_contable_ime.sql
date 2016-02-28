@@ -86,7 +86,7 @@ BEGIN
                      and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
                      and rc.id_centro_costo = v_parametros.id_centro_costo
                      and rc.estado_reg = 'activo'
-                     and rd.defecto = 'no'
+                     and rc.defecto = 'no'
                      and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null )  ) THEN
                      
                      raise exception 'Ya existe una relacion contable para este elemento';
@@ -364,7 +364,7 @@ BEGIN
 		end;
 
  
-      
+    
          
 	else
      
