@@ -182,18 +182,13 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     
     calcularTotales: function(){
     	 var pTot = this.detCmp.cantidad_sol.getValue() * this.detCmp.precio_unitario.getValue();
-    	 this.detCmp.precio_total.setValue(pTot);
-    	 
+    	 this.detCmp.precio_total.setValue(pTot);    	 
     	 if(this.Cmp.porc_descuento.getValue() > 0){
-    	 	 this.detCmp.precio_total_final.setValue(pTot - (pTot * this.Cmp.porc_descuento.getValue()));
-    	 	
-    	 	 
+    	 	 this.detCmp.precio_total_final.setValue(pTot - (pTot * this.Cmp.porc_descuento.getValue()));    	 	 
     	 }
     	 else{
     	 	 this.detCmp.precio_total_final.setValue(pTot);
     	 }
-    	
-    	 
     },
     
     iniciarEventosDetalle: function(){
