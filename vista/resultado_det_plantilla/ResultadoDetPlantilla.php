@@ -253,7 +253,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:200
+				maxLength:400
 			},
 				type:'TextArea',
 				filters:{pfiltro:'resdet.formula',type:'string'},

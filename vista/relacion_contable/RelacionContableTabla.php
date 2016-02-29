@@ -128,20 +128,20 @@ Phx.vista.RelacionContableTabla = {
             this.Cmp.id_auxiliar.store.setBaseParam('id_cuenta',r.data.id_cuenta);
             this.Cmp.id_auxiliar.modificado = true;
             this.Cmp.id_auxiliar.reset();
-            if (this.filtro_partida == 'no') {
-	            this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
-	            this.Cmp.id_partida.modificado = true;
-	            this.Cmp.id_partida.reset(); 
-	        }           
+            //if (this.filtro_partida == 'no') {
+	          //  this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
+	            //this.Cmp.id_partida.modificado = true;
+	            //this.Cmp.id_partida.reset(); 
+	        //}           
             
         }, this);
         
         this.Cmp.id_centro_costo.on('select', function (c,r,i) {           
-            if (this.filtro_partida == 'no') {
-	            this.Cmp.id_partida.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
-	            this.Cmp.id_partida.modificado = true;
-	            this.Cmp.id_partida.reset(); 
-	        }           
+            //if (this.filtro_partida == 'no') {
+	          //  this.Cmp.id_partida.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
+	            //this.Cmp.id_partida.modificado = true;
+	            //this.Cmp.id_partida.reset(); 
+	        //}           
             
         }, this);        
 		
@@ -203,7 +203,7 @@ Phx.vista.RelacionContableTabla = {
 				       		if (r.length == 1 ) {	       				       				
 				    			this.Cmp.id_partida.setValue(r[0].data.id_partida);
 				    			this.Cmp.id_partida.collapse();
-				    			this.Cmp.id_cuenta.store.setBaseParam('id_partida', this.Cmp.id_partida.getValue());
+				    			//this.Cmp.id_cuenta.store.setBaseParam('id_partida', this.Cmp.id_partida.getValue());
 				    			//si se selecciona automaticamente la partida ya no se filtrara por cuenta ni por centro de costo
 				    			this.filtro_partida = 'si';
 				    			//si selecciona automaticamante la partida es necesario aplicar nuevo filtro al centro de costos

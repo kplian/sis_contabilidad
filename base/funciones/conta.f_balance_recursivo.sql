@@ -52,9 +52,9 @@ BEGIN
        
        IF v_registros.sw_transaccional = 'movimiento' THEN
             -- caculamos el mayor
-           -- v_mayor =  conta.f_mayor_cuenta(p_id_cuenta_padre, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
-            --return v_mayor;
-            v_sw_force = true;
+             --v_mayor =  conta.f_mayor_cuenta(p_id_cuenta_padre, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
+             --return v_mayor;
+             v_sw_force = true;
        END IF; 
         
      END IF;
@@ -186,7 +186,7 @@ BEGIN
            into
             v_id_gestion  
            from param.tgestion ges
-           WHERE ges.gestion = (SELECT EXTRACT(YEAR FROM now()::Date))::integer  and ges.estado_reg = 'activo';
+           WHERE ges.gestion = (SELECT EXTRACT(YEAR FROM p_hasta::Date))::integer  and ges.estado_reg = 'activo';
            
            -- FOR listado de cuenta basicas de la gestion 
            FOR  v_registros in (

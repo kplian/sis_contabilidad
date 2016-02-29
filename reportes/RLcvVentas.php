@@ -37,7 +37,7 @@ class RLcvVentas extends  ReportePDF {
 		$this->datos_entidad = $entidad;
 		$this->datos_periodo = $periodo;
 		$this->subtotal = 0;
-		$this->SetMargins(7, 49, 5);
+		$this->SetMargins(7, 55, 5);
 	}
 	
 	function Header() {
@@ -59,45 +59,70 @@ class RLcvVentas extends  ReportePDF {
 		
 		
 	    $this->SetFont('','BU',12);		
-		$this->Cell(0,5,"LIBRO DE VENTAS ESTANDAR",0,1,'C');		
-		$this->Ln(3);
+		$this->Cell(0,5,"LIBRO DE VENTAS ESTANDAR",0,1,'C');
+		$this->SetFont('','BU',7);
+		$this->Cell(0,5,"Expresado en Bolivianos",0,1,'C');		
+		$this->Ln(2);		
+		
 		
 		$this->SetFont('','',10);
 		
-		$height = 5;
-        $width1 = 15;
-        $width2 = 20;
+		$height = 5;       
+        $width1 = 5;
+		$esp_width = 10;
+        $width_c1= 55;
+		$width_c2= 92;
         $width3 = 40;
         $width4 = 75;
 		
 		
-		$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell(60, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->SetFont('', '');
-        $this->SetFillColor(192,192,192, true);
-        $this->Cell(70, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
-        
-        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell(20, $height,'MES:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->SetFont('', '');
-        $this->SetFillColor(192,192,192, true);
-        $this->Cell(50, $height, $this->datos_periodo['literal_periodo'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		if($this->objParam->getParametro('filtro_sql') == 'fechas'){
+			
+			$fecha_ini =$this->objParam->getParametro('fecha_ini');
+		    $fecha_fin = $this->objParam->getParametro('fecha_fin');
+		
+		
+			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell($width_c1, $height, 'DEL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell($width_c2, $height, $fecha_ini, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        
+	        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(20, $height,'HASTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(50, $height, $fecha_fin, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		}
+		else{
+			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell($width_c1, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell($width_c2, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        
+	        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(20, $height,'MES:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(50, $height, $this->datos_periodo['literal_periodo'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		}
+		
 		
 		$this->Ln();
 		
-		$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell(60, $height, 'NOMBRE O RAZON SOCIAL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $this->Cell($width_c1, $height, 'NOMBRE O RAZON SOCIAL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->SetFont('', '');
         $this->SetFillColor(192,192,192, true);
-        $this->Cell(70, $height, $this->datos_entidad['nombre'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+        $this->Cell($width_c2, $height, $this->datos_entidad['nombre'].' ('.$this->datos_entidad['direccion_matriz'].')', $black, 0, 'L', true, '', 0, false, 'T', 'C');
         
-        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->Cell(20, $height,'NIT:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->SetFont('', '');
         $this->SetFillColor(192,192,192, true);
         $this->Cell(50, $height, $this->datos_entidad['nit'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
         
-		
 		
 		
 		$this->Ln(8);
@@ -283,8 +308,8 @@ class RLcvVentas extends  ReportePDF {
 		$this->s4 = $this->s4 + $val['venta_gravada_cero'];
 		$this->s5 = $this->s5 + $val['subtotal_venta'];
 		$this->s6 = $this->s6 + $val['importe_descuento'];
-		$this->s7 = $this->s5 + $val['sujeto_df'];
-		$this->s8 = $this->s6 + $val['importe_iva'];
+		$this->s7 = $this->s7 + $val['sujeto_df'];
+		$this->s8 = $this->s8 + $val['importe_iva'];
 		
 		
 		$this->t1 = $this->t1 + $val['importe_doc'];
@@ -293,8 +318,8 @@ class RLcvVentas extends  ReportePDF {
 		$this->t4 = $this->t4 + $val['venta_gravada_cero'];
 		$this->t5 = $this->t5 + $val['subtotal_venta'];
 		$this->t6 = $this->t6 + $val['importe_descuento'];
-		$this->t7 = $this->t5 + $val['sujeto_df'];
-		$this->t8 = $this->t6 + $val['importe_iva'];
+		$this->t7 = $this->t7 + $val['sujeto_df'];
+		$this->t8 = $this->t8 + $val['importe_iva'];
 		
 		
 		

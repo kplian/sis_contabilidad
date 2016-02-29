@@ -1,13 +1,10 @@
---------------- SQL ---------------
+-- Function: conta.ft_relacion_contable_ime(integer, integer, character varying, character varying)
 
-CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
+-- DROP FUNCTION conta.ft_relacion_contable_ime(integer, integer, character varying, character varying);
+
+CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime(p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
+  RETURNS character varying AS
+$BODY$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_relacion_contable_ime
@@ -62,8 +59,36 @@ BEGIN
             from conta.ttipo_relacion_contable trc 
             where trc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable;
             
+            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
             
-            IF v_tipo_rel.tiene_centro_costo IN ('si-unico','si-general') THEN
+               v_defecto =  v_parametros.defecto;
+        
+            ELSE
+            
+               v_defecto = 'no';
+            
+            
+            END IF;
+            
+            --si_unico solo permite un centro de costo para el id_tabla
+	    IF v_tipo_rel.tiene_centro_costo IN ('si-unico') THEN
+            
+            
+               IF  EXISTS(select  1 
+                   from conta.trelacion_contable  rc 
+                   where rc.id_gestion = v_parametros.id_gestion 
+                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
+                     and rc.id_centro_costo is not null
+                     and rc.estado_reg = 'activo'  
+                     and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null )  ) THEN
+                     
+                     raise exception 'En relaciones contables si-unico solo se permite una configuracion con un solo centro de costo';
+                     
+               END IF;   
+            
+            END IF;
+            --si_general permite  centro de costo para el id_tabla
+            IF (v_tipo_rel.tiene_centro_costo IN ('si-general') and v_defecto = 'no' )THEN
             
             
                IF  EXISTS(select  1 
@@ -71,7 +96,8 @@ BEGIN
                    where rc.id_gestion = v_parametros.id_gestion 
                      and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
                      and rc.id_centro_costo = v_parametros.id_centro_costo
-                     and rc.estado_reg = 'activo'  
+                     and rc.estado_reg = 'activo'
+                     and rc.defecto = 'no'
                      and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null )  ) THEN
                      
                      raise exception 'Ya existe una relacion contable para este elemento';
@@ -92,18 +118,6 @@ BEGIN
             
             END IF;
             
-            
-            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
-            
-               v_defecto =  v_parametros.defecto;
-        
-            ELSE
-            
-               v_defecto = 'no';
-            
-            
-            END IF;
-       
             
             IF  v_defecto = 'si'   THEN
              --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
@@ -367,9 +381,8 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION conta.ft_relacion_contable_ime(integer, integer, character varying, character varying)
+  OWNER TO postgres;

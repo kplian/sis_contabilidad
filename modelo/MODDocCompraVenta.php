@@ -6,7 +6,6 @@
 *@date 18-08-2015 15:57:09
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
-
 class MODDocCompraVenta extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -245,6 +244,25 @@ class MODDocCompraVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function obtenerRazonSocialxNIT(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_doc_compra_venta_ime';
+		$this->transaccion='CONTA_RAZONXNIT_GET';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('nit','nit','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
 	
 	function cambiarRevision(){
 		//Definicion de variables para ejecucion del procedimiento
@@ -382,64 +400,62 @@ class MODDocCompraVenta extends MODbase{
 			/////////////////////////////////////////////
 			
 			
-			
+			if($this->aParam->getParametro('regitrarDetalle') == 'si'){
 			//decodifica JSON  de detalles 
-			$json_detalle = $this->aParam->_json_decode($this->aParam->getParametro('json_new_records'));			
-			
-			//var_dump($json_detalle)	;
-			foreach($json_detalle as $f){
+				$json_detalle = $this->aParam->_json_decode($this->aParam->getParametro('json_new_records'));			
 				
-				$this->resetParametros();
-				//Definicion de variables para ejecucion del procedimiento
-			    $this->procedimiento='conta.ft_doc_concepto_ime';
-				$this->transaccion='CONTA_DOCC_INS';
-				$this->tipo_procedimiento='IME';
-				
-				//modifica los valores de las variables que mandaremos
-				$this->arreglo['id_centro_costo'] = $f['id_centro_costo'];
-				
-				
-				$this->arreglo['descripcion'] = $f['descripcion'];
-				$this->arreglo['precio_unitario'] = $f['precio_unitario'];
-				$this->arreglo['id_doc_compra_venta'] = $id_doc_compra_venta;
-				$this->arreglo['id_orden_trabajo'] = $f['id_orden_trabajo'];
-				$this->arreglo['id_concepto_ingas'] = $f['id_concepto_ingas'];
-				$this->arreglo['precio_total'] = $f['precio_total'];
-				$this->arreglo['precio_total_final'] = $f['precio_total_final'];
-				$this->arreglo['cantidad_sol'] = $f['cantidad_sol'];
-				
-				//throw new Exception("cantidad ...modelo...".$f['cantidad'], 1);
-						
-				//Define los parametros para la funcion
-				$this->setParametro('estado_reg','estado_reg','varchar');
-				$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
-				$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
-				$this->setParametro('id_centro_costo','id_centro_costo','int4');
-				$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
-				$this->setParametro('descripcion','descripcion','text');
-				$this->setParametro('cantidad_sol','cantidad_sol','numeric');
-				$this->setParametro('precio_unitario','precio_unitario','numeric');
-				$this->setParametro('precio_total','precio_total','numeric');
-				$this->setParametro('precio_total_final','precio_total_final','numeric');
-				
-				//Ejecuta la instruccion
-	            $this->armarConsulta();
-				$stmt = $link->prepare($this->consulta);		  
-			  	$stmt->execute();
-				$result = $stmt->fetch(PDO::FETCH_ASSOC);				
-				
-				//recupera parametros devuelto depues de insertar ... (id_solicitud)
-				$resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
-				if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
-					throw new Exception("Error al insertar detalle  en la bd", 3);
-				}
-                    
-                        
-            }
-			
-			
-			
-			//verifica si los totales cuadran
+				//var_dump($json_detalle)	;
+				foreach($json_detalle as $f){
+					
+					$this->resetParametros();
+					//Definicion de variables para ejecucion del procedimiento
+				    $this->procedimiento='conta.ft_doc_concepto_ime';
+					$this->transaccion='CONTA_DOCC_INS';
+					$this->tipo_procedimiento='IME';
+					
+					//modifica los valores de las variables que mandaremos
+					$this->arreglo['id_centro_costo'] = $f['id_centro_costo'];
+					
+					
+					$this->arreglo['descripcion'] = $f['descripcion'];
+					$this->arreglo['precio_unitario'] = $f['precio_unitario'];
+					$this->arreglo['id_doc_compra_venta'] = $id_doc_compra_venta;
+					$this->arreglo['id_orden_trabajo'] = $f['id_orden_trabajo'];
+					$this->arreglo['id_concepto_ingas'] = $f['id_concepto_ingas'];
+					$this->arreglo['precio_total'] = $f['precio_total'];
+					$this->arreglo['precio_total_final'] = $f['precio_total_final'];
+					$this->arreglo['cantidad_sol'] = $f['cantidad_sol'];
+					
+					//throw new Exception("cantidad ...modelo...".$f['cantidad'], 1);
+							
+					//Define los parametros para la funcion
+					$this->setParametro('estado_reg','estado_reg','varchar');
+					$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
+					$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
+					$this->setParametro('id_centro_costo','id_centro_costo','int4');
+					$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
+					$this->setParametro('descripcion','descripcion','text');
+					$this->setParametro('cantidad_sol','cantidad_sol','numeric');
+					$this->setParametro('precio_unitario','precio_unitario','numeric');
+					$this->setParametro('precio_total','precio_total','numeric');
+					$this->setParametro('precio_total_final','precio_total_final','numeric');
+					
+					//Ejecuta la instruccion
+		            $this->armarConsulta();
+					$stmt = $link->prepare($this->consulta);		  
+				  	$stmt->execute();
+					$result = $stmt->fetch(PDO::FETCH_ASSOC);				
+					
+					//recupera parametros devuelto depues de insertar ... (id_solicitud)
+					$resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+					if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
+						throw new Exception("Error al insertar detalle  en la bd", 3);
+					}
+	                    
+	                        
+	            }
+
+             //verifica si los totales cuadran
 			$this->resetParametros();
 			$this->procedimiento='conta.ft_doc_compra_venta_ime';
 			$this->transaccion='CONTA_CHKDOCSUM_IME';
@@ -458,6 +474,10 @@ class MODDocCompraVenta extends MODbase{
 			if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
 				throw new Exception("Error al verificar cuadre ", 3);
 			}	
+			
+			}
+			
+			
 			
 			
 			//si todo va bien confirmamos y regresamos el resultado
@@ -564,120 +584,123 @@ class MODDocCompraVenta extends MODbase{
 			$json_detalle = $this->aParam->_json_decode($this->aParam->getParametro('json_new_records'));			
 			
 			//var_dump($json_detalle)	;
-			foreach($json_detalle as $f){
-				
-				$this->resetParametros();
-				//Definicion de variables para ejecucion del procedimiento
-			    
-			    
-				//modifica los valores de las variables que mandaremos
-				$this->arreglo['id_centro_costo'] = $f['id_centro_costo'];
-				$this->arreglo['id_doc_concepto'] = $f['id_doc_concepto'];
-				
-				$this->arreglo['descripcion'] = $f['descripcion'];
-				$this->arreglo['precio_unitario'] = $f['precio_unitario'];
-				$this->arreglo['id_doc_compra_venta'] = $id_doc_compra_venta;
-				$this->arreglo['id_orden_trabajo'] = (isset($f['id_orden_trabajo'])?$f['id_orden_trabajo']:'null');
-				$this->arreglo['id_concepto_ingas'] = $f['id_concepto_ingas'];
-				$this->arreglo['precio_total'] = $f['precio_total'];
-				$this->arreglo['precio_total_final'] = $f['precio_total_final'];
-				$this->arreglo['cantidad_sol'] = $f['cantidad_sol'];
-				
-				
-				$this->procedimiento='conta.ft_doc_concepto_ime';
-				$this->tipo_procedimiento='IME';
-				//si tiene ID modificamos
-				if ( isset($this->arreglo['id_doc_concepto']) && $this->arreglo['id_doc_concepto'] != ''){
-					$this->transaccion='CONTA_DOCC_MOD';
-				}
-				else{
-					//si no tiene ID insertamos
-					$this->transaccion='CONTA_DOCC_INS';
-				}
-				
-				
-				
-				
-				//throw new Exception("cantidad ...modelo...".$f['cantidad'], 1);
+			
+		  if($this->aParam->getParametro('regitrarDetalle') == 'si'){
+					foreach($json_detalle as $f){
 						
-				//Define los parametros para la funcion
-				$this->setParametro('estado_reg','estado_reg','varchar');
-				$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
-				$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
-				$this->setParametro('id_centro_costo','id_centro_costo','int4');
-				$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
-				$this->setParametro('descripcion','descripcion','text');
-				$this->setParametro('cantidad_sol','cantidad_sol','numeric');
-				$this->setParametro('precio_unitario','precio_unitario','numeric');
-				$this->setParametro('precio_total','precio_total','numeric');
-				$this->setParametro('precio_total_final','precio_total_final','numeric');
-				$this->setParametro('id_doc_concepto','id_doc_concepto','numeric');
-				
-				
-				//Ejecuta la instruccion
-	            $this->armarConsulta();
-				$stmt = $link->prepare($this->consulta);		  
-			  	$stmt->execute();
-				$result = $stmt->fetch(PDO::FETCH_ASSOC);				
-				
-				//recupera parametros devuelto depues de insertar ... (id_solicitud)
-				$resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
-				if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
-					throw new Exception("Error al insertar detalle  en la bd", 3);
-				}
-                    
-                        
-            }
-			
-			/////////////////////////////
-			//elimia conceptos marcado
-			///////////////////////////
-			
-			$this->procedimiento='conta.ft_doc_concepto_ime';
-			$this->transaccion='CONTA_DOCC_ELI';
-			$this->tipo_procedimiento='IME';
-			
-			$id_doc_conceto_elis = explode(",", $this->aParam->getParametro('id_doc_conceto_elis'));			
-			//var_dump($json_detalle)	;
-			for( $i=0; $i<count($id_doc_conceto_elis); $i++){
-				
-				$this->resetParametros();
-				$this->arreglo['id_doc_concepto'] = $id_doc_conceto_elis[$i];
-				//Define los parametros para la funcion
-				$this->setParametro('id_doc_concepto','id_doc_concepto','int4');
-				//Ejecuta la instruccion
-	            $this->armarConsulta();
-				$stmt = $link->prepare($this->consulta);		  
-			  	$stmt->execute();
-				$result = $stmt->fetch(PDO::FETCH_ASSOC);				
-				
-				//recupera parametros devuelto depues de insertar ... (id_solicitud)
-				$resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
-				if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
-					throw new Exception("Error al eliminar concepto  en la bd", 3);
-				}
-			
-			}
-			//verifica si los totales cuadran
-			$this->resetParametros();
-			$this->procedimiento='conta.ft_doc_compra_venta_ime';
-			$this->transaccion='CONTA_CHKDOCSUM_IME';
-			$this->tipo_procedimiento='IME';
-			
-			$this->arreglo['id_doc_compra_venta'] = $id_doc_compra_venta;
-			$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
-			
-			$this->armarConsulta();
-			$stmt = $link->prepare($this->consulta);		  
-		  	$stmt->execute();
-			$result = $stmt->fetch(PDO::FETCH_ASSOC);
-			
-			//recupera parametros devuelto depues de insertar ... (id_solicitud)
-			$resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
-			if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
-				throw new Exception("Error al verificar cuadre ", 3);
-			}	
-			
+						$this->resetParametros();
+						//Definicion de variables para ejecucion del procedimiento
+					    
+					    
+						//modifica los valores de las variables que mandaremos
+						$this->arreglo['id_centro_costo'] = $f['id_centro_costo'];
+						$this->arreglo['id_doc_concepto'] = $f['id_doc_concepto'];
+						
+						$this->arreglo['descripcion'] = $f['descripcion'];
+						$this->arreglo['precio_unitario'] = $f['precio_unitario'];
+						$this->arreglo['id_doc_compra_venta'] = $id_doc_compra_venta;
+						$this->arreglo['id_orden_trabajo'] = (isset($f['id_orden_trabajo'])?$f['id_orden_trabajo']:'null');
+						$this->arreglo['id_concepto_ingas'] = $f['id_concepto_ingas'];
+						$this->arreglo['precio_total'] = $f['precio_total'];
+						$this->arreglo['precio_total_final'] = $f['precio_total_final'];
+						$this->arreglo['cantidad_sol'] = $f['cantidad_sol'];
+						
+						
+						$this->procedimiento='conta.ft_doc_concepto_ime';
+						$this->tipo_procedimiento='IME';
+						//si tiene ID modificamos
+						if ( isset($this->arreglo['id_doc_concepto']) && $this->arreglo['id_doc_concepto'] != ''){
+							$this->transaccion='CONTA_DOCC_MOD';
+						}
+						else{
+							//si no tiene ID insertamos
+							$this->transaccion='CONTA_DOCC_INS';
+						}
+						
+						
+						
+						
+						//throw new Exception("cantidad ...modelo...".$f['cantidad'], 1);
+								
+						//Define los parametros para la funcion
+						$this->setParametro('estado_reg','estado_reg','varchar');
+						$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
+						$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
+						$this->setParametro('id_centro_costo','id_centro_costo','int4');
+						$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
+						$this->setParametro('descripcion','descripcion','text');
+						$this->setParametro('cantidad_sol','cantidad_sol','numeric');
+						$this->setParametro('precio_unitario','precio_unitario','numeric');
+						$this->setParametro('precio_total','precio_total','numeric');
+						$this->setParametro('precio_total_final','precio_total_final','numeric');
+						$this->setParametro('id_doc_concepto','id_doc_concepto','numeric');
+						
+						
+						//Ejecuta la instruccion
+			            $this->armarConsulta();
+						$stmt = $link->prepare($this->consulta);		  
+					  	$stmt->execute();
+						$result = $stmt->fetch(PDO::FETCH_ASSOC);				
+						
+						//recupera parametros devuelto depues de insertar ... (id_solicitud)
+						$resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+						if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
+							throw new Exception("Error al insertar detalle  en la bd", 3);
+						}
+		                    
+		                        
+		            }
+					
+					/////////////////////////////
+					//elimia conceptos marcado
+					///////////////////////////
+					
+					$this->procedimiento='conta.ft_doc_concepto_ime';
+					$this->transaccion='CONTA_DOCC_ELI';
+					$this->tipo_procedimiento='IME';
+					
+					$id_doc_conceto_elis = explode(",", $this->aParam->getParametro('id_doc_conceto_elis'));			
+					//var_dump($json_detalle)	;
+					for( $i=0; $i<count($id_doc_conceto_elis); $i++){
+						
+						$this->resetParametros();
+						$this->arreglo['id_doc_concepto'] = $id_doc_conceto_elis[$i];
+						//Define los parametros para la funcion
+						$this->setParametro('id_doc_concepto','id_doc_concepto','int4');
+						//Ejecuta la instruccion
+			            $this->armarConsulta();
+						$stmt = $link->prepare($this->consulta);		  
+					  	$stmt->execute();
+						$result = $stmt->fetch(PDO::FETCH_ASSOC);				
+						
+						//recupera parametros devuelto depues de insertar ... (id_solicitud)
+						$resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+						if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
+							throw new Exception("Error al eliminar concepto  en la bd", 3);
+						}
+					
+					}
+					//verifica si los totales cuadran
+					$this->resetParametros();
+					$this->procedimiento='conta.ft_doc_compra_venta_ime';
+					$this->transaccion='CONTA_CHKDOCSUM_IME';
+					$this->tipo_procedimiento='IME';
+					
+					$this->arreglo['id_doc_compra_venta'] = $id_doc_compra_venta;
+					$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
+					
+					$this->armarConsulta();
+					$stmt = $link->prepare($this->consulta);		  
+				  	$stmt->execute();
+					$result = $stmt->fetch(PDO::FETCH_ASSOC);
+					
+					//recupera parametros devuelto depues de insertar ... (id_solicitud)
+					$resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+					if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
+						throw new Exception("Error al verificar cuadre ", 3);
+					}	
+					
+			}//fin del if tiene detalle
 			
 			//si todo va bien confirmamos y regresamos el resultado
 			$link->commit();
@@ -779,6 +802,10 @@ class MODDocCompraVenta extends MODbase{
 		  $this->captura('venta_gravada_cero','NUMERIC');
           $this->captura('subtotal_venta','NUMERIC');
           $this->captura('sujeto_df','NUMERIC');
+		  $this->captura('importe_ice','NUMERIC');
+		  $this->captura('importe_excento','NUMERIC');
+		  
+		              
 		
 
 		//Ejecuta la instruccion
@@ -789,6 +816,126 @@ class MODDocCompraVenta extends MODbase{
 		return $this->respuesta;
 	}
 
+     function listarRepLCVForm(){
+		  //Definicion de variables para ejecucion del procedimientp
+		  $this->procedimiento='conta.ft_doc_compra_venta_sel';
+		  $this->transaccion='CONTA_REPLCV_FRM';
+		  $this->tipo_procedimiento='SEL';//tipo de transaccion
+		  $this->setCount(false);	
+		
+		  
+		  $this->setParametro('filtro_sql','filtro_sql','VARCHAR');
+		  $this->setParametro('id_periodo','id_periodo','INTEGER');
+		  $this->setParametro('tipo_lcv','tipo_lcv','VARCHAR');
+		 $this->setParametro('fecha_ini','fecha_ini','date');
+		  $this->setParametro('fecha_fin','fecha_fin','date');
+		   
+		   
+		  //captura parametros adicionales para el count
+		 /* $this->setParametro('id_gestion','id_gestion','INTEGER');
+		  
+		  $this->setParametro('id_entidad','id_entidad','INTEGER');
+		  
+		  $this->setParametro('tipo','tipo','VARCHAR');
+		 
+		  $this->setParametro('fecha_ini','fecha_ini','date');
+		  $this->setParametro('fecha_fin','fecha_fin','date');*/
+		
+		  //Definicion de la lista del resultado del query
+		  
+		  
+		  $this->captura('id_doc_compra_venta','BIGINT');
+		  $this->captura('tipo','VARCHAR');
+		  $this->captura('fecha','DATE');
+		  $this->captura('nit','VARCHAR');
+		  $this->captura('razon_social','VARCHAR');
+		  $this->captura('nro_documento','VARCHAR');
+		  $this->captura('nro_dui','VARCHAR');
+		  $this->captura('nro_autorizacion','VARCHAR');
+		  $this->captura('importe_doc','NUMERIC');
+		  $this->captura('total_excento','NUMERIC');
+		  $this->captura('sujeto_cf','NUMERIC');
+		  $this->captura('importe_descuento','NUMERIC');
+		  $this->captura('subtotal','NUMERIC');
+		  $this->captura('credito_fiscal','NUMERIC');
+		  $this->captura('importe_iva','NUMERIC');
+		  $this->captura('codigo_control','VARCHAR');
+		  $this->captura('tipo_doc','VARCHAR');
+		  $this->captura('id_plantilla','INTEGER');
+		  $this->captura('id_moneda','INTEGER');
+		  $this->captura('codigo_moneda','VARCHAR');
+		  $this->captura('id_periodo','INTEGER');
+		  $this->captura('id_gestion','INTEGER');
+		  $this->captura('periodo','INTEGER');
+		  $this->captura('gestion','INTEGER');
+		  $this->captura('venta_gravada_cero','NUMERIC');
+          $this->captura('subtotal_venta','NUMERIC');
+          $this->captura('sujeto_df','NUMERIC');
+		  $this->captura('importe_ice','NUMERIC');
+		  $this->captura('importe_excento','NUMERIC');
+		  
+		              
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarRepLCVFormErpEndesis(){
+		  //Definicion de variables para ejecucion del procedimientp
+		  $this->procedimiento='conta.ft_doc_compra_venta_sel';
+		  $this->transaccion='CONTA_REPLCV_ENDERP';
+		  $this->tipo_procedimiento='SEL';//tipo de transaccion
+		  $this->setCount(false);			
+		  
+		  $this->setParametro('filtro_sql','filtro_sql','VARCHAR');
+		  $this->setParametro('id_periodo','id_periodo','INTEGER');
+		  $this->setParametro('tipo_lcv','tipo_lcv','VARCHAR');
+		  $this->setParametro('fecha_ini','fecha_ini','date');
+		  $this->setParametro('fecha_fin','fecha_fin','date');
+		   		
+		  //Definicion de la lista del resultado del query		
+		  $this->captura('id_doc_compra_venta','BIGINT');
+		  $this->captura('tipo','VARCHAR');
+		  $this->captura('fecha','DATE');
+		  $this->captura('nit','VARCHAR');
+		  $this->captura('razon_social','VARCHAR');
+		  $this->captura('nro_documento','VARCHAR');
+		  $this->captura('nro_dui','VARCHAR');
+		  $this->captura('nro_autorizacion','VARCHAR');
+		  $this->captura('importe_doc','NUMERIC');
+		  $this->captura('total_excento','NUMERIC');
+		  $this->captura('sujeto_cf','NUMERIC');
+		  $this->captura('importe_descuento','NUMERIC');
+		  $this->captura('subtotal','NUMERIC');
+		  $this->captura('credito_fiscal','NUMERIC');
+		  $this->captura('importe_iva','NUMERIC');
+		  $this->captura('codigo_control','VARCHAR');
+		  $this->captura('tipo_doc','VARCHAR');
+		  $this->captura('id_plantilla','INTEGER');
+		  $this->captura('id_moneda','INTEGER');
+		  $this->captura('codigo_moneda','VARCHAR');
+		  $this->captura('id_periodo','INTEGER');
+		  $this->captura('id_gestion','INTEGER');
+		  $this->captura('periodo','INTEGER');
+		  $this->captura('gestion','INTEGER');
+		  $this->captura('venta_gravada_cero','NUMERIC');
+          $this->captura('subtotal_venta','NUMERIC');
+          $this->captura('sujeto_df','NUMERIC');
+		  $this->captura('importe_ice','NUMERIC');
+		  $this->captura('importe_excento','NUMERIC');
+		  
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>

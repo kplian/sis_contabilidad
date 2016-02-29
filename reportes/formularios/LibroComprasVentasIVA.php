@@ -4,7 +4,7 @@
  *@file    GenerarLibroBancos.php
  *@author  Gonzalo Sarmiento Sejas
  *@date    01-12-2014
- *@description Archivo con la interfaz para generación de reporte
+ *@description Archivo con la interfaz para generaciï¿½n de reporte
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -13,77 +13,56 @@ header("content-type: text/javascript; charset=UTF-8");
 		
 		Atributos : [
 		{
-            config:{
-                name:'id_empresa',
-                fieldLabel:'Empresa',
-                allowBlank:true,
-                emptyText:'Empresa...',
-                store: new Ext.data.JsonStore({
-                         url: '../../sis_parametros/control/Empresa/listarEmpresa',
-                         id: 'id_empresa',
-                         root: 'datos',
-                         sortInfo:{
-                            field: 'nit',
-                            direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_empresa','nombre','nit'],
-                    // turn on remote sorting
-                    remoteSort: true,
-                    baseParams:{par_filtro:'nombre#nit'}
-                    }),
-                valueField: 'id_empresa',
-                displayField: 'nombre',
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{nombre}</b></p><p>{nit}</p></div></tpl>',
-                hiddenName: 'id_empresa',
-                forceSelection:true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender:true,
-                mode:'remote',
-                pageSize:10,
-                queryDelay:1000,
-                listWidth:600,
-                resizable:true,
-                anchor:'100%'
-                
-            },
-            type:'ComboBox',
-            id_grupo:0,
-            filters:{   
-                        pfiltro:'nombre#nit',
-                        type:'string'
-                    },
-            grid:true,
-            form:true
-        },
-		{
 			config:{
-				name: 'nombre_empresa',
-				fieldLabel: 'Nombre Empresa',
+				name: 'id_entidad',
+				fieldLabel: 'Entidad',
+				qtip: 'entidad a la que pertenese el depto, ',
 				allowBlank: false,
-				anchor: '80%',
-				gwidth: 100, 
-				renderer:function (value,p,record){return value}
-			},
-			type:'Field',
-			filters:{pfiltro:'nombre_empresa',type:'string'},
-			id_grupo:1,
+				emptyText:'Entidad...',
+				store:new Ext.data.JsonStore(
+				{
+					url: '../../sis_parametros/control/Entidad/listarEntidad',
+					id: 'id_entidad',
+					root: 'datos',
+					sortInfo:{
+						field: 'nombre',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_entidad','nit','nombre'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: { par_filtro:'nit#nombre' }
+				}),
+				valueField: 'id_entidad',
+				displayField: 'nombre',
+				gdisplayField:'desc_entidad',
+				hiddenName: 'id_entidad',
+    			triggerAction: 'all',
+    			lazyRender:true,
+				mode:'remote',
+				pageSize:50,
+				queryDelay:500,
+				anchor:"90%",
+				listWidth:280,
+				gwidth:150,
+				minChars:2,
+				renderer:function (value, p, record){return String.format('{0}', record.data['desc_entidad']);}
+
+       		},
+       		type:'ComboBox',
+			filters:{pfiltro:'ENT.nombre',type:'string'},
+			id_grupo:0,
+			egrid: true,
+			grid:true,
 			form:true
 		},
-		{
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'nit'
-			},
-			type:'Field',
-			form:true 
-		},
+		
+		
 		
 		{
 			config:{
-				name:'tipo',
+				name:'tipo_lcv',
 				fieldLabel:'Tipo de Reporte',
 				typeAhead: true,
 				allowBlank:false,
@@ -93,8 +72,12 @@ header("content-type: text/javascript; charset=UTF-8");
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
-	        	data :	[['LCEstandar','Libro de Compras Estandar'],	
-						['LCNCD','Libro de Compras NCD']]	        				
+	        	data :	[
+						['endesis_erp','Libro de Compras Estandar'],
+	        	        //['lcv_compras','Libro de Compras Estandar'],
+	        	        ['lcv_ventas','Libro de Ventas Estandar'],	
+						['LCNCD','Libro de Compras NCD']					
+						]	        				
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
@@ -107,7 +90,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		},
 		{
 			config:{
-				name:'filtro',
+				name:'filtro_sql',
 				fieldLabel:'Filtrar Por',
 				typeAhead: true,
 				allowBlank:false,
@@ -222,20 +205,6 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 		{
 			config:{
-				name: 'finalidad',
-				fieldLabel: 'Finalidad',
-				allowBlank: false,
-				anchor: '80%',
-				gwidth: 100, 
-				renderer:function (value,p,record){return value}
-			},
-			type:'Field',
-			filters:{pfiltro:'finalidad',type:'string'},
-			id_grupo:1,
-			form:true
-		},
-		{
-			config:{
 				name: 'fecha_ini',
 				fieldLabel: 'Fecha Inicio',
 				allowBlank: true,
@@ -266,6 +235,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			grid:true,
 			form:true
 		},
+		
 		{
 			config:{
 				name:'formato_reporte',
@@ -280,7 +250,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	        	fields: ['ID', 'valor'],
 	        	data :	[['txt','TXT'],
 						['pdf','PDF'],	
-						['excel','Excel']]	        				
+						['csv','CSV']]	        				
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
@@ -303,52 +273,46 @@ header("content-type: text/javascript; charset=UTF-8");
 		
 		constructor : function(config) {
 			Phx.vista.ReporteLibroComprasVentasIVA.superclass.constructor.call(this, config);
-			this.init();			
+			this.init();
+			
+			this.ocultarComponente(this.Cmp.fecha_fin);
+			this.ocultarComponente(this.Cmp.fecha_ini);
+			this.ocultarComponente(this.Cmp.id_gestion);
+			this.ocultarComponente(this.Cmp.id_periodo);
+						
 			this.iniciarEventos();
 		},
 		
 		iniciarEventos:function(){        
-			this.cmpFormatoReporte = this.getComponente('formato_reporte');
-			this.cmpFechaIni = this.getComponente('fecha_ini');
-			this.cmpFechaFin = this.getComponente('fecha_fin');
-			this.cmpIdGestion = this.getComponente('id_gestion');
-			this.cmpEstado = this.getComponente('estado');
-			this.cmpTipo = this.getComponente('tipo');
-			this.cmpNombreBanco = this.getComponente('nombre_banco');
-			this.cmpNroCuenta = this.getComponente('nro_cuenta');
 			
-			this.getComponente('finalidad').hide(true);
-			this.cmpNroCuenta.hide(true);
-			this.getComponente('id_finalidad').on('change',function(c,r,n){
-				this.getComponente('finalidad').setValue(c.lastSelectionText);
+			this.Cmp.id_gestion.on('select',function(c,r,n){
+				
+				this.Cmp.id_periodo.reset();
+				this.Cmp.id_periodo.store.baseParams={id_gestion:c.value, vista: 'reporte'};				
+				this.Cmp.id_periodo.modificado=true;
+				
 			},this);
 			
-			this.cmpIdGestion.on('select',function(c,r,n){
-				this.cmpNombreBanco.setValue(r.data.nombre_institucion);
-				this.cmpNroCuenta.setValue(c.lastSelectionText);
-				this.getComponente('id_periodo').reset();
-				this.getComponente('id_periodo').store.baseParams={id_gestion:c.value, vista: 'reporte'};				
-				this.getComponente('id_periodo').modificado=true;
-			},this);
+			
+			this.Cmp.filtro_sql.on('select',function(combo, record, index){
+				
+				if(index == 0){
+					this.ocultarComponente(this.Cmp.fecha_fin);
+					this.ocultarComponente(this.Cmp.fecha_ini);
+					this.mostrarComponente(this.Cmp.id_gestion);
+					this.mostrarComponente(this.Cmp.id_periodo);
+				}
+				else{
+					this.mostrarComponente(this.Cmp.fecha_fin);
+					this.mostrarComponente(this.Cmp.fecha_ini);
+					this.ocultarComponente(this.Cmp.id_gestion);
+					this.ocultarComponente(this.Cmp.id_periodo);
+				}
+				
+			}, this);
 		},
 		
-		onSubmit:function(o){
-			if(this.cmpFormatoReporte.getValue()==2){
-				var data = 'FechaIni=' + this.cmpFechaIni.getValue().format('d-m-Y');
-				data = data + '&FechaFin=' + this.cmpFechaFin.getValue().format('d-m-Y');
-				data = data + '&IdCuentaBancaria=' + this.cmpIdCuentaBancaria.getValue();
-				data = data + '&Estado=' + this.cmpEstado.getValue();
-				data = data + '&Tipo=' + this.cmpTipo.getValue();
-				data = data + '&NombreBanco=' + this.cmpNombreBanco.getValue();
-				data = data + '&NumeroCuenta=' + this.cmpNroCuenta.getValue();
-				
-				console.log(data);
-				window.open('http://sms.obairlines.bo/LibroBancos/Home/VerLibroBancos?'+data);
-				//window.open('http://localhost:2309/Home/VerLibroBancos?'+data);				
-			}else{
-				Phx.vista.ReporteLibroComprasVentasIVA.superclass.onSubmit.call(this,o);				
-			}
-		},
+		
 		
 		tipo : 'reporte',
 		clsSubmit : 'bprint',
@@ -366,6 +330,30 @@ header("content-type: text/javascript; charset=UTF-8");
 				id_grupo : 0,
 				collapsible : true
 			}]
-		}]
+		}],
+		
+	ActSave:'../../sis_contabilidad/control/DocCompraVentaForm/reporteLCV',
+	
+    successSave :function(resp){
+       Phx.CP.loadingHide();
+       var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+        if (reg.ROOT.error) {
+            alert('error al procesar');
+            return
+       } 
+       
+       var nomRep = reg.ROOT.detalle.archivo_generado;
+        if(Phx.CP.config_ini.x==1){  			
+        	nomRep = Phx.CP.CRIPT.Encriptar(nomRep);
+        }
+       
+        if(this.Cmp.formato_reporte.getValue()=='pdf'){
+        	window.open('../../../lib/lib_control/Intermediario.php?r='+nomRep+'&t='+new Date().toLocaleTimeString())
+        }
+        else{
+        	window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
+        }
+       
+	}
 })
 </script>

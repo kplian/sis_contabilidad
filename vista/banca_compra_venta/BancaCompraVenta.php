@@ -21,6 +21,10 @@ fheight: '80%',
 	
 	
 	
+	this.tbarItems = ['-',
+			this.cmbResolucion,
+			
+           ];
 	
 		
 		var dia = 01;
@@ -98,9 +102,10 @@ fheight: '80%',
          });
          fieldset.doLayout(); 
          
-		 console.log(fieldset);
-		 
-		
+		this.cmbResolucion.on('select', function(combo, record, index){
+		    this.tmpResolucion = record.data.field1;
+		    this.capturaFiltros();
+        },this);
 		
 		this.cmbGestion.on('select', function(combo, record, index){
 			this.tmpGestion = record.data.gestion;
@@ -172,10 +177,77 @@ fheight: '80%',
 		 this.construyeVariablesContratos();
 		 
 		 
-		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT',/*iconCls:'' ,*/disabled:false,handler:this.generar_txt});
+		 
+		 
+		 this.win_pago = new Ext.Window(
+                    {
+                        layout: 'fit',
+                        width: 500,
+                        height: 250,
+                        modal: true,
+                        closeAction: 'hide',
 
-		this.addButton('Importar',{argument: {imprimir: 'Importar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Importar TXT',/*iconCls:'' ,*/disabled:false,handler:this.importar_txt});
+                        items: new Ext.FormPanel({
+                            labelWidth: 75, // label settings here cascade unless overridden
 
+                            frame: true,
+                            // title: 'Factura Manual Concepto',
+                            bodyStyle: 'padding:5px 5px 0',
+                            width: 339,
+                            defaults: {width: 191},
+                            // defaultType: 'textfield',
+
+                            items: [this.cmbGestion_retenciones
+                                
+                            ],
+
+                            buttons: [{
+                                text: 'Save',
+                                handler: this.submitGenerarRetenciones,
+
+                                scope: this
+                            }, {
+                                text: 'Cancel'
+                            }]
+                        }),
+
+                    });
+                    
+		 
+		this.addButton('btnChequeoDocumentosWf',
+            {
+                text: 'Documentos',
+                grupo:[0,1,2],
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.loadCheckDocumentosSolWf,
+                tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
+            }
+        );
+	
+		 
+		 this.addBotonesListaNegra();
+		 this.addBotonesRetencionGarantias();
+		 
+		this.addButton('insertAuto',{argument: {imprimir: 'insertAuto'},text:'<i class="fa fa-file-text-o fa-2x"></i> insertAuto',/*iconCls:'' ,*/disabled:true,handler:this.insertAuto});
+
+
+		 
+		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT',/*iconCls:'' ,*/disabled:true,handler:this.generar_txt});
+
+		this.addButton('Importar',{argument: {imprimir: 'Importar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Importar TXT',/*iconCls:'' ,*/disabled:true,handler:this.importar_txt});
+
+
+		this.addButton('Acumulado',{argument: {imprimir: 'Acumulado'},text:'<i class="fa fa-file-text-o fa-2x"></i> Acumulado',/*iconCls:'' ,*/disabled:true,handler:this.acumulado});
+
+
+		this.addButton('BorrarTodo',{argument: {imprimir: 'BorrarTodo'},text:'<i class="fa fa-file-text-o fa-2x"></i> BorrarTodo',/*iconCls:'' ,*/disabled:true,handler:this.BorrarTodo});
+
+
+
+
+		
+        
 		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
 	
@@ -183,10 +255,19 @@ fheight: '80%',
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
         if(this.validarFiltros()){
+        	if(this.cmbResolucion.getValue() == 'todos'){
+        		this.store.baseParams.resolucion = '';
+        	}else{
+        		this.store.baseParams.resolucion = this.cmbResolucion.getValue();
+
+        	}
+        	
+        	
         	this.store.baseParams.id_gestion = this.cmbGestion.getValue();
 	        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
 	        this.store.baseParams.id_depto = this.cmbDepto.getValue();
 	        this.store.baseParams.tipo = this.tipoBan;
+	        this.store.baseParams.acumulado = 'no';
 	        this.load(); 
         }
         
@@ -194,21 +275,34 @@ fheight: '80%',
     
     validarFiltros:function(){
         if(this.cmbDepto.getValue() && this.cmbGestion.validate() && this.cmbPeriodo.validate()){
+        	this.getBoton('insertAuto').enable();
+        	this.getBoton('exportar').enable();
+        	this.getBoton('Importar').enable();
+        	this.getBoton('Acumulado').enable();
+        	this.getBoton('BorrarTodo').enable();
             return true;
         }
         else{
+        	this.getBoton('insertAuto').disable();
+        	this.getBoton('exportar').disable();
+        	this.getBoton('Importar').disable();
+        	this.getBoton('Acumulado').disable();
+        	this.getBoton('BorrarTodo').disable();
             return false;
+            
         }
     },
     onButtonAct:function(){
     	if(!this.validarFiltros()){
             alert('Especifique los filtros antes')
+            
+
         }
     },
     
     
     
-    /*cmbTipo : new Ext.form.ComboBox({
+    cmbTipo : new Ext.form.ComboBox({
     	
 				name: 'tipo',
 				fieldLabel: 'tipo',
@@ -222,7 +316,7 @@ fheight: '80%',
 				width: 200,
 				type: 'ComboBox',
 
-    }),*/
+    }),
     cmbDepto: new Ext.form.ComboBox({
                 name: 'id_depto',
                 fieldLabel: 'Depto',
@@ -324,11 +418,63 @@ fheight: '80%',
 				listWidth:'280',
 				width:80
 			}),
+			
+			cmbResolucion : new Ext.form.ComboBox({
+    	
+				name: 'resol',
+				fieldLabel: 'resol',
+				allowBlank: true,
+				emptyText: 'resol...',
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'local',
+				store: ['10-0011-11', '10-0017-15','todos'],
+				width: 200,
+				type: 'ComboBox',
+
+    }),
+    
 	
 	
+	
+	
+	
+	
+	cmbGestion_retenciones: new Ext.form.ComboBox({
+				fieldLabel: 'Gestion',
+				allowBlank: false,
+				emptyText:'Gestion...',
+				blankText: 'Año',
+				store:new Ext.data.JsonStore(
+				{
+					url: '../../sis_parametros/control/Gestion/listarGestion',
+					id: 'id_gestion',
+					root: 'datos',
+					sortInfo:{
+						field: 'gestion',
+						direction: 'DESC'
+					},
+					totalProperty: 'total',
+					fields: ['id_gestion','gestion'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams:{par_filtro:'gestion'}
+				}),
+				valueField: 'id_gestion',
+				triggerAction: 'all',
+				displayField: 'gestion',
+			    hiddenName: 'id_gestion',
+    			mode:'remote',
+				pageSize:50,
+				queryDelay:500,
+				listWidth:'280',
+				width:80
+			}),
+			
 	iniciarEventos:function(){
 		this.Cmp.tipo_documento_pago.on('select', function(combo, record, index){ 
-			console.log(this.Cmp.tipo_documento_pago.getValue());
+			//console.log(this.Cmp.tipo_documento_pago.getValue());
 		}, this);
 		
 		/*this.Cmp.autorizacion.on('change', function(combo, record, index){ 
@@ -348,7 +494,6 @@ fheight: '80%',
 			//console.log(record.data.desc_proveedor);
 			
 			var res = record.data.desc_proveedor.split("(");
-			console.log(res[0]);
 			this.Cmp.nit_ci.setValue(record.data.nit);
 			this.Cmp.razon.setValue(res[0]);
 			
@@ -376,7 +521,6 @@ fheight: '80%',
 		
 		
 		this.Cmp.id_cuenta_bancaria.on('select', function(combo, record, index){ 
-			console.log(record.data);
 			
 			if(this.Cmp.id_cuenta_bancaria.getValue() == 61){
 				this.Cmp.tipo_documento_pago.reset();
@@ -414,10 +558,11 @@ fheight: '80%',
 		this.Cmp.id_contrato.on('select', function(combo, record, index){ 
 			
 			
-			console.log(record.data)
 			
-			this.Cmp.id_contrato.setValue(record.data.id_contrato);
+			//this.Cmp.id_contrato.setValue(record.data.id_contrato);
 			this.Cmp.num_contrato.setValue(record.data.numero);
+			
+			this.Cmp.monto_contrato.setValue(record.data.monto);
 			this.contrato = record.data;
 			
 			if(record.data.tipo_plazo == 'tiempo_indefinido' ){
@@ -443,7 +588,7 @@ fheight: '80%',
 		
 		
 		
-		this.Cmp.monto_pagado.on('valid', function(combo, record, index){ 
+		/*this.Cmp.monto_pagado.on('valid', function(combo, record, index){ 
 			
 			console.log(this.Cmp.monto_pagado.getValue())
 			console.log(this.Cmp.monto_acumulado.getValue())
@@ -451,7 +596,7 @@ fheight: '80%',
 			this.Cmp.monto_acumulado.setValue(parseFloat(this.monto_acumulado_aux) + parseFloat(this.Cmp.monto_pagado.getValue()));
 				
 			
-		}, this);
+		}, this);*/
 		
 		
 		this.Cmp.tipo_transaccion.on('select', function(combo, record, index){
@@ -519,6 +664,7 @@ fheight: '80%',
 			form:true 
 		},
 		
+		
 		 {
 			//configuracion del componente
 			config:{
@@ -565,7 +711,6 @@ fheight: '80%',
             	       //check or un check row
             	       var checked = '',
             	       	    momento = 'no';
-            	       	    console.log(value);
                 	   if(value == 'si'){
                 	        	checked = 'checked';;
                 	   }
@@ -580,6 +725,103 @@ fheight: '80%',
 			form: false
 		},
 		
+		{
+			config:{
+				name: 'tramite_cuota',
+				fieldLabel: 'tramite_cuota',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255,
+				renderer: function (value, meta, record) {
+
+					var resp;
+					//meta.style=(record.json.saldo < 0)?'background:red; color:#fff; width:130px; height:30px;':'';
+					//meta.css = record.get('online') ? 'user-online' : 'user-offline';
+					resp = value;
+					var css;
+					
+					var lista_negra = '';
+					
+					if(record.json.lista_negra == 'si'){
+						css = "color:red; font-weight: bold; display:block;"
+						lista_negra = '<div>(lista negra)</div>'
+					}else{
+						css = "";
+					}
+					
+					
+					var devolucion = '';
+					if(record.json.tipo_bancarizacion == 'devolucion'){
+						devolucion = '<div style="color:blue; font-weight:bold;" >(devolucion)</div>'
+					}
+
+
+            	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}{2}{3}</span></div>',css,resp,lista_negra,devolucion);
+
+
+					//return resp;
+				}
+			},
+				type:'TextField',
+				filters: {pfiltro: 'banca.tramite_cuota',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:true
+		},
+		
+		{
+			config:{
+				name: 'rotulo_comercial',
+				fieldLabel: 'rotulo_comercial',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'provee.rotulo_comercial',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+				bottom_filter : true
+		},
+		
+		
+		{
+			config:{
+				name: 'resolucion',
+				fieldLabel: 'resolucion',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'banca.resolucion',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+				bottom_filter : true
+		},
+		
+		
+		{
+			config:{
+				name: 'tipo_monto',
+				fieldLabel: 'tipo_monto',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'contra.tipo_monto',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+		},
+		
 		
 		{
 			config:{
@@ -587,9 +829,29 @@ fheight: '80%',
 				fieldLabel: 'periodo',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 30,
 				maxLength:255,
 				disabled:true,
+				renderer: function (value, meta, record) {
+
+					var resp;
+					//meta.style=(record.json.saldo < 0)?'background:red; color:#fff; width:130px; height:30px;':'';
+					//meta.css = record.get('online') ? 'user-online' : 'user-offline';
+					resp = value;
+					var css;
+					
+					if(record.json.saldo < 0){
+						css = "color:red;"
+					}else{
+						css = "";
+					}
+
+
+            	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}</span></div>',css,resp);
+
+
+					//return resp;
+				}
 			},
 				type:'TextField',
 				
@@ -697,6 +959,7 @@ fheight: '80%',
 			filters: {pfiltro: 'provee.desc_proveedor',type: 'string'},
 			grid: true,
 			form: true
+			
 		},
 		
 		
@@ -769,7 +1032,7 @@ fheight: '80%',
 					totalProperty: 'total',
 					fields: ['id_documento', 'razon_social', 'nro_documento','nro_autorizacion','fecha_documento','nro_nit','sw_libro_compras','importe_total'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'doc.razon_social#doc.nro_documento#doc.nro_autorizacion#doc.nro_nit'}
+					baseParams: {par_filtro: 'doc.nro_documento#va.importe_total'}
 				}),
 				valueField: 'id_documento',
 				displayField: 'razon_social',
@@ -779,7 +1042,7 @@ fheight: '80%',
 
 				hiddenName: 'id_documento',
 				forceSelection: true,
-				typeAhead: true,
+				typeAhead: false,
 				triggerAction: 'all',
 				lazyRender: true,
 				mode: 'remote',
@@ -795,7 +1058,7 @@ fheight: '80%',
 			type: 'ComboBox',
 			id_grupo: 0,
 			filters: {pfiltro: 'd.razon_social',type: 'string'},
-			grid: true,
+			grid: false,
 			form: true
 		},
 		
@@ -898,7 +1161,7 @@ fheight: '80%',
 				hiddenName: 'id_contrato',
 				fieldLabel: 'Obj Contrato',
 				typeAhead: false,
-				forceSelection: false,
+				forceSelection: true,
 				allowBlank: true,
 				disabled: true,
 				emptyText: 'Contratos...',
@@ -968,6 +1231,22 @@ fheight: '80%',
 		
 		{
 			config:{
+				name: 'monto_contrato',
+				fieldLabel: 'monto_contrato',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				
+				id_grupo:0,
+				grid:true,
+				form:true
+		},
+		
+		{
+			config:{
 				name: 'acumulado',
 				fieldLabel: 'acumulado',
 				allowBlank: true,
@@ -981,6 +1260,7 @@ fheight: '80%',
 				grid:false,
 				form:true
 		},
+		
 		
 		{
 			config:{
@@ -1093,6 +1373,33 @@ fheight: '80%',
 				grid:true,
 				form:true
 		},
+		
+		{
+			config:{
+				name: 'saldo',
+				fieldLabel: 'saldo',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255,
+				renderer: function (value, meta, record) {
+
+					var resp;
+					meta.style=(record.json.saldo < 0)?'background:red; color:#fff;':'';
+					//meta.css = record.get('online') ? 'user-online' : 'user-offline';
+					resp = value;
+
+					return resp;
+				}
+			},
+				type:'TextField',
+				
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+		
+		
 		
 		{
 			config:{
@@ -1319,7 +1626,7 @@ fheight: '80%',
                     triggerAction: 'all',
                     lazyRender: true,
                     mode: 'local',
-                    store: ['ENERO', 'FEBRERO', 'MARZO','ABRIL','MAYO','JUNIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
+                    store: ['ENERO', 'FEBRERO', 'MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
                     width: 200
                 },
                 type: 'ComboBox',
@@ -1341,6 +1648,24 @@ fheight: '80%',
 				id_grupo:2,
 				form:true
 		},
+		
+		{
+			config:{
+				name: 'estado_libro',
+				fieldLabel: 'estado_libro',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'banca.estado_libro',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+				bottom_filter : true
+		},
+		
 		
 	],
 	tam_pag:50,	
@@ -1395,7 +1720,12 @@ fheight: '80%',
 		{name:'id_documento', type: 'numeric'},
 		{name:'desc_documento', type: 'string'},
 		{name:'periodo', type: 'string'},
-		
+		{name:'saldo', type: 'numeric'},
+		'monto_contrato',
+		  'numero_cuota',
+            			'tramite_cuota','id_proceso_wf'	,'resolucion',
+            			'tipo_monto','rotulo_comercial','estado_libro',
+            			'periodo_servicio','lista_negra','tipo_bancarizacion'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
@@ -1403,6 +1733,8 @@ fheight: '80%',
 	},
 	bdel:true,
 	bsave:true,
+	
+	
 	
 	oncellclick : function(grid, rowIndex, columnIndex, e) {
 		
@@ -1418,7 +1750,6 @@ fheight: '80%',
      cambiarRevision: function(record){
 		Phx.CP.loadingShow();
 	    var d = record.data
-	    console.log(d)
         Ext.Ajax.request({
             url:'../../sis_contabilidad/control/BancaCompraVenta/cambiarRevision',
             params:{ id_banca_compra_venta: d.id_banca_compra_venta,revisado:d.revisado},
@@ -1465,16 +1796,13 @@ fheight: '80%',
         	this.accionFormulario = 'NEW';
             Phx.vista.BancaCompraVenta.superclass.onButtonNew.call(this);//habilita el boton y se abre
             
-            
-            
-            
             this.Cmp.id_depto_conta.setValue(this.cmbDepto.getValue()); 
             this.Cmp.id_periodo.setValue(this.cmbPeriodo.getValue()); 
             //this.Cmp.tipo.setValue(this.cmbTipo.getValue()); 
             
             Ext.Ajax.request({
                 url: '../../sis_parametros/control/Periodo/literalPeriodo',
-                params: { "id_periodo":this.cmbPeriodo.getValue()},
+                params: { "id_periodo":this.cmbPeriodo.getValue(),"id_depto_conta":this.cmbDepto.getValue()},
                 success: this.successLiteralPeriodo,
                 failure: this.conexionFailure,
                 timeout: this.timeout,
@@ -1550,19 +1878,32 @@ fheight: '80%',
 			var rec = this.cmbPeriodo.getValue();
 			var tipo = this.tipoBan;
 
-			console.log(rec);
 
+
+
+			
 
 			
 			Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/exporta_txt',
-				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000},
+				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,'acumulado':'no','resolucion':this.cmbResolucion.getValue()},
 				success: this.successGeneracion_txt,
+			
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
 			});
 		},
+		
+		successGeneracion_txt:function(resp){
+			Phx.CP.loadingHide();
+	        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+	        
+	        var texto = objRes.datos;
+	        window.open('../../../reportes_generados/'+texto+'.txt')
+		}, 
+	
+	/*
 		successGeneracion_txt: function (resp) {
 			//Phx.CP.loadingHide();
 			console.log('resp' , resp)
@@ -1585,7 +1926,7 @@ fheight: '80%',
 			  delete link;
 
 
-		},
+		},*/
 		
 		successMontoAcumulado:function(resp){
 			
@@ -1594,12 +1935,9 @@ fheight: '80%',
 			//console.log(this.form.getForm().reset())
 			
 			this.monto_acumulado_aux=0;
-			console.log(resp);
 			var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 
-			console.log(objRes.datos);
 			for(var i=0; i<objRes.datos.length;i++){
-				console.log('dat',objRes.datos[i]);
 				this.monto_acumulado_aux = this.monto_acumulado_aux + objRes.datos[i].monto_acumulado
 			}
 			this.Cmp.monto_acumulado.setValue(this.monto_acumulado_aux);
@@ -1633,13 +1971,209 @@ fheight: '80%',
 			
 		},
 		acumulado : function (){
+			
+			 var data = this.getSelectedData();
+			
+			
 			Phx.CP.loadWindows('../../../sis_contabilidad/vista/banca_compra_venta/Acumulado.php',
 				'Acumulado',
 				{
 					width:900,
 					height:400
-				},this.contrato,this.idContenedor,'Acumulado')
-		}
+				},data,this.idContenedor,'Acumulado')
+		},
+		
+		insertAuto:function(){
+			
+			Phx.CP.loadingShow();
+			
+			var rec = this.cmbPeriodo.getValue();
+			var tipo = this.tipoBan;
+			
+			var id_depto_conta = this.cmbDepto.getValue();
+			
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/insertAuto',
+				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,id_depto_conta:id_depto_conta},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+		},
+		successAuto:function(resp){
+			Phx.CP.loadingHide();
+			this.reload();
+		},
+		BorrarTodo:function(){
+			
+			Phx.CP.loadingShow();
+			
+			var id_periodo = this.cmbPeriodo.getValue();
+			var tipo = this.tipoBan;
+			
+			var id_depto_conta = this.cmbDepto.getValue();
+			
+			
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/BorrarTodo',
+				params:{'id_periodo':id_periodo,'tipo':tipo,id_depto_conta:id_depto_conta},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+		},
+		
+		loadCheckDocumentosSolWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Chequear documento del WF',
+                    {
+                        width:'90%',
+                        height:500
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DocumentoWf')
+   		},
+   		Retenciones : function(){
+   			
+   			this.win_pago.show();
+   			
+   		},
+   		submitGenerarRetenciones :function(){
+   			alert(this.cmbGestion_retenciones.getValue())
+   		},
+   		
+   		addBotonesListaNegra: function() {
+   			
+   			// agregamos botones
+        this.menuAdqGantt = new Ext.Toolbar.SplitButton({
+            id: 'b-diagrama_gantt-' + this.idContenedor,
+            text: 'Lista Negra',
+            disabled: false,
+            grupo:[0,1,2],
+            iconCls : 'bcancelfile',
+            handler:this.listaNegra,
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-gantti-' + this.idContenedor,
+                text: 'Agregar a Lista Negra',
+                tooltip: '<b>agrega a la lista negra</b>',
+                handler:this.addListaNegra,
+                scope: this
+            }, /*{
+                id:'b-ganttd-' + this.idContenedor,
+                text: 'Lista Negra',
+                tooltip: '<b>Muestra la lista negra</b>',
+                handler:this.listaNegra,
+                scope: this
+            }*/
+        ]}
+        });
+		this.tbar.add(this.menuAdqGantt);
+    },
+    
+    addListaNegra : function(){
+    	
+    	 var data = this.getSelectedData();
+    	Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/agregarListarNegra',
+				params:{'id_banca_compra_venta':data.id_banca_compra_venta},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+    },
+    
+    
+    
+    
+    addBotonesRetencionGarantias: function() {
+        this.menuRetencionGarantias = new Ext.Toolbar.SplitButton({
+            id: 'b-retencion_garantias-' + this.idContenedor,
+            text: 'Retencion',
+            disabled: false,
+            grupo:[0,1,2],
+            iconCls : 'bmoney',
+            handler:this.listaRetencionGarantias,
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-ins-reten-' + this.idContenedor,
+                text: 'Insertar Retenciones',
+                tooltip: '<b>Insertar Retenciones de garantias</b>',
+                handler:this.addRetencionGarantias,
+                scope: this
+            },
+            {
+                id:'b-ins-reten-sin-pp-' + this.idContenedor,
+                text: 'Insertar Retenciones sin plan de pago',
+                tooltip: '<b>Insertar Retenciones de garantias</b>',
+                handler:this.addRetencionGarantiasSinPlanPago,
+                scope: this
+            },
+             /*{
+                id:'b-list-reten-' + this.idContenedor,
+                text: 'Lista de Rentenciones de Garantia',
+                tooltip: '<b>Lista de retenciones de garantias</b>',
+                handler:this.listaRetencionGarantias,
+                scope: this
+            }*/
+        ]}
+        });
+		this.tbar.add(this.menuRetencionGarantias);
+    },
+    
+    addRetencionGarantias : function (){
+    	
+			Phx.CP.loadingShow();
+			
+			var id_periodo = this.cmbPeriodo.getValue();
+			
+			var id_depto_conta = this.cmbDepto.getValue();
+			
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/insertarRetencionesPeriodo',
+				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta,'numero_tramite':''},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+    },
+    
+    addRetencionGarantiasSinPlanPago : function(){
+    	Phx.CP.loadingShow();
+			
+			var id_periodo = this.cmbPeriodo.getValue();
+			
+			var id_depto_conta = this.cmbDepto.getValue();
+			
+			var rec = this.sm.getSelected();
+			
+			var numero_tramite = rec.data.tramite_cuota;
+			
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/insertarRetencionesPeriodo',
+				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta,'numero_tramite':numero_tramite},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+    }
+    
+    
 		
 		/*,
 		onSubmit : function(o, x, force) {

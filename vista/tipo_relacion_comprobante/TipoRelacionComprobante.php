@@ -42,6 +42,7 @@ Phx.vista.TipoRelacionComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextField',
 				filters:{pfiltro:'trc.codigo',type:'string'},
+				bottom_filter : true,
 				id_grupo:1,
 				grid:true,
 				form:true
@@ -57,6 +58,7 @@ Phx.vista.TipoRelacionComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextField',
 				filters:{pfiltro:'trc.nombre',type:'string'},
+				bottom_filter : true,
 				id_grupo:1,
 				grid:true,
 				form:true

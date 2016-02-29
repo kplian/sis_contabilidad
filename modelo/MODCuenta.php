@@ -113,7 +113,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('sw_transaccional','sw_transaccional','varchar');
 		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('eeff','eeff','varchar');
-		$this->setParametro('valor_incremento','evalor_incrementoeff','varchar');
+		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
 		
 		
@@ -287,7 +287,7 @@ class MODCuenta extends MODbase{
    function clonarCuentasGestion(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='conta.f_cuenta_ime';
-		$this->transaccion='CONTA_CLONAR_IME';
+		$this->transaccion='CONTA_CLONARCUE_IME';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion

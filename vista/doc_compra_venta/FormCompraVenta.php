@@ -8,26 +8,24 @@
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
-
 <script>
 Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     ActSave:'../../sis_contabilidad/control/DocCompraVenta/insertarDocCompleto',
     tam_pag: 10,
     tabEnter: true,
     mostrarFormaPago : true,
+    regitrarDetalle: 'si',
+    id_moneda_defecto: 0,  // 0 quiere decir todas las monedas
     //layoutType: 'wizard',
     layout: 'fit',
     autoScroll: false,
     breset: false,
-   
+    heightHeader: 290,   
     conceptos_eliminados: [],
     listadoConcepto: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
     parFilConcepto:'desc_ingas#par.codigo',
-    //labelSubmit: '<i class="fa fa-check"></i> Siguiente',
-    
     constructor:function(config)
     {
-         //declaracion de eventos
          this.addEvents('beforesave');
          this.addEvents('successsave');
          Ext.apply(this,config);
@@ -38,13 +36,25 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     
     constructorEtapa2:function(config)
     {   
-    	this.buildComponentesDetalle();
-        this.buildDetailGrid();
+    	if(this.regitrarDetalle == 'si'){
+    		this.buildComponentesDetalle();
+            this.buildDetailGrid();
+    	}
+    	
         this.buildGrupos();        
+       
+        
         Phx.vista.FormCompraVenta.superclass.constructor.call(this,config);
-        this.init();    
+        
+        this.init(); 
+       
+        
         this.iniciarEventos();
-        this.iniciarEventosDetalle();
+       
+        if(this.regitrarDetalle == 'si'){
+          this.iniciarEventosDetalle();
+        }
+        
         if(this.data.tipo_form == 'new'){
         	this.onNew();
         }
@@ -52,7 +62,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         	this.onEdit();
         }
         
-        if(this.data.readOnly===true){
+        if(this.data.readOnly===true && this.regitrarDetalle == 'si'){
         	for(var index in this.Cmp) { 
 					if( this.Cmp[index].setReadOnly){
 					    	 this.Cmp[index].setReadOnly(true);
@@ -238,6 +248,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 				}
 				
 			},this);  
+			
+			
 			  
     },
     
@@ -538,7 +550,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                 });
     },
     buildGrupos: function(){
-    	this.Grupos = [{
+    	var me = this;
+    	if(me.regitrarDetalle == 'si'){
+    		me.Grupos = [{
     	           	    layout: 'border',
     	           	    border: false,
     	           	    frame:  true,
@@ -550,12 +564,89 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                        layout: 'column',
 	                        region: 'north',
 	                        autoScroll: true,
+	                        collapseFirst : false,
+	                        collapsible: true,
+	                        collapseMode : 'mini',
+	                        width: '100%',
+	                        height: me.heightHeader, 
+	                        padding: '0 0 0 10',
+	    	                items:[
+		    	                   {
+							        bodyStyle: 'padding-right:5px;',
+							        width: '33%',
+							        autoHeight: true,
+							        border: true,
+							        items:[
+			    	                   {
+			                            xtype: 'fieldset',
+			                            frame: true,
+			                            border: false,
+			                            layout: 'form',	
+			                            title: 'Tipo',
+			                            width: '100%',
+			                            
+			                            //margins: '0 0 0 5',
+			                            padding: '0 0 0 10',
+			                            bodyStyle: 'padding-left:5px;',
+			                            id_grupo: 0,
+			                            items: [],
+			                         }]
+			                     },
+			                     {
+			                      bodyStyle: 'padding-right:5px;',
+			                      width: '33%',
+			                      border: true,
+			                      autoHeight: true,
+							      items: [{
+			                            xtype: 'fieldset',
+			                            frame: true,
+			                            layout: 'form',
+			                            title: ' Datos básicos ',
+			                            width: '100%',
+			                            border: false,
+			                            //margins: '0 0 0 5',
+			                            padding: '0 0 0 10',
+			                            bodyStyle: 'padding-left:5px;',
+			                            id_grupo: 1,
+			                            items: [],
+			                         }]
+		                         },
+			                     {
+			                      bodyStyle: 'padding-right:2px;',
+			                      width: '33%',
+			                      border: true,
+			                      autoHeight: true,
+							      items: [{
+			                            xtype: 'fieldset',
+			                            frame: true,
+			                            layout: 'form',
+			                            title: 'Detalle de pago',
+			                            width: '100%',
+			                            border: false,
+			                            padding: '0 0 0 10',
+			                            bodyStyle: 'padding-left:2px;',
+			                            id_grupo: 2,
+			                            items: [],
+			                         }]
+		                         }
+    	                      ]
+    	                  },
+    	                     me.megrid
+                         ]
+                 }];	
+    	}
+    	else{
+    		me.Grupos = [{
+                        	xtype: 'fieldset',
+	                        border: false,
+	                        split: true,
+	                        layout: 'column',
+	                        autoScroll: true,
 	                        autoHeight: true,
 	                        collapseFirst : false,
 	                        collapsible: true,
 	                        collapseMode : 'mini',
 	                        width: '100%',
-	                        //autoHeight: true,
 	                        padding: '0 0 0 10',
 	    	                items:[
 		    	                   {
@@ -618,10 +709,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			                         }]
 		                         }
     	                      ]
-    	                  },
-    	                    this.megrid
-                         ]
-                 }];
+    	                  }];	
+    	}
+    	
+    	
     	
     	
     },
@@ -636,7 +727,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     },
     
    
-                
+    extraAtributos:[],            
     generarAtributos: function(){
         var me = this;
 		this.Atributos=[
@@ -818,7 +909,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                    totalProperty:'total',
 	                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
 	                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
-	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice','tipo_excento','valor_excento'],
+	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice','tipo_excento','valor_excento','sw_qr','sw_nit','plantilla_qr'],
 	                    remoteSort: true,
 	                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
 	                }),
@@ -841,11 +932,28 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	            id_grupo: 0,
 	            form: true
 	        },
+	        
+	        {
+				config:{
+					name: 'codigo_qr',
+					fieldLabel: 'QR',
+					allowBlank: true,
+					enableKeyEvents: true,
+					anchor: '80%',
+					maxLength:180
+				},
+					type:'TextField',
+					id_grupo:0,
+					form:true
+			},
+	        
+	        
 			{
 	            config:{
 	                name:'id_moneda',
 	                origen:'MONEDA',
 	                allowBlank:false,
+	                baseParams: {id_moneda_defecto: me.id_moneda_defecto}, 
 	                fieldLabel:'Moneda',
 	                gdisplayField:'desc_moneda',
 	                gwidth:100,
@@ -920,7 +1028,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                width: 200,
 	                boxMinWidth: 200,
 	                queryDelay:500,
-	                minChars:1
+	                minChars:1,
+					maskRe: /[0-9/-]+/i,
+					regex: /[0-9/-]+/i
 	            },
 	            type:'ComboBox',
 	            id_grupo: 0,
@@ -977,7 +1087,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					name: 'razon_social',
 					fieldLabel: 'Razón Social',
 					allowBlank: false,
-					maskRe: /[A-Za-z0-9 ]/,
+					maskRe: /[A-Za-z0-9 &-.]/,
 	                fieldStyle: 'text-transform:uppercase',
 	                listeners:{
 				          'change': function(field, newValue, oldValue){
@@ -997,7 +1107,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			{
 				config:{
 					name: 'nro_documento',
-					fieldLabel: 'Nro Doc',
+					fieldLabel: 'Nro Factura / Doc',
 					allowBlank: false,
 					anchor: '80%',
 					maxLength:100
@@ -1014,7 +1124,15 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					anchor: '80%',
 					gwidth: 100,
 					maxLength :16,
-					minLength:16
+					minLength:16,
+	                listeners:{
+				          'change': function(field, newValue, oldValue){
+				          			 
+				          			  field.suspendEvents(true);
+				                      field.setValue(newValue.toUpperCase());
+				                      field.resumeEvents(true);
+				                  }
+				     },
 				},
 					type:'TextField',
 					id_grupo:1,
@@ -1027,7 +1145,14 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
-					maxLength:200
+					enableKeyEvents: true,
+					fieldStyle : 'text-transform: uppercase',
+					maxLength:200,
+					validator: function(v) {
+				      return /^0|^([A-Fa-f0-9]{2,2}\-)*[A-Fa-f0-9]{2,2}$/i.test(v)? true : 'Introducir texto de la forma xx-xx, donde x representa dígitos  hexadecimales  [0-9]ABCDEF.';
+				    },
+					maskRe: /[0-9ABCDEF/-]+/i,
+					regex: /[0-9ABCDEF/-]+/i
 				},
 					type:'TextField',
 					id_grupo:1,
@@ -1235,8 +1360,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					form: true
 			}
 			
-			
 		];
+		
+		this.Atributos = this.Atributos.concat(me.extraAtributos);
+		
 	},
 	title: 'Frm solicitud',
 	iniciarEventos: function(){
@@ -1318,6 +1445,21 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                this.ocultarComponente(this.Cmp.nro_autorizacion);
 	            }
 	            
+	            if(rec.data.sw_nit == 'si'){
+	                this.mostrarComponente(this.Cmp.nit);
+	            }
+	            else{
+	                this.ocultarComponente(this.Cmp.nit);
+	            }
+	            
+	            if(rec.data.sw_qr == 'si' && rec.data.plantilla_qr != ''){
+	                this.mostrarComponente(this.Cmp.codigo_qr);
+	                this.plantilla_qr = rec.data.plantilla_qr;
+	            }
+	            else{
+	                this.ocultarComponente(this.Cmp.codigo_qr);
+	            }
+	            
 	            if(rec.data.sw_codigo_control == 'si'){
 	               this.mostrarComponente(this.Cmp.codigo_control);
 	            }
@@ -1358,11 +1500,76 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         	}
         	else{
         		this.Cmp.codigo_control.allowBlank = true;
+        		this.Cmp.codigo_control.setValue('0');
         		this.ocultarComponente(this.Cmp.codigo_control);
         		
         	};
         	
         },this);
+        
+        this.Cmp.codigo_control.on('keyup',function(cmp, e){
+				//inserta guiones en codigo de contorl
+				var value = cmp.getValue(), tmp='',tmp2='',sw = 0;				
+				tmp = value.replace(/-/g, '');
+				for(var i = 0; i< tmp.length; i++){
+					tmp2 = tmp2 + tmp[i]; 
+					if( (i+1)%2 == 0 && i!= tmp.length-1){
+						tmp2 = tmp2 + '-'; 
+					}
+				}
+				cmp.setValue(tmp2.toUpperCase());
+			},this);
+			
+			
+			
+		this.Cmp.codigo_qr.on('specialkey',function(cmb, e){
+         	
+         	if(e.getKey() == e.ENTER) {
+         		var res = cmb.getValue().split("|"),
+         		    plt = this.plantilla_qr.split("|");
+         		    
+         		    console.log('........',res,plt); 
+         		    
+         		    //if(plt.length == res.length) {
+         		    	
+         		    	for(var i=0; i < plt.length; i ++){
+         		    		
+         		    		if(this.Cmp[plt[i]]){
+         		    			
+         		    			if(plt[i] == 'importe_excento'){
+         		    				 var aux = 0;
+         		    				if(this.Cmp[plt[i]].getValue()){
+         		    					aux = this.Cmp[plt[i]].getValue();
+         		    				} 
+         		    				this.Cmp[plt[i]].setValue(res[i] + aux);
+         		    				console.log(res[i], aux)
+         		    			}
+         		    			else{
+         		    				  this.Cmp[plt[i]].setValue(res[i]);
+         		    			}
+         		    		
+         		    			if(plt[i] == 'nit'){
+         		    				this.cargarRazonSocial();
+         		    			}
+         		    		}
+         		    		console.log(plt[i]);
+         		    	}
+         		    //}
+         		   // else{
+         		   // 	alert('la plantilla de array no se corresponde con el QR');
+         		  //  }
+         		  
+         		  this.calculaMontoPago();
+         		  
+         		          		
+         	}
+         	
+         	
+         },this);
+        
+       
+      
+         
         
        
 	},
@@ -1375,6 +1582,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	 },
 	
 	calculaMontoPago:function(){
+       
         var me = this, 
             descuento_ley = 0.00;  
                  
@@ -1395,10 +1603,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
         var porc_descuento = this.Cmp.porc_descuento.getValue();
         
-    	for (i = 0; i < me.megrid.store.getCount(); i++) {
-		    		record = me.megrid.store.getAt(i);		    		
-		    		record.set('precio_total_final', record.data.precio_total - (record.data.precio_total * porc_descuento) );
-		}
+        if(this.regitrarDetalle == 'si'){
+	    	for (i = 0; i < me.megrid.store.getCount(); i++) {
+			    		record = me.megrid.store.getAt(i);		    		
+			    		record.set('precio_total_final', record.data.precio_total - (record.data.precio_total * porc_descuento) );
+			}
+        }
         
         if(this.tmp_porc_monto_excento_var){
         	alert('ENTRA ...')
@@ -1457,27 +1667,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         }
         var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
         this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+        
+        
      }, 
-	cargarRazonSocial: function(obj){
-		//Busca en la base de datos la razon social en función del NIT digitado. Si Razon social no esta vacío, entonces no hace nada
-		if(this.getComponente('razon_social').getValue()==''){
-			Phx.CP.loadingShow();
-			Ext.Ajax.request({
-				url:'../../sis_contabilidad/control/DocCompraVenta/obtenerRazonSocialxAutorizacion',
-				params:{ 'nro_autorizacion': this.Cmp.nro_autorizacion.getValue()},
-				success: function(resp){
-					Phx.CP.loadingHide();
-			        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-			       
-			        var razonSocial=objRes.ROOT.datos.razon_social;
-			        this.getComponente('razon_social').setValue(razonSocial);
-				},
-				failure: this.conexionFailure,
-				timeout: this.timeout,
-				scope:this
-			});
-		}
-	},
+	
 	getDetallePorAplicar:function(id_plantilla){
         var data = this.getSelectedData();
            Phx.CP.loadingShow();
@@ -1595,8 +1788,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.id_gestion.setValue(this.data.id_gestion);
         this.Cmp.tipo.setValue(this.data.tipoDoc); 
         //load detalle de conceptos
-        this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
-        this.mestore.load()
+        if(this.regitrarDetalle == 'si'){
+	        this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
+	        this.mestore.load()
+        }
         
         
         	
@@ -1619,42 +1814,50 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	},
    
     onSubmit: function(o) {
-    	//  validar formularios
-        var arra = [], total_det = 0.0, i, me = this;
-        for (i = 0; i < me.megrid.store.getCount(); i++) {
-    		record = me.megrid.store.getAt(i);
-    		arra[i] = record.data;
-    		total_det = total_det + (record.data.precio_total)*1
-    		
-		}
-		
-		//si tiene conceptos eliminados es necesari oincluirlos ...
-		
-		
-		me.argumentExtraSubmit = { 'id_doc_conceto_elis': this.conceptos_eliminados.join(), 
-		                           'json_new_records': JSON.stringify(arra, function replacer(key, value) {
-   	    	           if (typeof value === 'string') {
-							        return String(value).replace(/&/g, "%26")
-							    }
-							    return value;
-							}) };
-							
-   	    if( i > 0 &&  !this.editorDetail.isVisible()){
-   	    	
-   	    	
-   	    
-   	    	
-   	    	if (total_det*1 == this.Cmp.importe_doc.getValue()){
-   	    		Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
-   	    	}
-   	    	else{
-   	    		alert('El total del detalle no cuadra con el total del documento');
-   	    	}
-   	    	
-   	    	
+    	 var me = this;
+    	 if(me.regitrarDetalle == 'si'){
+    		//  validar formularios
+	        var arra = [], total_det = 0.0, i;
+	        for (i = 0; i < me.megrid.store.getCount(); i++) {
+	    		record = me.megrid.store.getAt(i);
+	    		arra[i] = record.data;
+	    		total_det = total_det + (record.data.precio_total)*1
+	    		
+			}
+			
+			//si tiene conceptos eliminados es necesari oincluirlos ...
+			
+			
+			me.argumentExtraSubmit = { 'regitrarDetalle': me.regitrarDetalle,
+				                       'id_doc_conceto_elis': this.conceptos_eliminados.join(), 
+			                           'json_new_records': JSON.stringify(arra, function replacer(key, value) {
+	   	    	           if (typeof value === 'string') {
+								        return String(value).replace(/&/g, "%26")
+								    }
+								    return value;
+								}) };
+								
+	   	    if( i > 0 &&  !this.editorDetail.isVisible()){
+	   	    	
+	   	    	
+	   	    
+	   	    	
+	   	    	if (total_det*1 == this.Cmp.importe_doc.getValue()){
+	   	    		Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
+	   	    	}
+	   	    	else{
+	   	    		alert('El total del detalle no cuadra con el total del documento');
+	   	    	}
+	   	    	
+	   	    	
+	   	    }
+	   	    else{
+	   	    	alert('no tiene ningun concepto  en el documento')
+	   	    }
    	    }
    	    else{
-   	    	alert('no tiene ningun concepto  en el documento')
+   	    	me.argumentExtraSubmit = { 'regitrarDetalle': me.regitrarDetalle };
+   	    	Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
    	    }
    	},
    
@@ -1712,6 +1915,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
             if(reg.total == 1){
                	
            	  this.Cmp.id_plantilla.fireEvent('select',this.Cmp.id_plantilla, {data:reg.datos[0] }, 0);
+           	  this.Cmp.nro_autorizacion.fireEvent('change',this.Cmp.nro_autorizacion,this.data.datosOriginales.data.nro_autorizacion)
+        
+           	  
            }else{
                 alert('error al recuperar la plantilla para editar, actualice su navegador');
             }
@@ -1733,10 +1939,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					if (reg.ROOT.error) {
 						Ext.Msg.alert('Error','Error a recuperar la variable global')
 					} else {
-						if(reg.ROOT.conta_partidas != 'si'){
+						if(reg.ROOT.datos.valor != 'si'){
 						   me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas';
 						   me.parFilConcepto = 'desc_ingas';
 					    }
+					   
+					   
 						me.constructorEtapa2(config);
 					
 					}
@@ -1747,6 +1955,27 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			});
 		
 	},
+	
+	cargarRazonSocial: function(nit){
+		//Busca en la base de datos la razon social en función del NIT digitado. Si Razon social no esta vacío, entonces no hace nada
+		if(this.getComponente('razon_social').getValue()==''){
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/DocCompraVenta/obtenerRazonSocialxNIT',
+				params:{ 'nit': nit},
+				success: function(resp){
+					Phx.CP.loadingHide();
+			        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+			       
+			        var razonSocial=objRes.ROOT.datos.razon_social;
+			        this.getComponente('razon_social').setValue(razonSocial);
+				},
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope:this
+			});
+		}
+	}
     
    
     

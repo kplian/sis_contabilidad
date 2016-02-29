@@ -129,9 +129,9 @@ class MODDocConcepto extends MODbase{
 	
 	function verificarRelacionConcepto(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='conta.ft_doc_concepto_ime';
-		$this->transaccion='CONTA_VERCONCEP_IME';
-		$this->tipo_procedimiento='IME';
+		$this->procedimiento = 'conta.ft_doc_concepto_ime';
+		$this->transaccion = 'CONTA_VERCONCEP_IME';
+		$this->tipo_procedimiento = 'IME';
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');

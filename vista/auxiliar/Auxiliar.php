@@ -88,6 +88,7 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'auxcta.codigo_auxiliar',type:'string'},
+			bottom_filter : true,
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -103,6 +104,7 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'auxcta.nombre_auxiliar',type:'string'},
+			bottom_filter : true,
 			id_grupo:1,
 			grid:true,
 			form:true

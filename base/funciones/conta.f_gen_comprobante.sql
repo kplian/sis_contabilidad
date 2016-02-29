@@ -1,8 +1,7 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_tabla_valor integer,
   p_codigo varchar,
+  p_id_estado_wf integer,
   p_id_usuario integer = NULL::integer,
   p_id_usuario_ai integer = NULL::integer,
   p_usuario_ai varchar = NULL::character varying,
@@ -76,13 +75,26 @@ DECLARE
     v_sw_tipo_cambio 		varchar;
     v_registros 			record;
     v_registros_rel 		record;
-    v_glosa 		varchar;
+    v_glosa 					varchar;
+    v_codigo_proceso_macro   	varchar;
+    v_id_proceso_macro			integer;
+    v_codigo_tipo_proceso		varchar;
+    v_num_tramite				varchar;
+   
+    v_id_proceso_wf				integer;
+    v_id_estado_wf				integer;
+    v_codigo_estado   			varchar;
+    v_clcbt_desc  				varchar;
   
 BEGIN
 
     v_nombre_funcion:='conta.f_gen_comprobante';
     
     --recupero el record de la plantilla con el codigo (parametro) dado
+    
+    IF p_codigo is null THEN
+      raise exception 'El codigo de plantilla del cbte no puede ser nulo';
+    END IF; 
     
     select * into v_plantilla
 	from conta.tplantilla_comprobante cbte
@@ -123,15 +135,27 @@ BEGIN
     v_consulta = 'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'';
-      
-    execute	'select '||v_columnas ||
+            
+            
+            
+     IF v_plantilla.id_tabla is null or v_plantilla.id_tabla = '' THEN
+        raise exception 'defina un id para la tabla en la plantilla de comprobante';
+     END IF; 
+     
+     IF v_plantilla.tabla_origen is null or v_plantilla.tabla_origen = '' THEN
+        raise exception 'defina el nombre de la tabla origen de datos en la plantilla de comprobante';
+     END IF; 
+     
+     
+    -- raise exception 'llega .. % , % , % -',p_codigo, v_plantilla.tabla_origen,p_id_tabla_valor ;
+
+ execute	'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'' into v_tabla;
             
             
           
-    
-    
+   
     ----------------------------------------------------------
     --  OBTIENE LOS VALORES,  THIS   (tipo de dato agrupador)     
     ----------------------------------------------------------
@@ -240,7 +264,7 @@ BEGIN
                                                                   hstore(v_this), 
                                                                   hstore(v_tabla));
 	end if;    
-    
+
     --RCM: guardar id_cuenta_bancaria_mov
     if ( v_plantilla.campo_id_cuenta_bancaria_mov != ''  AND  v_plantilla.campo_id_cuenta_bancaria_mov is not null ) then
         v_this.columna_id_cuenta_bancaria_mov = conta.f_get_columna('maestro', 
@@ -309,7 +333,12 @@ BEGIN
     
   
     
-         Select  id_clase_comprobante  into   v_id_clase_comprobante 
+         Select  
+           cl.id_clase_comprobante ,
+           cl.descripcion 
+         into   
+           v_id_clase_comprobante,
+           v_clcbt_desc
          from  conta.tclase_comprobante cl 
          where cl.estado_reg = 'activo' 
             and cl.codigo =  v_plantilla.clase_comprobante::varchar;
@@ -333,45 +362,143 @@ BEGIN
     --deterinar si es temporal
     v_temporal = 'no';
     v_localidad = 'nacional';
+    
     IF p_sincronizar_internacional THEN
       v_temporal = 'si';
       v_localidad = 'internacional';
     END IF;
     
-    --  genera tabla intermedia de comrobante
+    
+    ----------------------
+    --  GESTION DEL WF
+    --   v_this.columna_nro_tramite 
+    ---------------------
+  
+    -- si el id_proceso_Wf es nulo  iniciamos tramite
+    IF p_id_estado_wf is null THEN
+    
+    
+                    IF  v_this.columna_nro_tramite is not NULL and  v_this.columna_nro_tramite != '' THEN
+                       raise exception 'Si viene de untra mite necesita especifica el id_proceso_wf en la función  generación del cbte';
+                    END IF;
+    
+                    --  inicia tramite nuevo 
+                    v_codigo_proceso_macro = pxp.f_get_variable_global('conta_codigo_macro_wf_cbte');
+                    --obtener id del proceso macro
+                    select 
+                     pm.id_proceso_macro
+                    into
+                     v_id_proceso_macro
+                    from wf.tproceso_macro pm
+                    where pm.codigo = v_codigo_proceso_macro;
+                   
+                    If v_id_proceso_macro is NULL THEN
+                      raise exception 'El proceso macro  de codigo % no esta configurado en el sistema WF',v_codigo_proceso_macro;  
+                    END IF;
+                   
+                   --   obtener el codigo del tipo_proceso
+                    select   tp.codigo 
+                     into v_codigo_tipo_proceso
+                    from  wf.ttipo_proceso tp 
+                    where   tp.id_proceso_macro = v_id_proceso_macro
+                          and tp.estado_reg = 'activo' and tp.inicio = 'si';
+                          
+                    IF v_codigo_tipo_proceso is NULL THEN
+                     raise exception 'No existe un proceso inicial para el proceso macro indicado % (Revise la configuración)',v_codigo_proceso_macro;
+                    END IF;
+                  
+                  -- inciar el tramite en el sistema de WF
+                    SELECT 
+                       ps_num_tramite ,
+                       ps_id_proceso_wf ,
+                       ps_id_estado_wf ,
+                       ps_codigo_estado 
+                      into
+                       v_num_tramite,
+                       v_id_proceso_wf,
+                       v_id_estado_wf,
+                       v_codigo_estado   
+                        
+                    FROM wf.f_inicia_tramite(
+                       p_id_usuario,
+                       p_id_usuario_ai,
+                       p_usuario_ai,
+                       v_rec_periodo.po_id_gestion, 
+                       v_codigo_tipo_proceso, 
+                       null,--v_parametros.id_funcionario,
+                       v_this.columna_depto::integer,
+                       'Registro de Cbte Automático',
+                       '' );        
+               
+               
+                    IF  v_codigo_estado != 'borrador' THEN
+                      raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
+                    END IF;
+      
+         
+    
+    ELSE
+        -- si no disparamos proceso de wf
+         
+            -----------------------------------
+            -- dispara el comprobante
+            ----------------------------------
+          
+             SELECT
+                           ps_id_proceso_wf,
+                           ps_id_estado_wf,
+                           ps_codigo_estado,
+                           ps_nro_tramite
+                 into
+                           v_id_proceso_wf,
+                           v_id_estado_wf,
+                           v_codigo_estado,
+                           v_num_tramite
+             FROM wf.f_registra_proceso_disparado_wf(
+                          p_id_usuario,
+                          p_id_usuario_ai,
+                          p_usuario_ai,
+                          p_id_estado_wf, 
+                          NULL,  --id_funcionario wf
+                          v_this.columna_depto::integer,
+                          'Registro de Cbte Automático',
+                          'CBTE','');
+                          
+                         
+    
+    END IF;
+    
+    ------------------------
+    --  INSERTA CBTE
+    ------------------------
+    
+    IF  v_id_proceso_wf is null THEN
+      raise exception 'Todo comprobante tiene que tener un proceso wf';
+    END IF;
     
    INSERT INTO 
       conta.tint_comprobante
     (
       id_usuario_reg,
-    
       fecha_reg,
-     
       estado_reg,
-     
       id_clase_comprobante,
       id_subsistema,
       id_depto,
       id_depto_libro,
       id_moneda,
       id_periodo,
-      --nro_cbte,
       momento,
       momento_comprometido,
       momento_ejecutado,
       momento_pagado,
       id_plantilla_comprobante,
       glosa1,
-      --glosa2,
       beneficiario,
       tipo_cambio,
-      --id_funcionario_firma1,
-      --id_funcionario_firma2,
-      --id_funcionario_firma3,
       fecha,
       funcion_comprobante_validado,
       funcion_comprobante_eliminado,
-      --funcion_comprobante_editado,
       id_cuenta_bancaria, 
       id_cuenta_bancaria_mov, 
       nro_cheque, 
@@ -383,7 +510,9 @@ BEGIN
       fecha_costo_ini,
       fecha_costo_fin,
       localidad,
-      sw_editable
+      sw_editable,
+      id_proceso_wf,
+      id_estado_wf
              
     ) 
     VALUES (
@@ -396,40 +525,42 @@ BEGIN
       v_this.columna_libro_banco::integer,
       v_this.columna_moneda::integer,
       v_rec_periodo.po_id_periodo,
-      --:nro_cbte,
       v_plantilla.momento_presupuestario, -- contable, o presupuestario
       v_plantilla.momento_comprometido,
       v_plantilla.momento_ejecutado,
       v_plantilla.momento_pagado,
       v_plantilla.id_plantilla_comprobante,
       v_this.columna_descripcion,
-      --:glosa2,
       v_this.columna_acreedor,
       v_tipo_cambio,
-      --:id_funcionario_firma1,
-      --:id_funcionario_firma2,
-      --:id_funcionario_firma3,
       v_this.columna_fecha,
       v_plantilla.funcion_comprobante_validado,
       v_plantilla.funcion_comprobante_eliminado,
-      --v_plantilla.funcion_comprobante_editado,
       v_this.columna_id_cuenta_bancaria, 
       v_this.columna_id_cuenta_bancaria_mov, 
       v_this.columna_nro_cheque, 
       v_this.columna_nro_cuenta_bancaria_trans,
-      v_this.columna_nro_tramite,
+      v_num_tramite, --v_this.columna_nro_tramite,  ya no se considera el nro de tramite de generador
       p_id_usuario_ai,
       p_usuario_ai,
       v_temporal,
       v_this.columna_fecha_costo_ini,
       v_this.columna_fecha_costo_fin,
       v_localidad,
-      'no'
+      'no',
+      v_id_proceso_wf,
+      v_id_estado_wf
       
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
     
-    raise notice '=====> AL INSERTAR  v_id_int_comprobante= %',  v_id_int_comprobante;
+                     
+    update wf.tproceso_wf p set
+      descripcion = descripcion||' ('||v_clcbt_desc||' id:'||v_id_int_comprobante::varchar||')'
+    where p.id_proceso_wf = v_id_proceso_wf;
+    
+     
+    
     -- genera transacciones del comprobante
     
     resp_det =  conta.f_gen_transaccion(hstore(v_this), 
@@ -460,10 +591,10 @@ BEGIN
      
     ----------------------------------------------------------------------
     --   Si la gestion de la fecha no correponde con la gestion del pago
-    --   se tiene que actulizar las cuentas, centros de costos y partidas
-    ------------------------------------------------------------------- --
+    --   se tiene que actualizar las cuentas, centros de costos y partidas
+    -----------------------------------------------------------------------
     
-    
+   
      IF v_this.columna_gestion !=  v_rec_periodo.po_id_gestion THEN
          
          IF not  conta.f_act_gestion_transaccion(
@@ -477,18 +608,16 @@ BEGIN
       
      END IF;
     
-    --------------------------------------------------------------
+    ------------------------------------------------------------
     -- migracion de comprobante a endesis o regionales  DBLINK
     ------------------------------------------------------------
     
     v_sincronizar = pxp.f_get_variable_global('sincronizar');
     
-       
-    
-    -- TODO ver el problema de conexion en estaciones internacioanles para tener rooback
+    -- ver el problema de conexion en estaciones internacionales para tener roollback
      
     --Si la sincronizacion esta habilitada
-    IF(v_sincronizar = 'true')THEN
+    IF (v_sincronizar = 'true') THEN
   	 	
         -- si sincroniza localmente con endesis
          IF(not p_sincronizar_internacional)THEN

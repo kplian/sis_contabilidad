@@ -1,5 +1,5 @@
 <?php
-/**
+/**   
 *@package pXP
 *@file gen-ACTDocCompraVenta.php
 *@author  (admin)
@@ -42,9 +42,6 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    
         }
 		
-		
-		
-		
 		if($this->objParam->getParametro('id_depto')!=''){
             $this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
         }
@@ -53,14 +50,11 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
         }
 		
-		
-		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODDocCompraVenta','listarDocCompraVenta');
 		} else{
-			$this->objFunc=$this->create('MODDocCompraVenta');
-			
+			$this->objFunc=$this->create('MODDocCompraVenta');			
 			$this->res=$this->objFunc->listarDocCompraVenta($this->objParam);
 		}
 		
@@ -76,12 +70,9 @@ class ACTDocCompraVenta extends ACTbase{
 			$temp['importe_pendiente'] = $this->res->extraData['tota_importe_pendiente'];
 			$temp['importe_neto'] = $this->res->extraData['total_importe_neto'];
 			$temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
-			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];
-			
+			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];			
 			$temp['tipo_reg'] = 'summary';
-			$temp['id_int_doc_compra_venta'] = 0;
-			
-			
+			$temp['id_doc_compra_venta'] = 0;
 			
 			
 			$this->res->total++;
@@ -122,6 +113,14 @@ class ACTDocCompraVenta extends ACTbase{
 		$this->res=$this->objFunc->modificarBasico($this->objParam);		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function obtenerRazonSocialxNIT(){
+		$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->res=$this->objFunc->obtenerRazonSocialxNIT($this->objParam);		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	
 	
 	/*
 	 * Author:  		 RAC - KPLIAN
@@ -211,11 +210,13 @@ class ACTDocCompraVenta extends ACTbase{
 	
 	
 	function reporteLCV(){
+		
 			
 		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
 		$dataSource = $this->recuperarDatosLCV();
 		$dataEntidad = $this->recuperarDatosEntidad();
-		$dataPeriodo = $this->recuperarDatosPeriodo();	
+		$dataPeriodo = $this->recuperarDatosPeriodo();
+		
 		
 		
 		//parametros basicos
@@ -226,8 +227,7 @@ class ACTDocCompraVenta extends ACTbase{
 		
 		$this->objParam->addParametro('orientacion',$orientacion);
 		$this->objParam->addParametro('tamano',$tamano);		
-		$this->objParam->addParametro('titulo_archivo',$titulo);	
-        
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 		
 		//Instancia la clase de pdf
@@ -249,6 +249,114 @@ class ACTDocCompraVenta extends ACTbase{
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		
+	}
+
+    function exportarTxtLcvLCV(){
+		
+		//crea el objetoFunProcesoMacro que contiene todos los metodos del sistema de workflow
+		$this->objFun=$this->create('MODDocCompraVenta');		
+		
+		$this->res = $this->objFun->listarRepLCV();
+		
+		if($this->res->getTipo()=='ERROR'){
+			$this->res->imprimirRespuesta($this->res->generarJson());
+			exit;
+		}
+		
+		$nombreArchivo = $this->crearArchivoExportacion($this->res, $this->objParam);
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Se genero con exito el archivo LCV'.$nombreArchivo,
+										'Se genero con exito el archivo LCV'.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		
+		$this->res->imprimirRespuesta($this->mensajeExito->generarJson());
+
+	}
+	
+	function crearArchivoExportacion($res, $Obj) {
+		
+		/*******************************
+		 *  FORMATEA NOMBRE DE ARCHIVO
+		 * compras_MMAAAA_NIT.txt     
+		 * o    
+		 * ventas_MMAAAA_NIT.txt
+		 * 
+		 * ********************************/
+		 
+		$dataEntidad = $this->recuperarDatosEntidad();
+		$dataEntidadArray = $dataEntidad->getDatos();
+		$NIT = 	$dataEntidadArray['nit'];
+		
+		$dataPeriodo = $this->recuperarDatosPeriodo();
+		$dataPeriodoArray = $dataPeriodo->getDatos();
+		$sufijo = $dataPeriodoArray['periodo'].$dataPeriodoArray['gestion'];
+		
+		
+		 if($Obj->getParametro('tipo') == 'compra'){
+		 	 $nombre = 'compras_'.$sufijo.'_'.$NIT;
+		 }
+		 else{
+		 	 $nombre = 'ventas_'.$sufijo.'_'.$NIT;
+		 }
+		
+		$data = $res -> getDatos();
+		$fileName = $nombre.'.txt';
+		//create file
+		$file = fopen("../../../reportes_generados/$fileName", 'w');
+		$ctd = 1;
+		
+		foreach ($data as $val) {			
+			
+			 $newDate = date("d/m/Y", strtotime( $val['fecha']));			 
+			 if($Obj->getParametro('tipo') == 'compra'){
+			 	
+					fwrite ($file,  "1|".
+				 	                $ctd."|".
+			                        $newDate."|".
+			                        $val['nit']."|".
+			                        $val['razon_social']."|".
+			                        $val['nro_documento']."|".
+									$val['nro_dui']."|".
+			                        $val['nro_autorizacion']."|".
+			                        $val['importe_doc']."|".
+			                        $val['total_excento']."|".
+									$val['subtotal']."|".
+									$val['importe_descuento']."|".
+									$val['sujeto_cf']."|".
+									$val['importe_iva']."|".
+									$val['codigo_control']."|".
+			                        $val['tipo_doc']."\r\n");
+		              			
+			 }
+			 else{
+				 	fwrite ($file,  "3|".
+				 	        $ctd."|".
+	                        $newDate."|".
+	                        $val['nro_documento']."|".
+	                        $val['nro_autorizacion']."|".         
+							$val['tipo_doc']."|".
+	                        $val['nit']."|".        
+	                        $val['razon_social']."|".       
+	                        $val['importe_doc']."|".
+	                        $val['importe_ice']."|".            
+	                        $val['importe_excento']."|".
+	                        $val['venta_gravada_cero']."|".       
+	                        $val['subtotal_venta']."|".     
+	                        $val['importe_descuento']."|".      
+	                        $val['sujeto_df']."|".     
+	                        $val['importe_iva']."|".    
+	                        $val['codigo_control']."\r\n");
+						
+				
+			 }
+			 
+			 	  		
+			 $ctd = $ctd + 1;
+         } //end for
+		
+		fclose($file);
+		return $fileName;
 	}
 	
 	

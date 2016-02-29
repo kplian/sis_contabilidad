@@ -77,7 +77,7 @@ BEGIN
                   p_sw_nro_dui,
                   p_sw_ic,
                   p_tipo_excento,
-                  p_valor_excento,
+                  p_valor_excento::numeric,
                   p_tipo_informe
   							
               );
@@ -99,7 +99,7 @@ BEGIN
                 sw_nro_dui = p_sw_nro_dui,
                 sw_ic = p_sw_ic,
                 tipo_excento = p_tipo_excento,
-                valor_excento =   p_valor_excento,
+                valor_excento =   p_valor_excento::numeric,
                 tipo_informe =  p_tipo_informe
 			where id_plantilla=v_id_plantilla;       	
         end if;

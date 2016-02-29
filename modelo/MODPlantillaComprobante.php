@@ -57,10 +57,10 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('campo_fecha_costo_ini','text');
 		$this->captura('campo_fecha_costo_fin','text');
 		$this->captura('funcion_comprobante_editado','text');
+		$this->captura('funcion_comprobante_prevalidado','text');
+		$this->captura('funcion_comprobante_validado_eliminado','text');
 		
-        
-		
-		//Ejecuta la instruccion
+        //Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 		
@@ -108,6 +108,8 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_fecha_costo_ini','campo_fecha_costo_ini','text');
 		$this->setParametro('campo_fecha_costo_fin','campo_fecha_costo_fin','text');
 		$this->setParametro('funcion_comprobante_editado','funcion_comprobante_editado','text');
+		$this->setParametro('funcion_comprobante_prevalidado','funcion_comprobante_prevalidado','text');
+		$this->setParametro('funcion_comprobante_validado_eliminado','funcion_comprobante_validado_eliminado','text');
 		
 		
 		
@@ -161,6 +163,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('campo_fecha_costo_ini','campo_fecha_costo_ini','text');
 		$this->setParametro('campo_fecha_costo_fin','campo_fecha_costo_fin','text');
 		$this->setParametro('funcion_comprobante_editado','funcion_comprobante_editado','text');
+		$this->setParametro('funcion_comprobante_prevalidado','funcion_comprobante_prevalidado','text');
+		$this->setParametro('funcion_comprobante_validado_eliminado','funcion_comprobante_validado_eliminado','text');
+		
 		
         
 		//Ejecuta la instruccion
