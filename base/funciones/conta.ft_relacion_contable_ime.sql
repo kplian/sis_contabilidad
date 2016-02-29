@@ -59,6 +59,17 @@ BEGIN
             from conta.ttipo_relacion_contable trc 
             where trc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable;
             
+            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
+            
+               v_defecto =  v_parametros.defecto;
+        
+            ELSE
+            
+               v_defecto = 'no';
+            
+            
+            END IF;
+            
             --si_unico solo permite un centro de costo para el id_tabla
 	    IF v_tipo_rel.tiene_centro_costo IN ('si-unico') THEN
             
@@ -77,7 +88,7 @@ BEGIN
             
             END IF;
             --si_general permite  centro de costo para el id_tabla
-            IF (v_tipo_rel.tiene_centro_costo IN ('si-general') and v_parametros.defecto = 'no' )THEN
+            IF (v_tipo_rel.tiene_centro_costo IN ('si-general') and v_defecto = 'no' )THEN
             
             
                IF  EXISTS(select  1 
@@ -107,18 +118,6 @@ BEGIN
             
             END IF;
             
-            
-            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
-            
-               v_defecto =  v_parametros.defecto;
-        
-            ELSE
-            
-               v_defecto = 'no';
-            
-            
-            END IF;
-       
             
             IF  v_defecto = 'si'   THEN
              --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
