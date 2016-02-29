@@ -166,7 +166,7 @@ BEGIN
       -- si no es una relacion devengado pago procesa la plantilla normalmente
            
       
-          
+           
       
            --si el monto es cero saltamos el proceso, ya que no se generan transacciones
            
@@ -174,22 +174,56 @@ BEGIN
            
            
                   
-                      /******************************************************************  
-                       -- si no tiene centro_costo lo obtiene a partir del depto de conta---
-                      *********************************************************************/
+                      /*********************************************************************************************************************  
+                       -- si no tiene centro_costo lo obtiene a partir del depto de conta O del relacion contable configurada
+                      ****************************************************************************************************************/
                        
                         IF (v_this_hstore->'campo_centro_costo') ='' or (v_this_hstore->'campo_centro_costo'='NULL') or (v_this_hstore->'campo_centro_costo') is NULL THEN 
                            
-                               SELECT 
-                                  ps_id_centro_costo 
-                                 into 
-                                   v_id_centro_costo_depto 
-                               FROM conta.f_get_config_relacion_contable('CCDEPCON', -- relacion contable que almacena los centros de costo por departamento
+                             
+                               
+                               IF (v_this_hstore->'campo_relacion_contable_cc') ='' or (v_this_hstore->'campo_relacion_contable_cc'='NULL') or (v_this_hstore->'campo_relacion_contable_cc') is NULL THEN 
+                                    
+                                    /******************************************************************  
+                                      -- si no tiene centro_costo lo obtiene a partir del depto de conta---
+                                    *********************************************************************/
+                                    
+                                     SELECT 
+                                        ps_id_centro_costo 
+                                     into 
+                                         v_id_centro_costo_depto 
+                                     FROM conta.f_get_config_relacion_contable('CCDEPCON', -- relacion contable que almacena los centros de costo por departamento
                                                                          (p_super->'columna_gestion')::integer,  
                                                                          (p_super->'columna_depto')::integer,--p_id_depto_conta 
                                                                          NULL);  --id_dento_costo
                                                                              
-                               v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
+                                     v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
+                                
+                                
+                                ELSE
+                                
+                                    --raise exception '%, %,%',(v_this_hstore->'campo_relacion_contable_cc'),(p_super->'columna_gestion'),(p_reg_det_plantilla->'tipo_relacion_contable_cc');
+                               
+                                     SELECT 
+                                        ps_id_centro_costo 
+                                     into 
+                                         v_id_centro_costo_depto 
+                                     FROM conta.f_get_config_relacion_contable((p_reg_det_plantilla->'tipo_relacion_contable_cc')::varchar, -- relacion contable que almacena los centros de costo por departamento
+                                                                         (p_super->'columna_gestion')::integer,  
+                                                                         (v_this_hstore->'campo_relacion_contable_cc')::integer, 
+                                                                         NULL);  --id_dento_costo
+                                                                             
+                                     v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
+                                
+                                
+                                
+                                
+                                END IF; 
+                                
+                                
+                               
+                               
+                              
                           
                           END IF;
                        
@@ -296,7 +330,7 @@ BEGIN
                        --  CALCULO SIMPLE
                        -----------------------
                        
-                    
+                   
                        
                        IF (p_reg_det_plantilla->'forma_calculo_monto') = 'simple' THEN
                        
@@ -493,7 +527,8 @@ BEGIN
                   
                 
               
-               
+              --  raise exception '%...%', v_record_int_tran.importe_debe,v_record_int_tran.importe_haber;
+                
                      
                       /**********************************************
                       -- IF , se  aplica el documento si esta activo --
@@ -552,6 +587,7 @@ BEGIN
                            END IF;
                        ELSE
                        
+                      
                             
                            --inserta transaccion en tabla solo si tiene un monto maor a cero y dintinto de NULL
                            
@@ -586,7 +622,7 @@ BEGIN
            
         END IF; --FIN RELACION DVENGADO PAGO     
        
-    
+   
     return v_resp;
     
 EXCEPTION

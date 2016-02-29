@@ -79,6 +79,7 @@ BEGIN
                         'campo_orden_trabajo',
                         'campo_partida_ejecucion',
                         'campo_relacion_contable',
+                        'campo_relacion_contable_cc',
                         'campo_documento',
                         'otros_campos',
                         'campo_monto_pres',
@@ -126,11 +127,11 @@ BEGIN
                         ||(p_reg_det_plantilla->'tabla_detalle')||'.'||(p_reg_det_plantilla->'nom_fk_tabla_maestro')||'='||COALESCE(p_id_tabla_padre_valor,0);
          
        
-        
+       
         --  FOR, para todos los cada registro que satisfaga la consulta de la tabla detalle
         --   procesamos los valores
         FOR v_tabla in EXECUTE(v_consulta_tab) LOOP
-              --raise exception '%',v_tabla;
+             
               
               v_resp = conta.f_gen_transaccion_from_plantilla(
                                               p_super,    --p_super
