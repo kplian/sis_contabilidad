@@ -3131,5 +3131,32 @@ ALTER TABLE conta.tdoc_compra_venta
 
 COMMENT ON COLUMN conta.tdoc_compra_venta.id_tipo_doc_compra_venta
 IS 'dato para el reporte LCD de impuestos';
+
 /***********************************F-SCP-RAC-CONTA-0-22/02/2016****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-03/08/2016****************************************/
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_relacion_contable_cc TEXT;
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_relacion_contable_cc
+IS 'sirve para parametrizar el campo de la relacion contable para obtener el centro de costo';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN tipo_relacion_contable_cc VARCHAR(255);
+
+--------------- SQL ---------------
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.tipo_relacion_contable_cc
+IS 'relacion contable par ael calculo de centro de costo';
+
+/***********************************F-SCP-RAC-CONTA-0-03/08/2016****************************************/
+
+
+
+
 

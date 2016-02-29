@@ -224,6 +224,65 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		{
+            config: {
+                name: 'tipo_relacion_contable_cc',
+                fieldLabel: 'Relación CC',
+                qtip:'Relacion contable "unica" para conseguir el centro de costo, si es nulo o vacio no se opera, se ejecuta solo si no se tiene un campo  para centro de costo ya definido',
+                allowBlank: true,
+                emptyText: 'Elija Relación Contable...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_contabilidad/control/TipoRelacionContable/listarTipoRelacionContable',
+                    id: 'id_tipo_relacion_contable',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'codigo_tipo_relacion',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_tipo_relacion_contable','codigo_tipo_relacion','nombre_tipo_relacion'],
+                    remoteSort: true,
+                    baseParams: {par_filtro:'tiprelco.codigo_tipo_relacion#tiprelco.nombre_tipo_relacion'}
+                }),
+                valueField: 'codigo_tipo_relacion',
+                displayField: 'codigo_tipo_relacion',
+                gdisplayField: 'codigo_tipo_relacion',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>Código: {codigo_tipo_relacion}</p><p>Nombre: {nombre_tipo_relacion}</p></div></tpl>',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 20,
+                queryDelay: 100,
+                anchor: '100%',
+                gwidth: 120,
+                minChars: 2
+            },
+            type: 'ComboBox',
+            filters:{pfiltro:'cmpbdet.tipo_relacion_contable_cc',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+			config:{
+				name: 'campo_relacion_contable_cc',
+				fieldLabel: 'Campo Relacion CC',
+				qtip:'Define el campo llave para obtener la relacion contable del centro de costo',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_relacion_contable_cc',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+        
+        
+		{
 			config:{
 				name: 'campo_centro_costo',
 				fieldLabel: 'Campo Centro Costo',
@@ -832,7 +891,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_porc_monto_excento_var',
         {name:'campo_nombre_cheque_trans', type: 'string'},
         'prioridad_documento',
-        'campo_orden_trabajo','campo_forma_pago','codigo'
+        'campo_orden_trabajo','campo_forma_pago','codigo','tipo_relacion_contable_cc','campo_relacion_contable_cc'
 		
 	],
 	sortInfo:{
