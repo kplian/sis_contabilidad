@@ -1033,8 +1033,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					validator: function(v) {
 				      return /^0|^([A-Fa-f0-9]{2,2}\-)*[A-Fa-f0-9]{2,2}$/i.test(v)? true : 'Entered text must be of the form xx-xx, where x represent digits 0-9.';
 				    },
-					maskRe: /[0-9ABCDFG/-]+/i,
-					regex: /[0-9ABCDFG/-]+/i
+					maskRe: /[0-9ABCDEF/-]+/i,
+					regex: /[0-9ABCDEF/-]+/i
 				},
 					type:'TextField',
 					id_grupo:1,
