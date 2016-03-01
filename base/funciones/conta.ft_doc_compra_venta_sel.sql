@@ -66,7 +66,7 @@ BEGIN
                             COALESCE(dcv.importe_descuento,0)::numeric as importe_descuento,
                             COALESCE(dcv.importe_doc,0)::numeric as importe_doc,
                             dcv.sw_contabilizar,
-                            dcv.tabla_origen,
+                            COALESCE(dcv.tabla_origen,''ninguno'') as tabla_origen,
                             dcv.estado,
                             dcv.id_depto_conta,
                             dcv.id_origen,

@@ -108,6 +108,7 @@ BEGIN
                         and dcv.id_moneda = v_parametros.id_moneda
                         and dcv.manual = 'si'   --solo documentos registrdos manaulmente
                         and dcv.id_int_comprobante is NULL  --solo documentos que no esten en ningun comprobante
+                        and dcv.tabla_origen is null  --solo los documentos registrados en libro de compras o ventas
                         and  (
                                  (v_parametros.incluir_rev = 'si' and dcv.revisado = 'si') 
                               or 

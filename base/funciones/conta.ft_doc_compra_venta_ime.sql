@@ -321,7 +321,7 @@ BEGIN
               nro_documento = v_parametros.nro_documento,
               nit = v_parametros.nit,
               importe_ice = v_importe_ice,
-              nro_autorizacion =  upper(COALESCE(v_parametros.codigo_control,'0')),
+              nro_autorizacion =  upper(COALESCE(v_parametros.nro_autorizacion,'0')),
               importe_iva = v_parametros.importe_iva,
               importe_descuento = v_parametros.importe_descuento,
               importe_descuento_ley = v_parametros.importe_descuento_ley,
@@ -329,7 +329,7 @@ BEGIN
               importe_doc = v_parametros.importe_doc,
               id_depto_conta = v_parametros.id_depto_conta,  			
               obs = v_parametros.obs,
-              codigo_control = v_parametros.codigo_control,
+              codigo_control =  upper(COALESCE(v_parametros.codigo_control,'0')),
               importe_it = v_parametros.importe_it,
               razon_social = upper(trim(v_parametros.razon_social)),
               id_periodo = v_rec.po_id_periodo,
@@ -499,10 +499,11 @@ BEGIN
             from conta.tdoc_concepto dc
             where dc.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
             
-            IF v_sum_total != v_registros.importe_doc  THEN
+            IF COALESCE(v_sum_total,0) !=  COALESCE(v_registros.importe_doc,0)  THEN
                raise exception 'el total del documento no iguala con el total detallado de conceptos';
             END IF;
-               
+            
+           
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cuadra el documento insertado'); 
             v_resp = pxp.f_agrega_clave(v_resp,'sum_total',v_sum_total::varchar);
