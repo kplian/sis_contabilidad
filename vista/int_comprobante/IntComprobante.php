@@ -22,8 +22,6 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.init();
 			//this.load({params:{start:0, limit:this.tam_pag}});
 
-			
-
 			//Botón para Imprimir el Comprobante
 			this.addButton('btnImprimir', {
 				text : 'Imprimir',

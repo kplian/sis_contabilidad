@@ -15,6 +15,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     tam_pag: 10,
     tabEnter: true,
     mostrarFormaPago : true,
+    regitrarDetalle: 'si',
     //layoutType: 'wizard',
     layout: 'fit',
     autoScroll: false,
@@ -38,13 +39,27 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     
     constructorEtapa2:function(config)
     {   
-    	this.buildComponentesDetalle();
-        this.buildDetailGrid();
+    	
+    	
+    	if(this.regitrarDetalle == 'si'){
+    		this.buildComponentesDetalle();
+            this.buildDetailGrid();
+    	}
+    	
         this.buildGrupos();        
+       
+        
         Phx.vista.FormCompraVenta.superclass.constructor.call(this,config);
-        this.init();    
+        
+        this.init(); 
+       
+        
         this.iniciarEventos();
-        this.iniciarEventosDetalle();
+       
+        if(this.regitrarDetalle == 'si'){
+          this.iniciarEventosDetalle();
+        }
+        
         if(this.data.tipo_form == 'new'){
         	this.onNew();
         }
@@ -52,7 +67,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         	this.onEdit();
         }
         
-        if(this.data.readOnly===true){
+        if(this.data.readOnly===true && this.regitrarDetalle == 'si'){
         	for(var index in this.Cmp) { 
 					if( this.Cmp[index].setReadOnly){
 					    	 this.Cmp[index].setReadOnly(true);
@@ -538,7 +553,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                 });
     },
     buildGrupos: function(){
-    	this.Grupos = [{
+    	var me = this;
+    	if(me.regitrarDetalle == 'si'){
+    		me.Grupos = [{
     	           	    layout: 'border',
     	           	    border: false,
     	           	    frame:  true,
@@ -619,9 +636,88 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 		                         }
     	                      ]
     	                  },
-    	                    this.megrid
+    	                     me.megrid
                          ]
-                 }];
+                 }];	
+    	}
+    	else{
+    		me.Grupos = [{
+                        	xtype: 'fieldset',
+	                        border: false,
+	                        split: true,
+	                        layout: 'column',
+	                        autoScroll: true,
+	                        autoHeight: true,
+	                        collapseFirst : false,
+	                        collapsible: true,
+	                        collapseMode : 'mini',
+	                        width: '100%',
+	                        padding: '0 0 0 10',
+	    	                items:[
+		    	                   {
+							        bodyStyle: 'padding-right:5px;',
+							        width: '33%',
+							        autoHeight: true,
+							        border: true,
+							        items:[
+			    	                   {
+			                            xtype: 'fieldset',
+			                            frame: true,
+			                            border: false,
+			                            layout: 'form',	
+			                            title: 'Tipo',
+			                            width: '100%',
+			                            
+			                            //margins: '0 0 0 5',
+			                            padding: '0 0 0 10',
+			                            bodyStyle: 'padding-left:5px;',
+			                            id_grupo: 0,
+			                            items: [],
+			                         }]
+			                     },
+			                     {
+			                      bodyStyle: 'padding-right:5px;',
+			                      width: '33%',
+			                      border: true,
+			                      autoHeight: true,
+							      items: [{
+			                            xtype: 'fieldset',
+			                            frame: true,
+			                            layout: 'form',
+			                            title: ' Datos básicos ',
+			                            width: '100%',
+			                            border: false,
+			                            //margins: '0 0 0 5',
+			                            padding: '0 0 0 10',
+			                            bodyStyle: 'padding-left:5px;',
+			                            id_grupo: 1,
+			                            items: [],
+			                         }]
+		                         },
+			                     {
+			                      bodyStyle: 'padding-right:2px;',
+			                      width: '33%',
+			                      border: true,
+			                      autoHeight: true,
+							      items: [{
+			                            xtype: 'fieldset',
+			                            frame: true,
+			                            layout: 'form',
+			                            title: 'Detalle de pago',
+			                            width: '100%',
+			                            border: false,
+			                            //margins: '0 0 0 5',
+			                            padding: '0 0 0 10',
+			                            bodyStyle: 'padding-left:2px;',
+			                            id_grupo: 2,
+			                            items: [],
+			                         }]
+		                         }
+    	                      ]
+    	                  }];	
+    	}
+    	
+    	
     	
     	
     },
@@ -1383,6 +1479,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	 },
 	
 	calculaMontoPago:function(){
+       
         var me = this, 
             descuento_ley = 0.00;  
                  
@@ -1403,10 +1500,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
         var porc_descuento = this.Cmp.porc_descuento.getValue();
         
-    	for (i = 0; i < me.megrid.store.getCount(); i++) {
-		    		record = me.megrid.store.getAt(i);		    		
-		    		record.set('precio_total_final', record.data.precio_total - (record.data.precio_total * porc_descuento) );
-		}
+        if(this.regitrarDetalle == 'si'){
+	    	for (i = 0; i < me.megrid.store.getCount(); i++) {
+			    		record = me.megrid.store.getAt(i);		    		
+			    		record.set('precio_total_final', record.data.precio_total - (record.data.precio_total * porc_descuento) );
+			}
+        }
         
         if(this.tmp_porc_monto_excento_var){
         	alert('ENTRA ...')
@@ -1465,6 +1564,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         }
         var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
         this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+        
+        
      }, 
 	cargarRazonSocial: function(obj){
 		//Busca en la base de datos la razon social en función del NIT digitado. Si Razon social no esta vacío, entonces no hace nada
@@ -1603,9 +1704,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.id_gestion.setValue(this.data.id_gestion);
         this.Cmp.tipo.setValue(this.data.tipoDoc); 
         //load detalle de conceptos
-        this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
-        this.mestore.load()
-       
+        if(this.regitrarDetalle == 'si'){
+	        this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
+	        this.mestore.load()
+        }
         
         
         	
@@ -1628,42 +1730,50 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	},
    
     onSubmit: function(o) {
-    	//  validar formularios
-        var arra = [], total_det = 0.0, i, me = this;
-        for (i = 0; i < me.megrid.store.getCount(); i++) {
-    		record = me.megrid.store.getAt(i);
-    		arra[i] = record.data;
-    		total_det = total_det + (record.data.precio_total)*1
-    		
-		}
-		
-		//si tiene conceptos eliminados es necesari oincluirlos ...
-		
-		
-		me.argumentExtraSubmit = { 'id_doc_conceto_elis': this.conceptos_eliminados.join(), 
-		                           'json_new_records': JSON.stringify(arra, function replacer(key, value) {
-   	    	           if (typeof value === 'string') {
-							        return String(value).replace(/&/g, "%26")
-							    }
-							    return value;
-							}) };
-							
-   	    if( i > 0 &&  !this.editorDetail.isVisible()){
-   	    	
-   	    	
-   	    
-   	    	
-   	    	if (total_det*1 == this.Cmp.importe_doc.getValue()){
-   	    		Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
-   	    	}
-   	    	else{
-   	    		alert('El total del detalle no cuadra con el total del documento');
-   	    	}
-   	    	
-   	    	
+    	 var me = this;
+    	 if(me.regitrarDetalle == 'si'){
+    		//  validar formularios
+	        var arra = [], total_det = 0.0, i;
+	        for (i = 0; i < me.megrid.store.getCount(); i++) {
+	    		record = me.megrid.store.getAt(i);
+	    		arra[i] = record.data;
+	    		total_det = total_det + (record.data.precio_total)*1
+	    		
+			}
+			
+			//si tiene conceptos eliminados es necesari oincluirlos ...
+			
+			
+			me.argumentExtraSubmit = { 'regitrarDetalle': me.regitrarDetalle,
+				                       'id_doc_conceto_elis': this.conceptos_eliminados.join(), 
+			                           'json_new_records': JSON.stringify(arra, function replacer(key, value) {
+	   	    	           if (typeof value === 'string') {
+								        return String(value).replace(/&/g, "%26")
+								    }
+								    return value;
+								}) };
+								
+	   	    if( i > 0 &&  !this.editorDetail.isVisible()){
+	   	    	
+	   	    	
+	   	    
+	   	    	
+	   	    	if (total_det*1 == this.Cmp.importe_doc.getValue()){
+	   	    		Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
+	   	    	}
+	   	    	else{
+	   	    		alert('El total del detalle no cuadra con el total del documento');
+	   	    	}
+	   	    	
+	   	    	
+	   	    }
+	   	    else{
+	   	    	alert('no tiene ningun concepto  en el documento')
+	   	    }
    	    }
    	    else{
-   	    	alert('no tiene ningun concepto  en el documento')
+   	    	me.argumentExtraSubmit = { 'regitrarDetalle': me.regitrarDetalle };
+   	    	Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
    	    }
    	},
    
@@ -1758,7 +1868,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 				scope:this
 			});
 		
-	},
+	}
     
    
     

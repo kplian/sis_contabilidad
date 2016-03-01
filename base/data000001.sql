@@ -1437,7 +1437,15 @@ VALUES
   
 /***********************************F-DAT-RAC-CONTA-0-22/02/2016****************************************/
 
+ 
+/***********************************I-DAT-RAC-CONTA-0-29/02/2016****************************************/
+ 
   
+/* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
 
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_libro_compras_detallado', E'si', E'Si la interface de libro de compras permite el registro del detalle de la factura');
 
-
+/***********************************F-DAT-RAC-CONTA-0-29/02/2016****************************************/
+ 
