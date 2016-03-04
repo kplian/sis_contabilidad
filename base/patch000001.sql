@@ -3264,4 +3264,19 @@ IS 'relacion contable par ael calculo de centro de costo';
 
 
 
+/***********************************I-SCP-RAC-CONTA-0-31/08/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN orden NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.orden
+IS 'este campo define el orden de impresion, inicialmente se copia el id, pero al ser nuemric permite mover el orden usando decimales';
+
+
+/***********************************F-SCP-RAC-CONTA-0-31/08/2016****************************************/
+
+
+
 
