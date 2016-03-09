@@ -42,9 +42,6 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    
         }
 		
-		
-		
-		
 		if($this->objParam->getParametro('id_depto')!=''){
             $this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
         }
@@ -53,14 +50,11 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
         }
 		
-		
-		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODDocCompraVenta','listarDocCompraVenta');
 		} else{
-			$this->objFunc=$this->create('MODDocCompraVenta');
-			
+			$this->objFunc=$this->create('MODDocCompraVenta');			
 			$this->res=$this->objFunc->listarDocCompraVenta($this->objParam);
 		}
 		
@@ -76,12 +70,9 @@ class ACTDocCompraVenta extends ACTbase{
 			$temp['importe_pendiente'] = $this->res->extraData['tota_importe_pendiente'];
 			$temp['importe_neto'] = $this->res->extraData['total_importe_neto'];
 			$temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
-			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];
-			
+			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];			
 			$temp['tipo_reg'] = 'summary';
 			$temp['id_int_doc_compra_venta'] = 0;
-			
-			
 			
 			
 			$this->res->total++;

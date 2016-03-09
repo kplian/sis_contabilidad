@@ -798,6 +798,75 @@ class MODDocCompraVenta extends MODbase{
 		return $this->respuesta;
 	}
 
+     function listarRepLCVForm(){
+		  //Definicion de variables para ejecucion del procedimientp
+		  $this->procedimiento='conta.ft_doc_compra_venta_sel';
+		  $this->transaccion='CONTA_REPLCV_FRM';
+		  $this->tipo_procedimiento='SEL';//tipo de transaccion
+		  $this->setCount(false);	
+		
+		  
+		  $this->setParametro('filtro_sql','filtro_sql','VARCHAR');
+		  $this->setParametro('id_periodo','id_periodo','INTEGER');
+		  $this->setParametro('tipo_lcv','tipo_lcv','VARCHAR');
+		 $this->setParametro('fecha_ini','fecha_ini','date');
+		  $this->setParametro('fecha_fin','fecha_fin','date');
+		   
+		   
+		  //captura parametros adicionales para el count
+		 /* $this->setParametro('id_gestion','id_gestion','INTEGER');
+		  
+		  $this->setParametro('id_entidad','id_entidad','INTEGER');
+		  
+		  $this->setParametro('tipo','tipo','VARCHAR');
+		 
+		  $this->setParametro('fecha_ini','fecha_ini','date');
+		  $this->setParametro('fecha_fin','fecha_fin','date');*/
+		
+		  //Definicion de la lista del resultado del query
+		  
+		  
+		  $this->captura('id_doc_compra_venta','BIGINT');
+		  $this->captura('tipo','VARCHAR');
+		  $this->captura('fecha','DATE');
+		  $this->captura('nit','VARCHAR');
+		  $this->captura('razon_social','VARCHAR');
+		  $this->captura('nro_documento','VARCHAR');
+		  $this->captura('nro_dui','VARCHAR');
+		  $this->captura('nro_autorizacion','VARCHAR');
+		  $this->captura('importe_doc','NUMERIC');
+		  $this->captura('total_excento','NUMERIC');
+		  $this->captura('sujeto_cf','NUMERIC');
+		  $this->captura('importe_descuento','NUMERIC');
+		  $this->captura('subtotal','NUMERIC');
+		  $this->captura('credito_fiscal','NUMERIC');
+		  $this->captura('importe_iva','NUMERIC');
+		  $this->captura('codigo_control','VARCHAR');
+		  $this->captura('tipo_doc','VARCHAR');
+		  $this->captura('id_plantilla','INTEGER');
+		  $this->captura('id_moneda','INTEGER');
+		  $this->captura('codigo_moneda','VARCHAR');
+		  $this->captura('id_periodo','INTEGER');
+		  $this->captura('id_gestion','INTEGER');
+		  $this->captura('periodo','INTEGER');
+		  $this->captura('gestion','INTEGER');
+		  $this->captura('venta_gravada_cero','NUMERIC');
+          $this->captura('subtotal_venta','NUMERIC');
+          $this->captura('sujeto_df','NUMERIC');
+		  $this->captura('importe_ice','NUMERIC');
+		  $this->captura('importe_excento','NUMERIC');
+		  
+		              
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 			
 }
 ?>
