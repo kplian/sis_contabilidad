@@ -202,11 +202,13 @@ class ACTDocCompraVenta extends ACTbase{
 	
 	
 	function reporteLCV(){
+		
 			
 		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
 		$dataSource = $this->recuperarDatosLCV();
 		$dataEntidad = $this->recuperarDatosEntidad();
-		$dataPeriodo = $this->recuperarDatosPeriodo();	
+		$dataPeriodo = $this->recuperarDatosPeriodo();
+		
 		
 		
 		//parametros basicos
@@ -217,8 +219,7 @@ class ACTDocCompraVenta extends ACTbase{
 		
 		$this->objParam->addParametro('orientacion',$orientacion);
 		$this->objParam->addParametro('tamano',$tamano);		
-		$this->objParam->addParametro('titulo_archivo',$titulo);	
-        
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 		
 		//Instancia la clase de pdf
@@ -266,8 +267,33 @@ class ACTDocCompraVenta extends ACTbase{
 	}
 	
 	function crearArchivoExportacion($res, $Obj) {
+		
+		/*******************************
+		 *  FORMATEA NOMBRE DE ARCHIVO
+		 * compras_MMAAAA_NIT.txt     
+		 * o    
+		 * ventas_MMAAAA_NIT.txt
+		 * 
+		 * ********************************/
+		 
+		$dataEntidad = $this->recuperarDatosEntidad();
+		$dataEntidadArray = $dataEntidad->getDatos();
+		$NIT = 	$dataEntidadArray['nit'];
+		
+		$dataPeriodo = $this->recuperarDatosPeriodo();
+		$dataPeriodoArray = $dataPeriodo->getDatos();
+		$sufijo = $dataPeriodoArray['periodo'].$dataPeriodoArray['gestion'];
+		
+		
+		 if($Obj->getParametro('tipo') == 'compra'){
+		 	 $nombre = 'compras_'.$sufijo.'_'.$NIT;
+		 }
+		 else{
+		 	 $nombre = 'ventas_'.$sufijo.'_'.$NIT;
+		 }
+		
 		$data = $res -> getDatos();
-		$fileName = 'LCV-'.$Obj->getParametro('tipo').'.txt';
+		$fileName = $nombre.'.txt';
 		//create file
 		$file = fopen("../../../reportes_generados/$fileName", 'w');
 		$ctd = 1;
@@ -297,6 +323,7 @@ class ACTDocCompraVenta extends ACTbase{
 			 }
 			 else{
 				 	fwrite ($file,  "3|".
+				 	        $ctd."|".
 	                        $newDate."|".
 	                        $val['nro_documento']."|".
 	                        $val['nro_autorizacion']."|".         

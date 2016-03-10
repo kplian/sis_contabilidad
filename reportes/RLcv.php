@@ -44,7 +44,6 @@ class RLcv extends  ReportePDF {
 		
 		$this->Ln(3);
 		//formato de fecha
-		$newDate = date("d-m-Y", strtotime($this->objParam->getParametro('hasta')));
 		
 		//cabecera del reporte
 		$this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 10,5,40,20);
@@ -67,17 +66,40 @@ class RLcv extends  ReportePDF {
         $width4 = 75;
 		
 		
-		$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell(60, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->SetFont('', '');
-        $this->SetFillColor(192,192,192, true);
-        $this->Cell(70, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
-        
-        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell(20, $height,'MES:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->SetFont('', '');
-        $this->SetFillColor(192,192,192, true);
-        $this->Cell(50, $height, $this->datos_periodo['literal_periodo'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		if($this->objParam->getParametro('filtro_sql') == 'fechas'){
+			
+			$fecha_ini =$this->objParam->getParametro('fecha_ini');
+		    $fecha_fin = $this->objParam->getParametro('fecha_fin');
+		
+		
+			$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(60, $height, 'DEL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(70, $height, $fecha_ini, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        
+	        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(20, $height,'HASTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(50, $height, $fecha_fin, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		}
+		else{
+			$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(60, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(70, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        
+	        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(20, $height,'MES:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(50, $height, $this->datos_periodo['literal_periodo'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		}
+		
+		
+		
 		
 		$this->Ln();
 		

@@ -250,7 +250,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	        	fields: ['ID', 'valor'],
 	        	data :	[['txt','TXT'],
 						['pdf','PDF'],	
-						['excel','Excel']]	        				
+						['csv','CSV']]	        				
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
@@ -333,29 +333,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		}],
 		
 	ActSave:'../../sis_contabilidad/control/DocCompraVentaForm/reporteLCV',
-		// Funcion guardar del formulario
-   /* onSubmit: function(o) {
-    	var me = this;
-    	if (me.form.getForm().isValid()) {
-
-             var parametros = me.getValForm()
-             
-             console.log('parametros ....', parametros);
-             Phx.CP.loadingShow(); 
-			 Ext.Ajax.request({
-				
-				url: '../../sis_contabilidad/control/DocCompraVentaForm/reporteLCV',
-				params:  parametros,
-				success: this.successSinc,
-				failure: this.conexionFailure,
-				timeout: this.timeout,
-				scope: this
-			});
-             
-                    
-        }
-
-    },*/
+	
     successSave :function(resp){
        Phx.CP.loadingHide();
        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));

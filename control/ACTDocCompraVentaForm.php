@@ -131,51 +131,153 @@ class ACTDocCompraVentaForm extends ACTbase{
 	}
 	
 	function crearArchivoExportacion($res, $Obj) {
+			
+			
+		
+		
+		$separador = '|';
+		if($this->objParam->getParametro('formato_reporte') =='txt')
+		{
+			$separador = '|';
+			$ext = '.txt';
+		}
+		else{
+			$separador = ',';
+			$ext = '.csv';
+		}
+		
+		
+		/*******************************
+		 *  FORMATEA NOMBRE DE ARCHIVO
+		 * compras_MMAAAA_NIT.txt     
+		 * o    
+		 * ventas_MMAAAA_NIT.txt
+		 * 
+		 * ********************************/
+		 
+		$dataEntidad = $this->recuperarDatosEntidad();
+		$dataEntidadArray = $dataEntidad->getDatos();
+		$NIT = 	$dataEntidadArray['nit'];
+		 
+		if($this->objParam->getParametro('filtro_sql')=='periodo'){
+			$dataPeriodo = $this->recuperarDatosPeriodo();
+			$dataPeriodoArray = $dataPeriodo->getDatos();
+		    $sufijo = $dataPeriodoArray['periodo'].$dataPeriodoArray['gestion'];
+		}
+		else{
+			$sufijo=$this->objParam->getParametro('fecha_ini').'_'.$this->objParam->getParametro('fecha_fin');
+		}
+		
+		if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){			
+			 $nombre = 'compras_'.$sufijo.'_'.$NIT;
+		}
+		else{
+			 $nombre = 'ventas_'.$sufijo.'_'.$NIT;
+		}
+		
+		$nombre=str_replace("/", "", $nombre);
+		
+		
 		$data = $res -> getDatos();
-		$fileName = 'LCV-'.$Obj->getParametro('tipo').'.txt';
+		$fileName = $nombre.$ext;
 		//create file
 		$file = fopen("../../../reportes_generados/$fileName", 'w');
 		$ctd = 1;
+		
+		
+		/******************************
+		 *  IMPRIME CABECERA PARA CSV
+		 *****************************/
+		 
+		if($this->objParam->getParametro('formato_reporte') !='txt')
+		{
+			
+			if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){
+			 	
+					fwrite ($file,  "-".$separador.
+				 	                'N#'.$separador.
+			                        'FECHA DE LA FACTURA O DUI'.$separador.
+			                        'NIT PROVEEDOR'.$separador.
+			                        'NOMBRE O RAZON SOCIAL'.$separador.
+			                        'N# de LA FACTURA.'.$separador.
+									'N# de DUI'.$separador.
+			                        'N# de AUTORIZACION'.$separador.
+			                        "IMPORTE TOTAL DE LA COMPRA A".$separador.
+			                        "IMPORTE NO SUJETO A CREDITO FISCAL B".$separador.
+									"SUBTOTAL C = A - B".$separador.
+									"DESCUENTOS BONOS Y REBAJAS  D".$separador.
+									"IMPORTE SUJETO a CREDITO FISCAL E = C-D".$separador.
+									"CREDITO FISCAL F = E*13%".$separador.
+									'CODIGO DE CONTROL'.$separador.
+			                        'TIPO DE COMPRA'."\r\n");
+									
+									
+			 }
+			 else{
+				 	fwrite ($file,  "-".$separador.
+				 	        'N#'.$separador.
+	                        'FECHA DE LA FACTURA'.$separador.
+	                        'N# de LA FACTURA'.$separador.
+	                        'N# de AUTORIZACION'.$separador.        
+							'ESTADO'.$separador.
+	                        'NIT CLIENTE'.$separador.      
+	                        'NOMBRE O RAZON SOCIAL'.$separador.      
+	                        "IMPORTE TOTAL DE LA VENTA A".$separador.
+	                        "IMPORTE ICE/ IEHD/ TASAS B".$separador.          
+	                        "EXPORTACIO. Y OPERACIONES EXENTAS C".$separador.
+	                        "VENTAS GRAVADAS TASA CERO D".$separador.    
+	                        "SUBTOTAL E = A-B-C-D".$separador.  
+	                        "DESCUENTOS BONOS Y REBAJAS OTORGADAS F".$separador.     
+	                        "IMPORTE BASE DEBITO FISCAL G = E-F".$separador.   
+	                        "DEBITO FISCAL H = G*13%".$separador.   
+	                        'CODIGO DE CONTROL'."\r\n");
+				 }
+		}
+		
+		/**************************
+		 *  IMPRIME CUERPO
+		 **************************/
 		
 		foreach ($data as $val) {			
 			
 			 $newDate = date("d/m/Y", strtotime( $val['fecha']));			 
 			 if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){
 			 	
-					fwrite ($file,  "1|".
-				 	                $ctd."|".
-			                        $newDate."|".
-			                        $val['nit']."|".
-			                        $val['razon_social']."|".
-			                        $val['nro_documento']."|".
-									$val['nro_dui']."|".
-			                        $val['nro_autorizacion']."|".
-			                        $val['importe_doc']."|".
-			                        $val['total_excento']."|".
-									$val['subtotal']."|".
-									$val['importe_descuento']."|".
-									$val['sujeto_cf']."|".
-									$val['importe_iva']."|".
-									$val['codigo_control']."|".
+					fwrite ($file,  "1".$separador.
+				 	                $ctd.$separador.
+			                        $newDate.$separador.
+			                        $val['nit'].$separador.
+			                        $val['razon_social'].$separador.
+			                        $val['nro_documento'].$separador.
+									$val['nro_dui'].$separador.
+			                        $val['nro_autorizacion'].$separador.
+			                        $val['importe_doc'].$separador.
+			                        $val['total_excento'].$separador.
+									$val['subtotal'].$separador.
+									$val['importe_descuento'].$separador.
+									$val['sujeto_cf'].$separador.
+									$val['importe_iva'].$separador.
+									$val['codigo_control'].$separador.
 			                        $val['tipo_doc']."\r\n");
 		              			
 			 }
 			 else{
-				 	fwrite ($file,  "3|".
-	                        $newDate."|".
-	                        $val['nro_documento']."|".
-	                        $val['nro_autorizacion']."|".         
-							$val['tipo_doc']."|".
-	                        $val['nit']."|".        
-	                        $val['razon_social']."|".       
-	                        $val['importe_doc']."|".
-	                        $val['importe_ice']."|".            
-	                        $val['importe_excento']."|".
-	                        $val['venta_gravada_cero']."|".       
-	                        $val['subtotal_venta']."|".     
-	                        $val['importe_descuento']."|".      
-	                        $val['sujeto_df']."|".     
-	                        $val['importe_iva']."|".    
+				 	fwrite ($file,  "3".$separador.
+				 	        $ctd.$separador.
+	                        $newDate.$separador.
+	                        $val['nro_documento'].$separador.
+	                        $val['nro_autorizacion'].$separador.        
+							$val['tipo_doc'].$separador.
+	                        $val['nit'].$separador.      
+	                        $val['razon_social'].$separador.      
+	                        $val['importe_doc'].$separador.
+	                        $val['importe_ice'].$separador.          
+	                        $val['importe_excento'].$separador.
+	                        $val['venta_gravada_cero'].$separador.    
+	                        $val['subtotal_venta'].$separador.  
+	                        $val['importe_descuento'].$separador.     
+	                        $val['sujeto_df'].$separador.   
+	                        $val['importe_iva'].$separador.   
 	                        $val['codigo_control']."\r\n");
 						
 				
