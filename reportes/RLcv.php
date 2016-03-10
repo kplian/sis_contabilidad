@@ -50,9 +50,6 @@ class RLcv extends  ReportePDF {
 		$this->ln(5);
 		
 		
-	    
-		
-		
 	    $this->SetFont('','BU',12);		
 		$this->Cell(0,5,"LIBRO DE COMPRAS ESTANDAR",0,1,'C');		
 		$this->Ln(3);
@@ -64,7 +61,6 @@ class RLcv extends  ReportePDF {
         $width2 = 20;
         $width3 = 40;
         $width4 = 75;
-		
 		
 		if($this->objParam->getParametro('filtro_sql') == 'fechas'){
 			
@@ -99,8 +95,6 @@ class RLcv extends  ReportePDF {
 		}
 		
 		
-		
-		
 		$this->Ln();
 		
 		$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -116,8 +110,6 @@ class RLcv extends  ReportePDF {
         $this->Cell(50, $height, $this->datos_entidad['nit'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
         
 		
-		
-		
 		$this->Ln(8);
 		
 		$this->SetFont('','B',6);
@@ -130,13 +122,8 @@ class RLcv extends  ReportePDF {
 		$this->setFontSubsetting(false);
 		$this->AddPage();
 		
-	
-		
-		$sw = false;
+	    $sw = false;
 		$concepto = '';
-		
-		
-		
 		
 		$this->generarCuerpo($this->datos_detalle);
 		
