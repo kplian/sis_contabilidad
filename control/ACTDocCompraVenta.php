@@ -347,7 +347,7 @@ class ACTDocCompraVenta extends ACTbase{
 			 $ctd = $ctd + 1;
          } //end for
 		
-		
+		fclose($file);
 		return $fileName;
 	}
 	

@@ -184,6 +184,13 @@ class ACTDocCompraVentaForm extends ACTbase{
 		$file = fopen("../../../reportes_generados/$fileName", 'w');
 		$ctd = 1;
 		
+		if($this->objParam->getParametro('formato_reporte') !='txt'){
+			/*AÑADE EL BOMM PARA NO TENER PROBLEMAS AL LEER DE APLICACIONES EXTERNAS*/
+		    fwrite($file, pack("CCC",0xef,0xbb,0xbf));
+		}
+		
+		
+		
 		
 		/******************************
 		 *  IMPRIME CABECERA PARA CSV
@@ -242,12 +249,13 @@ class ACTDocCompraVentaForm extends ACTbase{
 			
 			 $newDate = date("d/m/Y", strtotime( $val['fecha']));			 
 			 if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){
-			 	
+						
+					
 					fwrite ($file,  "1".$separador.
 				 	                $ctd.$separador.
 			                        $newDate.$separador.
 			                        $val['nit'].$separador.
-			                        $val['razon_social'].$separador.
+			                        $val['razon_social'].$separador. 
 			                        $val['nro_documento'].$separador.
 									$val['nro_dui'].$separador.
 			                        $val['nro_autorizacion'].$separador.
@@ -269,7 +277,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 	                        $val['nro_autorizacion'].$separador.        
 							$val['tipo_doc'].$separador.
 	                        $val['nit'].$separador.      
-	                        $val['razon_social'].$separador.      
+	                        $val['razon_social'].$separador, 	                            
 	                        $val['importe_doc'].$separador.
 	                        $val['importe_ice'].$separador.          
 	                        $val['importe_excento'].$separador.
@@ -278,16 +286,17 @@ class ACTDocCompraVentaForm extends ACTbase{
 	                        $val['importe_descuento'].$separador.     
 	                        $val['sujeto_df'].$separador.   
 	                        $val['importe_iva'].$separador.   
-	                        $val['codigo_control']."\r\n");
-						
+	                        $val['codigo_control']."\r\n");						
 				
 			 }
 			 
 			 	  		
 			 $ctd = $ctd + 1;
          } //end for
-		
-		
+         
+     
+				
+		fclose($file);
 		return $fileName;
 	}
 	
