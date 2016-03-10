@@ -1449,3 +1449,17 @@ VALUES
 
 /***********************************F-DAT-RAC-CONTA-0-29/02/2016****************************************/
  
+
+
+
+/***********************************I-DAT-RAC-CONTA-0-10/03/2016*****************************************/
+
+select pxp.f_insert_tgui ('Reporte LCV - IVA', 'Reporte LCV - IVA', 'REPLCV', 'si', 4, 'sis_contabilidad/reportes/formularios/LibroComprasVentasIVA.php', 3, '', 'ReporteLibroComprasVentasIVA', 'CONTA');
+select pxp.f_insert_testructura_gui ('REPLCV', 'REPCON');
+
+
+/***********************************F-DAT-RAC-CONTA-0-10/03/2016*****************************************/
+
+
+
+

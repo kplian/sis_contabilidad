@@ -42,9 +42,6 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    
         }
 		
-		
-		
-		
 		if($this->objParam->getParametro('id_depto')!=''){
             $this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
         }
@@ -53,14 +50,11 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
         }
 		
-		
-		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODDocCompraVenta','listarDocCompraVenta');
 		} else{
-			$this->objFunc=$this->create('MODDocCompraVenta');
-			
+			$this->objFunc=$this->create('MODDocCompraVenta');			
 			$this->res=$this->objFunc->listarDocCompraVenta($this->objParam);
 		}
 		
@@ -76,12 +70,9 @@ class ACTDocCompraVenta extends ACTbase{
 			$temp['importe_pendiente'] = $this->res->extraData['tota_importe_pendiente'];
 			$temp['importe_neto'] = $this->res->extraData['total_importe_neto'];
 			$temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
-			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];
-			
+			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];			
 			$temp['tipo_reg'] = 'summary';
 			$temp['id_int_doc_compra_venta'] = 0;
-			
-			
 			
 			
 			$this->res->total++;
@@ -211,11 +202,13 @@ class ACTDocCompraVenta extends ACTbase{
 	
 	
 	function reporteLCV(){
+		
 			
 		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
 		$dataSource = $this->recuperarDatosLCV();
 		$dataEntidad = $this->recuperarDatosEntidad();
-		$dataPeriodo = $this->recuperarDatosPeriodo();	
+		$dataPeriodo = $this->recuperarDatosPeriodo();
+		
 		
 		
 		//parametros basicos
@@ -226,8 +219,7 @@ class ACTDocCompraVenta extends ACTbase{
 		
 		$this->objParam->addParametro('orientacion',$orientacion);
 		$this->objParam->addParametro('tamano',$tamano);		
-		$this->objParam->addParametro('titulo_archivo',$titulo);	
-        
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 		
 		//Instancia la clase de pdf
@@ -275,8 +267,33 @@ class ACTDocCompraVenta extends ACTbase{
 	}
 	
 	function crearArchivoExportacion($res, $Obj) {
+		
+		/*******************************
+		 *  FORMATEA NOMBRE DE ARCHIVO
+		 * compras_MMAAAA_NIT.txt     
+		 * o    
+		 * ventas_MMAAAA_NIT.txt
+		 * 
+		 * ********************************/
+		 
+		$dataEntidad = $this->recuperarDatosEntidad();
+		$dataEntidadArray = $dataEntidad->getDatos();
+		$NIT = 	$dataEntidadArray['nit'];
+		
+		$dataPeriodo = $this->recuperarDatosPeriodo();
+		$dataPeriodoArray = $dataPeriodo->getDatos();
+		$sufijo = $dataPeriodoArray['periodo'].$dataPeriodoArray['gestion'];
+		
+		
+		 if($Obj->getParametro('tipo') == 'compra'){
+		 	 $nombre = 'compras_'.$sufijo.'_'.$NIT;
+		 }
+		 else{
+		 	 $nombre = 'ventas_'.$sufijo.'_'.$NIT;
+		 }
+		
 		$data = $res -> getDatos();
-		$fileName = 'LCV-'.$Obj->getParametro('tipo').'.txt';
+		$fileName = $nombre.'.txt';
 		//create file
 		$file = fopen("../../../reportes_generados/$fileName", 'w');
 		$ctd = 1;
@@ -306,6 +323,7 @@ class ACTDocCompraVenta extends ACTbase{
 			 }
 			 else{
 				 	fwrite ($file,  "3|".
+				 	        $ctd."|".
 	                        $newDate."|".
 	                        $val['nro_documento']."|".
 	                        $val['nro_autorizacion']."|".         

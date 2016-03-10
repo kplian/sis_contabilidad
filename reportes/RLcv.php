@@ -44,7 +44,6 @@ class RLcv extends  ReportePDF {
 		
 		$this->Ln(3);
 		//formato de fecha
-		$newDate = date("d-m-Y", strtotime($this->objParam->getParametro('hasta')));
 		
 		//cabecera del reporte
 		$this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 10,5,40,20);
@@ -67,17 +66,40 @@ class RLcv extends  ReportePDF {
         $width4 = 75;
 		
 		
-		$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell(60, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->SetFont('', '');
-        $this->SetFillColor(192,192,192, true);
-        $this->Cell(70, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
-        
-        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell(20, $height,'MES:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->SetFont('', '');
-        $this->SetFillColor(192,192,192, true);
-        $this->Cell(50, $height, $this->datos_periodo['literal_periodo'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		if($this->objParam->getParametro('filtro_sql') == 'fechas'){
+			
+			$fecha_ini =$this->objParam->getParametro('fecha_ini');
+		    $fecha_fin = $this->objParam->getParametro('fecha_fin');
+		
+		
+			$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(60, $height, 'DEL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(70, $height, $fecha_ini, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        
+	        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(20, $height,'HASTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(50, $height, $fecha_fin, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		}
+		else{
+			$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(60, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(70, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        
+	        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(20, $height,'MES:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->SetFont('', '');
+	        $this->SetFillColor(192,192,192, true);
+	        $this->Cell(50, $height, $this->datos_periodo['literal_periodo'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+		}
+		
+		
+		
 		
 		$this->Ln();
 		
@@ -205,7 +227,7 @@ class RLcv extends  ReportePDF {
 		$conf_par_tablewidths=array(6,15,20,30,15,22,25,18,17,17,17,17,17,15,13);
         $conf_par_tablealigns=array('C','L','R','R','R','R','R','R','R','R','R','R','R','R','R');
         $conf_par_tablenumbers=array(0,0,0,0,0,0,0,2,2,2,2,2,2,0,0);
-		$conf_tableborders=array();//array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');
+		$conf_tableborders=array('LTR','TLR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR');
 		
 		$this->tablewidths=$conf_par_tablewidths;
         $this->tablealigns=$conf_par_tablealigns;
@@ -298,18 +320,10 @@ class RLcv extends  ReportePDF {
   	
 	   
 	   	    //si noes inicio termina el cuardro anterior
-	   	  
-			
-			$conf_par_tablewidths=array(6 +15 +20 +30 +15 +22 +25,18,17,17,17,17,17);
-            $conf_par_tablealigns=array('R','R','R','R','R','R','R');
-            $conf_par_tablenumbers=array(0,2,2,2,2,2,2);		
-	   	    $conf_par_tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
-			//coloca el total de egresos
-			//coloca el total de la partida 
-	        $this->tablewidths=$conf_par_tablewidths;
-	        $this->tablealigns=$conf_par_tablealigns;
-	        $this->tablenumbers=$conf_par_tablenumbers;
-	        $this->tableborders=$conf_par_tableborders;
+	   	    $this->tablewidths=array(6 +15 +20 +30 +15 +22 +25,18,17,17,17,17,17,15,13);
+	        $this->tablealigns=array('R','R','R','R','R','R','R','R','R');
+	        $this->tablenumbers=array(0,2,2,2,2,2,2,0,0);	
+	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','T','T');
 	        
 	        $RowArray = array( 
 	                    'espacio' => 'Subtotal: ',
@@ -318,7 +332,9 @@ class RLcv extends  ReportePDF {
 	                    's3' => $this->s3,
 	                    's4' => $this->s4,
 	                    's5' => $this->s5,
-	                    's6' => $this->s6
+	                    's6' => $this->s6,
+	                    's7' => '',
+	                    's8' => ''
 	                  );     
 	                     
 	        $this-> MultiRow($RowArray,false,1);
@@ -337,17 +353,10 @@ class RLcv extends  ReportePDF {
 	   
 	   	    //si noes inicio termina el cuardro anterior
 	   	  
-			
-			$conf_par_tablewidths=array(6 +15 +20 +30 +15 +22 +25,18,17,17,17,17,17);
-            $conf_par_tablealigns=array('R','R','R','R','R','R','R');
-            $conf_par_tablenumbers=array(0,2,2,2,2,2,2);		
-	   	    $conf_par_tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
-			//coloca el total de egresos
-			//coloca el total de la partida 
-	        $this->tablewidths=$conf_par_tablewidths;
-	        $this->tablealigns=$conf_par_tablealigns;
-	        $this->tablenumbers=$conf_par_tablenumbers;
-	        $this->tableborders=$conf_par_tableborders;
+			$this->tablewidths=array(6 +15 +20 +30 +15 +22 +25,18,17,17,17,17,17);
+	        $this->tablealigns=array('R','R','R','R','R','R','R');
+	        $this->tablenumbers=array(0,2,2,2,2,2,2);	
+	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
 	        
 	        $RowArray = array( 
 	                    'espacio' => 'TOTAL: ',
