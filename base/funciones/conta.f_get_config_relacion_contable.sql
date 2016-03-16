@@ -127,7 +127,6 @@ BEGIN
     
     
     
-    
      
     
 
@@ -265,16 +264,18 @@ BEGIN
   --  tiene varias segun  la tabla
   --------------------------------------------------
    ELSE
-         
+              
          --si necesita tabla de configuracion el parametros p_tabla y p_id_tabla no pueden ser nulos
           IF p_id_tabla is NULL THEN
             raise exception 'Para este tipo de relacion contable (%) se necesita indicar la tabla y el id para busquedas',p_codigo;
           END IF;
           
           
-          
+          IF p_id_gestion IS NULL THEN
+          	raise exception 'No existe el parametro id_gestion';
+          END IF;
          
-          
+         
           --Consulta general
           v_sql = 'select
                    rc.id_cuenta,
@@ -513,7 +514,7 @@ BEGIN
           IF p_codigo = 'PAGOANT' THEN
               raise exception 'bbbbbbb';
           END IF;*/
-         
+    
           
           --si es de auxiliar dinamico accedemos a la tabla	
           IF v_rec.tiene_auxiliar = 'dinamico' and ps_id_auxiliar  is NULL  THEN
