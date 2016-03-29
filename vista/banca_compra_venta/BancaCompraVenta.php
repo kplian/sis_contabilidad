@@ -538,6 +538,7 @@ fheight: '80%',
 			form:true 
 		},
 		
+		
 		 {
 			//configuracion del componente
 			config:{
@@ -599,7 +600,21 @@ fheight: '80%',
 			form: false
 		},
 		
-		
+		{
+			config:{
+				name: 'tramite_cuota',
+				fieldLabel: 'tramite_cuota',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				
+				id_grupo:0,
+				grid:true,
+				form:true
+		},
 		{
 			config:{
 				name: 'periodo',
