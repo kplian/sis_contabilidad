@@ -3127,4 +3127,7 @@ ALTER TABLE conta.tbanca_compra_venta
   
   
   
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN id_proceso_wf INTEGER;
+  
 /***********************************F-SCP-RAC-CONTA-0-21/03/2016****************************************/

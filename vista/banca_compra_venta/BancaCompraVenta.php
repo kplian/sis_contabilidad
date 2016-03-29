@@ -174,7 +174,16 @@ fheight: '80%',
 		 
 		 
 		 
-		
+		this.addButton('btnChequeoDocumentosWf',
+            {
+                text: 'Documentos',
+                grupo:[0,1,2],
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.loadCheckDocumentosSolWf,
+                tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
+            }
+        );
 	
 		 
 		this.addButton('insertAuto',{argument: {imprimir: 'insertAuto'},text:'<i class="fa fa-file-text-o fa-2x"></i> insertAuto',/*iconCls:'' ,*/disabled:false,handler:this.insertAuto});
@@ -192,6 +201,9 @@ fheight: '80%',
 		this.addButton('BorrarTodo',{argument: {imprimir: 'BorrarTodo'},text:'<i class="fa fa-file-text-o fa-2x"></i> BorrarTodo',/*iconCls:'' ,*/disabled:false,handler:this.BorrarTodo});
 
 
+
+		
+        
 		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
 	
@@ -1489,7 +1501,7 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota'	
+            			'tramite_cuota','id_proceso_wf'	
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
@@ -1789,7 +1801,21 @@ fheight: '80%',
 				timeout:this.timeout,
 				scope:this
 			});
-		}
+		},
+		
+		loadCheckDocumentosSolWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Chequear documento del WF',
+                    {
+                        width:'90%',
+                        height:500
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DocumentoWf')
+   		},
 		
 		/*,
 		onSubmit : function(o, x, force) {

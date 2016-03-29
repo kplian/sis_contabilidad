@@ -86,6 +86,7 @@ class MODBancaCompraVenta extends MODbase{
 		$this->captura('numero_cuota','int4');
 		$this->captura('tramite_cuota','varchar'); 
 
+	$this->captura('id_proceso_wf','int4');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
