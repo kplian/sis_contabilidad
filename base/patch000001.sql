@@ -3082,28 +3082,6 @@ IS 'indetifica que auxiliar son usados para acumular cuenta corriente en cotabil
 
 
 
-/***********************************I-SCP-RAC-CONTA-0-19/02/2016****************************************/
-
---------------- SQL ---------------
-
-ALTER TABLE param.tplantilla
-  ADD COLUMN tipo_excento VARCHAR(20) DEFAULT 'variable' NOT NULL;
-
-COMMENT ON COLUMN param.tplantilla.tipo_excento
-IS 'peuden ser variable, porcentual, constante. En caso de constante o porcentual toma el valor del campo valor_excento';
-
-
---------------- SQL ---------------
-
-ALTER TABLE param.tplantilla
-  ADD COLUMN valor_excento NUMERIC DEFAULT 0 NOT NULL;
-
-COMMENT ON COLUMN param.tplantilla.valor_excento
-IS 'valor que se aplica al excento cuando es  porcentual o constante';
-
-/***********************************F-SCP-RAC-CONTA-0-19/02/2016****************************************/
-
-
 
 /***********************************I-SCP-RAC-CONTA-0-22/02/2016****************************************/
 
@@ -3133,3 +3111,20 @@ COMMENT ON COLUMN conta.tdoc_compra_venta.id_tipo_doc_compra_venta
 IS 'dato para el reporte LCD de impuestos';
 /***********************************F-SCP-RAC-CONTA-0-22/02/2016****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-0-21/03/2016****************************************/
+
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN saldo NUMERIC(10,2);
+
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN resolucion VARCHAR(255);
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN tramite_cuota VARCHAR(255);
+  
+  
+  
+/***********************************F-SCP-RAC-CONTA-0-21/03/2016****************************************/

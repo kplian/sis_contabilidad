@@ -29,6 +29,8 @@ DECLARE
 
   v_record record;
   v_host varchar;
+  
+  v_id_banca_compra_venta_seleccionado integer;
 
 BEGIN
 
@@ -52,7 +54,13 @@ BEGIN
       
       --Sentencia de la consulta
       
-                        
+      --raise exception '%',v_parametros.acumulado;
+     
+      v_id_banca_compra_venta_seleccionado = 0; 
+      IF v_parametros.acumulado = 'si'
+      then
+      v_id_banca_compra_venta_seleccionado = v_parametros.id_banca_compra_venta;
+      end if;             
                         
       
        if v_parametros.banca_documentos = 'endesis'
@@ -106,7 +114,13 @@ BEGIN
                         cuenta.denominacion as desc_cuenta_bancaria,
                         banca.id_documento,
                         doc.razon_social as desc_documento,
-                        param.f_literal_periodo(banca.id_periodo) as periodo	
+                        param.f_literal_periodo(banca.id_periodo) as periodo,
+                        banca.saldo,
+                        contra.monto as monto_contrato,
+                        ges.gestion,
+                        '||v_id_banca_compra_venta_seleccionado||' as banca_seleccionada,
+ 						banca.numero_cuota,
+            			banca.tramite_cuota
 						from conta.tbanca_compra_venta banca
 						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
@@ -116,6 +130,8 @@ BEGIN
                         left join param.vproveedor provee on provee.id_proveedor = banca.id_proveedor
                         left join leg.tcontrato contra on contra.id_contrato = banca.id_contrato                        
                         left join tes.tcuenta_bancaria cuenta on cuenta.id_cuenta_bancaria = banca.id_cuenta_bancaria                        
+                        inner join param.tperiodo per on per.id_periodo = banca.id_periodo
+                        inner join param.tgestion ges on ges.id_gestion = per.id_gestion
                         left join tabla_temporal_documentos doc on doc.id_documento = banca.id_documento
                         where ';
 
@@ -165,7 +181,14 @@ BEGIN
                         cuenta.denominacion as desc_cuenta_bancaria,
                         banca.id_documento,
                         doc.razon_social::varchar as desc_documento,
-                        param.f_literal_periodo(banca.id_periodo) as periodo	
+                        param.f_literal_periodo(banca.id_periodo) as periodo,
+                        banca.saldo,
+                        contra.monto as monto_contrato,
+                        ges.gestion,
+                        '||v_id_banca_compra_venta_seleccionado||' as banca_seleccionada,
+                        
+                        banca.numero_cuota,
+            			banca.tramite_cuota	
 						from conta.tbanca_compra_venta banca
 						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
@@ -175,6 +198,8 @@ BEGIN
                         inner join param.vproveedor provee on provee.id_proveedor = banca.id_proveedor
                         left join leg.tcontrato contra on contra.id_contrato = banca.id_contrato                        
                         left join tes.tcuenta_bancaria cuenta on cuenta.id_cuenta_bancaria = banca.id_cuenta_bancaria                        
+                        inner join param.tperiodo per on per.id_periodo = banca.id_periodo
+                        inner join param.tgestion ges on ges.id_gestion = per.id_gestion
                         left join conta.tdoc_compra_venta doc on doc.id_doc_compra_venta = banca.id_documento
                         where ';
                         

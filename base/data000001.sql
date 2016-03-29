@@ -1463,3 +1463,30 @@ select pxp.f_insert_testructura_gui ('REPLCV', 'REPCON');
 
 
 
+/***********************************I-DAT-RAC-CONTA-0-22/03/2016*****************************************/
+
+INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id", "tabla_id_fk", "recorrido_arbol", "tabla_id_auxiliar", "tabla_codigo_auxiliar")
+VALUES 
+  (1, NULL, E'2016-03-22 13:21:05.346', NULL, E'activo', NULL, NULL, 11, E'tfuncionario', E'ORGA', E'id_funcionario', E'', E'', E'', E'codigo');
+  
+  
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_relacion_contable", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES 
+  (1, NULL, E'2016-03-22 13:22:39.393', NULL, E'activo', NULL, NULL, 61, E'Cuenta por Rendir', E'CUEXREND', E'no', E'si', E'dinamico', 11, E'flujo', E'recurso_gasto');  
+
+
+
+
+/* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 1) */
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_relacion_contable", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES 
+  (1, NULL, E'2016-03-24 14:46:07.159', NULL, E'activo', NULL, NULL, 62, E'Entrega de Dinero por Rendir', E'EDINXRENDIR', E'no', E'si', E'si', 11, E'flujo', E'gasto');
+  
+  
+/***********************************F-DAT-RAC-CONTA-0-22/03/2016*****************************************/
+
+
+
+
