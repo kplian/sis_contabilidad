@@ -120,7 +120,8 @@ BEGIN
                         ges.gestion,
                         '||v_id_banca_compra_venta_seleccionado||' as banca_seleccionada,
  						banca.numero_cuota,
-            			banca.tramite_cuota
+            			banca.tramite_cuota,
+                        banca.id_proceso_wf
 						from conta.tbanca_compra_venta banca
 						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
@@ -188,7 +189,8 @@ BEGIN
                         '||v_id_banca_compra_venta_seleccionado||' as banca_seleccionada,
                         
                         banca.numero_cuota,
-            			banca.tramite_cuota	
+            			banca.tramite_cuota	,
+                        banca.id_proceso_wf
 						from conta.tbanca_compra_venta banca
 						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod

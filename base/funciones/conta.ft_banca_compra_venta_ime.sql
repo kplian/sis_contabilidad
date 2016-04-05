@@ -572,7 +572,8 @@ BEGIN
       sigma.comprobante_c31,
       sigma.fecha_entrega,
       pg_pagado.id_cuenta_bancaria as id_cuenta_bancaria_plan_pago,
-      libro.nro_cheque
+      libro.nro_cheque,
+      pg_pagado.id_proceso_wf
 
 from tes.tplan_pago pg_pagado
 inner join tes.tplan_pago pg_devengado on pg_devengado.id_plan_pago = pg_pagado.id_plan_pago_fk
@@ -763,7 +764,8 @@ or (sigma.fecha_entrega >= '''||v_periodo.fecha_ini||'''::date and sigma.fecha_e
             numero_cuota,
             tramite_cuota,
             saldo,
-            id_depto_conta
+            id_depto_conta,
+            id_proceso_wf
           	) values(
 			v_record_plan_pago_pxp.nro_cuenta,
 			v_tipo_documento_pago,
@@ -798,7 +800,8 @@ or (sigma.fecha_entrega >= '''||v_periodo.fecha_ini||'''::date and sigma.fecha_e
             v_record_plan_pago_pxp.nro_cuota,
            v_numero_tramite_y_cuota,
            v_saldo,
-           v_parametros.id_depto_conta
+           v_parametros.id_depto_conta,
+           v_record_plan_pago_pxp.id_proceso_wf
 							
 			
 			

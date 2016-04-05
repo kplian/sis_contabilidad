@@ -124,7 +124,7 @@ class MODResultadoPlantilla extends MODbase{
 	function clonarPlantilla(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='conta.ft_resultado_plantilla_ime';
-		$this->transaccion='CONTA_CLONAR_IME';
+		$this->transaccion='CONTA_CLONARPLT_IME';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion

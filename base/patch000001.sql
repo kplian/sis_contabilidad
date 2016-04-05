@@ -3131,3 +3131,31 @@ ALTER TABLE conta.tbanca_compra_venta
   ADD COLUMN id_proceso_wf INTEGER;
   
 /***********************************F-SCP-RAC-CONTA-0-21/03/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-05/04/2016****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN funcion_comprobante_prevalidado TEXT;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.funcion_comprobante_prevalidado
+IS 'esta funcion se ejecuta previamente a la validacion del comprobante,  puede ser util para revertir presupuestos previamente validados';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN funcion_comprobante_validado_eliminado TEXT;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.funcion_comprobante_validado_eliminado
+IS 'esta funcion corre al apretar el boton eliminar de un un comprobante generado que ya a sido validado';
+
+/***********************************I-SCP-RAC-CONTA-0-05/04/2016****************************************/
+
+
+
+

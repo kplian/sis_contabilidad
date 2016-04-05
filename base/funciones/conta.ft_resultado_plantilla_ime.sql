@@ -157,13 +157,13 @@ BEGIN
 
 		end;
     /*********************************    
- 	#TRANSACCION:  'CONTA_CLONAR_IME'
+ 	#TRANSACCION:  'CONTA_CLONARPLT_IME'
  	#DESCRIPCION:	clonar plantilla de resultados
  	#AUTOR:		admin	
  	#FECHA:		08-07-2015 13:12:43
 	***********************************/
 
-	elsif(p_transaccion='CONTA_CLONAR_IME')then
+	elsif(p_transaccion='CONTA_CLONARPLT_IME')then
 
 		begin
 		    ------------------------------------

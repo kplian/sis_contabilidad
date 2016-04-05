@@ -30,6 +30,7 @@ DECLARE
     v_resp			varchar;
     v_nombre_funcion   				varchar;
     v_funcion_comprobante_validado  varchar;
+    v_funcion_comprobante_prevalidado  varchar;
     v_funcion_comprobante_editado   varchar;
     v_variacion        				numeric;
     v_nombre_conexion				varchar;
@@ -143,6 +144,21 @@ BEGIN
     if v_filas < 2 then
     	raise exception 'Validación no realizada: el comprobante debe tener al menos dos transacciones';
     end if;
+    
+    
+    --se ejecuta funcion de prevalidacion si existe
+    IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+           
+                select 
+                 pc.funcion_comprobante_prevalidado
+                into v_funcion_comprobante_prevalidado 
+                from conta.tplantilla_comprobante pc  
+                where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+                
+                IF  v_funcion_comprobante_prevalidado is not null and v_funcion_comprobante_prevalidado != '' THEN
+                   EXECUTE ( 'select ' || v_funcion_comprobante_prevalidado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+                END IF;                    
+    END IF;
     
     
     --------------------------------------------------------------------------

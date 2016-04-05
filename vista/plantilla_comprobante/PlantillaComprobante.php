@@ -354,7 +354,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'funcion_comprobante_validado',
 				qtip:'funcion que se ejecuta una vez que se valida el comprobante',
-				fieldLabel: 'Funcion Comprobante Validado',
+				fieldLabel: 'Funcion Cbte Validado',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -369,7 +369,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'funcion_comprobante_eliminado',
-				fieldLabel: 'Funcion Comprobante Eliminado',
+				fieldLabel: 'Funcion Cbte Eliminado',
 				qtip:'Funcion que se ejecuta al eliminar el comprobante',
 				allowBlank: true,
 				anchor: '80%',
@@ -385,7 +385,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'funcion_comprobante_editado',
-				fieldLabel: 'Funcion Comprobante Editado',
+				fieldLabel: 'Funcion Cbte Editado',
 				qtip:'Funcion que se ejecuta al validar un cbte que ha sido editado',
 				allowBlank: true,
 				anchor: '80%',
@@ -394,6 +394,38 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.funcion_comprobante_editado',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'funcion_comprobante_prevalidado',
+				fieldLabel: 'Funcion Cbte Prevalidado',
+				qtip:'Esta funcion se ejecuta previamente a la validacion del comprobante,  puede ser util para revertir presupuestos previamente validados',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.funcion_comprobante_prevalidado',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'funcion_comprobante_validado_eliminado',
+				fieldLabel: 'Funcion Cbte Validado Eliminado',
+				qtip:'Esta funcion corre al apretar el boton eliminar de un comprobante generado que ya a sido validado',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.funcion_comprobante_validado_eliminado',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -641,7 +673,9 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		'campo_nro_cuenta_bancaria_trans',
 		'campo_nro_tramite','campo_tipo_cambio','campo_depto_libro',
 	    'campo_fecha_costo_ini',
-	    'campo_fecha_costo_fin','funcion_comprobante_editado'
+	    'campo_fecha_costo_fin',
+	    'funcion_comprobante_editado','funcion_comprobante_prevalidado',
+	    'funcion_comprobante_validado_eliminado'
         
 		
 	],
