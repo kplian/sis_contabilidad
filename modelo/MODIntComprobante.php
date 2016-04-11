@@ -75,6 +75,10 @@ class MODIntComprobante extends MODbase{
 		$this->captura('origen','varchar');
 		$this->captura('localidad','varchar');		
 		$this->captura('sw_editable','varchar');
+		$this->captura('cbte_reversion','varchar');
+		$this->captura('volcado','varchar');
+		
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -406,6 +410,53 @@ class MODIntComprobante extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+   
+   function volcarCbte(){
+		//swEditable de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_VOLCARCBTE_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+   
+   function listarCbteDependencias(){
+		    //Definicion de variables para ejecucion del procedimientp
+		    $this->procedimiento='conta.ft_int_comprobante_sel';
+		    $this-> setCount(false);
+		    $this->transaccion='CONTA_DEPCBT_SEL';
+		    $this->tipo_procedimiento='SEL';//tipo de transaccion
+		    
+		    $id_padre = $this->objParam->getParametro('id_padre');
+		    
+		    $this->setParametro('id_padre','id_padre','varchar'); 
+			$this->setParametro('id_int_comprobante_basico','id_int_comprobante_basico','int4'); 
+			
+			$this->captura('id_int_comprobante','int4');
+			$this->captura('id_int_comprobante_padre','int4');
+			
+		    $this->captura('nro_cbte','varchar');
+		    $this->captura('glosa1','varchar');
+		    $this->captura('nombre','varchar');
+		    $this->captura('volcado','varchar');
+		    $this->captura('cbte_reversion','varchar');
+			$this->captura('tipo_nodo','varchar');
+			
+			
+		    //Ejecuta la instruccion
+		    $this->armarConsulta();
+			$this->ejecutarConsulta();
+    
+    return $this->respuesta;       
+ }
 			
 }
 ?>

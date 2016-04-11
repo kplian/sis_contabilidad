@@ -113,7 +113,9 @@ BEGIN
                               incbte.desc_moneda_tri,
                               incbte.origen,
                               incbte.localidad,
-                              incbte.sw_editable
+                              incbte.sw_editable,
+                              incbte.cbte_reversion,
+                              incbte.volcado
                           from conta.vint_comprobante incbte
                           where  ';
 			

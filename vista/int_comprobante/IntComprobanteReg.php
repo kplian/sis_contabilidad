@@ -143,9 +143,7 @@ Phx.vista.IntComprobanteReg = {
 					timeout : this.timeout,
 					scope : this
 				});
-			
-
-		},
+	  },
        preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
 			var rec = this.sm.getSelected();
@@ -170,14 +168,9 @@ Phx.vista.IntComprobanteReg = {
 				this.getBoton('btnRelDev').setDisabled(false);
 				this.getBoton('btnIgualarCbte').setDisabled(false);
 				this.getBoton('btnDocCmpVnt').setDisabled(false);
+				this.getBoton('chkpresupuesto').setDisabled(false);
 			}
 			
-			
-			
-			
-			
-			
-
 			return tb;
 		},
 		liberaMenu : function() {
@@ -188,6 +181,7 @@ Phx.vista.IntComprobanteReg = {
 				this.getBoton('btnRelDev').setDisabled(true);
 				this.getBoton('btnIgualarCbte').setDisabled(true);
 				this.getBoton('btnDocCmpVnt').setDisabled(true);
+				this.getBoton('chkpresupuesto').setDisabled(true);
 			
 			
 			

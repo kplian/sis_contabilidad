@@ -244,11 +244,8 @@ BEGIN
                                 IF v_registros_comprobante.momento_comprometido = 'si'  then
                                   
                                       -- validamos que si tiene que comprometer la id_partida_ejecucion tiene que ser nulo
-                                      
-                                       IF v_registros.id_partida_ejecucion is not NULL THEN
-                                       
-                                           raise exception 'EL comprobante no puede estar marcada para comprometer, si ya existe un comprometido';
-                                       
+                                      IF v_registros.id_partida_ejecucion is not NULL THEN
+                                         raise exception 'EL comprobante no puede estar marcada para comprometer, si ya existe un comprometido';
                                        END IF;
                                        
                                        --TODO verificar si el alcanza el presuuesto para comprometer

@@ -79,7 +79,8 @@ BEGIN
         c.nro_cbte,
         c.codigo_estacion_origen,
         c.localidad,
-        c.id_ajuste
+        c.id_ajuste,
+        c.cbte_reversion
         
 	  into 
         v_rec_cbte
@@ -112,7 +113,6 @@ BEGIN
 	
     -- si es un comprobante editado internacionales , abrimos una segunda conexion 
   
-   
     IF v_rec_cbte.sw_editable = 'si' and  v_rec_cbte.vbregional = 'si' and  v_conta_codigo_estacion = 'CENTRAL' and v_rec_cbte.localidad != 'nacional'  THEN
          v_conexion_int_act = migra.f_crear_conexion(NULL,'tes.testacion', v_rec_cbte.codigo_estacion_origen);
     END IF;
@@ -261,7 +261,8 @@ BEGIN
     --  si el dinero comprometido o devengado es suficiente para proseguir con la transaccion
     -----------------------------------------------------------------------------------------------
     
-     IF v_pre_integrar_presupuestos = 'true' THEN    
+     --solo verifica en cbte que no son de reversion
+     IF v_pre_integrar_presupuestos = 'true' and  v_rec_cbte.cbte_reversion ='no' THEN    
      	v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
      END IF;
   
@@ -276,6 +277,8 @@ BEGIN
             inner join param.tdocumento doc
             on doc.id_documento = ccbte.id_documento
             where ccbte.id_clase_comprobante = v_rec_cbte.id_clase_comprobante;
+            
+            
             
             --Se obtiene el periodo
             select po_id_periodo 
@@ -321,6 +324,8 @@ BEGIN
                 -- Si no es un cbte de apertura y estamso en enero fuerza el saltar inicio
                 IF  v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
                      
+                
+                       raise exception '-- % --', v_doc;
                        v_nro_cbte =  param.f_obtener_correlativo(
                                  v_doc, 
                                  v_id_periodo,-- par_id, 
@@ -388,7 +393,8 @@ BEGIN
           ----------------------------------------------------------------------
           --  Si es solo un cbte de pago  validar la relacion con el devengado
           ----------------------------------------------------------------------
-          
+          --TODO analizar el caso de cbte de pago que se revierten
+           
           IF v_rec_cbte.sw_editable = 'si' and v_rec_cbte.momento_comprometido = 'no'  and  v_rec_cbte.momento_ejecutado = 'no'  and    v_rec_cbte.momento_pagado = 'si'  THEN   
              v_sw_rel = TRUE;
              FOR v_registros in  (
@@ -429,8 +435,6 @@ BEGIN
           END IF;
           
         
-         
-            
             
          ----------------------------------------------------------------------------------- 
          -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
@@ -495,7 +499,6 @@ BEGIN
          IF (v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'si' and  v_rec_cbte.id_ajuste is null)THEN
              -- si sincroniza locamente con endesis, marcando la bandera que proviene de regional internacional
              v_resp_int_endesis =  migra.f_migrar_cbte_endesis(p_id_int_comprobante, v_nombre_conexion, 'si');
-               
          END IF;
           
          -----------------------------------------------------------------------------------------------
@@ -503,13 +506,17 @@ BEGIN
          --   si es de uan regioanl internacion y es moenda diferente de doalres convertimos a Bolivianos
          ------------------------------------------------------------------------------------------------
          IF v_pre_integrar_presupuestos = 'true' THEN  --en las regionales internacionales la sincro de presupeustos esta deshabilitada
-              v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
+         
+             IF v_sincronizar = 'true' THEN
+                v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
+             ELSE
+                v_resp =  conta.f_gestionar_presupuesto_cbte_pxp(p_id_usuario, p_id_int_comprobante, 'no', p_fecha_ejecucion, v_nombre_conexion);
+             END IF;
          END IF;
          
          
-         
          -------------------------------------------------- 
-         --10.cerrars conexiones dblink si es que existe 
+         --10.cerrar conexiones dblink si es que existe 
          -------------------------------------------------
          
          --cerrar la conexion de actulizacion (que peude ser paralela a la de jecucion de presupesutos)  central -> regional

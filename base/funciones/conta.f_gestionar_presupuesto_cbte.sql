@@ -130,7 +130,8 @@ BEGIN
       ic.fecha,
       ic.vbregional,
       ic.temporal,
-      ic.nro_tramite
+      ic.nro_tramite,
+      ic.cbte_reversion
     into v_registros_comprobante
     from conta.tint_comprobante ic
     inner join conta.tclase_comprobante cl  on ic.id_clase_comprobante =  cl.id_clase_comprobante
@@ -288,10 +289,8 @@ BEGIN
                                   
                                       -- validamos que si tiene que comprometer la id_partida_ejecucion tiene que ser nulo
                                       
-                                       IF v_registros.id_partida_ejecucion is not NULL THEN
-                                       
+                                       IF v_registros.id_partida_ejecucion is not NULL THEN                                       
                                            raise exception 'EL comprobante no puede estar marcada para comprometer, si ya existe un comprometido';
-                                       
                                        END IF;
                                       
                                        
@@ -303,8 +302,6 @@ BEGIN
                                 IF v_registros.sw_movimiento = 'presupuestaria' THEN
                                      
                                      v_monto_cmp = 0;
-                                     
-                                   
                                      v_i = v_i + 1;
                                      -- determinamos el monto a comprometer
                                      
@@ -453,6 +450,8 @@ BEGIN
                                                    va_columna_relacion[v_i] = 'id_int_transaccion';
                                                    va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                                    va_id_transaccion[v_i] = v_registros.id_int_transaccion;
+                                                   va_nro_tramite[v_i]= v_registros_comprobante.nro_tramite;
+
                                                    
                                                    -- fechaejecucion presupuestaria  
                                                    IF p_fecha_ejecucion is NULL THEN
@@ -578,9 +577,9 @@ BEGIN
                                               
                                               IF v_sw_moneda_base = 'si' THEN
                                                  v_monto_x_pagar = v_registros_dev.monto_pago_mb;
-                                              ELSE
+                                               ELSE
                                                  v_monto_x_pagar = v_registros_dev.monto_pago;
-                                              END IF; 
+                                               END IF; 
                                              
                                                -- revisar la reversion del devengado para ajustar el monto a pagar
                                                
@@ -640,6 +639,8 @@ BEGIN
                                                va_columna_relacion[v_i]= 'id_int_transaccion';
                                                va_fk_llave[v_i] = v_registros.id_int_transaccion;
                                                va_id_int_rel_devengado[v_i]= v_registros_dev.id_int_rel_devengado;
+                                               va_nro_tramite[v_i]= v_registros_comprobante.nro_tramite;
+
                                                -- fecha pago presupuestaria  
                                                
                                                

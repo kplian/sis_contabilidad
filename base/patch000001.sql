@@ -3157,5 +3157,39 @@ IS 'esta funcion corre al apretar el boton eliminar de un un comprobante generad
 /***********************************I-SCP-RAC-CONTA-0-05/04/2016****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-1-05/04/2016****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN volcado VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.volcado
+IS 'indica si el comprobante tiene un volcaco';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN cbte_reversion VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.cbte_reversion
+IS 'si o no, es un cbte de reversion, los cbtes de reversion tienen un manejo presupuestario diferente'
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_rel_devengado
+  ADD COLUMN sw_reversion VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_rel_devengado.sw_reversion
+IS 'cuando es una reversion los montos son negativos y esta bandera es marcada';
+
+/***********************************F-SCP-RAC-CONTA-1-05/04/2016****************************************/
+
+
+
+
 
 
