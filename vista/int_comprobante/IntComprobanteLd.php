@@ -113,8 +113,6 @@ Phx.vista.IntComprobanteLd = {
 										  this.idContenedor,
 										 'CbteDependencias');
 			   
-	 },
-	
-	
+	 }
 };
 </script>

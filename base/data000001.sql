@@ -1476,8 +1476,6 @@ VALUES
   (1, NULL, E'2016-03-22 13:22:39.393', NULL, E'activo', NULL, NULL, 61, E'Cuenta por Rendir', E'CUEXREND', E'no', E'si', E'dinamico', 11, E'flujo', E'recurso_gasto');  
 
 
-
-
 /* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 1) */
 
 INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_relacion_contable", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
@@ -1486,6 +1484,13 @@ VALUES
   
   
 /***********************************F-DAT-RAC-CONTA-0-22/03/2016*****************************************/
+
+
+/***********************************I-DAT-RAC-CONTA-0-12/04/2016*****************************************/
+
+select param.f_import_tdocumento ('insert','CBT','Numero de Tramite Cbte','CONTA','depto','gestion','',NULL);
+
+/***********************************F-DAT-RAC-CONTA-0-12/04/2016*****************************************/
 
 
 

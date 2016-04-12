@@ -71,6 +71,7 @@ Phx.vista.GrupoOtDet=Ext.extend(Phx.gridInterfaz,{
             type:'ComboRec',
             id_grupo:0,
             filters:{pfiltro:'ot.motivo_orden#ot.desc_orden',type:'string'},
+            bottom_filter : true,
             grid:true,
             form:true
         },

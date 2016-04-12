@@ -57,6 +57,8 @@ DECLARE
     v_id_clase_comprobante			integer;
     v_id_int_transaccion			integer;
     v_registros_dev					record;
+    v_num_tramite					varchar;
+    va_id_int_cbte_fk				integer[];
    
    
 			    
@@ -136,11 +138,39 @@ BEGIN
             where cc.id_clase_comprobante = v_parametros.id_clase_comprobante;
             
             
-            
-        	--PERIODO
+           
+               
+            --PERIODO
         	--Obtiene el periodo a partir de la fecha
         	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
-        	
+            
+            
+            va_id_int_cbte_fk = (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[];
+            
+            
+            IF va_id_int_cbte_fk is null THEN
+                  -- TODO crear numero de tramite para cbts manuales
+                  v_num_tramite  =   param.f_obtener_correlativo(
+                        'CBT', 
+                         NULL,-- par_id, 
+                         NULL, --id_uo 
+                         v_parametros.id_depto,    -- id_depto
+                         p_id_usuario, 
+                         'CONTA', 
+                         NULL);
+             
+        	ELSE
+                 
+                 -- si tiene  un cbte relacion recuperar el nro de tramite
+                 select 
+                    cbte.nro_tramite
+                 into
+                   v_num_tramite
+                 from conta.tint_comprobante cbte
+                 where cbte.id_int_comprobante = va_id_int_cbte_fk[1];
+                 -- si tiene  mas de un cbte relacion y los nro de tramite bvarian genera un nuevo nro de tramite
+            
+            END IF;
         	
         	-----------------------------
         	--REGISTRO DEL COMPROBANTE
@@ -182,45 +212,47 @@ BEGIN
                 id_config_cambiaria,
                 tipo_cambio_2,
                 localidad,
-                id_moneda_tri
+                id_moneda_tri,
+                nro_tramite
           	) values(
-              v_parametros.id_clase_comprobante,  			
-              v_id_subsistema,
-              v_parametros.id_depto,
-              v_parametros.id_moneda,
-              v_rec.po_id_periodo,
-              v_parametros.id_funcionario_firma1,
-              v_parametros.id_funcionario_firma2,
-              v_parametros.id_funcionario_firma3,
-              v_parametros.tipo_cambio,
-              v_parametros.beneficiario,  			
-              'borrador',
-              v_parametros.glosa1,
-              v_parametros.fecha,
-              v_parametros.glosa2,  			
-              --v_parametros.momento,
-              p_id_usuario,
-              now(),
-              null,
-              null,
-              v_parametros._id_usuario_ai,
-              v_parametros._nombre_usuario_ai,
-              (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[],
-              v_parametros.cbte_cierre,
-              v_parametros.cbte_apertura,
-              v_parametros.cbte_aitb,
-              'si',
-              v_momento_comprometido,
-              v_momento_ejecutado,
-              v_momento_pagado,
-              v_tipo_comprobante,
-              v_parametros.id_tipo_relacion_comprobante,
-              v_parametros.fecha_costo_ini,
-              v_parametros.fecha_costo_fin,
-              v_parametros.id_config_cambiaria,
-              v_parametros.tipo_cambio_2,
-              'nacional',
-              v_id_moneda_tri
+                v_parametros.id_clase_comprobante,  			
+                v_id_subsistema,
+                v_parametros.id_depto,
+                v_parametros.id_moneda,
+                v_rec.po_id_periodo,
+                v_parametros.id_funcionario_firma1,
+                v_parametros.id_funcionario_firma2,
+                v_parametros.id_funcionario_firma3,
+                v_parametros.tipo_cambio,
+                v_parametros.beneficiario,  			
+                'borrador',
+                v_parametros.glosa1,
+                v_parametros.fecha,
+                v_parametros.glosa2,  			
+                --v_parametros.momento,
+                p_id_usuario,
+                now(),
+                null,
+                null,
+                v_parametros._id_usuario_ai,
+                v_parametros._nombre_usuario_ai,
+                va_id_int_cbte_fk,
+                v_parametros.cbte_cierre,
+                v_parametros.cbte_apertura,
+                v_parametros.cbte_aitb,
+                'si',
+                v_momento_comprometido,
+                v_momento_ejecutado,
+                v_momento_pagado,
+                v_tipo_comprobante,
+                v_parametros.id_tipo_relacion_comprobante,
+                v_parametros.fecha_costo_ini,
+                v_parametros.fecha_costo_fin,
+                v_parametros.id_config_cambiaria,
+                v_parametros.tipo_cambio_2,
+                'nacional',
+                v_id_moneda_tri,
+                v_num_tramite
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
 			
@@ -893,6 +925,58 @@ BEGIN
 
 		end;
     
+    
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_GETRAIZ_IME'
+ 	#DESCRIPCION:	Busca el cbte relacionado raiz
+ 	#AUTOR:		rac	
+ 	#FECHA:		11/04/2016 00:28:30
+	***********************************/
+
+	elsif(p_transaccion='CONTA_SWEDIT_IME')then
+
+		begin
+        
+              WITH RECURSIVE path_rec(id_int_comprobante, id_int_comprobante_fks,nro_tramite,nro_cbte,glosa1 ) AS (
+                      
+                      SELECT  
+                        c.id_int_comprobante,
+                        c.id_int_comprobante_fks,
+                        c.nro_tramite,
+                        c.nro_cbte,
+                        c.glosa1
+                      FROM conta.tint_comprobante c 
+                      WHERE c.id_int_comprobante = v_parametros.id_int_comprobante
+              	
+                      UNION
+                      SELECT  
+                        c2.id_int_comprobante,
+                        c2.id_int_comprobante_fks,
+                        c2.nro_tramite,
+                        c2.nro_cbte,
+                        c2.glosa1
+                      FROM conta.tint_comprobante c2
+                      inner join path_rec  pr on c2.id_int_comprobante = ANY(pr.id_int_comprobante_fks)
+                      
+              	     
+                  )
+                  SELECT 
+                    id_int_comprobante
+                  into
+                    v_id_int_comprobante
+                  FROM path_rec order by id_int_comprobante  limit 1 offset 0;
+          
+          
+                       
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','busqueda de raiz relacionada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante_raiz',COALESCE(v_id_int_comprobante::varchar,'0'));
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;     
     
     else
      

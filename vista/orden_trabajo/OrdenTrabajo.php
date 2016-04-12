@@ -74,6 +74,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'odt.desc_orden',type:'string'},
+			bottom_filter : true,
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -89,6 +90,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'odt.motivo_orden',type:'string'},
+			bottom_filter : true,
 			id_grupo:1,
 			grid:true,
 			form:true

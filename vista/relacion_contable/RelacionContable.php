@@ -92,6 +92,7 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
             },
             type:'ComboRec',
             filters:{pfiltro:'cc.codigo_cc',type:'string'},
+            bottom_filter : true,
             id_grupo:1,
             grid:true,
             form:true
@@ -113,10 +114,10 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 	   			type:'ComboRec',
 	   			id_grupo:0,
 	   			filters:{	
-			        pfiltro:'cue.nombre_cuenta#cu.nro_cuenta',
+			        pfiltro:'cu.nombre_cuenta#cu.nro_cuenta',
 					type:'string'
 				},
-	   		   
+	   		    bottom_filter : true,
 	   			grid:true,
 	   			form:true
 	   	},
@@ -139,7 +140,7 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 			        pfiltro:'au.codigo_auxiliar#au.nombre_auxiliar',
 					type:'string'
 				},
-	   		   
+	   		    bottom_filter : true,
 	   			grid:true,
 	   			form:true
 	   	},
@@ -162,7 +163,7 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 			        pfiltro:'par.codigo#par.nombre_partida',
 					type:'string'
 				},
-	   		   
+	   		    bottom_filter : true,
 	   			grid:true,
 	   			form:true
 	   	},	

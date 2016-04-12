@@ -14,8 +14,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
     fwidth: '70%',
     tabEnter: true,
     tipoDoc: 'venta',
-    regitrarDetalle:'si',
-	constructor:function(config){
+    regitrarDetalle: 'si',
+    constructor:function(config){
 		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
 		var me = this;
 		
