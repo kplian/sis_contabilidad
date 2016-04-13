@@ -3154,7 +3154,7 @@ ALTER TABLE conta.tplantilla_comprobante
 COMMENT ON COLUMN conta.tplantilla_comprobante.funcion_comprobante_validado_eliminado
 IS 'esta funcion corre al apretar el boton eliminar de un un comprobante generado que ya a sido validado';
 
-/***********************************I-SCP-RAC-CONTA-0-05/04/2016****************************************/
+/***********************************F-SCP-RAC-CONTA-0-05/04/2016****************************************/
 
 
 /***********************************I-SCP-RAC-CONTA-1-05/04/2016****************************************/
