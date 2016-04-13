@@ -3175,7 +3175,7 @@ ALTER TABLE conta.tint_comprobante
   ADD COLUMN cbte_reversion VARCHAR(4) DEFAULT 'no' NOT NULL;
 
 COMMENT ON COLUMN conta.tint_comprobante.cbte_reversion
-IS 'si o no, es un cbte de reversion, los cbtes de reversion tienen un manejo presupuestario diferente'
+IS 'si o no, es un cbte de reversion, los cbtes de reversion tienen un manejo presupuestario diferente';
 
 
 --------------- SQL ---------------
