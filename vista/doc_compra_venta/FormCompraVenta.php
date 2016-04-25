@@ -736,10 +736,6 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                 
     generarAtributos: function(){
         var me = this;
-		console.log('gonzalo');
-		console.log(me);
-		
-	   console.log('sejas');
 		this.Atributos=[
 			{
 				//configuracion del componente
