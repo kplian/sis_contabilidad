@@ -11,25 +11,25 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.IntComprobanteReg = {
+Phx.vista.IntComprobanteRegContable = {
     bsave:false,
    
 	require: '../../../sis_contabilidad/vista/int_comprobante/IntComprobante.php',
 	requireclase: 'Phx.vista.IntComprobante',
 	title: 'Libro Diario',
-	nombreVista: 'IntComprobanteReg',
+	nombreVista: 'IntComprobanteRegContable',
 	
 	constructor: function(config) {
-	    Phx.vista.IntComprobanteReg.superclass.constructor.call(this,config);
+	    Phx.vista.IntComprobanteRegContable.superclass.constructor.call(this,config);
 	    
 	    
-	    //Botón para Validación del Comprobante
+	    //Bot�n para Validaci�n del Comprobante
 			this.addButton('btnValidar', {
-				text : 'Validación',
+				text : 'Validaci�n',
 				iconCls : 'bchecklist',
 				disabled : true,
 				handler : this.validarCbte,
-				tooltip : '<b>Validación</b><br/>Validación del Comprobante'
+				tooltip : '<b>Validaci�n</b><br/>Validaci�n del Comprobante'
 			});
 			
 	    this.addButton('btnWizard', {
@@ -191,7 +191,7 @@ Phx.vista.IntComprobanteReg = {
 			this.desbloquearOrdenamientoGrid();
 			this.store.baseParams.id_deptos = this.cmbDepto.getValue();
 			this.store.baseParams.nombreVista = this.nombreVista;
-			this.store.baseParams.momento = 'presupuestario';
+			this.store.baseParams.momento = 'contable';
 			this.load();
 		},
 		
@@ -249,7 +249,7 @@ Phx.vista.IntComprobanteReg = {
 					if (reg.ROOT.error) {
 						this.Cmp.tipo_cambio.reset();
 						this.Cmp.tipo_cambio_2.reset();
-						Ext.Msg.alert('Error', 'Validación no realizada: ' + reg.ROOT.error)
+						Ext.Msg.alert('Error', 'Validaci�n no realizada: ' + reg.ROOT.error)
 					} else {
 						
 						//cambia labels
@@ -279,7 +279,7 @@ Phx.vista.IntComprobanteReg = {
 
 		},
 		validarCbte : function() {
-			Ext.Msg.confirm('Confirmación', '¿Está seguro de Validar el Comprobante?', function(btn, x, c) {
+			Ext.Msg.confirm('Confirmaci�n', '¿Esta seguro de Validar el Comprobante?', function(btn, x, c) {
 				if (btn == 'yes') {
 					var rec = this.sm.getSelected();
 					Phx.CP.loadingShow();
@@ -296,7 +296,7 @@ Phx.vista.IntComprobanteReg = {
 								Ext.Msg.alert('Error', 'Validación no realizada: ' + reg.ROOT.error)
 							} else {
 								this.reload();
-								Ext.Msg.alert('Mensaje', 'Proceso ejecutado con éxito')
+								Ext.Msg.alert('Mensaje', 'Proceso ejecutado con exito')
 							}
 						},
 						failure : this.conexionFailure,
