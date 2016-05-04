@@ -17,6 +17,7 @@ Phx.vista.DocVenta= {
 	requireclase: 'Phx.vista.DocCompraVenta',
 	title: 'Libro de Ventas',
 	nombreVista: 'DocVenta',
+	formTitulo: 'Formulario de Documento Venta',
 	
 	
    constructor: function(config) {
