@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -231,6 +229,21 @@ BEGIN
               v_id_tipo_doc_compra_venta
 			)RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 			
+            if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
+            	update conta.tdoc_compra_venta
+                set id_origen = v_parametros.id_origen,
+                tabla_origen = v_parametros.tabla_origen
+                where id_doc_compra_venta = v_id_doc_compra_venta;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
+            	if(v_parametros.id_tipo_compra_venta is not null) then
+                	
+                    update conta.tdoc_compra_venta
+                    set id_tipo_doc_compra_venta = v_parametros.id_tipo_compra_venta                    
+                    where id_doc_compra_venta = v_id_doc_compra_venta;
+                end if;
+            end if;
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta almacenado(a) con exito (id_doc_compra_venta'||v_id_doc_compra_venta||')'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_id_doc_compra_venta::varchar);
@@ -343,6 +356,15 @@ BEGIN
               id_cliente = v_id_cliente,
               id_auxiliar = v_parametros.id_auxiliar
 			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+            
+            if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
+            	if(v_parametros.id_tipo_compra_venta is not null) then
+                	
+                    update conta.tdoc_compra_venta
+                    set id_tipo_doc_compra_venta = v_parametros.id_tipo_compra_venta                    
+                    where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+                end if;
+            end if;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta modificado(a)'); 
