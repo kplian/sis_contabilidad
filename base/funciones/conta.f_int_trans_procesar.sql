@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_int_trans_procesar (
   p_id_int_comprobante integer
 )
@@ -40,7 +38,8 @@ BEGIN
       ic.origen,
       ic.id_clase_comprobante,
       cc.codigo,
-      ic.nro_tramite 
+      ic.nro_tramite ,
+      ic.id_subsistema
    into
       v_registros_cbte
    from conta.tint_comprobante ic 
@@ -64,7 +63,7 @@ BEGIN
                 
           --si es un cbte de pago
            
-          IF upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON') and (COALESCE(v_registros_cbte.nro_tramite,'') not like 'RRHH%') THEN  
+          IF upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON') and v_registros_cbte.id_subsistema != 13  THEN  
              
              
             

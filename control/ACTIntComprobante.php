@@ -31,6 +31,10 @@ class ACTIntComprobante extends ACTbase{
 			$this->objParam->addFiltro("incbte.estado_reg in (''borrador'', ''edicion'')");
 		}
 		
+		if($this->objParam->getParametro('momento')!= ''){
+			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
+		}
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarIntComprobante');

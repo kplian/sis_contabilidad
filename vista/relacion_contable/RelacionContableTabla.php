@@ -128,20 +128,20 @@ Phx.vista.RelacionContableTabla = {
             this.Cmp.id_auxiliar.store.setBaseParam('id_cuenta',r.data.id_cuenta);
             this.Cmp.id_auxiliar.modificado = true;
             this.Cmp.id_auxiliar.reset();
-            if (this.filtro_partida == 'no') {
-	            this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
-	            this.Cmp.id_partida.modificado = true;
-	            this.Cmp.id_partida.reset(); 
-	        }           
+            //if (this.filtro_partida == 'no') {
+	          //  this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
+	            //this.Cmp.id_partida.modificado = true;
+	            //this.Cmp.id_partida.reset(); 
+	        //}           
             
         }, this);
         
         this.Cmp.id_centro_costo.on('select', function (c,r,i) {           
-            if (this.filtro_partida == 'no') {
-	            this.Cmp.id_partida.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
-	            this.Cmp.id_partida.modificado = true;
-	            this.Cmp.id_partida.reset(); 
-	        }           
+            //if (this.filtro_partida == 'no') {
+	          //  this.Cmp.id_partida.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
+	            //this.Cmp.id_partida.modificado = true;
+	            //this.Cmp.id_partida.reset(); 
+	        //}           
             
         }, this);        
 		
