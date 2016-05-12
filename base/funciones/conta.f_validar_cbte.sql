@@ -325,7 +325,6 @@ BEGIN
                 IF  v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
                      
                 
-                       raise exception '-- % --', v_doc;
                        v_nro_cbte =  param.f_obtener_correlativo(
                                  v_doc, 
                                  v_id_periodo,-- par_id, 
