@@ -1,12 +1,8 @@
-CREATE OR REPLACE FUNCTION conta.ft_banca_compra_venta_ime (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
-/**************************************************************************
+CREATE OR REPLACE FUNCTION conta.ft_banca_compra_venta_ime(p_administrador int4, p_id_usuario int4, p_tabla varchar, p_transaccion varchar)
+  RETURNS varchar
+AS
+$BODY$
+  /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_banca_compra_venta_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tbanca_compra_venta'
@@ -65,6 +61,7 @@ DECLARE
       
       v_fecha_libro_o_entrega date;
       v_nro_cheque_o_sigma varchar;
+  v_resolucion varchar;
      
      
      
@@ -573,7 +570,8 @@ BEGIN
       sigma.fecha_entrega,
       pg_pagado.id_cuenta_bancaria as id_cuenta_bancaria_plan_pago,
       libro.nro_cheque,
-      pg_pagado.id_proceso_wf
+      pg_pagado.id_proceso_wf,
+      contra.resolucion_bancarizacion
 
 from tes.tplan_pago pg_pagado
 inner join tes.tplan_pago pg_devengado on pg_devengado.id_plan_pago = pg_pagado.id_plan_pago_fk
@@ -702,19 +700,34 @@ or (sigma.fecha_entrega >= '''||v_periodo.fecha_ini||'''::date and sigma.fecha_e
             v_saldo = v_monto_contrato  - v_monto_acumulado;
             
             
-            
+            --si se tiene contrato entonces se tiene la resolucion
+           
             
          end if;
          
-         --vemos si tiene contrato
-         /*if v_record_plan_pago_pxp.id_contrato is not null
+         --vemos si no tiene contrato se agrega la resolucion segun la fecha documento
+         if v_record_plan_pago_pxp.id_contrato is null
          then
-         
-         select numero into v_numero_de_contrato from leg.tcontrato
-         where id_contrato = v_record_plan_pago_pxp.id_contrato;
-         
-    
-         end if;*/
+      
+           --si la fecha es mayor al 1 de junio del 2015 entonces entra a la nueva resolucion
+           if (v_record_plan_pago_pxp.fecha_documento::date >= '2015-06-01'::DATE ) THEN
+             --entra a la nueva resolucion
+             v_resolucion = '10-0017-15';
+             
+             ELSE 
+             --entra a la antigua resolucion
+             v_resolucion = '10-0011-11';
+           END IF;
+           
+           else --tiene contrato
+             
+
+            v_resolucion = v_record_plan_pago_pxp.resolucion_bancarizacion;
+           
+          
+           
+           
+         end if;
          
          --sacamos el nit de la entidad financiera segun el contrato
          select inst.doc_id 
@@ -765,7 +778,8 @@ or (sigma.fecha_entrega >= '''||v_periodo.fecha_ini||'''::date and sigma.fecha_e
             tramite_cuota,
             saldo,
             id_depto_conta,
-            id_proceso_wf
+            id_proceso_wf,
+            resolucion
           	) values(
 			v_record_plan_pago_pxp.nro_cuenta,
 			v_tipo_documento_pago,
@@ -801,7 +815,8 @@ or (sigma.fecha_entrega >= '''||v_periodo.fecha_ini||'''::date and sigma.fecha_e
            v_numero_tramite_y_cuota,
            v_saldo,
            v_parametros.id_depto_conta,
-           v_record_plan_pago_pxp.id_proceso_wf
+           v_record_plan_pago_pxp.id_proceso_wf,
+            v_resolucion
 							
 			
 			
@@ -848,9 +863,5 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;
+$BODY$
+LANGUAGE plpgsql VOLATILE;

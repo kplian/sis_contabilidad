@@ -627,6 +627,24 @@ fheight: '80%',
 				grid:true,
 				form:true
 		},
+		
+		{
+			config:{
+				name: 'resolucion',
+				fieldLabel: 'resolucion',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'banca.resolucion',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+				bottom_filter : true
+		},
+		
 		{
 			config:{
 				name: 'periodo',
@@ -1501,7 +1519,7 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota','id_proceso_wf'	
+            			'tramite_cuota','id_proceso_wf'	,'resolucion'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
