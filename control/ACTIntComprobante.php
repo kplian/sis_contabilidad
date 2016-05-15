@@ -31,6 +31,10 @@ class ACTIntComprobante extends ACTbase{
 			$this->objParam->addFiltro("incbte.estado_reg in (''borrador'', ''edicion'')");
 		}
 		
+		if($this->objParam->getParametro('momento')!= ''){
+			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
+		}
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarIntComprobante');
@@ -401,6 +405,71 @@ class ACTIntComprobante extends ACTbase{
 		$this->res=$this->objFunc->swEditable($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function volcarCbte(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->volcarCbte($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	function listarCbteDependencias(){
+        
+        //obtiene el parametro nodo enviado por la vista
+        $node=$this->objParam->getParametro('node');
+
+        $id_cuenta=$this->objParam->getParametro('id_int_comprobante');
+        $tipo_nodo=$this->objParam->getParametro('tipo_nodo');
+        
+                   
+        if($node=='id'){
+            $this->objParam->addParametro('id_padre','%');
+        }
+        else {
+            $this->objParam->addParametro('id_padre',$id_cuenta);
+        }
+        
+		$this->objFunc=$this->create('MODIntComprobante');
+        $this->res=$this->objFunc->listarCbteDependencias();
+        
+        $this->res->setTipoRespuestaArbol();
+        
+        $arreglo=array();
+        
+        array_push($arreglo,array('nombre'=>'id','valor'=>'id_int_comprobante'));
+        array_push($arreglo,array('nombre'=>'id_p','valor'=>'id_int_comprobante_padre'));
+        
+        
+        array_push($arreglo,array('nombre'=>'text','valores'=>'<b> (#id_int_comprobante#) - #nro_cbte# </b>'));
+        array_push($arreglo,array('nombre'=>'cls','valor'=>'nombre_cuenta'));
+        array_push($arreglo,array('nombre'=>'qtip','valores'=>'<b> #nro_cbte#</b><br/>#glosa1#'));
+        
+        
+        $this->res->addNivelArbol('tipo_nodo','raiz',array('leaf'=>false,
+                                                        'allowDelete'=>true,
+                                                        'allowEdit'=>true,
+                                                        'cls'=>'folder',
+                                                        'tipo_nodo'=>'raiz',
+                                                        'icon'=>'../../../lib/imagenes/a_form.png'),
+                                                        $arreglo);
+         
+        /*se añade un nivel al arbol incluyendo con tido de nivel carpeta con su arreglo de equivalencias
+          es importante que entre los resultados devueltos por la base exista la variable\
+          tipo_dato que tenga el valor en texto = 'hoja' */
+                                                                
+
+         $this->res->addNivelArbol('tipo_nodo','hijo',array(
+                                                        'leaf'=>false,
+                                                        'allowDelete'=>true,
+                                                        'allowEdit'=>true,
+                                                        'tipo_nodo'=>'hijo',
+                                                        'icon'=>'../../../lib/imagenes/a_form.png'),
+                                                        $arreglo);
+													
+														
+
+        $this->res->imprimirRespuesta($this->res->generarJson());         
+
+   }
 		
 		
 }

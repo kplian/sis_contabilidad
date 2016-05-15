@@ -62,9 +62,9 @@ Phx.vista.TipoDocCompraVenta=Ext.extend(Phx.gridInterfaz,{
             },
             type:'ComboBox',
             id_grupo:1,
-            filters:{   pfiltro:'tdoc.tipo',
+            filters:{   pfiltro: 'tdoc.tipo',
                         type: 'list',
-                         options: ['compra','venta']  
+                        options: ['compra','venta']  
                     },
             grid: true,
             egrid: true,

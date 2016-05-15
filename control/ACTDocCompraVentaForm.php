@@ -181,7 +181,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 		$data = $res -> getDatos();
 		$fileName = $nombre.$ext;
 		//create file
-		$file = fopen("../../../reportes_generados/$fileName", 'w');
+		$file = fopen("../../../reportes_generados/$fileName","w+");
 		$ctd = 1;
 		
 		if($this->objParam->getParametro('formato_reporte') !='txt'){

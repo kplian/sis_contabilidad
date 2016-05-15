@@ -31,6 +31,9 @@ class MODBancaCompraVenta extends MODbase{
 		$this->arreglo['banca_documentos'] = $_SESSION["BANCA_DOCUMENTOS"];
 		$this->setParametro('banca_documentos','banca_documentos','varchar');	
 		
+		
+		$this->setParametro('acumulado','acumulado','varchar');
+		$this->setParametro('id_banca_compra_venta','id_banca_compra_venta','int4');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_banca_compra_venta','int4');
@@ -52,8 +55,6 @@ class MODBancaCompraVenta extends MODbase{
 		$this->captura('num_documento_pago','varchar');
 		$this->captura('num_contrato','varchar');
 		$this->captura('nit_entidad','numeric');
-			
-		
 		$this->captura('fecha_reg','timestamp');
 		$this->captura('usuario_ai','varchar');
 		$this->captura('id_usuario_reg','int4');
@@ -63,25 +64,35 @@ class MODBancaCompraVenta extends MODbase{
 		$this->captura('id_periodo','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		
 		$this->captura('desc_modalidad_transaccion','varchar');
 		$this->captura('desc_tipo_transaccion','varchar');
 		$this->captura('desc_tipo_documento_pago','varchar');
-		
 		$this->captura('revisado','varchar');
 		$this->captura('id_contrato','int4');
 		$this->captura('id_proveedor','int4');
-		
 		$this->captura('desc_proveedor2','varchar');
          $this->captura('desc_contrato','text');     
-		 
 		 $this->captura('id_cuenta_bancaria','int4'); 
 		 $this->captura('desc_cuenta_bancaria','varchar'); 
-		 
 		 $this->captura('id_documento','int4'); 
 		 $this->captura('desc_documento','varchar'); 
-		          
 		$this->captura('periodo','varchar'); 
+		$this->captura('saldo','numeric');
+		$this->captura('monto_contrato','numeric');
+		$this->captura('gestion','int4');
+		
+		$this->captura('banca_seleccionada','int4');
+		
+		$this->captura('numero_cuota','int4');
+		$this->captura('tramite_cuota','varchar'); 
+
+	$this->captura('id_proceso_wf','int4');
+	
+	
+	$this->captura('resolucion','varchar'); 
+
+	
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -130,8 +141,7 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('numero_cuota','numero_cuota','int4');
 		
 		
-		
-	
+				
 	
 
 		//Ejecuta la instruccion
@@ -179,6 +189,8 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('id_documento','id_documento','int4');
 		
 		$this->setParametro('revisado','revisado','varchar');
+		
+		$this->setParametro('monto_contrato','monto_contrato','numeric');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -430,6 +442,8 @@ class MODBancaCompraVenta extends MODbase{
         $this->setTipoRetorno('record');
 		
 		//BANCA_DOCUMENTOS
+		
+		
 		if($_SESSION["BANCA_DOCUMENTOS"] == NULL){
 			$_SESSION["BANCA_DOCUMENTOS"] = "pxp"; // si no tiene esa variable entrara por defecto en las tablas del pxp
 		}
@@ -458,6 +472,50 @@ class MODBancaCompraVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+	function insertAuto(){
+		
+		$this->procedimiento='conta.ft_banca_compra_venta_ime';
+		$this->transaccion='CONTA_BANCA_AUT';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_periodo','id_periodo','int4');
+		$this->setParametro('tipo','tipo','varchar');
+		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+		
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+		
+	}
+	
+	function BorrarTodo(){
+		
+		$this->procedimiento='conta.ft_banca_compra_venta_ime';
+		$this->transaccion='CONTA_BANCA_ELITO';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+		
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+		
+	}
+	
+	
 
 
 

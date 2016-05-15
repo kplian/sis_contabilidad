@@ -46,6 +46,13 @@ header("content-type: text/javascript; charset=UTF-8");
 				handler : this.loadRelDev,
 				tooltip : '<b>Relación con el devengado</b><br/>Solo para comprobantes de pago presupuestario'
 			});
+			
+			this.addButton('chkpresupuesto',{	text:'Chk Presupuesto',
+				iconCls: 'blist',
+				disabled: true,
+				handler: this.checkPresupuesto,
+				tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>'
+			});
 
 			
 
@@ -530,7 +537,17 @@ header("content-type: text/javascript; charset=UTF-8");
 			config : {
 				name : 'nro_tramite',
 				gwidth : 150,
-				fieldLabel : 'Nro. Trámite'
+				fieldLabel : 'Nro. Trámite',
+                renderer: function(value,p,record){
+                         if(record.data.cbte_reversion=='si'){
+                             return String.format('<div title="Cbte de Reversión"><b><font color="#0000FF">{0}</font></b></div>', value);
+                         }
+                        if(record.data.volcado=='si'){
+                             return String.format('<div title="Cbte Revertido/Volcado"><b><font color="red">{0}</font></b></div>', value);
+                        }
+                             return String.format('{0}', value);
+                       
+                 }
 			},
 			type : 'Field',
 			id_grupo : 0,
@@ -1029,7 +1046,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		'cbte_cierre', 'cbte_apertura', 'cbte_aitb', 'momento_pagado', 'manual', 
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
 		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 
-		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 'desc_moneda_tri', 'localidad','sw_editable'],
+		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 
+		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado'],
 
 		rowExpander : new Ext.ux.grid.RowExpander({
 			tpl : new Ext.Template('<br>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Clase cbte:&nbsp;&nbsp;</b> {desc_clase_comprobante}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Origen:&nbsp;&nbsp;</b> {desc_subsistema}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Beneficiario:&nbsp;&nbsp;</b> {beneficiario}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa1} {glosa2}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Frima 1:&nbsp;&nbsp;</b> {desc_firma1} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 2:&nbsp;&nbsp;</b> {desc_firma2} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 3:&nbsp;&nbsp;</b> {desc_firma3} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>')
@@ -1167,7 +1185,31 @@ header("content-type: text/javascript; charset=UTF-8");
 				width : '80%',
 				height : '80%'
 			}, rec.data, this.idContenedor, 'IntRelDevengado');
-		}
+		},
+	   checkPresupuesto:function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
+										'Estado del Presupuesto',
+										{
+											modal:true,
+											width:700,
+											height:450
+										}, {
+											data:{
+											   nro_tramite: rec.data.nro_tramite								  
+											}}, this.idContenedor,'ChkPresupuesto',
+										{
+											config:[{
+													  event:'onclose',
+													  delegate: this.onCloseChk												  
+													}],
+											
+											scope:this
+										 });
+			   
+	 },
+		
 		
 		
 		

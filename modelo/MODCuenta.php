@@ -287,7 +287,7 @@ class MODCuenta extends MODbase{
    function clonarCuentasGestion(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='conta.f_cuenta_ime';
-		$this->transaccion='CONTA_CLONAR_IME';
+		$this->transaccion='CONTA_CLONARCUE_IME';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion

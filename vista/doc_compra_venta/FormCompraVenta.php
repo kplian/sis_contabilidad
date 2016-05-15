@@ -16,6 +16,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     tabEnter: true,
     mostrarFormaPago : true,
     regitrarDetalle: 'si',
+    id_moneda_defecto: 0,  // 0 quiere decir todas las monedas
     //layoutType: 'wizard',
     layout: 'fit',
     autoScroll: false,
@@ -942,6 +943,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                name:'id_moneda',
 	                origen:'MONEDA',
 	                allowBlank:false,
+	                baseParams: {id_moneda_defecto: me.id_moneda_defecto}, 
 	                fieldLabel:'Moneda',
 	                gdisplayField:'desc_moneda',
 	                gwidth:100,

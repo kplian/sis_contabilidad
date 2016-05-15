@@ -50,7 +50,7 @@ Phx.vista.OficinaOt=Ext.extend(Phx.gridInterfaz,{
 					fields: ['id_oficina','nombre','codigo','nombre_lugar'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams:{par_filtro:'ofi.nombre,ofi.codigo,lug.nombre'}
+					baseParams:{par_filtro:'ofi.nombre'}
 				}),
 				valueField: 'id_oficina',
 				displayField: 'nombre',

@@ -113,7 +113,9 @@ BEGIN
                               incbte.desc_moneda_tri,
                               incbte.origen,
                               incbte.localidad,
-                              incbte.sw_editable
+                              incbte.sw_editable,
+                              incbte.cbte_reversion,
+                              incbte.volcado
                           from conta.vint_comprobante incbte
                           where  ';
 			
@@ -321,6 +323,98 @@ BEGIN
 			return v_consulta;
 						
 		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_DEPCBT_SEL'
+ 	#DESCRIPCION:	Listado de dependencia en formato arbol
+ 	#AUTOR:			RAC	
+ 	#FECHA:			11/04/2016
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DEPCBT_SEL')then
+     				
+    	begin
+        
+           --si el priemro obtener el razi
+           
+           
+           -- si no obtener los otros
+           
+           if(v_parametros.id_padre = '%') then
+           
+                 v_consulta:='WITH RECURSIVE path_rec(id_int_comprobante, id_int_comprobante_fks, nro_tramite, nro_cbte, glosa1,volcado, cbte_reversion,id_tipo_relacion_comprobante ) AS (
+                                SELECT  
+                                  c.id_int_comprobante,
+                                  c.id_int_comprobante_fks,
+                                  c.nro_tramite,
+                                  c.nro_cbte,
+                                  c.glosa1,
+                                  c.volcado,
+                                  c.cbte_reversion,
+                                  c.id_tipo_relacion_comprobante
+                                FROM conta.tint_comprobante c 
+                                WHERE c.id_int_comprobante = '||v_parametros.id_int_comprobante_basico::varchar||'
+                        	
+                                UNION
+                                SELECT  
+                                  c2.id_int_comprobante,
+                                  c2.id_int_comprobante_fks,
+                                  c2.nro_tramite,
+                                  c2.nro_cbte,
+                                  c2.glosa1,
+                                  c2.volcado,
+                                  c2.cbte_reversion,
+                                  c2.id_tipo_relacion_comprobante
+                                FROM conta.tint_comprobante c2
+                                inner join path_rec  pr on c2.id_int_comprobante = ANY(pr.id_int_comprobante_fks)
+                                
+                        	     
+                            )
+                            SELECT 
+                              c.id_int_comprobante,
+                              NULL::integer as id_int_comprobante_padre,
+                              c.nro_cbte,
+                              c.glosa1,
+                              rc.nombre,
+                              c.volcado,
+                              c.cbte_reversion,
+                              ''raiz''::varchar as tipo_nodo
+                            FROM path_rec c
+                            left join conta.ttipo_relacion_comprobante rc on rc.id_tipo_relacion_comprobante = c.id_tipo_relacion_comprobante
+                            order by id_int_comprobante  limit 1 offset 0';
+                  
+                     
+               else
+               
+                --Sentencia de la consulta
+			    v_consulta:='SELECT
+                              c.id_int_comprobante,
+                              '||v_parametros.id_padre||'::integer as id_int_comprobante_padre,
+                              c.nro_cbte,
+                              c.glosa1,
+                              rc.nombre,
+                              c.volcado,
+                              c.cbte_reversion,
+                              ''hijo''::varchar as tipo_nodo
+                          FROM conta.tint_comprobante c
+                          inner join conta.ttipo_relacion_comprobante rc on rc.id_tipo_relacion_comprobante = c.id_tipo_relacion_comprobante
+                          WHERE  '||v_parametros.id_padre||' = ANY(c.id_int_comprobante_fks)';
+              
+              
+              
+              
+              
+              
+              end if;
+        
+          
+			raise notice '--> %', v_consulta;			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;    
+        
 					
 	else
 					     

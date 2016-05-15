@@ -36,9 +36,23 @@ class ACTBancaCompraVenta extends ACTbase{
 		}
 		
 		
-		if($this->objParam->getParametro('id_contrato') != ''){
+		/*if($this->objParam->getParametro('id_contrato') != ''){
 			$this->objParam->addFiltro("banca.id_contrato = ".$this->objParam->getParametro('id_contrato'));  
+		}*/
+		
+		
+		
+		if($this->objParam->getParametro('acumulado') == 'si'){
+			$this->objParam->addFiltro("banca.id_contrato = ".$this->objParam->getParametro('id_contrato'));  
+			
 		}
+		
+		if($this->objParam->getParametro('id_depto') != ''){
+			$this->objParam->addFiltro("banca.id_depto_conta = ".$this->objParam->getParametro('id_depto'));  
+			
+		}
+		
+		
 		
 		
 		
@@ -134,7 +148,7 @@ class ACTBancaCompraVenta extends ACTbase{
 		
 		
 		
-		$MiDocumento = fopen("/var/www/html/erpkplian/reportes_generados/".$tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa.".txt", "w+");
+		$MiDocumento = fopen("../../../reportes_generados/".$tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa.".txt", "w+");
 		$nombre_archivo = $tipo."_Auxiliar_".$periodo.$gestion."_".$nit_empresa;
 		
 		
@@ -142,7 +156,22 @@ class ACTBancaCompraVenta extends ACTbase{
 		foreach ($datos as $dato) {
 			if($this->objParam->getParametro('tipo') == 'Compras'){
 				
-				$Escribo = "".$dato['modalidad_transaccion'] ."|".$dato['fecha_documento'] ."|".$dato['tipo_transaccion'] ."|".$dato['nit_ci'] ."|".$dato['razon'] ."|".$dato['num_documento'] ."|".$dato['num_contrato'] ."|".$dato['importe_documento'] ."|".$dato['autorizacion'] ."|".$dato['num_cuenta_pago'] ."|".$dato['monto_pagado'] ."|".$dato['monto_acumulado'] ."|".$dato['nit_entidad'] ."|".$dato['num_documento_pago'] ."|".$dato['tipo_documento_pago'] ."|".$dato['fecha_de_pago'] ."| ";
+				$Escribo = "".$dato['modalidad_transaccion'] ."|"
+							.$dato['fecha_documento'] ."|"
+							.$dato['tipo_transaccion'] ."|"
+							.$dato['nit_ci'] ."|"
+							.$dato['razon'] ."|"
+							.$dato['num_documento'] ."|"
+							.$dato['num_contrato'] ."|"
+							.$dato['importe_documento'] ."|"
+							.$dato['autorizacion'] ."|"
+							.$dato['num_cuenta_pago'] ."|"
+							.$dato['monto_pagado'] ."|"
+							.$dato['monto_acumulado'] ."|"
+							.$dato['nit_entidad'] ."|"
+							.$dato['num_documento_pago'] ."|"
+							.$dato['tipo_documento_pago']."|"
+							.$dato['fecha_de_pago'] ."|";
 				
 			}else if($this->objParam->getParametro('tipo') == 'Ventas'){
 				
@@ -189,6 +218,18 @@ class ACTBancaCompraVenta extends ACTbase{
 		$this->res=$this->objFunc->listarDocumento($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function insertAuto(){
+		$this->objFunc=$this->create('MODBancaCompraVenta');	
+		$this->res=$this->objFunc->insertAuto($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	function BorrarTodo(){
+		$this->objFunc=$this->create('MODBancaCompraVenta');	
+		$this->res=$this->objFunc->BorrarTodo($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
 
 
 

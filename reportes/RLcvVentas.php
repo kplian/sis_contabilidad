@@ -59,14 +59,19 @@ class RLcvVentas extends  ReportePDF {
 		
 		
 	    $this->SetFont('','BU',12);		
-		$this->Cell(0,5,"LIBRO DE VENTAS ESTANDAR",0,1,'C');		
-		$this->Ln(3);
+		$this->Cell(0,5,"LIBRO DE VENTAS ESTANDAR",0,1,'C');
+		$this->SetFont('','BU',7);
+		$this->Cell(0,5,"Expresado en Bolivianos",0,1,'C');		
+		$this->Ln(2);		
+		
 		
 		$this->SetFont('','',10);
 		
-		$height = 5;
-        $width1 = 15;
-        $width2 = 20;
+		$height = 5;       
+        $width1 = 5;
+		$esp_width = 10;
+        $width_c1= 55;
+		$width_c2= 92;
         $width3 = 40;
         $width4 = 75;
 		
@@ -77,26 +82,26 @@ class RLcvVentas extends  ReportePDF {
 		    $fecha_fin = $this->objParam->getParametro('fecha_fin');
 		
 		
-			$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-	        $this->Cell(60, $height, 'DEL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell($width_c1, $height, 'DEL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
 	        $this->SetFillColor(192,192,192, true);
-	        $this->Cell(70, $height, $fecha_ini, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        $this->Cell($width_c2, $height, $fecha_ini, $black, 0, 'L', true, '', 0, false, 'T', 'C');
 	        
-	        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->Cell(20, $height,'HASTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
 	        $this->SetFillColor(192,192,192, true);
 	        $this->Cell(50, $height, $fecha_fin, $black, 0, 'L', true, '', 0, false, 'T', 'C');
 		}
 		else{
-			$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-	        $this->Cell(60, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell($width_c1, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
 	        $this->SetFillColor(192,192,192, true);
-	        $this->Cell(70, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        $this->Cell($width_c2, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
 	        
-	        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->Cell(20, $height,'MES:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
 	        $this->SetFillColor(192,192,192, true);
@@ -106,19 +111,18 @@ class RLcvVentas extends  ReportePDF {
 		
 		$this->Ln();
 		
-		$this->Cell(45, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell(60, $height, 'NOMBRE O RAZON SOCIAL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $this->Cell($width_c1, $height, 'NOMBRE O RAZON SOCIAL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->SetFont('', '');
         $this->SetFillColor(192,192,192, true);
-        $this->Cell(70, $height, $this->datos_entidad['nombre'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+        $this->Cell($width_c2, $height, $this->datos_entidad['nombre'].' ('.$this->datos_entidad['direccion_matriz'].')', $black, 0, 'L', true, '', 0, false, 'T', 'C');
         
-        $this->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->Cell(20, $height,'NIT:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->SetFont('', '');
         $this->SetFillColor(192,192,192, true);
         $this->Cell(50, $height, $this->datos_entidad['nit'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
         
-		
 		
 		
 		$this->Ln(8);

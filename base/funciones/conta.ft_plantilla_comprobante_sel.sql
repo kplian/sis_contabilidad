@@ -83,7 +83,9 @@ BEGIN
                           cmpb.campo_depto_libro,
                           campo_fecha_costo_ini,
                           campo_fecha_costo_fin,
-                          cmpb.funcion_comprobante_editado
+                          cmpb.funcion_comprobante_editado,
+                          cmpb.funcion_comprobante_prevalidado,
+                          cmpb.funcion_comprobante_validado_eliminado
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod

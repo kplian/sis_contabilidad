@@ -3082,28 +3082,6 @@ IS 'indetifica que auxiliar son usados para acumular cuenta corriente en cotabil
 
 
 
-/***********************************I-SCP-RAC-CONTA-0-19/02/2016****************************************/
-
---------------- SQL ---------------
-
-ALTER TABLE param.tplantilla
-  ADD COLUMN tipo_excento VARCHAR(20) DEFAULT 'variable' NOT NULL;
-
-COMMENT ON COLUMN param.tplantilla.tipo_excento
-IS 'peuden ser variable, porcentual, constante. En caso de constante o porcentual toma el valor del campo valor_excento';
-
-
---------------- SQL ---------------
-
-ALTER TABLE param.tplantilla
-  ADD COLUMN valor_excento NUMERIC DEFAULT 0 NOT NULL;
-
-COMMENT ON COLUMN param.tplantilla.valor_excento
-IS 'valor que se aplica al excento cuando es  porcentual o constante';
-
-/***********************************F-SCP-RAC-CONTA-0-19/02/2016****************************************/
-
-
 
 /***********************************I-SCP-RAC-CONTA-0-22/02/2016****************************************/
 
@@ -3132,4 +3110,86 @@ ALTER TABLE conta.tdoc_compra_venta
 COMMENT ON COLUMN conta.tdoc_compra_venta.id_tipo_doc_compra_venta
 IS 'dato para el reporte LCD de impuestos';
 /***********************************F-SCP-RAC-CONTA-0-22/02/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-21/03/2016****************************************/
+
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN saldo NUMERIC(10,2);
+
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN resolucion VARCHAR(255);
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN tramite_cuota VARCHAR(255);
+  
+  
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN id_proceso_wf INTEGER;
+  
+/***********************************F-SCP-RAC-CONTA-0-21/03/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-05/04/2016****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN funcion_comprobante_prevalidado TEXT;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.funcion_comprobante_prevalidado
+IS 'esta funcion se ejecuta previamente a la validacion del comprobante,  puede ser util para revertir presupuestos previamente validados';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN funcion_comprobante_validado_eliminado TEXT;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.funcion_comprobante_validado_eliminado
+IS 'esta funcion corre al apretar el boton eliminar de un un comprobante generado que ya a sido validado';
+
+/***********************************F-SCP-RAC-CONTA-0-05/04/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-05/04/2016****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN volcado VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.volcado
+IS 'indica si el comprobante tiene un volcaco';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN cbte_reversion VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.cbte_reversion
+IS 'si o no, es un cbte de reversion, los cbtes de reversion tienen un manejo presupuestario diferente';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_rel_devengado
+  ADD COLUMN sw_reversion VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_rel_devengado.sw_reversion
+IS 'cuando es una reversion los montos son negativos y esta bandera es marcada';
+
+/***********************************F-SCP-RAC-CONTA-1-05/04/2016****************************************/
+
+
+
+
+
 

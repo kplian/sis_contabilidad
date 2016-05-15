@@ -123,15 +123,28 @@ BEGIN
     v_consulta = 'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'';
-      
-    execute	'select '||v_columnas ||
+            
+            
+            
+     IF v_plantilla.id_tabla is null or v_plantilla.id_tabla = '' THEN
+        raise exception 'defina un id para la tabla en la plantilla de comprobante';
+     END IF; 
+     
+     IF v_plantilla.tabla_origen is null or v_plantilla.tabla_origen = '' THEN
+        raise exception 'defina el nombre de la tabla origen de datos en la plantilla de comprobante';
+     END IF; 
+     
+     
+    -- raise exception 'llega .. % , % , % -',p_codigo, v_plantilla.tabla_origen,p_id_tabla_valor ;
+    
+
+ execute	'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'' into v_tabla;
             
             
           
-    
-    
+   
     ----------------------------------------------------------
     --  OBTIENE LOS VALORES,  THIS   (tipo de dato agrupador)     
     ----------------------------------------------------------
@@ -429,6 +442,7 @@ BEGIN
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
     
+     
     raise notice '=====> AL INSERTAR  v_id_int_comprobante= %',  v_id_int_comprobante;
     -- genera transacciones del comprobante
     
@@ -463,7 +477,7 @@ BEGIN
     --   se tiene que actulizar las cuentas, centros de costos y partidas
     ------------------------------------------------------------------- --
     
-    
+   
      IF v_this.columna_gestion !=  v_rec_periodo.po_id_gestion THEN
          
          IF not  conta.f_act_gestion_transaccion(
@@ -477,7 +491,7 @@ BEGIN
       
      END IF;
     
-    --------------------------------------------------------------
+    ------------------------------------------------------------
     -- migracion de comprobante a endesis o regionales  DBLINK
     ------------------------------------------------------------
     
@@ -488,7 +502,7 @@ BEGIN
     -- TODO ver el problema de conexion en estaciones internacioanles para tener rooback
      
     --Si la sincronizacion esta habilitada
-    IF(v_sincronizar = 'true')THEN
+    IF (v_sincronizar = 'true') THEN
   	 	
         -- si sincroniza localmente con endesis
          IF(not p_sincronizar_internacional)THEN

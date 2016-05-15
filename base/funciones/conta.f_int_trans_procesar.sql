@@ -38,7 +38,8 @@ BEGIN
       ic.origen,
       ic.id_clase_comprobante,
       cc.codigo,
-      ic.nro_tramite 
+      ic.nro_tramite ,
+      ic.id_subsistema
    into
       v_registros_cbte
    from conta.tint_comprobante ic 
@@ -61,8 +62,12 @@ BEGIN
           ------------------------------------------------------------------------------------------------------
                 
           --si es un cbte de pago
-          IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON') and v_registros_cbte.nro_tramite not like 'RRHH%' THEN  
-              -- busca si alguna de las cuentas contables tiene relacion 
+           
+          IF upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON') and v_registros_cbte.id_subsistema != 13  THEN  
+             
+             
+            
+           -- busca si alguna de las cuentas contables tiene relacion 
               -- con una cuenta bancaria
               v_id_cuenta_bancaria = NULL;
                     
@@ -79,13 +84,15 @@ BEGIN
                          and rc.id_auxiliar = v_registros.id_auxiliar
                   offset 0 limit 1;
               END IF;
-                       
+                 
+                 
               IF v_id_cuenta_bancaria is not null  THEN
                  UPDATE  conta.tint_transaccion it set
                    id_cuenta_bancaria =  v_id_cuenta_bancaria,
                    banco = 'si'   -- bandera que habilita boton de cheque  en la interface, y exige el registro en la validacion
                  WHERE id_int_transaccion = v_registros.id_int_transaccion;
                     
+                -- raise exception 'entra %', v_registros.id_int_transaccion;
               ELSE
                      
                 UPDATE  conta.tint_transaccion it set
@@ -101,8 +108,7 @@ BEGIN
         -----------------------------------
               
      END LOOP;
-   
-   
+         
    
    --retorna resultado
    RETURN TRUE;

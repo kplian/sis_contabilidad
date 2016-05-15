@@ -18,6 +18,7 @@ Phx.vista.DocCompra = {
 	title: 'Libro de Compras',
 	nombreVista: 'DocCompra',
 	tipoDoc: 'compra',
+	formTitulo: 'Formulario de Documento Compra',
 	
 	constructor: function(config) {
 	    Phx.vista.DocCompra.superclass.constructor.call(this,config);

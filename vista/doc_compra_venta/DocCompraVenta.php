@@ -14,8 +14,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
     fwidth: '70%',
     tabEnter: true,
     tipoDoc: 'venta',
-    regitrarDetalle:'si',
-	constructor:function(config){
+    regitrarDetalle: 'si',
+    constructor:function(config){
 		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
 		var me = this;
 		
@@ -163,7 +163,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                    totalProperty: 'total',
 	                    fields: ['id_tipo_doc_compra_venta','codigo','nombre','obs','tipo'],
 	                    remoteSort: true,
-	                    baseParams: { par_filtro:'nombre',tipo:(me.tipoDoc == 'compra')?'compra':'venta'}
+	                    baseParams: { par_filtro:'nombre',tipo: me.tipoDoc}
 	                }),
 	                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo} - {nombre}</p></div></tpl>',
 	                valueField: 'id_tipo_doc_compra_venta',
@@ -1253,12 +1253,12 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
         }
     },
    
-   
+   formTitulo: 'Formulario de Documento Compra',
    abrirFormulario: function(tipo, record){
    	       var me = this;
    	       console.log(' me.regitrarDetalle', me.regitrarDetalle)
 	       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVenta.php',
-	                                (me.tipoDoc == 'compra')?'Formulario de Documento Compra':'Formulario de Documento Venta',
+	                                me.formTitulo,
 	                                {
 	                                    modal:true,
 	                                    width:'100%',
