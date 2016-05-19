@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -229,21 +231,6 @@ BEGIN
               v_id_tipo_doc_compra_venta
 			)RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 			
-            if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
-            	update conta.tdoc_compra_venta
-                set id_origen = v_parametros.id_origen,
-                tabla_origen = v_parametros.tabla_origen
-                where id_doc_compra_venta = v_id_doc_compra_venta;
-            end if;
-            
-            if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
-            	if(v_parametros.id_tipo_compra_venta is not null) then
-                	
-                    update conta.tdoc_compra_venta
-                    set id_tipo_doc_compra_venta = v_parametros.id_tipo_compra_venta                    
-                    where id_doc_compra_venta = v_id_doc_compra_venta;
-                end if;
-            end if;
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta almacenado(a) con exito (id_doc_compra_venta'||v_id_doc_compra_venta||')'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_id_doc_compra_venta::varchar);
@@ -274,13 +261,16 @@ BEGIN
             --revisa si el documento no esta marcado como revisado
             select 
              dcv.revisado,
-             dcv.id_int_comprobante
+             dcv.id_int_comprobante,
+             dcv.id_origen,
+             dcv.tabla_origen
             into 
               v_registros
             from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
             
+            
             IF  v_registros.revisado = 'si' THEN
-               raise exception 'los documentos revisados no peuden modificarse';
+               raise exception 'los documentos revisados no pueden modificarse';
             END IF;
             
             
@@ -356,15 +346,6 @@ BEGIN
               id_cliente = v_id_cliente,
               id_auxiliar = v_parametros.id_auxiliar
 			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
-            
-            if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
-            	if(v_parametros.id_tipo_compra_venta is not null) then
-                	
-                    update conta.tdoc_compra_venta
-                    set id_tipo_doc_compra_venta = v_parametros.id_tipo_compra_venta                    
-                    where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
-                end if;
-            end if;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta modificado(a)'); 
@@ -416,18 +397,33 @@ BEGIN
              --revisa si el documento no esta marcado como revisado
             select 
              dcv.revisado,
-             dcv.id_int_comprobante
+             dcv.id_int_comprobante,
+             dcv.tabla_origen,
+             dcv.id_origen,
+             dcv.id_depto_conta
             into 
               v_registros
             from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
             
             IF  v_registros.revisado = 'si' THEN
-               raise exception 'los documentos revisados no peuden modificarse';
+               raise exception 'los documentos revisados no pueden eliminarse';
             END IF;
             
-            --TODO revisar si el archivo es manual o no
-            -- revisar si tiene conceptos de gasto
-             
+             -- revisar si el archivo es manual o no
+            
+            IF v_registros.id_origen is not null THEN            
+               raise exception 'Solo puede eliminar los documentos insertados manualmente';
+            END IF;
+            
+           
+           
+            --validar si el periodo de conta esta cerrado o abierto
+            -- recuepra el periodo de la fecha ...
+            --Obtiene el periodo a partir de la fecha
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+            
+            -- valida que period de libro de compras y ventas este abierto
+            v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_registros.id_depto_conta, v_rec.po_id_periodo);
              
              
              
@@ -437,6 +433,10 @@ BEGIN
                raise exception 'No puede elimiar por que el documento esta acociado al cbte id(%), primero quite esta relacion', v_registros.id_int_comprobante; 
             END IF;
         
+        
+            --Sentencia de la eliminacion
+			delete from conta.tdoc_concepto
+            where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
         
         
 			--Sentencia de la eliminacion

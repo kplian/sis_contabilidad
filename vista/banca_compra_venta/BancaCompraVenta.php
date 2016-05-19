@@ -622,7 +622,7 @@ fheight: '80%',
 				maxLength:255
 			},
 				type:'TextField',
-				
+				filters: {pfiltro: 'banca.tramite_cuota',type: 'string'},
 				id_grupo:0,
 				grid:true,
 				form:true
@@ -644,6 +644,24 @@ fheight: '80%',
 				form:false,
 				bottom_filter : true
 		},
+		
+		
+		{
+			config:{
+				name: 'tipo_monto',
+				fieldLabel: 'tipo_monto',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'contra.tipo_monto',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+		},
+		
 		
 		{
 			config:{
@@ -772,6 +790,7 @@ fheight: '80%',
 			filters: {pfiltro: 'provee.desc_proveedor',type: 'string'},
 			grid: true,
 			form: true
+			
 		},
 		
 		
@@ -1519,7 +1538,7 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota','id_proceso_wf'	,'resolucion'
+            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
@@ -1805,14 +1824,15 @@ fheight: '80%',
 			
 			Phx.CP.loadingShow();
 			
-			var rec = this.cmbPeriodo.getValue();
+			var id_periodo = this.cmbPeriodo.getValue();
 			var tipo = this.tipoBan;
 			
 			var id_depto_conta = this.cmbDepto.getValue();
 			
+			
 			Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/BorrarTodo',
-				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,id_depto_conta:id_depto_conta},
+				params:{'id_periodo':id_periodo,'tipo':tipo,id_depto_conta:id_depto_conta},
 				success: this.successAuto,
 			
 				failure: this.conexionFailure,

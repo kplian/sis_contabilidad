@@ -1298,18 +1298,6 @@ IS 'defecto, (toma valor de config del tipo), resultado o balance';
 /***********************************F-SCP-RAC-CONTA-0-15/06/2015****************************************/
 
 
-/***********************************I-SCP-RAC-CONTA-0-07/07/2015****************************************/
-
-
-select pxp.f_insert_tgui ('Reportes', 'Reportes', 'REPCON', 'si', 10, '', 2, '', '', 'CONTA');
-select pxp.f_insert_tgui ('Balance de cuentas', 'Balance general', 'BALCON', 'si', 1, 'sis_contabilidad/vista/cuenta/FormFiltroBalance.php', 3, '', 'FormFiltroBalance', 'CONTA');
-
-
-select pxp.f_insert_testructura_gui ('REPCON', 'CONTA');
-select pxp.f_insert_testructura_gui ('BALCON', 'REPCON');
-
-/***********************************F-SCP-RAC-CONTA-0-07/07/2015****************************************/
-
 
 
 /***********************************I-SCP-RAC-CONTA-0-08/07/2015****************************************/
@@ -3185,6 +3173,9 @@ ALTER TABLE conta.tint_rel_devengado
 
 COMMENT ON COLUMN conta.tint_rel_devengado.sw_reversion
 IS 'cuando es una reversion los montos son negativos y esta bandera es marcada';
+
+
+
 
 /***********************************F-SCP-RAC-CONTA-1-05/04/2016****************************************/
 

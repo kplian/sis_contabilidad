@@ -90,6 +90,7 @@ class MODBancaCompraVenta extends MODbase{
 	
 	
 	$this->captura('resolucion','varchar'); 
+	$this->captura('tipo_monto','varchar'); 
 
 	
 		
@@ -503,6 +504,9 @@ class MODBancaCompraVenta extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+				$this->setParametro('id_periodo','id_periodo','int4');
+				$this->setParametro('tipo','tipo','varchar');
+		
 		
 
 

@@ -21,6 +21,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     layout: 'fit',
     autoScroll: false,
     breset: false,
+    heightHeader: 290,
    
     conceptos_eliminados: [],
     listadoConcepto: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
@@ -568,12 +569,11 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                        layout: 'column',
 	                        region: 'north',
 	                        autoScroll: true,
-	                        autoHeight: true,
 	                        collapseFirst : false,
 	                        collapsible: true,
 	                        collapseMode : 'mini',
 	                        width: '100%',
-	                        //autoHeight: true,
+	                        height: me.heightHeader, 
 	                        padding: '0 0 0 10',
 	    	                items:[
 		    	                   {
@@ -628,7 +628,6 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			                            title: 'Detalle de pago',
 			                            width: '100%',
 			                            border: false,
-			                            //margins: '0 0 0 5',
 			                            padding: '0 0 0 10',
 			                            bodyStyle: 'padding-left:2px;',
 			                            id_grupo: 2,
@@ -733,7 +732,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     },
     
    
-                
+    extraAtributos:[],            
     generarAtributos: function(){
         var me = this;
 		this.Atributos=[
@@ -1340,8 +1339,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					form: true
 			}
 			
-			
 		];
+		
+		this.Atributos = this.Atributos.concat(me.extraAtributos);
+		
 	},
 	title: 'Frm solicitud',
 	iniciarEventos: function(){
