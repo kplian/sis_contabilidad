@@ -3182,5 +3182,24 @@ IS 'cuando es una reversion los montos son negativos y esta bandera es marcada';
 
 
 
+/***********************************I-SCP-FFP-CONTA-1-20/05/2016****************************************/
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN retencion_cuota numeric(10,2) DEFAULT 0 NOT NULL;
+  
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN multa_cuota numeric(10,2) DEFAULT 0 NOT NULL;
+  
+  
+  
+  
+
+/***********************************F-SCP-FFP-CONTA-1-20/05/2016****************************************/
+
+
+
+
+
 
 

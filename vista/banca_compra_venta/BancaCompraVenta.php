@@ -630,6 +630,24 @@ fheight: '80%',
 		
 		{
 			config:{
+				name: 'rotulo_comercial',
+				fieldLabel: 'rotulo_comercial',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'provee.rotulo_comercial',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+				bottom_filter : true
+		},
+		
+		
+		{
+			config:{
 				name: 'resolucion',
 				fieldLabel: 'resolucion',
 				allowBlank: true,
@@ -1538,7 +1556,7 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto'
+            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto','rotulo_comercial'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
