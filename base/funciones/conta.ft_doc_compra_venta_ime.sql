@@ -400,7 +400,8 @@ BEGIN
              dcv.id_int_comprobante,
              dcv.tabla_origen,
              dcv.id_origen,
-             dcv.id_depto_conta
+             dcv.id_depto_conta,
+             dcv.fecha
             into 
               v_registros
             from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
@@ -420,7 +421,7 @@ BEGIN
             --validar si el periodo de conta esta cerrado o abierto
             -- recuepra el periodo de la fecha ...
             --Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+        	v_rec = param.f_get_periodo_gestion(v_registros.fecha);
             
             -- valida que period de libro de compras y ventas este abierto
             v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_registros.id_depto_conta, v_rec.po_id_periodo);
