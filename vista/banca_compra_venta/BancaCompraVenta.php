@@ -1500,6 +1500,24 @@ fheight: '80%',
 				form:true
 		},
 		
+		{
+			config:{
+				name: 'estado_libro',
+				fieldLabel: 'estado_libro',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'banca.estado_libro',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+				bottom_filter : true
+		},
+		
+		
 	],
 	tam_pag:50,	
 	title:'bancarizacion',
@@ -1556,7 +1574,7 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto','rotulo_comercial'
+            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto','rotulo_comercial','estado_libro'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',

@@ -3191,9 +3191,8 @@ ALTER TABLE conta.tbanca_compra_venta
   ALTER TABLE conta.tbanca_compra_venta
   ADD COLUMN multa_cuota numeric(10,2) DEFAULT 0 NOT NULL;
   
-  
-  
-  
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN estado_libro VARCHAR(255) NULL ;
 
 /***********************************F-SCP-FFP-CONTA-1-20/05/2016****************************************/
 

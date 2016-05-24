@@ -96,6 +96,7 @@ class MODBancaCompraVenta extends MODbase{
 	$this->captura('retencion_cuota','numeric');
 	$this->captura('multa_cuota','numeric');
 	$this->captura('rotulo_comercial','varchar'); 
+	$this->captura('estado_libro','varchar'); 
 	
 	
 	
