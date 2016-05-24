@@ -1477,7 +1477,7 @@ fheight: '80%',
                     triggerAction: 'all',
                     lazyRender: true,
                     mode: 'local',
-                    store: ['ENERO', 'FEBRERO', 'MARZO','ABRIL','MAYO','JUNIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
+                    store: ['ENERO', 'FEBRERO', 'MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
                     width: 200
                 },
                 type: 'ComboBox',
