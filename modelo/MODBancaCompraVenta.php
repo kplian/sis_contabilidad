@@ -149,6 +149,8 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('periodo_servicio','periodo_servicio','varchar');
 
 		$this->setParametro('numero_cuota','numero_cuota','int4');
+		$this->setParametro('tramite_cuota','tramite_cuota','varchar');
+		
 		
 		
 				
@@ -201,6 +203,7 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('revisado','revisado','varchar');
 		
 		$this->setParametro('monto_contrato','monto_contrato','numeric');
+		$this->setParametro('tramite_cuota','tramite_cuota','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
