@@ -716,7 +716,7 @@ fheight: '80%',
 				fieldLabel: 'periodo',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 30,
 				maxLength:255,
 				disabled:true,
 				renderer: function (value, meta, record) {
@@ -724,11 +724,22 @@ fheight: '80%',
 
 					var resp;
 					console.log('saldo',record.json.saldo)
-					meta.style=(record.json.saldo < 0)?'background:red; color:#fff;':'';
+					//meta.style=(record.json.saldo < 0)?'background:red; color:#fff; width:130px; height:30px;':'';
 					//meta.css = record.get('online') ? 'user-online' : 'user-offline';
 					resp = value;
+					var css;
+					
+					if(record.json.saldo < 0){
+						css = "color:red;"
+					}else{
+						css = "";
+					}
 
-					return resp;
+
+            	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}</span></div>',css,resp);
+
+
+					//return resp;
 				}
 			},
 				type:'TextField',

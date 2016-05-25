@@ -1507,4 +1507,16 @@ select param.f_import_tdocumento ('insert','CBT','Numero de Tramite Cbte','CONTA
 
 
 
+/***********************************I-DAT-RAC-CONTA-0-25/05/2016*****************************************/
+
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_codigo_macro_wf_cbte', E'CBT', E'codigo de proceso macro del WF de contabilidad');
+  
+
+/***********************************F-DAT-RAC-CONTA-0-25/05/2016*****************************************/
+
+  
 

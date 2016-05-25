@@ -3209,20 +3209,19 @@ ALTER TABLE conta.tint_comprobante
   ADD COLUMN id_proceso_wf INTEGER;
 
 COMMENT ON COLUMN conta.tint_comprobante.id_proceso_wf
-IS 'identifica el proceso_wf que origina el cbte, para encontrar el registor ver la tabla';
+IS 'identifica el proceso_wf';
+
 
 
 --------------- SQL ---------------
 
 ALTER TABLE conta.tint_comprobante
-  ADD COLUMN tabla_origen_pwf VARCHAR(100);
-
-COMMENT ON COLUMN conta.tint_comprobante.tabla_origen_pwf
-IS 'nombre de la tabla que origino el proceso del WF';
-
+  ADD COLUMN id_estado_wf INTEGER;
 
 
 /***********************************F-SCP-FFP-CONTA-1-24/05/2016****************************************/
+
+
 
 
 

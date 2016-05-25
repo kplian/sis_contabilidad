@@ -1042,7 +1042,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			name : 'fecha_costo_fin',
 			type : 'date',
 			dateFormat : 'Y-m-d'
-		}, 'momento_comprometido', 'momento_ejecutado', 'id_moneda_base', 
+		}, 'momento_comprometido', 'momento_ejecutado', 'id_moneda_base','id_proceso_wf','id_estado_wf',
 		'cbte_cierre', 'cbte_apertura', 'cbte_aitb', 'momento_pagado', 'manual', 
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
 		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 
@@ -1208,13 +1208,13 @@ header("content-type: text/javascript; charset=UTF-8");
 											scope:this
 										 });
 			   
-	 },
+	 }
 		
 		
 		
 		
 		
 		
-	})
+})
 </script>
 
