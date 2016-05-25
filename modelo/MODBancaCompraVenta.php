@@ -98,6 +98,10 @@ class MODBancaCompraVenta extends MODbase{
 	$this->captura('rotulo_comercial','varchar'); 
 	$this->captura('estado_libro','varchar'); 
 	
+	$this->captura('periodo_servicio','varchar');
+	
+	
+	
 	
 	
 

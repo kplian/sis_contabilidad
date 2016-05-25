@@ -1614,7 +1614,7 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto','rotulo_comercial','estado_libro'
+            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto','rotulo_comercial','estado_libro','periodo_servicio'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
