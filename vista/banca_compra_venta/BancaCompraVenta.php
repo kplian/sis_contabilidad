@@ -20,7 +20,8 @@ fheight: '80%',
 		
 	
 	
-	
+	this.tbarItems = ['-',this.cmbResolucion
+           ];
 	
 		
 		var dia = 01;
@@ -100,7 +101,10 @@ fheight: '80%',
          
 		 console.log(fieldset);
 		 
-		
+		this.cmbResolucion.on('select', function(combo, record, index){
+		    this.tmpResolucion = record.data.field1;
+		    this.capturaFiltros();
+        },this);
 		
 		this.cmbGestion.on('select', function(combo, record, index){
 			this.tmpGestion = record.data.gestion;
@@ -211,6 +215,14 @@ fheight: '80%',
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
         if(this.validarFiltros()){
+        	if(this.cmbResolucion.getValue() == 'todos'){
+        		this.store.baseParams.resolucion = '';
+        	}else{
+        		this.store.baseParams.resolucion = this.cmbResolucion.getValue();
+
+        	}
+        	
+        	
         	this.store.baseParams.id_gestion = this.cmbGestion.getValue();
 	        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
 	        this.store.baseParams.id_depto = this.cmbDepto.getValue();
@@ -353,6 +365,23 @@ fheight: '80%',
 				listWidth:'280',
 				width:80
 			}),
+			
+			cmbResolucion : new Ext.form.ComboBox({
+    	
+				name: 'resol',
+				fieldLabel: 'resol',
+				allowBlank: true,
+				emptyText: 'resol...',
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'local',
+				store: ['10-0011-11', '10-0017-15','todos'],
+				width: 200,
+				type: 'ComboBox',
+
+    }),
+    
 	
 	
 	iniciarEventos:function(){

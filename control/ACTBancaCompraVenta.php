@@ -53,6 +53,13 @@ class ACTBancaCompraVenta extends ACTbase{
 		}
 		
 		
+		if($this->objParam->getParametro('resolucion') != ''){
+			$this->objParam->addFiltro("banca.resolucion = ''".$this->objParam->getParametro('resolucion')."'' ");  
+			
+		}
+		
+		
+		
 		
 		
 		
