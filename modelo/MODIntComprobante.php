@@ -78,6 +78,9 @@ class MODIntComprobante extends MODbase{
 		$this->captura('cbte_reversion','varchar');
 		$this->captura('volcado','varchar');
 		
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_estado_wf','int4');
+		
 		
 		
 		//Ejecuta la instruccion

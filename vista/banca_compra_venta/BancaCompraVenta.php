@@ -20,7 +20,8 @@ fheight: '80%',
 		
 	
 	
-	
+	this.tbarItems = ['-',this.cmbResolucion
+           ];
 	
 		
 		var dia = 01;
@@ -100,7 +101,10 @@ fheight: '80%',
          
 		 console.log(fieldset);
 		 
-		
+		this.cmbResolucion.on('select', function(combo, record, index){
+		    this.tmpResolucion = record.data.field1;
+		    this.capturaFiltros();
+        },this);
 		
 		this.cmbGestion.on('select', function(combo, record, index){
 			this.tmpGestion = record.data.gestion;
@@ -211,6 +215,14 @@ fheight: '80%',
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
         if(this.validarFiltros()){
+        	if(this.cmbResolucion.getValue() == 'todos'){
+        		this.store.baseParams.resolucion = '';
+        	}else{
+        		this.store.baseParams.resolucion = this.cmbResolucion.getValue();
+
+        	}
+        	
+        	
         	this.store.baseParams.id_gestion = this.cmbGestion.getValue();
 	        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
 	        this.store.baseParams.id_depto = this.cmbDepto.getValue();
@@ -353,6 +365,23 @@ fheight: '80%',
 				listWidth:'280',
 				width:80
 			}),
+			
+			cmbResolucion : new Ext.form.ComboBox({
+    	
+				name: 'resol',
+				fieldLabel: 'resol',
+				allowBlank: true,
+				emptyText: 'resol...',
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'local',
+				store: ['10-0011-11', '10-0017-15','todos'],
+				width: 200,
+				type: 'ComboBox',
+
+    }),
+    
 	
 	
 	iniciarEventos:function(){
@@ -622,11 +651,29 @@ fheight: '80%',
 				maxLength:255
 			},
 				type:'TextField',
-				
+				filters: {pfiltro: 'banca.tramite_cuota',type: 'string'},
 				id_grupo:0,
 				grid:true,
 				form:true
 		},
+		
+		{
+			config:{
+				name: 'rotulo_comercial',
+				fieldLabel: 'rotulo_comercial',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'provee.rotulo_comercial',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+				bottom_filter : true
+		},
+		
 		
 		{
 			config:{
@@ -645,13 +692,31 @@ fheight: '80%',
 				bottom_filter : true
 		},
 		
+		
+		{
+			config:{
+				name: 'tipo_monto',
+				fieldLabel: 'tipo_monto',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'contra.tipo_monto',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+		},
+		
+		
 		{
 			config:{
 				name: 'periodo',
 				fieldLabel: 'periodo',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 30,
 				maxLength:255,
 				disabled:true,
 				renderer: function (value, meta, record) {
@@ -659,11 +724,22 @@ fheight: '80%',
 
 					var resp;
 					console.log('saldo',record.json.saldo)
-					meta.style=(record.json.saldo < 0)?'background:red; color:#fff;':'';
+					//meta.style=(record.json.saldo < 0)?'background:red; color:#fff; width:130px; height:30px;':'';
 					//meta.css = record.get('online') ? 'user-online' : 'user-offline';
 					resp = value;
+					var css;
+					
+					if(record.json.saldo < 0){
+						css = "color:red;"
+					}else{
+						css = "";
+					}
 
-					return resp;
+
+            	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}</span></div>',css,resp);
+
+
+					//return resp;
 				}
 			},
 				type:'TextField',
@@ -772,6 +848,7 @@ fheight: '80%',
 			filters: {pfiltro: 'provee.desc_proveedor',type: 'string'},
 			grid: true,
 			form: true
+			
 		},
 		
 		
@@ -1440,7 +1517,7 @@ fheight: '80%',
                     triggerAction: 'all',
                     lazyRender: true,
                     mode: 'local',
-                    store: ['ENERO', 'FEBRERO', 'MARZO','ABRIL','MAYO','JUNIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
+                    store: ['ENERO', 'FEBRERO', 'MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
                     width: 200
                 },
                 type: 'ComboBox',
@@ -1462,6 +1539,24 @@ fheight: '80%',
 				id_grupo:2,
 				form:true
 		},
+		
+		{
+			config:{
+				name: 'estado_libro',
+				fieldLabel: 'estado_libro',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+				type:'TextField',
+				filters: {pfiltro: 'banca.estado_libro',type: 'string'},
+				id_grupo:0,
+				grid:true,
+				form:false,
+				bottom_filter : true
+		},
+		
 		
 	],
 	tam_pag:50,	
@@ -1519,7 +1614,7 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota','id_proceso_wf'	,'resolucion'
+            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto','rotulo_comercial','estado_libro','periodo_servicio'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
@@ -1805,14 +1900,15 @@ fheight: '80%',
 			
 			Phx.CP.loadingShow();
 			
-			var rec = this.cmbPeriodo.getValue();
+			var id_periodo = this.cmbPeriodo.getValue();
 			var tipo = this.tipoBan;
 			
 			var id_depto_conta = this.cmbDepto.getValue();
 			
+			
 			Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/BorrarTodo',
-				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,id_depto_conta:id_depto_conta},
+				params:{'id_periodo':id_periodo,'tipo':tipo,id_depto_conta:id_depto_conta},
 				success: this.successAuto,
 			
 				failure: this.conexionFailure,

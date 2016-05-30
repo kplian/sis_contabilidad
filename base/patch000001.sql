@@ -1298,18 +1298,6 @@ IS 'defecto, (toma valor de config del tipo), resultado o balance';
 /***********************************F-SCP-RAC-CONTA-0-15/06/2015****************************************/
 
 
-/***********************************I-SCP-RAC-CONTA-0-07/07/2015****************************************/
-
-
-select pxp.f_insert_tgui ('Reportes', 'Reportes', 'REPCON', 'si', 10, '', 2, '', '', 'CONTA');
-select pxp.f_insert_tgui ('Balance de cuentas', 'Balance general', 'BALCON', 'si', 1, 'sis_contabilidad/vista/cuenta/FormFiltroBalance.php', 3, '', 'FormFiltroBalance', 'CONTA');
-
-
-select pxp.f_insert_testructura_gui ('REPCON', 'CONTA');
-select pxp.f_insert_testructura_gui ('BALCON', 'REPCON');
-
-/***********************************F-SCP-RAC-CONTA-0-07/07/2015****************************************/
-
 
 
 /***********************************I-SCP-RAC-CONTA-0-08/07/2015****************************************/
@@ -3186,8 +3174,52 @@ ALTER TABLE conta.tint_rel_devengado
 COMMENT ON COLUMN conta.tint_rel_devengado.sw_reversion
 IS 'cuando es una reversion los montos son negativos y esta bandera es marcada';
 
+
+
+
 /***********************************F-SCP-RAC-CONTA-1-05/04/2016****************************************/
 
+
+
+
+/***********************************I-SCP-FFP-CONTA-1-20/05/2016****************************************/
+
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN retencion_cuota numeric(10,2) DEFAULT 0 NOT NULL;
+  
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN multa_cuota numeric(10,2) DEFAULT 0 NOT NULL;
+  
+ALTER TABLE conta.tbanca_compra_venta
+  ADD COLUMN estado_libro VARCHAR(255) NULL ;
+
+/***********************************F-SCP-FFP-CONTA-1-20/05/2016****************************************/
+
+
+
+/***********************************I-SCP-FFP-CONTA-1-24/05/2016****************************************/
+
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_proceso_wf INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_proceso_wf
+IS 'identifica el proceso_wf';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_estado_wf INTEGER;
+
+
+/***********************************F-SCP-FFP-CONTA-1-24/05/2016****************************************/
 
 
 

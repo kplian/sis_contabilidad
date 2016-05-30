@@ -90,6 +90,20 @@ class MODBancaCompraVenta extends MODbase{
 	
 	
 	$this->captura('resolucion','varchar'); 
+	$this->captura('tipo_monto','varchar'); 
+	
+	
+	$this->captura('retencion_cuota','numeric');
+	$this->captura('multa_cuota','numeric');
+	$this->captura('rotulo_comercial','varchar'); 
+	$this->captura('estado_libro','varchar'); 
+	
+	$this->captura('periodo_servicio','varchar');
+	
+	
+	
+	
+	
 
 	
 		
@@ -139,6 +153,10 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('periodo_servicio','periodo_servicio','varchar');
 
 		$this->setParametro('numero_cuota','numero_cuota','int4');
+		$this->setParametro('tramite_cuota','tramite_cuota','varchar');
+		
+		
+		
 		
 		
 				
@@ -191,6 +209,10 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('revisado','revisado','varchar');
 		
 		$this->setParametro('monto_contrato','monto_contrato','numeric');
+		$this->setParametro('tramite_cuota','tramite_cuota','varchar');
+		
+				$this->setParametro('periodo_servicio','periodo_servicio','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -503,6 +525,9 @@ class MODBancaCompraVenta extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+				$this->setParametro('id_periodo','id_periodo','int4');
+				$this->setParametro('tipo','tipo','varchar');
+		
 		
 
 

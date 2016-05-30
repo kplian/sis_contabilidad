@@ -72,7 +72,7 @@ class ACTDocCompraVenta extends ACTbase{
 			$temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
 			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];			
 			$temp['tipo_reg'] = 'summary';
-			$temp['id_int_doc_compra_venta'] = 0;
+			$temp['id_doc_compra_venta'] = 0;
 			
 			
 			$this->res->total++;

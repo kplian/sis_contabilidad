@@ -84,6 +84,11 @@ BEGIN
     
     --recupero el record de la plantilla con el codigo (parametro) dado
     
+   IF p_codigo is null THEN
+      raise exception 'El codigo de plantilla del cbte no puede ser nulo';
+   END IF; 
+    
+    
     select * into v_plantilla
 	from conta.tplantilla_comprobante cbte
 	where cbte.codigo=p_codigo;

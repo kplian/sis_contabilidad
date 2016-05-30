@@ -37,7 +37,7 @@ class RLcvVentas extends  ReportePDF {
 		$this->datos_entidad = $entidad;
 		$this->datos_periodo = $periodo;
 		$this->subtotal = 0;
-		$this->SetMargins(7, 49, 5);
+		$this->SetMargins(7, 55, 5);
 	}
 	
 	function Header() {

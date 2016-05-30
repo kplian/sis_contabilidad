@@ -961,6 +961,19 @@ select pxp.f_insert_testructura_gui ('LIBMAY', 'CBTE.1.3');
 select pxp.f_insert_tgui ('Libro Diario', 'Libro Diario', 'CBTE.1.3.1', 'si', 1, 'sis_contabilidad/vista/int_comprobante/IntComprobanteLd.php', 3, '', 'IntComprobanteLd', 'CONTA');
 /***********************************F-DAT-RAC-CONTA-0-25/06/2015*****************************************/
 
+/***********************************I-DAT-RAC-CONTA-0-07/07/2015****************************************/
+
+
+select pxp.f_insert_tgui ('Reportes', 'Reportes', 'REPCON', 'si', 10, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Balance de cuentas', 'Balance general', 'BALCON', 'si', 1, 'sis_contabilidad/vista/cuenta/FormFiltroBalance.php', 3, '', 'FormFiltroBalance', 'CONTA');
+
+
+select pxp.f_insert_testructura_gui ('REPCON', 'CONTA');
+select pxp.f_insert_testructura_gui ('BALCON', 'REPCON');
+
+/***********************************F-DAT-RAC-CONTA-0-07/07/2015****************************************/
+
+
 
 
 /***********************************I-DAT-RAC-CONTA-0-09/07/2015*****************************************/
@@ -1494,4 +1507,16 @@ select param.f_import_tdocumento ('insert','CBT','Numero de Tramite Cbte','CONTA
 
 
 
+/***********************************I-DAT-RAC-CONTA-0-25/05/2016*****************************************/
+
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_codigo_macro_wf_cbte', E'CBT', E'codigo de proceso macro del WF de contabilidad');
+  
+
+/***********************************F-DAT-RAC-CONTA-0-25/05/2016*****************************************/
+
+  
 
