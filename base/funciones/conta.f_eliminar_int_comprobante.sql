@@ -51,6 +51,21 @@ BEGIN
                     raise exception 'No puede eliminar cbtes  que ya fueron validados, para no perder la numeración';
                END IF; 
                
+               
+               
+               IF  v_rec_cbte.temporal = 'no'  THEN 
+               
+                   -- llevar a estado de WF eliminado ...
+                   PERFORM conta.f_cambia_estado_wf_cbte(p_id_usuario, p_id_usuario_ai, p_usuario_ai, 
+                                                         p_id_int_comprobante, 
+                                                         'eliminado', 
+                                                          'Cbte eliminado');
+               END IF;
+                
+                
+                
+                
+                
                 -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
                  IF v_rec_cbte.id_plantilla_comprobante is not null THEN
                              
@@ -85,7 +100,7 @@ BEGIN
                       delete from conta.tint_comprobante
                       where id_int_comprobante=p_id_int_comprobante;
                       
-              ELSE   
+             ELSE   
               
                       -- si el comprobante solo fue originado en la regional internacional
                      IF  v_rec_cbte.temporal = 'no'  THEN 
@@ -96,6 +111,8 @@ BEGIN
                           -- Sentencia de la eliminacion
                           delete from conta.tint_comprobante
                           where id_int_comprobante=p_id_int_comprobante;
+                          
+                          
                      ELSE
                           -- cambio el estado de la bandera de vbregional a no
                           update   conta.tint_comprobante set
@@ -182,7 +199,7 @@ BEGIN
            END IF;
           
          
-       
+        
           
           -- si se integra con presupeustos, y tiene presupeusto es encesario revertir
           IF v_pre_integrar_presupuestos = 'true'  THEN 
@@ -191,16 +208,22 @@ BEGIN
          
           ELSE
             
-         
+             --TODO  retroceder ele stado del WF a borrador
+             
+             
             update conta.tint_comprobante  set
                estado_reg = 'borrador'
             where id_int_comprobante = p_id_int_comprobante;
+            
+            -- llevar a estado de WF eliminado ...
+            PERFORM conta.f_cambia_estado_wf_cbte(p_id_usuario, p_id_usuario_ai, p_usuario_ai, 
+                                                  p_id_int_comprobante, 
+                                                  'borrador', 
+                                                  'devuelto a borrador');
          
          END IF; 
       
       END IF;
-      
-     
     
     
      

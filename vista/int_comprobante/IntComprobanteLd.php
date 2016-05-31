@@ -86,6 +86,9 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('chkpresupuesto').enable();
 			this.getBoton('btnVolcar').enable();
 			this.getBoton('chkdep').enable();
+			this.getBoton('btnChequeoDocumentosWf').enable();
+            this.getBoton('diagrama_gantt').enable();
+            this.getBoton('btnObs').enable();
 			
 			return tb;
 	},
@@ -97,6 +100,9 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('chkpresupuesto').disable();
 			this.getBoton('btnVolcar').disable();
 			this.getBoton('chkdep').disable();
+			this.getBoton('btnChequeoDocumentosWf').disable();
+            this.getBoton('diagrama_gantt').disable();
+            this.getBoton('btnObs').disable() 
 			
 	},
 	checkDependencias: function(){                   

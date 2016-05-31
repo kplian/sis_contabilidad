@@ -53,6 +53,27 @@ header("content-type: text/javascript; charset=UTF-8");
 				handler: this.checkPresupuesto,
 				tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>'
 			});
+			
+			this.addBotonesGantt();
+	        this.addButton('btnChequeoDocumentosWf',
+	            {
+	                text: 'Documentos',
+	                grupo:[0,1,2,3],
+	                iconCls: 'bchecklist',
+	                disabled: true,
+	                handler: this.loadCheckDocumentosWf,
+	                tooltip: '<b>Documentos del Trámite</b><br/>PErmite ver los documentos asociados al NRO de trámite.'
+	            }
+	        );
+        
+	        this.addButton('btnObs',{
+	                    text :'Obs Wf',
+	                    grupo:[0,1,2,3],
+	                    iconCls : 'bchecklist',
+	                    disabled: true,
+	                    handler : this.onOpenObs,
+	                    tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
+	         });
 
 			
 
@@ -1208,7 +1229,88 @@ header("content-type: text/javascript; charset=UTF-8");
 											scope:this
 										 });
 			   
-	 }
+	 },
+	 
+	 addBotonesGantt: function() {
+        this.menuAdqGantt = new Ext.Toolbar.SplitButton({
+            id: 'b-diagrama_gantt-' + this.idContenedor,
+            text: 'Gantt',
+            disabled: true,
+            grupo:[0,1,2,3],
+            iconCls : 'bgantt',
+            handler:this.diagramGanttDinamico,
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-gantti-' + this.idContenedor,
+                text: 'Gantt Imagen',
+                tooltip: '<b>Mues un reporte gantt en formato de imagen</b>',
+                handler:this.diagramGantt,
+                scope: this
+            }, {
+                id:'b-ganttd-' + this.idContenedor,
+                text: 'Gantt Dinámico',
+                tooltip: '<b>Muestra el reporte gantt facil de entender</b>',
+                handler:this.diagramGanttDinamico,
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuAdqGantt);
+    },
+    
+    loadCheckDocumentosWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Documentos del Proceso',
+                    {
+                        width:'90%',
+                        height:500
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DocumentoWf'
+        )
+    },
+    
+    onOpenObs:function() {
+            var rec=this.sm.getSelected();
+            
+            var data = {
+            	id_proceso_wf: rec.data.id_proceso_wf,
+            	id_estado_wf: rec.data.id_estado_wf,
+            	num_tramite: rec.data.num_tramite
+            }
+            
+            Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
+                    'Observaciones del WF',
+                    {
+                        width:'80%',
+                        height:'70%'
+                    },
+                    data,
+                    this.idContenedor,
+                    'Obs'
+        )
+    },
+    
+    diagramGantt: function (){			
+			var data=this.sm.getSelected().data.id_proceso_wf;
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+				params:{'id_proceso_wf':data},
+				success: this.successExport,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});			
+	},
+	diagramGanttDinamico: function (){			
+			var data=this.sm.getSelected().data.id_proceso_wf;
+			window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)		
+	}, 
 		
 		
 		

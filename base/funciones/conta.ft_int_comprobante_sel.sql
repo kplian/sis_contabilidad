@@ -57,6 +57,8 @@ BEGIN
             from param.tmoneda m 
             where m.id_moneda = v_id_moneda_base;
             
+            --TODO si no es administrador, solo puede listar al responsable del depto o al usuario que creo e documentos
+            
     		--Sentencia de la consulta
 			v_consulta := 'select
                               incbte.id_int_comprobante,
@@ -115,14 +117,19 @@ BEGIN
                               incbte.localidad,
                               incbte.sw_editable,
                               incbte.cbte_reversion,
-                              incbte.volcado
+                              incbte.volcado,
+                              incbte.id_proceso_wf,
+                              incbte.id_estado_wf
                           from conta.vint_comprobante incbte
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
+                          inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
                           where  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
             
+            --raise exception '--> %', v_consulta;	
             raise notice  '-- % --', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
@@ -142,7 +149,9 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_int_comprobante)
 					     from conta.vint_comprobante incbte
-					     where ';
+                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
+                         inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
+                         where ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -408,7 +417,7 @@ BEGIN
               end if;
         
           
-			raise notice '--> %', v_consulta;			
+					
 			
 			--Devuelve la respuesta
 			return v_consulta;

@@ -163,12 +163,16 @@ Phx.vista.IntComprobanteReg = {
 		        else{
 		        	 this.getBoton('btnSwEditble').setDisabled(true);
 		        }
-		        this.getBoton('btnValidar').setDisabled(false);
-				this.getBoton('btnImprimir').setDisabled(false);
-				this.getBoton('btnRelDev').setDisabled(false);
-				this.getBoton('btnIgualarCbte').setDisabled(false);
-				this.getBoton('btnDocCmpVnt').setDisabled(false);
-				this.getBoton('chkpresupuesto').setDisabled(false);
+		        this.getBoton('btnValidar').enable();
+				this.getBoton('btnImprimir').enable();
+				this.getBoton('btnRelDev').enable();
+				this.getBoton('btnIgualarCbte').enable();
+				this.getBoton('btnDocCmpVnt').enable();
+				this.getBoton('chkpresupuesto').enable();
+				
+				this.getBoton('btnChequeoDocumentosWf').enable();
+                this.getBoton('diagrama_gantt').enable();
+                this.getBoton('btnObs').enable(); 
 			}
 			
 			return tb;
@@ -176,12 +180,15 @@ Phx.vista.IntComprobanteReg = {
 		liberaMenu : function() {
 			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
 			
-				this.getBoton('btnValidar').setDisabled(true);
-				this.getBoton('btnImprimir').setDisabled(true);
-				this.getBoton('btnRelDev').setDisabled(true);
-				this.getBoton('btnIgualarCbte').setDisabled(true);
-				this.getBoton('btnDocCmpVnt').setDisabled(true);
-				this.getBoton('chkpresupuesto').setDisabled(true);
+				this.getBoton('btnValidar').disable();
+				this.getBoton('btnImprimir').disable();
+				this.getBoton('btnRelDev').disable();
+				this.getBoton('btnIgualarCbte').disable();
+				this.getBoton('btnDocCmpVnt').disable();
+				this.getBoton('chkpresupuesto').disable();
+				this.getBoton('btnChequeoDocumentosWf').disable();
+                this.getBoton('diagrama_gantt').disable();
+                this.getBoton('btnObs').disable()
 			
 			
 			
