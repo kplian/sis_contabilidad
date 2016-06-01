@@ -100,6 +100,9 @@ class MODBancaCompraVenta extends MODbase{
 	
 	$this->captura('periodo_servicio','varchar');
 	
+	$this->captura('lista_negra','varchar');
+	
+	
 	
 	
 	
@@ -538,6 +541,23 @@ class MODBancaCompraVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 		
+	}
+
+	function agregarListarNegra(){
+		$this->procedimiento='conta.ft_banca_compra_venta_ime';
+		$this->transaccion='CONTA_BANCA_ADDLN';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_banca_compra_venta','id_banca_compra_venta','int4');
+	
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
 	}
 	
 	

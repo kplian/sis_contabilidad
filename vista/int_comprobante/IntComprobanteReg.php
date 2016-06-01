@@ -20,24 +20,24 @@ Phx.vista.IntComprobanteReg = {
 	nombreVista: 'IntComprobanteReg',
 	
 	constructor: function(config) {
-	    Phx.vista.IntComprobanteReg.superclass.constructor.call(this,config);
 	    
-	    
-	    //Botón para Validación del Comprobante
-			this.addButton('btnValidar', {
-				text : 'Validación',
-				iconCls : 'bchecklist',
-				disabled : true,
-				handler : this.validarCbte,
-				tooltip : '<b>Validación</b><br/>Validación del Comprobante'
-			});
-			
-	    this.addButton('btnWizard', {
-				text : 'Plantilla',
-				iconCls : 'bgear',
-				disabled : false,
-				handler : this.loadWizard,
-				tooltip : '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
+	        Phx.vista.IntComprobanteReg.superclass.constructor.call(this,config);
+	        
+	        //Botón para Validación del Comprobante
+			/*this.addButton('btnValidar', {
+					text : 'Validación',
+					iconCls : 'bchecklist',
+					disabled : true,
+					handler : this.validarCbte,
+					tooltip : '<b>Validación</b><br/>Validación del Comprobante'
+			});*/
+				
+		    this.addButton('btnWizard', {
+					text : 'Plantilla',
+					iconCls : 'bgear',
+					disabled : false,
+					handler : this.loadWizard,
+					tooltip : '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
 			});
 
 			
@@ -57,6 +57,8 @@ Phx.vista.IntComprobanteReg = {
 				handler : this.swEditable,
 				tooltip : '<b>Hacer editable</b><br/>Si la edición esta deshabilitada toma un backup y la habilita'
 			});
+			
+			this.init();
     
     },
 	
@@ -64,7 +66,7 @@ Phx.vista.IntComprobanteReg = {
 	onButtonEdit:function(){
          this.swButton = 'EDIT';
          var rec = this.sm.getSelected().data;
-         Phx.vista.IntComprobante.superclass.onButtonEdit.call(this); 
+         Phx.vista.IntComprobanteReg.superclass.onButtonEdit.call(this); 
          this.Cmp.id_moneda.setReadOnly(true);
          if(rec.localidad == 'internacional'){
          	this.Cmp.fecha.setReadOnly(true);
@@ -87,7 +89,7 @@ Phx.vista.IntComprobanteReg = {
        onButtonNew:function(){
           this.swButton = 'NEW';
           this.sw_valores = 'si';
-          Phx.vista.IntComprobante.superclass.onButtonNew.call(this); 
+          Phx.vista.IntComprobanteReg.superclass.onButtonNew.call(this); 
           this.Cmp.id_moneda.setReadOnly(false);
           this.Cmp.fecha.setReadOnly(false);
           this.mostrarComponente(this.Cmp.tipo_cambio);
@@ -145,7 +147,7 @@ Phx.vista.IntComprobanteReg = {
 				});
 	  },
        preparaMenu : function(n) {
-			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
+			var tb = Phx.vista.IntComprobanteReg.superclass.preparaMenu.call(this);
 			var rec = this.sm.getSelected();
 		
 		    if(rec.data.tipo_reg == 'summary'){
@@ -178,7 +180,7 @@ Phx.vista.IntComprobanteReg = {
 			return tb;
 		},
 		liberaMenu : function() {
-			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
+			var tb = Phx.vista.IntComprobanteReg.superclass.liberaMenu.call(this);
 			
 				this.getBoton('btnValidar').disable();
 				this.getBoton('btnImprimir').disable();

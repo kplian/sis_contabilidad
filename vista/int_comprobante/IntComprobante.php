@@ -19,7 +19,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 			//llama al constructor de la clase padre
 			Phx.vista.IntComprobante.superclass.constructor.call(this, config);
-			this.init();
+			
 			//this.load({params:{start:0, limit:this.tam_pag}});
 
 			//Botón para Imprimir el Comprobante
@@ -47,7 +47,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				tooltip : '<b>Relación con el devengado</b><br/>Solo para comprobantes de pago presupuestario'
 			});
 			
-			this.addButton('chkpresupuesto',{	text:'Chk Presupuesto',
+			this.addButton('chkpresupuesto',{text:'Chk Presupuesto',
 				iconCls: 'blist',
 				disabled: true,
 				handler: this.checkPresupuesto,
@@ -62,7 +62,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	                iconCls: 'bchecklist',
 	                disabled: true,
 	                handler: this.loadCheckDocumentosWf,
-	                tooltip: '<b>Documentos del Trámite</b><br/>PErmite ver los documentos asociados al NRO de trámite.'
+	                tooltip: '<b>Documentos del Trámite</b><br/>Permite ver los documentos asociados al NRO de trámite.'
 	            }
 	        );
         

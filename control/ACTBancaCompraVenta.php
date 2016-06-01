@@ -236,7 +236,11 @@ class ACTBancaCompraVenta extends ACTbase{
 		$this->res=$this->objFunc->BorrarTodo($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-	
+	function agregarListarNegra(){
+		$this->objFunc=$this->create('MODBancaCompraVenta');	
+		$this->res=$this->objFunc->agregarListarNegra($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 
 
 

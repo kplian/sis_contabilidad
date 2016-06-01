@@ -79,7 +79,7 @@ Phx.vista.IntComprobanteLd = {
 	  cls:'IntTransaccionLd'
 	},
 	preparaMenu : function(n) {
-			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
+			var tb = Phx.vista.IntComprobanteLd.superclass.preparaMenu.call(this);
 			this.getBoton('btnImprimir').enable();
 			this.getBoton('btnRelDev').enable();
 			this.getBoton('btnDocCmpVnt').enable();
@@ -93,7 +93,7 @@ Phx.vista.IntComprobanteLd = {
 			return tb;
 	},
 	liberaMenu : function() {
-			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
+			var tb = Phx.vista.IntComprobanteLd.superclass.liberaMenu.call(this);
 			this.getBoton('btnImprimir').disable();
 			this.getBoton('btnRelDev').disable();
 			this.getBoton('btnDocCmpVnt').disable();
