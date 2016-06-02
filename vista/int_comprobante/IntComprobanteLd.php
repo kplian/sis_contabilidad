@@ -32,6 +32,14 @@ Phx.vista.IntComprobanteLd = {
 				tooltip : '<b>Volcar</b><br/>Genera un cbte volcado que revierte el actual'
 		});
 		
+		this.addButton('btnClonar', {
+				text : 'Clonar',
+				iconCls : 'balert',
+				disabled : true,
+				handler : this.clonarCbte,
+				tooltip : '<b>Clonar</b><br/>Clonar Cbte (genera nuevo nro de trámite)'
+		});
+		
 		this.addButton('chkdep',{	text:'Dependencias',
 				iconCls: 'blist',
 				disabled: true,
@@ -39,7 +47,7 @@ Phx.vista.IntComprobanteLd = {
 				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
 			});
 	    
-	    
+	   this.init();	 
     
     },
     
@@ -72,11 +80,40 @@ Phx.vista.IntComprobanteLd = {
 			    
 	},
 	
+   clonarCbte: function() {
+			  
+			 if(confirm("Esta seguro de clonar  el cbte")){
+			 	 if(confirm("¿Esta realmente seguro?")){
+				 	var rec = this.sm.getSelected().data;
+				    Phx.CP.loadingShow();
+					Ext.Ajax.request({
+						url : '../../sis_contabilidad/control/IntComprobante/clonarCbte',
+						params : {
+							id_int_comprobante : rec.id_int_comprobante
+						},
+						success : function(resp) {
+							Phx.CP.loadingHide();
+							var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+							if (reg.ROOT.error) {
+								Ext.Msg.alert('Error', 'Al clonar el cbte: ' + reg.ROOT.error)
+							} else {
+								this.reload();
+							}
+						},
+						failure : this.conexionFailure,
+						timeout : this.timeout,
+						scope : this
+					});
+				}
+			 }
+			    
+	},
+	
    south:{
-	  url:'../../../sis_contabilidad/vista/int_transaccion/IntTransaccionLd.php',
-	  title:'Transacciones', 
-	  height:'50%',	//altura de la ventana hijo
-	  cls:'IntTransaccionLd'
+	  url: '../../../sis_contabilidad/vista/int_transaccion/IntTransaccionLd.php',
+	  title: 'Transacciones', 
+	  height: '50%',	//altura de la ventana hijo
+	  cls: 'IntTransaccionLd'
 	},
 	preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobanteLd.superclass.preparaMenu.call(this);
@@ -85,6 +122,7 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('btnDocCmpVnt').enable();
 			this.getBoton('chkpresupuesto').enable();
 			this.getBoton('btnVolcar').enable();
+			this.getBoton('btnClonar').enable();
 			this.getBoton('chkdep').enable();
 			this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
@@ -99,6 +137,7 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('btnDocCmpVnt').disable();
 			this.getBoton('chkpresupuesto').disable();
 			this.getBoton('btnVolcar').disable();
+			this.getBoton('btnClonar').disable();
 			this.getBoton('chkdep').disable();
 			this.getBoton('btnChequeoDocumentosWf').disable();
             this.getBoton('diagrama_gantt').disable();

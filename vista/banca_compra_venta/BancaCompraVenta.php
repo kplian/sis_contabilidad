@@ -245,7 +245,6 @@ fheight: '80%',
 
 		this.addButton('BorrarTodo',{argument: {imprimir: 'BorrarTodo'},text:'<i class="fa fa-file-text-o fa-2x"></i> BorrarTodo',/*iconCls:'' ,*/disabled:false,handler:this.BorrarTodo});
 
-		this.addButton('Rentenciones',{argument: {imprimir: 'Retenciones'},text:'<i class="fa fa-file-text-o fa-2x"></i> Retenciones',/*iconCls:'' ,*/disabled:false,handler:this.Retenciones});
 
 
 
@@ -744,9 +743,15 @@ fheight: '80%',
 					}else{
 						css = "";
 					}
+					
+					
+					var devolucion = '';
+					if(record.json.tipo_bancarizacion == 'devolucion'){
+						devolucion = '<div style="color:blue; font-weight:bold;" >(devolucion)</div>'
+					}
 
 
-            	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}{2}</span></div>',css,resp,lista_negra);
+            	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}{2}{3}</span></div>',css,resp,lista_negra,devolucion);
 
 
 					//return resp;
@@ -1716,7 +1721,9 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto','rotulo_comercial','estado_libro','periodo_servicio','lista_negra'
+            			'tramite_cuota','id_proceso_wf'	,'resolucion',
+            			'tipo_monto','rotulo_comercial','estado_libro',
+            			'periodo_servicio','lista_negra','tipo_bancarizacion'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
@@ -2090,7 +2097,7 @@ fheight: '80%',
     addBotonesRetencionGarantias: function() {
         this.menuRetencionGarantias = new Ext.Toolbar.SplitButton({
             id: 'b-retencion_garantias-' + this.idContenedor,
-            text: 'Retencion Garantias',
+            text: 'Retencion',
             disabled: false,
             grupo:[0,1,2],
             iconCls : 'bmoney',
@@ -2121,11 +2128,11 @@ fheight: '80%',
 			
 			var id_periodo = this.cmbPeriodo.getValue();
 			
-			
+			var id_depto_conta = this.cmbDepto.getValue();
 			
 			Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/insertarRetencionesPeriodo',
-				params:{'id_periodo':id_periodo},
+				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta},
 				success: this.successAuto,
 			
 				failure: this.conexionFailure,

@@ -198,7 +198,8 @@ BEGIN
                                 NULL,  --id_funcionario wf
                                 v_parametros.id_depto,
                                 'Registro Manual de Cbte Relacionado',
-                                '','');
+                                'CBTE', --dispara proceso del comprobante
+                                '');
                 
                 
              
@@ -769,7 +770,8 @@ BEGIN
                           NULL,  --id_funcionario wf
                           v_reg_cbte.id_depto,
                           'Cbte de Volcado (Anula el original)',
-                          '','');
+                          'CBTE', --sipara comprobante
+                          '');
             
             
             -----------------------------
@@ -1346,7 +1348,355 @@ BEGIN
                         
         
         end;     
-	 
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_CLONARCBTE_IME'
+ 	#DESCRIPCION:	Clonar comprobante comprobante
+ 	#AUTOR:		rac (kplian)	
+ 	#FECHA:		02-06-2016 00:28:30
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CLONARCBTE_IME')then
+
+		begin
+        
+        
+            select 
+             ic.*,
+             p.id_gestion 
+            into
+             v_reg_cbte
+            from conta.tint_comprobante ic 
+            inner join param.tperiodo p on p.id_periodo = ic.id_periodo
+            where ic.id_int_comprobante = v_parametros.id_int_comprobante;
+            
+            
+           
+            --validar que el periodo se encuentre abierto
+            IF not param.f_periodo_subsistema_abierto(v_reg_cbte.fecha::date, 'CONTA') THEN
+                raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_reg_cbte.fecha;
+            END IF;
+            
+            
+            ----------------------------------------
+            -- registrar proceso disparado de WF 
+            ----------------------------------------
+            
+              --  inicia tramite nuevo 
+              v_codigo_proceso_macro = pxp.f_get_variable_global('conta_codigo_macro_wf_cbte');
+              
+              --obtener id del proceso macro
+              select 
+               pm.id_proceso_macro
+              into
+               v_id_proceso_macro
+              from wf.tproceso_macro pm
+              where pm.codigo = v_codigo_proceso_macro;
+              
+                   
+              If v_id_proceso_macro is NULL THEN
+                raise exception 'El proceso macro  de codigo % no esta configurado en el sistema WF',v_codigo_proceso_macro;  
+              END IF;
+                   
+              --   obtener el codigo del tipo_proceso
+              select   tp.codigo 
+               into v_codigo_tipo_proceso
+              from  wf.ttipo_proceso tp 
+              where   tp.id_proceso_macro = v_id_proceso_macro
+                    and tp.estado_reg = 'activo' and tp.inicio = 'si';
+                          
+              IF v_codigo_tipo_proceso is NULL THEN
+               raise exception 'No existe un proceso inicial para el proceso macro indicado % (Revise la configuración)',v_codigo_proceso_macro;
+              END IF;
+                  
+             -- inciar el tramite en el sistema de WF
+              SELECT 
+                 ps_num_tramite ,
+                 ps_id_proceso_wf ,
+                 ps_id_estado_wf ,
+                 ps_codigo_estado 
+                into
+                 v_num_tramite,
+                 v_id_proceso_wf,
+                 v_id_estado_wf,
+                 v_codigo_estado   
+                        
+              FROM wf.f_inicia_tramite(
+                 p_id_usuario,
+                 v_parametros._id_usuario_ai,
+                 v_parametros._nombre_usuario_ai,
+                 v_reg_cbte.id_gestion, 
+                 v_codigo_tipo_proceso, 
+                 null,--v_parametros.id_funcionario,
+                 v_reg_cbte.id_depto,
+                 'Registro de Cbte manual',
+                 '' );        
+               
+               
+              IF  v_codigo_estado != 'borrador' THEN
+                raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
+              END IF;
+            
+            
+            -----------------------------
+        	--REGISTRO DEL COMPROBANTE
+        	-----------------------------
+        	insert into conta.tint_comprobante(
+                id_clase_comprobante,    		
+                id_subsistema,
+                id_depto,
+                id_moneda,
+                id_periodo,
+                id_funcionario_firma1,
+                id_funcionario_firma2,
+                id_funcionario_firma3,
+                tipo_cambio,
+                beneficiario,    			
+                estado_reg,
+                glosa1,
+                fecha,
+                glosa2,    			
+                --momento,
+                id_usuario_reg,
+                fecha_reg,
+                id_usuario_mod,
+                fecha_mod,
+                id_usuario_ai,
+                usuario_ai,
+                cbte_cierre,
+                cbte_apertura,
+                cbte_aitb,
+                manual,
+                momento_comprometido,
+                momento_ejecutado,
+                momento_pagado,
+                momento,              
+                fecha_costo_ini,
+                fecha_costo_fin,
+                id_config_cambiaria,
+                tipo_cambio_2,
+                localidad,
+                id_moneda_tri,
+                nro_tramite,
+                sw_editable,
+                sw_tipo_cambio,
+                cbte_reversion,
+                id_proceso_wf,
+                id_estado_wf
+          	) values(
+              v_reg_cbte.id_clase_comprobante,  			
+              v_reg_cbte.id_subsistema,
+              v_reg_cbte.id_depto,
+              v_reg_cbte.id_moneda,
+              v_reg_cbte.id_periodo,
+              v_reg_cbte.id_funcionario_firma1,
+              v_reg_cbte.id_funcionario_firma2,
+              v_reg_cbte.id_funcionario_firma3,
+              v_reg_cbte.tipo_cambio,
+              v_reg_cbte.beneficiario,  			
+              'borrador',
+              'CBTE CLONADO(id:'||v_reg_cbte.id_int_comprobante||' )',
+              v_reg_cbte.fecha,
+              v_reg_cbte.glosa2,  			
+              --v_parametros.momento,
+              p_id_usuario,
+              now(),
+              null,
+              null,
+              v_parametros._id_usuario_ai,
+              v_parametros._nombre_usuario_ai,           
+              v_reg_cbte.cbte_cierre,
+              v_reg_cbte.cbte_apertura,
+              v_reg_cbte.cbte_aitb,
+              'no',
+              v_reg_cbte.momento_comprometido,
+              v_reg_cbte.momento_ejecutado,
+              v_reg_cbte.momento_pagado,
+              v_reg_cbte.momento,            
+              v_reg_cbte.fecha_costo_ini,
+              v_reg_cbte.fecha_costo_fin,
+              v_reg_cbte.id_config_cambiaria,
+              v_reg_cbte.tipo_cambio_2,
+              v_reg_cbte.localidad,
+              v_reg_cbte.id_moneda_tri,
+              v_num_tramite,
+              'no',  -- sw_editable 
+              'si', -- sw_tipo_cambio 
+			  'no', -- cbte_reversion	, marcamos como cbte de reversion
+              v_id_proceso_wf,
+              v_id_estado_wf		
+			)RETURNING id_int_comprobante into v_id_int_comprobante;
+            
+            
+            -- listar todas las transacciones originales
+            FOR v_registros in (
+                     select * 
+                     from conta.tint_transaccion it 
+                     where  it.estado_reg = 'activo' and   
+                     it.id_int_comprobante = v_parametros.id_int_comprobante) LOOP
+                     
+                   --  insertar transaccion volcada
+                   
+                    -----------------------------
+                    --REGISTRO DE LA TRANSACCIÓN
+                    -----------------------------
+                    
+                    insert into conta.tint_transaccion(
+                        id_partida,
+                        id_centro_costo,
+                        estado_reg,
+                        id_cuenta,
+                        glosa,
+                        id_int_comprobante,
+                        id_auxiliar,
+                        importe_debe,
+                        importe_haber,
+                        importe_gasto,
+                        importe_recurso,
+                        
+                        id_usuario_reg,
+                        fecha_reg,
+                        id_usuario_mod,
+                        fecha_mod,
+                        id_orden_trabajo,
+                        tipo_cambio,
+                        tipo_cambio_2,
+                        id_moneda,
+                        id_moneda_tri,
+                        
+                        importe_debe_mb,
+                        importe_haber_mb,
+                        importe_recurso_mb,
+                        importe_gasto_mb,
+                        
+                        importe_debe_mt,
+                        importe_haber_mt,
+                        importe_recurso_mt ,
+                        importe_gasto_mt,
+                        
+                        
+                        triangulacion ,
+                        actualizacion, 
+                        id_partida_ejecucion,
+                        id_partida_ejecucion_dev
+                        
+                    ) values(
+                        v_registros.id_partida,
+                        v_registros.id_centro_costo,
+                        'activo',
+                        v_registros.id_cuenta,
+                        v_registros.glosa,
+                        v_id_int_comprobante,  --referencia al cbte volcado
+                        v_registros.id_auxiliar,
+                        v_registros.importe_debe, 
+                        v_registros.importe_haber,   
+                        v_registros.importe_debe, --  
+                        v_registros.importe_haber, --  
+                        
+                        p_id_usuario,
+                        now(),
+                        null,
+                        null,
+                        v_registros.id_orden_trabajo,
+                        v_registros.tipo_cambio,
+                        v_registros.tipo_cambio_2,
+                        v_registros.id_moneda,
+                        v_registros.id_moneda_tri,
+                        v_registros.importe_debe_mb,
+                        v_registros.importe_haber_mb,  
+                        v_registros.importe_recurso_mb,   
+                        v_registros.importe_gasto_mb, 
+                        v_registros.importe_debe_mt,                       
+                        v_registros.importe_haber_mt,
+                        v_registros.importe_recurso_mt,    
+                        v_registros.importe_gasto_mt, 
+                        v_registros.triangulacion ,
+                        v_registros.actualizacion, 
+                        v_registros.id_partida_ejecucion,
+                        v_registros.id_partida_ejecucion_dev
+                        
+                    )RETURNING id_int_transaccion into v_id_int_transaccion;
+                    
+                      /*
+                    
+                     --  si el comprobante tiene relaciones de devenago (si es un cbte de pago)
+                     --  asociamos el pago al nuevo comprobante
+                     
+                     FOR  v_registros_dev in (
+                                              select 
+                                                ird.id_int_rel_devengado,
+                                                ird.monto_pago,
+                                                ird.monto_pago_mb,
+                                                ird.monto_pago_mt,
+                                                ird.id_int_transaccion_dev,
+                                                it.id_partida_ejecucion_dev,
+                                                it.importe_reversion,
+                                                it.factor_reversion,
+                                                it.monto_pagado_revertido,
+                                                ic.fecha,
+                                                it.id_partida_ejecucion_rev,
+                                                p.codigo as codigo_partida,
+                                                it.id_centro_costo as id_presupuesto,
+                                                ird.id_partida_ejecucion_pag
+                                                                    
+                                              from  conta.tint_rel_devengado ird
+                                              inner join conta.tint_transaccion it 
+                                                on it.id_int_transaccion = ird.id_int_transaccion_dev
+                                              inner join pre.tpartida p on p.id_partida = it.id_partida 
+                                                                  
+                                              inner join conta.tint_comprobante ic on ic.id_int_comprobante = it.id_int_comprobante
+                                              where  ird.id_int_transaccion_pag = v_registros.id_int_transaccion
+                                                     and ird.estado_reg = 'activo'
+                                                     and p.sw_movimiento = 'presupuestaria'
+                                             ) LOOP
+                                             
+                    
+                                    insert into conta.tint_rel_devengado(
+                                        id_int_transaccion_pag,
+                                        id_int_transaccion_dev,
+                                        monto_pago,
+                                        monto_pago_mb,
+                                        monto_pago_mt,
+                                        estado_reg,
+                                        id_usuario_ai,
+                                        fecha_reg,
+                                        usuario_ai,
+                                        id_usuario_reg,
+                                        sw_reversion,
+                                        id_partida_ejecucion_pag
+                                     ) values(
+                                        v_id_int_transaccion,
+                                        v_registros_dev.id_int_transaccion_dev,
+                                        v_registros_dev.monto_pago*(-1),
+                                        v_registros_dev.monto_pago_mb*(-1),
+                                        v_registros_dev.monto_pago_mt*(-1),
+                                        'activo',
+                                        v_parametros._id_usuario_ai,
+                                        now(),
+                                        v_parametros._nombre_usuario_ai,
+                                        p_id_usuario,
+                                        'si',
+                                        v_registros_dev.id_partida_ejecucion_pag
+                                    ) ;
+                        
+                            --isnerta relacion de devengado con la reversion
+                            --marcando el sw de reversion
+                    
+                    END LOOP;
+                    
+                    */
+            
+            END LOOP;
+                
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue clonado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+     
     
     
     else

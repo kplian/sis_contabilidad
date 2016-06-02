@@ -33,6 +33,7 @@ DECLARE
     v_id_moneda_base	integer;
     v_id_moneda_tri	    integer;
     v_filtro 			varchar;
+    va_id_depto			integer[];
 			    
 BEGIN
 
@@ -50,6 +51,7 @@ BEGIN
     	begin
         
             v_id_moneda_base=param.f_get_moneda_base();
+            v_filtro = ' 0 = 0 and ';
             
             select 
              *
@@ -58,8 +60,18 @@ BEGIN
             from param.tmoneda m 
             where m.id_moneda = v_id_moneda_base;
             
-            --TODO si no es administrador, solo puede listar al responsable del depto o al usuario que creo e documentos
+            -- si no es administrador, solo puede listar al responsable del depto o al usuario que creo e documentos
+            IF p_administrador !=1 THEN  
+               
+                select  
+                   pxp.aggarray(depu.id_depto)
+                into 
+                   va_id_depto
+                from param.tdepto_usuario depu 
+                where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
             
+                v_filtro = ' ( incbte.id_usuario_reg = '||p_id_usuario::varchar ||'  or   (ew.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))) and ';
+            END IF;
     		--Sentencia de la consulta
 			v_consulta := 'select
                               incbte.id_int_comprobante,
@@ -124,7 +136,7 @@ BEGIN
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
-                          where  incbte.estado_reg in (''borrador'',''validado'') and ';
+                          where  incbte.estado_reg in (''borrador'',''validado'') and '||v_filtro;
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -147,12 +159,28 @@ BEGIN
 	elsif(p_transaccion='CONTA_INCBTE_CONT')then
 
 		begin
-			--Sentencia de la consulta de conteo de registros
+        
+            v_filtro = ' 0 = 0 and ';
+        
+           -- si no es administrador, solo puede listar al responsable del depto o al usuario que creo e documentos
+            IF p_administrador !=1 THEN  
+               
+                select  
+                   pxp.aggarray(depu.id_depto)
+                into 
+                   va_id_depto
+                from param.tdepto_usuario depu 
+                where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
+            
+                v_filtro = ' ( incbte.id_usuario_reg = '||p_id_usuario::varchar ||'  or  (ew.id_depto  in ('||COALESCE(array_to_string(va_id_depto,','),'0')||'))) and ';
+            END IF;
+			
+            --Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_int_comprobante)
 					     from conta.vint_comprobante incbte
                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                          inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
-                         where  incbte.estado_reg in (''borrador'',''validado'') and ';
+                         where  incbte.estado_reg in (''borrador'',''validado'') and '||v_filtro;
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

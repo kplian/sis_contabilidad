@@ -518,6 +518,12 @@ class ACTIntComprobante extends ACTbase{
         $this->res=$this->objFunc->anteriorEstado($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+   
+   function clonarCbte(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->clonarCbte($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 		
 		
 }
