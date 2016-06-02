@@ -19,7 +19,12 @@ Phx.vista.IntComprobanteReg = {
 	title: 'Libro Diario',
 	nombreVista: 'IntComprobanteReg',
 	
+	
 	constructor: function(config) {
+		    var me = this;
+		    me.bMedios = [];
+            me.addButtonCustom(config.idContenedor, 'sig_estado', { text: 'Aprobar', iconCls: 'badelante', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>' });
+        
 	    
 	        Phx.vista.IntComprobanteReg.superclass.constructor.call(this,config);
 	        
@@ -151,12 +156,12 @@ Phx.vista.IntComprobanteReg = {
 			var rec = this.sm.getSelected();
 		
 		    if(rec.data.tipo_reg == 'summary'){
-		    	this.getBoton('btnSwEditble').setDisabled(true);
-				this.getBoton('btnValidar').setDisabled(true);
-				this.getBoton('btnImprimir').setDisabled(true);
-				this.getBoton('btnRelDev').setDisabled(true);
-				this.getBoton('btnIgualarCbte').setDisabled(true);
-				this.getBoton('btnDocCmpVnt').setDisabled(true);
+		    	this.getBoton('btnSwEditble').disable();
+				this.getBoton('sig_estado').disable();
+				this.getBoton('btnImprimir').disable();
+				this.getBoton('btnRelDev').disable();
+				this.getBoton('btnIgualarCbte').disable();
+				this.getBoton('btnDocCmpVnt').disable();
 			}
 			else{
 				if(rec.data.sw_editable == 'no'){
@@ -165,7 +170,8 @@ Phx.vista.IntComprobanteReg = {
 		        else{
 		        	 this.getBoton('btnSwEditble').setDisabled(true);
 		        }
-		        this.getBoton('btnValidar').enable();
+		        this.getBoton('sig_estado').enable();
+            
 				this.getBoton('btnImprimir').enable();
 				this.getBoton('btnRelDev').enable();
 				this.getBoton('btnIgualarCbte').enable();
@@ -177,12 +183,15 @@ Phx.vista.IntComprobanteReg = {
                 this.getBoton('btnObs').enable(); 
 			}
 			
+			
+            
+			
 			return tb;
 		},
 		liberaMenu : function() {
 			var tb = Phx.vista.IntComprobanteReg.superclass.liberaMenu.call(this);
 			
-				this.getBoton('btnValidar').disable();
+				this.getBoton('sig_estado').disable();
 				this.getBoton('btnImprimir').disable();
 				this.getBoton('btnRelDev').disable();
 				this.getBoton('btnIgualarCbte').disable();

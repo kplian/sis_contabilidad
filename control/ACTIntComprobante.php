@@ -47,6 +47,42 @@ class ACTIntComprobante extends ACTbase{
 		//echo dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php';exit;
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+
+   function listarIntComprobanteWF(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    
+		
+		if($this->objParam->getParametro('id_deptos')!=''){
+            $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
+        }
+		
+		
+		if($this->objParam->getParametro('momento')!= ''){
+			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
+		}
+		
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+		
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarIntComprobanteWF');
+		} else{
+			$this->objFunc=$this->create('MODIntComprobante');
+			
+			$this->res=$this->objFunc->listarIntComprobanteWF($this->objParam);
+		}
+		
+		//echo dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php';exit;
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+
+
+
+
 	
 	function listarSimpleIntComprobante(){
 		$this->objParam->defecto('ordenacion','id_int_comprobante');

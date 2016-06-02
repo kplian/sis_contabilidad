@@ -229,6 +229,7 @@ fheight: '80%',
 	
 		 
 		 this.addBotonesListaNegra();
+		 this.addBotonesRetencionGarantias();
 		 
 		this.addButton('insertAuto',{argument: {imprimir: 'insertAuto'},text:'<i class="fa fa-file-text-o fa-2x"></i> insertAuto',/*iconCls:'' ,*/disabled:false,handler:this.insertAuto});
 
@@ -2046,7 +2047,7 @@ fheight: '80%',
             text: 'Lista Negra',
             disabled: false,
             grupo:[0,1,2],
-            iconCls : 'bgantt',
+            iconCls : 'bcancelfile',
             handler:this.listaNegra,
             scope: this,
             menu:{
@@ -2081,7 +2082,58 @@ fheight: '80%',
 				timeout:this.timeout,
 				scope:this
 			});
+    },
+    
+    
+    
+    
+    addBotonesRetencionGarantias: function() {
+        this.menuRetencionGarantias = new Ext.Toolbar.SplitButton({
+            id: 'b-retencion_garantias-' + this.idContenedor,
+            text: 'Retencion Garantias',
+            disabled: false,
+            grupo:[0,1,2],
+            iconCls : 'bmoney',
+            handler:this.listaRetencionGarantias,
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-ins-reten-' + this.idContenedor,
+                text: 'Insertar Retenciones',
+                tooltip: '<b>Insertar Retenciones de garantias</b>',
+                handler:this.addRetencionGarantias,
+                scope: this
+            }, {
+                id:'b-list-reten-' + this.idContenedor,
+                text: 'Lista de Rentenciones de Garantia',
+                tooltip: '<b>Lista de retenciones de garantias</b>',
+                handler:this.listaRetencionGarantias,
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuRetencionGarantias);
+    },
+    
+    addRetencionGarantias : function (){
+    	
+			Phx.CP.loadingShow();
+			
+			var id_periodo = this.cmbPeriodo.getValue();
+			
+			
+			
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/insertarRetencionesPeriodo',
+				params:{'id_periodo':id_periodo},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
     }
+    
     
 		
 		/*,

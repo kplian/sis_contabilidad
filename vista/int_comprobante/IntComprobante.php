@@ -1311,9 +1311,84 @@ header("content-type: text/javascript; charset=UTF-8");
 			var data=this.sm.getSelected().data.id_proceso_wf;
 			window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)		
 	}, 
-		
-		
-		
+	
+	sigEstado:function(){                   
+      	var rec=this.sm.getSelected();
+      	
+      	this.mostrarWizard(rec);
+      	
+               
+     },
+     
+    mostrarWizard : function(rec) {
+     	var configExtra = [],
+     		obsValorInicial;
+     	   
+		this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+                                'Estado de Wf',
+                                {
+                                    modal: true,
+                                    width: 700,
+                                    height: 450
+                                }, 
+                                {
+                                	configExtra: configExtra,
+                                	eventosExtra: this.eventosExtra,
+                                	data:{
+                                       id_estado_wf: rec.data.id_estado_wf,
+                                       id_proceso_wf: rec.data.id_proceso_wf,
+                                       id_int_comprobante: rec.data.id_int_comprobante,
+                                       fecha_ini: rec.data.fecha
+                                   },
+                                   obsValorInicial: obsValorInicial,
+                                }, this.idContenedor, 'FormEstadoWf',
+                                {
+                                    config:[{
+                                              event:'beforesave',
+                                              delegate: this.onSaveWizard,
+                                              
+                                            },
+					                        {
+					                          event:'requirefields',
+					                          delegate: function () {
+						                          	this.onButtonEdit();
+										        	this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
+										        	this.formulario_wizard = 'si';
+					                          }
+					                          
+					                        }],
+                                  
+                                    scope:this
+                        });        
+     },
+    onSaveWizard:function(wizard,resp){
+        Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            url:'../../sis_contabilidad/control/IntComprobante/siguienteEstado',
+            params:{
+            	    id_int_comprobante: wizard.data.id_int_comprobante,
+            	    id_proceso_wf_act:  resp.id_proceso_wf_act,
+	                id_estado_wf_act:   resp.id_estado_wf_act,
+	                id_tipo_estado:     resp.id_tipo_estado,
+	                id_funcionario_wf:  resp.id_funcionario_wf,
+	                id_depto_wf:        resp.id_depto_wf,
+	                obs:                resp.obs,
+	                instruc_rpc:		resp.instruc_rpc,
+	                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+	                
+                },
+            success: this.successWizard,
+            failure: this.conexionFailure, 
+            argument: { wizard:wizard },
+            timeout: this.timeout,
+            scope: this
+        });
+    },
+    successWizard: function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+    }
 		
 		
 		
