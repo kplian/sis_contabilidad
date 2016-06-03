@@ -224,13 +224,14 @@ class MODResultadoPlantilla extends MODbase{
 			$this->captura('tipo_saldo','varchar');
 			$this->captura('signo_balance','varchar');			
 			$this->captura('relacion_contable','varchar');
-			$this->captura('codigo_partida','varchar');
-			
+			$this->captura('codigo_partida','varchar');			
 			$this->captura('id_auxiliar','int4');
 			$this->captura('destino','varchar');
 			$this->captura('orden_cbte','numeric');
 			$this->captura('codigo_auxiliar','varchar');
 			$this->captura('desc_partida','varchar');
+			$this->captura('codigo_resultado_plantilla','varchar');
+			
 			
 			$this->armarConsulta();
 			$consulta=$this->getConsulta();			

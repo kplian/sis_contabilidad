@@ -6,7 +6,6 @@
 *@date 08-07-2015 13:12:43
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
-
 class ACTResultadoPlantilla extends ACTbase{    
 			
 	function listarResultadoPlantilla(){
@@ -135,7 +134,10 @@ class ACTResultadoPlantilla extends ACTbase{
 							 (is_null($row['codigo_partida'])?'NULL':"'".$row['codigo_partida']."'") ."," .
 							 (is_null($row['destino'])?'NULL':"'".$row['destino']."'") ."," .
 							 (is_null($row['orden_cbte'])?'NULL':"'".$row['orden_cbte']."'") ."," .
-							 (is_null($row['codigo_auxiliar'])?'NULL':"'".$row['codigo_auxiliar']."'") .");\r\n");
+							 (is_null($row['codigo_auxiliar'])?'NULL':"'".$row['ocodigo_auxiliarrden_cbte']."'") ."," .
+							 (is_null($row['codigo_resultado_plantilla'])?'NULL':"'".$row['codigo_resultado_plantilla']."'") .");\r\n");
+							 
+						
 							 
 							 						
 				
