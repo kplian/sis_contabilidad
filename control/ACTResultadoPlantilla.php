@@ -73,7 +73,7 @@ class ACTResultadoPlantilla extends ACTbase{
 	
 	function crearArchivoExportacion($res) {
 		$data = $res -> getDatos();
-		$fileName = uniqid(md5(session_id()).'PlantillaCalculo').'.sql';
+		$fileName = uniqid(md5(session_id()).'ResultadoPlantilla').'.sql';
 		//create file
 		$file = fopen("../../../reportes_generados/$fileName", 'w');
 		
@@ -83,121 +83,75 @@ class ACTResultadoPlantilla extends ACTbase{
 		$sw_rol=0; 
 		$sw_rol_pro=0;
 		fwrite ($file,"----------------------------------\r\n".
-						  "--COPY LINES TO SUBSYSTEM data.sql FILE  \r\n".
-						  "---------------------------------\r\n".
+					  "--COPY LINES TO SUBSYSTEM data.sql FILE  \r\n".
+					  "---------------------------------\r\n".
 						  "\r\n" );
 		foreach ($data as $row) {			
 			 if ($row['tipo_reg'] == 'maestro' ) {
-			 	
-				if ($row['estado_reg'] == 'inactivo') {
+			 							
 					fwrite ($file, 
-					"select conta.f_import_tplantilla_comprobante ('delete','".							 
-							$row['codigo']."',
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL.NULL);\r\n");
-							
-				} else {
-					fwrite ($file, 
-					 "select conta.f_import_tplantilla_comprobante ('insert','".
+					 "select conta.f_import_tresultado_plantilla ('insert','".
 								$row['codigo']."'," .
-						     (is_null($row['funcion_comprobante_eliminado'])?'NULL':"'".$row['funcion_comprobante_eliminado']."'") ."," .
-							 (is_null($row['id_tabla'])?'NULL':"'".$row['id_tabla']."'") ."," .
-							 (is_null($row['campo_subsistema'])?'NULL':"'".$row['campo_subsistema']."'") ."," .
-							 (is_null($row['campo_descripcion'])?'NULL':"'".$row['campo_descripcion']."'") ."," .							 
-							 (is_null($row['funcion_comprobante_validado'])?'NULL':"'".$row['funcion_comprobante_validado']."'") ."," .							 
-							 (is_null($row['campo_fecha'])?'NULL':"'".$row['campo_fecha']."'") ."," .							 
-							 (is_null($row['estado_reg'])?'NULL':"'".$row['estado_reg']."'") ."," .							 
-							 (is_null($row['campo_acreedor'])?'NULL':"'".$row['campo_acreedor']."'") ."," .							 
-							 (is_null($row['campo_depto'])?'NULL':"'".$row['campo_depto']."'") ."," .							 
-							 (is_null($row['momento_presupuestario'])?'NULL':"'".$row['momento_presupuestario']."'") ."," .							 
-							 (is_null($row['campo_fk_comprobante'])?'NULL':"'".$row['campo_fk_comprobante']."'")."," .							 
-							 (is_null($row['tabla_origen'])?'NULL':"'".$row['tabla_origen']."'") ."," .							  
-							 (is_null($row['clase_comprobante'])?'NULL':"'".$row['clase_comprobante']."'") ."," .							 
-							 (is_null($row['campo_moneda'])?'NULL':"'".$row['campo_moneda']."'")."," .							 
-							 (is_null($row['campo_gestion_relacion'])?'NULL':"'".$row['campo_gestion_relacion']."'") ."," .							  
-							 (is_null($row['otros_campos'])?'NULL':"'".$row['otros_campos']."'") ."," .							 
-							 (is_null($row['momento_comprometido'])?'NULL':"'".$row['momento_comprometido']."'")."," .							 
-							 (is_null($row['momento_ejecutado'])?'NULL':"'".$row['momento_ejecutado']."'") ."," .							  
-							 (is_null($row['momento_pagado'])?'NULL':"'".$row['momento_pagado']."'") ."," .							 
-							 (is_null($row['campo_id_cuenta_bancaria'])?'NULL':"'".$row['campo_id_cuenta_bancaria']."'")."," .							 	
-							 (is_null($row['campo_id_cuenta_bancaria_mov'])?'NULL':"'".$row['campo_id_cuenta_bancaria_mov']."'") ."," .							 
-							 (is_null($row['campo_nro_cheque'])?'NULL':"'".$row['campo_nro_cheque']."'") ."," .							 
-							 (is_null($row['campo_nro_cuenta_bancaria_trans'])?'NULL':"'".$row['campo_nro_cuenta_bancaria_trans']."'")."," .							 	
-							 (is_null($row['campo_nro_tramite'])?'NULL':"'".$row['campo_nro_tramite']."'") ."," .							 
-							 (is_null($row['campo_tipo_cambio'])?'NULL':"'".$row['campo_tipo_cambio']."'") ."," .							 
-							 (is_null($row['campo_depto_libro'])?'NULL':"'".$row['campo_depto_libro']."'")."," .							 
-							 (is_null($row['campo_fecha_costo_ini'])?'NULL':"'".$row['campo_fecha_costo_ini']."'") ."," .							 
-							 (is_null($row['campo_fecha_costo_fin'])?'NULL':"'".$row['campo_fecha_costo_fin']."'")."," .
-							 (is_null($row['funcion_comprobante_editado'])?'NULL':"'".$row['funcion_comprobante_editado']."'").");\r\n");			
+						    (is_null($row['estado_reg'])?'NULL':"'".$row['estado_reg']."'") ."," .
+							 (is_null($row['nombre'])?'NULL':"'".$row['nombre']."'") ."," .
+							 (is_null($row['tipo'])?'NULL':"'".$row['tipo']."'") ."," .							 
+							 (is_null($row['cbte_aitb'])?'NULL':"'".$row['cbte_aitb']."'") ."," .		 
+							 (is_null($row['cbte_apertura'])?'NULL':"'".$row['cbte_apertura']."'") ."," .							 
+							 (is_null($row['cbte_cierre'])?'NULL':"'".$row['cbte_cierre']."'") ."," .							 
+							 (is_null($row['periodo_calculo'])?'NULL':"'".$row['periodo_calculo']."'") ."," .							 
+							 (is_null($row['glosa'])?'NULL':"'".$row['glosa']."'") ."," .							 
+							 (is_null($row['codigo_clase_comprobante'])?'NULL':"'".$row['codigo_clase_comprobante']."'").");\r\n");			
 							 
 							 	
-				}
+				
 			 } else if ($row['tipo_reg'] == 'detalle') {
-				if ($row['estado_reg'] == 'inactivo') {
-						
-					fwrite ($file, 
-					"select conta.f_import_tdetalle_plantilla_comprobante ('delete','".							 
-							$row['codigo_plantilla']."','".
-							$row['codigo']."',
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,NULL);\r\n");	
-	
-			} else {
+				
 					
 					fwrite ($file, 
-					 "select conta.f_import_tdetalle_plantilla_comprobante ('insert',".
-							 
-							 (is_null($row['codigo_plantilla'])?'NULL':"'".$row['codigo_plantilla']."'") ."," .
+					 "select conta.f_import_tresultado_det_plantilla ('insert',".
+							 (is_null($row['orden'])?'NULL':"'".$row['orden']."'") ."," .
+							 (is_null($row['font_size'])?'NULL':"'".$row['font_size']."'") ."," .
+							 (is_null($row['formula'])?'NULL':"'".$row['formula']."'") ."," .
+							 (is_null($row['subrayar'])?'NULL':"'".$row['subrayar']."'") ."," .
 							 (is_null($row['codigo'])?'NULL':"'".$row['codigo']."'") ."," .
-							 (is_null($row['debe_haber'])?'NULL':"'".$row['debe_haber']."'") ."," .
-							 (is_null($row['agrupar'])?'NULL':"'".$row['agrupar']."'") ."," .
-							 (is_null($row['es_relacion_contable'])?'NULL':"'".$row['es_relacion_contable']."'") ."," .
-							 (is_null($row['campo_partida'])?'NULL':"'".$row['campo_partida']."'") ."," .
-							 (is_null($row['campo_concepto_transaccion'])?'NULL':"'".$row['campo_concepto_transaccion']."'") ."," .
-							 (is_null($row['tipo_relacion_contable'])?'NULL':"'".$row['tipo_relacion_contable']."'") ."," .
-							 (is_null($row['campo_cuenta'])?'NULL':"'".$row['campo_cuenta']."'") ."," .
-							 (is_null($row['campo_monto'])?'NULL':"'".$row['campo_monto']."'") ."," .
-							 (is_null($row['campo_relacion_contable'])?'NULL':"'".$row['campo_relacion_contable']."'") ."," .
-							 (is_null($row['campo_documento'])?'NULL':"'".$row['campo_documento']."'") ."," .
-							 (is_null($row['aplicar_documento'])?'NULL':"'".$row['aplicar_documento']."'") ."," .
-							 (is_null($row['campo_centro_costo'])?'NULL':"'".$row['campo_centro_costo']."'") ."," .
-							 (is_null($row['campo_auxiliar'])?'NULL':"'".$row['campo_auxiliar']."'") ."," .
-							 (is_null($row['campo_fecha'])?'NULL':"'".$row['campo_fecha']."'") ."," .
-							 (is_null($row['primaria'])?'NULL':"'".$row['primaria']."'") ."," .
-							 (is_null($row['otros_campos'])?'NULL':"'".$row['otros_campos']."'") ."," .
-							 (is_null($row['nom_fk_tabla_maestro'])?'NULL':"'".$row['nom_fk_tabla_maestro']."'") ."," .
-							 (is_null($row['campo_partida_ejecucion'])?'NULL':"'".$row['campo_partida_ejecucion']."'") ."," .
-							 (is_null($row['descripcion'])?'NULL':"'".$row['descripcion']."'") ."," .
-							 (is_null($row['campo_monto_pres'])?'NULL':"'".$row['campo_monto_pres']."'") ."," .
-							 (is_null($row['id_detalle_plantilla_fk'])?'NULL':"'".$row['id_detalle_plantilla_fk']."'") ."," .
-							 (is_null($row['forma_calculo_monto'])?'NULL':"'".$row['forma_calculo_monto']."'") ."," .
-							 (is_null($row['func_act_transaccion'])?'NULL':"'".$row['func_act_transaccion']."'") ."," .
-							 (is_null($row['campo_id_tabla_detalle'])?'NULL':"'".$row['campo_id_tabla_detalle']."'") ."," .
-							 (is_null($row['rel_dev_pago'])?'NULL':"'".$row['rel_dev_pago']."'") ."," .
-							 (is_null($row['campo_trasaccion_dev'])?'NULL':"'".$row['campo_trasaccion_dev']."'") ."," .
-							 (is_null($row['campo_id_cuenta_bancaria'])?'NULL':"'".$row['campo_id_cuenta_bancaria']."'") ."," .
-							 (is_null($row['campo_id_cuenta_bancaria_mov'])?'NULL':"'".$row['campo_id_cuenta_bancaria_mov']."'") ."," .
-							 (is_null($row['campo_nro_cheque'])?'NULL':"'".$row['campo_nro_cheque']."'") ."," .
-							 (is_null($row['campo_nro_cuenta_bancaria_trans'])?'NULL':"'".$row['campo_nro_cuenta_bancaria_trans']."'") ."," .
-							 (is_null($row['campo_porc_monto_excento_var'])?'NULL':"'".$row['campo_porc_monto_excento_var']."'") ."," .
-							 (is_null($row['campo_nombre_cheque_trans'])?'NULL':"'".$row['campo_nombre_cheque_trans']."'") ."," .
-							 (is_null($row['prioridad_documento'])?'NULL':"'".$row['prioridad_documento']."'") ."," .
-							 (is_null($row['campo_orden_trabajo'])?'NULL':"'".$row['campo_orden_trabajo']."'") ."," .
-							 (is_null($row['tabla_detalle'])?'NULL':"'".$row['tabla_detalle']."'") ."," .
-							 (is_null($row['codigo_fk'])?'NULL':"'".$row['codigo_fk']."'")."," .							 
-							 (is_null($row['campo_forma_pago'])?'NULL':"'".$row['campo_forma_pago']."'") .");\r\n");
+							 (is_null($row['montopos'])?'NULL':"'".$row['montopos']."'") ."," .
+							 (is_null($row['nombre_variable'])?'NULL':"'".$row['nombre_variable']."'") ."," .
+							 (is_null($row['posicion'])?'NULL':"'".$row['posicion']."'") ."," .
+							 (is_null($row['estado_reg'])?'NULL':"'".$row['estado_reg']."'") ."," .
+							 (is_null($row['nivel_detalle'])?'NULL':"'".$row['nivel_detalle']."'") ."," .
+							 (is_null($row['origen'])?'NULL':"'".$row['origen']."'") ."," .
+							 (is_null($row['signo'])?'NULL':"'".$row['signo']."'") ."," .
+							 (is_null($row['codigo_cuenta'])?'NULL':"'".$row['codigo_cuenta']."'") ."," .
+							 (is_null($row['visible'])?'NULL':"'".$row['visible']."'") ."," .
+							 (is_null($row['incluir_apertura'])?'NULL':"'".$row['incluir_apertura']."'") ."," .
+							 (is_null($row['incluir_cierre'])?'NULL':"'".$row['incluir_cierre']."'") ."," .
+							 (is_null($row['desc_cuenta'])?'NULL':"'".$row['desc_cuenta']."'") ."," .
+							 (is_null($row['negrita'])?'NULL':"'".$row['negrita']."'") ."," .
+							 (is_null($row['cursiva'])?'NULL':"'".$row['cursiva']."'") ."," .
+							 (is_null($row['espacio_previo'])?'NULL':"'".$row['espacio_previo']."'") ."," .
+							 (is_null($row['incluir_aitb'])?'NULL':"'".$row['incluir_aitb']."'") ."," .
+							 (is_null($row['tipo_saldo'])?'NULL':"'".$row['tipo_saldo']."'") ."," .
+							 (is_null($row['signo_balance'])?'NULL':"'".$row['signo_balance']."'") ."," .
+							 (is_null($row['relacion_contable'])?'NULL':"'".$row['relacion_contable']."'") ."," .
+							 (is_null($row['codigo_partida'])?'NULL':"'".$row['codigo_partida']."'") ."," .
+							 (is_null($row['destino'])?'NULL':"'".$row['destino']."'") ."," .
+							 (is_null($row['orden_cbte'])?'NULL':"'".$row['orden_cbte']."'") ."," .
+							 (is_null($row['codigo_auxiliar'])?'NULL':"'".$row['codigo_auxiliar']."'") .");\r\n");
 							 
 							 						
-				}
+				
+			} else if ($row['tipo_reg'] == 'dependencia') {
+				
+					
+					fwrite ($file, 
+					 "select conta.f_import_ttresultado_dep ('insert',".
+							 (is_null($row['obs'])?'NULL':"'".$row['obs']."'") ."," .
+							 (is_null($row['prioridad'])?'NULL':"'".$row['prioridad']."'") ."," .
+							 (is_null($row['estado_reg'])?'NULL':"'".$row['estado_reg']."'") ."," .
+							 (is_null($row['codigo_resultado_plantilla'])?'NULL':"'".$row['codigo_resultado_plantilla']."'") .");\r\n");
+							 
+							 						
+				
 			} 
          } //end for
 		

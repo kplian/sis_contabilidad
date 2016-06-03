@@ -37,7 +37,7 @@ class MODResultadoPlantilla extends MODbase{
         $this->captura('cbte_apertura','varchar');
         $this->captura('cbte_cierre','varchar');
         $this->captura('periodo_calculo','varchar');
-        $this->captura('id_clase_comprobante','integer');
+        $this->captura('id_clase_comprobante','integer'); // .....
         $this->captura('glosa','varchar');
 		$this->captura('desc_clase_comprobante','varchar');
 		
@@ -168,7 +168,7 @@ class MODResultadoPlantilla extends MODbase{
 	        $this->captura('periodo_calculo','varchar');
 	        $this->captura('id_clase_comprobante','integer');
 	        $this->captura('glosa','varchar');
-			$this->captura('desc_clase_comprobante','varchar');
+			$this->captura('codigo_clase_comprobante','varchar');
 		
 		$this->armarConsulta();	
 		
@@ -225,10 +225,11 @@ class MODResultadoPlantilla extends MODbase{
 			$this->captura('signo_balance','varchar');			
 			$this->captura('relacion_contable','varchar');
 			$this->captura('codigo_partida','varchar');
+			
 			$this->captura('id_auxiliar','int4');
 			$this->captura('destino','varchar');
 			$this->captura('orden_cbte','numeric');
-			$this->captura('desc_auxiliar','varchar');
+			$this->captura('codigo_auxiliar','varchar');
 			$this->captura('desc_partida','varchar');
 			
 			$this->armarConsulta();

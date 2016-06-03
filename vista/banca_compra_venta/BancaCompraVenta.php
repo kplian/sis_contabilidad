@@ -2049,6 +2049,8 @@ fheight: '80%',
    		},
    		
    		addBotonesListaNegra: function() {
+   			
+   			// agregamos botones
         this.menuAdqGantt = new Ext.Toolbar.SplitButton({
             id: 'b-diagrama_gantt-' + this.idContenedor,
             text: 'Lista Negra',
@@ -2064,13 +2066,13 @@ fheight: '80%',
                 tooltip: '<b>agrega a la lista negra</b>',
                 handler:this.addListaNegra,
                 scope: this
-            }, {
+            }, /*{
                 id:'b-ganttd-' + this.idContenedor,
                 text: 'Lista Negra',
                 tooltip: '<b>Muestra la lista negra</b>',
                 handler:this.listaNegra,
                 scope: this
-            }
+            }*/
         ]}
         });
 		this.tbar.add(this.menuAdqGantt);
@@ -2110,13 +2112,13 @@ fheight: '80%',
                 tooltip: '<b>Insertar Retenciones de garantias</b>',
                 handler:this.addRetencionGarantias,
                 scope: this
-            }, {
+            }, /*{
                 id:'b-list-reten-' + this.idContenedor,
                 text: 'Lista de Rentenciones de Garantia',
                 tooltip: '<b>Lista de retenciones de garantias</b>',
                 handler:this.listaRetencionGarantias,
                 scope: this
-            }
+            }*/
         ]}
         });
 		this.tbar.add(this.menuRetencionGarantias);
