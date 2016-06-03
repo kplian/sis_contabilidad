@@ -124,32 +124,32 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-                        ''maestro''::varchar as tipo_reg,
-						resplan.id_resultado_plantilla,
-						resplan.codigo,
-						resplan.estado_reg,
-						resplan.nombre,
-						resplan.id_usuario_reg,
-						resplan.usuario_ai,
-						resplan.fecha_reg,
-						resplan.id_usuario_ai,
-						resplan.fecha_mod,
-						resplan.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        resplan.tipo,
-                        resplan.cbte_aitb,
-                        resplan.cbte_apertura,
-                        resplan.cbte_cierre,
-                        resplan.periodo_calculo,
-                        resplan.id_clase_comprobante,
-                        resplan.glosa,
-                        cc.descripcion as desc_clase_comprobante
-						from conta.tresultado_plantilla resplan
-                        inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
-						left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante
-						left join segu.tusuario usu2 on usu2.id_usuario = resplan.id_usuario_mod
-				        where  resplan.id_resultado_plantilla = '||v_parametros.id_resultado_plantilla;
+                            ''maestro''::varchar as tipo_reg,
+                            resplan.id_resultado_plantilla,
+                            resplan.codigo,
+                            resplan.estado_reg,
+                            resplan.nombre,
+                            resplan.id_usuario_reg,
+                            resplan.usuario_ai,
+                            resplan.fecha_reg,
+                            resplan.id_usuario_ai,
+                            resplan.fecha_mod,
+                            resplan.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            resplan.tipo,
+                            resplan.cbte_aitb,
+                            resplan.cbte_apertura,
+                            resplan.cbte_cierre,
+                            resplan.periodo_calculo,
+                            resplan.id_clase_comprobante,
+                            resplan.glosa,
+                            cc.codigo as codigo_clase_comprobante
+                      from conta.tresultado_plantilla resplan
+                      inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
+                      left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante
+                      left join segu.tusuario usu2 on usu2.id_usuario = resplan.id_usuario_mod
+                      where  resplan.id_resultado_plantilla = '||v_parametros.id_resultado_plantilla;
 			
             return v_consulta;
 						
@@ -227,7 +227,7 @@ BEGIN
                           resdet.id_auxiliar,
                           resdet.destino,
                           resdet.orden_cbte,
-                          aux.nombre_auxiliar as desc_auxiliar,
+                          aux.codigo_auxiliar,
                           par.nombre_partida as desc_partida
                          from conta.tresultado_det_plantilla resdet
                          inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
@@ -253,25 +253,27 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-                        ''dependencia''::varchar as tipo_reg,
-						resdep.id_resultado_dep,
-						resdep.id_resultado_plantilla,
-						resdep.obs,
-						resdep.prioridad,
-						resdep.estado_reg,
-						resdep.id_usuario_ai,
-						resdep.fecha_reg,
-						resdep.usuario_ai,
-						resdep.id_usuario_reg,
-						resdep.fecha_mod,
-						resdep.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        rp.codigo as codigo_resultado_plantilla	,                        
-                        rp.nombre as nombre_resultado_plantilla	,
-                        resdep.id_resultado_plantilla_hijo
+                            ''dependencia''::varchar as tipo_reg,
+                            resdep.id_resultado_dep,
+                            resdep.id_resultado_plantilla,
+                            resdep.obs,
+                            resdep.prioridad,
+                            resdep.estado_reg,
+                            resdep.id_usuario_ai,
+                            resdep.fecha_reg,
+                            resdep.usuario_ai,
+                            resdep.id_usuario_reg,
+                            resdep.fecha_mod,
+                            resdep.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            rp.codigo as codigo_resultado_plantilla	,                        
+                            rp.nombre as nombre_resultado_plantilla	,
+                            resdep.id_resultado_plantilla_hijo,
+                            rpp.codigo as codigo_resultado_plantilla_padre
 						from conta.tresultado_dep resdep
                         inner join conta.tresultado_plantilla rp  on rp.id_resultado_plantilla = resdep.id_resultado_plantilla_hijo
+                        inner join conta.tresultado_plantilla rpp  on rpp.id_resultado_plantilla = resdep.id_resultado_plantilla
 						inner join segu.tusuario usu1 on usu1.id_usuario = resdep.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = resdep.id_usuario_mod
 				        where  resdep.id_resultado_plantilla = '||v_parametros.id_resultado_plantilla;

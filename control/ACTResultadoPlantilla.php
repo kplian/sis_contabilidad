@@ -62,7 +62,7 @@ class ACTResultadoPlantilla extends ACTbase{
 		
 		$nombreArchivo = $this->crearArchivoExportacion($this->res);
 		
-		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito = new Mensaje();
 		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Se genero con exito el sql'.$nombreArchivo,
 										'Se genero con exito el sql'.$nombreArchivo,'control');
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
@@ -101,7 +101,6 @@ class ACTResultadoPlantilla extends ACTbase{
 							 (is_null($row['periodo_calculo'])?'NULL':"'".$row['periodo_calculo']."'") ."," .							 
 							 (is_null($row['glosa'])?'NULL':"'".$row['glosa']."'") ."," .							 
 							 (is_null($row['codigo_clase_comprobante'])?'NULL':"'".$row['codigo_clase_comprobante']."'").");\r\n");			
-							 
 							 	
 				
 			 } else if ($row['tipo_reg'] == 'detalle') {
@@ -142,9 +141,9 @@ class ACTResultadoPlantilla extends ACTbase{
 				
 			} else if ($row['tipo_reg'] == 'dependencia') {
 				
-					
 					fwrite ($file, 
 					 "select conta.f_import_ttresultado_dep ('insert',".
+					         (is_null($row['codigo_resultado_plantilla_padre'])?'NULL':"'".$row['codigo_resultado_plantilla_padre']."'") ."," .
 							 (is_null($row['obs'])?'NULL':"'".$row['obs']."'") ."," .
 							 (is_null($row['prioridad'])?'NULL':"'".$row['prioridad']."'") ."," .
 							 (is_null($row['estado_reg'])?'NULL':"'".$row['estado_reg']."'") ."," .

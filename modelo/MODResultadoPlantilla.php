@@ -267,6 +267,8 @@ class MODResultadoPlantilla extends MODbase{
 				$this->captura('codigo_resultado_plantilla','varchar');
 				$this->captura('nombre_resultado_plantilla','varchar');
 				$this->captura('id_resultado_plantilla_hijo','int4');
+				$this->captura('codigo_resultado_plantilla_padre','varchar');
+				
 				
 			    $this->armarConsulta();
 				$consulta=$this->getConsulta();			
