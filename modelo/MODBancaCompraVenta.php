@@ -352,6 +352,11 @@ class MODBancaCompraVenta extends MODbase{
 					$arr_temp = $this->remove_utf8_bom($arr_temp);
 					
 					if($this->aParam->getParametro('tipo')=='Compras'){
+						
+
+
+
+
 						$arra[] = array(
 							"modalidad_transaccion" => $arr_temp[0],
        						"fecha_documento" => $arr_temp[1],
@@ -448,6 +453,9 @@ class MODBancaCompraVenta extends MODbase{
 			
 		
 	}
+
+
+
 
 	function remove_utf8_bom($text)
 	{
