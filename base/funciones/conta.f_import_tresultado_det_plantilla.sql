@@ -29,7 +29,8 @@ CREATE OR REPLACE FUNCTION conta.f_import_tresultado_det_plantilla (
   p_codigo_partida varchar,
   p_destino varchar,
   p_orden_cbte varchar,
-  p_codigo_auxiliar varchar
+  p_codigo_auxiliar varchar,
+  p_codigo_resultado_plantilla varchar
 )
 RETURNS varchar AS
 $body$
@@ -42,10 +43,10 @@ DECLARE
    v_id_detalle_plantilla_comprobante_fk	integer;
 BEGIN
 	 
+    
     select plt.id_resultado_plantilla into v_id_resultado_plantilla
     from conta.tresultado_plantilla plt    
-    where trim(lower(plt.codigo)) = trim(lower(p_codigo_plantilla));
-    
+    where trim(lower(plt.codigo)) = trim(lower(p_codigo_resultado_plantilla));
     
     select plt.id_resultado_det_plantilla into v_id_resultado_det_plantilla
     from conta.tresultado_det_plantilla plt    

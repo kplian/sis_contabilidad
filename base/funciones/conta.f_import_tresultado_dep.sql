@@ -54,7 +54,7 @@ BEGIN
                 v_id_resultado_plantilla_padre,
                 v_id_resultado_plantilla,
                 p_obs,
-                p_prioridad,
+                p_prioridad::numeric,
                 'activo',
                 now(),
                 1

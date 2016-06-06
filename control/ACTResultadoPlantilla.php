@@ -144,7 +144,7 @@ class ACTResultadoPlantilla extends ACTbase{
 			} else if ($row['tipo_reg'] == 'dependencia') {
 				
 					fwrite ($file, 
-					 "select conta.f_import_ttresultado_dep ('insert',".
+					 "select conta.f_import_tresultado_dep ('insert',".
 					         (is_null($row['codigo_resultado_plantilla_padre'])?'NULL':"'".$row['codigo_resultado_plantilla_padre']."'") ."," .
 							 (is_null($row['obs'])?'NULL':"'".$row['obs']."'") ."," .
 							 (is_null($row['prioridad'])?'NULL':"'".$row['prioridad']."'") ."," .

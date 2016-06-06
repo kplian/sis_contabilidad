@@ -103,7 +103,6 @@ fheight: '80%',
          fieldset.doLayout(); 
          
 		 console.log(fieldset);
-		 
 		this.cmbResolucion.on('select', function(combo, record, index){
 		    this.tmpResolucion = record.data.field1;
 		    this.capturaFiltros();
@@ -1878,10 +1877,13 @@ fheight: '80%',
 			console.log(rec);
 
 
+
+			
+
 			
 			Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/exporta_txt',
-				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,'acumulado':'no'},
+				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,'acumulado':'no','resolucion':this.cmbResolucion.getValue()},
 				success: this.successGeneracion_txt,
 			
 				failure: this.conexionFailure,
