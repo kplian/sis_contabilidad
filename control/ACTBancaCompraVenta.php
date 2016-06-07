@@ -260,6 +260,9 @@ class ACTBancaCompraVenta extends ACTbase{
 	}
 	
 	function insertarRetencionesPeriodo(){
+		
+		
+		
 		$this->objFunc=$this->create('MODBancaCompraVenta');	
 		$this->res=$this->objFunc->insertarRetencionesPeriodo($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());

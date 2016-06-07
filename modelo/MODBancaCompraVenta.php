@@ -586,6 +586,9 @@ class MODBancaCompraVenta extends MODbase{
 		$this->setParametro('id_depto_conta','id_depto_conta','int4');
 				
 	
+		$this->setParametro('numero_tramite','numero_tramite','varchar'); //el que envia
+		
+	
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

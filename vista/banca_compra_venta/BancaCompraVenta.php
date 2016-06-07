@@ -2114,7 +2114,15 @@ fheight: '80%',
                 tooltip: '<b>Insertar Retenciones de garantias</b>',
                 handler:this.addRetencionGarantias,
                 scope: this
-            }, /*{
+            },
+            {
+                id:'b-ins-reten-sin-pp-' + this.idContenedor,
+                text: 'Insertar Retenciones sin plan de pago',
+                tooltip: '<b>Insertar Retenciones de garantias</b>',
+                handler:this.addRetencionGarantiasSinPlanPago,
+                scope: this
+            },
+             /*{
                 id:'b-list-reten-' + this.idContenedor,
                 text: 'Lista de Rentenciones de Garantia',
                 tooltip: '<b>Lista de retenciones de garantias</b>',
@@ -2136,7 +2144,30 @@ fheight: '80%',
 			
 			Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/insertarRetencionesPeriodo',
-				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta},
+				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta,'numero_tramite':''},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+    },
+    
+    addRetencionGarantiasSinPlanPago : function(){
+    	Phx.CP.loadingShow();
+			
+			var id_periodo = this.cmbPeriodo.getValue();
+			
+			var id_depto_conta = this.cmbDepto.getValue();
+			
+			var rec = this.sm.getSelected();
+			console.log(rec);
+			
+			var numero_tramite = rec.data.tramite_cuota;
+			
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/insertarRetencionesPeriodo',
+				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta,'numero_tramite':numero_tramite},
 				success: this.successAuto,
 			
 				failure: this.conexionFailure,
