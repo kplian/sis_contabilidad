@@ -116,10 +116,12 @@ class ACTBancaCompraVenta extends ACTbase{
 		$this->objParam->addFiltro("banca.id_periodo = ''".$this->objParam->getParametro('id_periodo')."'' ");
 		$this->objParam->addFiltro("banca.revisado = ''si'' ");
 		
+		$mostrar_contrato = 'si';
 		if($this->objParam->getParametro('resolucion') == '10-0017-15'){
 			$this->objParam->addFiltro("banca.resolucion = ''10-0017-15'' ");
 		}elseif($this->objParam->getParametro('resolucion') == '10-0011-11'){
 			$this->objParam->addFiltro("banca.resolucion = ''10-0011-11'' ");
+			$mostrar_contrato = 'no';
 		}else{
 			
 		}
@@ -175,13 +177,16 @@ class ACTBancaCompraVenta extends ACTbase{
 				if($dato['num_contrato'] != ''){
 					$contrato =$dato['num_contrato']; 
 				}
+
+				$contrato = ($mostrar_contrato == 'si')?$contrato ."|":"";
+
 				$Escribo = "".$dato['modalidad_transaccion'] ."|"
 							.$dato['fecha_documento'] ."|"
 							.$dato['tipo_transaccion'] ."|"
 							.$dato['nit_ci'] ."|"
 							.$dato['razon'] ."|"
 							.$dato['num_documento'] ."|"
-							.$contrato ."|"
+							.$contrato
 							.$dato['importe_documento'] ."|"
 							.$dato['autorizacion'] ."|"
 							.$dato['num_cuenta_pago'] ."|"
