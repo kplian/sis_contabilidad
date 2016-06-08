@@ -45,6 +45,14 @@ class ACTBancaCompraVenta extends ACTbase{
 		if($this->objParam->getParametro('acumulado') == 'si'){
 			$this->objParam->addFiltro("banca.id_contrato = ".$this->objParam->getParametro('id_contrato'));  
 			
+			if($this->objParam->getParametro('autorizacion') != ''){
+			$this->objParam->addFiltro("banca.autorizacion = ".$this->objParam->getParametro('autorizacion'));  
+			}
+			if($this->objParam->getParametro('num_documento') != ''){
+			$this->objParam->addFiltro("banca.num_documento = ".$this->objParam->getParametro('num_documento'));  
+			}
+			
+			
 		}
 		
 		if($this->objParam->getParametro('id_depto') != ''){

@@ -812,7 +812,7 @@ fheight: '80%',
 				filters: {pfiltro: 'contra.tipo_monto',type: 'string'},
 				id_grupo:0,
 				grid:true,
-				form:true,
+				form:false,
 		},
 		
 		
