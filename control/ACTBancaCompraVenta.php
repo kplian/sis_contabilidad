@@ -49,7 +49,8 @@ class ACTBancaCompraVenta extends ACTbase{
 			$this->objParam->addFiltro("banca.autorizacion = ".$this->objParam->getParametro('autorizacion'));  
 			}
 			if($this->objParam->getParametro('num_documento') != ''){
-			$this->objParam->addFiltro("banca.num_documento = ".$this->objParam->getParametro('num_documento'));  
+				$this->objParam->addFiltro("banca.num_documento = ''".$this->objParam->getParametro('num_documento')."'' ");  
+				
 			}
 			
 			
