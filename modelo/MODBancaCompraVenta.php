@@ -222,6 +222,7 @@ class MODBancaCompraVenta extends MODbase{
 		
 				$this->setParametro('periodo_servicio','periodo_servicio','varchar');
 		
+		$this->setParametro('saldo','saldo','numeric');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

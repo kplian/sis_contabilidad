@@ -34,6 +34,7 @@ DECLARE
     v_id_moneda_tri	    integer;
     v_filtro 			varchar;
     va_id_depto			integer[];
+    v_codigo_moneda_base		varchar;
 			    
 BEGIN
 
@@ -259,6 +260,15 @@ BEGIN
      				
     	begin
              v_id_moneda_base=param.f_get_moneda_base();
+             
+            --recuperar el codigo de la moneda base
+            
+            select 
+               m.codigo into v_codigo_moneda_base
+            from param.tmoneda m
+            where m.id_moneda = v_id_moneda_base; 
+            
+            
     		--Sentencia de la consulta
 			v_consulta:='select
                             incbte.id_int_comprobante,
@@ -300,11 +310,12 @@ BEGIN
                             incbte.id_tipo_relacion_comprobante,
                             incbte.desc_tipo_relacion_comprobante,
                             '||v_id_moneda_base::VARCHAR||'::integer as id_moneda_base,
+                            '''||v_codigo_moneda_base::VARCHAR||'''::varchar as codigo_moneda_base,                            
                             incbte.codigo_depto
                           
                           from conta.vint_comprobante incbte
                           
-                          where incbte.id_int_comprobante = '||v_parametros.id_int_comprobante;
+                          where incbte.id_proceso_wf = '||v_parametros.id_proceso_wf;
 			
 			--Devuelve la respuesta
 			return v_consulta;
@@ -321,6 +332,7 @@ BEGIN
 	elsif(p_transaccion='CONTA_DETCBT_SEL')then
      				
     	begin
+        
     		--Sentencia de la consulta
 			v_consulta:='select
                             cue.nro_cuenta,
@@ -331,7 +343,7 @@ BEGIN
                             par.codigo as codigo_partida,
                             par.nombre_partida,
                             ot.desc_orden,
-                            tra.glosa,
+                            tra.glosa::varchar as glosa,
                             sum(tra.importe_debe) as importe_debe, 
                             sum(tra.importe_haber) as importe_haber,
                             sum(tra.importe_debe_mb) as importe_debe_mb,
@@ -343,7 +355,7 @@ BEGIN
                           left join pre.tpartida par on par.id_partida = tra.id_partida
                           left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
                           left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
-                          where tra.id_int_comprobante = '||v_parametros.id_int_comprobante||'
+                          where cbte.id_proceso_wf = '||v_parametros.id_proceso_wf||'
                           group by 
                             cue.nro_cuenta,
                             cue.nombre_cuenta,

@@ -86,6 +86,7 @@ DECLARE
     v_id_funcionario		integer;
     v_id_usuario_reg	integer;
     v_id_estado_wf_ant	integer;
+    v_clcbt_desc	varchar;
     
    
    
@@ -155,22 +156,23 @@ BEGIN
            
             --segun la clase  del comprobante definir si es presupeustario o contable
             select 
-              cc.tipo_comprobante
+              cc.tipo_comprobante,
+              cc.descripcion
             into 
-              v_tipo_comprobante
+              v_tipo_comprobante,
+              v_clcbt_desc
             from conta.tclase_comprobante cc 
             where cc.id_clase_comprobante = v_parametros.id_clase_comprobante;
             
             
             --PERIODO  Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
-            
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);            
             va_id_int_cbte_fk = (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[];
             
            
-            -------------------------------------------
+            -------------------------------
             --   GENERAR PROCESO DEL WF
-            -----------------------------------------------
+            -------------------------------
         	IF va_id_int_cbte_fk is null THEN
                 --  dispara proceso
                 -- si tiene  un cbte relacion recuperar el nro de tramite
@@ -351,6 +353,10 @@ BEGIN
             
             
 			
+            
+            update wf.tproceso_wf p set
+              descripcion = descripcion||' ('||v_clcbt_desc||'id:'||v_id_int_comprobante::varchar||')'
+            where p.id_proceso_wf = v_id_proceso_wf;
             
             
 			--Definicion de la respuesta
@@ -717,6 +723,8 @@ BEGIN
             where ic.id_int_comprobante = v_parametros.id_int_comprobante;
             
             
+            
+            
             IF  v_reg_cbte.estado_reg != 'validado'  THEN
                raise exception 'solo pueden volcar comprobantes validados';
             END IF; 
@@ -772,6 +780,15 @@ BEGIN
                           'Cbte de Volcado (Anula el original)',
                           'CBTE', --sipara comprobante
                           '');
+                          
+            select 
+              cc.tipo_comprobante,
+              cc.descripcion
+            into 
+              v_tipo_comprobante,
+              v_clcbt_desc
+            from conta.tclase_comprobante cc 
+            where cc.id_clase_comprobante = v_reg_cbte.id_clase_comprobante;              
             
             
             -----------------------------
@@ -866,6 +883,10 @@ BEGIN
               v_id_proceso_wf,
               v_id_estado_wf		
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
+            
+           update wf.tproceso_wf p set
+            descripcion = descripcion||' ('||v_clcbt_desc||'id:'||v_id_int_comprobante::varchar||')'
+           where p.id_proceso_wf = v_id_proceso_wf;
             
             
             -- listar todas las transacciones originales
@@ -1435,6 +1456,15 @@ BEGIN
               IF  v_codigo_estado != 'borrador' THEN
                 raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
               END IF;
+              
+             select 
+              cc.tipo_comprobante,
+              cc.descripcion
+            into 
+              v_tipo_comprobante,
+              v_clcbt_desc
+            from conta.tclase_comprobante cc 
+            where cc.id_clase_comprobante = v_reg_cbte.id_clase_comprobante;   
             
             
             -----------------------------
@@ -1525,6 +1555,10 @@ BEGIN
               v_id_proceso_wf,
               v_id_estado_wf		
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
+            
+            update wf.tproceso_wf p set
+              descripcion = descripcion||' ('||v_clcbt_desc||'id:'||v_id_int_comprobante::varchar||')'
+            where p.id_proceso_wf = v_id_proceso_wf;
             
             
             -- listar todas las transacciones originales

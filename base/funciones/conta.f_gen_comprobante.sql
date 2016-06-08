@@ -86,6 +86,7 @@ DECLARE
     v_id_proceso_wf				integer;
     v_id_estado_wf				integer;
     v_codigo_estado   			varchar;
+    v_clcbt_desc  				varchar;
   
 BEGIN
 
@@ -149,7 +150,6 @@ BEGIN
      
      
     -- raise exception 'llega .. % , % , % -',p_codigo, v_plantilla.tabla_origen,p_id_tabla_valor ;
-    
 
  execute	'select '||v_columnas ||
             ' from '||v_plantilla.tabla_origen|| ' where '
@@ -266,7 +266,7 @@ BEGIN
                                                                   hstore(v_this), 
                                                                   hstore(v_tabla));
 	end if;    
-    
+
     --RCM: guardar id_cuenta_bancaria_mov
     if ( v_plantilla.campo_id_cuenta_bancaria_mov != ''  AND  v_plantilla.campo_id_cuenta_bancaria_mov is not null ) then
         v_this.columna_id_cuenta_bancaria_mov = conta.f_get_columna('maestro', 
@@ -335,7 +335,12 @@ BEGIN
     
   
     
-         Select  id_clase_comprobante  into   v_id_clase_comprobante 
+         Select  
+           cl.id_clase_comprobante ,
+           cl.descripcion 
+         into   
+           v_id_clase_comprobante,
+           v_clcbt_desc
          from  conta.tclase_comprobante cl 
          where cl.estado_reg = 'activo' 
             and cl.codigo =  v_plantilla.clase_comprobante::varchar;
@@ -552,10 +557,12 @@ BEGIN
     
     
                      
-    
+    update wf.tproceso_wf p set
+      descripcion = descripcion||' ('||v_clcbt_desc||'id:'||v_id_int_comprobante::varchar||')'
+    where p.id_proceso_wf = v_id_proceso_wf;
     
      
-    raise notice '=====> AL INSERTAR  v_id_int_comprobante= %',  v_id_int_comprobante;
+    
     -- genera transacciones del comprobante
     
     resp_det =  conta.f_gen_transaccion(hstore(v_this), 

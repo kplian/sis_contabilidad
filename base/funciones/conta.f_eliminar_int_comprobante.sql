@@ -43,7 +43,10 @@ BEGIN
     
     IF   v_rec_cbte.estado_reg = 'borrador'  THEN
     
-   
+              --borrar documentos WF relacionados
+              
+              delete from wf.tdocumento_wf wf 
+              where wf.id_proceso_wf = v_rec_cbte.id_proceso_wf;
                   
     
                -- verifica que no tenga numero, solo si no es un cbte migrado de la regional
