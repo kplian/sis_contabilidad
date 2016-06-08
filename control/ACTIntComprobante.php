@@ -11,6 +11,7 @@
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/PlantillasHTML.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
+require_once(dirname(__FILE__).'/../reportes/RIntCbte.php');
 class ACTIntComprobante extends ACTbase{
 	
 	private $objPlantHtml;
@@ -372,7 +373,34 @@ class ACTIntComprobante extends ACTbase{
 		
     }
 
-    function reporteCbte(){
+   function reporteCbte(){
+			
+		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
+		$dataSource = $this->recuperarDatosCbte();	
+		
+		//parametros basicos
+		$tamano = 'LETTER';
+		$orientacion = 'p';
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);		
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		//Instancia la clase de pdf
+		
+		$reporte = new RIntCbte($this->objParam); 
+		
+		$reporte->datosHeader($dataSource);
+		$reporte->generarReporte();
+		$reporte->output($reporte->url_archivo,'F');
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		
+	}
+
+    function reporteCbte_bk(){
    	    	
    	    $dataSource = $this->recuperarDatosCbte(); 
    	   	

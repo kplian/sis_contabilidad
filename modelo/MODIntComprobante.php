@@ -76,8 +76,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('localidad','varchar');		
 		$this->captura('sw_editable','varchar');
 		$this->captura('cbte_reversion','varchar');
-		$this->captura('volcado','varchar');
-		
+		$this->captura('volcado','varchar');		
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_estado_wf','int4');
 		
@@ -157,11 +156,9 @@ class MODIntComprobante extends MODbase{
 		$this->captura('localidad','varchar');		
 		$this->captura('sw_editable','varchar');
 		$this->captura('cbte_reversion','varchar');
-		$this->captura('volcado','varchar');
-		
+		$this->captura('volcado','varchar');		
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_estado_wf','int4');
-		
 		
 		
 		//Ejecuta la instruccion
@@ -191,12 +188,9 @@ class MODIntComprobante extends MODbase{
 		$this->captura('descripcion','varchar');
 		
 		
-		
 		//Ejecuta la instruccion
-		$this->armarConsulta();
-		        
-		$this->ejecutarConsulta();
-		
+		$this->armarConsulta();		        
+		$this->ejecutarConsulta();	
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
@@ -227,19 +221,14 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('glosa2','glosa2','varchar');
 		$this->setParametro('nro_tramite','nro_tramite','varchar');
 		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
-		$this->setParametro('momento_pagado','momento_pagado','varchar');
-		
+		$this->setParametro('momento_pagado','momento_pagado','varchar');		
 		$this->setParametro('id_int_comprobante_fks','id_int_comprobante_fks','varchar');
-		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
-		
+		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');		
 		$this->setParametro('cbte_cierre','cbte_cierre','varchar');
 		$this->setParametro('cbte_apertura','cbte_apertura','varchar');
-		$this->setParametro('cbte_aitb','cbte_aitb','varchar');
-		
+		$this->setParametro('cbte_aitb','cbte_aitb','varchar');		
 		$this->setParametro('fecha_costo_ini','fecha_costo_ini','date');
-		$this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
-		
-		
+		$this->setParametro('fecha_costo_fin','fecha_costo_fin','date');	
 		$this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
 		$this->setParametro('id_config_cambiaria','id_config_cambiaria','integer');
 		
@@ -360,9 +349,6 @@ class MODIntComprobante extends MODbase{
 	}
 	
 	
-	
-	
-	
 	function listarCbteCabecera(){
 			
 		//Definicion de variables para ejecucion del procedimientp
@@ -371,7 +357,7 @@ class MODIntComprobante extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);
 		
-		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_int_comprobante','int4');
@@ -413,7 +399,10 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_tipo_relacion_comprobante','int');
 		$this->captura('desc_tipo_relacion_comprobante','varchar');
 		$this->captura('id_moneda_base','int4');
+		$this->captura('codigo_moneda_base','varchar');		
 		$this->captura('codigo_depto','varchar');
+		//$this->captura('nro_tramite','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -429,7 +418,7 @@ class MODIntComprobante extends MODbase{
 		$this->transaccion='CONTA_DETCBT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);
-		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('nro_cuenta','varchar');

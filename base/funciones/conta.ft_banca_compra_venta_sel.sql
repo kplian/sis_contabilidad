@@ -119,7 +119,15 @@ BEGIN
  						banca.numero_cuota,
             			banca.tramite_cuota,
                         banca.id_proceso_wf,
-                        banca.resolucion
+                        banca.resolucion,
+                        contra.tipo_monto,
+                        banca.retencion_cuota,
+                        banca.multa_cuota,
+                        provee.rotulo_comercial,
+                        banca.estado_libro,
+                        banca.periodo_servicio,
+                        banca.lista_negra,
+                        banca.tipo_bancarizacion
 						from conta.tbanca_compra_venta banca
 						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
@@ -188,7 +196,8 @@ BEGIN
                         
                         banca.numero_cuota,
             			banca.tramite_cuota	,
-                        banca.id_proceso_wf
+                        banca.id_proceso_wf,
+                        banca.resolucion
 						from conta.tbanca_compra_venta banca
 						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
@@ -239,6 +248,8 @@ BEGIN
 					    from conta.tbanca_compra_venta banca
 					    inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
+						                        inner join param.vproveedor provee on provee.id_proveedor = banca.id_proveedor
+
                         inner join conta.tconfig_banca confmo on confmo.digito = banca.modalidad_transaccion
                         inner join conta.tconfig_banca conftt on conftt.digito = banca.tipo_transaccion
                         inner join conta.tconfig_banca conftd on conftd.digito = banca.tipo_documento_pago

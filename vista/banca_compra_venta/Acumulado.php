@@ -27,7 +27,15 @@ Phx.vista.Acumulado=Ext.extend(Phx.gridInterfaz,{
 		this.id_bancarizacion = config.id_banca_compra_venta;
 		console.log(this.id_bancarizacion);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag,id_contrato:config.id_contrato,id_banca_compra_venta:config.id_banca_compra_venta,acumulado:'si'}})
+		console.log('tipo monto',config);
+		
+		if (config.tipo_monto == 'abierto'){
+			this.load({params:{num_documento:config.num_documento,autorizacion:config.autorizacion,start:0, limit:this.tam_pag,id_contrato:config.id_contrato,id_banca_compra_venta:config.id_banca_compra_venta,acumulado:'si'}})
+
+		}else{
+			this.load({params:{start:0, limit:this.tam_pag,id_contrato:config.id_contrato,id_banca_compra_venta:config.id_banca_compra_venta,acumulado:'si'}})
+
+		}
 		
 		
 			

@@ -1179,10 +1179,9 @@ header("content-type: text/javascript; charset=UTF-8");
 			if (data) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
-					//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
 					url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
 					params : {
-						'id_int_comprobante' : data.id_int_comprobante
+						'id_proceso_wf' : data.id_proceso_wf
 					},
 					success : this.successExport,
 					failure : this.conexionFailure,
