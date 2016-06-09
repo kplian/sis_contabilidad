@@ -558,7 +558,7 @@ BEGIN
     
                      
     update wf.tproceso_wf p set
-      descripcion = descripcion||' ('||v_clcbt_desc||'id:'||v_id_int_comprobante::varchar||')'
+      descripcion = descripcion||' ('||v_clcbt_desc||' id:'||v_id_int_comprobante::varchar||')'
     where p.id_proceso_wf = v_id_proceso_wf;
     
      
