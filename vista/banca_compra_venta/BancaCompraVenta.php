@@ -1027,7 +1027,7 @@ fheight: '80%',
 					totalProperty: 'total',
 					fields: ['id_documento', 'razon_social', 'nro_documento','nro_autorizacion','fecha_documento','nro_nit','sw_libro_compras','importe_total'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'doc.nro_documento'}
+					baseParams: {par_filtro: 'doc.nro_documento#doc.importe_total'}
 				}),
 				valueField: 'id_documento',
 				displayField: 'razon_social',
