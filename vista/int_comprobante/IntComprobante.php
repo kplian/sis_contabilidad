@@ -254,7 +254,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 2,
 			grid : true,
 			form : true
-		}, {
+		}, 
+		{
 			config : {
 				name : 'id_depto',
 				hiddenName : 'id_depto',
@@ -282,7 +283,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			grid : false,
 			form : true
-		}, {
+		}, 
+		{
 			config : {
 				name : 'id_clase_comprobante',
 				fieldLabel : 'Tipo Cbte.',

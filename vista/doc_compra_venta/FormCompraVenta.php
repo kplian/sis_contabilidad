@@ -1096,7 +1096,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			{
 				config:{
 					name: 'nro_documento',
-					fieldLabel: 'Nro Doc',
+					fieldLabel: 'Nro Factura / Doc',
 					allowBlank: false,
 					anchor: '80%',
 					maxLength:100
