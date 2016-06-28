@@ -3223,6 +3223,18 @@ ALTER TABLE conta.tint_comprobante
 /***********************************F-SCP-FFP-CONTA-1-24/05/2016****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-1-22/06/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_concepto
+  ADD COLUMN id_partida INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_concepto.id_partida
+IS 'cuando el documento compromete aca guarda la partida correspondiente';
+
+
+/***********************************F-SCP-RAC-CONTA-1-22/06/2016****************************************/
 
 
 

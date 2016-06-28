@@ -41,6 +41,7 @@ DECLARE
     v_id_proveedor			integer;
     v_id_cliente			integer;
     v_id_tipo_doc_compra_venta integer;
+    v_razon_social			varchar;
 			    
 BEGIN
 
@@ -95,10 +96,26 @@ BEGIN
             
             
             --TODO
-            --validar que no exsita un documento con el mismo nro y misma razon social  ...?
             --validar que no exista un documento con el mismo nro_autorizacion, nro_factura , y nit y razon social
+             
+               
+            IF exists ( select 1
+                        from conta.tdoc_compra_venta dcv
+                        where 
+                                   dcv.nro_autorizacion = v_parametros.nro_autorizacion
+                              and  
+                                (      (dcv.nit != '0' and dcv.nit = v_parametros.nit)
+                                   or  
+                                       (dcv.nit = '0'  and upper(trim(dcv.razon_social)) = upper(trim(v_parametros.razon_social)))
+                                )
+                              and dcv.nro_documento = v_parametros.nro_documento
+                              and dcv.fecha = v_parametros.fecha) THEN
+                   
+                raise exception 'El documento ya se encuentra registrado en la base de datos';
+                          
+            END IF;
             
-            
+             
             IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
             
                IF v_parametros.id_auxiliar is null THEN
@@ -117,6 +134,8 @@ BEGIN
             where pla.id_plantilla = v_parametros.id_plantilla;
             
             --PARA COMPRAS
+            
+            
             IF v_parametros.tipo = 'compra' THEN
                 
                 IF EXISTS(select 
@@ -151,6 +170,7 @@ BEGIN
               v_importe_ice = v_parametros.importe_excento;
             END IF;
            
+        
             
             --Sentencia de la insercion
         	insert into conta.tdoc_compra_venta(
@@ -279,10 +299,29 @@ BEGIN
                 v_id_proveedor = param.f_check_proveedor(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social)));
                 
             ELSE  
-                 --TODO  chequear que la factura de venta no este duplicada
+               
                  -- chequear el el cliente esta registrado 
                 v_id_cliente = vef.f_check_cliente(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social))); 
             END IF; 
+            
+              
+            --  chequear que la factura de  no este duplicada
+            IF exists (select 1
+                        from conta.tdoc_compra_venta dcv
+                        where 
+                                   dcv.nro_autorizacion = v_parametros.nro_autorizacion
+                              and  
+                                (      (dcv.nit != '0' and dcv.nit = v_parametros.nit)
+                                   or  
+                                       (dcv.nit = '0'  and upper(trim(dcv.razon_social)) = upper(trim(v_parametros.razon_social)))
+                                )
+                              and dcv.nro_documento = v_parametros.nro_documento
+                              and dcv.fecha = v_parametros.fecha
+                              and dcv.id_doc_compra_venta!=v_parametros.id_doc_compra_venta) THEN
+                   
+                raise exception 'El documento ya se encuentra registrado en la base de datos';
+                          
+            END IF;
             
            
             
@@ -400,8 +439,7 @@ BEGIN
              dcv.id_int_comprobante,
              dcv.tabla_origen,
              dcv.id_origen,
-             dcv.id_depto_conta,
-             dcv.fecha
+             dcv.id_depto_conta
             into 
               v_registros
             from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
@@ -421,7 +459,7 @@ BEGIN
             --validar si el periodo de conta esta cerrado o abierto
             -- recuepra el periodo de la fecha ...
             --Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_registros.fecha);
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
             
             -- valida que period de libro de compras y ventas este abierto
             v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_registros.id_depto_conta, v_rec.po_id_periodo);
@@ -597,6 +635,39 @@ BEGIN
             return v_resp;
 
 		end;
+     
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_RAZONXNIT_GET'
+ 	#DESCRIPCION:	recupera la razon social apartir del nit
+ 	#AUTOR:		admin	
+ 	#FECHA:		25-09-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_RAZONXNIT_GET')then
+
+		begin
+        
+            -- validamos que el documento no tenga otro comprobante
+            
+            select 
+              d.razon_social
+            into
+              v_razon_social
+            from conta.tdoc_compra_venta  d
+            where d.nit = v_parametros.nit
+            offset 0 limit 1;
+            
+            
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','razon social recuperada' ); 
+            v_resp = pxp.f_agrega_clave(v_resp,'razon_social',COALESCE(upper(v_razon_social),''));
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;   
+        
     
     else
      

@@ -6,7 +6,6 @@
 *@date 18-08-2015 15:57:09
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
-
 class MODDocCompraVenta extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -245,6 +244,25 @@ class MODDocCompraVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function obtenerRazonSocialxNIT(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_doc_compra_venta_ime';
+		$this->transaccion='CONTA_RAZONXNIT_GET';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('nit','nit','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
 	
 	function cambiarRevision(){
 		//Definicion de variables para ejecucion del procedimiento

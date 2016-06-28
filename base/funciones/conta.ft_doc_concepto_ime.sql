@@ -87,9 +87,13 @@ BEGIN
             
             --Validar si tiene relacion contable        
             SELECT 
-              ps_id_cuenta
+              ps_id_partida ,
+              ps_id_cuenta,
+              ps_id_auxiliar
             into 
-              v_id_cuenta
+              v_id_partida,
+              v_id_cuenta, 
+              v_id_auxiliar
             FROM conta.f_get_config_relacion_contable(v_codigo_rel, 
                                                      v_registros_doc.id_gestion, 
                                                      v_parametros.id_concepto_ingas, 
@@ -100,8 +104,8 @@ BEGIN
            IF  v_id_cuenta is NULL THEN
                raise exception 'no se encontro relacion contable ...';
            END IF;
-        
-         
+           
+          
         
         	--Sentencia de la insercion
         	insert into conta.tdoc_concepto(
@@ -118,7 +122,8 @@ BEGIN
 			id_usuario_mod,
 			fecha_mod,
             id_doc_compra_venta,
-            precio_total_final
+            precio_total_final,
+            id_partida
           	) values(
 			'activo',
 			v_parametros.id_orden_trabajo,
@@ -133,7 +138,8 @@ BEGIN
 			null,
 			null,            
             v_parametros.id_doc_compra_venta,
-            v_parametros.precio_total_final
+            v_parametros.precio_total_final,
+            v_id_partida
 			)RETURNING id_doc_concepto into v_id_doc_concepto;
 			
 			--Definicion de la respuesta
@@ -185,9 +191,13 @@ BEGIN
             
             --Validar si tiene relacion contable        
             SELECT 
-              ps_id_cuenta
+              ps_id_partida ,
+              ps_id_cuenta,
+              ps_id_auxiliar
             into 
-              v_id_cuenta
+              v_id_partida,
+              v_id_cuenta, 
+              v_id_auxiliar
             FROM conta.f_get_config_relacion_contable(v_codigo_rel, 
                                                      v_registros_doc.id_gestion, 
                                                      v_parametros.id_concepto_ingas, 
@@ -208,7 +218,8 @@ BEGIN
                 precio_total = v_parametros.precio_total,
                 id_usuario_mod = p_id_usuario,
                 fecha_mod = now(),
-                precio_total_final = v_parametros.precio_total_final
+                precio_total_final = v_parametros.precio_total_final,
+                id_partida = v_id_partida
 			where id_doc_concepto=v_parametros.id_doc_concepto;
                
 			--Definicion de la respuesta
