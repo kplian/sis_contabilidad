@@ -1,5 +1,5 @@
 <?php
-/**
+/**   
 *@package pXP
 *@file gen-ACTDocCompraVenta.php
 *@author  (admin)
@@ -113,6 +113,14 @@ class ACTDocCompraVenta extends ACTbase{
 		$this->res=$this->objFunc->modificarBasico($this->objParam);		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function obtenerRazonSocialxNIT(){
+		$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->res=$this->objFunc->obtenerRazonSocialxNIT($this->objParam);		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	
 	
 	/*
 	 * Author:  		 RAC - KPLIAN

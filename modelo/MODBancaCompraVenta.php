@@ -100,6 +100,15 @@ class MODBancaCompraVenta extends MODbase{
 	
 	$this->captura('periodo_servicio','varchar');
 	
+	$this->captura('lista_negra','varchar');
+	
+	$this->captura('tipo_bancarizacion','varchar');
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -213,6 +222,7 @@ class MODBancaCompraVenta extends MODbase{
 		
 				$this->setParametro('periodo_servicio','periodo_servicio','varchar');
 		
+		$this->setParametro('saldo','saldo','numeric');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -343,6 +353,11 @@ class MODBancaCompraVenta extends MODbase{
 					$arr_temp = $this->remove_utf8_bom($arr_temp);
 					
 					if($this->aParam->getParametro('tipo')=='Compras'){
+						
+
+
+
+
 						$arra[] = array(
 							"modalidad_transaccion" => $arr_temp[0],
        						"fecha_documento" => $arr_temp[1],
@@ -440,6 +455,9 @@ class MODBancaCompraVenta extends MODbase{
 		
 	}
 
+
+
+
 	function remove_utf8_bom($text)
 	{
 	    $bom = pack('H*','EFBBBF');
@@ -531,6 +549,48 @@ class MODBancaCompraVenta extends MODbase{
 		
 
 
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+		
+	}
+
+	function agregarListarNegra(){
+		$this->procedimiento='conta.ft_banca_compra_venta_ime';
+		$this->transaccion='CONTA_BANCA_ADDLN';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_banca_compra_venta','id_banca_compra_venta','int4');
+	
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function insertarRetencionesPeriodo(){
+		
+		
+		$this->procedimiento='conta.ft_banca_compra_venta_ime';
+		$this->transaccion='CONTA_BANCA_INSRET';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_periodo','id_periodo','int4');
+		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+				
+	
+		$this->setParametro('numero_tramite','numero_tramite','varchar'); //el que envia
+		
+	
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

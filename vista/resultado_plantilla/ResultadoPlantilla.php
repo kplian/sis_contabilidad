@@ -27,6 +27,18 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 				tooltip: '<b>Clonar</b><br/>Clona la plantilla, su detalle y dependencias'
 			}
 		);
+		
+		this.addButton('btnWizard',
+            {
+                text: 'Exportar Plantilla',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expProceso,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo SQL la plantilla'
+            }
+        );
+        
+        
 		this.load({params:{start:0, limit:this.tam_pag}});
 	},
 			
@@ -376,7 +388,8 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
         'cbte_cierre',
         'periodo_calculo',
         'id_clase_comprobante',
-        'glosa','desc_clase_comprobante'
+        'glosa',
+        'desc_clase_comprobante'
 		
 	],
 	sortInfo:{
@@ -408,6 +421,21 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 			});
 		}, this)
 	},
+	
+	expProceso : function(resp){
+			var data=this.sm.getSelected().data;
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url: '../../sis_contabilidad/control/ResultadoPlantilla/exportarDatos',
+				params: { 'id_resultado_plantilla' : data.id_resultado_plantilla },
+				success: this.successExport,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});
+			
+	},
+	
 	preparaMenu: function(n) {
 		var tb = Phx.vista.ResultadoPlantilla.superclass.preparaMenu.call(this);
 	   	this.getBoton('btnClonar').setDisabled(false);
@@ -433,8 +461,7 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 		 }],
 	bdel:true,
 	bsave:true
-	}
-)
+})
 </script>
 		
 		

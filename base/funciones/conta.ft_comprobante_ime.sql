@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_ime (
+CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
@@ -10,15 +10,15 @@ RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.ft_int_comprobante_ime
- DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tint_comprobante'
+ FUNCION: 		conta.ft_doc_compra_venta_ime
+ DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
  AUTOR: 		 (admin)
- FECHA:	        29-08-2013 00:28:30
+ FECHA:	        18-08-2015 15:57:09
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
+ DESCRIPCION:	 	
  AUTOR:			
  FECHA:		
 ***************************************************************************/
@@ -27,140 +27,232 @@ DECLARE
 
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
+    v_registros				record;
 	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_int_comprobante	integer;
-	v_id_subsistema			integer;
-	v_rec					record;
-	v_result				varchar;
-    v_rec_cbte record;
-    v_funcion_comprobante_eliminado varchar;
-    v_momento_comprometido varchar;
-    v_momento_ejecutado    varchar;
-    v_momento_pagado varchar;
+	v_id_doc_compra_venta	integer;
+    v_rec					record;
+    v_tmp_resp				boolean;
+    v_importe_ice			numeric;
+    v_revisado				varchar;
+    v_sum_total				numeric;
+    v_id_proveedor			integer;
+    v_id_cliente			integer;
+    v_id_tipo_doc_compra_venta integer;
 			    
 BEGIN
 
-    v_nombre_funcion = 'conta.ft_int_comprobante_ime';
+    v_nombre_funcion = 'conta.ft_doc_compra_venta_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_INCBTE_INS'
- 	#DESCRIPCION:	Insercion de manual de comprobantes contables intermedios
+ 	#TRANSACCION:  'CONTA_DCV_INS'
+ 	#DESCRIPCION:	Insercion de registros
  	#AUTOR:		admin	
- 	#FECHA:		29-08-2013 00:28:30
+ 	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
-	if(p_transaccion='CONTA_INCBTE_INS')then
+	if(p_transaccion='CONTA_DCV_INS')then
 					
         begin
-         --TODO considerar modificaciones de coprobantes nanuales
+        
+           
+        
+           --  calcula valores pode defecto para el tipo de doc compra venta
+           
+           
+           IF v_parametros.tipo = 'compra' THEN
+                 -- paracompras por defecto es 
+                 -- Compras para mercado interno con destino a actividades gravadas
+                 select 
+                   td.id_tipo_doc_compra_venta
+                 into
+                   v_id_tipo_doc_compra_venta
+                 from conta.ttipo_doc_compra_venta td
+                 where td.codigo = '1';
+           
+           ELSE
+                 -- para ventas por defecto es 
+                 -- facturas valida
+                 select 
+                   td.id_tipo_doc_compra_venta
+                 into
+                   v_id_tipo_doc_compra_venta
+                 from conta.ttipo_doc_compra_venta td
+                 where td.codigo = 'V';
+           
+           END IF;
+                        
+            
+            -- recuepra el periodo de la fecha ...
+            --Obtiene el periodo a partir de la fecha
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+            
+            -- valida que period de libro de compras y ventas este abierto
+            v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+            
+            
+            --TODO
+            --validar que no exista un documento con el mismo nro_autorizacion, nro_factura , y nit y razon social
+             
+               
+            IF exists ( select 1
+                        from conta.tdoc_compra_venta dcv
+                        where 
+                                   dcv.nro_autorizacion = v_parametros.nro_autorizacion
+                              and  
+                                (      (dcv.nit != '0' and dcv.nit = v_parametros.nit)
+                                   or  
+                                       (dcv.nit = '0'  and upper(trim(dcv.razon_social)) = upper(trim(v_parametros.razon_social)))
+                                )
+                              and dcv.nro_documento = v_parametros.nro_documento
+                              and dcv.fecha = v_parametros.fecha) THEN
+                   
+                raise exception 'El documento ya se encuentra registrado en la base de datos';
+                          
+            END IF;
+            
+             
+            IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
+            
+               IF v_parametros.id_auxiliar is null THEN
+                 raise EXCEPTION 'es necesario indicar una cuenta corriente';
+               END IF;
+            
+            END IF;
+            
+        
+            --recupera parametrizacion de la plantilla     
+            select 
+             *
+            into 
+             v_registros
+            from param.tplantilla pla 
+            where pla.id_plantilla = v_parametros.id_plantilla;
+            
+            --PARA COMPRAS
+            
+            
+            IF v_parametros.tipo = 'compra' THEN
+                
+                IF EXISTS(select 
+                 1 
+                from conta.tdoc_compra_venta dcv
+                where    dcv.estado_reg = 'activo' and  dcv.nit = v_parametros.nit 
+                     and dcv.nro_autorizacion = v_parametros.nro_autorizacion
+                     and dcv.nro_documento = v_parametros.nro_documento
+                     and dcv.nro_dui = v_parametros.nro_dui
+                     and dcv.fecha = v_parametros.fecha
+                     and dcv.id_plantilla = v_parametros.id_plantilla
+                     and dcv.razon_social = upper(trim(v_parametros.razon_social))) then
+                     
+                     raise exception 'Ya existe un documento registrado con el mismo nro,  razon social y fecha';
+                     
+                END IF;
+               
+               -- chequear si el proveedor esta registrado
+                v_id_proveedor = param.f_check_proveedor(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social)));
+                
+            ELSE  
+               --TODO  chequear que la factura de venta no este duplicada
+            
+               -- chequear el el cliente esta registrado 
+                v_id_cliente = vef.f_check_cliente(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social))); 
+            END IF; 
+            
+            
+            --si tiene habilitado el ic copiamos el monto excento
+            v_importe_ice = NULL;
+            IF v_registros.sw_ic = 'si' then
+              v_importe_ice = v_parametros.importe_excento;
+            END IF;
+           
         
             
-            ------------------
-        	-- VALIDACIONES
-        	------------------
-            
-        	 -- SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
-              select 
-               id_subsistema
-              into v_id_subsistema
-              from segu.tsubsistema
-              where codigo = 'CONTA';
-        	
-        	
-        	--PERIODO
-        	--Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha,v_id_subsistema);
-        	
-        	--Verifica si el Periodo esta abierto
-        	v_resp = param.f_verifica_periodo_subsistema_abierto(v_rec.po_id_periodo_subsistema);
-        	
-            --------------------------------
-        	--definicion de momentos ....
-            -----------------------------------
-            
-            IF v_parametros.momento_ejecutado = 'true' THEN
-              --si ejecutamos manualmente el compromiso es explicito ...
-              v_momento_comprometido = 'si';
-              v_momento_ejecutado = 'si';
-            else
-              v_momento_ejecutado = 'no';
-              v_momento_comprometido = 'no';
-            END IF;
-            
-            IF v_parametros.momento_pagado = 'true' THEN
-              v_momento_pagado = 'si';
-            else
-              v_momento_pagado = 'no';
-            END IF;
-            
-            
-        	-----------------------------
-        	--REGISTRO DEL COMPROBANTE
-        	-----------------------------
-        	insert into conta.tint_comprobante(
-                id_clase_comprobante,
-    		    id_subsistema,
-                id_depto,
-                id_moneda,
-                id_periodo,
-                id_funcionario_firma1,
-                id_funcionario_firma2,
-                id_funcionario_firma3,
-                tipo_cambio,
-                beneficiario,
-    			estado_reg,
-                glosa1,
-                fecha,
-                glosa2,
-    			id_usuario_reg,
-                fecha_reg,
-                id_usuario_mod,
-                fecha_mod,
-                id_usuario_ai,
-                usuario_ai,
-                manual,
-                id_tipo_relacion_comprobante,
-                id_int_comprobante_fks,
-                momento_comprometido,
-                momento_ejecutado,
-                momento_pagado
+            --Sentencia de la insercion
+        	insert into conta.tdoc_compra_venta(
+              tipo,
+              importe_excento,
+              id_plantilla,
+              fecha,
+              nro_documento,
+              nit,
+              importe_ice,
+              nro_autorizacion,
+              importe_iva,
+              importe_descuento,
+              importe_descuento_ley,
+              importe_pago_liquido,
+              importe_doc,
+              sw_contabilizar,
+              estado,
+              id_depto_conta,  			
+              obs,
+              estado_reg,
+              codigo_control,
+              importe_it,
+              razon_social,
+              id_usuario_ai,
+              id_usuario_reg,
+              fecha_reg,
+              usuario_ai,
+              manual,
+              id_periodo,
+              nro_dui,
+              id_moneda,
+              importe_pendiente,
+              importe_anticipo,
+              importe_retgar,
+              importe_neto,
+              id_proveedor,
+              id_cliente,
+              id_auxiliar,
+              id_tipo_doc_compra_venta
           	) values(
-              v_parametros.id_clase_comprobante,
-  			  v_id_subsistema,
-              v_parametros.id_depto,
-              v_parametros.id_moneda,
-              v_parametros.id_periodo,
-              v_parametros.id_funcionario_firma1,
-              v_parametros.id_funcionario_firma2,
-              v_parametros.id_funcionario_firma3,
-              v_parametros.tipo_cambio,
-              v_parametros.beneficiario,
-  			  'borrador',
-              v_parametros.glosa1,
+              v_parametros.tipo,
+              v_parametros.importe_excento,
+              v_parametros.id_plantilla,
               v_parametros.fecha,
-              v_parametros.glosa2,
-  			  p_id_usuario,
-              now(),
-              null,
-              null,
+              v_parametros.nro_documento,
+              v_parametros.nit,
+              v_importe_ice,
+              v_parametros.nro_autorizacion,
+              v_parametros.importe_iva,
+              v_parametros.importe_descuento,
+              v_parametros.importe_descuento_ley,
+              v_parametros.importe_pago_liquido,
+              v_parametros.importe_doc,
+              'si', --sw_contabilizar,  		
+              'registrado', --estado
+              v_parametros.id_depto_conta,  			
+              v_parametros.obs,
+              'activo',
+              upper(COALESCE(v_parametros.codigo_control,'0')),
+              v_parametros.importe_it,
+              upper(trim(v_parametros.razon_social)),
               v_parametros._id_usuario_ai,
+              p_id_usuario,
+              now(),
               v_parametros._nombre_usuario_ai,
               'si',
-              v_parametros.id_tipo_relacion_comprobante,
-              string_to_array(v_parametros.id_int_comprobante_fks,',')::integer[],
-              v_momento_comprometido,
-              v_momento_ejecutado,
-              v_momento_pagado
-  							
-           )RETURNING id_int_comprobante into v_id_int_comprobante;
+              v_rec.po_id_periodo,
+              v_parametros.nro_dui,
+              v_parametros.id_moneda,
+              COALESCE(v_parametros.importe_pendiente,0),
+              COALESCE(v_parametros.importe_anticipo,0),
+              COALESCE(v_parametros.importe_retgar,0),
+              v_parametros.importe_neto,
+              v_id_proveedor,
+              v_id_cliente,
+              v_parametros.id_auxiliar,
+              v_id_tipo_doc_compra_venta
+			)RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 			
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante almacenado(a) con exito (id_int_comprobante'||v_id_int_comprobante||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_id_int_comprobante::varchar);
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta almacenado(a) con exito (id_doc_compra_venta'||v_id_doc_compra_venta||')'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_id_doc_compra_venta::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -168,82 +260,134 @@ BEGIN
 		end;
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_INCBTE_MOD'
+ 	#TRANSACCION:  'CONTA_DCV_MOD'
  	#DESCRIPCION:	Modificacion de registros
  	#AUTOR:		admin	
- 	#FECHA:		29-08-2013 00:28:30
+ 	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
-	elsif(p_transaccion='CONTA_INCBTE_MOD')then
+	elsif(p_transaccion='CONTA_DCV_MOD')then
 
 		begin
-		
-			------------------
-        	-- VALIDACIONES
-        	------------------
-        	
-        	
-        	--PERIODO
-        	--Obtiene el periodo a partir de la fecha
-        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha,v_id_subsistema);
-        	
-        	--Verifica si el Periodo esta abierto
-        	v_resp = param.f_verifica_periodo_subsistema_abierto(v_rec.po_id_periodo_subsistema);
+        
+            -- recuepra el periodo de la fecha ...
+            --Obtiene el periodo a partir de la fecha
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
             
-            --------------------------------
-        	--definicion de momentos ....
-            -----------------------------------
+            -- valida que period de libro de compras y ventas este abierto
+            v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
             
-            IF v_parametros.momento_ejecutado = 'true' THEN
-              --si ejecutamos manualmente el compromiso es explicito ...
-              v_momento_comprometido = 'si';
-              v_momento_ejecutado = 'si';
-            else
-              v_momento_ejecutado = 'no';
-              v_momento_comprometido = 'no';
-            END IF;
+            --revisa si el documento no esta marcado como revisado
+            select 
+             dcv.revisado,
+             dcv.id_int_comprobante,
+             dcv.id_origen,
+             dcv.tabla_origen
+            into 
+              v_registros
+            from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
             
-            IF v_parametros.momento_pagado = 'true' THEN
-              v_momento_pagado = 'si';
-            else
-              v_momento_pagado = 'no';
+            
+            IF  v_registros.revisado = 'si' THEN
+               raise exception 'los documentos revisados no pueden modificarse';
             END IF;
             
             
-        	
-			------------------------------
+            IF v_parametros.tipo = 'compra' THEN
+                -- chequear si el proveedor esta registrado
+                v_id_proveedor = param.f_check_proveedor(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social)));
+                
+            ELSE  
+               
+                 -- chequear el el cliente esta registrado 
+                v_id_cliente = vef.f_check_cliente(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social))); 
+            END IF; 
+            
+              
+            --  chequear que la factura de  no este duplicada
+            IF exists (select 1
+                        from conta.tdoc_compra_venta dcv
+                        where 
+                                   dcv.nro_autorizacion = v_parametros.nro_autorizacion
+                              and  
+                                (      (dcv.nit != '0' and dcv.nit = v_parametros.nit)
+                                   or  
+                                       (dcv.nit = '0'  and upper(trim(dcv.razon_social)) = upper(trim(v_parametros.razon_social)))
+                                )
+                              and dcv.nro_documento = v_parametros.nro_documento
+                              and dcv.fecha = v_parametros.fecha
+                              and dcv.id_doc_compra_venta!=v_parametros.id_doc_compra_venta) THEN
+                   
+                raise exception 'El documento ya se encuentra registrado en la base de datos';
+                          
+            END IF;
+            
+           
+            
+            -- validar que no tenga un comprobante asociado
+            
+            IF  v_registros.id_int_comprobante is not NULL THEN
+               raise exception 'No puede editar por que el documento esta acociado al cbte id(%), primero quite esta relacion', v_registros.id_int_comprobante; 
+            END IF;
+            
+            -- recupera parametrizacion de la plantilla     
+            select 
+             *
+            into 
+             v_registros
+            from param.tplantilla pla 
+            where pla.id_plantilla = v_parametros.id_plantilla;
+            
+            --si tiene habilitado el ic copiamos el monto excento
+            v_importe_ice = NULL;
+            IF v_registros.sw_ic = 'si' then
+              v_importe_ice = v_parametros.importe_excento;
+            END IF;
+            
+            IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
+            
+               IF v_parametros.id_auxiliar is null THEN
+                 raise EXCEPTION 'es necesario indicar una cuenta corriente';
+               END IF;
+            
+            END IF;
+        
+        
 			--Sentencia de la modificacion
-			------------------------------
-			update conta.tint_comprobante set
-			id_clase_comprobante = v_parametros.id_clase_comprobante,
-			id_int_comprobante_fks =  string_to_array(v_parametros.id_int_comprobante_fks,',')::integer[],
-			
-			id_depto = v_parametros.id_depto,
-			id_moneda = v_parametros.id_moneda,
-			id_periodo = v_parametros.id_periodo,
-			id_funcionario_firma1 = v_parametros.id_funcionario_firma1,
-			id_funcionario_firma2 = v_parametros.id_funcionario_firma2,
-			id_funcionario_firma3 = v_parametros.id_funcionario_firma3,
-			tipo_cambio = v_parametros.tipo_cambio,
-			beneficiario = v_parametros.beneficiario,
-			
-			glosa1 = v_parametros.glosa1,
-			fecha = v_parametros.fecha,
-			glosa2 = v_parametros.glosa2,
-			
-			
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-            id_usuario_ai = v_parametros._id_usuario_ai,
-            usuario_ai = v_parametros._nombre_usuario_ai,
-            momento_comprometido = v_momento_comprometido,
-            momento_ejecutado =  v_momento_ejecutado,
-            momento_pagado =  v_momento_pagado
-			where id_int_comprobante=v_parametros.id_int_comprobante;
+			update conta.tdoc_compra_venta set			
+			  tipo = v_parametros.tipo,
+              importe_excento = v_parametros.importe_excento,
+              id_plantilla = v_parametros.id_plantilla,
+              fecha = v_parametros.fecha,
+              nro_documento = v_parametros.nro_documento,
+              nit = v_parametros.nit,
+              importe_ice = v_importe_ice,
+              nro_autorizacion =  upper(COALESCE(v_parametros.nro_autorizacion,'0')),
+              importe_iva = v_parametros.importe_iva,
+              importe_descuento = v_parametros.importe_descuento,
+              importe_descuento_ley = v_parametros.importe_descuento_ley,
+              importe_pago_liquido = v_parametros.importe_pago_liquido,
+              importe_doc = v_parametros.importe_doc,
+              id_depto_conta = v_parametros.id_depto_conta,  			
+              obs = v_parametros.obs,
+              codigo_control =  upper(COALESCE(v_parametros.codigo_control,'0')),
+              importe_it = v_parametros.importe_it,
+              razon_social = upper(trim(v_parametros.razon_social)),
+              id_periodo = v_rec.po_id_periodo,
+              nro_dui = v_parametros.nro_dui,
+              id_moneda = v_parametros.id_moneda,
+              importe_pendiente = COALESCE(v_parametros.importe_pendiente,0),
+              importe_anticipo = COALESCE(v_parametros.importe_anticipo,0),
+              importe_retgar = COALESCE(v_parametros.importe_retgar,0),
+              importe_neto = v_parametros.importe_neto,
+              id_proveedor = v_id_proveedor,
+              id_cliente = v_id_cliente,
+              id_auxiliar = v_parametros.id_auxiliar
+			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
                
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante modificado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
                
             --Devuelve la respuesta
             return v_resp;
@@ -251,58 +395,247 @@ BEGIN
 		end;
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_INCBTE_ELI'
- 	#DESCRIPCION:	Eliminacion de registros
+ 	#TRANSACCION:  'CONTA_DCVBASIC_MOD'
+ 	#DESCRIPCION:	Modificacion basica de documento de compra venta
  	#AUTOR:		admin	
- 	#FECHA:		29-08-2013 00:28:30
+ 	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
-	elsif(p_transaccion='CONTA_INCBTE_ELI')then
+	elsif(p_transaccion='CONTA_DCVBASIC_MOD')then
 
 		begin
-			
-            v_result = conta.f_eliminar_int_comprobante(p_id_usuario,
-                                                        v_parametros._id_usuario_ai,
-                                                        v_parametros._nombre_usuario_ai,
-                                                        v_parametros.id_int_comprobante);
+        
+            --Sentencia de la modificacion
+			update conta.tdoc_compra_venta set			
+			  id_tipo_doc_compra_venta = v_parametros.id_tipo_doc_compra_venta
+			where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','estado del documento modificado'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;
+    
+    
+    
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_DCV_ELI'
+ 	#DESCRIPCION:	Eliminacion de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DCV_ELI')then
+
+		begin
+        
+             --revisa si el documento no esta marcado como revisado
+            select 
+             dcv.revisado,
+             dcv.id_int_comprobante,
+             dcv.tabla_origen,
+             dcv.id_origen,
+             dcv.id_depto_conta
+            into 
+              v_registros
+            from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
+            
+            IF  v_registros.revisado = 'si' THEN
+               raise exception 'los documentos revisados no pueden eliminarse';
+            END IF;
+            
+             -- revisar si el archivo es manual o no
+            
+            IF v_registros.id_origen is not null THEN            
+               raise exception 'Solo puede eliminar los documentos insertados manualmente';
+            END IF;
+            
+           
+           
+            --validar si el periodo de conta esta cerrado o abierto
+            -- recuepra el periodo de la fecha ...
+            --Obtiene el periodo a partir de la fecha
+        	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+            
+            -- valida que period de libro de compras y ventas este abierto
+            v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_registros.id_depto_conta, v_rec.po_id_periodo);
+             
+             
+             
+            --validar que no tenga un comprobante asociado
+            
+            IF  v_registros.id_int_comprobante is not NULL THEN
+               raise exception 'No puede elimiar por que el documento esta acociado al cbte id(%), primero quite esta relacion', v_registros.id_int_comprobante; 
+            END IF;
+        
+        
+            --Sentencia de la eliminacion
+			delete from conta.tdoc_concepto
+            where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+        
+        
+			--Sentencia de la eliminacion
+			delete from conta.tdoc_compra_venta
+            where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+            
+            
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
               
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-		
-	/*********************************    
- 	#TRANSACCION:  'CONTA_INCBTE_VAL'
- 	#DESCRIPCION:	Validación del comprobante
- 	#AUTOR:			rcm	
- 	#FECHA:			05/09/2013
+   /*********************************    
+ 	#TRANSACCION:  'CONTA_CAMREV_IME'
+ 	#DESCRIPCION:	Cambia el estao de la revisón del documento de compra o venta
+ 	#AUTOR:		admin	
+ 	#FECHA:		09-09-2015 15:57:09
 	***********************************/
 
-	elsif(p_transaccion='CONTA_INCBTE_VAL')then
+	elsif(p_transaccion='CONTA_CAMREV_IME')then
 
 		begin
-			--Lamada a la función de validación
-			v_result = conta.f_validar_cbte(
-                 p_id_usuario,
-                 v_parametros._id_usuario_ai,
-                 v_parametros._nombre_usuario_ai,
-                 v_parametros.id_int_comprobante,
-                 v_parametros.igualar);
+			
+            
+            select 
+             dcv.revisado
+            into 
+              v_registros
+            from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
+            
+            
+            IF  v_registros.revisado = 'si' THEN
+             v_revisado = 'no';
+            ELSE
+             v_revisado = 'si';
+            END IF;
+            
+            
+            update conta.tdoc_compra_venta set			
+			  revisado = v_revisado
+            where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+            
+            
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cambio del documento a revisado '||v_revisado|| ' id: '||v_parametros.id_doc_compra_venta); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    
+    
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_CHKDOCSUM_IME'
+ 	#DESCRIPCION:	verifica si el detalle del documento cuadra con el total
+ 	#AUTOR:		admin	
+ 	#FECHA:		09-09-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CHKDOCSUM_IME')then
+
+		begin
+			
+            
+            select 
+             dcv.importe_doc
+            into 
+              v_registros
+            from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
+            
+            
+            select
+              sum (dc.precio_total)
+            into
+             v_sum_total
+            from conta.tdoc_concepto dc
+            where dc.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+            
+            IF COALESCE(v_sum_total,0) !=  COALESCE(v_registros.importe_doc,0)  THEN
+               raise exception 'el total del documento no iguala con el total detallado de conceptos';
+            END IF;
+            
+           
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cuadra el documento insertado'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'sum_total',v_sum_total::varchar);
               
             --Devuelve la respuesta
             return v_resp;
 
 		end;
          
-	else
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_QUITCBTE_ELI'
+ 	#DESCRIPCION:	quita el comprobante del documento
+ 	#AUTOR:		admin	
+ 	#FECHA:		25-09-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_QUITCBTE_ELI')then
+
+		begin
+        
+            
+            update conta.tdoc_compra_venta  set			
+			  id_int_comprobante = NULL
+            where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
+            
+            
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se retiro el cbte del documento '||v_parametros.id_doc_compra_venta); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_ADDCBTE_IME'
+ 	#DESCRIPCION:	adiciona un documento al comprobante
+ 	#AUTOR:		admin	
+ 	#FECHA:		25-09-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_ADDCBTE_IME')then
+
+		begin
+        
+            -- validamos que el documento no tenga otro comprobante
+            
+            IF not EXISTS(select
+                           1 
+                          from conta.tdoc_compra_venta dcv 
+                          where dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta and dcv.id_int_comprobante is null) THEN
+            
+                raise exception 'El documento no existe o ya tiene un cbte relacionado';
+            END IF;
+            
+            update conta.tdoc_compra_venta  set			
+			  id_int_comprobante =  v_parametros.id_int_comprobante
+            where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+            
+            
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se adiciono el cbte del documento '||v_parametros.id_doc_compra_venta ||' cbte '||v_parametros.id_int_comprobante); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+    
+    else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 

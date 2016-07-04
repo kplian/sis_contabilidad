@@ -113,7 +113,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('sw_transaccional','sw_transaccional','varchar');
 		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('eeff','eeff','varchar');
-		$this->setParametro('valor_incremento','evalor_incrementoeff','varchar');
+		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
 		
 		

@@ -3180,19 +3180,20 @@ IS 'cuando es una reversion los montos son negativos y esta bandera es marcada';
 /***********************************F-SCP-RAC-CONTA-1-05/04/2016****************************************/
 
 
-
-
 /***********************************I-SCP-FFP-CONTA-1-20/05/2016****************************************/
 
 ALTER TABLE conta.tbanca_compra_venta
   ADD COLUMN retencion_cuota numeric(10,2) DEFAULT 0 NOT NULL;
-  
-  
+
   ALTER TABLE conta.tbanca_compra_venta
   ADD COLUMN multa_cuota numeric(10,2) DEFAULT 0 NOT NULL;
   
 ALTER TABLE conta.tbanca_compra_venta
   ADD COLUMN estado_libro VARCHAR(255) NULL ;
+  
+  ALTER TABLE conta.tbanca_compra_venta
+  ALTER COLUMN monto_acumulado TYPE NUMERIC(12,2);
+  
 
 /***********************************F-SCP-FFP-CONTA-1-20/05/2016****************************************/
 
@@ -3222,6 +3223,18 @@ ALTER TABLE conta.tint_comprobante
 /***********************************F-SCP-FFP-CONTA-1-24/05/2016****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-1-22/06/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_concepto
+  ADD COLUMN id_partida INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_concepto.id_partida
+IS 'cuando el documento compromete aca guarda la partida correspondiente';
+
+
+/***********************************F-SCP-RAC-CONTA-1-22/06/2016****************************************/
 
 
 

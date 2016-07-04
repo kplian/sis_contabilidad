@@ -20,7 +20,10 @@ fheight: '80%',
 		
 	
 	
-	this.tbarItems = ['-',this.cmbResolucion
+	
+	this.tbarItems = ['-',
+			this.cmbResolucion,
+			
            ];
 	
 		
@@ -100,7 +103,6 @@ fheight: '80%',
          fieldset.doLayout(); 
          
 		 console.log(fieldset);
-		 
 		this.cmbResolucion.on('select', function(combo, record, index){
 		    this.tmpResolucion = record.data.field1;
 		    this.capturaFiltros();
@@ -178,6 +180,41 @@ fheight: '80%',
 		 
 		 
 		 
+		 this.win_pago = new Ext.Window(
+                    {
+                        layout: 'fit',
+                        width: 500,
+                        height: 250,
+                        modal: true,
+                        closeAction: 'hide',
+
+                        items: new Ext.FormPanel({
+                            labelWidth: 75, // label settings here cascade unless overridden
+
+                            frame: true,
+                            // title: 'Factura Manual Concepto',
+                            bodyStyle: 'padding:5px 5px 0',
+                            width: 339,
+                            defaults: {width: 191},
+                            // defaultType: 'textfield',
+
+                            items: [this.cmbGestion_retenciones
+                                
+                            ],
+
+                            buttons: [{
+                                text: 'Save',
+                                handler: this.submitGenerarRetenciones,
+
+                                scope: this
+                            }, {
+                                text: 'Cancel'
+                            }]
+                        }),
+
+                    });
+                    
+		 
 		this.addButton('btnChequeoDocumentosWf',
             {
                 text: 'Documentos',
@@ -189,6 +226,9 @@ fheight: '80%',
             }
         );
 	
+		 
+		 this.addBotonesListaNegra();
+		 this.addBotonesRetencionGarantias();
 		 
 		this.addButton('insertAuto',{argument: {imprimir: 'insertAuto'},text:'<i class="fa fa-file-text-o fa-2x"></i> insertAuto',/*iconCls:'' ,*/disabled:false,handler:this.insertAuto});
 
@@ -203,6 +243,7 @@ fheight: '80%',
 
 
 		this.addButton('BorrarTodo',{argument: {imprimir: 'BorrarTodo'},text:'<i class="fa fa-file-text-o fa-2x"></i> BorrarTodo',/*iconCls:'' ,*/disabled:false,handler:this.BorrarTodo});
+
 
 
 
@@ -249,7 +290,7 @@ fheight: '80%',
     
     
     
-    /*cmbTipo : new Ext.form.ComboBox({
+    cmbTipo : new Ext.form.ComboBox({
     	
 				name: 'tipo',
 				fieldLabel: 'tipo',
@@ -263,7 +304,7 @@ fheight: '80%',
 				width: 200,
 				type: 'ComboBox',
 
-    }),*/
+    }),
     cmbDepto: new Ext.form.ComboBox({
                 name: 'id_depto',
                 fieldLabel: 'Depto',
@@ -384,6 +425,41 @@ fheight: '80%',
     
 	
 	
+	
+	
+	
+	
+	cmbGestion_retenciones: new Ext.form.ComboBox({
+				fieldLabel: 'Gestion',
+				allowBlank: false,
+				emptyText:'Gestion...',
+				blankText: 'Año',
+				store:new Ext.data.JsonStore(
+				{
+					url: '../../sis_parametros/control/Gestion/listarGestion',
+					id: 'id_gestion',
+					root: 'datos',
+					sortInfo:{
+						field: 'gestion',
+						direction: 'DESC'
+					},
+					totalProperty: 'total',
+					fields: ['id_gestion','gestion'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams:{par_filtro:'gestion'}
+				}),
+				valueField: 'id_gestion',
+				triggerAction: 'all',
+				displayField: 'gestion',
+			    hiddenName: 'id_gestion',
+    			mode:'remote',
+				pageSize:50,
+				queryDelay:500,
+				listWidth:'280',
+				width:80
+			}),
+			
 	iniciarEventos:function(){
 		this.Cmp.tipo_documento_pago.on('select', function(combo, record, index){ 
 			console.log(this.Cmp.tipo_documento_pago.getValue());
@@ -648,7 +724,37 @@ fheight: '80%',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:255
+				maxLength:255,
+				renderer: function (value, meta, record) {
+					console.log('meta',meta)
+
+					var resp;
+					//meta.style=(record.json.saldo < 0)?'background:red; color:#fff; width:130px; height:30px;':'';
+					//meta.css = record.get('online') ? 'user-online' : 'user-offline';
+					resp = value;
+					var css;
+					
+					var lista_negra = '';
+					
+					if(record.json.lista_negra == 'si'){
+						css = "color:red; font-weight: bold; display:block;"
+						lista_negra = '<div>(lista negra)</div>'
+					}else{
+						css = "";
+					}
+					
+					
+					var devolucion = '';
+					if(record.json.tipo_bancarizacion == 'devolucion'){
+						devolucion = '<div style="color:blue; font-weight:bold;" >(devolucion)</div>'
+					}
+
+
+            	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}{2}{3}</span></div>',css,resp,lista_negra,devolucion);
+
+
+					//return resp;
+				}
 			},
 				type:'TextField',
 				filters: {pfiltro: 'banca.tramite_cuota',type: 'string'},
@@ -921,7 +1027,7 @@ fheight: '80%',
 					totalProperty: 'total',
 					fields: ['id_documento', 'razon_social', 'nro_documento','nro_autorizacion','fecha_documento','nro_nit','sw_libro_compras','importe_total'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'doc.razon_social#doc.nro_documento#doc.nro_autorizacion#doc.nro_nit'}
+					baseParams: {par_filtro: 'doc.nro_documento#va.importe_total'}
 				}),
 				valueField: 'id_documento',
 				displayField: 'razon_social',
@@ -931,7 +1037,7 @@ fheight: '80%',
 
 				hiddenName: 'id_documento',
 				forceSelection: true,
-				typeAhead: true,
+				typeAhead: false,
 				triggerAction: 'all',
 				lazyRender: true,
 				mode: 'remote',
@@ -1050,7 +1156,7 @@ fheight: '80%',
 				hiddenName: 'id_contrato',
 				fieldLabel: 'Obj Contrato',
 				typeAhead: false,
-				forceSelection: false,
+				forceSelection: true,
 				allowBlank: true,
 				disabled: true,
 				emptyText: 'Contratos...',
@@ -1614,7 +1720,9 @@ fheight: '80%',
 		{name:'saldo', type: 'numeric'},
 		'monto_contrato',
 		  'numero_cuota',
-            			'tramite_cuota','id_proceso_wf'	,'resolucion','tipo_monto','rotulo_comercial','estado_libro','periodo_servicio'
+            			'tramite_cuota','id_proceso_wf'	,'resolucion',
+            			'tipo_monto','rotulo_comercial','estado_libro',
+            			'periodo_servicio','lista_negra','tipo_bancarizacion'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',
@@ -1769,10 +1877,13 @@ fheight: '80%',
 			console.log(rec);
 
 
+
+			
+
 			
 			Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/exporta_txt',
-				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,'acumulado':'no'},
+				params:{'id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,'acumulado':'no','resolucion':this.cmbResolucion.getValue()},
 				success: this.successGeneracion_txt,
 			
 				failure: this.conexionFailure,
@@ -1930,6 +2041,142 @@ fheight: '80%',
                     this.idContenedor,
                     'DocumentoWf')
    		},
+   		Retenciones : function(){
+   			
+   			this.win_pago.show();
+   			
+   		},
+   		submitGenerarRetenciones :function(){
+   			alert(this.cmbGestion_retenciones.getValue())
+   		},
+   		
+   		addBotonesListaNegra: function() {
+   			
+   			// agregamos botones
+        this.menuAdqGantt = new Ext.Toolbar.SplitButton({
+            id: 'b-diagrama_gantt-' + this.idContenedor,
+            text: 'Lista Negra',
+            disabled: false,
+            grupo:[0,1,2],
+            iconCls : 'bcancelfile',
+            handler:this.listaNegra,
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-gantti-' + this.idContenedor,
+                text: 'Agregar a Lista Negra',
+                tooltip: '<b>agrega a la lista negra</b>',
+                handler:this.addListaNegra,
+                scope: this
+            }, /*{
+                id:'b-ganttd-' + this.idContenedor,
+                text: 'Lista Negra',
+                tooltip: '<b>Muestra la lista negra</b>',
+                handler:this.listaNegra,
+                scope: this
+            }*/
+        ]}
+        });
+		this.tbar.add(this.menuAdqGantt);
+    },
+    
+    addListaNegra : function(){
+    	
+    	 var data = this.getSelectedData();
+    	 console.log(data.id_banca_compra_venta)
+    	Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/agregarListarNegra',
+				params:{'id_banca_compra_venta':data.id_banca_compra_venta},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+    },
+    
+    
+    
+    
+    addBotonesRetencionGarantias: function() {
+        this.menuRetencionGarantias = new Ext.Toolbar.SplitButton({
+            id: 'b-retencion_garantias-' + this.idContenedor,
+            text: 'Retencion',
+            disabled: false,
+            grupo:[0,1,2],
+            iconCls : 'bmoney',
+            handler:this.listaRetencionGarantias,
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-ins-reten-' + this.idContenedor,
+                text: 'Insertar Retenciones',
+                tooltip: '<b>Insertar Retenciones de garantias</b>',
+                handler:this.addRetencionGarantias,
+                scope: this
+            },
+            {
+                id:'b-ins-reten-sin-pp-' + this.idContenedor,
+                text: 'Insertar Retenciones sin plan de pago',
+                tooltip: '<b>Insertar Retenciones de garantias</b>',
+                handler:this.addRetencionGarantiasSinPlanPago,
+                scope: this
+            },
+             /*{
+                id:'b-list-reten-' + this.idContenedor,
+                text: 'Lista de Rentenciones de Garantia',
+                tooltip: '<b>Lista de retenciones de garantias</b>',
+                handler:this.listaRetencionGarantias,
+                scope: this
+            }*/
+        ]}
+        });
+		this.tbar.add(this.menuRetencionGarantias);
+    },
+    
+    addRetencionGarantias : function (){
+    	
+			Phx.CP.loadingShow();
+			
+			var id_periodo = this.cmbPeriodo.getValue();
+			
+			var id_depto_conta = this.cmbDepto.getValue();
+			
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/insertarRetencionesPeriodo',
+				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta,'numero_tramite':''},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+    },
+    
+    addRetencionGarantiasSinPlanPago : function(){
+    	Phx.CP.loadingShow();
+			
+			var id_periodo = this.cmbPeriodo.getValue();
+			
+			var id_depto_conta = this.cmbDepto.getValue();
+			
+			var rec = this.sm.getSelected();
+			console.log(rec);
+			
+			var numero_tramite = rec.data.tramite_cuota;
+			
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/insertarRetencionesPeriodo',
+				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta,'numero_tramite':numero_tramite},
+				success: this.successAuto,
+			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+    }
+    
+    
 		
 		/*,
 		onSubmit : function(o, x, force) {

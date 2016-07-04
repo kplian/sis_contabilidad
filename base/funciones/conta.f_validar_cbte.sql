@@ -50,6 +50,8 @@ DECLARE
     v_variacion_mb					numeric;
     v_variacion_mt					numeric;
     v_sw_rel						boolean;
+    v_id_tipo_estado				integer;
+    v_id_estado_actual 				integer;
      
 
 BEGIN
@@ -80,7 +82,12 @@ BEGIN
         c.codigo_estacion_origen,
         c.localidad,
         c.id_ajuste,
-        c.cbte_reversion
+        c.cbte_reversion,
+        c.id_proceso_wf,
+        c.nro_tramite,
+        c.id_estado_wf,
+        c.estado_reg,
+        c.id_depto
         
 	  into 
         v_rec_cbte
@@ -120,13 +127,6 @@ BEGIN
     --raise exception '% . % ,% ,%', v_rec_cbte.sw_editable,v_rec_cbte.vbregional,v_conta_codigo_estacion ,v_rec_cbte.localidad ;
    
     
-    --1. Verificar existencia del comprobante
-    if not exists(select 1 from conta.tint_comprobante
-    			where id_int_comprobante = p_id_int_comprobante
-                and estado_reg in ('borrador')) then
-    	raise exception 'Error al Validar Comprobante: comprobante no está en Borrador o en Edición';
-    end if;
-    	
     
     --validar que el periodo al que se agregara este abierto
     IF  p_origen != 'endesis' THEN
@@ -228,7 +228,7 @@ BEGIN
         
      
      end if;
-     
+      
     
     ---------------------------------------------------------------------------------------------------------
     --  Llamar a funcion de comprobante editado, 
@@ -325,6 +325,7 @@ BEGIN
                 IF  v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
                      
                 
+                       
                        v_nro_cbte =  param.f_obtener_correlativo(
                                  v_doc, 
                                  v_id_periodo,-- par_id, 
@@ -380,13 +381,24 @@ BEGIN
               v_nro_cbte = v_rec_cbte.nro_cbte; 
            END IF;
             
-           
+          
+          -----------------------------------------------------
+          -- Llevar e estado de WF del cbte a validado
+          --   
+          -------------------------------------------------------
+          
+           -- llevar a cbte al estado validado ...
+            PERFORM conta.f_cambia_estado_wf_cbte(p_id_usuario, p_id_usuario_ai, p_usuario_ai, 
+                                                  p_id_int_comprobante, 
+                                                  'validado', 
+                                                  'Cbte validado');
+    
+    
             
-           --Se guarda el número del comprobante y se cambia el estado a validado
-          update conta.tint_comprobante set
-          nro_cbte = v_nro_cbte,
-          estado_reg = 'validado'
-          where id_int_comprobante = p_id_int_comprobante;
+           --Se guarda el número del comprobante 
+            update conta.tint_comprobante set
+              nro_cbte = v_nro_cbte
+            where id_int_comprobante = p_id_int_comprobante;
           
           
           ----------------------------------------------------------------------
@@ -433,7 +445,7 @@ BEGIN
                 
           END IF;
           
-        
+         
             
          ----------------------------------------------------------------------------------- 
          -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
@@ -461,7 +473,7 @@ BEGIN
          END IF;
            
            
-           
+          
          --------------------------------------------------
          -- Validaciones sobre el cbte y sus transacciones
          ----------------------------------------------------
@@ -469,8 +481,8 @@ BEGIN
               raise exception 'error al realizar validaciones en el combrobante';
          END IF; 
             
-            
-           
+            -- raise exception 'pasa .. '; 
+          
          ---------------------------------------------------------------------------------------
          -- SI estamos en una regional internacional y  el comprobante es propio de la estacion
          -- migramos a contabilidad central
