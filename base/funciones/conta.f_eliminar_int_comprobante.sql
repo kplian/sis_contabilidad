@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_eliminar_int_comprobante (
   p_id_usuario integer,
   p_id_usuario_ai integer,
