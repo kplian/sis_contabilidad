@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_tabla_valor integer,
   p_codigo varchar,
@@ -464,7 +462,7 @@ BEGIN
                           NULL,  --id_funcionario wf
                           v_this.columna_depto::integer,
                           'Registro de Cbte Automático',
-                          '','');
+                          'CBTE','');
                           
                          
     
