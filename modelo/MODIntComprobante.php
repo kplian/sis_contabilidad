@@ -220,6 +220,7 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('fecha','fecha','date');
 		$this->setParametro('glosa2','glosa2','varchar');
 		$this->setParametro('nro_tramite','nro_tramite','varchar');
+		$this->setParametro('momento_comprometido','momento_comprometido','varchar');
 		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
 		$this->setParametro('momento_pagado','momento_pagado','varchar');		
 		$this->setParametro('id_int_comprobante_fks','id_int_comprobante_fks','varchar');
@@ -267,6 +268,8 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('fecha','fecha','date');
 		$this->setParametro('glosa2','glosa2','varchar');
 		$this->setParametro('nro_tramite','nro_tramite','varchar');
+		
+		$this->setParametro('momento_comprometido','momento_comprometido','varchar');
 		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
 		$this->setParametro('momento_pagado','momento_pagado','varchar');
 		$this->setParametro('id_int_comprobante_fks','id_int_comprobante_fks','varchar');

@@ -141,9 +141,16 @@ BEGIN
               raise exception 'la configuracion cambiara no puede ser nula';
             END IF;
             
-            v_momento_comprometido = 'si';
+            v_momento_comprometido = 'no';
             v_momento_ejecutado = 'no';
             v_momento_pagado = 'no';
+            
+            --momentos comprometido
+            IF v_parametros.momento_comprometido = 'true' THEN
+             v_momento_comprometido = 'si';
+            END IF;
+            
+            
             
             --momentos presupeustarios
             IF v_parametros.momento_ejecutado = 'true' THEN
@@ -169,11 +176,12 @@ BEGIN
         	v_rec = param.f_get_periodo_gestion(v_parametros.fecha);            
             va_id_int_cbte_fk = (string_to_array(v_parametros.id_int_comprobante_fks,','))::INTEGER[];
             
-           
+            --raise exception '%', va_id_int_cbte_fk;   
+        
             -------------------------------
             --   GENERAR PROCESO DEL WF
             -------------------------------
-        	IF va_id_int_cbte_fk is null THEN
+        	IF va_id_int_cbte_fk is not null THEN
                 --  dispara proceso
                 -- si tiene  un cbte relacion recuperar el nro de tramite
                  select 
@@ -434,7 +442,17 @@ BEGIN
             v_momento_pagado =  v_reg_cbte.momento_pagado;
             
             IF  v_reg_cbte.manual = 'si' THEN
+              
+              
               --momentos presupeustarios
+              
+              IF v_parametros.momento_comprometido = 'true' THEN
+                 v_momento_comprometido = 'si';
+              ELSE
+                 v_momento_comprometido = 'no';
+              END IF;
+              
+              
               IF v_parametros.momento_ejecutado = 'true' THEN
                  v_momento_ejecutado = 'si';
               ELSE
@@ -446,6 +464,7 @@ BEGIN
               ELSE
                  v_momento_pagado = 'no';
               END IF;
+            
             ELSE
             
                IF v_momento_ejecutado != v_reg_cbte.momento_ejecutado  or  v_momento_pagado != v_reg_cbte.momento_pagado THEN

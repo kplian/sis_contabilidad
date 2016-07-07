@@ -369,7 +369,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			type : 'Checkbox',
 			id_grupo : 1,
 			grid : true,
-			form : false
+			form : true
 		}, {
 			config : {
 				name : 'momento_ejecutado',
@@ -1137,13 +1137,31 @@ header("content-type: text/javascript; charset=UTF-8");
 			//si es solo contable coloco en falo los momentos y los deshabilita
 			if (record.data.tipo_comprobante == 'contable') {
 
+				this.Cmp.momento_comprometido.setValue(false);
 				this.Cmp.momento_ejecutado.setValue(false);
 				this.Cmp.momento_pagado.setValue(false);
-
+				
+				this.Cmp.momento_comprometido.disable();
 				this.Cmp.momento_ejecutado.disable();
 				this.Cmp.momento_pagado.disable();
 
 			} else {
+				
+				
+				//comprometido
+				if (record.data.momento_comprometido == 'opcional') {
+					this.Cmp.momento_comprometido.enable();
+				}
+				if (record.data.momento_comprometido == 'obligatorio') {
+					this.Cmp.momento_comprometido.setValue(true);
+					this.Cmp.momento_comprometido.disable();
+				}
+				if (record.data.momento_comprometido == 'no_permitido') {
+					this.Cmp.momento_comprometido.setValue(false);
+					this.Cmp.momento_comprometido.disable();
+				}
+
+
 
 				//ejecutado
 				if (record.data.momento_ejecutado == 'opcional') {
