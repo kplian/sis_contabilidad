@@ -152,6 +152,7 @@ BEGIN
             v_id_int_comprobante =   conta.f_gen_comprobante (
                                                    v_parametros.id_agrupador,
                                                    v_codigo_pla,
+                                                   NULL,
                                                    p_id_usuario,
                                                    NULL,
                                                    NULL, 

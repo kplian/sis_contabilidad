@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_evaluar_sumatoria (
   p_formula varchar,
   p_plantilla varchar
@@ -50,7 +48,7 @@ BEGIN
      
      
      if p_plantilla is null or p_plantilla = '' THEN
-       raise exception 'en sumatoria la formula son del tipo 1-2,   inico y fin, revise % en la plantilla', p_formula, p_plantilla;
+       raise exception 'en sumatoria la formula son del tipo 1-2,   inico y fin, revise % en la plantilla %', p_formula, p_plantilla;
      end if;
      
      select 

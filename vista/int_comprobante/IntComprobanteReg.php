@@ -19,25 +19,30 @@ Phx.vista.IntComprobanteReg = {
 	title: 'Libro Diario',
 	nombreVista: 'IntComprobanteReg',
 	
+	
 	constructor: function(config) {
-	    Phx.vista.IntComprobanteReg.superclass.constructor.call(this,config);
+		    var me = this;
+		    me.bMedios = [];
+            me.addButtonCustom(config.idContenedor, 'sig_estado', { text: 'Aprobar', iconCls: 'badelante', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>' });
+        
 	    
-	    
-	    //Botón para Validación del Comprobante
-			this.addButton('btnValidar', {
-				text : 'Validación',
-				iconCls : 'bchecklist',
-				disabled : true,
-				handler : this.validarCbte,
-				tooltip : '<b>Validación</b><br/>Validación del Comprobante'
-			});
-			
-	    this.addButton('btnWizard', {
-				text : 'Plantilla',
-				iconCls : 'bgear',
-				disabled : false,
-				handler : this.loadWizard,
-				tooltip : '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
+	        Phx.vista.IntComprobanteReg.superclass.constructor.call(this,config);
+	        
+	        //Botón para Validación del Comprobante
+			/*this.addButton('btnValidar', {
+					text : 'Validación',
+					iconCls : 'bchecklist',
+					disabled : true,
+					handler : this.validarCbte,
+					tooltip : '<b>Validación</b><br/>Validación del Comprobante'
+			});*/
+				
+		    this.addButton('btnWizard', {
+					text : 'Plantilla',
+					iconCls : 'bgear',
+					disabled : false,
+					handler : this.loadWizard,
+					tooltip : '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
 			});
 
 			
@@ -57,6 +62,8 @@ Phx.vista.IntComprobanteReg = {
 				handler : this.swEditable,
 				tooltip : '<b>Hacer editable</b><br/>Si la edición esta deshabilitada toma un backup y la habilita'
 			});
+			
+			this.init();
     
     },
 	
@@ -64,7 +71,7 @@ Phx.vista.IntComprobanteReg = {
 	onButtonEdit:function(){
          this.swButton = 'EDIT';
          var rec = this.sm.getSelected().data;
-         Phx.vista.IntComprobante.superclass.onButtonEdit.call(this); 
+         Phx.vista.IntComprobanteReg.superclass.onButtonEdit.call(this); 
          this.Cmp.id_moneda.setReadOnly(true);
          if(rec.localidad == 'internacional'){
          	this.Cmp.fecha.setReadOnly(true);
@@ -87,7 +94,7 @@ Phx.vista.IntComprobanteReg = {
        onButtonNew:function(){
           this.swButton = 'NEW';
           this.sw_valores = 'si';
-          Phx.vista.IntComprobante.superclass.onButtonNew.call(this); 
+          Phx.vista.IntComprobanteReg.superclass.onButtonNew.call(this); 
           this.Cmp.id_moneda.setReadOnly(false);
           this.Cmp.fecha.setReadOnly(false);
           this.mostrarComponente(this.Cmp.tipo_cambio);
@@ -145,16 +152,16 @@ Phx.vista.IntComprobanteReg = {
 				});
 	  },
        preparaMenu : function(n) {
-			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
+			var tb = Phx.vista.IntComprobanteReg.superclass.preparaMenu.call(this);
 			var rec = this.sm.getSelected();
 		
 		    if(rec.data.tipo_reg == 'summary'){
-		    	this.getBoton('btnSwEditble').setDisabled(true);
-				this.getBoton('btnValidar').setDisabled(true);
-				this.getBoton('btnImprimir').setDisabled(true);
-				this.getBoton('btnRelDev').setDisabled(true);
-				this.getBoton('btnIgualarCbte').setDisabled(true);
-				this.getBoton('btnDocCmpVnt').setDisabled(true);
+		    	this.getBoton('btnSwEditble').disable();
+				this.getBoton('sig_estado').disable();
+				this.getBoton('btnImprimir').disable();
+				this.getBoton('btnRelDev').disable();
+				this.getBoton('btnIgualarCbte').disable();
+				this.getBoton('btnDocCmpVnt').disable();
 			}
 			else{
 				if(rec.data.sw_editable == 'no'){
@@ -163,25 +170,36 @@ Phx.vista.IntComprobanteReg = {
 		        else{
 		        	 this.getBoton('btnSwEditble').setDisabled(true);
 		        }
-		        this.getBoton('btnValidar').setDisabled(false);
-				this.getBoton('btnImprimir').setDisabled(false);
-				this.getBoton('btnRelDev').setDisabled(false);
-				this.getBoton('btnIgualarCbte').setDisabled(false);
-				this.getBoton('btnDocCmpVnt').setDisabled(false);
-				this.getBoton('chkpresupuesto').setDisabled(false);
+		        this.getBoton('sig_estado').enable();
+            
+				this.getBoton('btnImprimir').enable();
+				this.getBoton('btnRelDev').enable();
+				this.getBoton('btnIgualarCbte').enable();
+				this.getBoton('btnDocCmpVnt').enable();
+				this.getBoton('chkpresupuesto').enable();
+				
+				this.getBoton('btnChequeoDocumentosWf').enable();
+                this.getBoton('diagrama_gantt').enable();
+                this.getBoton('btnObs').enable(); 
 			}
+			
+			
+            
 			
 			return tb;
 		},
 		liberaMenu : function() {
-			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
+			var tb = Phx.vista.IntComprobanteReg.superclass.liberaMenu.call(this);
 			
-				this.getBoton('btnValidar').setDisabled(true);
-				this.getBoton('btnImprimir').setDisabled(true);
-				this.getBoton('btnRelDev').setDisabled(true);
-				this.getBoton('btnIgualarCbte').setDisabled(true);
-				this.getBoton('btnDocCmpVnt').setDisabled(true);
-				this.getBoton('chkpresupuesto').setDisabled(true);
+				this.getBoton('sig_estado').disable();
+				this.getBoton('btnImprimir').disable();
+				this.getBoton('btnRelDev').disable();
+				this.getBoton('btnIgualarCbte').disable();
+				this.getBoton('btnDocCmpVnt').disable();
+				this.getBoton('chkpresupuesto').disable();
+				this.getBoton('btnChequeoDocumentosWf').disable();
+                this.getBoton('diagrama_gantt').disable();
+                this.getBoton('btnObs').disable()
 			
 			
 			

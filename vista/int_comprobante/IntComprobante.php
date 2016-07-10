@@ -19,7 +19,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 			//llama al constructor de la clase padre
 			Phx.vista.IntComprobante.superclass.constructor.call(this, config);
-			this.init();
+			
 			//this.load({params:{start:0, limit:this.tam_pag}});
 
 			//Botón para Imprimir el Comprobante
@@ -47,12 +47,33 @@ header("content-type: text/javascript; charset=UTF-8");
 				tooltip : '<b>Relación con el devengado</b><br/>Solo para comprobantes de pago presupuestario'
 			});
 			
-			this.addButton('chkpresupuesto',{	text:'Chk Presupuesto',
+			this.addButton('chkpresupuesto',{text:'Chk Presupuesto',
 				iconCls: 'blist',
 				disabled: true,
 				handler: this.checkPresupuesto,
 				tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>'
 			});
+			
+			this.addBotonesGantt();
+	        this.addButton('btnChequeoDocumentosWf',
+	            {
+	                text: 'Documentos',
+	                grupo:[0,1,2,3],
+	                iconCls: 'bchecklist',
+	                disabled: true,
+	                handler: this.loadCheckDocumentosWf,
+	                tooltip: '<b>Documentos del Trámite</b><br/>Permite ver los documentos asociados al NRO de trámite.'
+	            }
+	        );
+        
+	        this.addButton('btnObs',{
+	                    text :'Obs Wf',
+	                    grupo:[0,1,2,3],
+	                    iconCls : 'bchecklist',
+	                    disabled: true,
+	                    handler : this.onOpenObs,
+	                    tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
+	         });
 
 			
 
@@ -233,7 +254,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 2,
 			grid : true,
 			form : true
-		}, {
+		}, 
+		{
 			config : {
 				name : 'id_depto',
 				hiddenName : 'id_depto',
@@ -261,7 +283,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			grid : false,
 			form : true
-		}, {
+		}, 
+		{
 			config : {
 				name : 'id_clase_comprobante',
 				fieldLabel : 'Tipo Cbte.',
@@ -346,7 +369,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			type : 'Checkbox',
 			id_grupo : 1,
 			grid : true,
-			form : false
+			form : true
 		}, {
 			config : {
 				name : 'momento_ejecutado',
@@ -1042,7 +1065,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			name : 'fecha_costo_fin',
 			type : 'date',
 			dateFormat : 'Y-m-d'
-		}, 'momento_comprometido', 'momento_ejecutado', 'id_moneda_base', 
+		}, 'momento_comprometido', 'momento_ejecutado', 'id_moneda_base','id_proceso_wf','id_estado_wf',
 		'cbte_cierre', 'cbte_apertura', 'cbte_aitb', 'momento_pagado', 'manual', 
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
 		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 
@@ -1114,13 +1137,31 @@ header("content-type: text/javascript; charset=UTF-8");
 			//si es solo contable coloco en falo los momentos y los deshabilita
 			if (record.data.tipo_comprobante == 'contable') {
 
+				this.Cmp.momento_comprometido.setValue(false);
 				this.Cmp.momento_ejecutado.setValue(false);
 				this.Cmp.momento_pagado.setValue(false);
-
+				
+				this.Cmp.momento_comprometido.disable();
 				this.Cmp.momento_ejecutado.disable();
 				this.Cmp.momento_pagado.disable();
 
 			} else {
+				
+				
+				//comprometido
+				if (record.data.momento_comprometido == 'opcional') {
+					this.Cmp.momento_comprometido.enable();
+				}
+				if (record.data.momento_comprometido == 'obligatorio') {
+					this.Cmp.momento_comprometido.setValue(true);
+					this.Cmp.momento_comprometido.disable();
+				}
+				if (record.data.momento_comprometido == 'no_permitido') {
+					this.Cmp.momento_comprometido.setValue(false);
+					this.Cmp.momento_comprometido.disable();
+				}
+
+
 
 				//ejecutado
 				if (record.data.momento_ejecutado == 'opcional') {
@@ -1158,10 +1199,9 @@ header("content-type: text/javascript; charset=UTF-8");
 			if (data) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
-					//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
 					url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
 					params : {
-						'id_int_comprobante' : data.id_int_comprobante
+						'id_proceso_wf' : data.id_proceso_wf
 					},
 					success : this.successExport,
 					failure : this.conexionFailure,
@@ -1209,12 +1249,168 @@ header("content-type: text/javascript; charset=UTF-8");
 										 });
 			   
 	 },
+	 
+	 addBotonesGantt: function() {
+        this.menuAdqGantt = new Ext.Toolbar.SplitButton({
+            id: 'b-diagrama_gantt-' + this.idContenedor,
+            text: 'Gantt',
+            disabled: true,
+            grupo:[0,1,2,3],
+            iconCls : 'bgantt',
+            handler:this.diagramGanttDinamico,
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-gantti-' + this.idContenedor,
+                text: 'Gantt Imagen',
+                tooltip: '<b>Mues un reporte gantt en formato de imagen</b>',
+                handler:this.diagramGantt,
+                scope: this
+            }, {
+                id:'b-ganttd-' + this.idContenedor,
+                text: 'Gantt Dinámico',
+                tooltip: '<b>Muestra el reporte gantt facil de entender</b>',
+                handler:this.diagramGanttDinamico,
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuAdqGantt);
+    },
+    
+    loadCheckDocumentosWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Documentos del Proceso',
+                    {
+                        width:'90%',
+                        height:500
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DocumentoWf'
+        )
+    },
+    
+    onOpenObs:function() {
+            var rec=this.sm.getSelected();
+            
+            var data = {
+            	id_proceso_wf: rec.data.id_proceso_wf,
+            	id_estado_wf: rec.data.id_estado_wf,
+            	num_tramite: rec.data.num_tramite
+            }
+            
+            Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
+                    'Observaciones del WF',
+                    {
+                        width:'80%',
+                        height:'70%'
+                    },
+                    data,
+                    this.idContenedor,
+                    'Obs'
+        )
+    },
+    
+    diagramGantt: function (){			
+			var data=this.sm.getSelected().data.id_proceso_wf;
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+				params:{'id_proceso_wf':data},
+				success: this.successExport,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});			
+	},
+	diagramGanttDinamico: function (){			
+			var data=this.sm.getSelected().data.id_proceso_wf;
+			window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)		
+	}, 
+	
+	sigEstado:function(){                   
+      	var rec=this.sm.getSelected();
+      	
+      	this.mostrarWizard(rec);
+      	
+               
+     },
+     
+    mostrarWizard : function(rec) {
+     	var configExtra = [],
+     		obsValorInicial;
+     	   
+		this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+                                'Estado de Wf',
+                                {
+                                    modal: true,
+                                    width: 700,
+                                    height: 450
+                                }, 
+                                {
+                                	configExtra: configExtra,
+                                	eventosExtra: this.eventosExtra,
+                                	data:{
+                                       id_estado_wf: rec.data.id_estado_wf,
+                                       id_proceso_wf: rec.data.id_proceso_wf,
+                                       id_int_comprobante: rec.data.id_int_comprobante,
+                                       fecha_ini: rec.data.fecha
+                                   },
+                                   obsValorInicial: obsValorInicial,
+                                }, this.idContenedor, 'FormEstadoWf',
+                                {
+                                    config:[{
+                                              event:'beforesave',
+                                              delegate: this.onSaveWizard,
+                                              
+                                            },
+					                        {
+					                          event:'requirefields',
+					                          delegate: function () {
+						                          	this.onButtonEdit();
+										        	this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
+										        	this.formulario_wizard = 'si';
+					                          }
+					                          
+					                        }],
+                                  
+                                    scope:this
+                        });        
+     },
+    onSaveWizard:function(wizard,resp){
+        Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            url:'../../sis_contabilidad/control/IntComprobante/siguienteEstado',
+            params:{
+            	    id_int_comprobante: wizard.data.id_int_comprobante,
+            	    id_proceso_wf_act:  resp.id_proceso_wf_act,
+	                id_estado_wf_act:   resp.id_estado_wf_act,
+	                id_tipo_estado:     resp.id_tipo_estado,
+	                id_funcionario_wf:  resp.id_funcionario_wf,
+	                id_depto_wf:        resp.id_depto_wf,
+	                obs:                resp.obs,
+	                instruc_rpc:		resp.instruc_rpc,
+	                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+	                
+                },
+            success: this.successWizard,
+            failure: this.conexionFailure, 
+            argument: { wizard:wizard },
+            timeout: this.timeout,
+            scope: this
+        });
+    },
+    successWizard: function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+    }
 		
 		
 		
-		
-		
-		
-	})
+})
 </script>
 

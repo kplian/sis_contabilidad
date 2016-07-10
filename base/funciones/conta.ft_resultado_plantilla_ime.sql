@@ -116,14 +116,14 @@ BEGIN
               id_usuario_mod = p_id_usuario,
               id_usuario_ai = v_parametros._id_usuario_ai,
               usuario_ai = v_parametros._nombre_usuario_ai,
-              tipo=v_parametros.tipo,
-              cbte_aitb=v_parametros.cbte_aitb,
-              cbte_apertura=v_parametros.cbte_apertura,
-              cbte_cierre=v_parametros.cbte_cierre,
-              periodo_calculo=v_parametros.periodo_calculo,
-              id_clase_comprobante=v_parametros.id_clase_comprobante,
-              glosa=v_parametros.glosa
-			where id_resultado_plantilla=v_parametros.id_resultado_plantilla;
+              tipo = v_parametros.tipo,
+              cbte_aitb = v_parametros.cbte_aitb,
+              cbte_apertura = v_parametros.cbte_apertura,
+              cbte_cierre = v_parametros.cbte_cierre,
+              periodo_calculo = v_parametros.periodo_calculo,
+              id_clase_comprobante = v_parametros.id_clase_comprobante,
+              glosa = v_parametros.glosa
+			where id_resultado_plantilla = v_parametros.id_resultado_plantilla;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla de Resultados modificado(a)'); 

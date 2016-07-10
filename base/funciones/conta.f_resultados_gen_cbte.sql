@@ -43,6 +43,13 @@ v_id_centro_costo_depto	integer;
 v_id_cuenta				integer;
 v_monto_debe			numeric;
 v_monto_haber			numeric;
+v_id_proceso_macro		integer;
+v_codigo_proceso_macro 		varchar;
+v_codigo_tipo_proceso 		varchar;
+v_num_tramite 				varchar;
+v_id_proceso_wf				integer;
+v_id_estado_wf				integer;
+v_codigo_estado   			varchar;
  
 
 BEGIN
@@ -173,7 +180,7 @@ BEGIN
                                                       v_str_id_deptos,
                                                       v_id_gestion,
                                                       false) THEN
-             raise exception 'Error al procesar la plantilla pirncipal';                                                  
+             raise exception 'Error al procesar la plantilla principal';                                                  
          END IF;
            
          
@@ -193,39 +200,106 @@ BEGIN
          --recupera moneda base .... 
          v_id_moneda_base = param.f_get_moneda_base();
          
+         
+         
+         -----------------------------------------
+         --   INICIA TRAMITE
+         -----------------------------------------
+         
+          --  inicia tramite nuevo 
+          v_codigo_proceso_macro = pxp.f_get_variable_global('conta_codigo_macro_wf_cbte');
+          --obtener id del proceso macro
+          select 
+           pm.id_proceso_macro
+          into
+           v_id_proceso_macro
+          from wf.tproceso_macro pm
+          where pm.codigo = v_codigo_proceso_macro;
+                     
+          If v_id_proceso_macro is NULL THEN
+            raise exception 'El proceso macro  de codigo % no esta configurado en el sistema WF',v_codigo_proceso_macro;  
+          END IF;
+                     
+         --   obtener el codigo del tipo_proceso
+          select   tp.codigo 
+           into v_codigo_tipo_proceso
+          from  wf.ttipo_proceso tp 
+          where   tp.id_proceso_macro = v_id_proceso_macro
+                and tp.estado_reg = 'activo' and tp.inicio = 'si';
+                            
+          IF v_codigo_tipo_proceso is NULL THEN
+           raise exception 'No existe un proceso inicial para el proceso macro indicado % (Revise la configuración)',v_codigo_proceso_macro;
+          END IF;
+                    
+        -- inciar el tramite en el sistema de WF
+          SELECT 
+             ps_num_tramite ,
+             ps_id_proceso_wf ,
+             ps_id_estado_wf ,
+             ps_codigo_estado 
+            into
+             v_num_tramite,
+             v_id_proceso_wf,
+             v_id_estado_wf,
+             v_codigo_estado   
+                          
+          FROM wf.f_inicia_tramite(
+             p_id_usuario,
+             v_parametros._id_usuario_ai,
+             v_parametros._nombre_usuario_ai,
+             v_rec.po_id_gestion, 
+             v_codigo_tipo_proceso, 
+             null,--v_parametros.id_funcionario,
+             v_parametros.id_depto,
+             'Registrado a trave de plantilla',
+             '' );        
+                 
+                 
+          IF  v_codigo_estado != 'borrador' THEN
+            raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
+          END IF;
+                    
+         ------------------------------------
+         --  registro de comprobante
+         ------------------------------------
          insert into conta.tint_comprobante(
-			id_clase_comprobante,		
-			id_subsistema,
-			id_depto,
-			id_moneda,
-			id_periodo,
-			tipo_cambio,			
-			estado_reg,
-			glosa1,
-			fecha,
-			id_usuario_reg,
-			fecha_reg,
-            cbte_cierre,
-            cbte_apertura,
-            cbte_aitb
-          	) values(
-			v_registros_plantilla.id_clase_comprobante,			
-			v_id_subsistema_conta,
-			v_parametros.id_depto,
-			v_id_moneda_base,
-			v_rec.po_id_periodo,
-			1, --tipo de cambio para moenda base
-			'borrador',
-			v_registros_plantilla.glosa,
-			v_parametros.fecha,
-			p_id_usuario,
-			now(),
-            v_registros_plantilla.cbte_cierre,
-            v_registros_plantilla.cbte_apertura,
-            v_registros_plantilla.cbte_aitb
-			
-							
-			)RETURNING id_int_comprobante into v_id_int_comprobante;
+              id_clase_comprobante,		
+              id_subsistema,
+              id_depto,
+              id_moneda,
+              id_periodo,
+              tipo_cambio,			
+              estado_reg,
+              glosa1,
+              fecha,
+              id_usuario_reg,
+              fecha_reg,
+              cbte_cierre,
+              cbte_apertura,
+              cbte_aitb,
+              nro_tramite,
+              id_proceso_wf,
+              id_estado_wf
+          	) 
+            values(
+              v_registros_plantilla.id_clase_comprobante,			
+              v_id_subsistema_conta,
+              v_parametros.id_depto,
+              v_id_moneda_base,
+              v_rec.po_id_periodo,
+              1, --tipo de cambio para moenda base
+              'borrador',
+              v_registros_plantilla.glosa,
+              v_parametros.fecha,
+              p_id_usuario,
+              now(),
+              v_registros_plantilla.cbte_cierre,
+              v_registros_plantilla.cbte_apertura,
+              v_registros_plantilla.cbte_aitb,
+              v_num_tramite,
+              v_id_proceso_wf,
+              v_id_estado_wf
+		   )RETURNING id_int_comprobante into v_id_int_comprobante;
             
             
          

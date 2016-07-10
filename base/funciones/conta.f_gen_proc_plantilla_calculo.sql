@@ -66,20 +66,22 @@ BEGIN
     p_porc_monto_excento_var = COALESCE(p_porc_monto_excento_var,0);
     
     --RAC 11/02/2014, agrega la capacidad de calcular si el documento utiliza el monto excento
-    
+    v_sw_calcular_excento  = TRUE;
     if p_porc_monto_excento_var >= 0 THEN
+       v_porc_monto_imponible = 1.00 - p_porc_monto_excento_var;
+    END IF;
     
-        v_sw_calcular_excento  = TRUE;
-        v_porc_monto_imponible = 1 - p_porc_monto_excento_var;
-    ELSE
-        v_sw_calcular_excento  = TRUE;
-        
+    
+    IF v_porc_monto_imponible  < 0 THEN
+       raise exception 'el porcentaje de excento  no peude ser menor a cero, revise la configuracion del excento en la plantilla de comprobante,  el campo excento debe ser porcentual entre 0 y 1';
     END IF;
   
 
    IF p_id_plantilla is NULL THEN
       raise exception 'no se encontro ningun id para la plantila de calculo';
    END IF;
+   
+   
      
      
     v_cont = 1;
@@ -100,22 +102,27 @@ BEGIN
                                 pc.id_plantilla = p_id_plantilla
                            order by pc.prioridad ) LOOP
                            
-          --coconfirma  si es necesario el monto excento             
+          --confirma  si es necesario el monto excento             
           IF v_registros.sw_monto_excento = 'no'  and v_sw_calcular_excento THEN
               v_sw_calcular_excento = FALSE;   
-          END IF;             
+          END IF; 
+          
+                     
                            
      
         --IF es registro primario o secundario  
         
         IF  p_proc_terci = 'si' or (v_registros.prioridad <= p_prioridad_documento )   THEN  -- p_prioridad_documento  por defecto tiene el valor de dos
         
-                --  crea un record del tipo de la transaccion  
+             --  crea un record del tipo de la transaccion  
                 
-                v_record_int_tran = populate_record(null::conta.tint_transaccion,p_hstore_transaccion);
+              v_record_int_tran = populate_record(null::conta.tint_transaccion,p_hstore_transaccion);
              
-              --  obtine valor o porcentajes aplicado
+             --  obtine valor o porcentajes aplicado
                IF v_registros.tipo_importe = 'porcentaje' THEN
+               
+               
+               
                
                    IF v_sw_calcular_excento  THEN
                       
@@ -131,6 +138,8 @@ BEGIN
                              v_porc_importe = v_porc_importe + p_porc_monto_excento_var;
                              v_porc_importe_presupuesto = v_porc_importe_presupuesto + p_porc_monto_excento_var;
                        END IF;
+                       
+                     
                          
                      
                       
@@ -139,7 +148,9 @@ BEGIN
                      v_porc_importe = v_registros.importe; 
                      v_porc_importe_presupuesto = v_registros.importe_presupuesto;
                    
-                   END IF;               
+                   END IF; 
+                   
+                                
                
                   v_monto_x_aplicar = (p_monto * v_porc_importe)::numeric;
                   v_monto_x_aplicar_pre = (p_monto * v_porc_importe_presupuesto)::numeric;
@@ -152,10 +163,12 @@ BEGIN
                
                   v_monto_x_aplicar = v_registros.importe::numeric;
                   v_monto_x_aplicar_pre = v_registros.importe_presupuesto::numeric;
-                  
-                 
-               
                END IF;
+               
+               
+              --  IF  p_id_plantilla =  25  THEN
+              --      raise exception '% ,  %    ', v_monto_x_aplicar, v_monto_revertir;
+              -- END IF; 
                
                
                --  acomoda en el debe o haber 
@@ -191,7 +204,7 @@ BEGIN
                   
                   v_record_int_tran.glosa = v_registros.descripcion;
                   
-                  raise notice ')))))))))))))) p_id_gestion = %, p_id_depto_conta = % ',p_id_gestion,p_id_depto_conta ;
+                  --raise notice ')))))))))))))) p_id_gestion = %, p_id_depto_conta = % ',p_id_gestion,p_id_depto_conta ;
                   
                   SELECT 
                       ps_id_centro_costo 

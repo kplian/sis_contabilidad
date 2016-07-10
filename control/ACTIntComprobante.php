@@ -11,6 +11,7 @@
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/PlantillasHTML.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
+require_once(dirname(__FILE__).'/../reportes/RIntCbte.php');
 class ACTIntComprobante extends ACTbase{
 	
 	private $objPlantHtml;
@@ -47,6 +48,42 @@ class ACTIntComprobante extends ACTbase{
 		//echo dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php';exit;
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+
+   function listarIntComprobanteWF(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    
+		
+		if($this->objParam->getParametro('id_deptos')!=''){
+            $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
+        }
+		
+		
+		if($this->objParam->getParametro('momento')!= ''){
+			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
+		}
+		
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+		
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarIntComprobanteWF');
+		} else{
+			$this->objFunc=$this->create('MODIntComprobante');
+			
+			$this->res=$this->objFunc->listarIntComprobanteWF($this->objParam);
+		}
+		
+		//echo dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php';exit;
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+
+
+
+
 	
 	function listarSimpleIntComprobante(){
 		$this->objParam->defecto('ordenacion','id_int_comprobante');
@@ -336,7 +373,34 @@ class ACTIntComprobante extends ACTbase{
 		
     }
 
-    function reporteCbte(){
+   function reporteCbte(){
+			
+		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
+		$dataSource = $this->recuperarDatosCbte();	
+		
+		//parametros basicos
+		$tamano = 'LETTER';
+		$orientacion = 'p';
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);		
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		//Instancia la clase de pdf
+		
+		$reporte = new RIntCbte($this->objParam); 
+		
+		$reporte->datosHeader($dataSource);
+		$reporte->generarReporte();
+		$reporte->output($reporte->url_archivo,'F');
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		
+	}
+
+    function reporteCbte_bk(){
    	    	
    	    $dataSource = $this->recuperarDatosCbte(); 
    	   	
@@ -470,6 +534,24 @@ class ACTIntComprobante extends ACTbase{
         $this->res->imprimirRespuesta($this->res->generarJson());         
 
    }
+
+   function siguienteEstado(){
+        $this->objFunc=$this->create('MODIntComprobante');  
+        $this->res=$this->objFunc->siguienteEstado($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+   function anteriorEstado(){
+        $this->objFunc=$this->create('MODIntComprobante');  
+        $this->res=$this->objFunc->anteriorEstado($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+   
+   function clonarCbte(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->clonarCbte($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 		
 		
 }
