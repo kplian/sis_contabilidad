@@ -102,7 +102,6 @@ fheight: '80%',
          });
          fieldset.doLayout(); 
          
-		 console.log(fieldset);
 		this.cmbResolucion.on('select', function(combo, record, index){
 		    this.tmpResolucion = record.data.field1;
 		    this.capturaFiltros();
@@ -230,19 +229,19 @@ fheight: '80%',
 		 this.addBotonesListaNegra();
 		 this.addBotonesRetencionGarantias();
 		 
-		this.addButton('insertAuto',{argument: {imprimir: 'insertAuto'},text:'<i class="fa fa-file-text-o fa-2x"></i> insertAuto',/*iconCls:'' ,*/disabled:false,handler:this.insertAuto});
+		this.addButton('insertAuto',{argument: {imprimir: 'insertAuto'},text:'<i class="fa fa-file-text-o fa-2x"></i> insertAuto',/*iconCls:'' ,*/disabled:true,handler:this.insertAuto});
 
 
 		 
-		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT',/*iconCls:'' ,*/disabled:false,handler:this.generar_txt});
+		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT',/*iconCls:'' ,*/disabled:true,handler:this.generar_txt});
 
-		this.addButton('Importar',{argument: {imprimir: 'Importar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Importar TXT',/*iconCls:'' ,*/disabled:false,handler:this.importar_txt});
-
-
-		this.addButton('Acumulado',{argument: {imprimir: 'Acumulado'},text:'<i class="fa fa-file-text-o fa-2x"></i> Acumulado',/*iconCls:'' ,*/disabled:false,handler:this.acumulado});
+		this.addButton('Importar',{argument: {imprimir: 'Importar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Importar TXT',/*iconCls:'' ,*/disabled:true,handler:this.importar_txt});
 
 
-		this.addButton('BorrarTodo',{argument: {imprimir: 'BorrarTodo'},text:'<i class="fa fa-file-text-o fa-2x"></i> BorrarTodo',/*iconCls:'' ,*/disabled:false,handler:this.BorrarTodo});
+		this.addButton('Acumulado',{argument: {imprimir: 'Acumulado'},text:'<i class="fa fa-file-text-o fa-2x"></i> Acumulado',/*iconCls:'' ,*/disabled:true,handler:this.acumulado});
+
+
+		this.addButton('BorrarTodo',{argument: {imprimir: 'BorrarTodo'},text:'<i class="fa fa-file-text-o fa-2x"></i> BorrarTodo',/*iconCls:'' ,*/disabled:true,handler:this.BorrarTodo});
 
 
 
@@ -276,15 +275,28 @@ fheight: '80%',
     
     validarFiltros:function(){
         if(this.cmbDepto.getValue() && this.cmbGestion.validate() && this.cmbPeriodo.validate()){
+        	this.getBoton('insertAuto').enable();
+        	this.getBoton('exportar').enable();
+        	this.getBoton('Importar').enable();
+        	this.getBoton('Acumulado').enable();
+        	this.getBoton('BorrarTodo').enable();
             return true;
         }
         else{
+        	this.getBoton('insertAuto').disable();
+        	this.getBoton('exportar').disable();
+        	this.getBoton('Importar').disable();
+        	this.getBoton('Acumulado').disable();
+        	this.getBoton('BorrarTodo').disable();
             return false;
+            
         }
     },
     onButtonAct:function(){
     	if(!this.validarFiltros()){
             alert('Especifique los filtros antes')
+            
+
         }
     },
     
@@ -462,7 +474,7 @@ fheight: '80%',
 			
 	iniciarEventos:function(){
 		this.Cmp.tipo_documento_pago.on('select', function(combo, record, index){ 
-			console.log(this.Cmp.tipo_documento_pago.getValue());
+			//console.log(this.Cmp.tipo_documento_pago.getValue());
 		}, this);
 		
 		/*this.Cmp.autorizacion.on('change', function(combo, record, index){ 
@@ -482,7 +494,6 @@ fheight: '80%',
 			//console.log(record.data.desc_proveedor);
 			
 			var res = record.data.desc_proveedor.split("(");
-			console.log(res[0]);
 			this.Cmp.nit_ci.setValue(record.data.nit);
 			this.Cmp.razon.setValue(res[0]);
 			
@@ -510,7 +521,6 @@ fheight: '80%',
 		
 		
 		this.Cmp.id_cuenta_bancaria.on('select', function(combo, record, index){ 
-			console.log(record.data);
 			
 			if(this.Cmp.id_cuenta_bancaria.getValue() == 61){
 				this.Cmp.tipo_documento_pago.reset();
@@ -548,7 +558,6 @@ fheight: '80%',
 		this.Cmp.id_contrato.on('select', function(combo, record, index){ 
 			
 			
-			console.log(record.data)
 			
 			//this.Cmp.id_contrato.setValue(record.data.id_contrato);
 			this.Cmp.num_contrato.setValue(record.data.numero);
@@ -702,7 +711,6 @@ fheight: '80%',
             	       //check or un check row
             	       var checked = '',
             	       	    momento = 'no';
-            	       	    console.log(value);
                 	   if(value == 'si'){
                 	        	checked = 'checked';;
                 	   }
@@ -726,7 +734,6 @@ fheight: '80%',
 				gwidth: 100,
 				maxLength:255,
 				renderer: function (value, meta, record) {
-					console.log('meta',meta)
 
 					var resp;
 					//meta.style=(record.json.saldo < 0)?'background:red; color:#fff; width:130px; height:30px;':'';
@@ -826,10 +833,8 @@ fheight: '80%',
 				maxLength:255,
 				disabled:true,
 				renderer: function (value, meta, record) {
-					console.log('meta',meta)
 
 					var resp;
-					console.log('saldo',record.json.saldo)
 					//meta.style=(record.json.saldo < 0)?'background:red; color:#fff; width:130px; height:30px;':'';
 					//meta.css = record.get('online') ? 'user-online' : 'user-offline';
 					resp = value;
@@ -1378,10 +1383,8 @@ fheight: '80%',
 				gwidth: 100,
 				maxLength:255,
 				renderer: function (value, meta, record) {
-					console.log('meta',meta)
 
 					var resp;
-					console.log('saldo',record.json.saldo)
 					meta.style=(record.json.saldo < 0)?'background:red; color:#fff;':'';
 					//meta.css = record.get('online') ? 'user-online' : 'user-offline';
 					resp = value;
@@ -1731,6 +1734,8 @@ fheight: '80%',
 	bdel:true,
 	bsave:true,
 	
+	
+	
 	oncellclick : function(grid, rowIndex, columnIndex, e) {
 		
      	var record = this.store.getAt(rowIndex),
@@ -1745,7 +1750,6 @@ fheight: '80%',
      cambiarRevision: function(record){
 		Phx.CP.loadingShow();
 	    var d = record.data
-	    console.log(d)
         Ext.Ajax.request({
             url:'../../sis_contabilidad/control/BancaCompraVenta/cambiarRevision',
             params:{ id_banca_compra_venta: d.id_banca_compra_venta,revisado:d.revisado},
@@ -1874,7 +1878,6 @@ fheight: '80%',
 			var rec = this.cmbPeriodo.getValue();
 			var tipo = this.tipoBan;
 
-			console.log(rec);
 
 
 
@@ -1932,12 +1935,9 @@ fheight: '80%',
 			//console.log(this.form.getForm().reset())
 			
 			this.monto_acumulado_aux=0;
-			console.log(resp);
 			var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 
-			console.log(objRes.datos);
 			for(var i=0; i<objRes.datos.length;i++){
-				console.log('dat',objRes.datos[i]);
 				this.monto_acumulado_aux = this.monto_acumulado_aux + objRes.datos[i].monto_acumulado
 			}
 			this.Cmp.monto_acumulado.setValue(this.monto_acumulado_aux);
@@ -1973,7 +1973,6 @@ fheight: '80%',
 		acumulado : function (){
 			
 			 var data = this.getSelectedData();
-			 console.log(data);
 			
 			
 			Phx.CP.loadWindows('../../../sis_contabilidad/vista/banca_compra_venta/Acumulado.php',
@@ -2083,7 +2082,6 @@ fheight: '80%',
     addListaNegra : function(){
     	
     	 var data = this.getSelectedData();
-    	 console.log(data.id_banca_compra_venta)
     	Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/agregarListarNegra',
 				params:{'id_banca_compra_venta':data.id_banca_compra_venta},
@@ -2161,7 +2159,6 @@ fheight: '80%',
 			var id_depto_conta = this.cmbDepto.getValue();
 			
 			var rec = this.sm.getSelected();
-			console.log(rec);
 			
 			var numero_tramite = rec.data.tramite_cuota;
 			
