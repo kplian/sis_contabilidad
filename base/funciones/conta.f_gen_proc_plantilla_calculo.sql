@@ -234,7 +234,14 @@ BEGIN
                    										     p_id_gestion, 
                                                              NULL, --id_tabla
                                                              v_record_int_tran.id_centro_costo);  --id_dento_costo
-               
+                                                             
+                                                             
+                    -- si la relacion contable tiene centro de costo unico, .... 
+                    -- OJO podria tener algun BUG
+                    if v_record_rel_con.ps_id_centro_costo is not null THEN
+                       v_record_int_tran.id_centro_costo = v_record_rel_con.ps_id_centro_costo;
+                    END IF;
+                    
                     
                     IF(v_record_rel_con.ps_id_cuenta is NULL) THEN
                        raise exception 'Revisar la ps_id_cuenta para la relacion contable:  % (%)',  v_record_rel_con.ps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;

@@ -181,7 +181,9 @@ BEGIN
             -------------------------------
             --   GENERAR PROCESO DEL WF
             -------------------------------
-        	IF va_id_int_cbte_fk is not null THEN
+            
+           -- raise exception 'sss ---  %  ',va_id_int_cbte_fk; 
+        	IF va_id_int_cbte_fk is not null and va_id_int_cbte_fk [1] is not null THEN
                 --  dispara proceso
                 -- si tiene  un cbte relacion recuperar el nro de tramite
                  select 
