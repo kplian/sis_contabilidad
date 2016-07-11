@@ -69,9 +69,9 @@ Phx.vista.RelacionContableGeneral = {
             this.Cmp.id_auxiliar.modificado = true;
             this.Cmp.id_auxiliar.reset();
             
-            this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
-            this.Cmp.id_partida.modificado = true;
-            this.Cmp.id_partida.reset();
+            //this.Cmp.id_partida.store.setBaseParam('id_cuenta',r.data.id_cuenta);
+            //this.Cmp.id_partida.modificado = true;
+            //this.Cmp.id_partida.reset();
             
             
         }, this);

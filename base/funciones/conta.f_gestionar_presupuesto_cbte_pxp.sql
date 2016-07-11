@@ -263,7 +263,8 @@ BEGIN
                                                    -- sino se tiene error almacenamos el id de la aprtida ejecucion
                                                    IF v_registros.id_partida_ejecucion is  NULL THEN 
                                                         update conta.tint_transaccion it set
-                                                           id_partida_ejecucion = v_resp_ges[2],  
+                                                           id_partida_ejecucion = v_resp_ges[2],
+                                                           id_partida_ejecucion_dev = v_resp_ges[2],  
                                                            fecha_mod = now(),
                                                            id_usuario_mod = p_id_usuario
                                                         where it.id_int_transaccion  =  v_registros.id_int_transaccion;

@@ -203,7 +203,7 @@ Phx.vista.RelacionContableTabla = {
 				       		if (r.length == 1 ) {	       				       				
 				    			this.Cmp.id_partida.setValue(r[0].data.id_partida);
 				    			this.Cmp.id_partida.collapse();
-				    			this.Cmp.id_cuenta.store.setBaseParam('id_partida', this.Cmp.id_partida.getValue());
+				    			//this.Cmp.id_cuenta.store.setBaseParam('id_partida', this.Cmp.id_partida.getValue());
 				    			//si se selecciona automaticamente la partida ya no se filtrara por cuenta ni por centro de costo
 				    			this.filtro_partida = 'si';
 				    			//si selecciona automaticamante la partida es necesario aplicar nuevo filtro al centro de costos
