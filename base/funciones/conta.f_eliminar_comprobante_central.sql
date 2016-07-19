@@ -10,13 +10,10 @@ CREATE OR REPLACE FUNCTION conta.f_eliminar_comprobante_central (
 RETURNS boolean AS
 $body$
 /*
-
 Autor: RAC KPLIAN
 Fecha:   6 junio de 2013
 Descripcion  Esta funcion retrocede el estado de los planes de pago cuando los comprobantes son eliminados
-
   
-
 */
 
 

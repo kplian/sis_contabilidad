@@ -705,7 +705,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		}, {
 			config : {
 				name : 'cbte_cierre',
-				qtip : 'Es un comprobante de cierre?',
+				qtip : 'Es un comprobante de cierre?,  en la mayoria de lso casos es No,<br>  solo utilice si es un comprobante de cierre de balance o de resultados',
 				fieldLabel : 'Cierre',
 				allowBlank : false,
 				gwidth : 80,
@@ -719,7 +719,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			type : 'ComboBox',
 			filters : {
-				pfiltro : 'incbte.incluir_cierre',
+				pfiltro : 'incbte.cbte_cierre',
 				type : 'string'
 			},
 			valorInicial : 'no',

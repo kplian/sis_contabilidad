@@ -358,7 +358,8 @@ BEGIN
                                  
                           
                           ELSIF  v_momento_aux='solo pagar'  THEN
-                          
+                                
+                                 -- raise exception 'entro ...';
                           
                                  -- si es solo pagar debemos identificar las transacciones del devengado 
                                  FOR  v_registros_dev in (
@@ -375,11 +376,11 @@ BEGIN
                                                                     it.id_partida_ejecucion_rev,
                                                                     p.codigo as codigo_partida,
                                                                     it.id_centro_costo as id_presupuesto,
-                                                                    p.id_partida
+                                                                    p.id_partida,
+                                                                    ic.nro_tramite
                                                                     
                                                                   from  conta.tint_rel_devengado ird
-                                                                  inner join conta.tint_transaccion it 
-                                                                    on it.id_int_transaccion = ird.id_int_transaccion_dev
+                                                                  inner join conta.tint_transaccion it  on it.id_int_transaccion = ird.id_int_transaccion_dev
                                                                   inner join pre.tpartida p on p.id_partida = it.id_partida 
                                                                   
                                                                   inner join conta.tint_comprobante ic on ic.id_int_comprobante = it.id_int_comprobante
@@ -441,7 +442,7 @@ BEGIN
                                                                                     v_registros_dev.id_partida_ejecucion_dev, 
                                                                                     'id_int_rel_devengado', 
                                                                                     v_registros_dev.id_int_rel_devengado,--p_fk_llave, 
-                                                                                    v_registros_comprobante.nro_tramite, 
+                                                                                    v_registros_dev.nro_tramite,   --nro de tramite del devengado
                                                                                     p_id_int_comprobante, 
                                                                                     v_registros_comprobante.momento_comprometido, 
                                                                                     v_registros_comprobante.momento_ejecutado, 

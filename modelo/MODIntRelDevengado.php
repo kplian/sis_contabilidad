@@ -43,12 +43,14 @@ class MODIntRelDevengado extends MODbase{
 		$this->captura('desc_centro_costo_dev','TEXT');
 		$this->captura('desc_orden_dev','VARCHAR');
 		$this->captura('importe_debe_dev','NUMERIC');
+		$this->captura('importe_haber_dev','NUMERIC');
 		
 		$this->captura('desc_cuenta_pag','TEXT');
 		$this->captura('desc_partida_pag','TEXT');
 		$this->captura('desc_centro_costo_pag','TEXT');
 		$this->captura('desc_orden_pag','VARCHAR');
 		$this->captura('importe_debe_pag','NUMERIC');
+		$this->captura('importe_haber_pag','NUMERIC');
 		
 		$this->captura('id_cuenta_dev','INTEGER');
 		$this->captura('id_orden_trabajo_dev','INTEGER');

@@ -41,6 +41,7 @@ DECLARE
     v_monto_total_x_pagar	numeric;
     v_monto_total_devengado	numeric;
     va_montos  				numeric[];
+    v_registros_dev			record;
 			    
 BEGIN
 
@@ -71,6 +72,20 @@ BEGIN
             inner join conta.tint_transaccion it on it.id_int_comprobante = ic.id_int_comprobante
             where it.id_int_transaccion = v_parametros.id_int_transaccion_pag;
             
+            
+            --datos del devengado
+             select 
+             ic.*,
+             it.importe_debe,
+             it.importe_haber,
+             it.tipo_cambio as tipo_cambio_t,
+             it.tipo_cambio_2 as tipo_cambio_2_t,
+             it.id_moneda as id_moneda_t
+            into
+             v_registros_dev
+            from conta.tint_comprobante ic
+            inner join conta.tint_transaccion it on it.id_int_comprobante = ic.id_int_comprobante
+            where it.id_int_transaccion = v_parametros.id_int_transaccion_dev;
             
             
             IF v_registros.estado_reg = 'validado' THEN
@@ -123,13 +138,22 @@ BEGIN
            and rd.estado_reg = 'activo'; 
            
            
+           IF v_registros.importe_haber = 0 and (v_registros_dev.importe_haber <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           END IF;
+           
+           
+           IF v_registros.importe_debe = 0 and (v_registros_dev.importe_debe <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           END IF;
+           
            IF v_registros.importe_haber = 0 and (v_registros.importe_debe <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_registros.importe_debe, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
            END IF;
            
            
            IF v_registros.importe_debe = 0 and (v_registros.importe_haber <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_registros.importe_haber, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
            END IF;
            
            
@@ -203,6 +227,21 @@ BEGIN
             inner join conta.tint_transaccion it on it.id_int_comprobante = ic.id_int_comprobante
             where it.id_int_transaccion = v_parametros.id_int_transaccion_pag;
             
+            
+            --datos del devengado
+             select 
+             ic.*,
+             it.importe_debe,
+             it.importe_haber,
+             it.tipo_cambio as tipo_cambio_t,
+             it.tipo_cambio_2 as tipo_cambio_2_t,
+             it.id_moneda as id_moneda_t
+            into
+             v_registros_dev
+            from conta.tint_comprobante ic
+            inner join conta.tint_transaccion it on it.id_int_comprobante = ic.id_int_comprobante
+            where it.id_int_transaccion = v_parametros.id_int_transaccion_dev;
+            
             --validacion de comprobante editable
             IF v_registros.sw_editable = 'no' THEN
               raise exception 'no puede insertar relaciones en comprobantes no editables';  
@@ -233,14 +272,26 @@ BEGIN
            
            
            
-           IF v_registros.importe_haber = 0 and (v_registros.importe_debe <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_registros.importe_debe, (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago);
+           IF v_registros.importe_haber = 0 and (v_registros_dev.importe_haber <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago);
            END IF; 
            
            
-           IF v_registros.importe_debe = 0 and (v_registros.importe_haber <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
-              raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_registros.importe_haber, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           IF v_registros.importe_debe = 0 and (v_registros_dev.importe_debe <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
+              raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           END IF; 
+           
+           
+           IF v_registros.importe_haber = 0 and (v_registros.importe_debe <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
+             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago);
+           END IF; 
+           
+           
+           IF v_registros.importe_debe = 0 and (v_registros_dev.importe_haber <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
+              raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
            END IF;  
+           
+           
             
             
             -- Obtener la moneda base

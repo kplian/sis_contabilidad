@@ -30,6 +30,20 @@ class ACTIntTransaccion extends ACTbase{
 			$this->objParam->addFiltro("transa.importe_haber > 0 ");	
 		}
 		
+		if($this->objParam->getParametro('solo_gasto_recurso') == 'si'){
+			$this->objParam->addFiltro("par.tipo in (''recurso'',''gasto'')");	
+		}
+		
+		if($this->objParam->getParametro('pres_gasto_recurso') == 'si'){
+			$this->objParam->addFiltro("cc.movimiento_tipo_pres in (''gasto'',''recurso'')");	
+		}
+
+         if($this->objParam->getParametro('pres_adm') == 'si'){
+			$this->objParam->addFiltro("cc.movimiento_tipo_pres in (''administrativo'')");	
+		}
+
+		
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarIntTransaccion');

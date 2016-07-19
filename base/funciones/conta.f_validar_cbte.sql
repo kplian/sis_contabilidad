@@ -405,6 +405,7 @@ BEGIN
           --  Si es solo un cbte de pago  validar la relacion con el devengado
           ----------------------------------------------------------------------
           --TODO analizar el caso de cbte de pago que se revierten
+          --TODO analizar, cosnidera todas las transcciones que afecten bancos
            
           IF v_rec_cbte.sw_editable = 'si' and v_rec_cbte.momento_comprometido = 'no'  and  v_rec_cbte.momento_ejecutado = 'no'  and    v_rec_cbte.momento_pagado = 'si'  THEN   
              v_sw_rel = TRUE;
@@ -427,11 +428,11 @@ BEGIN
                
               
                                   IF v_registros.total < v_registros.importe_debe_pag and v_registros.importe_haber_pag = 0   THEN
-                                    raise exception 'El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_debe_pag;
+                                    raise exception 'a) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_debe_pag;
                                   END IF;
                                   
                                   IF v_registros.total < v_registros.importe_haber_pag and v_registros.importe_debe_pag = 0   THEN
-                                    raise exception 'El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_haber_pag;
+                                    raise exception 'b) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_haber_pag;
                                   END IF;
                                   
                                   v_sw_rel = FALSE;
@@ -446,12 +447,12 @@ BEGIN
           END IF;
           
          
-            
+           
          ----------------------------------------------------------------------------------- 
          -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
          ----------------------------------------------------------------------------------------
            
-         IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+         IF v_rec_cbte.id_plantilla_comprobante is not null  THEN
            
                 select 
                  pc.funcion_comprobante_validado
@@ -460,19 +461,21 @@ BEGIN
                 where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
                 
                 
+                -- raise exception 'llega % ---', v_funcion_comprobante_validado;
+                
                 -- raise exception 'validar comprobante pxp %',v_funcion_comprobante_validado ;
-              	 
-                EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
-                                   
-         ELSE
+              	 IF  v_funcion_comprobante_validado is not null and v_funcion_comprobante_validado != '' THEN
+                    EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+                end IF;                   
+          ELSE
                 -- si no tenemos plantilla de comprobante revisamos la funcin directamente	          
-                IF v_rec_cbte.funcion_comprobante_validado is not NULL THEN
+                IF v_rec_cbte.funcion_comprobante_validado is not NULL and v_rec_cbte.funcion_comprobante_validado != '' THEN
                    EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
                 END IF;
            
          END IF;
            
-           
+        
           
          --------------------------------------------------
          -- Validaciones sobre el cbte y sus transacciones
@@ -521,10 +524,12 @@ BEGIN
              IF v_sincronizar = 'true' THEN
                 v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
              ELSE
+            
                 v_resp =  conta.f_gestionar_presupuesto_cbte_pxp(p_id_usuario, p_id_int_comprobante, 'no', p_fecha_ejecucion, v_nombre_conexion);
              END IF;
          END IF;
          
+        
          
          -------------------------------------------------- 
          --10.cerrar conexiones dblink si es que existe 
