@@ -29,6 +29,19 @@ class ACTDocCompraVentaForm extends ACTbase{
 		
     }
 	
+	function recuperarDatosErpEndensisLCV(){    	
+		$this->objFunc = $this->create('MODDocCompraVenta');
+		$cbteHeader = $this->objFunc->listarRepLCVFormErpEndesis($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){				
+			return $cbteHeader;
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}              
+		
+    }
+	
 	function recuperarDatosEntidad(){    	
 		$this->objFunc = $this->create('sis_parametros/MODEntidad');
 		$cbteHeader = $this->objFunc->getEntidad($this->objParam);
@@ -62,7 +75,11 @@ class ACTDocCompraVentaForm extends ACTbase{
 		if($this->objParam->getParametro('formato_reporte')=='pdf'){
 			
 			$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
-			$dataSource = $this->recuperarDatosLCV();
+			if($this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
+				$dataSource = $this->recuperarDatosErpEndensisLCV();
+			}else{
+				$dataSource = $this->recuperarDatosLCV();
+			}
 			$dataEntidad = $this->recuperarDatosEntidad();
 			$dataPeriodo = $this->recuperarDatosPeriodo();	
 			

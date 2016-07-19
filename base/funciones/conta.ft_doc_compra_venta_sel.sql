@@ -423,6 +423,105 @@ BEGIN
 						
 		end;				
 	
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_REPLCV_ENDESIS_ERP'
+ 	#DESCRIPCION:	listado consolidado para reporte de libro de compras y ventas  desde formulario, tanto del endesis como del erp
+ 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	ELSEIF(p_transaccion='CONTA_REPLCV_ENDERP')then
+     				
+    	begin
+        
+           IF v_parametros.filtro_sql = 'periodo'  THEN           
+               v_filtro =  ' (lcv.id_periodo = '||v_parametros.id_periodo||')  ';           
+           ELSE
+               v_filtro =  ' (lcv.fecha::Date between '''||v_parametros.fecha_ini||'''::Date  and '''||v_parametros.fecha_fin||'''::date)  ';
+           END IF;
+           
+           
+          IF v_parametros.tipo_lcv = 'lcv_compras' or v_parametros.tipo_lcv='endesis_erp' THEN
+              v_tipo = 'compra';
+          ELSE
+              v_tipo = 'venta';
+          END IF;
+          
+          --Sentencia de la consulta
+		  v_consulta:='SELECT id_doc_compra_venta::BIGINT,
+                               tipo::Varchar,
+                               fecha::date,
+                               nit::varchar,
+                               razon_social::Varchar,
+                               COALESCE(nro_documento::varchar, ''0'')::Varchar,
+                               COALESCE(nro_dui::varchar, ''0'')::Varchar,
+                               nro_autorizacion::Varchar,
+                               importe_doc::numeric,
+                               total_excento::numeric,
+                               sujeto_cf::numeric,
+                               importe_descuento::numeric,
+                               subtotal::numeric,
+                               credito_fiscal::numeric,
+                               importe_iva::numeric,
+                               codigo_control::varchar,
+                               tipo_doc::varchar,
+                               id_plantilla::integer,
+                               id_moneda::integer,
+                               codigo_moneda::Varchar,
+                               id_periodo::integer,
+                               id_gestion::integer,
+                               periodo::integer,
+                               gestion::integer,
+                               venta_gravada_cero::numeric,
+                               subtotal_venta::numeric,
+                               sujeto_df::numeric,
+                               importe_ice::numeric,
+                               importe_excento::numeric
+                        FROM conta.tlcv_endesis lcv
+                        where  lcv.tipo = '''||v_tipo||'''
+                               and id_moneda = '||param.f_get_moneda_base()||'
+                               and '||v_filtro||'
+                        UNION ALL
+                        SELECT id_doc_compra_venta::BIGINT,
+                               tipo::Varchar,
+                               fecha::date,
+                               nit::varchar,
+                               razon_social::Varchar,
+                               COALESCE(nro_documento::varchar, ''0'')::Varchar,
+                               COALESCE(nro_dui::varchar, ''0'')::Varchar,
+                               nro_autorizacion::Varchar,
+                               importe_doc::numeric,
+                               total_excento::numeric,
+                               sujeto_cf::numeric,
+                               importe_descuento::numeric,
+                               subtotal::numeric,
+                               credito_fiscal::numeric,
+                               importe_iva::numeric,
+                               codigo_control::varchar,
+                               tipo_doc::varchar,
+                               id_plantilla::integer,
+                               id_moneda::integer,
+                               codigo_moneda::Varchar,
+                               id_periodo::integer,
+                               id_gestion::integer,
+                               periodo::integer,
+                               gestion::integer,
+                               venta_gravada_cero::numeric,
+                               subtotal_venta::numeric,
+                               sujeto_df::numeric,
+                               importe_ice::numeric,
+                               importe_excento::numeric
+                        FROM conta.vlcv lcv
+                        where  lcv.tipo = '''||v_tipo||'''
+                               and id_moneda = '||param.f_get_moneda_base()||'
+                               and '||v_filtro||'
+                        order by fecha';
+			
+			raise notice '%', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;				
     
     
     else
