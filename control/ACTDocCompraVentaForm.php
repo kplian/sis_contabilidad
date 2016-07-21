@@ -98,7 +98,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 			
 			
 			//Instancia la clase de pdf
-		    if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){
+		    if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
 			
 		       $reporte = new RLcv($this->objParam);  
 		    }
