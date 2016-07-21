@@ -73,10 +73,10 @@ header("content-type: text/javascript; charset=UTF-8");
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
 	        	data :	[
-	        	        ['lcv_compras','Libro de Compras Estandar'],
+						['endesis_erp','Libro de Compras Estandar'],
+	        	        //['lcv_compras','Libro de Compras Estandar'],
 	        	        ['lcv_ventas','Libro de Ventas Estandar'],	
-						['LCNCD','Libro de Compras NCD'],
-						['endesis_erp','Libro de Compras Consolidado ERP Endesis']						
+						['LCNCD','Libro de Compras NCD']					
 						]	        				
 	    		}),
 				valueField:'ID',
