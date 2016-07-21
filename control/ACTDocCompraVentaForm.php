@@ -129,7 +129,11 @@ class ACTDocCompraVentaForm extends ACTbase{
 		//crea el objetoFunProcesoMacro que contiene todos los metodos del sistema de workflow
 		$this->objFun=$this->create('MODDocCompraVenta');		
 		
-		$this->res = $this->objFun->listarRepLCVForm();
+		if($this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
+			$this->res = $this->objFun->listarRepLCVFormErpEndesis();
+		}else{
+			$this->res = $this->objFun->listarRepLCVForm();
+		}
 		
 		if($this->res->getTipo()=='ERROR'){
 			$this->res->imprimirRespuesta($this->res->generarJson());
@@ -185,7 +189,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 			$sufijo=$this->objParam->getParametro('fecha_ini').'_'.$this->objParam->getParametro('fecha_fin');
 		}
 		
-		if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){			
+		if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'){			
 			 $nombre = 'compras_'.$sufijo.'_'.$NIT;
 		}
 		else{
@@ -216,7 +220,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 		if($this->objParam->getParametro('formato_reporte') !='txt')
 		{
 			
-			if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){
+			if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
 			 	
 					fwrite ($file,  "-".$separador.
 				 	                'N#'.$separador.
@@ -265,7 +269,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 		foreach ($data as $val) {			
 			
 			 $newDate = date("d/m/Y", strtotime( $val['fecha']));			 
-			 if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){
+			 if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
 						
 					
 					fwrite ($file,  "1".$separador.
