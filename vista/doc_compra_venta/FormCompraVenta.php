@@ -316,8 +316,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     },
     
     cargarDatosMaestro: function(){
-    	
-        
+	
         this.detCmp.id_orden_trabajo.store.baseParams.fecha_solicitud = this.Cmp.fecha.getValue().dateFormat('d/m/Y');
         this.detCmp.id_orden_trabajo.modificado = true;
         
@@ -1087,7 +1086,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					name: 'razon_social',
 					fieldLabel: 'Razón Social',
 					allowBlank: false,
-					maskRe: /[A-Za-z0-9 &-.]/,
+					maskRe: /[A-Za-z0-9 &-. ñ Ñ]/,
 	                fieldStyle: 'text-transform:uppercase',
 	                listeners:{
 				          'change': function(field, newValue, oldValue){
@@ -1668,7 +1667,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
         this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
         
-        
+        if(this.Cmp.id_plantilla.value == 25)
+			this.Cmp.importe_neto.setValue(this.Cmp.importe_neto.getValue() * 0.7);  
      }, 
 	
 	getDetallePorAplicar:function(id_plantilla){
@@ -1776,6 +1776,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     onEdit:function(){
         this.Cmp.nit.modificado = true;
  	    this.Cmp.nro_autorizacion.modificado = true;
+		this.Cmp.fecha.setReadOnly(false);
     	this.accionFormulario = 'EDIT';
     	
     	this.loadForm(this.data.datosOriginales);
@@ -1787,6 +1788,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.id_depto_conta.setValue(this.data.id_depto);
         this.Cmp.id_gestion.setValue(this.data.id_gestion);
         this.Cmp.tipo.setValue(this.data.tipoDoc); 
+		this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
         //load detalle de conceptos
         if(this.regitrarDetalle == 'si'){
 	        this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
