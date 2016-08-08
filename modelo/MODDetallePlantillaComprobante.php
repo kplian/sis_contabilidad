@@ -72,6 +72,11 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('campo_forma_pago','varchar');
 		$this->captura('codigo','varchar');
 		
+		$this->captura('tipo_relacion_contable_cc','varchar');
+		$this->captura('campo_relacion_contable_cc','text');
+		
+		
+		
 		
 		
 	
@@ -134,6 +139,9 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_forma_pago','campo_forma_pago','varchar');
 		$this->setParametro('codigo','codigo','varchar');
 		
+		$this->setParametro('tipo_relacion_contable_cc','tipo_relacion_contable_cc','varchar');
+		$this->setParametro('campo_relacion_contable_cc','campo_relacion_contable_cc','varchar');
+		
 		
         
 
@@ -194,6 +202,10 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_orden_trabajo','campo_orden_trabajo','varchar');
         $this->setParametro('campo_forma_pago','campo_forma_pago','varchar');
 		$this->setParametro('codigo','codigo','varchar');
+		
+		$this->setParametro('tipo_relacion_contable_cc','tipo_relacion_contable_cc','varchar');
+		$this->setParametro('campo_relacion_contable_cc','campo_relacion_contable_cc','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

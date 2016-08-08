@@ -93,7 +93,10 @@ BEGIN
                             cmpbdet.prioridad_documento,
                             cmpbdet.campo_orden_trabajo,
                             cmpbdet.campo_forma_pago,
-                            cmpbdet.codigo
+                            cmpbdet.codigo,
+                            cmpbdet.tipo_relacion_contable_cc,
+                            cmpbdet.campo_relacion_contable_cc
+                            
                         
 						from conta.tdetalle_plantilla_comprobante cmpbdet
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg

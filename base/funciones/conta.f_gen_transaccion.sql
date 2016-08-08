@@ -44,7 +44,7 @@ BEGIN
     v_nombre_funcion:='conta.f_gen_transaccion';
     
     --  FOR leer la plantillas de transaccion primarias
-    
+   
     
  	IF p_primario = 'si' THEN
      
@@ -81,8 +81,7 @@ BEGIN
             
             
             
-            
-            
+             
             
             END LOOP;
    ELSE
