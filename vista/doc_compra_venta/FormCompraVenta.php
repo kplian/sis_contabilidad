@@ -1668,7 +1668,11 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
         
         if(this.Cmp.id_plantilla.value == 25)
-			this.Cmp.importe_neto.setValue(this.Cmp.importe_neto.getValue() * 0.7);  
+			this.Cmp.importe_neto.setValue(this.Cmp.importe_neto.getValue() * 0.7);
+		else if (this.Cmp.id_plantilla.value == 4)
+				this.Cmp.importe_neto.setValue(0);
+			else
+				this.Cmp.importe_neto.setValue(this.Cmp.importe_doc.getValue() -  this.Cmp.importe_descuento.getValue() - this.Cmp.importe_excento.getValue());
      }, 
 	
 	getDetallePorAplicar:function(id_plantilla){

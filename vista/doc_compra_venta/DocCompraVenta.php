@@ -211,6 +211,20 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	            form: false
 	       },
 		   {
+				config:{
+					name: 'id_int_comprobante',
+					fieldLabel: 'Id Int Comprobante',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:100
+				},
+					type:'TextField',
+					id_grupo:0,
+					grid:true,
+					form:false
+			},
+		   {
 	            config:{
 	                name: 'id_plantilla',
 	                fieldLabel: 'Tipo Documento',
