@@ -224,6 +224,22 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					grid:true,
 					form:false
 			},
+			{
+				config:{
+					name: 'nro_tramite',
+					fieldLabel: 'Nro Tramite',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:100
+				},
+					type:'TextField',
+					filters:{pfiltro:'ic.nro_tramite',type:'string'},
+					id_grupo:0,
+					grid:true,
+					bottom_filter: true,
+					form:false
+			},
 		   {
 	            config:{
 	                name: 'id_plantilla',
@@ -1242,7 +1258,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'desc_depto','desc_plantilla',
 		'importe_descuento_ley',
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
-		'desc_tipo_doc_compra_venta','id_tipo_doc_compra_venta',
+		'desc_tipo_doc_compra_venta','id_tipo_doc_compra_venta','nro_tramite',
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg'
 		
 	],

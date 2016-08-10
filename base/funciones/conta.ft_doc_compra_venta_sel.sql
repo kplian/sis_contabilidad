@@ -95,6 +95,7 @@ BEGIN
                             dcv.id_moneda,
                             mon.codigo as desc_moneda,
                             dcv.id_int_comprobante,
+							ic.nro_tramite,
                             COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
                             COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
                             COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,

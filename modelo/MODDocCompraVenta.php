@@ -78,6 +78,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('id_moneda','int4');
 		$this->captura('desc_moneda','varchar');
 		$this->captura('id_int_comprobante','int4');
+		$this->captura('nro_tramite','varchar');
 		$this->captura('desc_comprobante','varchar');
 		
 		
