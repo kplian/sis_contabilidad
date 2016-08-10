@@ -1361,8 +1361,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
      preparaMenu:function(tb){
         Phx.vista.DocCompraVenta.superclass.preparaMenu.call(this,tb)
         var data = this.getSelectedData();
-        if(data['revisado'] ==  'si' || data['id_int_comprobante'] > 0 || data.tipo_reg == 'summary' || data.tabla_origen !='ninguno'){
-             
+        //if(data['revisado'] ==  'si' || data['id_int_comprobante'] > 0 || data.tipo_reg == 'summary' || data.tabla_origen !='ninguno'){
+        if(data['revisado'] ==  'si' || data.tipo_reg == 'summary'){
              this.getBoton('edit').disable();
              this.getBoton('del').disable();
          
