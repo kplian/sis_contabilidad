@@ -118,7 +118,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					fieldLabel: 'Revisado',
 					allowBlank: true,
 					anchor: '80%',
-					gwidth: 100,
+					gwidth: 80,
 					maxLength:3,
 	                renderer: function (value, p, record, rowIndex, colIndex){  
 	                	     
@@ -146,100 +146,313 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				grid: true,
 				form: false
 			},
-			{
+	        {
 	            config:{
-	                name: 'id_tipo_doc_compra_venta',
-	                fieldLabel: (me.tipoDoc == 'compra')?'Tipo Compra':'Estado',
+	                name: 'nit',
+	                fieldLabel: 'NIT',
+	                qtip: 'Número de indentificación del proveedor',
 	                allowBlank: false,
-	                emptyText:'tipo...',
-	                store: new Ext.data.JsonStore({
-	                    url: '../../sis_contabilidad/control/TipoDocCompraVenta/listarTipoDocCompraVenta',
-	                    id: 'id_tipo_doc_compra_venta',
-	                    root: 'datos',
-	                    sortInfo: {
-	                        field: 'id_tipo_doc_compra_venta',
-	                        direction: 'ASC'
+	                emptyText:'nit ...',
+	                store:new Ext.data.JsonStore(
+	                {
+	                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroNit',
+	                    id: 'nit',
+	                    root:'datos',
+	                    sortInfo:{
+	                        field:'nit',
+	                        direction:'ASC'
 	                    },
-	                    totalProperty: 'total',
-	                    fields: ['id_tipo_doc_compra_venta','codigo','nombre','obs','tipo'],
-	                    remoteSort: true,
-	                    baseParams: { par_filtro:'nombre',tipo: me.tipoDoc}
+	                    totalProperty:'total',
+	                    fields: ['nit','razon_social'],
+	                    remoteSort: true
 	                }),
-	                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo} - {nombre}</p></div></tpl>',
-	                valueField: 'id_tipo_doc_compra_venta',
-	                hiddenName: 'id_tipo_doc_compra_venta',
-	                editable : false,
-	                displayField: 'nombre',
-	                gdisplayField: 'desc_tipo_doc_compra_venta',
-	                listWidth: '280',
-	                forceSelection: true,
-	                typeAhead:  false,
-	                triggerAction: 'all',
-	                lazyRender: true,
-	                mode: 'remote',
-	                pageSize: 20,
-	                queryDelay: 500,
-	               
-	                gwidth: (me.tipoDoc == 'compra')?250:100,
-	                minChars:2,
-	                renderer: function (value, p, record){
-		                	return String.format('{0}', record.data['desc_tipo_doc_compra_venta']);
-	                	
-	                	}
+	                valueField: 'nit',
+	                hiddenValue: 'nit',
+	                displayField: 'nit',
+	                gdisplayField:'nit',
+	                queryParam: 'nit',
+	                listWidth:'280',
+	                forceSelection:false,
+	                autoSelect: false,
+	                typeAhead: false,
+	                typeAheadDelay: 75,
+	                hideTrigger:true,
+	                triggerAction: 'query',
+	                lazyRender:false,
+	                mode:'remote',
+	                pageSize:20,
+	                queryDelay:500,
+	                gwidth: 100,
+	                minChars:1
 	            },
 	            type:'ComboBox',
-	            filters:{pfiltro:'tdcv.nombre',type:'string'},
+	            filters:{pfiltro:'dcv.nit',type:'string'},
 	            id_grupo: 0,
-	            egrid: true,
 	            grid: true,
 	            bottom_filter: true,
 	            form: false
-	        },
-			
+	        },			
 			{
-	            config:{
-	                name: 'desc_comprobante',
-	                fieldLabel: 'Cbte',
-	                allowBlank: false,
-	                gwidth: 100
-	            },
-	            type:'Field',
-	            filters:{ pfiltro:'ic.id_int_comprobante#ic.nro_cbte', type:'string'},
-	            id_grupo: 0,
-	            grid: true,
-	            //bottom_filter: true,
-	            form: false
-	       },
-		   {
 				config:{
-					name: 'id_int_comprobante',
-					fieldLabel: 'Id Int Comprobante',
+					name: 'nro_documento',
+					fieldLabel: 'Nro Doc',
 					allowBlank: false,
 					anchor: '80%',
 					gwidth: 100,
 					maxLength:100
 				},
 					type:'TextField',
-					id_grupo:0,
-					grid:true,
-					form:false
-			},
-			{
-				config:{
-					name: 'nro_tramite',
-					fieldLabel: 'Nro Tramite',
-					allowBlank: false,
-					anchor: '80%',
-					gwidth: 100,
-					maxLength:100
-				},
-					type:'TextField',
-					filters:{pfiltro:'ic.nro_tramite',type:'string'},
+					filters:{pfiltro:'dcv.nro_documento',type:'string'},
 					id_grupo:0,
 					grid:true,
 					bottom_filter: true,
 					form:false
+			},			
+	        {
+	            config:{
+	                name: 'nro_autorizacion',
+	                fieldLabel: 'Autorización',
+	                allowBlank: false,
+	                emptyText:'autorización ...',
+	                store:new Ext.data.JsonStore(
+	                {
+	                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroAutorizacion',
+	                    id: 'nro_autorizacion',
+	                    root:'datos',
+	                    sortInfo:{
+	                        field:'nro_autorizacion',
+	                        direction:'ASC'
+	                    },
+	                    totalProperty:'total',
+	                    fields: ['nro_autorizacion','nit','razon_social'],
+	                    remoteSort: true
+	                }),
+	                valueField: 'nro_autorizacion',
+	                hiddenValue: 'nro_autorizacion',
+	                displayField: 'nro_autorizacion',
+	                gdisplayField:'nro_autorizacion',
+	                queryParam: 'nro_autorizacion',
+	                listWidth:'280',
+	                forceSelection:false,
+	                autoSelect: false,
+	                hideTrigger:true,
+	                typeAhead: false,
+	                typeAheadDelay: 75,
+	                //triggerAction: 'query',
+	                lazyRender:false,
+	                mode:'remote',
+	                pageSize:20,
+	                queryDelay:500,
+	                gwidth: 150,
+	                minChars:1
+	            },
+	            type:'ComboBox',
+	            filters:{pfiltro:'dcv.nro_autorizacion',type:'string'},
+	            id_grupo: 0,
+	            grid: true,
+	            bottom_filter: true,
+	            form: false
+	        },			
+			{
+				config:{
+					name: 'fecha',
+					fieldLabel: 'Fecha',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					format: 'd/m/Y',
+					readOnly:true,
+					renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				},
+					type:'DateField',
+					filters:{pfiltro:'dcv.fecha',type:'date'},
+					id_grupo:0,
+					grid:true,
+					form:false
 			},
+			{
+				config:{
+					name: 'razon_social',
+					fieldLabel: 'Razón Social',
+					allowBlank: false,
+					maskRe: /[A-Za-z0-9 ]/,
+	                fieldStyle: 'text-transform:uppercase',
+	                listeners:{
+				          'change': function(field, newValue, oldValue){
+				          			  console.log('keyup ...  ')
+				          			  field.suspendEvents(true);
+				                      field.setValue(newValue.toUpperCase());
+				                      field.resumeEvents(true);
+				                  }
+				     },
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:180
+				},
+					type:'TextField',
+					filters:{pfiltro:'dcv.razon_social',type:'string'},
+					id_grupo:0,
+					grid:true,
+					bottom_filter: true,
+					form:false
+			},			
+			{
+				config:{
+					name: 'codigo_control',
+					fieldLabel: 'Código de Control',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:200
+				},
+					type:'TextField',
+					filters:{pfiltro:'dcv.codigo_control',type:'string'},
+					id_grupo:0,
+					grid:true,
+					form:false
+			},			
+			{
+				config:{
+					name: 'importe_doc',
+					fieldLabel: 'Monto',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 80,
+					maxLength:1179650,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', value);
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', value);
+						}
+						
+					}
+				},
+					type:'NumberField',
+					filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
+					id_grupo:1,
+					grid:true,
+					form:false
+			},			
+			{
+				config:{
+					name: 'importe_excento',
+					fieldLabel: 'Excento',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', value);
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', value);
+						}
+						
+					}
+				},
+					type: 'NumberField',
+					filters: {pfiltro:'dcv.importe_excento',type:'numeric'},
+					id_grupo:1,
+					grid: true,
+					form: false
+			},			
+			{
+				config:{
+					name: 'importe_descuento',
+					fieldLabel: 'Descuento',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', value);
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', value);
+						}
+						
+					}
+				},
+					type:'NumberField',
+					filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
+					id_grupo:1,
+					grid:true,
+					form:false
+			},
+			{
+				config:{
+					name: 'importe_neto',
+					fieldLabel: 'Neto',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:1179650,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', value);
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', value);
+						}
+						
+					}
+				},
+					type:'NumberField',
+					filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
+					id_grupo:1,
+					grid:true,
+					form:false
+			},			
+			{
+				config:{
+					name: 'importe_iva',
+					fieldLabel: 'IVA',
+					allowBlank: true,
+					readOnly:true,
+					anchor: '80%',
+					gwidth: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', value);
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', value);
+						}
+						
+					}
+				},
+					type: 'NumberField',
+					filters: { pfiltro:'dcv.importe_iva',type:'numeric'},
+					id_grupo: 1,
+					grid: true,
+					form: false
+			},			
+			{
+				config:{
+					name: 'importe_pago_liquido',
+					fieldLabel: 'Liquido Pagado',
+					allowBlank: true,
+					readOnly:true,
+					anchor: '80%',
+					gwidth: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', value);
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', value);
+						}
+						
+					}
+				},
+					type:'NumberField',
+					filters:{pfiltro:'dcv.importe_pago_liquido',type:'numeric'},
+					id_grupo:1,
+					grid:true,
+					form: false
+			},			
 		   {
 	            config:{
 	                name: 'id_plantilla',
@@ -293,7 +506,100 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	            bottom_filter: true,
 	            form: false
 	        },
+			{
+	            config:{
+	                name: 'id_tipo_doc_compra_venta',
+	                fieldLabel: (me.tipoDoc == 'compra')?'Tipo Compra':'Estado',
+	                allowBlank: false,
+	                emptyText:'tipo...',
+	                store: new Ext.data.JsonStore({
+	                    url: '../../sis_contabilidad/control/TipoDocCompraVenta/listarTipoDocCompraVenta',
+	                    id: 'id_tipo_doc_compra_venta',
+	                    root: 'datos',
+	                    sortInfo: {
+	                        field: 'id_tipo_doc_compra_venta',
+	                        direction: 'ASC'
+	                    },
+	                    totalProperty: 'total',
+	                    fields: ['id_tipo_doc_compra_venta','codigo','nombre','obs','tipo'],
+	                    remoteSort: true,
+	                    baseParams: { par_filtro:'nombre',tipo: me.tipoDoc}
+	                }),
+	                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo} - {nombre}</p></div></tpl>',
+	                valueField: 'id_tipo_doc_compra_venta',
+	                hiddenName: 'id_tipo_doc_compra_venta',
+	                editable : false,
+	                displayField: 'nombre',
+	                gdisplayField: 'desc_tipo_doc_compra_venta',
+	                listWidth: '280',
+	                forceSelection: true,
+	                typeAhead:  false,
+	                triggerAction: 'all',
+	                lazyRender: true,
+	                mode: 'remote',
+	                pageSize: 20,
+	                queryDelay: 500,
+	               
+	                gwidth: (me.tipoDoc == 'compra')?250:100,
+	                minChars:2,
+	                renderer: function (value, p, record){
+		                	return String.format('{0}', record.data['desc_tipo_doc_compra_venta']);
+	                	
+	                	}
+	            },
+	            type:'ComboBox',
+	            filters:{pfiltro:'tdcv.nombre',type:'string'},
+	            id_grupo: 1,
+	            egrid: true,
+	            grid: true,
+	            bottom_filter: true,
+	            form: false
+	        },
 			
+			{
+	            config:{
+	                name: 'desc_comprobante',
+	                fieldLabel: 'Cbte',
+	                allowBlank: false,
+	                gwidth: 100
+	            },
+	            type:'Field',
+	            filters:{ pfiltro:'ic.id_int_comprobante#ic.nro_cbte', type:'string'},
+	            id_grupo: 0,
+	            grid: true,
+	            //bottom_filter: true,
+	            form: false
+	       },
+		   {
+				config:{
+					name: 'id_int_comprobante',
+					fieldLabel: 'Id Int Comprobante',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:100
+				},
+					type:'TextField',
+					id_grupo:0,
+					grid:true,
+					form:false
+			},
+			{
+				config:{
+					name: 'nro_tramite',
+					fieldLabel: 'Nro Tramite',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:100
+				},
+					type:'TextField',
+					filters:{pfiltro:'ic.nro_tramite',type:'string'},
+					id_grupo:0,
+					grid:true,
+					bottom_filter: true,
+					form:false
+			},			
 	        {
 	            config:{
 	                name:'id_moneda',
@@ -331,161 +637,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					id_grupo:0,
 					grid:false,
 					form: false
-			},
-			
-			{
-				config:{
-					name: 'fecha',
-					fieldLabel: 'Fecha',
-					allowBlank: false,
-					anchor: '80%',
-					gwidth: 100,
-					format: 'd/m/Y',
-					readOnly:true,
-					renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-				},
-					type:'DateField',
-					filters:{pfiltro:'dcv.fecha',type:'date'},
-					id_grupo:0,
-					grid:true,
-					form:false
-			},
-	        {
-	            config:{
-	                name: 'nro_autorizacion',
-	                fieldLabel: 'Autorización',
-	                allowBlank: false,
-	                emptyText:'autorización ...',
-	                store:new Ext.data.JsonStore(
-	                {
-	                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroAutorizacion',
-	                    id: 'nro_autorizacion',
-	                    root:'datos',
-	                    sortInfo:{
-	                        field:'nro_autorizacion',
-	                        direction:'ASC'
-	                    },
-	                    totalProperty:'total',
-	                    fields: ['nro_autorizacion','nit','razon_social'],
-	                    remoteSort: true
-	                }),
-	                valueField: 'nro_autorizacion',
-	                hiddenValue: 'nro_autorizacion',
-	                displayField: 'nro_autorizacion',
-	                gdisplayField:'nro_autorizacion',
-	                queryParam: 'nro_autorizacion',
-	                listWidth:'280',
-	                forceSelection:false,
-	                autoSelect: false,
-	                hideTrigger:true,
-	                typeAhead: false,
-	                typeAheadDelay: 75,
-	                //triggerAction: 'query',
-	                lazyRender:false,
-	                mode:'remote',
-	                pageSize:20,
-	                queryDelay:500,
-	                gwidth: 250,
-	                minChars:1
-	            },
-	            type:'ComboBox',
-	            filters:{pfiltro:'dcv.nro_autorizacion',type:'string'},
-	            id_grupo: 0,
-	            grid: true,
-	            bottom_filter: true,
-	            form: false
-	        },
-	        
-	        {
-	            config:{
-	                name: 'nit',
-	                fieldLabel: 'NIT',
-	                qtip: 'Número de indentificación del proveedor',
-	                allowBlank: false,
-	                emptyText:'nit ...',
-	                store:new Ext.data.JsonStore(
-	                {
-	                    url: '../../sis_contabilidad/control/DocCompraVenta/listarNroNit',
-	                    id: 'nit',
-	                    root:'datos',
-	                    sortInfo:{
-	                        field:'nit',
-	                        direction:'ASC'
-	                    },
-	                    totalProperty:'total',
-	                    fields: ['nit','razon_social'],
-	                    remoteSort: true
-	                }),
-	                valueField: 'nit',
-	                hiddenValue: 'nit',
-	                displayField: 'nit',
-	                gdisplayField:'nit',
-	                queryParam: 'nit',
-	                listWidth:'280',
-	                forceSelection:false,
-	                autoSelect: false,
-	                typeAhead: false,
-	                typeAheadDelay: 75,
-	                hideTrigger:true,
-	                triggerAction: 'query',
-	                lazyRender:false,
-	                mode:'remote',
-	                pageSize:20,
-	                queryDelay:500,
-	                gwidth: 250,
-	                minChars:1
-	            },
-	            type:'ComboBox',
-	            filters:{pfiltro:'dcv.nit',type:'string'},
-	            id_grupo: 0,
-	            grid: true,
-	            bottom_filter: true,
-	            form: false
-	        },
-			
-			
-			{
-				config:{
-					name: 'razon_social',
-					fieldLabel: 'Razón Social',
-					allowBlank: false,
-					maskRe: /[A-Za-z0-9 ]/,
-	                fieldStyle: 'text-transform:uppercase',
-	                listeners:{
-				          'change': function(field, newValue, oldValue){
-				          			  console.log('keyup ...  ')
-				          			  field.suspendEvents(true);
-				                      field.setValue(newValue.toUpperCase());
-				                      field.resumeEvents(true);
-				                  }
-				     },
-					anchor: '80%',
-					gwidth: 100,
-					maxLength:180
-				},
-					type:'TextField',
-					filters:{pfiltro:'dcv.razon_social',type:'string'},
-					id_grupo:0,
-					grid:true,
-					bottom_filter: true,
-					form:false
-			},
-			{
-				config:{
-					name: 'nro_documento',
-					fieldLabel: 'Nro Doc',
-					allowBlank: false,
-					anchor: '80%',
-					gwidth: 100,
-					maxLength:100
-				},
-					type:'TextField',
-					filters:{pfiltro:'dcv.nro_documento',type:'string'},
-					id_grupo:0,
-					grid:true,
-					bottom_filter: true,
-					form:false
-			},
+			},			
 			{
 				config:{
 					name: 'nro_dui',
@@ -501,23 +653,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					id_grupo:0,
 					grid:true,
 					form:false
-			},
-			{
-				config:{
-					name: 'codigo_control',
-					fieldLabel: 'Código de Control',
-					allowBlank: true,
-					anchor: '80%',
-					gwidth: 100,
-					maxLength:200
-				},
-					type:'TextField',
-					filters:{pfiltro:'dcv.codigo_control',type:'string'},
-					id_grupo:0,
-					grid:true,
-					form:false
-			},
-			
+			},			
 			{
 				config:{
 					name: 'obs',
@@ -532,100 +668,6 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					id_grupo:0,
 					grid: true,
 					bottom_filter: true,
-					form: false
-			},
-			{
-				config:{
-					name: 'importe_doc',
-					fieldLabel: 'Monto',
-					allowBlank: false,
-					anchor: '80%',
-					gwidth: 100,
-					maxLength:1179650,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
-						}
-						
-					}
-				},
-					type:'NumberField',
-					filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
-					id_grupo:1,
-					grid:true,
-					form:false
-			},
-			{
-				config:{
-					name: 'importe_descuento',
-					fieldLabel: 'Descuento',
-					allowBlank: true,
-					anchor: '80%',
-					gwidth: 100,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
-						}
-						
-					}
-				},
-					type:'NumberField',
-					filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
-					id_grupo:1,
-					grid:true,
-					form:false
-			},
-			{
-				config:{
-					name: 'importe_neto',
-					fieldLabel: 'Neto',
-					allowBlank: false,
-					anchor: '80%',
-					gwidth: 100,
-					maxLength:1179650,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
-						}
-						
-					}
-				},
-					type:'NumberField',
-					filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
-					id_grupo:1,
-					grid:true,
-					form:false
-			},
-			{
-				config:{
-					name: 'importe_excento',
-					fieldLabel: 'Excento',
-					allowBlank: true,
-					anchor: '80%',
-					gwidth: 100,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
-						}
-						
-					}
-				},
-					type: 'NumberField',
-					filters: {pfiltro:'dcv.importe_excento',type:'numeric'},
-					id_grupo:1,
-					grid: true,
 					form: false
 			},
 			{
@@ -749,30 +791,6 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			},
 			{
 				config:{
-					name: 'importe_iva',
-					fieldLabel: 'IVA',
-					allowBlank: true,
-					readOnly:true,
-					anchor: '80%',
-					gwidth: 100,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
-						}
-						
-					}
-				},
-					type: 'NumberField',
-					filters: { pfiltro:'dcv.importe_iva',type:'numeric'},
-					id_grupo: 1,
-					grid: true,
-					form: false
-			},
-			{
-				config:{
 					name: 'importe_it',
 					fieldLabel: 'IT',
 					allowBlank: true,
@@ -794,32 +812,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					id_grupo:1,
 					grid:true,
 					form: false
-			},
-			{
-				config:{
-					name: 'importe_pago_liquido',
-					fieldLabel: 'Liquido Pagado',
-					allowBlank: true,
-					readOnly:true,
-					anchor: '80%',
-					gwidth: 100,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
-						}
-						
-					}
-				},
-					type:'NumberField',
-					filters:{pfiltro:'dcv.importe_pago_liquido',type:'numeric'},
-					id_grupo:1,
-					grid:true,
-					form: false
-			},
-			
+			},			
 			{
 				config:{
 					name: 'estado',
