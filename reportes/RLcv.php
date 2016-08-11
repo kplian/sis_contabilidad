@@ -50,11 +50,11 @@ class RLcv extends  ReportePDF {
 		$this->ln(5);
 		
 		
-	    $this->SetFont('','BU',12);		
+	    $this->SetFont('','B',12);		
 		$this->Cell(0,5,"LIBRO DE COMPRAS ESTANDAR",0,1,'C');		
 		//$this->Ln();
-		$this->SetFont('','BU',7);
-		$this->Cell(0,5,"Expresado en Bolivianos",0,1,'C');		
+		$this->SetFont('','B',7);
+		$this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');		
 		$this->Ln(2);
 		
 		$this->SetFont('','',10);
@@ -63,7 +63,7 @@ class RLcv extends  ReportePDF {
         $width1 = 5;
 		$esp_width = 10;
         $width_c1= 55;
-		$width_c2= 92;
+		$width_c2= 112;
         $width3 = 40;
         $width4 = 75;
 		
@@ -77,26 +77,26 @@ class RLcv extends  ReportePDF {
 	        $this->Cell($width_c1, $height, 'DEL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
 	        $this->SetFillColor(192,192,192, true);
-	        $this->Cell($width_c2, $height, $fecha_ini, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        $this->Cell($width_c2, $height, $fecha_ini, 0, 0, 'L', true, '', 0, false, 'T', 'C');
 	        
 	        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->Cell(20, $height,'HASTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
 	        $this->SetFillColor(192,192,192, true);
-	        $this->Cell(50, $height, $fecha_fin, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        $this->Cell(50, $height, $fecha_fin, 0, 0, 'L', true, '', 0, false, 'T', 'C');
 		}
 		else{
 			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->Cell($width_c1, $height, 'AÑO:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
-	        $this->SetFillColor(192,192,192, true);
-	        $this->Cell($width_c2, $height, $this->datos_periodo['gestion'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        //$this->SetFillColor(192,192,192, true);
+	        $this->Cell($width_c2, $height, $this->datos_periodo['gestion'], 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        
 	        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->Cell(20, $height,'MES:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
-	        $this->SetFillColor(192,192,192, true);
-	        $this->Cell(50, $height, $this->datos_periodo['literal_periodo'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+	        //$this->SetFillColor(192,192,192, true);
+	        $this->Cell(50, $height, $this->datos_periodo['literal_periodo'], 0, 0, 'L', false, '', 0, false, 'T', 'C');
 		}
 		
 		
@@ -106,13 +106,13 @@ class RLcv extends  ReportePDF {
         $this->Cell($width_c1, $height, 'NOMBRE O RAZON SOCIAL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->SetFont('', '');
         $this->SetFillColor(192,192,192, true);
-        $this->Cell($width_c2, $height, $this->datos_entidad['nombre'].' ('.$this->datos_entidad['direccion_matriz'].')', $black, 0, 'L', true, '', 0, false, 'T', 'C');
+        $this->Cell($width_c2, $height, $this->datos_entidad['nombre'].' ('.$this->datos_entidad['direccion_matriz'].')', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         
         $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->Cell(20, $height,'NIT:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->SetFont('', '');
         $this->SetFillColor(192,192,192, true);
-        $this->Cell(50, $height, $this->datos_entidad['nit'], $black, 0, 'L', true, '', 0, false, 'T', 'C');
+        $this->Cell(50, $height, $this->datos_entidad['nit'], 0, 0, 'L', false, '', 0, false, 'T', 'C');
         
 		
 		$this->Ln(8);
@@ -122,6 +122,47 @@ class RLcv extends  ReportePDF {
 		
 		
 	}
+	
+	function Footer() {
+		
+		$this->setY(-15);
+		$ormargins = $this->getOriginalMargins();
+		$this->SetTextColor(0, 0, 0);
+		//set style for cell border
+		$line_width = 0.85 / $this->getScaleFactor();
+		$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+		$ancho = round(($this->getPageWidth() - $ormargins['left'] - $ormargins['right']) / 3);
+		$this->Ln(2);
+		$cur_y = $this->GetY();
+		
+		$this->Cell($ancho, 0, '', '', 0, 'L');
+		$pagenumtxt = 'Página'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
+		$this->Cell($ancho, 0, $pagenumtxt, '', 0, 'C');
+		$this->Cell($ancho, 0, $_SESSION['_REP_NOMBRE_SISTEMA'], '', 0, 'R');
+		$this->Ln();
+		$fecha_rep = date("d-m-Y H:i:s");
+		$this->Cell($ancho, 0, '', '', 0, 'L');
+		$this->Ln($line_width);
+		$this->Ln();
+		$barcode = $this->getBarcode();
+		$style = array(
+					'position' => $this->rtl?'R':'L',
+					'align' => $this->rtl?'R':'L',
+					'stretch' => false,
+					'fitwidth' => true,
+					'cellfitalign' => '',
+					'border' => false,
+					'padding' => 0,
+					'fgcolor' => array(0,0,0),
+					'bgcolor' => false,
+					'text' => false,
+					'position' => 'R'
+				);
+				$this->write1DBarcode($barcode, 'C128B', $ancho*2, $cur_y + $line_width+5, '', (($this->getFooterMargin() / 3) - $line_width), 0.3, $style, '');
+				
+	
+	}
+	
    
    function generarReporte() {
 		$this->setFontSubsetting(false);
@@ -133,6 +174,7 @@ class RLcv extends  ReportePDF {
 		$this->generarCuerpo($this->datos_detalle);
 		
 		if($this->s1 != 0){
+			$this->SetFont('','B',6);
 			$this->cerrarCuadro();	
 		    $this->cerrarCuadroTotal();
 		}
@@ -146,7 +188,7 @@ class RLcv extends  ReportePDF {
 		
 		
 		//armca caecera de la tabla
-		$conf_par_tablewidths=array(6,15,20,30,15,22,25,18,17,17,17,17,17,15,13);
+		$conf_par_tablewidths=array(6,15,17,50,13,20,20,18,15,17,17,17,14,18,10);
         $conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C','C');
         $conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
         $conf_tableborders=array();
@@ -161,11 +203,11 @@ class RLcv extends  ReportePDF {
 		$RowArray = array(
             			's0'  => 'Nº',
                         's1' => 'FECHA DE LA FACTURA O DUI',    //ingreso_inicial
-                        's2' => 'NIT PROVEEDOR',        //ingreso_colectas
+                        's2' => "NIT\nPROVEEDOR",        //ingreso_colectas
                         's3' => 'NOMBRE O RAZON SOCIAL',           //ingreso_traspasos
-                        's4' => 'Nº de LA FACTURA.',
-                        's5' => 'Nº de DUI',   //egreso_inicial_por_rendir
-                        's6' => 'Nº de AUTORIZACION',     //egreso_operacion
+                        's4' => 'Nº DE LA FACTURA',
+                        's5' => 'Nº DE DUI',   //egreso_inicial_por_rendir
+                        's6' => "Nº DE\nAUTORIZACION",     //egreso_operacion
                         's7' => "IMPORTE TOTAL DE LA COMPRA\nA",   //egresos_contra_rendicion
                         's8' => "IMPORTE NO SUJETO A CREDITO FISCAL\nB",       //egresos_rendidos
                         's9' => "SUBTOTAL\nC = A - B",      //egreso_traspaso
@@ -214,12 +256,12 @@ class RLcv extends  ReportePDF {
 		
 		$this->SetFillColor(224, 235, 255);
         $this->SetTextColor(0);
-        $this->SetFont('','B',6);
+        $this->SetFont('','',6);
 			
-		$conf_par_tablewidths=array(6,15,20,30,15,22,25,18,17,17,17,17,17,15,13);
-        $conf_par_tablealigns=array('C','L','R','R','R','R','R','R','R','R','R','R','R','R','R');
+		$conf_par_tablewidths=array(6,15,17,50,13,20,20,18,15,17,17,17,14,18,10);
+        $conf_par_tablealigns=array('C','C','R','L','R','R','R','R','R','R','R','R','R','L','C');
         $conf_par_tablenumbers=array(0,0,0,0,0,0,0,2,2,2,2,2,2,0,0);
-		$conf_tableborders=array('LTR','TLR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR','LTR');
+		$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');
 		
 		$this->tablewidths=$conf_par_tablewidths;
         $this->tablealigns=$conf_par_tablealigns;
@@ -312,7 +354,9 @@ class RLcv extends  ReportePDF {
   	
 	   
 	   	    //si noes inicio termina el cuardro anterior
-	   	    $this->tablewidths=array(6 +15 +20 +30 +15 +22 +25,18,17,17,17,17,17,15,13);
+				
+									
+	   	    $this->tablewidths=array(6 +15 +17 +50 +13 +20 +20,18,15,17,17,17,14,18,10);
 	        $this->tablealigns=array('R','R','R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2,0,0);	
 	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','T','T');
@@ -344,8 +388,8 @@ class RLcv extends  ReportePDF {
   	
 	   
 	   	    //si noes inicio termina el cuardro anterior
-	   	  
-			$this->tablewidths=array(6 +15 +20 +30 +15 +22 +25,18,17,17,17,17,17);
+									
+			$this->tablewidths=array(6 +15 +17 +50 +13 +20 +20,18,15,17,17,17,14);
 	        $this->tablealigns=array('R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2);	
 	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
