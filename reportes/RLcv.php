@@ -188,7 +188,7 @@ class RLcv extends  ReportePDF {
 		
 		
 		//armca caecera de la tabla
-		$conf_par_tablewidths=array(6,15,17,50,13,20,20,18,15,17,17,17,14,18,10);
+		$conf_par_tablewidths=array(7,15,17,55,13,17,20,18,15,17,17,17,14,18,10);
         $conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C','C');
         $conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
         $conf_tableborders=array();
@@ -258,7 +258,7 @@ class RLcv extends  ReportePDF {
         $this->SetTextColor(0);
         $this->SetFont('','',6);
 			
-		$conf_par_tablewidths=array(6,15,17,50,13,20,20,18,15,17,17,17,14,18,10);
+		$conf_par_tablewidths=array(7,15,17,55,13,17,20,18,15,17,17,17,14,18,10);
         $conf_par_tablealigns=array('C','C','R','L','R','R','R','R','R','R','R','R','R','L','C');
         $conf_par_tablenumbers=array(0,0,0,0,0,0,0,2,2,2,2,2,2,0,0);
 		$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');
@@ -356,7 +356,7 @@ class RLcv extends  ReportePDF {
 	   	    //si noes inicio termina el cuardro anterior
 				
 									
-	   	    $this->tablewidths=array(6 +15 +17 +50 +13 +20 +20,18,15,17,17,17,14,18,10);
+	   	    $this->tablewidths=array(7 +15 +17 +55 +13 +17 +20,18,15,17,17,17,14,18,10);
 	        $this->tablealigns=array('R','R','R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2,0,0);	
 	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','T','T');
@@ -389,7 +389,7 @@ class RLcv extends  ReportePDF {
 	   
 	   	    //si noes inicio termina el cuardro anterior
 									
-			$this->tablewidths=array(6 +15 +17 +50 +13 +20 +20,18,15,17,17,17,14);
+			$this->tablewidths=array(7 +15 +17 +55 +13 +17 +20,18,15,17,17,17,14);
 	        $this->tablealigns=array('R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2);	
 	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
