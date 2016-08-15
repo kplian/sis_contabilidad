@@ -1122,7 +1122,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					fields: ['id_depto','nombre','codigo'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams: { par_filtro:'deppto.nombre#deppto.codigo', estado:'activo', codigo_subsistema: 'CONTA'}
+					baseParams: { par_filtro:'deppto.nombre#deppto.codigo', estado:'activo', codigo_subsistema: 'CONTA', _adicionar : 'si'}
                 }),
                 valueField: 'id_depto',
    				displayField: 'nombre',

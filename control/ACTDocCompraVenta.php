@@ -41,9 +41,14 @@ class ACTDocCompraVenta extends ACTbase{
 		if($this->objParam->getParametro('fecha_cbte')!=''){
             $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    
         }
+
+        if($this->objParam->getParametro('filtro_usuario') == 'si'){
+            $this->objParam->addFiltro("dcv.id_usuario_reg = ".$_SESSION["ss_id_usuario"]);
+        }
 		
 		if($this->objParam->getParametro('id_depto')!=''){
-            $this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
+			if($this->objParam->getParametro('id_depto')!=0)
+				$this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
         }
 		
 		if($this->objParam->getParametro('id_agrupador')!=''){
