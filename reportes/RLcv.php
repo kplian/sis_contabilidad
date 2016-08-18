@@ -27,6 +27,8 @@ class RLcv extends  ReportePDF {
 	
 	
 	function datosHeader ( $detalle, $totales,$entidad, $periodo) {
+        $this->SetHeaderMargin(8);
+        $this->SetAutoPageBreak(TRUE, 10);
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
 		$this->datos_titulo = $totales;
@@ -218,7 +220,7 @@ class RLcv extends  ReportePDF {
 						's14' => 'TIPO DE COMPRA');
                          
         $this-> MultiRow($RowArray,false,1);
-		
+
 		
     }
 	
@@ -237,7 +239,7 @@ class RLcv extends  ReportePDF {
 		$this->s4 = 0;
 		$this->s5 = 0;
 		$this->s6 = 0;
-		
+        //$this->Cell(20, $height,'NIT:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 		foreach ($detalle as $val) {
 			
 			$this->imprimirLinea($val,$count,$fill);
@@ -302,20 +304,12 @@ class RLcv extends  ReportePDF {
 		$startY = $this->GetY();
 		$this->getNumLines($row['cell1data'], 80);
 		
-		if (($startY + 4 * 6) + $dimensions['bm'] > ($dimensions['hk'])) {
+		/*if (($startY + 4 * 6) + $dimensions['bm'] > ($dimensions['hk'])) {
 		    	
 			$this->cerrarCuadro();	
 			$this->cerrarCuadroTotal();
 			$k = 	($startY + 4 * 6) + $dimensions['bm'] - ($dimensions['hk']);
-			/*
-			for($i=0;$i<=k;$i++){
-				$this->ln();
-				$this->ln();
-				$this->ln();
-				$this->ln();
-				$this->ln();
-				$this->ln();
-			}*/
+
 			
 			if($this->total!= 0){
 				$this->AddPage();
@@ -323,10 +317,23 @@ class RLcv extends  ReportePDF {
 			
 			
 		    
-		} 
-		 
-		
-	}
+		} */
+
+        if ($startY > 190) {
+
+            $this->cerrarCuadro();
+            $this->cerrarCuadroTotal();
+
+            if($this->total!= 0){
+                $this->AddPage();
+            }
+
+
+
+        }
+
+
+    }
 	
 	
 	
@@ -392,7 +399,7 @@ class RLcv extends  ReportePDF {
 			$this->tablewidths=array(7 +15 +17 +55 +13 +17 +20,18,15,17,17,17,14);
 	        $this->tablealigns=array('R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2);	
-	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
+	        $this->tableborders=array('','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
 	        
 	        $RowArray = array( 
 	                    'espacio' => 'TOTAL: ',
