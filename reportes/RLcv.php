@@ -140,7 +140,7 @@ class RLcv extends  ReportePDF {
 		$this->Cell($ancho, 0, '', '', 0, 'L');
 		$pagenumtxt = 'Página'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
 		$this->Cell($ancho, 0, $pagenumtxt, '', 0, 'C');
-		$this->Cell($ancho, 0, $_SESSION['_REP_NOMBRE_SISTEMA'], '', 0, 'R');
+		$this->Cell($ancho, 0, '', '', 0, 'R');
 		$this->Ln();
 		$fecha_rep = date("d-m-Y H:i:s");
 		$this->Cell($ancho, 0, '', '', 0, 'L');
