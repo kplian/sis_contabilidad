@@ -1489,7 +1489,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
         
         this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
-        	if (newValue[3] == '4'){
+        	if (newValue[3] == '4' || newValue[3] == '8'){
         		this.mostrarComponente(this.Cmp.codigo_control);
 	            this.Cmp.codigo_control.allowBlank = false;
         	}
