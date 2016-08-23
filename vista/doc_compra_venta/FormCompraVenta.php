@@ -28,6 +28,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     {
          this.addEvents('beforesave');
          this.addEvents('successsave');
+         if (config.data.mostrarFormaPago === false) {
+             this.mostrarFormaPago = config.data.mostrarFormaPago;
+         }
          Ext.apply(this,config);
          this.obtenerVariableGlobal(config);
          this.generarAtributos();
@@ -1645,10 +1648,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         		excento = this.Cmp.importe_excento.getValue();
         	}
         	if(this.Cmp.porc_iva_cf.getValue() > 0){
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
+        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue()));
         	}
         	else {
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
+        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue()));
         	}
         }	
         
@@ -1791,7 +1794,24 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
         this.Cmp.id_depto_conta.setValue(this.data.id_depto);
         this.Cmp.id_gestion.setValue(this.data.id_gestion);
-        this.Cmp.tipo.setValue(this.data.tipoDoc); 
+        this.Cmp.tipo.setValue(this.data.tipoDoc);
+
+		if(this.mycls='FormRendicionCD' && this['data']['objPadre']['maestro']['estado'] =='vbrendicion'){
+			this.Cmp.id_plantilla.setDisabled(true);
+			this.Cmp.codigo_qr.setDisabled(true);
+			this.Cmp.id_moneda.setDisabled(true);
+			this.Cmp.fecha.setDisabled(true);
+			this.Cmp.nro_autorizacion.setDisabled(true);
+			this.Cmp.nit.setDisabled(true);
+			this.Cmp.razon_social.setDisabled(true);
+			this.Cmp.nro_documento.setDisabled(true);
+			this.Cmp.importe_doc.setDisabled(true);
+			this.Cmp.importe_excento.setDisabled(true);
+			this.Cmp.importe_iva.setDisabled(true);
+			this.Cmp.importe_pago_liquido.setDisabled(true);
+			this.Cmp.importe_descuento.setDisabled(true);
+		}
+		
 		this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
         //load detalle de conceptos
         if(this.regitrarDetalle == 'si'){
