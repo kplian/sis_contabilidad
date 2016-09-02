@@ -1796,7 +1796,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.id_gestion.setValue(this.data.id_gestion);
         this.Cmp.tipo.setValue(this.data.tipoDoc);
 
-		if(this.mycls='FormRendicionCD' && this['data']['objPadre']['maestro']['estado'] =='vbrendicion'){
+		if((this.mycls='FormRendicionCD' && this['data']['objPadre']['maestro']['estado'] =='vbrendicion') ||
+				(this.mycls='FormRendicion' && this['data']['objPadre']['maestro']['estado'] =='revision')){
 			this.Cmp.id_plantilla.setDisabled(true);
 			this.Cmp.codigo_qr.setDisabled(true);
 			this.Cmp.id_moneda.setDisabled(true);
@@ -1868,7 +1869,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	   	    	
 	   	    
 	   	    	
-	   	    	if (total_det*1 == this.Cmp.importe_doc.getValue()){
+	   	    	if ((total_det.toFixed(2)*1) == this.Cmp.importe_doc.getValue()){
 	   	    		Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
 	   	    	}
 	   	    	else{
