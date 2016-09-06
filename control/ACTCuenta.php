@@ -36,12 +36,12 @@ class ACTCuenta extends ACTbase{
         if($this->objParam->getParametro('sw_transaccional')!=''){
             $this->objParam->addFiltro("cta.sw_transaccional = ''".$this->objParam->getParametro('sw_transaccional')."''"); 
         }
-        
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODCuenta','listarCuenta');
-		} else{
+		} 
+		else{
 			$this->objFunc=$this->create('MODCuenta');
 			
 			$this->res=$this->objFunc->listarCuenta($this->objParam);

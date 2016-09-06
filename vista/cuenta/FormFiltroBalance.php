@@ -140,6 +140,26 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
 	       		valorInicial: 'no',
 	       		grid:true,
 	       		form:true
+	      },
+	      {
+	       		config:{
+	       			name: 'incluir_sinmov',
+	       			qtip : 'Incluir slo cuentas con movimiento?',
+	       			fieldLabel: 'Solo con movimiento',
+	       			allowBlank: false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['no','si']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		valorInicial: 'no',
+	       		grid:true,
+	       		form:true
 	       	}
     ],
     labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
