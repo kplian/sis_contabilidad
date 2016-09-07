@@ -332,80 +332,66 @@ BEGIN
 	elsif(p_transaccion='CONTA_DETCBT_SEL')then
      				
     	begin
-        
+       
     		--Sentencia de la consulta
-			v_consulta:='(select
-                            cue.nro_cuenta,
-                            cue.nombre_cuenta,
-                            aux.codigo_auxiliar,
-                            aux.nombre_auxiliar,
-                            cc.codigo_cc as cc,
-                            par.codigo as codigo_partida,
-                            par.nombre_partida,
-                            ot.desc_orden,
-                            tra.glosa::varchar as glosa,
-                            sum(tra.importe_debe) as importe_debe, 
-                            sum(tra.importe_haber) as importe_haber,
-                            sum(tra.importe_debe_mb) as importe_debe_mb,
-                            sum(tra.importe_haber_mb) as importe_haber_mb
-                          from conta.tint_transaccion tra
-                          inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
-                          inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
-                          inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
-                          left join pre.tpartida par on par.id_partida = tra.id_partida
-                          left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
-                          left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
-                          where cbte.id_proceso_wf = '||v_parametros.id_proceso_wf||'
-                          and (importe_debe > 0 or importe_debe_mb >0)
-                          group by 
-                            cue.nro_cuenta,
-                            cue.nombre_cuenta,
-                            aux.codigo_auxiliar,
-                            aux.nombre_auxiliar,
-                            cc.codigo_cc ,
-                            par.codigo ,
-                            par.nombre_partida,
-                            ot.desc_orden,
-                            tra.glosa,
-                            tra.orden
-                          order by  orden
-                    )
-                     UNION
-                    ( select
-                            cue.nro_cuenta,
-                            cue.nombre_cuenta,
-                            aux.codigo_auxiliar,
-                            aux.nombre_auxiliar,
-                            cc.codigo_cc as cc,
-                            par.codigo as codigo_partida,
-                            par.nombre_partida,
-                            ot.desc_orden,
-                            tra.glosa::varchar as glosa,
-                            sum(tra.importe_debe) as importe_debe, 
-                            sum(tra.importe_haber) as importe_haber,
-                            sum(tra.importe_debe_mb) as importe_debe_mb,
-                            sum(tra.importe_haber_mb) as importe_haber_mb
-                          from conta.tint_transaccion tra
-                          inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
-                          inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
-                          inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
-                          left join pre.tpartida par on par.id_partida = tra.id_partida
-                          left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
-                          left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
-                          where cbte.id_proceso_wf = '||v_parametros.id_proceso_wf||'
-                          and (importe_haber > 0 or importe_haber_mb > 0)
-                          group by 
-                            cue.nro_cuenta,
-                            cue.nombre_cuenta,
-                            aux.codigo_auxiliar,
-                            aux.nombre_auxiliar,
-                            cc.codigo_cc ,
-                            par.codigo ,
-                            par.nombre_partida,
-                            ot.desc_orden,
-                            tra.glosa,
-                            tra.orden
-                          order by  orden)';
+			v_consulta:='select    
+                                nro_cuenta,
+                                nombre_cuenta,
+                                codigo_auxiliar,
+                                nombre_auxiliar,
+                                ccc,
+                                codigo_partida,
+                                nombre_partida,
+                                desc_orden,
+                                glosa,
+                                importe_debe, 
+                                importe_haber,
+                                importe_debe_mb,
+                                importe_haber_mb
+                                FROM ((select
+                                                  CASE 
+                                                    WHEN  (sum(tra.importe_debe) > 0 or sum(tra.importe_debe_mb) >0) then  1 
+                                                    ELSE   2
+                                                   END as tipo,
+                                                  max(tra.orden) as orden_rank,
+                                                  cue.nro_cuenta,
+                                                  cue.nombre_cuenta,
+                                                  aux.codigo_auxiliar,
+                                                  aux.nombre_auxiliar,
+                                                  cc.codigo_cc as ccc,
+                                                  par.codigo as codigo_partida,
+                                                  par.nombre_partida,
+                                                  ot.desc_orden,
+                                                  tra.glosa::varchar as glosa,
+                                                  sum(tra.importe_debe) as importe_debe, 
+                                                  sum(tra.importe_haber) as importe_haber,
+                                                  sum(tra.importe_debe_mb) as importe_debe_mb,
+                                                  sum(tra.importe_haber_mb) as importe_haber_mb
+                                                from conta.tint_transaccion tra
+                                                inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
+                                                inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
+                                                inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
+                                                left join pre.tpartida par on par.id_partida = tra.id_partida
+                                                left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
+                                                left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
+                                                where cbte.id_proceso_wf =  '||v_parametros.id_proceso_wf||'
+                                                
+                                                group by 
+                                                  cue.nro_cuenta,
+                                                  cue.nombre_cuenta,
+                                                  aux.codigo_auxiliar,
+                                                  aux.nombre_auxiliar,
+                                                  cc.codigo_cc ,
+                                                  par.codigo ,
+                                                  par.nombre_partida,
+                                                  ot.desc_orden,
+                                                  tra.glosa
+                                          )
+                                          
+                                                  
+                                ) iii 
+                                
+                                order by tipo, orden_rank';
 						
 			
 			--Devuelve la respuesta
