@@ -44,7 +44,7 @@ class MODDocConcepto extends MODbase{
 		$this->captura('desc_orden_trabajo','VARCHAR');
 		$this->captura('id_presupuesto','int4');
 		$this->captura('precio_total_final','numeric');
-		
+		$this->captura('desc_partida','varchar');
 		
 		
 		//Ejecuta la instruccion

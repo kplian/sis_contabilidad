@@ -115,6 +115,16 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 							               qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
 							               tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
 							             }),
+
+					'desc_partida': new Ext.form.TextField({
+						name: 'desc_partida',
+						msgTarget: 'title',
+						fieldLabel: 'Partida',
+						allowBlank: true,
+						anchor: '80%',
+						maxLength:1200,
+						disabled : true
+					}),
 							             
 	              'id_centro_costo': new Ext.form.ComboRec({
 						                    name:'id_centro_costo',
@@ -239,7 +249,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 				if(idcc){
 				  this.checkRelacionConcepto({id_centro_costo: idcc , id_concepto_ingas: rec.data.id_concepto_ingas, id_gestion :  this.Cmp.id_gestion.getValue()});	
 				}
-			        
+			    this.detCmp.desc_partida.setValue(rec.data.desc_partida);
 			  },this);
 			  
 			  
@@ -352,6 +362,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                     }, {
                         name: 'id_concepto_ingas',
                         type: 'int'
+					}, {
+						name: 'desc_partida',
+						type: 'int'
                     }, {
                         name: 'id_centro_costo',
                         type: 'int'
@@ -377,7 +390,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					totalProperty: 'total',
 					fields: ['id_doc_concepto','id_centro_costo','descripcion', 'precio_unitario',
 					         'id_doc_compra_venta','id_orden_trabajo','id_concepto_ingas','precio_total','cantidad_sol',
-							 'desc_centro_costo','desc_concepto_ingas','desc_orden_trabajo','precio_total_final'
+							 'desc_centro_costo','desc_concepto_ingas','desc_orden_trabajo','precio_total_final', 'desc_partida'
 					],remoteSort: true,
 					baseParams: {dir:'ASC',sort:'id_doc_concepto',limit:'50',start:'0'}
 				});
@@ -479,7 +492,15 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                         renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);},
                         editor: this.detCmp.id_concepto_ingas 
                     },
-                    {
+					{
+						header: 'Partida',
+						dataIndex: 'desc_partida',
+						align: 'center',
+						width: 150,
+						renderer:function (value, p, record){return String.format('{0}', record.data['desc_partida']);},
+						editor: this.detCmp.desc_partida
+					},
+					{
                        
                         header: 'Centro de Costo',
                         dataIndex: 'id_centro_costo',
@@ -515,8 +536,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                         summaryType: 'sum',
                         editor: this.detCmp.cantidad_sol 
                     },
-                    
-                    
+
+
                     {
                        
                         header: 'P / Unit',
