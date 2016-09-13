@@ -25,6 +25,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     conceptos_eliminados: [],
     listadoConcepto: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
     parFilConcepto:'desc_ingas#par.codigo',
+    tipo_pres_gasto: 'gasto',
+    tipo_pres_recurso: 'recurso', 
     constructor:function(config)
     {
          this.addEvents('beforesave');
@@ -143,7 +145,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						                    url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
 						                    emptyText : 'Centro Costo...',
 						                    allowBlank: false,
-						                    baseParams: (me.data.tipoDoc == 'compra')?{tipo_pres:'gasto', filtrar:'grupo_ep'}:{tipo_pres:'recurso', filtrar:'grupo_ep'}
+						                    baseParams: (me.data.tipoDoc == 'compra')?{tipo_pres:me.tipo_pres_gasto, filtrar:'grupo_ep'}:{tipo_pres: me.tipo_pres_recurso, filtrar:'grupo_ep'}
 						                }),
 						                
 	               'id_orden_trabajo': new Ext.form.ComboRec({
