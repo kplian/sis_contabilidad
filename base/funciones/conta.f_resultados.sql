@@ -226,7 +226,7 @@ BEGIN
                                         plantilla,
                                         nombre_columna
                                     FROM temp_balancef 
-                                    WHERE monto != 0
+                                    WHERE (monto != 0 or origen = 'titulo')
                                         order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
                        RETURN NEXT v_registros;
              END LOOP;
