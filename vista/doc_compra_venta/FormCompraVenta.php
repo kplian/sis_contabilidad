@@ -13,6 +13,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     ActSave:'../../sis_contabilidad/control/DocCompraVenta/insertarDocCompleto',
     tam_pag: 10,
     tabEnter: true,
+    codigoSistema: 'ADQ',
     mostrarFormaPago : true,
     mostrarPartidas: false,
     regitrarDetalle: 'si',
@@ -345,8 +346,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.detCmp.id_orden_trabajo.modificado = true;
         
         this.detCmp.id_centro_costo.store.baseParams.id_gestion = this.Cmp.id_gestion.getValue();
-        this.detCmp.id_centro_costo.store.baseParams.codigo_subsistema = 'ADQ';
+        this.detCmp.id_centro_costo.store.baseParams.codigo_subsistema = this.codigoSistema;
         this.detCmp.id_centro_costo.store.baseParams.id_depto = this.Cmp.id_depto_conta.getValue();
+        
+        if(this.data.id_uo){
+        	this.detCmp.id_centro_costo.store.baseParams.id_uo = this.data.id_uo;
+        }
         this.detCmp.id_centro_costo.modificado = true;
         //cuando esta el la inteface de presupeustos no filtra por bienes o servicios
         this.detCmp.id_concepto_ingas.store.baseParams.movimiento=(this.Cmp.tipo.getValue()=='compra')?'gasto':'recurso';

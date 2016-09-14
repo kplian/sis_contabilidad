@@ -24,6 +24,7 @@ DECLARE
     v_rec_cbte 		record;
     v_registros		record;
     v_doc			varchar;
+    v_codigo_clase_cbte			varchar;
     v_nro_cbte		varchar;
     v_id_periodo 	integer;
     v_filas			bigint;
@@ -52,6 +53,7 @@ DECLARE
     v_sw_rel						boolean;
     v_id_tipo_estado				integer;
     v_id_estado_actual 				integer;
+    v_tiene_apertura				varchar;
      
 
 BEGIN
@@ -271,8 +273,14 @@ BEGIN
     if v_errores = '' then
     	
             --Obtiene el documento para la numeración
-            select doc.codigo
-            into v_doc
+            select 
+               doc.codigo,
+               ccbte.codigo,
+               ccbte.tiene_apertura
+            into 
+              v_doc,
+              v_codigo_clase_cbte,
+              v_tiene_apertura
             from conta.tclase_comprobante ccbte
             inner join param.tdocumento doc
             on doc.id_documento = ccbte.id_documento
@@ -306,12 +314,20 @@ BEGIN
                END IF;
                
                --el comprobante de apertura solo puede ser un comprobante de diaraio
-               IF v_doc != 'CDIR' THEN
-                 raise exception 'El comprobante de paertura solo puede ser del tipo DIARIO (CDIR) no %', v_doc;
+               IF v_codigo_clase_cbte != 'DIARIO' THEN
+                 raise exception 'El comprobante de paertura solo puede ser del tipo DIARIO (CDIR) no %', v_codigo_clase_cbte;
                END IF;
                
                
             END IF;
+            
+            
+           --valida cbte de apertura
+           
+           IF v_tiene_apertura = 'no' and  v_rec_cbte.cbte_apertura = 'si' THEN
+               raise exception 'Esta clase de cbte no permite registros de apertura';           
+           END IF;
+            
             
            -----------------------------------------
            --  OBTENCION DE LA NUMERACION DEL CBTE
@@ -321,8 +337,10 @@ BEGIN
            IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte  = '' THEN
                
                
-                -- Si no es un cbte de apertura y estamso en enero fuerza el saltar inicio
-                IF  v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
+                -- Si no es un cbte de apertura (pero su clase de cbte admite cbte de apertura) 
+                -- y estamos en enero fuerza el saltar inicio
+                
+                IF  v_tiene_apertura = 'si' and v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
                      
                 
                        

@@ -252,7 +252,7 @@ class ACTCuenta extends ACTbase{
 			//parametros basicos
 			$tamano = 'LETTER';
 			$orientacion = 'P';
-			$titulo = 'Estado de Resultados';
+			$titulo = 'Estados Financieros';
 			
 			$this->objParam->addParametro('orientacion',$orientacion);
 			$this->objParam->addParametro('tamano',$tamano);		

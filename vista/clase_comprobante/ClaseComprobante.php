@@ -215,6 +215,35 @@ Phx.vista.ClaseComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		
+		{
+			config:{
+				name: 'tiene_apertura',
+				fieldLabel: 'Apertura?',
+				qtip:'Admite comprobante de apertura, generalmente solo para cbte de diario',
+				allowBlank: false,
+				anchor: '40%',
+				gwidth: 100,
+				typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio',       		    
+       		    store:['si','no']
+			},
+			type:'ComboBox',
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'ccom.tiene_apertura',
+	       				 options: ['si','no'],	
+	       		 	},
+			grid:true,
+			form:true
+		},
+		
+		
+		
 		{
 			config:{
 				name: 'estado_reg',
@@ -313,7 +342,7 @@ Phx.vista.ClaseComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},'desc_doc',
 		'momento_comprometido',
 		'momento_ejecutado',
-		'momento_pagado','codigo'
+		'momento_pagado','codigo','tiene_apertura'
 		
 	],
 	sortInfo:{

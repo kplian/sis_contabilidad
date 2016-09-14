@@ -3310,3 +3310,21 @@ IS 'tabla para migrar desde un excel y transofrmar al formato arbol';
 
 
 
+/***********************************I-SCP-RAC-CONTA-0-20/10/2016****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN tiene_apertura VARCHAR(8) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tclase_comprobante.tiene_apertura
+IS 'esa calse de comprobantes admite cbte de apertura, esto es para saber si va saltar la numeracion o no';
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-20/10/2016****************************************/
+
+
+
+
