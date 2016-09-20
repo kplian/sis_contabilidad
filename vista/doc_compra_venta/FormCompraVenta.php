@@ -1661,7 +1661,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         if(this.Cmp.porc_it.getValue() > 0){
         	this.Cmp.importe_it.setValue(this.Cmp.porc_it.getValue()*this.Cmp.importe_neto.getValue())
         }
-        
+
         //calculo iva cf
         if(this.Cmp.porc_iva_cf.getValue() > 0 || this.Cmp.porc_iva_df.getValue() > 0){
         	var excento = 0.00;
@@ -1669,13 +1669,16 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         		excento = this.Cmp.importe_excento.getValue();
         	}
         	if(this.Cmp.porc_iva_cf.getValue() > 0){
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue()));
+				if(this.Cmp.id_plantilla.value == 25)
+        	   		this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_doc.getValue()-this.Cmp.importe_descuento.getValue()));
+				else
+					this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_doc.getValue()-this.Cmp.importe_descuento.getValue() - excento));
         	}
         	else {
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue()));
+        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_doc.getValue() - this.Cmp.importe_descuento.getValue() - excento));
         	}
-        }	
-        
+        }
+
         if(this.mostrarFormaPago){
 	        if(this.Cmp.importe_retgar.getValue() > 0 || this.Cmp.importe_anticipo.getValue() > 0 ||  this.Cmp.importe_pendiente.getValue() > 0){
 	        	this.Cmp.id_auxiliar.allowBlank = false;
