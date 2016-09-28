@@ -70,14 +70,13 @@ BEGIN
                             ot.desc_orden as desc_orden_trabajo,
                             pre.id_presupuesto,
                             docc.precio_total_final,
-                            prepar.desc_partida
+                            par.codigo as desc_partida
 						from conta.tdoc_concepto docc
 						inner join segu.tusuario usu1 on usu1.id_usuario = docc.id_usuario_reg
                         inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = docc.id_concepto_ingas
                         inner join param.vcentro_costo cc on cc.id_centro_costo = docc.id_centro_costo
                         inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo
-            inner join pre.tconcepto_partida cgpar on cgpar.id_concepto_ingas=cig.id_concepto_ingas
-						inner join pre.vpresup_partida prepar on prepar.id_partida=cgpar.id_partida and prepar.id_presupuesto=pre.id_presupuesto
+            inner join pre.tpartida par on par.id_partida=docc.id_partida
 						left join segu.tusuario usu2 on usu2.id_usuario = docc.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = docc.id_orden_trabajo
 				        where  ';
