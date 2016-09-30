@@ -209,7 +209,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('id_deptos','id_deptos','varchar'); 		
 		$this->setParametro('tipo_cuenta','tipo_cuenta','varchar'); 
 		$this->setParametro('incluir_cierre','incluir_cierre','varchar');  
-		$this->setParametro('tipo_balance','tipo_balance','varchar');       
+		$this->setParametro('tipo_balance','tipo_balance','varchar'); 
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');      
 	            
 	    //Definicion de la lista del resultado del query
 	     $this->captura('id_cuenta','int4');     
@@ -241,7 +242,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('hasta','hasta','date');
 		$this->setParametro('id_resultado_plantilla','id_resultado_plantilla','integer');
 		$this->setParametro('id_deptos','id_deptos','varchar'); 
-		$this->setParametro('extendido','extendido','varchar');       
+		$this->setParametro('extendido','extendido','varchar');
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');        
 	            
 	    //Definicion de la lista del resultado del query
 	    $this->captura('subrayar','varchar'); 

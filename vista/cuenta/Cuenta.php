@@ -508,7 +508,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		this.ocultarComponente(this.cmpTipoCuenta);
 		this.ocultarComponente(this.cmpTipoCuentaPat);
 		this.ocultarComponente(this.cmpDigito);
-		this.cmpNroCuenta.disable();
+		//this.cmpNroCuenta.disable();
 		Phx.vista.Cuenta.superclass.onButtonEdit.call(this);
 		
 		var nodo = this.sm.getSelectedNode(this.cmpTipoCuenta);           

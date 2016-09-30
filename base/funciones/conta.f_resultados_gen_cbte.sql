@@ -258,6 +258,8 @@ BEGIN
           IF  v_codigo_estado != 'borrador' THEN
             raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
           END IF;
+          
+         
                     
          ------------------------------------
          --  registro de comprobante
@@ -411,6 +413,16 @@ BEGIN
                   );
             END IF;
          END LOOP;
+         
+         
+      ----------------------------------------------------------------
+      -- definir tipos de cambio 
+       ----------------------------------------------------------------
+    
+         IF not  conta.f_act_trans_cbte_generados(v_id_int_comprobante) THEN
+           raise exception 'error al generar comprobante';
+         END IF;
+    
            
   
 

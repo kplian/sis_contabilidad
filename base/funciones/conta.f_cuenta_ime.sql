@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_cuenta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -81,9 +83,17 @@ BEGIN
         
         END IF;
         
+        -- buscamos que el nuero de cuenta no se repita
         
+        IF exists(SELECT 1
+                  from conta.tcuenta c 
+                  where trim(c.nro_cuenta) = trim(v_parametros.nro_cuenta)
+                  and c.id_gestion = v_parametros.id_gestion
+                  and c.estado_reg = 'activo') THEN
+            
+            raise exception 'El código de cuenta  % ya existe', v_parametros.nro_cuenta;
         
-        
+        END IF;
         
         
         
@@ -161,6 +171,16 @@ BEGIN
         ELSE
        		 v_tipo_cuenta_pat = v_parametros.tipo_cuenta_pat;
         
+        END IF;
+        
+        
+        IF exists(SELECT 1
+                  from conta.tcuenta c 
+                  where trim(c.nro_cuenta) = trim(v_parametros.nro_cuenta)
+                  and c.id_gestion = v_parametros.id_gestion
+                  and c.estado_reg = 'activo'
+                  and c.id_cuenta !=  v_parametros.id_cuenta ) THEN            
+            raise exception 'El código de cuenta  % ya existe', v_parametros.nro_cuenta;        
         END IF;
         
             --  obtener valores previos

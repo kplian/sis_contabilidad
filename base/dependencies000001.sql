@@ -2610,3 +2610,13 @@ AS
 /**********************************F-DEP-RAC-CONTA-0-11/07/2016****************************************/
 
 
+/**********************************I-DEP-RAC-CONTA-0-31/08/2016****************************************/
+
+CREATE TRIGGER f_trig_int_transaccion_defore
+  BEFORE INSERT 
+  ON conta.tint_transaccion FOR EACH ROW 
+  EXECUTE PROCEDURE conta.f_trig_int_transaccion_defore();
+
+
+/**********************************F-DEP-RAC-CONTA-0-31/08/2016****************************************/
+
