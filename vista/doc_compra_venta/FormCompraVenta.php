@@ -77,8 +77,13 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
     },
     buildComponentesDetalle: function(){
-    	var me = this,
+    	var me = this;
+
+		if(me.autorizacion!='')
+			bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto', autorizacion: this.autorizacion}:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
+		else
     	    bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto'}:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
+
     	me.detCmp = {
     		       'id_concepto_ingas': new Ext.form.ComboBox({
 							                name: 'id_concepto_ingas',
