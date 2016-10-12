@@ -342,7 +342,7 @@ BEGIN
                         where      lcv.tipo = '''||v_parametros.tipo||'''
                                and lcv.id_periodo = '||v_parametros.id_periodo||'
                                and id_depto_conta in ( '||v_id_deptos||')
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
@@ -418,7 +418,7 @@ BEGIN
                         where  lcv.tipo = '''||v_tipo||'''
                                and id_moneda = '||param.f_get_moneda_base()||'
                                and '||v_filtro||'
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
@@ -518,7 +518,7 @@ BEGIN
                         where  lcv.tipo = '''||v_tipo||'''
                                and id_moneda = '||param.f_get_moneda_base()||'
                                and '||v_filtro||'
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
