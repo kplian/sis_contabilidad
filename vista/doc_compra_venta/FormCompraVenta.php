@@ -14,6 +14,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     tam_pag: 10,
     tabEnter: true,
     mostrarFormaPago : true,
+    mostrarPartidas: false,
     regitrarDetalle: 'si',
     id_moneda_defecto: 0,  // 0 quiere decir todas las monedas
     //layoutType: 'wizard',
@@ -114,9 +115,13 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 							               minChars: 2,
 							               qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
 							               tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
-							             }),
-
-					'desc_partida': new Ext.form.TextField({
+							             })
+							    };
+							             
+							             
+		
+		if(me.mostrarPartidas){
+			Ext.apply(me.detCmp,{'desc_partida': new Ext.form.TextField({
 						name: 'desc_partida',
 						msgTarget: 'title',
 						fieldLabel: 'Partida',
@@ -124,8 +129,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						anchor: '80%',
 						maxLength:1200,
 						disabled : true
-					}),
-							             
+					})});	
+		}					             
+						             
+
+					
+	   Ext.apply(me.detCmp,{					             
 	              'id_centro_costo': new Ext.form.ComboRec({
 						                    name:'id_centro_costo',
 						                    msgTarget: 'title',
@@ -188,7 +197,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                       		 	})
 					
 					
-			  }
+			  });
     		
     		
     }, 
@@ -240,11 +249,16 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			        }
 			        this.detCmp.id_orden_trabajo.reset();
 			    
-			    var idcc = this.detCmp.id_centro_costo.getValue();
-				if(idcc){
-				  this.checkRelacionConcepto({id_centro_costo: idcc , id_concepto_ingas: rec.data.id_concepto_ingas, id_gestion :  this.Cmp.id_gestion.getValue()});	
-				}
-			    this.detCmp.desc_partida.setValue(rec.data.desc_partida);
+			       var idcc = this.detCmp.id_centro_costo.getValue();
+				   if(idcc){
+				      this.checkRelacionConcepto({id_centro_costo: idcc , id_concepto_ingas: rec.data.id_concepto_ingas, id_gestion :  this.Cmp.id_gestion.getValue()});	
+				   }
+			    
+			       if(this.mostrarPartidas){
+			       	 this.detCmp.desc_partida.setValue(rec.data.desc_partida);
+			       }
+			       
+			    
 			  },this);
 			  
 			  
@@ -411,74 +425,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
         
         
-        
-        
-        
-        this.megrid = new Ext.grid.GridPanel({
-        	        layout: 'fit',
-                    store:  this.mestore,
-                    region: 'center',
-                    split: true,
-                    border: false,
-                    plain: true,
-                    //autoHeight: true,
-                    plugins: [ this.editorDetail, this.summary ],
-                    stripeRows: true,
-                    tbar: [{
-                        /*iconCls: 'badd',*/
-                        text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Concepto',
-                        scope: this,
-                        width: '100',
-                        handler: function(){
-                        	if(this.evaluaRequistos() === true){
-                        		
-	                        		 var e = new Items({
-	                        		 	id_concepto_ingas: undefined,
-		                                cantidad_sol: 1,
-		                                descripcion: '',
-		                                precio_total: 0,
-		                                precio_total_final: 0,
-		                                precio_unitario: undefined
-	                            });
-	                            this.editorDetail.stopEditing();
-	                            this.mestore.insert(0, e);
-	                            this.megrid.getView().refresh();
-	                            this.megrid.getSelectionModel().selectRow(0);
-	                            this.editorDetail.startEditing(0);
-	                            this.sw_init_add = true;
-	                            
-	                            this.bloqueaRequisitos(true);
-                        	}
-                        	else{
-                        		//alert('Verifique los requisitos');
-                        	}
-                           
-                        }
-                    },{
-                        ref: '../removeBtn',
-                        text: '<i class="fa fa-trash fa-lg"></i> Eliminar',
-                        scope:this,
-                        handler: function(){
-                            this.editorDetail.stopEditing();
-                            var s = this.megrid.getSelectionModel().getSelections();
-                            for(var i = 0, r; r = s[i]; i++){
-                                
-                             
-                                
-                                // si se edita el documento y el concepto esta registrado, marcarlo para eliminar de la base
-                                if(r.data.id_doc_concepto > 0){
-                                	this.conceptos_eliminados.push(r.data.id_doc_concepto);
-                                }
-                                this.mestore.remove(r);
-                            }
-                            
-                            
-                            this.evaluaGrilla();
-                        }
-                    }],
-            
-                    columns: [
-                    new Ext.grid.RowNumberer(),
+        this.columnasDet = [
+                       new Ext.grid.RowNumberer(),
                     {
                         header: 'Concepto',
                         dataIndex: 'id_concepto_ingas',
@@ -486,7 +434,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                         sortable: false,
                         renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);},
                         editor: this.detCmp.id_concepto_ingas 
-                    },
+                    }]
+       
+       if(this.mostrarPartidas){
+       	  this.columnasDet.push(             
 					{
 						header: 'Partida',
 						dataIndex: 'desc_partida',
@@ -494,7 +445,11 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						width: 150,
 						renderer:function (value, p, record){return String.format('{0}', record.data['desc_partida']);},
 						editor: this.detCmp.desc_partida
-					},
+					});
+       }
+       
+		
+	  this.columnasDet = this.columnasDet.concat([			
 					{
                        
                         header: 'Centro de Costo',
@@ -564,7 +519,73 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                         sortable: false,
                         summaryType: 'sum',
                         editor: this.detCmp.precio_total_final 
-                    }]
+                    }]);
+        
+        
+        this.megrid = new Ext.grid.GridPanel({
+        	        layout: 'fit',
+                    store:  this.mestore,
+                    region: 'center',
+                    split: true,
+                    border: false,
+                    plain: true,
+                    //autoHeight: true,
+                    plugins: [ this.editorDetail, this.summary ],
+                    stripeRows: true,
+                    tbar: [{
+                        /*iconCls: 'badd',*/
+                        text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Concepto',
+                        scope: this,
+                        width: '100',
+                        handler: function(){
+                        	if(this.evaluaRequistos() === true){
+                        		
+	                        		 var e = new Items({
+	                        		 	id_concepto_ingas: undefined,
+		                                cantidad_sol: 1,
+		                                descripcion: '',
+		                                precio_total: 0,
+		                                precio_total_final: 0,
+		                                precio_unitario: undefined
+	                            });
+	                            this.editorDetail.stopEditing();
+	                            this.mestore.insert(0, e);
+	                            this.megrid.getView().refresh();
+	                            this.megrid.getSelectionModel().selectRow(0);
+	                            this.editorDetail.startEditing(0);
+	                            this.sw_init_add = true;
+	                            
+	                            this.bloqueaRequisitos(true);
+                        	}
+                        	else{
+                        		//alert('Verifique los requisitos');
+                        	}
+                           
+                        }
+                    },{
+                        ref: '../removeBtn',
+                        text: '<i class="fa fa-trash fa-lg"></i> Eliminar',
+                        scope:this,
+                        handler: function(){
+                            this.editorDetail.stopEditing();
+                            var s = this.megrid.getSelectionModel().getSelections();
+                            for(var i = 0, r; r = s[i]; i++){
+                                
+                             
+                                
+                                // si se edita el documento y el concepto esta registrado, marcarlo para eliminar de la base
+                                if(r.data.id_doc_concepto > 0){
+                                	this.conceptos_eliminados.push(r.data.id_doc_concepto);
+                                }
+                                this.mestore.remove(r);
+                            }
+                            
+                            
+                            this.evaluaGrilla();
+                        }
+                    }],
+            
+                    columns: this.columnasDet
                 });
     },
     buildGrupos: function(){
@@ -1989,6 +2010,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						if(reg.ROOT.datos.valor != 'si'){
 						   me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas';
 						   me.parFilConcepto = 'desc_ingas';
+						   me.mostrarPartidas = false;
 					    }
 					   
 					   
