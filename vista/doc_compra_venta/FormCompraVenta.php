@@ -1678,20 +1678,21 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         	this.Cmp.importe_it.setValue(this.Cmp.porc_it.getValue()*this.Cmp.importe_neto.getValue())
         }
 
+        
         //calculo iva cf
         if(this.Cmp.porc_iva_cf.getValue() > 0 || this.Cmp.porc_iva_df.getValue() > 0){
+        	
         	var excento = 0.00;
+        	
         	if(this.Cmp.importe_excento.getValue() > 0){
         		excento = this.Cmp.importe_excento.getValue();
         	}
         	if(this.Cmp.porc_iva_cf.getValue() > 0){
-				if(this.Cmp.id_plantilla.value == 25)
-        	   		this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_doc.getValue()-this.Cmp.importe_descuento.getValue()));
-				else
-					this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_doc.getValue()-this.Cmp.importe_descuento.getValue() - excento));
-        	}
+        		
+        		this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
+			}
         	else {
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_doc.getValue() - this.Cmp.importe_descuento.getValue() - excento));
+        	    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
         	}
         }
 
@@ -1707,15 +1708,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	        }	
 	        this.Cmp.id_auxiliar.validate();
         }
+        
         var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
         this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
         
-        if(this.Cmp.id_plantilla.value == 25)
-			this.Cmp.importe_neto.setValue(this.Cmp.importe_neto.getValue() * 0.7);
-		else if (this.Cmp.id_plantilla.value == 4)
-				this.Cmp.importe_neto.setValue(0);
-			else
-				this.Cmp.importe_neto.setValue(this.Cmp.importe_doc.getValue() -  this.Cmp.importe_descuento.getValue() - this.Cmp.importe_excento.getValue());
+        
+     
      }, 
 	
 	getDetallePorAplicar:function(id_plantilla){
@@ -1835,25 +1833,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.id_depto_conta.setValue(this.data.id_depto);
         this.Cmp.id_gestion.setValue(this.data.id_gestion);
         this.Cmp.tipo.setValue(this.data.tipoDoc);
-
-		if( typeof(this['data']['objPadre']['maestro']) !== 'undefined' ) {
-			if ((this.mycls = 'FormRendicionCD' && this['data']['objPadre']['maestro']['estado'] == 'vbrendicion')
-				||	(this.mycls='FormRendicion' && this['data']['objPadre']['maestro']['estado'] =='revision')){
-				this.Cmp.id_plantilla.setDisabled(true);
-				this.Cmp.codigo_qr.setDisabled(true);
-				this.Cmp.id_moneda.setDisabled(true);
-				this.Cmp.fecha.setDisabled(true);
-				this.Cmp.nro_autorizacion.setDisabled(true);
-				this.Cmp.nit.setDisabled(true);
-				this.Cmp.razon_social.setDisabled(true);
-				this.Cmp.nro_documento.setDisabled(true);
-				this.Cmp.importe_doc.setDisabled(true);
-				this.Cmp.importe_excento.setDisabled(true);
-				this.Cmp.importe_iva.setDisabled(true);
-				this.Cmp.importe_pago_liquido.setDisabled(true);
-				this.Cmp.importe_descuento.setDisabled(true);
-			}
-		}
+        
 		this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
         //load detalle de conceptos
         if(this.regitrarDetalle == 'si'){
