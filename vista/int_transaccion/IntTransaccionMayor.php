@@ -73,9 +73,35 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    else{
 		   			    	//cargar resumen en el panel
 		   			    	var debe = record.data["importe_debe_mb"]?record.data["importe_debe_mb"]:0,
-		   			    		haber = record.data["importe_haber_mb"]?record.data["importe_haber_mb"]:0;
+		   			    		haber = record.data["importe_haber_mb"]?record.data["importe_haber_mb"]:0,
+		   			    		sum_debe, sum_haber;
 		   			    	
-		   			    	Phx.CP.getPagina(me.idContenedorPadre).panelResumen.update( String.format('<p>DEBE: {0} <br> HABER: {1} </br> SALDO: {2}</p>' ,debe, haber, debe - haber))
+		   			    	if ((debe - haber ) > 0) {
+		   			    		sum_debe = debe - haber;
+		   			    		sum_haber = '';
+		   			    	}
+		   			    	else{
+		   			    		sum_debe = '';
+		   			    		sum_haber = haber - debe;
+		   			    	}
+		   			    	
+		   			    	var html = String.format("<table style='width:70%; border-collapse:collapse;'> \
+		   			    							  <tr>\
+													    <td >Debe </td>\
+													    <td >Haber</td> \
+													  </tr>\
+		   			    	                          <tr>\
+													    <td style='padding: 15px; border-top:  solid #000000; border-right:  solid #000000;'>{0} </td>\
+													    <td style='padding: 15px; border-top:  solid #000000;'>{1}</td> \
+													  </tr>\
+													  <tr>\
+													    <td style='padding: 15px; border-right: solid #000000;'>{2}</td>\
+													    <td style='padding: 15px;' >{3}</td>\
+													  </tr><table>" ,debe, haber, sum_debe, sum_haber);
+		   			    	
+		   			    	//var html = String.format('<p>DEBE: {0} <br> HABER: {1} </br> SALDO: {2}</p>' ,debe, haber, debe - haber);
+		   			    	
+		   			    	Phx.CP.getPagina(me.idContenedorPadre).panelResumen.update(html)
 		   			    	return '<b><p align="right">Total: &nbsp;&nbsp; </p></b>';
 		   			    }
 		   			    
