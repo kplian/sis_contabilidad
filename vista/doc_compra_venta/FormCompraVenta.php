@@ -14,6 +14,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     tam_pag: 10,
     tabEnter: true,
     mostrarFormaPago : true,
+    mostrarPartidas: false,
     regitrarDetalle: 'si',
     id_moneda_defecto: 0,  // 0 quiere decir todas las monedas
     //layoutType: 'wizard',
@@ -24,6 +25,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
     conceptos_eliminados: [],
     listadoConcepto: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
     parFilConcepto:'desc_ingas#par.codigo',
+    tipo_pres_gasto: 'gasto',
+    tipo_pres_recurso: 'recurso', 
     constructor:function(config)
     {
          this.addEvents('beforesave');
@@ -114,8 +117,26 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 							               minChars: 2,
 							               qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
 							               tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
-							             }),
+							             })
+							    };
 							             
+							             
+		
+		if(me.mostrarPartidas){
+			Ext.apply(me.detCmp,{'desc_partida': new Ext.form.TextField({
+						name: 'desc_partida',
+						msgTarget: 'title',
+						fieldLabel: 'Partida',
+						allowBlank: true,
+						anchor: '80%',
+						maxLength:1200,
+						disabled : true
+					})});	
+		}					             
+						             
+
+					
+	   Ext.apply(me.detCmp,{					             
 	              'id_centro_costo': new Ext.form.ComboRec({
 						                    name:'id_centro_costo',
 						                    msgTarget: 'title',
@@ -124,7 +145,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						                    url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
 						                    emptyText : 'Centro Costo...',
 						                    allowBlank: false,
-						                    baseParams: (me.data.tipoDoc == 'compra')?{tipo_pres:'gasto', filtrar:'grupo_ep'}:{tipo_pres:'recurso', filtrar:'grupo_ep'}
+						                    baseParams: (me.data.tipoDoc == 'compra')?{tipo_pres:me.tipo_pres_gasto, filtrar:'grupo_ep'}:{tipo_pres: me.tipo_pres_recurso, filtrar:'grupo_ep'}
 						                }),
 						                
 	               'id_orden_trabajo': new Ext.form.ComboRec({
@@ -178,7 +199,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                       		 	})
 					
 					
-			  }
+			  });
     		
     		
     }, 
@@ -230,11 +251,16 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 			        }
 			        this.detCmp.id_orden_trabajo.reset();
 			    
-			    var idcc = this.detCmp.id_centro_costo.getValue();
-				if(idcc){
-				  this.checkRelacionConcepto({id_centro_costo: idcc , id_concepto_ingas: rec.data.id_concepto_ingas, id_gestion :  this.Cmp.id_gestion.getValue()});	
-				}
-			        
+			       var idcc = this.detCmp.id_centro_costo.getValue();
+				   if(idcc){
+				      this.checkRelacionConcepto({id_centro_costo: idcc , id_concepto_ingas: rec.data.id_concepto_ingas, id_gestion :  this.Cmp.id_gestion.getValue()});	
+				   }
+			    
+			       if(this.mostrarPartidas){
+			       	 this.detCmp.desc_partida.setValue(rec.data.desc_partida);
+			       }
+			       
+			    
 			  },this);
 			  
 			  
@@ -347,6 +373,9 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                     }, {
                         name: 'id_concepto_ingas',
                         type: 'int'
+					}, {
+						name: 'desc_partida',
+						type: 'int'
                     }, {
                         name: 'id_centro_costo',
                         type: 'int'
@@ -372,7 +401,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					totalProperty: 'total',
 					fields: ['id_doc_concepto','id_centro_costo','descripcion', 'precio_unitario',
 					         'id_doc_compra_venta','id_orden_trabajo','id_concepto_ingas','precio_total','cantidad_sol',
-							 'desc_centro_costo','desc_concepto_ingas','desc_orden_trabajo','precio_total_final'
+							 'desc_centro_costo','desc_concepto_ingas','desc_orden_trabajo','precio_total_final', 'desc_partida'
 					],remoteSort: true,
 					baseParams: {dir:'ASC',sort:'id_doc_concepto',limit:'50',start:'0'}
 				});
@@ -398,7 +427,101 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
         
         
-        
+        this.columnasDet = [
+                       new Ext.grid.RowNumberer(),
+                    {
+                        header: 'Concepto',
+                        dataIndex: 'id_concepto_ingas',
+                        width: 200,
+                        sortable: false,
+                        renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);},
+                        editor: this.detCmp.id_concepto_ingas 
+                    }]
+       
+       if(this.mostrarPartidas){
+       	  this.columnasDet.push(             
+					{
+						header: 'Partida',
+						dataIndex: 'desc_partida',
+						align: 'center',
+						width: 150,
+						renderer:function (value, p, record){return String.format('{0}', record.data['desc_partida']);},
+						editor: this.detCmp.desc_partida
+					});
+       }
+       
+		
+	  this.columnasDet = this.columnasDet.concat([			
+					{
+                       
+                        header: 'Centro de Costo',
+                        dataIndex: 'id_centro_costo',
+                        align: 'center',
+                        width: 200,
+                        renderer:function (value, p, record){return String.format('{0}', record.data['desc_centro_costo']);},
+                        editor: this.detCmp.id_centro_costo 
+                    },
+                    {
+                       
+                        header: 'Orden de Trabajo',
+                        dataIndex: 'id_orden_trabajo',
+                        align: 'center',
+                        width: 150,
+                        renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden_trabajo']?record.data['desc_orden_trabajo']:'');},
+					    editor: this.detCmp.id_orden_trabajo 
+                    },
+                    {
+                       
+                        header: 'Descripción',
+                        dataIndex: 'descripcion',
+                        
+                        align: 'center',
+                        width: 200,
+                        editor: this.detCmp.descripcion 
+                    },
+                    {
+                       
+                        header: 'Cantidad',
+                        dataIndex: 'cantidad_sol',
+                        align: 'center',
+                        width: 50,
+                        summaryType: 'sum',
+                        editor: this.detCmp.cantidad_sol 
+                    },
+
+
+                    {
+                       
+                        header: 'P / Unit',
+                        dataIndex: 'precio_unitario',
+                        align: 'center',
+                        width: 50,
+                        trueText: 'Yes',
+                        falseText: 'No',
+                        minValue: 0.001,
+                        summaryType: 'sum',
+                        editor: this.detCmp.precio_unitario
+                    },
+                    {
+                        xtype: 'numbercolumn',
+                        header: 'Importe Total',
+                        dataIndex: 'precio_total',
+                        format: '$0,0.00',
+                        width: 75,
+                        sortable: false,
+                        summaryType: 'sum',
+                        editor: this.detCmp.precio_total 
+                    },
+                    {
+                        xtype: 'numbercolumn',
+                        header: 'Importe Neto',
+                        dataIndex: 'precio_total_final',
+                        format: '$0,0.00',
+                        width: 75,
+                        sortable: false,
+                        summaryType: 'sum',
+                        editor: this.detCmp.precio_total_final 
+                    }]);
         
         
         this.megrid = new Ext.grid.GridPanel({
@@ -464,86 +587,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
                         }
                     }],
             
-                    columns: [
-                    new Ext.grid.RowNumberer(),
-                    {
-                        header: 'Concepto',
-                        dataIndex: 'id_concepto_ingas',
-                        width: 200,
-                        sortable: false,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);},
-                        editor: this.detCmp.id_concepto_ingas 
-                    },
-                    {
-                       
-                        header: 'Centro de Costo',
-                        dataIndex: 'id_centro_costo',
-                        align: 'center',
-                        width: 200,
-                        renderer:function (value, p, record){return String.format('{0}', record.data['desc_centro_costo']);},
-                        editor: this.detCmp.id_centro_costo 
-                    },
-                    {
-                       
-                        header: 'Orden de Trabajo',
-                        dataIndex: 'id_orden_trabajo',
-                        align: 'center',
-                        width: 150,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden_trabajo']?record.data['desc_orden_trabajo']:'');},
-					    editor: this.detCmp.id_orden_trabajo 
-                    },
-                    {
-                       
-                        header: 'Descripción',
-                        dataIndex: 'descripcion',
-                        
-                        align: 'center',
-                        width: 200,
-                        editor: this.detCmp.descripcion 
-                    },
-                    {
-                       
-                        header: 'Cantidad',
-                        dataIndex: 'cantidad_sol',
-                        align: 'center',
-                        width: 50,
-                        summaryType: 'sum',
-                        editor: this.detCmp.cantidad_sol 
-                    },
-                    
-                    
-                    {
-                       
-                        header: 'P / Unit',
-                        dataIndex: 'precio_unitario',
-                        align: 'center',
-                        width: 50,
-                        trueText: 'Yes',
-                        falseText: 'No',
-                        minValue: 0.001,
-                        summaryType: 'sum',
-                        editor: this.detCmp.precio_unitario
-                    },
-                    {
-                        xtype: 'numbercolumn',
-                        header: 'Importe Total',
-                        dataIndex: 'precio_total',
-                        format: '$0,0.00',
-                        width: 75,
-                        sortable: false,
-                        summaryType: 'sum',
-                        editor: this.detCmp.precio_total 
-                    },
-                    {
-                        xtype: 'numbercolumn',
-                        header: 'Importe Neto',
-                        dataIndex: 'precio_total_final',
-                        format: '$0,0.00',
-                        width: 75,
-                        sortable: false,
-                        summaryType: 'sum',
-                        editor: this.detCmp.precio_total_final 
-                    }]
+                    columns: this.columnasDet
                 });
     },
     buildGrupos: function(){
@@ -1635,21 +1679,25 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         if(this.Cmp.porc_it.getValue() > 0){
         	this.Cmp.importe_it.setValue(this.Cmp.porc_it.getValue()*this.Cmp.importe_neto.getValue())
         }
+
         
         //calculo iva cf
         if(this.Cmp.porc_iva_cf.getValue() > 0 || this.Cmp.porc_iva_df.getValue() > 0){
+        	
         	var excento = 0.00;
+        	
         	if(this.Cmp.importe_excento.getValue() > 0){
         		excento = this.Cmp.importe_excento.getValue();
         	}
         	if(this.Cmp.porc_iva_cf.getValue() > 0){
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue()));
-        	}
+        		
+        		this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
+			}
         	else {
-        	   this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue()));
+        	    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
         	}
-        }	
-        
+        }
+
         if(this.mostrarFormaPago){
 	        if(this.Cmp.importe_retgar.getValue() > 0 || this.Cmp.importe_anticipo.getValue() > 0 ||  this.Cmp.importe_pendiente.getValue() > 0){
 	        	this.Cmp.id_auxiliar.allowBlank = false;
@@ -1662,15 +1710,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	        }	
 	        this.Cmp.id_auxiliar.validate();
         }
+        
         var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
         this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
         
-        if(this.Cmp.id_plantilla.value == 25)
-			this.Cmp.importe_neto.setValue(this.Cmp.importe_neto.getValue() * 0.7);
-		else if (this.Cmp.id_plantilla.value == 4)
-				this.Cmp.importe_neto.setValue(0);
-			else
-				this.Cmp.importe_neto.setValue(this.Cmp.importe_doc.getValue() -  this.Cmp.importe_descuento.getValue() - this.Cmp.importe_excento.getValue());
+        
+     
      }, 
 	
 	getDetallePorAplicar:function(id_plantilla){
@@ -1790,23 +1835,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.id_depto_conta.setValue(this.data.id_depto);
         this.Cmp.id_gestion.setValue(this.data.id_gestion);
         this.Cmp.tipo.setValue(this.data.tipoDoc);
-
-		if(this.mycls='FormRendicionCD' && this['data']['objPadre']['maestro']['estado'] =='vbrendicion'){
-			this.Cmp.id_plantilla.setDisabled(true);
-			this.Cmp.codigo_qr.setDisabled(true);
-			this.Cmp.id_moneda.setDisabled(true);
-			this.Cmp.fecha.setDisabled(true);
-			this.Cmp.nro_autorizacion.setDisabled(true);
-			this.Cmp.nit.setDisabled(true);
-			this.Cmp.razon_social.setDisabled(true);
-			this.Cmp.nro_documento.setDisabled(true);
-			this.Cmp.importe_doc.setDisabled(true);
-			this.Cmp.importe_excento.setDisabled(true);
-			this.Cmp.importe_iva.setDisabled(true);
-			this.Cmp.importe_pago_liquido.setDisabled(true);
-			this.Cmp.importe_descuento.setDisabled(true);
-		}
-		
+        
 		this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
         //load detalle de conceptos
         if(this.regitrarDetalle == 'si'){
@@ -1863,7 +1892,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	   	    	
 	   	    
 	   	    	
-	   	    	if (total_det*1 == this.Cmp.importe_doc.getValue()){
+	   	    	if ((total_det.toFixed(2)*1) == this.Cmp.importe_doc.getValue()){
 	   	    		Phx.vista.FormCompraVenta.superclass.onSubmit.call(this, o, undefined, true);
 	   	    	}
 	   	    	else{
@@ -1963,6 +1992,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 						if(reg.ROOT.datos.valor != 'si'){
 						   me.listadoConcepto = '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas';
 						   me.parFilConcepto = 'desc_ingas';
+						   me.mostrarPartidas = false;
 					    }
 					   
 					   

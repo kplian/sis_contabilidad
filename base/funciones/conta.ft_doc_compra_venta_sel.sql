@@ -95,7 +95,7 @@ BEGIN
                             dcv.id_moneda,
                             mon.codigo as desc_moneda,
                             dcv.id_int_comprobante,
-							ic.nro_tramite,
+                            COALESCE(ic.nro_tramite,cd.nro_tramite),
                             COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
                             COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
                             COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
@@ -116,6 +116,8 @@ BEGIN
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
+                          left join cd.trendicion_det ren on ren.id_doc_compra_venta=dcv.id_doc_compra_venta
+					      left join cd.tcuenta_doc cd on cd.id_cuenta_doc=ren.id_cuenta_doc
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -340,7 +342,7 @@ BEGIN
                         where      lcv.tipo = '''||v_parametros.tipo||'''
                                and lcv.id_periodo = '||v_parametros.id_periodo||'
                                and id_depto_conta in ( '||v_id_deptos||')
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
@@ -416,7 +418,7 @@ BEGIN
                         where  lcv.tipo = '''||v_tipo||'''
                                and id_moneda = '||param.f_get_moneda_base()||'
                                and '||v_filtro||'
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
@@ -516,7 +518,7 @@ BEGIN
                         where  lcv.tipo = '''||v_tipo||'''
                                and id_moneda = '||param.f_get_moneda_base()||'
                                and '||v_filtro||'
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta

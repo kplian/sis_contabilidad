@@ -19,7 +19,7 @@ CREATE TABLE conta.tcuenta (
   nro_cuenta VARCHAR(20), 
   id_gestion INTEGER, 
   id_moneda INTEGER, 
-  nombre_cuenta VARCHAR(100), 
+  nombre_cuenta VARCHAR(200), 
   desc_cuenta VARCHAR(500), 
   nivel_cuenta INTEGER, 
   tipo_cuenta VARCHAR(30), 
@@ -3277,6 +3277,36 @@ IS 'este campo define el orden de impresion, inicialmente se copia el id, pero a
 
 /***********************************F-SCP-RAC-CONTA-0-31/08/2016****************************************/
 
+
+
+/***********************************I-SCP-RAC-CONTA-0-03/10/2016****************************************/
+
+
+CREATE TABLE conta.tcuenta_tmp (
+  codigo VARCHAR,
+  c1 VARCHAR,
+  c2 VARCHAR,
+  c3 VARCHAR,
+  c4 VARCHAR,
+  c5 VARCHAR,
+  mov VARCHAR(10) NOT NULL,
+  aux VARCHAR(16),
+  nivel INTEGER,
+  c6 VARCHAR,
+  eeff VARCHAR(12) DEFAULT 'B'::character varying,
+  saldo VARCHAR(12) DEFAULT 'D'::character varying NOT NULL,
+  tipo_cuenta VARCHAR(30) DEFAULT 'activo'::character varying NOT NULL
+) 
+WITH (oids = false);
+
+ALTER TABLE conta.tcuenta_tmp
+  ALTER COLUMN codigo SET STATISTICS 0;
+
+COMMENT ON TABLE conta.tcuenta_tmp
+IS 'tabla para migrar desde un excel y transofrmar al formato arbol';
+
+
+/***********************************F-SCP-RAC-CONTA-0-03/10/2016****************************************/
 
 
 

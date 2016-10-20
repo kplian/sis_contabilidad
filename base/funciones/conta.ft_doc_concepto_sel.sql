@@ -69,12 +69,14 @@ BEGIN
                             cig.desc_ingas as desc_concepto_ingas,
                             ot.desc_orden as desc_orden_trabajo,
                             pre.id_presupuesto,
-                            docc.precio_total_final                      
+                            docc.precio_total_final,
+                            par.codigo as desc_partida
 						from conta.tdoc_concepto docc
 						inner join segu.tusuario usu1 on usu1.id_usuario = docc.id_usuario_reg
                         inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = docc.id_concepto_ingas
                         inner join param.vcentro_costo cc on cc.id_centro_costo = docc.id_centro_costo
                         inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo
+                        left join pre.tpartida par on par.id_partida=docc.id_partida
 						left join segu.tusuario usu2 on usu2.id_usuario = docc.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = docc.id_orden_trabajo
 				        where  ';
@@ -82,7 +84,8 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+             
+            raise notice '%',  v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
