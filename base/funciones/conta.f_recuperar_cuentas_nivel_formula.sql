@@ -1,21 +1,17 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel (
+CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel_formula (
   p_id_cuenta integer,
   p_nivel_ini integer,
   p_nivel_final integer,
   p_id_resultado_det_plantilla integer,
-  p_desde date,
-  p_hasta date,
-  p_id_deptos varchar,
-  p_incluir_cierre varchar,
-  p_incluir_apertura varchar,
-  p_incluir_aitb varchar,
-  p_signo_balance varchar,
-  p_tipo_balance varchar,
-  p_origen varchar
+  p_origen varchar,
+  p_formula varchar,
+  p_plantilla varchar,
+  p_destino varchar,
+  p_columnas_formula varchar []
 )
-RETURNS boolean AS
+RETURNS varchar [] AS
 $body$
 DECLARE
 
@@ -31,15 +27,16 @@ va_mayor			numeric[];
 v_id_gestion  		integer;
 v_id_cuentas		integer[];
 v_monto				numeric;
+v_columnas_formula	varchar[];
  
 
 BEGIN
 
 
 
-    v_nombre_funcion = 'conta.f_recuperar_cuentas_nivel';
+    v_nombre_funcion = 'conta.f_recuperar_cuentas_nivel_formula';
     
-    IF (p_nivel_ini = p_nivel_final and p_origen != 'balance') THEN
+    IF (p_nivel_ini = p_nivel_final) THEN
        
         FOR v_registros in (
                      select 
@@ -49,18 +46,24 @@ BEGIN
                      from conta.tcuenta cue 
                      where cue.id_cuenta_padre = p_id_cuenta and cue.estado_reg = 'activo') LOOP
                      
-                  --calculamos el balance de la cuenta para las fechas indicadas
-                   va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
-                  								 p_desde, 
-                                                 p_hasta, 
-                                                 p_id_deptos, 
-                                                 p_incluir_cierre, 
-                                                 p_incluir_apertura, 
-                                                 p_incluir_aitb,
-                                                 p_signo_balance,
-                                                 p_tipo_balance);
+                  
+                                                 
+                 --calculamos la formula para el nivel deseado                             
+                 SELECT 
+                     po_columnas_formula,
+                     po_monto
+                 into 
+                     v_columnas_formula,
+                     v_monto
+                     
+                 FROM conta.f_evaluar_resultado_detalle_formula(
+                                     p_formula, 
+                                     p_plantilla, 
+                                     p_destino, 
+                                     p_columnas_formula, 
+                                     v_registros.nro_cuenta);                               
                  		
-                  v_monto  =  va_mayor[1];
+                  p_columnas_formula = v_columnas_formula;
                   
                   --	insertamos en la tabla temporal
                   insert into temp_balancef (
@@ -95,20 +98,25 @@ BEGIN
                           cue.id_cuenta_padre = p_id_cuenta   
                          and cue.estado_reg = 'activo') LOOP
                      
-              
+             
+                
                      IF  v_registros.sw_transaccional = 'movimiento'  THEN
                          
-                          va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
-                  								 p_desde, 
-                                                 p_hasta, 
-                                                 p_id_deptos, 
-                                                 p_incluir_cierre, 
-                                                 p_incluir_apertura, 
-                                                 p_incluir_aitb,
-                                                 p_signo_balance,
-                                                 p_tipo_balance);
+                          SELECT 
+                               po_columnas_formula,
+                               po_monto
+                           into 
+                               v_columnas_formula,
+                               v_monto
+                               
+                           FROM conta.f_evaluar_resultado_detalle_formula(
+                                               p_formula, 
+                                               p_plantilla, 
+                                               p_destino, 
+                                               p_columnas_formula, 
+                                               v_registros.nro_cuenta); 
                                                  
-                          v_monto =  va_mayor[1];
+                          p_columnas_formula = v_columnas_formula;
                        
                           --	insertamos en la tabla temporal
                           insert into temp_balancef (
@@ -128,33 +136,31 @@ BEGIN
                      
                      ELSE
                      
-                             IF ( not conta.f_recuperar_cuentas_nivel(
-                                                    v_registros.id_cuenta, 
-                                                    p_nivel_ini + 1, 
-                                                    p_nivel_final, 
-                                                    p_id_resultado_det_plantilla, 
-                                                    p_desde, 
-                                                    p_hasta, 
-                                                    p_id_deptos,
-                                                    p_incluir_cierre,
-                                                    p_incluir_apertura,
-                                                    p_incluir_aitb,
-                                                    p_signo_balance,
-                                                    p_tipo_balance,
-                                                    p_origen) ) THEN     
-                                raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
-                          END IF;
+                         v_columnas_formula =  conta.f_recuperar_cuentas_nivel_formula(
+                                                        v_registros.id_cuenta, 
+                                                        p_nivel_ini + 1, 
+                                                        p_nivel_final, 
+                                                        p_id_resultado_det_plantilla, 
+                                                        p_origen,
+                                                        p_formula,
+                                                        p_plantilla,
+                                                        p_destino,
+                                                        p_columnas_formula
+                                                        );
+                                                        
+                                                         
+                                                        
+                    
+                       p_columnas_formula = v_columnas_formula;
                      
-                     
-                     END IF;
-               
+                 END IF;
+              
        END LOOP;  
     
     END IF;
     
    
-    RETURN TRUE;
-
+   return p_columnas_formula;
 
 EXCEPTION
 				

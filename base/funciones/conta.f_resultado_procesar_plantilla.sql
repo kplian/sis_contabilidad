@@ -34,6 +34,7 @@ v_id_cuenta				integer;
 v_force_invisible		boolean;
 v_registros_plan		record;
 v_id_prioridad			integer;
+v_columnas_formula		varchar[];
 
 BEGIN
      
@@ -105,6 +106,7 @@ BEGIN
                   
                   --   2.1) si el origen es balance
                   IF  v_registros.origen = 'balance' and v_registros.destino = 'reporte' THEN
+                        
                         --	2.1.1)  recuperamos los datos de la cuenta 
                         select
                           cue.id_cuenta,
@@ -195,6 +197,12 @@ BEGIN
                   --    2.2) si el origen es detall
                   ELSIF  v_registros.origen = 'detalle' or (v_registros.origen = 'balance' and v_registros.destino != 'reporte') THEN
                          
+                        -----------------------------------------------------------------------------------
+                        --   cuando es balance y el destino es un cbte, no se pueden insertar directamente las cuentas
+                        --   titulares, por eso se desglosa  la cuenta hasta encontrar las cuentas de movimiento
+                        --    e se insertar las trasacciones con cuenta de moviemto
+                        ----------------------------------------------------------------------------------  
+                  
                          
                          --   2.2.1)  recuperamos la cuenta raiz
                          select
@@ -285,16 +293,116 @@ BEGIN
                                 orden_cbte = v_registros.orden_cbte
                         WHERE id_resultado_det_plantilla = v_registros.id_resultado_det_plantilla;
                                    
+                  
+                  --    2.2) si el origen es detalle_formula (aplica la formula a los detalle de la cuenta)
+                  
+                  ELSIF  v_registros.origen = 'detalle_formula'  THEN
+                         
+                         
+                         --   2.2.1)  recuperamos la cuenta raiz
+                         select
+                          cue.id_cuenta,
+                          cue.nro_cuenta,
+                          cue.nombre_cuenta,
+                          cue.sw_transaccional
+                        into
+                          v_reg_cuenta
+                        from conta.tcuenta cue
+                        where cue.id_gestion = p_id_gestion and 
+                              cue.nro_cuenta = v_registros.codigo_cuenta ;
+                       
+                  
+                      IF v_reg_cuenta.sw_transaccional != 'movimiento' THEN  
+                            
+                            --  2.2.2) Recuperar las cuentas del nivel requerido
+                            v_columnas_formula =  conta.f_recuperar_cuentas_nivel_formula(
+                                                        v_reg_cuenta.id_cuenta, 
+                                                        1, 
+                                                        v_registros.nivel_detalle, 
+                                                        v_registros.id_resultado_det_plantilla, 
+                                                        v_registros.origen,
+                                                        v_registros.formula,
+                                                        p_plantilla,
+                                                        v_registros.destino,
+                                                        NULL --p_columnas_formula 
+                                                        );
+                            
+                        
+                        ELSE
+                                            
+                           
+                           SELECT 
+                               po_columnas_formula,
+                               po_monto
+                           into 
+                               v_columnas_formula,
+                               v_monto
+                               
+                           FROM conta.f_evaluar_resultado_detalle_formula(
+                                               v_registros.formula, 
+                                               p_plantilla, 
+                                               v_registros.destino, 
+                                               NULL, --p_columnas_formula, 
+                                               v_reg_cuenta.nro_cuenta);
+                                                
+                                               
+                          --	insertamos en la tabla temporal
+                          insert into temp_balancef (
+                              
+                              id_cuenta,
+                              desc_cuenta,
+                              codigo_cuenta,
+                              monto,
+                              id_resultado_det_plantilla)
+                          values (
+                              
+                              v_reg_cuenta.id_cuenta,
+                              v_reg_cuenta.nombre_cuenta,
+                              v_reg_cuenta.nro_cuenta,
+                              v_monto,
+                              v_registros.id_resultado_det_plantilla); 
+                        END IF;
+                       
+                        --  2.2.3)  modificamos los registors de la tabla temporal comunes
+                        UPDATE temp_balancef  set
+                                plantilla = p_plantilla,
+                                subrayar = v_registros.subrayar,
+                                font_size = v_registros.font_size,
+                                posicion = v_registros.posicion,
+                                signo = v_registros.signo,
+                                codigo = v_registros.codigo,
+                                origen = v_registros.origen,
+                                orden = v_registros.orden,
+                                montopos = v_registros.montopos,
+                                id_cuenta_raiz = v_reg_cuenta.id_cuenta,
+                                visible = v_visible,
+                                incluir_cierre = v_registros.incluir_cierre,
+                                incluir_apertura = v_registros.incluir_apertura,
+                                negrita = v_registros.negrita,
+                                cursiva = v_registros.cursiva,
+                                espacio_previo = v_registros.espacio_previo,
+                                incluir_aitb = v_registros.incluir_aitb,
+                                relacion_contable = v_registros.relacion_contable,
+                                codigo_partida = v_registros.codigo_partida,
+                                id_auxiliar = v_registros.id_auxiliar,
+                                destino = v_registros.destino,
+                                orden_cbte = v_registros.orden_cbte
+                        WHERE id_resultado_det_plantilla = v_registros.id_resultado_det_plantilla;
+                  
+                  
+                  
                   --   2.3) si el origen es formula
 	              ELSIF  v_registros.origen = 'formula' THEN
                            
                            --la formula vacia solo se admiten cuando el destino es segun balance
                            IF v_registros.formula is NULL and v_registros.destino != 'reporte' THEN
-                             raise exception 'En registros de origen formula, la formula no peude ser nula o vacia';
+                             raise exception 'En registros de origen formula, la formula no puede ser nula o vacia';
                            END IF;
                           
                            v_nombre_variable = '';
+                           
                            IF v_registros.codigo_cuenta is not null and v_registros.codigo_cuenta !='' THEN 
+                              
                               select
                                cue.id_cuenta,
                                cue.nro_cuenta,

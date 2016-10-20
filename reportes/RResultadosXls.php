@@ -110,7 +110,7 @@ class RResultadosXls
 			if($val['visible'] == 'si'){
 				
 				//necesita espacios
-					if ($val['origen'] != 'detalle'){
+					if ($val['origen'] != 'detalle' && $val['origen'] != 'detalle_formula'){
 						$sw_espacio = 1;
 						$sw_detalle = 1;
 					}
@@ -199,7 +199,7 @@ class RResultadosXls
 					}
 					else{
 						$texto = $tabs.$val['desc_cuenta'];
-						if($val['origen'] == 'detalle'){
+						if($val['origen'] == 'detalle'  ||  $val['origen'] == 'detalle_formula'){
 							$texto = $this->formatearTextoDetalle($texto);	
 						}
 					}
@@ -318,13 +318,14 @@ class RResultadosXls
 					}
 				else{
 						$texto = $val['desc_cuenta'];
-						if($val['origen'] == 'detalle'){
+						if($val['origen'] == 'detalle'  || $val['origen'] == 'detalle_formula'){
 							$texto = $this->formatearTextoDetalle($texto);	
 						}
 				}
 					
-				if(!array_key_exists (  $texto, $titulos_filas )){
-					$titulos_filas[$texto] = $indice_filas;
+				if(!array_key_exists (  $this->getLlaveFila($val), $titulos_filas )){
+						
+					$titulos_filas[$this->getLlaveFila($val)] = $indice_filas;
 					//Agrega la fila
 					$sheet->setCellValueByColumnAndRow(0,$indice_filas, $texto);
 					$indice_filas ++;
@@ -347,15 +348,15 @@ class RResultadosXls
 					$monto_str =  $val['monto'];
 				}
 				//registra el monto correspondiente
-				$sheet->getStyle(($this->equivalencias[$titulos_columnas[$val['plantilla']]]).$titulos_filas[$texto])->getFont()->applyFromArray(array(
+				$sheet->getStyle(($this->equivalencias[$titulos_columnas[$val['plantilla']]]).$titulos_filas[$this->getLlaveFila($val)])->getFont()->applyFromArray(array(
 																	    'bold'=>false,
 																	    'size'=>10,
 																	    'name'=>Arial,
 																	    'color'=>$color));
 				
-				$sheet->getStyle(($this->equivalencias[$titulos_columnas[$val['plantilla']]]).$titulos_filas[$texto])->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
+				$sheet->getStyle(($this->equivalencias[$titulos_columnas[$val['plantilla']]]).$titulos_filas[$this->getLlaveFila($val)])->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
 					   
-				$sheet->setCellValueByColumnAndRow($titulos_columnas[$val['plantilla']],$titulos_filas[$texto], $monto_str);
+				$sheet->setCellValueByColumnAndRow($titulos_columnas[$val['plantilla']],$titulos_filas[$this->getLlaveFila($val)], $monto_str);
 				
 				
 			}
@@ -383,6 +384,25 @@ class RResultadosXls
 		$this->objWriter->save($this->url_archivo);	
 		
 	}	
+	
+	function getLlaveFila($val){
+		
+		if(isset($val['codigo_cuenta']) && $val['codigo_cuenta'] != '' ){			
+			return  $val['codigo_cuenta'];
+		}
+		
+		//registra una nueva fila
+		if(isset($val['nombre_variable']) && $val['nombre_variable'] != ''){
+			return $val['nombre_variable'];
+					   
+		}
+		else{
+			return  $val['desc_cuenta'];
+			
+		}
+		
+		
+	}
 	
 
 }
