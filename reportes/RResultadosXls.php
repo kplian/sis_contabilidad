@@ -2,6 +2,7 @@
 //incluimos la libreria
 //echo dirname(__FILE__);
 //include_once(dirname(__FILE__).'/../PHPExcel/Classes/PHPExcel.php');
+
 class RResultadosXls
 {
 	private $docexcel;
@@ -25,7 +26,9 @@ class RResultadosXls
 		$cacheMethod = PHPExcel_CachedObjectStorageFactory:: cache_to_phpTemp;
 		$cacheSettings = array('memoryCacheSize'  => '10MB');
 		PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
-
+		PHPExcel_Shared_Font::setAutoSizeMethod(PHPExcel_Shared_Font::AUTOSIZE_METHOD_EXACT);
+		
+		
 		$this->docexcel = new PHPExcel();
 		$this->docexcel->getProperties()->setCreator("PXP")
 							 ->setLastModifiedBy("PXP")
@@ -48,7 +51,7 @@ class RResultadosXls
 								68=>'BQ',69=>'BR',70=>'BS',71=>'BT',72=>'BU',73=>'BV',74=>'BW',75=>'BX',
 								76=>'BY',77=>'BZ');		
 									
-	}
+	}  
 	
 	
 	function imprimeTitulo($sheet){
@@ -300,6 +303,18 @@ class RResultadosXls
 		$indice_columnas = 1;
 		$indice_filas = $fila  + 1;
 		
+		
+		$styleArrayAllBorders = array(
+						      'borders' => array(
+						          'allborders' => array(
+						              'style' => PHPExcel_Style_Border::BORDER_THIN
+						          )
+						      )
+						  );
+		
+		
+			
+		
 		foreach($datos as $val) {			
 			if($val['visible'] == 'si'){
 				
@@ -307,8 +322,14 @@ class RResultadosXls
 				if(!array_key_exists (  $val['plantilla'], $titulos_columnas )){
 					$titulos_columnas[$val['plantilla']] = $indice_columnas;
 					//Agrega la columna
+					//$sheet->getStyle($indice_columnas.$fila)->applyFromArray($styleArrayAllBorders);
 					$sheet->setCellValueByColumnAndRow($indice_columnas,$fila,$val['nombre_columna']);
+					$sheet->getColumnDimension($this->equivalencias[$indice_columnas])->setWidth(10);
+					
 					$indice_columnas ++;
+					
+					
+					
 				}  
 				
 				//registra una nueva fila
@@ -361,6 +382,30 @@ class RResultadosXls
 				
 			}
 		}
+
+
+
+
+         $sheet->getStyle($this->equivalencias[0].$fila.':'.$this->equivalencias[$indice_columnas-2].$fila)->applyFromArray($styleArrayAllBorders);
+		 $sheet->getStyle($this->equivalencias[0].$fila.':'.$this->equivalencias[$indice_columnas-2].$fila)->getFont()->applyFromArray(array(
+															    'bold'=>true,
+															    'size'=>10,
+															    'name'=>Arial));	
+																															
+		 $sheet->getStyle($this->equivalencias[0].$fila.':'.$this->equivalencias[$indice_columnas-2].$fila)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		
+		
+		
+		for($k = 0; $k < $indice_columnas -1; $k ++){
+			 
+			    
+		     $sheet->getColumnDimension($this->equivalencias[$k])->setAutoSize(true);			 
+			 $sheet->calculateColumnWidths();			 
+			 $titlecolwidth = $sheet->getColumnDimension($this->equivalencias[$k])->getWidth(); 
+			 $sheet->getColumnDimension($this->equivalencias[$k])->setAutoSize(false);
+			 $sheet->getColumnDimension($this->equivalencias[$k])->setWidth( $titlecolwidth + ((int)$titlecolwidth*0.12));
+			 
+		}
 		
 		
 		
@@ -403,6 +448,8 @@ class RResultadosXls
 		
 		
 	}
+	
+	
 	
 
 }
