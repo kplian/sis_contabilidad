@@ -1422,15 +1422,43 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 		}, this);
 		
 		this.Cmp.nro_autorizacion.on('select', function(cmb,rec,i){
-			console.log('nro_autorizacion ' + rec);
 			this.Cmp.nit.setValue(rec.data.nit);
 			this.Cmp.razon_social.setValue(rec.data.razon_social);
 		} ,this);
 		
+		
+		this.Cmp.nro_autorizacion.on('change', function(cmb,newval,oldval){
+			var rec = cmb.getStore().getById(newval)
+			if(!rec){
+				//si el combo no tiene resultado
+				if(cmb.lastQuery){
+					 //y se tiene una consulta anterior( cuando editemos no abra cnsulta anterior)
+				     this.Cmp.nit.reset();
+			         this.Cmp.razon_social.reset();	
+			         }	
+			}
+			
+		} ,this);
+		
+		
 		this.Cmp.nit.on('select', function(cmb,rec,i){
-			console.log('razon_social ' + rec);
 			this.Cmp.razon_social.setValue(rec.data.razon_social);
 		} ,this);
+		
+		this.Cmp.nit.on('change', function(cmb,newval,oldval){
+			var rec = cmb.getStore().getById(newval)
+			if(!rec){
+				//si el combo no tiene resultado
+				if(cmb.lastQuery){
+					 //y se tiene una consulta anterior( cuando editemos no abra cnsulta anterior)
+				     this.Cmp.razon_social.reset();	
+			         }	
+			}
+			
+		} ,this);
+		
+		
+		
 		
 		//this.Cmp.nro_autorizacion .on('blur',this.cargarRazonSocial,this);
 		this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
