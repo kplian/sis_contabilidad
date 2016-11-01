@@ -375,7 +375,7 @@ class ACTIntComprobante extends ACTbase{
 
    function reporteCbte(){
 			
-		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
+		$nombreArchivo = uniqid(md5(session_id()).'-Cbte') . '.pdf'; 
 		$dataSource = $this->recuperarDatosCbte();	
 		
 		//parametros basicos

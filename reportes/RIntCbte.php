@@ -17,44 +17,43 @@ class RIntCbte extends  ReportePDF {
 	
 	function datosHeader ( $detalle) {
 		
-		$this->cabecera = $detalle->getParameter('cabecera');
-        $this->detalleCbte = $detalle->getParameter('detalleCbte');
-		
-		$this->ancho_hoja = $this->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT-10;
-		$this->datos_detalle = $detalle;
-	    $this->SetMargins(15, 70, 5);
+		 
+		 	$this->cabecera = $detalle->getParameter('cabecera');
+	        $this->detalleCbte = $detalle->getParameter('detalleCbte');			
+			$this->ancho_hoja = $this->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT-10;
+			$this->datos_detalle = $detalle;
+		 	$this->SetMargins(15, 35, 5);
+		 
+		 
 	}
 	
 	function Header() {
 			
-		
-		$newDate = date("d/m/Y", strtotime( $this->cabecera[0]['fecha']));		
-		$dataSource = $this->datos_detalle; 
-	    ob_start();
-		include(dirname(__FILE__).'/../reportes/tpl/cabecera.php');
-        $content = ob_get_clean();
-		$this->writeHTML($content, true, false, true, false, '');
-		
-		
-		
+		 if($this->page==1){
+		 	   // $this->SetMargins(15, 40, 5);
+				$newDate = date("d/m/Y", strtotime( $this->cabecera[0]['fecha']));		
+				$dataSource = $this->datos_detalle; 
+			    ob_start();
+				include(dirname(__FILE__).'/../reportes/tpl/cabecera.php');
+		        $content = ob_get_clean();
+				$this->writeHTML($content, true, false, true, false, '');
+		}
+		else{
+		       $this->SetMargins(15, 60, 5);
+			    ob_start();
+				include(dirname(__FILE__).'/../reportes/tpl/cabecera.php');
+		        $content = ob_get_clean();
+				$this->writeHTML($content, true, false, true, false, '');
+			    ob_start();
+				include(dirname(__FILE__).'/../reportes/tpl/cabeceraDetalle.php');
+		        $content = ob_get_clean();
+				$this->writeHTML($content, true, false, true, false, '');
+		 }
 	}
 	
 	
    
-   function generarReporteooo() {
-		// get the HTML
-		$dataSource = $this->datos_detalle; 
-	    ob_start();		
-	    include(dirname(__FILE__).'/../reportes/tpl/intCbte.php');
-        $content = ob_get_clean();
-		
-		$this->AddPage();
-	    $this->writeHTML($content, true, false, true, false, '');
-		$this->revisarfinPagina();
-		
-		$this->Firmas();	
-		
-	} 
+  
    
   
 	
@@ -74,6 +73,18 @@ class RIntCbte extends  ReportePDF {
 		
 		$with_col = $this->with_col;
 		
+		
+		//adiciona glosa
+		ob_start();
+		include(dirname(__FILE__).'/../reportes/tpl/glosa.php');
+        $content = ob_get_clean();
+		
+		ob_start();
+		include(dirname(__FILE__).'/../reportes/tpl/cabeceraDetalle.php');
+        $content2 = ob_get_clean();
+		$this->writeHTML($content.$content2, true, false, true, false, '');
+		
+		
 		foreach($this->detalleCbte as $key=>$val){
 		   	
 		   $sw = 1;	
@@ -85,6 +96,9 @@ class RIntCbte extends  ReportePDF {
 		    	ob_start();
 			    include(dirname(__FILE__).'/../reportes/tpl/transaccion.php');
 	            $content = ob_get_clean();
+				
+				$this->revisarfinPagina($content);
+				
 				$this->writeHTML($content, false, false, true, false, '');
 				
 				
@@ -93,7 +107,7 @@ class RIntCbte extends  ReportePDF {
 				$this->tot_debe_mb+=$val['importe_debe_mb'];
 				$this->tot_haber_mb+=$val['importe_haber_mb'];
 				
-				$this->revisarfinPagina();
+				
 				
 		    }	
 			
@@ -135,19 +149,29 @@ class RIntCbte extends  ReportePDF {
    }
 	
 	
-   function revisarfinPagina(){
+   function revisarfinPagina($content){
 		$dimensions = $this->getPageDimensions();
 		$hasBorder = false; //flag for fringe case
 		
 		$startY = $this->GetY();
-		$this->getNumLines($row['cell1data'], 80);
+		$test = $this->getNumLines($content, 80);
 		
 		//if (($startY + 10 * 6) + $dimensions['bm'] > ($dimensions['hk'])) {
 		    
-		if ($startY > 220) {
+		if ($startY +  $test > 250) {
 			$this->Ln();
-			$this->subtotales('Pasa a la siguiente página');			
-			$this->AddPage();		    
+			//$this->subtotales('Pasa a la siguiente página. '.$startY);
+			$this->subtotales('Pasa a la siguiente página');
+			$startY = $this->GetY();			
+			if($startY < 70){
+				//$this->AddPage();
+			}
+			else{
+				$this->AddPage();
+			}
+			
+			
+			//$this->writeHTML('<p>text'.$startY.'</p>', false, false, true, false, '');		    
 		} 
 	}
 }
