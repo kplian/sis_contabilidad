@@ -159,11 +159,11 @@ class ACTDocCompraVentaForm extends ACTbase{
 		$separador = '|';
 		if($this->objParam->getParametro('formato_reporte') =='txt')
 		{
-			$separador = '|';
+			$separador = "|";
 			$ext = '.txt';
 		}
 		else{
-			$separador = ',';
+			$separador = ",";
 			$ext = '.csv';
 		}
 		
@@ -206,7 +206,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 		$ctd = 1;
 		
 		if($this->objParam->getParametro('formato_reporte') !='txt'){
-			/*AÑADE EL BOMM PARA NO TENER PROBLEMAS AL LEER DE APLICACIONES EXTERNAS*/
+			//AÑADE EL BOMM PARA NO TENER PROBLEMAS AL LEER DE APLICACIONES EXTERNAS
 		    fwrite($file, pack("CCC",0xef,0xbb,0xbf));
 		}
 		
@@ -298,7 +298,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 	                        $val['nro_autorizacion'].$separador.        
 							$val['tipo_doc'].$separador.
 	                        $val['nit'].$separador.      
-	                        $val['razon_social'].$separador, 	                            
+	                        $val['razon_social'].$separador.	                            
 	                        $val['importe_doc'].$separador.
 	                        $val['importe_ice'].$separador.          
 	                        $val['importe_excento'].$separador.
@@ -307,7 +307,9 @@ class ACTDocCompraVentaForm extends ACTbase{
 	                        $val['importe_descuento'].$separador.     
 	                        $val['sujeto_df'].$separador.   
 	                        $val['importe_iva'].$separador.   
-	                        $val['codigo_control']."\r\n");						
+	                        $val['codigo_control']."\r\n");		
+	                        
+	                  				
 				
 			 }
 			 
