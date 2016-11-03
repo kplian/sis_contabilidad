@@ -1,10 +1,12 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
+RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
@@ -267,6 +269,8 @@ BEGIN
 
     begin
 
+    /*  03/11/2016 se comenta pelotudes,---TODO ojo pensar en alguna alternativa no intrusiva
+      
       select COALESCE(cd.estado,efe.estado) into v_estado_rendicion
       from conta.tdoc_compra_venta d
         left join cd.trendicion_det ren on ren.id_doc_compra_venta = d.id_doc_compra_venta
@@ -274,8 +278,8 @@ BEGIN
         left join tes.tsolicitud_rendicion_det det on det.id_documento_respaldo=d.id_doc_compra_venta
         left join tes.tsolicitud_efectivo efe on efe.id_solicitud_efectivo=det.id_solicitud_efectivo
       where d.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
-
-      -- recuepra el periodo de la fecha ...
+      
+       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
@@ -283,6 +287,15 @@ BEGIN
         -- valida que period de libro de compras y ventas este abierto
         v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
       END IF;
+      
+      */
+
+      -- recuepra el periodo de la fecha ...
+      --Obtiene el periodo a partir de la fecha
+      v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+
+      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+      
 
       --revisa si el documento no esta marcado como revisado
       select
@@ -413,6 +426,7 @@ BEGIN
       if (v_codigo_estado = 'A') then
         update conta.tdoc_compra_venta set
           importe_iva = 0,
+          importe_excento = 0,
           importe_descuento = 0,
           importe_descuento_ley = 0,
           importe_pago_liquido = 0,
