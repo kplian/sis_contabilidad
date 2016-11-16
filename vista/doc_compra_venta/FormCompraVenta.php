@@ -78,7 +78,7 @@ header("content-type: text/javascript; charset=UTF-8");
         buildComponentesDetalle: function(){
             var me = this;
             if(me.autorizacion!='')
-                bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto', autorizacion: this.autorizacion}:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
+                bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto', autorizacion: this.autorizacion, autorizacion_nulos:this.autorizacion_nulos}:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
             else
                 bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto'}:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
             me.detCmp = {
@@ -114,7 +114,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     pageSize: 10,
                     queryDelay: 1000,
                     minChars: 2,
-                    qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
+                    qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el Ã¡rea de presupuestos para solictar la creaciÃ³n',
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
                 }),
                 'desc_partida': new Ext.form.TextField({
@@ -520,7 +520,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     },
                     {
 
-                        header: 'Descripción',
+                        header: 'DescripciÃ³n',
                         dataIndex: 'descripcion',
 
                         align: 'center',
@@ -624,7 +624,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                         xtype: 'fieldset',
                                         frame: true,
                                         layout: 'form',
-                                        title: ' Datos básicos ',
+                                        title: ' Datos bÃ¡sicos ',
                                         width: '100%',
                                         border: false,
                                         //margins: '0 0 0 5',
@@ -702,7 +702,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 xtype: 'fieldset',
                                 frame: true,
                                 layout: 'form',
-                                title: ' Datos básicos ',
+                                title: ' Datos bÃ¡sicos ',
                                 width: '100%',
                                 border: false,
                                 //margins: '0 0 0 5',
@@ -1019,9 +1019,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'nro_autorizacion',
-                        fieldLabel: 'Autorización',
+                        fieldLabel: 'AutorizaciÃ³n',
                         allowBlank: false,
-                        emptyText:'autorización ...',
+                        emptyText:'autorizaciÃ³n ...',
                         store:new Ext.data.JsonStore(
                             {
                                 url: '../../sis_contabilidad/control/DocCompraVenta/listarNroAutorizacion',
@@ -1064,7 +1064,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     config:{
                         name: 'nit',
                         fieldLabel: 'NIT',
-                        qtip: 'Número de indentificación del proveedor',
+                        qtip: 'NÃºmero de indentificaciÃ³n del proveedor',
                         allowBlank: false,
                         emptyText:'nit ...',
                         store:new Ext.data.JsonStore(
@@ -1108,9 +1108,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'razon_social',
-                        fieldLabel: 'Razón Social',
+                        fieldLabel: 'RazÃ³n Social',
                         allowBlank: false,
-                        maskRe: /[A-Za-z0-9 &-. ñ Ñ]/,
+                        maskRe: /[A-Za-z0-9 &-. Ã± Ã‘]/,
                         fieldStyle: 'text-transform:uppercase',
                         listeners:{
                             'change': function(field, newValue, oldValue){
@@ -1164,7 +1164,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'codigo_control',
-                        fieldLabel: 'Código de Control',
+                        fieldLabel: 'CÃ³digo de Control',
                         allowBlank: true,
                         anchor: '80%',
                         gwidth: 100,
@@ -1172,7 +1172,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         fieldStyle : 'text-transform: uppercase',
                         maxLength:200,
                         validator: function(v) {
-                            return /^0|^([A-Fa-f0-9]{2,2}\-)*[A-Fa-f0-9]{2,2}$/i.test(v)? true : 'Introducir texto de la forma xx-xx, donde x representa dígitos  hexadecimales  [0-9]ABCDEF.';
+                            return /^0|^([A-Fa-f0-9]{2,2}\-)*[A-Fa-f0-9]{2,2}$/i.test(v)? true : 'Introducir texto de la forma xx-xx, donde x representa dÃ­gitos  hexadecimales  [0-9]ABCDEF.';
                         },
                         maskRe: /[0-9ABCDEF/-]+/i,
                         regex: /[0-9ABCDEF/-]+/i
@@ -1242,7 +1242,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'importe_excento',
-                        qtip: 'sobre el importe ento, ¿que monto es exento de impuestos?',
+                        qtip: 'sobre el importe ento, Â¿que monto es exento de impuestos?',
                         fieldLabel: 'Exento',
                         allowNegative :false,
                         allowBlank: true,
@@ -1257,7 +1257,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     config:{
                         name: 'importe_pendiente',
                         fieldLabel:  (me.data.tipoDoc == 'compra')?'Cuentas por  Pagar':'Cuentas por Cobrar',
-                        qtip: 'Usualmente una cuenta pendiente de  cobrar o  pagar, si la cuenta se aplica posterior a la emisión del documento',
+                        qtip: 'Usualmente una cuenta pendiente de  cobrar o  pagar, si la cuenta se aplica posterior a la emisiÃ³n del documento',
                         allowBlank: true,
                         allowNegative :false,
                         anchor: '80%',
@@ -2001,7 +2001,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         cargarRazonSocial: function(nit){
-            //Busca en la base de datos la razon social en función del NIT digitado. Si Razon social no esta vacío, entonces no hace nada
+            //Busca en la base de datos la razon social en funciÃ³n del NIT digitado. Si Razon social no esta vacÃ­o, entonces no hace nada
             if(this.getComponente('razon_social').getValue()==''){
                 Phx.CP.loadingShow();
                 Ext.Ajax.request({

@@ -3262,6 +3262,13 @@ IS 'relacion contable par ael calculo de centro de costo';
 
 /***********************************F-SCP-RAC-CONTA-0-03/08/2016****************************************/
 
+/***********************************I-SCP-JRR-CONTA-0-15/08/2016****************************************/
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN c31 VARCHAR(200);
 
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN fecha_c31 DATE;
+
+/***********************************F-SCP-JRR-CONTA-0-15/08/2016****************************************/
 
 
