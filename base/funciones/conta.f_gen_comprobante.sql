@@ -11,9 +11,9 @@ CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
 RETURNS integer AS
 $body$
 /*
-Autor inicial GAYME RIMERA ROJAS (No sabe porner comentarios)
+Autor inicial GAYRRINCHA ARTEAGA COPARI (No sabe porner comentarios)
 Fecha 28/06/2013
-Descripcion: nose por que el gayme no puso comentarios
+Descripcion: nose por que el gayrrincha no puso comentarios
 
 
 Autor:  Rensi Arteaga Copari
