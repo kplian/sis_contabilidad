@@ -25,6 +25,14 @@ class ACTIntComprobante extends ACTbase{
             $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
         }
 		
+		if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("incbte.id_gestion in (".$this->objParam->getParametro('id_gestion').")");    
+        }
+		
+		if($this->objParam->getParametro('id_clase_comprobante')!=''){
+            $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");    
+        }
+		
 		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'){
             $this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
         }
@@ -375,7 +383,7 @@ class ACTIntComprobante extends ACTbase{
 
    function reporteCbte(){
 			
-		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
+		$nombreArchivo = uniqid(md5(session_id()).'-Cbte') . '.pdf'; 
 		$dataSource = $this->recuperarDatosCbte();	
 		
 		//parametros basicos

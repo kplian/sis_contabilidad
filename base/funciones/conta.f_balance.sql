@@ -28,6 +28,7 @@ v_nivel_inicial		integer;
 v_total 			numeric;
 v_tipo_cuenta		varchar;
 v_incluir_cierre	varchar;
+v_incluir_sinmov	varchar;
  
 
 BEGIN
@@ -51,6 +52,12 @@ BEGIN
         
         if pxp.f_existe_parametro(p_tabla,'incluir_cierre') then
           v_incluir_cierre = v_parametros.incluir_cierre;
+        end if;
+        
+        
+        v_incluir_sinmov = 'no';
+        if pxp.f_existe_parametro(p_tabla,'incluir_sinmov') then
+          v_incluir_sinmov = v_parametros.incluir_sinmov;
         end if;
         
         
@@ -83,18 +90,35 @@ BEGIN
        
       raise notice '------------------------------------------------> total %', v_total;
       
-      FOR v_registros in (SELECT                                   
-       							id_cuenta,
-                                nro_cuenta,
-                                nombre_cuenta,
-                                id_cuenta_padre,
-                                monto,
-                                nivel,
-                                tipo_cuenta
-       						FROM temp_balancef 
-                                order by nro_cuenta) LOOP
-               RETURN NEXT v_registros;
-     END LOOP;
+      IF v_incluir_sinmov = 'no' THEN
+          FOR v_registros in (SELECT                                   
+                                    id_cuenta,
+                                    nro_cuenta,
+                                    nombre_cuenta,
+                                    id_cuenta_padre,
+                                    monto,
+                                    nivel,
+                                    tipo_cuenta
+                                FROM temp_balancef 
+                                    order by nro_cuenta) LOOP
+                   RETURN NEXT v_registros;
+         END LOOP;
+     ELSE
+       FOR v_registros in (SELECT                                   
+                                    id_cuenta,
+                                    nro_cuenta,
+                                    nombre_cuenta,
+                                    id_cuenta_padre,
+                                    monto,
+                                    nivel,
+                                    tipo_cuenta
+                                FROM temp_balancef 
+                                WHERE monto != 0
+                                    order by nro_cuenta) LOOP
+                   RETURN NEXT v_registros;
+         END LOOP;
+     
+     END IF;
   
 
 END IF;

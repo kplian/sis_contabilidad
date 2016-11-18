@@ -1175,3 +1175,21 @@ select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','REN','pendiente'
 
 
 
+
+/**********************************I-DAT-RAC-CONTA-1-29/06/2016*****************************************/
+
+
+select pxp.f_insert_tgui ('Estados Financieros', 'Reportes de Estados Financieros (desde la plantilla de resultados)', 'REPRES', 'si', 2, 'sis_contabilidad/vista/cuenta/FormFiltroResultado.php', 3, '', 'FormFiltroResultado', 'CONTA');
+
+/**********************************F-DAT-RAC-CONTA-1-29/06/2016*****************************************/
+
+
+
+/**********************************I-DAT-RAC-CONTA-1-17/11/2016*****************************************/
+
+select pxp.f_insert_tgui ('Entrega C31', 'Entrega C31', 'ENTR', 'si', 4, 'sis_contabilidad/vista/entrega/Entrega.php', 3, '', 'Entrega', 'CONTA');
+select pxp.f_insert_testructura_gui ('ENTR', 'CBTE.1');
+
+/**********************************F-DAT-RAC-CONTA-1-17/11/2016*****************************************/
+
+

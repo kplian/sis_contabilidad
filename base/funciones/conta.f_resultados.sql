@@ -35,6 +35,7 @@ v_registros_plantilla	record;
 v_multiple_col 			boolean;
 v_forzar_visible		boolean;
 v_prioridad				integer;
+v_incluir_sinmov    	varchar;
  
 
 BEGIN
@@ -73,6 +74,11 @@ BEGIN
           IF v_id_gestion is NULL THEN  
           		raise exception 'No se encontro gestion para la fecha % en %', v_parametros.desde, v_gestion;
           END IF;
+          
+          v_incluir_sinmov = 'no';
+          if pxp.f_existe_parametro(p_tabla,'incluir_sinmov') then
+            v_incluir_sinmov = v_parametros.incluir_sinmov;
+          end if;
           
           select 
             rp.codigo,
@@ -159,36 +165,75 @@ BEGIN
            
          
          raise notice 'INICIA CONSULTA....';
-         -- 3) retorno de resultados
-         FOR v_registros in (SELECT                                   
-                                    subrayar,
-                                    font_size,
-                                    posicion,
-                                    signo,
-                                    id_cuenta,
-                                    desc_cuenta,
-                                    codigo_cuenta,
-                                    codigo,
-                                    origen,
-                                    orden,
-                                    nombre_variable,
-                                    montopos,
-                                    monto,
-                                    id_resultado_det_plantilla,
-                                    id_cuenta_raiz,
-                                    visible,
-                                    incluir_cierre,
-                                    incluir_apertura,
-                                    negrita,
-                                    cursiva,
-                                    espacio_previo,
-                                    id,
-                                    plantilla,
-                                    nombre_columna
-                                FROM temp_balancef 
-                                    order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
-                   RETURN NEXT v_registros;
-         END LOOP;
+         
+         IF v_incluir_sinmov = 'no' THEN
+             -- 3) retorno de resultados
+             FOR v_registros in (SELECT                                   
+                                        subrayar,
+                                        font_size,
+                                        posicion,
+                                        signo,
+                                        id_cuenta,
+                                        desc_cuenta,
+                                        codigo_cuenta,
+                                        codigo,
+                                        origen,
+                                        orden,
+                                        nombre_variable,
+                                        montopos,
+                                        monto,
+                                        id_resultado_det_plantilla,
+                                        id_cuenta_raiz,
+                                        visible,
+                                        incluir_cierre,
+                                        incluir_apertura,
+                                        negrita,
+                                        cursiva,
+                                        espacio_previo,
+                                        id,
+                                        plantilla,
+                                        nombre_columna
+                                    FROM temp_balancef 
+                                        order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
+                       RETURN NEXT v_registros;
+             END LOOP;
+        
+        ELSE
+          
+          FOR v_registros in (SELECT                                   
+                                        subrayar,
+                                        font_size,
+                                        posicion,
+                                        signo,
+                                        id_cuenta,
+                                        desc_cuenta,
+                                        codigo_cuenta,
+                                        codigo,
+                                        origen,
+                                        orden,
+                                        nombre_variable,
+                                        montopos,
+                                        monto,
+                                        id_resultado_det_plantilla,
+                                        id_cuenta_raiz,
+                                        visible,
+                                        incluir_cierre,
+                                        incluir_apertura,
+                                        negrita,
+                                        cursiva,
+                                        espacio_previo,
+                                        id,
+                                        plantilla,
+                                        nombre_columna
+                                    FROM temp_balancef 
+                                    WHERE (monto != 0 or origen = 'titulo')
+                                        order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
+                       RETURN NEXT v_registros;
+             END LOOP;
+      
+      
+     
+     END IF; 
   
 
 END IF;

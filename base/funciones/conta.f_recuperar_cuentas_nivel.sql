@@ -95,11 +95,7 @@ BEGIN
                           cue.id_cuenta_padre = p_id_cuenta   
                          and cue.estado_reg = 'activo') LOOP
                      
-               --si viene de un balance verificamos si la cuenta es de moviemitno y calculamos el mayor
-               IF p_origen = 'balance'  THEN
-               
-             
-                
+              
                      IF  v_registros.sw_transaccional = 'movimiento'  THEN
                          
                           va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
@@ -130,32 +126,28 @@ BEGIN
                               v_monto,
                               p_id_resultado_det_plantilla); 
                      
+                     ELSE
+                     
+                             IF ( not conta.f_recuperar_cuentas_nivel(
+                                                    v_registros.id_cuenta, 
+                                                    p_nivel_ini + 1, 
+                                                    p_nivel_final, 
+                                                    p_id_resultado_det_plantilla, 
+                                                    p_desde, 
+                                                    p_hasta, 
+                                                    p_id_deptos,
+                                                    p_incluir_cierre,
+                                                    p_incluir_apertura,
+                                                    p_incluir_aitb,
+                                                    p_signo_balance,
+                                                    p_tipo_balance,
+                                                    p_origen) ) THEN     
+                                raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
+                          END IF;
+                     
+                     
                      END IF;
                
-                     
-                      
-               
-               END IF;
-               
-               
-               
-               
-               IF ( not conta.f_recuperar_cuentas_nivel(
-                							v_registros.id_cuenta, 
-                                            p_nivel_ini + 1, 
-                                            p_nivel_final, 
-                                            p_id_resultado_det_plantilla, 
-                                            p_desde, 
-                                            p_hasta, 
-                                            p_id_deptos,
-                                            p_incluir_cierre,
-                                            p_incluir_apertura,
-                                            p_incluir_aitb,
-                                            p_signo_balance,
-                                            p_tipo_balance,
-                                            p_origen) ) THEN     
-                  raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
-               END IF;
        END LOOP;  
     
     END IF;

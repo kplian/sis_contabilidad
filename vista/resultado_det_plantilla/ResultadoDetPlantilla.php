@@ -126,7 +126,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'origen',
                 fieldLabel: 'Origen',
-                qtip: 'Como calcula el monto, (1)  en caso de detalle agregar Nivel detalle (2) en caso de formula especificar el campoformula (3) en caso de sumatoria especificar orden inicial y final en campo formula ejmplo 1-10',
+                qtip: 'Como calcula el monto, (1)  en caso de detalle agregar Nivel detalle <br>(2) en caso de formula especificar el campoformula <br>(3) en caso de sumatoria especificar orden inicial y final en campo formula ejmplo 1-10 <br>(4) En caso de formula usar los codigo entre llaves como variables ejemplo, {ACT} + {DEP.ACT} <br>(5) en el caso de formula detalle, la formula se aplcan sobre el detalle de las cuentas',
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -134,13 +134,13 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender: true,
                 mode: 'local',
-                store: ['balance', 'detalle', 'titulo', 'formula','sumatoria']
+                store: ['balance', 'detalle', 'titulo', 'formula','sumatoria','detalle_formula']
             },
             type:'ComboBox',
             id_grupo:1,
             filters:{   pfiltro:'resdet.origen',
                         type: 'list',
-                         options: ['balance','detalle','titulo','formula','sumatoria']  
+                         options: ['balance','detalle','titulo','formula','sumatoria','detalle_formula']  
                     },
             grid:true,
             egrid: true,

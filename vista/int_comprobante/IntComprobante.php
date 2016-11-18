@@ -15,10 +15,11 @@ header("content-type: text/javascript; charset=UTF-8");
 		nombreVista : 'IntComprobante',
 		constructor : function(config) {
 			this.maestro = config.maestro;
-			this.initButtons = [this.cmbDepto];
+			this.initButtons = [this.cmbDepto, this.cmbGestion];
 
 			//llama al constructor de la clase padre
-			Phx.vista.IntComprobante.superclass.constructor.call(this, config);
+			Phx.vista.IntComprobante.superclass.constructor.call(this, config);			
+			this.bbar.add(this.cmbTipoCbte);
 			
 			//this.load({params:{start:0, limit:this.tam_pag}});
 
@@ -85,9 +86,34 @@ header("content-type: text/javascript; charset=UTF-8");
 			}, this);
 
 			this.cmbDepto.on('valid', function() {
-				this.capturaFiltros();
+				 if(this.cmbGestion.validate()){
+				   this.capturaFiltros();
+				}
+				
 
 			}, this);
+			
+			this.cmbGestion.on('select', function(){
+			    if( this.validarFiltros() ){
+	                  this.capturaFiltros();
+	             }
+			},this);
+			
+			
+			this.cmbTipoCbte.on('select', function(obj,newValue,oldValue){
+			    if( this.validarFiltros() ){			      	
+				    this.capturaFiltros();
+			     }
+			},this);
+			
+			this.cmbTipoCbte.on('clearcmb', function(obj,newValue,oldValue){
+			    if( this.validarFiltros() ){			      	
+				    this.capturaFiltros();
+			     }
+			},this); 
+			
+			
+			
 
 			this.iniciarEventos();
 		},
@@ -103,12 +129,22 @@ header("content-type: text/javascript; charset=UTF-8");
 		capturaFiltros : function(combo, record, index) {
 			this.desbloquearOrdenamientoGrid();
 			this.store.baseParams.id_deptos = this.cmbDepto.getValue();
+			this.store.baseParams.id_gestion = this.cmbGestion.getValue();
+			if(this.cmbTipoCbte.getValue()){
+				this.store.baseParams.id_clase_comprobante = this.cmbTipoCbte.getValue();
+			}
+			else{
+				delete this.store.baseParams.id_clase_comprobante;
+			}
+			this.store.baseParams.id_clase_comprobante = this.cmbTipoCbte.getValue();
 			this.store.baseParams.nombreVista = this.nombreVista
 			this.load();
 		},
 
 		validarFiltros : function() {
-			if (this.cmbDepto.validate()) {
+			console.log('values....', this.cmbDepto.getValue())
+			if (this.cmbDepto.getValue() != '' && this.cmbGestion.validate() ) {
+			
 				return true;
 			} else {
 				return false;
@@ -117,6 +153,9 @@ header("content-type: text/javascript; charset=UTF-8");
 		onButtonAct : function() {
 			if (!this.validarFiltros()) {
 				alert('Especifique los filtros antes')
+			}
+			else{
+				 this.capturaFiltros();
 			}
 		},
 		iniciarEventos : function() {
@@ -1124,7 +1163,68 @@ header("content-type: text/javascript; charset=UTF-8");
 			resizable : true,
 			minChars : 2
 		}),
-
+		
+		
+      cmbGestion: new Ext.form.ComboBox({
+				fieldLabel: 'Gestion',
+				grupo:[0,1,2],
+				allowBlank: false,
+				emptyText:'Gestion...',
+				store:new Ext.data.JsonStore(
+				{
+					url: '../../sis_parametros/control/Gestion/listarGestion',
+					id: 'id_gestion',
+					root: 'datos',
+					sortInfo:{
+						field: 'gestion',
+						direction: 'DESC'
+					},
+					totalProperty: 'total',
+					fields: ['id_gestion','gestion'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams:{par_filtro:'gestion'}
+				}),
+				valueField: 'id_gestion',
+				triggerAction: 'all',
+				displayField: 'gestion',
+			    hiddenName: 'id_gestion',
+    			mode:'remote',
+				pageSize:50,
+				queryDelay:500,
+				listWidth:'280',
+				width:80
+			}),	
+			
+		cmbTipoCbte: new Ext.form.ClearCombo({
+				name : 'id_clase_comprobante',
+				fieldLabel : 'Tipo Cbte.',
+				allowBlank : true,
+				emptyText : 'Elija una opción...',
+				store : new Ext.data.JsonStore({
+					url : '../../sis_contabilidad/control/ClaseComprobante/listarClaseComprobante',
+					id : 'id_clase_comprobante',
+					root : 'datos',
+					sortInfo : {field : 'id_clase_comprobante',direction : 'ASC'},
+					totalProperty : 'total',
+					fields : ['id_clase_comprobante', 'tipo_comprobante', 'descripcion', 'codigo', 'momento_comprometido', 'momento_ejecutado', 'momento_pagado'],
+					remoteSort : true,
+					baseParams : {par_filtro : 'ccom.tipo_comprobante#ccom.descripcion'}
+				}),
+				valueField : 'id_clase_comprobante',
+				displayField : 'descripcion',				
+				hiddenName : 'id_clase_comprobante',
+				forceSelection : true,
+				typeAhead : false,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'remote',
+				pageSize : 15,
+				queryDelay : 1000,
+				width : 250,
+				minChars : 2,
+			}),		
+			
 		south : {
 			url : '../../../sis_contabilidad/vista/int_transaccion/IntTransaccion.php',
 			title : 'Transacciones',

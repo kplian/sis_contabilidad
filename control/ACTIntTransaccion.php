@@ -10,7 +10,7 @@
 class ACTIntTransaccion extends ACTbase{    
 			
 	function listarIntTransaccion(){
-		$this->objParam->defecto('ordenacion','id_int_transaccion');
+		$this->objParam->defecto('ordenacion','orden');
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
 		if($this->objParam->getParametro('id_int_comprobante')!=''){
@@ -116,6 +116,10 @@ class ACTIntTransaccion extends ACTbase{
 			$this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));	
 		}
 		
+		if($this->objParam->getParametro('id_orden_trabajo')!=''){
+			$this->objParam->addFiltro("transa.id_orden_trabajo = ".$this->objParam->getParametro('id_orden_trabajo'));	
+		}
+		
 		
 		if($this->objParam->getParametro('id_auxiliar')!=''){
 			$this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));	
@@ -126,7 +130,7 @@ class ACTIntTransaccion extends ACTbase{
 		}
 		
 		if($this->objParam->getParametro('nro_tramite')!=''){
-			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite'))."%''";	
+			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");	
 		}
 
         if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){

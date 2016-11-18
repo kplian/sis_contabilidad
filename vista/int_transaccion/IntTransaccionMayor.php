@@ -6,18 +6,15 @@
 *@date 01-09-2013 18:10:12
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
-   
-	constructor:function(config){
-		
+    title:'Mayor',
+	constructor:function(config){		
 		var me = this;
 		this.maestro=config.maestro;
 		 //Agrega combo de moneda
-		
 		
 		this.Atributos = [
 			{
@@ -73,9 +70,35 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    else{
 		   			    	//cargar resumen en el panel
 		   			    	var debe = record.data["importe_debe_mb"]?record.data["importe_debe_mb"]:0,
-		   			    		haber = record.data["importe_haber_mb"]?record.data["importe_haber_mb"]:0;
+		   			    		haber = record.data["importe_haber_mb"]?record.data["importe_haber_mb"]:0,
+		   			    		sum_debe, sum_haber;
 		   			    	
-		   			    	Phx.CP.getPagina(me.idContenedorPadre).panelResumen.update( String.format('<p>DEBE: {0} <br> HABER: {1} </br> SALDO: {2}</p>' ,debe, haber, debe - haber))
+		   			    	if ((debe - haber ) > 0) {
+		   			    		sum_debe = debe - haber;
+		   			    		sum_haber = '';
+		   			    	}
+		   			    	else{
+		   			    		sum_debe = '';
+		   			    		sum_haber = haber - debe;
+		   			    	}
+		   			    	
+		   			    	var html = String.format("<table style='width:70%; border-collapse:collapse;'> \
+		   			    							  <tr>\
+													    <td >Debe </td>\
+													    <td >Haber</td> \
+													  </tr>\
+		   			    	                          <tr>\
+													    <td style='padding: 15px; border-top:  solid #000000; border-right:  solid #000000;'>{0} </td>\
+													    <td style='padding: 15px; border-top:  solid #000000;'>{1}</td> \
+													  </tr>\
+													  <tr>\
+													    <td style='padding: 15px; border-right: solid #000000;'>{2}</td>\
+													    <td style='padding: 15px;' >{3}</td>\
+													  </tr><table>" ,debe, haber, sum_debe, sum_haber);
+		   			    	
+		   			    	//var html = String.format('<p>DEBE: {0} <br> HABER: {1} </br> SALDO: {2}</p>' ,debe, haber, debe - haber);
+		   			    	
+		   			    	Phx.CP.getPagina(me.idContenedorPadre).panelResumen.update(html)
 		   			    	return '<b><p align="right">Total: &nbsp;&nbsp; </p></b>';
 		   			    }
 		   			    
@@ -307,19 +330,23 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		
     	//llama al constructor de la clase padre
 		Phx.vista.IntTransaccionMayor.superclass.constructor.call(this,config);
+		
+		this.addButton('chkdep',{	text:'Dependencias',
+				iconCls: 'blist',
+				disabled: true,
+				handler: this.checkDependencias,
+				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
+			});
+			
+			
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
 		this.init();
-		
-		
-		
-		
 		
 	},
 	
 	
 	tam_pag: 50,	
-	title:'Transacción',
 	
 	ActList: '../../sis_contabilidad/control/IntTransaccion/listarIntTransaccionMayor',
 	id_store: 'id_int_transaccion',
@@ -418,6 +445,24 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			alert('Error al obtener gestión: fecha inválida')
 		}
 	},
+	
+	checkDependencias: function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/CbteDependencias.php',
+										'Dependencias',
+										{
+											modal:true,
+											width: '80%',
+											height: '80%'
+										}, 
+										  {id_int_comprobante: rec.data.id_int_comprobante}, 
+										  this.idContenedor,
+										 'CbteDependencias');
+			   
+	},
+	
+	
 	successGestion: function(resp){
 		var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
         if(!reg.ROOT.error){
@@ -431,6 +476,25 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
             alert('Error al obtener la gestión. Cierre y vuelva a intentarlo')
         } 
 	},
+	
+	ExtraColumExportDet:[{ 
+		   	    label:'Partida',
+				name:'desc_partida',
+				width:'200',
+				type:'string',
+				gdisplayField:'desc_partida',
+				value:'desc_partida'
+			},
+			{ 
+		   	    label:'Cbte',
+				name:'nro_cbte',
+				width:'100',
+				type:'string',
+				gdisplayField:'nro_cbte',
+				value:'nro_cbte'
+			}],
+	
+	
     bnew : false,
     bedit: false,
     bdel:  false

@@ -204,13 +204,13 @@ Phx.vista.IntComprobanteReg = {
 			
 			
 		},
-		
+		/*
 		capturaFiltros : function(combo, record, index) {
 			this.desbloquearOrdenamientoGrid();
 			this.store.baseParams.id_deptos = this.cmbDepto.getValue();
 			this.store.baseParams.nombreVista = this.nombreVista;			
 			this.load();
-		},
+		},*/
 		
 		getTipoCambio : function() {
 			//Verifica que la fecha y la moneda hayan sido elegidos

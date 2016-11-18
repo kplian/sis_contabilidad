@@ -275,8 +275,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					name: 'razon_social',
 					fieldLabel: 'Razón Social',
 					allowBlank: false,
-					maskRe: /[A-Za-z0-9 ]/,
-	                fieldStyle: 'text-transform:uppercase',
+					//maskRe: /[A-Za-z0-9 ]/,
+	                //fieldStyle: 'text-transform:uppercase',
+					style:'text-transform:uppercase;',
 	                listeners:{
 				          'change': function(field, newValue, oldValue){
 				          			  console.log('keyup ...  ')
@@ -338,7 +339,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			{
 				config:{
 					name: 'importe_excento',
-					fieldLabel: 'Excento',
+					fieldLabel: 'Exento',
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
@@ -657,7 +658,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			{
 				config:{
 					name: 'obs',
-					fieldLabel: 'Obs',
+					fieldLabel: 'Observaciones',
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
@@ -1151,7 +1152,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					root: 'datos',
 					sortInfo:{
 						field: 'gestion',
-						direction: 'ASC'
+						direction: 'DESC'
 					},
 					totalProperty: 'total',
 					fields: ['id_gestion','gestion'],
@@ -1186,14 +1187,14 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_periodo','periodo','id_gestion'],
+					fields: ['id_periodo','periodo','id_gestion','literal'],
 					// turn on remote sorting
 					remoteSort: true,
 					baseParams:{par_filtro:'gestion'}
 				}),
 				valueField: 'id_periodo',
 				triggerAction: 'all',
-				displayField: 'periodo',
+				displayField: 'literal',
 			    hiddenName: 'id_periodo',
     			mode:'remote',
 				pageSize:50,
@@ -1276,7 +1277,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
         }
     },
    
-   formTitulo: 'Formulario de Documento Compra',
+   formTitulo: 'Registro de Documento Compra',
    abrirFormulario: function(tipo, record){
    	       var me = this;
    	       console.log(' me.regitrarDetalle', me.regitrarDetalle)
@@ -1284,8 +1285,18 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                                me.formTitulo,
 	                                {
 	                                    modal:true,
-	                                    width:'100%',
-	                                    height:'100%'
+	                                    width:'90%',
+										height:'60%'
+
+										/*if (me.regitrarDetalle == 'si')
+									    {
+										   height:'100%'
+									    }
+										else
+	   									{
+	   										height:'50%'
+	   									}*/
+
 	                                    
 	                                }, { data: { 
 		                                	 objPadre: me ,

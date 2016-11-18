@@ -80,6 +80,13 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_estado_wf','int4');
 		
+		$this->captura('fecha_c31','date');
+		$this->captura('c31','varchar');
+		$this->captura('id_gestion','int4');
+		$this->captura('periodo','int4');
+		
+		
+		
 		
 		
 		//Ejecuta la instruccion
