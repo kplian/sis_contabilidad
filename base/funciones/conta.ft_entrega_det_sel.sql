@@ -1,7 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_entrega_det_sel"(	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
+
+CREATE OR REPLACE FUNCTION conta.ft_entrega_det_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_entrega_det_sel
@@ -41,27 +47,33 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						end.id_entrega_det,
-						end.estado_reg,
-						end.id_int_comprobante,
-						end.id_entrega,
-						end.id_usuario_reg,
-						end.fecha_reg,
-						end.usuario_ai,
-						end.id_usuario_ai,
-						end.id_usuario_mod,
-						end.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	
-						from conta.tentrega_det end
-						inner join segu.tusuario usu1 on usu1.id_usuario = end.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = end.id_usuario_mod
+                                  ende.id_entrega_det,
+                                  ende.estado_reg,
+                                  ende.id_int_comprobante,
+                                  ende.id_entrega,
+                                  ende.id_usuario_reg,
+                                  ende.fecha_reg,
+                                  ende.usuario_ai,
+                                  ende.id_usuario_ai,
+                                  ende.id_usuario_mod,
+                                  ende.fecha_mod,
+                                  usu1.cuenta as usr_reg,
+                                  usu2.cuenta as usr_mod,
+                                  cbte.nro_cbte::varchar,
+                                  cbte.nro_tramite::varchar,
+                                  cbte.beneficiario::varchar,
+                                  cbte.desc_clase_comprobante::varchar,
+                                  cbte.glosa1::varchar
+                              from conta.tentrega_det ende
+                              inner join conta.vint_comprobante cbte on cbte.id_int_comprobante = ende.id_int_comprobante
+                              inner join segu.tusuario usu1 on usu1.id_usuario = ende.id_usuario_reg
+                              left join segu.tusuario usu2 on usu2.id_usuario = ende.id_usuario_mod
 				        where  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+            RAISE NOTICE '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -79,10 +91,11 @@ BEGIN
 		begin
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_entrega_det)
-					    from conta.tentrega_det end
-					    inner join segu.tusuario usu1 on usu1.id_usuario = end.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = end.id_usuario_mod
-					    where ';
+					          from conta.tentrega_det ende
+                              inner join conta.vint_comprobante cbte on cbte.id_int_comprobante = ende.id_int_comprobante
+                              inner join segu.tusuario usu1 on usu1.id_usuario = ende.id_usuario_reg
+                              left join segu.tusuario usu2 on usu2.id_usuario = ende.id_usuario_mod
+				        where ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -107,7 +120,9 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_entrega_det_sel"(integer, integer, character varying, character varying) OWNER TO postgres;

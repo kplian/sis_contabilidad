@@ -11,8 +11,14 @@ class ACTEntrega extends ACTbase{
 			
 	function listarEntrega(){
 		$this->objParam->defecto('ordenacion','id_entrega');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		
+		if($this->objParam->getParametro('id_depto')!=''){
+			$this->objParam->addFiltro("ent.id_depto_conta = ".$this->objParam->getParametro('id_depto'));	
+		}
+		
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODEntrega','listarEntrega');
@@ -35,11 +41,21 @@ class ACTEntrega extends ACTbase{
 	}
 						
 	function eliminarEntrega(){
-			$this->objFunc=$this->create('MODEntrega');	
+		$this->objFunc=$this->create('MODEntrega');	
 		$this->res=$this->objFunc->eliminarEntrega($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+	
+	function crearEntrega(){
+		$this->objFunc=$this->create('MODEntrega');	
+		$this->res=$this->objFunc->crearEntrega($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	function cambiarEstado(){
+		$this->objFunc=$this->create('MODEntrega');	
+		$this->res=$this->objFunc->cambiarEstado($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}		
 }
-
 ?>

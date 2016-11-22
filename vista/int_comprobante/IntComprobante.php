@@ -262,11 +262,18 @@ header("content-type: text/javascript; charset=UTF-8");
 				name : 'nro_cbte',
 				fieldLabel : 'Nro.Cbte.',
 				gwidth : 135,
-				emptyText : 'Nro. de Cbte.'
+				emptyText : 'Nro. de Cbte.',
+				renderer: function(value,p,record){
+                         if(record.data.c31 && record.data.c31 !='' ){
+                             return String.format('<font color="#0000FF">{0}</font><br>{1}', value,record.data.c31);
+                         }
+                          return String.format('{0}', value);
+                       
+                 }
 			},
 			type : 'Field',
 			filters : {
-				pfiltro : 'incbte.nro_cbte',
+				pfiltro : 'incbte.nro_cbte#incbte.C31',
 				type : 'string'
 			},
 			id_grupo : 0,
@@ -1109,7 +1116,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
 		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 
 		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 
-		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado'],
+		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31'],
 
 		rowExpander : new Ext.ux.grid.RowExpander({
 			tpl : new Ext.Template('<br>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Clase cbte:&nbsp;&nbsp;</b> {desc_clase_comprobante}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Origen:&nbsp;&nbsp;</b> {desc_subsistema}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Beneficiario:&nbsp;&nbsp;</b> {beneficiario}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa1} {glosa2}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Frima 1:&nbsp;&nbsp;</b> {desc_firma1} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 2:&nbsp;&nbsp;</b> {desc_firma2} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 3:&nbsp;&nbsp;</b> {desc_firma3} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>')
@@ -1169,6 +1176,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel: 'Gestion',
 				grupo:[0,1,2],
 				allowBlank: false,
+				blankText:'... ?',
 				emptyText:'Gestion...',
 				store:new Ext.data.JsonStore(
 				{

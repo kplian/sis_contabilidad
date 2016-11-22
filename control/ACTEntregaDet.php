@@ -11,8 +11,12 @@ class ACTEntregaDet extends ACTbase{
 			
 	function listarEntregaDet(){
 		$this->objParam->defecto('ordenacion','id_entrega_det');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if($this->objParam->getParametro('id_entrega')!=''){
+			$this->objParam->addFiltro("ende.id_entrega = ".$this->objParam->getParametro('id_entrega'));	
+		}
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODEntregaDet','listarEntregaDet');

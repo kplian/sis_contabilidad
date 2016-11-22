@@ -16,8 +16,14 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.EntregaDet.superclass.constructor.call(this,config);
+		this.addButton('chkdep',{	text:'Dependencias',
+				iconCls: 'blist',
+				disabled: true,
+				handler: this.checkDependencias,
+				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
+			});
+			
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
 	},
 			
 	Atributos:[
@@ -42,48 +48,118 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
 		{
-			config: {
-				name: 'id_int_comprobante',
-				fieldLabel: 'COmprobante',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
+			config : {
+				name : 'id_int_comprobante',
+				fieldLabel : 'ID Cbte.',
+				qtip : 'Comprobante a entregar',
+				allowBlank : true,
+				emptyText : 'Elija una opción...',
+				store : new Ext.data.JsonStore({
+					url : '../../sis_contabilidad/control/IntComprobante/listarSimpleIntComprobante',
+					id : 'id_int_comprobante',
+					root : 'datos',
+					sortInfo : {
+						field : 'id_int_comprobante',
+						direction : 'DESC'
 					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
+					totalProperty : 'total',
+					fields : ['id_int_comprobante', 'nro_cbte', 'nro_tramite', 'fecha', 'glosa1', 'glosa2', 'id_clase_comprobante', 'codigo', 'descripcion'],
+					remoteSort : true,
+					baseParams : {
+						par_filtro : 'inc.id_int_comprobante#inc.nro_cbte#inc.fecha#inc.glosa1#inc.glosa2#inc.nro_tramite'
+					}
 				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_int_comprobante',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
+				tpl : new Ext.XTemplate('<tpl for="."><div class="awesomecombo-5item {checked}">', '<p>(ID: {id_int_comprobante}), Nro: {nro_cbte}</p>', '<p>Fecha: <strong>{fecha}</strong></p>', '<p>TR: {nro_tramite}</p>', '<p>GLS: {glosa1}</p>', '</div></tpl>'),
+				itemSelector : 'div.awesomecombo-5item',
+
+				valueField : 'id_int_comprobante',
+				displayField : 'nro_cbte',
+				gdisplayField : 'nro_cbte',
+				forceSelection : true,
+				typeAhead : false,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'remote',
+				pageSize : 15,
+				queryDelay : 1000,
+				width : 250,
+				anchor : '100%',
+				listWidth : '320',
+				gwidth : 150,
+				minChars : 2,
+				resizable : true,
 				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
+					return String.format('{0}', record.data['id_int_comprobante']);
 				}
 			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
+			type : 'ComboBox',
+			id_grupo : 1,
+			filters:{pfiltro:'cbte.id_int_comprobante',type:'numeric'},
+			grid : true,
+			form : true
 		},
+		
+		{
+			config:{
+				name: 'nro_cbte',
+				fieldLabel: 'Nro Cbte',
+				gwidth: 250
+			},
+				type:'Field',
+				filters: { pfiltro:'cbte.nro_cbte',type:'string' },
+				id_grupo: 1,
+				grid: true,
+				form: false
+		},
+		{
+			config:{
+				name: 'beneficiario',
+				fieldLabel: 'Beneficiario',
+				gwidth: 250
+			},
+				type:'Field',
+				filters:{pfiltro:'cbte.beneficiario',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
+		{
+			config:{
+				name: 'nro_tramite',
+				fieldLabel: 'Tramite',
+				gwidth: 130
+			},
+				type:'Field',
+				filters:{pfiltro:'cbte.nro_tramite',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
+		{
+			config:{
+				name: 'desc_clase_comprobante',
+				fieldLabel: 'Tipo',
+				gwidth: 130
+			},
+				type:'Field',
+				filters:{pfiltro:'cbte.desc_clase_comprobante',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
+		{
+			config:{
+				name: 'glosa1',
+				fieldLabel: 'Glosa',
+				gwidth: 250
+			},
+				type:'Field',
+				filters:{pfiltro:'cbte.glosa1',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
+		
 		
 		{
 			config:{
@@ -95,7 +171,7 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 				maxLength:10
 			},
 				type:'TextField',
-				filters:{pfiltro:'end.estado_reg',type:'string'},
+				filters:{pfiltro:'ende.estado_reg',type:'string'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -128,7 +204,7 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
-				filters:{pfiltro:'end.fecha_reg',type:'date'},
+				filters:{pfiltro:'ende.fecha_reg',type:'date'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -143,7 +219,7 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 				maxLength:300
 			},
 				type:'TextField',
-				filters:{pfiltro:'end.usuario_ai',type:'string'},
+				filters:{pfiltro:'ende.usuario_ai',type:'string'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -158,7 +234,7 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 				maxLength:4
 			},
 				type:'Field',
-				filters:{pfiltro:'end.id_usuario_ai',type:'numeric'},
+				filters:{pfiltro:'ende.id_usuario_ai',type:'numeric'},
 				id_grupo:1,
 				grid:false,
 				form:false
@@ -189,7 +265,7 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
-				filters:{pfiltro:'end.fecha_mod',type:'date'},
+				filters:{pfiltro:'ende.fecha_mod',type:'date'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -214,6 +290,7 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		'nro_cbte','nro_tramite', 'beneficiario','desc_clase_comprobante','glosa1'
 		
 	],
 	sortInfo:{
@@ -221,9 +298,55 @@ Phx.vista.EntregaDet=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:false,
+	bedit:false,
+	checkDependencias: function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/CbteDependencias.php',
+										'Dependencias',
+										{
+											modal:true,
+											width: '80%',
+											height: '80%'
+										}, 
+										  rec.data, 
+										  this.idContenedor,
+										 'CbteDependencias');			   
+	},
+	onReloadPage:function(m){
+		this.maestro=m;						
+		this.store.baseParams={id_entrega:this.maestro.id_entrega};
+		this.load({params:{start:0, limit:this.tam_pag}});
+	},
+	loadValoresIniciales:function(){
+		Phx.vista.EntregaDet.superclass.loadValoresIniciales.call(this);
+		console.log('asigna depto', this.maestro)
+		this.Cmp.id_int_comprobante.store.baseParams.id_deptos = this.maestro.id_depto_conta;
+		this.Cmp.id_int_comprobante.modificado = true;
+		this.getComponente('id_entrega').setValue(this.maestro.id_entrega);		
+	},
+	preparaMenu : function(n) {
+			var tb = Phx.vista.EntregaDet.superclass.preparaMenu.call(this);
+			this.getBoton('chkdep').enable();
+			if(this.maestro.estado == 'borrador'){
+				this.getBoton('new').enable();
+				this.getBoton('del').enable();
+			}
+			else{
+				this.getBoton('new').disable();
+				this.getBoton('del').disable();
+			}
+			return tb;
+	},
+	liberaMenu : function() {
+			var tb = Phx.vista.EntregaDet.superclass.liberaMenu.call(this);
+			this.getBoton('chkdep').disable();
+			if(this.maestro.estado != 'borrador'){
+				this.getBoton('new').disable();
+			}
 	}
-)
+})
 </script>
 		
 		

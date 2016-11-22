@@ -33,12 +33,16 @@ class ACTIntComprobante extends ACTbase{
             $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");    
         }
 		
-		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'){
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'  || $this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
             $this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
         }
 		else{
 			$this->objParam->addFiltro("incbte.estado_reg in (''borrador'', ''edicion'')");
 		}
+		
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
+            $this->objParam->addFiltro(" (incbte.c31 = '''' or incbte.c31 is null )" );      
+        }
 		
 		if($this->objParam->getParametro('momento')!= ''){
 			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    

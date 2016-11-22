@@ -2797,3 +2797,45 @@ GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES, TRIGGER, TRUNCATE
 /**********************************F-DEP-RAC-CONTA-0-17/11/2016****************************************/
 
 
+/**********************************I-DEP-RAC-CONTA-0-21/11/2016****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT tint_comprobante_fk FOREIGN KEY (id_clase_comprobante)
+    REFERENCES conta.tclase_comprobante(id_clase_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+
+--------------- SQL ---------------
+
+CREATE UNIQUE INDEX ttipo_relacion_comprobante_idx ON conta.ttipo_relacion_comprobante
+  USING btree (codigo);
+  
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT tint_comprobante_fk1 FOREIGN KEY (id_tipo_relacion_comprobante)
+    REFERENCES conta.ttipo_relacion_comprobante(id_tipo_relacion_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE; 
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD CONSTRAINT tentrega_fk FOREIGN KEY (id_tipo_relacion_comprobante)
+    REFERENCES conta.ttipo_relacion_comprobante(id_tipo_relacion_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+
+/**********************************F-DEP-RAC-CONTA-0-21/11/2016****************************************/
+
+    

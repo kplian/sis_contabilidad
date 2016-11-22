@@ -3364,4 +3364,35 @@ WITH (oids = false);
 /***********************************F-SCP-RAC-CONTA-0-17/11/2016****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-17/11/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN obs VARCHAR;
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_tipo_relacion_comprobante INTEGER;
+  
+/***********************************F-SCP-RAC-CONTA-0-17/11/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-22/11/2016****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_depto_conta INTEGER;
+
+COMMENT ON COLUMN conta.tentrega.id_depto_conta
+IS 'indetifica el depto de contabilidad';
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-22/11/2016****************************************/
+
 

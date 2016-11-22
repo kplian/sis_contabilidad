@@ -15,27 +15,95 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
+    	this.initButtons = [this.cmbDepto];
 		Phx.vista.Entrega.superclass.constructor.call(this,config);
+		
+        
+        this.addButton('cam_estado', {
+				text : 'Rel Dev',
+				iconCls : 'btag_accept',
+				disabled : true,
+				handler : this.cambiarEstado,
+				tooltip: '<b>Finaliza la entrega, defini el nro de Cbte relacionado en SIGMA/SIGEP/OTRO</b>' 
+			});
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.bloquearOrdenamientoGrid();
+        this.cmbDepto.on('clearcmb', function() {
+				this.DisableSelect();
+				this.store.removeAll();
+			}, this);
+			
+		this.cmbDepto.on('valid', function() {
+				this.capturaFiltros();				
+		}, this);	
+			
 	},
+	
+	
+	
+	cmbDepto : new Ext.form.AwesomeCombo({
+			name : 'id_depto',
+			fieldLabel : 'Depto',
+			typeAhead : false,
+			forceSelection : true,
+			allowBlank : false,
+			disableSearchButton : true,
+			emptyText : 'Depto Contable',
+			store : new Ext.data.JsonStore({
+				url : '../../sis_parametros/control/Depto/listarDeptoFiltradoDeptoUsuario',
+				id : 'id_depto',
+				root : 'datos',
+				sortInfo : {
+					field : 'deppto.nombre',
+					direction : 'ASC'
+				},
+				totalProperty : 'total',
+				fields : ['id_depto', 'nombre', 'codigo'],
+				// turn on remote sorting
+				remoteSort : true,
+				baseParams : {
+					par_filtro : 'deppto.nombre#deppto.codigo',
+					estado : 'activo',
+					codigo_subsistema : 'CONTA'
+				}
+			}),
+			valueField : 'id_depto',
+			displayField : 'nombre',
+			hiddenName : 'id_depto',
+			enableMultiSelect : false,
+			triggerAction : 'all',
+			lazyRender : true,
+			mode : 'remote',
+			pageSize : 20,
+			queryDelay : 200,
+			anchor : '80%',
+			listWidth : '280',
+			resizable : true,
+			minChars : 2
+		}),
 			
 	Atributos:[
+		
 		{
-			//configuracion del componente
 			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_entrega'
+				name: 'id_entrega',
+				fieldLabel: 'ID',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:200
 			},
-			type:'Field',
-			form:true 
+				type:'TextField',
+				filters:{pfiltro:'ent.id_entrega',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:true
 		},
 		{
 			config:{
 				name: 'c31',
 				fieldLabel: 'Nro C31',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:200
@@ -205,7 +273,7 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'id_depto_conta'
 		
 	],
 	sortInfo:{
@@ -218,13 +286,88 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 			height : '50%', //altura de la ventana hijo
 			cls : 'EntregaDet'
 		},
-	bdel:false,
-	bsave:false,
-	bnew:false,
-	bedit:false,
-	bsave:true
-	}
-)
+	//para retroceder de estado
+    cambiarEstado:function(res){
+         var rec=this.sm.getSelected(),
+             obsValorInicial;
+             Phx.CP.loadWindows('../../../sis_contabilidad/vista/entrega/EntregaForm.php',
+            'Estado de Wf',
+            {   modal: true,
+                width: '70%',
+                height: '70%'
+            }, 
+            {    data: rec.data }, this.idContenedor,'EntregaForm',
+            {
+                config:[{
+                          event:'beforesave',
+                          delegate: this.onCambiartEstado,
+                        }
+                        ],
+               scope:this
+           });
+   },
+   
+    onCambiartEstado: function(wizard,resp){
+            Phx.CP.loadingShow();
+            var operacion = 'cambiar';
+            Ext.Ajax.request({
+                url:'../../sis_contabilidad/control/Entrega/cambiarEstado',
+                params:{
+                        id_entrega: resp.id_entrega,
+                        c31:  resp.c31,
+                        fecha_c31:  resp.fecha_c31,  
+                        id_tipo_relacion_comprobante:  resp.id_tipo_relacion_comprobante,    
+                        obs: resp.obs
+                 },
+                argument: { wizard: wizard },  
+                success: this.successEstadoSinc,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+           
+    },
+    successEstadoSinc:function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+    },
+    
+    preparaMenu : function(n) {
+			var tb = Phx.vista.Entrega.superclass.preparaMenu.call(this,n);
+			this.getBoton('cam_estado').enable();
+			return tb;
+	},
+	liberaMenu : function() {
+			var tb = Phx.vista.Entrega.superclass.liberaMenu.call(this);
+			this.getBoton('cam_estado').disable();
+			
+	},  
+	capturaFiltros : function(combo, record, index) {
+			this.desbloquearOrdenamientoGrid();
+			this.store.baseParams.id_depto = this.cmbDepto.getValue();
+			this.store.baseParams.nombreVista = this.nombreVista
+			this.load();
+		},
+
+	validarFiltros : function() {
+			if (this.cmbDepto.getValue() != '' ) {			
+				return true;
+			} else {
+				return false;
+			}
+		},
+	onButtonAct : function() {
+			if (!this.validarFiltros()) {
+				alert('Especifique los filtros antes')
+			}
+			else{
+				 this.capturaFiltros();
+			}
+		}, 
+	bdel: true,
+	bsave: false,
+	bnew: false,
+	bedit: false
+})
 </script>
-		
-		

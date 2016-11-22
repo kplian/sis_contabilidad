@@ -32,6 +32,12 @@ class MODEntregaDet extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('nro_cbte','varchar');
+        $this->captura('nro_tramite','varchar');
+        $this->captura('beneficiario','varchar');
+        $this->captura('desc_clase_comprobante','varchar');
+        $this->captura('glosa1','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

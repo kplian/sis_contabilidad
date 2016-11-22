@@ -46,7 +46,8 @@ Phx.vista.IntComprobanteLd = {
 				handler: this.checkDependencias,
 				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
 			});
-	    
+			
+		
 	   this.init();	 
     
     },
@@ -127,6 +128,7 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
             this.getBoton('btnObs').enable();
+            
 			
 			return tb;
 	},
@@ -156,8 +158,7 @@ Phx.vista.IntComprobanteLd = {
 										}, 
 										  rec.data, 
 										  this.idContenedor,
-										 'CbteDependencias');
-			   
-	 }
+										 'CbteDependencias');			   
+	}
 };
 </script>
