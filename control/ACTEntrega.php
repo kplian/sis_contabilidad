@@ -6,7 +6,8 @@
 *@date 17-11-2016 19:50:19
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
-
+require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
+require_once(dirname(__FILE__).'/../reportes/REntregaXls.php');
 class ACTEntrega extends ACTbase{    
 			
 	function listarEntrega(){
@@ -56,6 +57,49 @@ class ACTEntrega extends ACTbase{
 		$this->objFunc=$this->create('MODEntrega');	
 		$this->res=$this->objFunc->cambiarEstado($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
-	}		
+	}	
+	
+	function recuperarEntrega(){    	
+		$this->objFunc = $this->create('MODEntrega');
+		$cbteHeader = $this->objFunc->recuperarEntrega($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){				
+			return $cbteHeader;
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		} 
+    }
+	
+	function reporteEntrega(){
+		
+			    
+				$nombreArchivo = uniqid(md5(session_id()).'Entrega').'.xls'; 
+				$dataSource = $this->recuperarEntrega();
+				
+				//parametros basicos
+				$tamano = 'LETTER';
+				$orientacion = 'L';
+				$titulo = 'Consolidado';
+				
+				$this->objParam->addParametro('orientacion',$orientacion);
+				$this->objParam->addParametro('tamano',$tamano);		
+				$this->objParam->addParametro('titulo_archivo',$titulo);        
+				$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+				
+				
+				$reporte = new REntregaXls($this->objParam); 
+				$reporte->datosHeader($dataSource->getDatos(), $this->objParam->getParametro('id_entrega'));
+				  $reporte->generarReporte(); 
+				
+		         
+				
+				
+				$this->mensajeExito=new Mensaje();
+				$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+				$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+				$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		
+	}	
 }
 ?>

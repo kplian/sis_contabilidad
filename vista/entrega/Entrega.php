@@ -26,6 +26,16 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 				handler : this.cambiarEstado,
 				tooltip: '<b>Finaliza la entrega, defini el nro de Cbte relacionado en SIGMA/SIGEP/OTRO</b>' 
 			});
+			
+		//Botón para Imprimir el Comprobante
+		this.addButton('btnImprimir', {
+				text : 'Imprimir',
+				iconCls : 'bprint',
+				disabled : true,
+				handler : this.imprimirCbte,
+				tooltip : '<b>Imprimir Reporte de Entrega</b><br/>Imprime un detalle de las factidas presupeustarias relacioandas a la entrega'
+		});
+				
 		this.init();
 		this.bloquearOrdenamientoGrid();
         this.cmbDepto.on('clearcmb', function() {
@@ -336,11 +346,14 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
     preparaMenu : function(n) {
 			var tb = Phx.vista.Entrega.superclass.preparaMenu.call(this,n);
 			this.getBoton('cam_estado').enable();
+			this.getBoton('btnImprimir').enable();
+			
 			return tb;
 	},
 	liberaMenu : function() {
 			var tb = Phx.vista.Entrega.superclass.liberaMenu.call(this);
 			this.getBoton('cam_estado').disable();
+			this.getBoton('btnImprimir').disable();
 			
 	},  
 	capturaFiltros : function(combo, record, index) {
@@ -365,6 +378,24 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 				 this.capturaFiltros();
 			}
 		}, 
+	imprimirCbte : function() {
+			var rec = this.sm.getSelected();
+			var data = rec.data;
+			if (data) {
+				Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/Entrega/reporteEntrega',
+					params : {
+						'id_entrega' : data.id_entrega
+					},
+					success : this.successExport,
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			}
+
+		},	
 	bdel: true,
 	bsave: false,
 	bnew: false,

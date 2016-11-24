@@ -146,6 +146,57 @@ class MODEntrega extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function recuperarEntrega(){
+		  //Definicion de variables para ejecucion del procedimientp
+		  $this->procedimiento='conta.ft_entrega_sel';
+		  $this->transaccion='CONTA_REPENT_SEL';
+		  $this->tipo_procedimiento='SEL';//tipo de transaccion
+		  $this->setCount(false);
+		  
+		  //captura parametros adicionales para el count
+		  $this->setParametro('id_entrega','id_entrega','int4');
+		  
+		 
+		
+		//Definicion de la lista del resultado del query
+		$this->captura('id_entrega','int4');
+        $this->captura('estado','varchar');
+        $this->captura('c31','varchar');
+        $this->captura('id_depto_conta','int4');
+        $this->captura('fecha_c31','date');
+        $this->captura('codigo','varchar');
+        $this->captura('nombre_partida','varchar');
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('importe_debe_mb_completo','numeric');
+        $this->captura('importe_haber_mb_completo','numeric');
+        $this->captura('importe_gasto_mb','numeric');
+        $this->captura('importe_recurso_mb','numeric');
+        $this->captura('factor_reversion','numeric');
+        $this->captura('codigo_cc','varchar');
+        $this->captura('codigo_categoria','varchar');
+        $this->captura('codigo_cg','varchar');
+        $this->captura('nombre_cg','varchar');
+        $this->captura('beneficiario','varchar');
+        $this->captura('glosa1','varchar');
+        $this->captura('id_int_comprobante','int4');
+        $this->captura('id_int_comprobante_dev','int4');
+        $this->captura('id_cuenta_bancaria','int4');
+		
+		
+		
+		  
+		              
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 	
 	
 			

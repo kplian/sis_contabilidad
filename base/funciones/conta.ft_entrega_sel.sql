@@ -99,6 +99,50 @@ BEGIN
 			return v_consulta;
 
 		end;
+     /*********************************    
+ 	#TRANSACCION:  'CONTA_REPENT_SEL'
+ 	#DESCRIPCION:	Consulta de datos para reporte de entrega
+ 	#AUTOR:		RAC KPLIAN	
+ 	#FECHA:		23-11-2016 19:50:19
+	***********************************/
+    elseif(p_transaccion='CONTA_REPENT_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='SELECT 
+                            id_entrega,
+                            estado::varchar,
+                            c31::varchar,
+                            id_depto_conta,
+                            fecha_c31,
+                            codigo::varchar,
+                            nombre_partida::varchar,
+                            importe_debe_mb::numeric,
+                            importe_haber_mb::numeric,
+                            importe_debe_mb_completo::numeric,
+                            importe_haber_mb_completo::numeric,
+                            importe_gasto_mb::numeric,
+                            importe_recurso_mb::numeric,
+                            factor_reversion::numeric,
+                            codigo_cc::varchar,
+                            codigo_categoria::varchar,
+                            codigo_cg::varchar,
+                            nombre_cg::varchar,
+                            beneficiario::varchar,
+                            glosa1::varchar,
+                            id_int_comprobante,
+                            id_int_comprobante_dev,
+                            id_cuenta_bancaria
+                          FROM 
+                            conta.ventrega   e
+                          WHERE id_entrega = '||v_parametros.id_entrega||'
+						  ORDER by e.codigo_cg , e.codigo_categoria , e.codigo';
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
 					
 	else
 					     
