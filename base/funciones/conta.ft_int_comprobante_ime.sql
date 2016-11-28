@@ -1451,9 +1451,9 @@ BEGIN
                raise exception 'No existe un proceso inicial para el proceso macro indicado % (Revise la configuración)',v_codigo_proceso_macro;
               END IF;
               
-              --TODO preguntar si se quiere clonar el  con el nro de tramite  nro_tramite
-             IF    FALSE  THEN     
-                	 -- inciar el tramite en el sistema de WF
+              -- preguntar si se quiere clonar el  con el nro de tramite  nro_tramite
+             IF    v_parametros.sw_tramite = 'si'  THEN     
+                	 -- inciar el proceso con un nuevo nro  de  tramite en el sistema de WF
                     SELECT 
                        ps_num_tramite ,
                        ps_id_proceso_wf ,
