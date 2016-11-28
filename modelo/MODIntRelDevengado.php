@@ -70,6 +70,11 @@ class MODIntRelDevengado extends MODbase{
 		$this->captura('desc_auxiliar_dev','text');
 		$this->captura('desc_auxiliar_pag','text');
 		
+		$this->captura('importe_gasto_pag','NUMERIC');
+        $this->captura('importe_recurso_pag','NUMERIC');
+        $this->captura('importe_gasto_dev','NUMERIC');
+        $this->captura('importe_recurso_de','NUMERIC');
+		
 		
 		 
 		

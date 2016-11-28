@@ -385,7 +385,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			{
 				config:{
 					name: 'importe_neto',
-					fieldLabel: 'Neto',
+					fieldLabel: 'Importe c/d',
 					allowBlank: false,
 					anchor: '80%',
 					gwidth: 100,
@@ -402,6 +402,29 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				},
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
+					id_grupo:1,
+					grid:true,
+					form:false
+			},	
+			{
+				config:{
+					name: 'importe_aux_neto',
+					fieldLabel: 'Neto',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:1179650,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', value );
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', value);
+						}
+						
+					}
+				},
+					type:'NumberField',
 					id_grupo:1,
 					grid:true,
 					form:false
@@ -976,12 +999,6 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		],
 			
 		
-		
-		
-		
-		
-		
-		
 		//llama al constructor de la clase padre
 		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
 		
@@ -1250,7 +1267,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		{name:'importe_retgar', type: 'numeric'},
 		{name:'importe_neto', type: 'numeric'},
 		'desc_depto','desc_plantilla',
-		'importe_descuento_ley',
+		'importe_descuento_ley','importe_aux_neto',
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
 		'desc_tipo_doc_compra_venta','id_tipo_doc_compra_venta','nro_tramite',
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg'

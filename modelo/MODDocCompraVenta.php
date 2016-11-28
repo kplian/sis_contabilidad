@@ -31,7 +31,8 @@ class MODDocCompraVenta extends MODbase{
 		$this->capturaCount('tota_importe_pendiente','numeric');
 		$this->capturaCount('total_importe_neto','numeric');
 		$this->capturaCount('total_importe_descuento_ley','numeric');
-		$this->capturaCount('tota_importe_pago_liquido','numeric');
+		$this->capturaCount('total_importe_pago_liquido','numeric');
+		$this->capturaCount('total_importe_aux_neto','numeric');
 		
 		
 		
@@ -93,6 +94,10 @@ class MODDocCompraVenta extends MODbase{
 		
 		$this->captura('id_tipo_doc_compra_venta','integer');
 		$this->captura('desc_tipo_doc_compra_venta','varchar');
+		
+		$this->captura('importe_aux_neto','numeric');
+		
+		
 		
 		
 
@@ -378,6 +383,7 @@ class MODDocCompraVenta extends MODbase{
 			$this->setParametro('importe_retgar','importe_retgar','numeric');
 			$this->setParametro('importe_neto','importe_neto','numeric');			
 		    $this->setParametro('id_auxiliar','id_auxiliar','integer');
+			$this->setParametro('id_int_comprobante','id_int_comprobante','integer');
 			
 			
 			//Ejecuta la instruccion
@@ -557,6 +563,7 @@ class MODDocCompraVenta extends MODbase{
 			$this->setParametro('importe_retgar','importe_retgar','numeric');
 			$this->setParametro('importe_neto','importe_neto','numeric');
 			$this->setParametro('id_auxiliar','id_auxiliar','integer');
+			$this->setParametro('id_int_comprobante','id_int_comprobante','integer');
 			
 			
 			//Ejecuta la instruccion

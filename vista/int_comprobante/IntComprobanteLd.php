@@ -24,6 +24,7 @@ Phx.vista.IntComprobanteLd = {
 	constructor: function(config) {
 	    Phx.vista.IntComprobanteLd.superclass.constructor.call(this,config);
 	    
+	    
 	    this.addButton('btnVolcar', {
 				text : 'Volcar',
 				iconCls : 'balert',
@@ -32,13 +33,15 @@ Phx.vista.IntComprobanteLd = {
 				tooltip : '<b>Volcar</b><br/>Genera un cbte volcado que revierte el actual'
 		});
 		
+		this.addBotonesClonar();
+		/*
 		this.addButton('btnClonar', {
 				text : 'Clonar',
 				iconCls : 'balert',
 				disabled : true,
 				handler : this.clonarCbte,
 				tooltip : '<b>Clonar</b><br/>Clonar Cbte (genera nuevo nro de trámite)'
-		});
+		});*/
 		
 		this.addButton('chkdep',{	text:'Dependencias',
 				iconCls: 'blist',
@@ -81,8 +84,11 @@ Phx.vista.IntComprobanteLd = {
 			    
 	},
 	
-   clonarCbte: function() {
-			  
+	clonarCbteSt: function(){
+		this.clonarCbte('si');
+	},
+    clonarCbte: function(sw_tramite) {
+	 		  
 			 if(confirm("Esta seguro de clonar  el cbte")){
 			 	 if(confirm("¿Esta realmente seguro?")){
 				 	var rec = this.sm.getSelected().data;
@@ -90,7 +96,8 @@ Phx.vista.IntComprobanteLd = {
 					Ext.Ajax.request({
 						url : '../../sis_contabilidad/control/IntComprobante/clonarCbte',
 						params : {
-							id_int_comprobante : rec.id_int_comprobante
+							id_int_comprobante : rec.id_int_comprobante,
+							sw_tramite: sw_tramite?sw_tramite:'no'
 						},
 						success : function(resp) {
 							Phx.CP.loadingHide();
@@ -159,6 +166,32 @@ Phx.vista.IntComprobanteLd = {
 										  rec.data, 
 										  this.idContenedor,
 										 'CbteDependencias');			   
-	}
+	},
+	addBotonesClonar: function() {
+        this.menuClonar = new Ext.Toolbar.SplitButton({
+            id: 'b-btnClonar-' + this.idContenedor,
+            text: 'Clonar',
+            disabled: true,
+            grupo:[0,1,2,3],
+            iconCls : 'balert',
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-gantti-' + this.idContenedor,
+                text: 'Clonar sin  Trámite',
+                tooltip: '<b>Clona el cbte sin mantener el nro de trámite</b>',
+                handler:this.clonarCbteSt,
+                scope: this
+            }, {
+                id:'b-ganttd-' + this.idContenedor,
+                text: 'Clonar con Trámite',
+                tooltip: '<b>Clonar el cbte manteniendo el nro de trámite</b>',
+                handler:this.clonarCbte,
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuClonar	);
+    },
 };
 </script>

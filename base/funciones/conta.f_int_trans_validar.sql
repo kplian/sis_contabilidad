@@ -82,7 +82,7 @@ BEGIN
                         IF v_registros.importe_haber > 0 and v_registros.banco = 'si'  THEN   
                             
                                IF v_registros.forma_pago = '' or v_registros.forma_pago is  null  THEN
-                                 raise exception 'defina la forma de pago para proceder con la validaci{on';
+                                 raise exception 'defina la forma de pago para proceder con la validación';
                                END IF;
                                
                               --TODO verificar integracion con libro de bancos ....
@@ -96,6 +96,8 @@ BEGIN
                                     END IF;
                                     
                                END IF;
+                               raise exception 'ssss';
+                               
                         
                         END IF;
                     END IF;

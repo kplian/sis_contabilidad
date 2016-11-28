@@ -2961,3 +2961,71 @@ WHERE par.sw_movimiento::text = 'presupuestaria'::text;
  /**********************************F-DEP-RAC-CONTA-0-23/11/2016****************************************/
 
     
+ /**********************************I-DEP-RAC-CONTA-0-29/11/2016****************************************/
+  
+    --------------- SQL ---------------
+
+ -- object recreation
+DROP VIEW conta.vint_rel_devengado;
+
+CREATE VIEW conta.vint_rel_devengado
+AS
+  SELECT rde.id_int_rel_devengado,
+         rde.id_int_transaccion_pag,
+         rde.id_int_transaccion_dev,
+         rde.monto_pago,
+         rde.id_partida_ejecucion_pag,
+         rde.monto_pago_mb,
+         rde.estado_reg,
+         rde.id_usuario_ai,
+         rde.fecha_reg,
+         rde.usuario_ai,
+         rde.id_usuario_reg,
+         rde.fecha_mod,
+         rde.id_usuario_mod,
+         usu1.cuenta AS usr_reg,
+         usu2.cuenta AS usr_mod,
+         cd.nro_cbte AS nro_cbte_dev,
+         td.desc_cuenta AS desc_cuenta_dev,
+         td.desc_partida AS desc_partida_dev,
+         td.desc_centro_costo AS desc_centro_costo_dev,
+         td.desc_orden AS desc_orden_dev,
+         td.importe_debe AS importe_debe_dev,
+         td.importe_haber AS importe_haber_dev,
+         tp.desc_cuenta AS desc_cuenta_pag,
+         tp.desc_partida AS desc_partida_pag,
+         tp.desc_centro_costo AS desc_centro_costo_pag,
+         tp.desc_orden AS desc_orden_pag,
+         tp.importe_debe AS importe_debe_pag,
+         tp.importe_haber AS importe_haber_pag,
+         td.id_cuenta AS id_cuenta_dev,
+         td.id_orden_trabajo AS id_orden_trabajo_dev,
+         td.id_auxiliar AS id_auxiliar_dev,
+         td.id_centro_costo AS id_centro_costo_dev,
+         tp.id_cuenta AS id_cuenta_pag,
+         tp.id_orden_trabajo AS id_orden_trabajo_pag,
+         tp.id_auxiliar AS id_auxiliar_pag,
+         tp.id_centro_costo AS id_centro_costo_pag,
+         tp.id_int_comprobante AS id_int_comprobante_pago,
+         td.id_int_comprobante AS id_int_comprobante_dev,
+         td.tipo_partida AS tipo_partida_dev,
+         tp.tipo_partida AS tipo_partida_pag,
+         td.desc_auxiliar AS desc_auxiliar_dev,
+         tp.desc_auxiliar AS desc_auxiliar_pag,
+         
+         tp.importe_gasto AS importe_gasto_pag,
+         tp.importe_recurso AS importe_recurso_pag,
+         td.importe_gasto AS importe_gasto_dev,
+         td.importe_recurso AS importe_recurso_dev
+  FROM conta.tint_rel_devengado rde
+       JOIN conta.vint_transaccion tp ON tp.id_int_transaccion =
+         rde.id_int_transaccion_pag
+       JOIN conta.vint_transaccion td ON td.id_int_transaccion =
+         rde.id_int_transaccion_dev
+       JOIN conta.tint_comprobante cd ON cd.id_int_comprobante =
+         tp.id_int_comprobante
+       JOIN segu.tusuario usu1 ON usu1.id_usuario = rde.id_usuario_reg
+       LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = rde.id_usuario_mod;
+    
+/**********************************I-DEP-RAC-CONTA-0-29/11/2016****************************************/
+  

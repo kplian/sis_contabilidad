@@ -42,7 +42,8 @@ DECLARE
   v_id_cliente			integer;
   v_id_tipo_doc_compra_venta integer;
   v_codigo_estado			varchar;
-  v_estado_rendicion		varchar;
+  v_estado_rendicion		varchar;	
+  v_id_int_comprobante		integer;
 
 BEGIN
 
@@ -108,6 +109,11 @@ BEGIN
         END IF;
 
       END IF;
+      
+      
+      if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
+          v_id_int_comprobante = v_parametros.id_int_comprobante;
+      end if;
 
 
       --recupera parametrizacion de la plantilla
@@ -192,7 +198,8 @@ BEGIN
         id_proveedor,
         id_cliente,
         id_auxiliar,
-        id_tipo_doc_compra_venta
+        id_tipo_doc_compra_venta,
+        id_int_comprobante
       ) values(
         v_parametros.tipo,
         v_parametros.importe_excento,
@@ -230,7 +237,8 @@ BEGIN
         v_id_proveedor,
         v_id_cliente,
         v_parametros.id_auxiliar,
-        v_id_tipo_doc_compra_venta
+        v_id_tipo_doc_compra_venta,
+        v_id_int_comprobante
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -269,7 +277,7 @@ BEGIN
 
     begin
 
-    /*  03/11/2016 se comenta pelotudes,---TODO ojo pensar en alguna alternativa no intrusiva
+    /*  03/11/2016 se comenta ---TODO ojo pensar en alguna alternativa no intrusiva
       
       select COALESCE(cd.estado,efe.estado) into v_estado_rendicion
       from conta.tdoc_compra_venta d
@@ -354,6 +362,10 @@ BEGIN
         END IF;
 
       END IF;
+      
+      if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
+          v_id_int_comprobante = v_parametros.id_int_comprobante;
+      end if;
 
 
       --Sentencia de la modificacion
@@ -385,7 +397,8 @@ BEGIN
         importe_neto = v_parametros.importe_neto,
         id_proveedor = v_id_proveedor,
         id_cliente = v_id_cliente,
-        id_auxiliar = v_parametros.id_auxiliar
+        id_auxiliar = v_parametros.id_auxiliar,
+        id_int_comprobante = v_id_int_comprobante
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then

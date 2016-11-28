@@ -21,6 +21,13 @@ class ACTIntTransaccion extends ACTbase{
 		if($this->objParam->getParametro('id_int_comprobante_fks')!=''){
 			$this->objParam->addFiltro("transa.id_int_comprobante in (".$this->objParam->getParametro('id_int_comprobante_fks').")");	
 		}
+		else{
+			if($this->objParam->getParametro('forzar_relacion')=='si'){
+				 throw new Exception("Primero defina con que comprobante esta relacionado", 3);
+				 $this->objParam->addFiltro("transa.id_int_comprobante in (0)");	
+		
+			}
+		}
 		
 		if($this->objParam->getParametro('solo_debe')=='si'){
 			$this->objParam->addFiltro("transa.importe_debe > 0 ");	

@@ -65,7 +65,9 @@ BEGIN
              it.importe_haber,
              it.tipo_cambio as tipo_cambio_t,
              it.tipo_cambio_2 as tipo_cambio_2_t,
-             it.id_moneda as id_moneda_t
+             it.id_moneda as id_moneda_t,
+             it.importe_recurso,
+             it.importe_gasto
             into
              v_registros
             from conta.tint_comprobante ic
@@ -78,6 +80,8 @@ BEGIN
              ic.*,
              it.importe_debe,
              it.importe_haber,
+             it.importe_gasto,
+             it.importe_recurso,
              it.tipo_cambio as tipo_cambio_t,
              it.tipo_cambio_2 as tipo_cambio_2_t,
              it.id_moneda as id_moneda_t
@@ -89,7 +93,7 @@ BEGIN
             
             
             IF v_registros.estado_reg = 'validado' THEN
-               raise exception 'No puede insertar esta relación por que el cbte esta validado';
+               raise exception 'No puede insertar esta relación por que el cbte de pago ya esta validado';
             END IF;
             
          -- Obtener la moneda base
@@ -130,6 +134,7 @@ BEGIN
           --  validar que el monto a pagar  no sobre pase el monto ejecutado
                   
            SELECT
+
              sum(rd.monto_pago)
            into
              v_monto_total_x_pagar
@@ -137,24 +142,18 @@ BEGIN
            where rd.id_int_transaccion_dev = v_parametros.id_int_transaccion_dev
            and rd.estado_reg = 'activo'; 
            
+          -- raise exception '%  --  %',v_monto_total_x_pagar,v_parametros.monto_pago;
            
-           IF v_registros.importe_haber = 0 and (v_registros_dev.importe_haber <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           IF v_registros.importe_recurso = 0 and v_registros_dev.importe_gasto > 0 and (v_registros_dev.importe_gasto <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
+             raise exception 'Este devengado ya tiene otros registros por (%), sumado al monto que queremos pagar (%) el total devengado no alcanza (%)', COALESCE(v_monto_total_x_pagar,0) ,v_parametros.monto_pago, v_registros_dev.importe_gasto;
            END IF;
            
            
-           IF v_registros.importe_debe = 0 and (v_registros_dev.importe_debe <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
-           END IF;
-           
-           IF v_registros.importe_haber = 0 and (v_registros.importe_debe <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
+           IF v_registros.importe_gasto = 0 and v_registros_dev.importe_recurso > 0 and (v_registros_dev.importe_recusro <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
+             raise exception 'Este devengado ya tiene otros registros por (%), sumado al monto que queremos pagar (%) el total devengado no alcanza (%)', COALESCE(v_monto_total_x_pagar,0) ,v_parametros.monto_pago, v_registros_dev.importe_recurso;
            END IF;
            
            
-           IF v_registros.importe_debe = 0 and (v_registros.importe_haber <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
-           END IF;
            
            
         	--Sentencia de la insercion

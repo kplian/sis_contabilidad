@@ -75,7 +75,9 @@ class ACTDocCompraVenta extends ACTbase{
 			$temp['importe_pendiente'] = $this->res->extraData['tota_importe_pendiente'];
 			$temp['importe_neto'] = $this->res->extraData['total_importe_neto'];
 			$temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
-			$temp['importe_pago_liquido'] = $this->res->extraData['tota_importe_pago_liquido'];			
+			$temp['importe_pago_liquido'] = $this->res->extraData['total_importe_pago_liquido'];	
+			$temp['importe_aux_neto'] = $this->res->extraData['total_importe_aux_neto'];	
+					
 			$temp['tipo_reg'] = 'summary';
 			$temp['id_doc_compra_venta'] = 0;
 			

@@ -588,6 +588,8 @@ class MODIntComprobante extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('sw_tramite','sw_tramite','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

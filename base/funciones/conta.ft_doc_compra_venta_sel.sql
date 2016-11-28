@@ -105,7 +105,8 @@ BEGIN
                             aux.codigo_auxiliar,
                             aux.nombre_auxiliar,
                             dcv.id_tipo_doc_compra_venta,
-                            (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta
+                            (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta,
+                            (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto
                         
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
@@ -151,7 +152,8 @@ BEGIN
                               COALESCE(sum(dcv.importe_pendiente),0)::numeric  as tota_importe_pendiente,                              
                               COALESCE(sum(dcv.importe_neto),0)::numeric  as total_importe_neto,
                               COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
-                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as tota_importe_pago_liquido
+                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
+                              COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
                               
 					   from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg

@@ -150,7 +150,7 @@ BEGIN
              v_momento_comprometido = 'si';
             END IF;
             
-            
+          
             
             --momentos presupeustarios
             IF v_parametros.momento_ejecutado = 'true' THEN
@@ -1296,7 +1296,8 @@ BEGIN
             ic.id_proceso_wf,
             ic.estado_reg,
             pwf.id_tipo_proceso,
-            ic.id_estado_wf
+            ic.id_estado_wf,
+            ic.nro_tramite
         into 
             v_rec            
         from conta.tint_comprobante  ic
@@ -1401,7 +1402,7 @@ BEGIN
 
 		begin
         
-        
+          
             select 
              ic.*,
              p.id_gestion 
@@ -1449,30 +1450,54 @@ BEGIN
               IF v_codigo_tipo_proceso is NULL THEN
                raise exception 'No existe un proceso inicial para el proceso macro indicado % (Revise la configuración)',v_codigo_proceso_macro;
               END IF;
-                  
-             -- inciar el tramite en el sistema de WF
-              SELECT 
-                 ps_num_tramite ,
-                 ps_id_proceso_wf ,
-                 ps_id_estado_wf ,
-                 ps_codigo_estado 
-                into
-                 v_num_tramite,
-                 v_id_proceso_wf,
-                 v_id_estado_wf,
-                 v_codigo_estado   
-                        
-              FROM wf.f_inicia_tramite(
-                 p_id_usuario,
-                 v_parametros._id_usuario_ai,
-                 v_parametros._nombre_usuario_ai,
-                 v_reg_cbte.id_gestion, 
-                 v_codigo_tipo_proceso, 
-                 null,--v_parametros.id_funcionario,
-                 v_reg_cbte.id_depto,
-                 'Registro de Cbte manual',
-                 '' );        
+              
+              --TODO preguntar si se quiere clonar el  con el nro de tramite  nro_tramite
+             IF    FALSE  THEN     
+                	 -- inciar el tramite en el sistema de WF
+                    SELECT 
+                       ps_num_tramite ,
+                       ps_id_proceso_wf ,
+                       ps_id_estado_wf ,
+                       ps_codigo_estado 
+                      into
+                       v_num_tramite,
+                       v_id_proceso_wf,
+                       v_id_estado_wf,
+                       v_codigo_estado   
+                              
+                    FROM wf.f_inicia_tramite(
+                       p_id_usuario,
+                       v_parametros._id_usuario_ai,
+                       v_parametros._nombre_usuario_ai,
+                       v_reg_cbte.id_gestion, 
+                       v_codigo_tipo_proceso, 
+                       null,--v_parametros.id_funcionario,
+                       v_reg_cbte.id_depto,
+                       'Registro de Cbte manual/clonado',
+                       '' );        
                
+              ELSE
+                  
+                    SELECT
+                                 ps_id_proceso_wf,
+                                 ps_id_estado_wf,
+                                 ps_codigo_estado,
+                                 ps_nro_tramite
+                       into
+                                 v_id_proceso_wf,
+                                 v_id_estado_wf,
+                                 v_codigo_estado,
+                                 v_num_tramite
+                   FROM wf.f_registra_proceso_disparado_wf(
+                                p_id_usuario,
+                                v_parametros._id_usuario_ai,
+                                v_parametros._nombre_usuario_ai,
+                                v_reg_cbte.id_estado_wf, 
+                                NULL,  --id_funcionario wf
+                                v_reg_cbte.id_depto,
+                                'Cbte Clonado',
+                                'CBTE','');
+              END IF;
                
               IF  v_codigo_estado != 'borrador' THEN
                 raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
@@ -1487,6 +1512,9 @@ BEGIN
             from conta.tclase_comprobante cc 
             where cc.id_clase_comprobante = v_reg_cbte.id_clase_comprobante;   
             
+            
+            
+             
             
             -----------------------------
         	--REGISTRO DEL COMPROBANTE
@@ -1558,7 +1586,7 @@ BEGIN
               v_reg_cbte.cbte_cierre,
               v_reg_cbte.cbte_apertura,
               v_reg_cbte.cbte_aitb,
-              'no',
+              'si', ---comprobantes clonados se registran como  manaules
               v_reg_cbte.momento_comprometido,
               v_reg_cbte.momento_ejecutado,
               v_reg_cbte.momento_pagado,
@@ -1570,7 +1598,7 @@ BEGIN
               v_reg_cbte.localidad,
               v_reg_cbte.id_moneda_tri,
               v_num_tramite,
-              'no',  -- sw_editable 
+              'si',  -- sw_editable 
               'si', -- sw_tipo_cambio 
 			  'no', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
@@ -1666,8 +1694,8 @@ BEGIN
                         v_registros.importe_gasto_mt, 
                         v_registros.triangulacion ,
                         v_registros.actualizacion, 
-                        v_registros.id_partida_ejecucion,
-                        v_registros.id_partida_ejecucion_dev
+                        NULL,--v_registros.id_partida_ejecucion,       --com oestamos clonado , es mejor no hacer refencia al id_partida ejecucion original
+                        NULL --v_registros.id_partida_ejecucion_dev
                         
                     )RETURNING id_int_transaccion into v_id_int_transaccion;
                     
