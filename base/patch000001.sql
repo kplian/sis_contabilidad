@@ -3396,3 +3396,14 @@ IS 'indetifica el depto de contabilidad';
 /***********************************F-SCP-RAC-CONTA-0-22/11/2016****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-01/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN forma_cambio VARCHAR(20) DEFAULT 'oficial' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.forma_cambio
+IS 'oficial, compra, venta, convenido';
+
+/***********************************F-SCP-RAC-CONTA-0-01/12/2016****************************************/

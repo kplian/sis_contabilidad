@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_tabla_valor integer,
   p_codigo varchar,
@@ -617,16 +619,12 @@ BEGIN
     -- ver el problema de conexion en estaciones internacionales para tener roollback
      
     --Si la sincronizacion esta habilitada
-    IF (v_sincronizar = 'true') THEN
-  	 	
-        -- si sincroniza localmente con endesis
-         IF(not p_sincronizar_internacional)THEN
-           v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante, p_conexion);
-        
-         ELSE
-         -- si es necesario migrar a contabilidad internacional (soo comprobante temporales)....
-            v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante, p_id_tabla_valor);
+    IF (v_sincronizar = 'true') THEN  	 	
+         -- si sincroniza localmente con endesis
+         IF(p_sincronizar_internacional)THEN
+           v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante, p_id_tabla_valor);
          END IF;
+    
     END IF;
    
      

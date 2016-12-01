@@ -96,7 +96,7 @@ BEGIN
                                     END IF;
                                     
                                END IF;
-                               raise exception 'ssss';
+                            
                                
                         
                         END IF;

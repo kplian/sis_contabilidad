@@ -3,7 +3,8 @@
 CREATE OR REPLACE FUNCTION conta.f_determinar_tipo_cambio (
   p_cod_mon_1 varchar,
   p_cod_mon_2 varchar,
-  p_fecha date
+  p_fecha date,
+  p_forma_cambio varchar
 )
 RETURNS numeric AS
 $body$
@@ -65,17 +66,17 @@ BEGIN
      
     -- calula tipo de cambio
     IF v_id_moneda_base != v_registros_mon_1.id_moneda and v_id_moneda_base != v_registros_mon_2.id_moneda THEN
-    	RETURN  param.f_convertir_moneda (v_registros_mon_1.id_moneda,v_registros_mon_2.id_moneda, 1.00, p_fecha,'O',50,1.00, 'no'); 
+    	RETURN  param.f_convertir_moneda (v_registros_mon_1.id_moneda,v_registros_mon_2.id_moneda, 1.00, p_fecha,p_forma_cambio,50,1.00, 'no'); 
    
     ELSE
        
        IF v_id_moneda_base = v_registros_mon_1.id_moneda THEN
           
-          RETURN  param.f_get_tipo_cambio(v_registros_mon_2.id_moneda, p_fecha, 'O');
+          RETURN  param.f_get_tipo_cambio(v_registros_mon_2.id_moneda, p_fecha, p_forma_cambio);
        
        ELSE
          
-         RETURN  param.f_get_tipo_cambio(v_registros_mon_1.id_moneda, p_fecha, 'O');
+         RETURN  param.f_get_tipo_cambio(v_registros_mon_1.id_moneda, p_fecha, p_forma_cambio);
        
        END IF;
     

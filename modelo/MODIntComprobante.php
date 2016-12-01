@@ -84,6 +84,9 @@ class MODIntComprobante extends MODbase{
 		$this->captura('c31','varchar');
 		$this->captura('id_gestion','int4');
 		$this->captura('periodo','int4');
+		$this->captura('forma_cambio','varchar');
+		
+		
 		
 		
 		
@@ -166,6 +169,13 @@ class MODIntComprobante extends MODbase{
 		$this->captura('volcado','varchar');		
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_estado_wf','int4');
+		$this->captura('fecha_c31','date');
+		$this->captura('c31','varchar');
+		$this->captura('id_gestion','int4');
+		$this->captura('periodo','int4');
+		$this->captura('forma_cambio','varchar');
+		
+		
 		
 		
 		//Ejecuta la instruccion

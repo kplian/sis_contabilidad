@@ -149,7 +149,7 @@ BEGIN
            END IF;
            
            
-           IF v_registros.importe_gasto = 0 and v_registros_dev.importe_recurso > 0 and (v_registros_dev.importe_recusro <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
+           IF v_registros.importe_gasto = 0 and v_registros_dev.importe_recurso > 0 and (v_registros_dev.importe_recurso <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
              raise exception 'Este devengado ya tiene otros registros por (%), sumado al monto que queremos pagar (%) el total devengado no alcanza (%)', COALESCE(v_monto_total_x_pagar,0) ,v_parametros.monto_pago, v_registros_dev.importe_recurso;
            END IF;
            

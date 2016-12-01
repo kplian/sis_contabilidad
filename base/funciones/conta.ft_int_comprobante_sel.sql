@@ -133,7 +133,12 @@ BEGIN
                               incbte.cbte_reversion,
                               incbte.volcado,
                               incbte.id_proceso_wf,
-                              incbte.id_estado_wf
+                              incbte.id_estado_wf,
+                              incbte.fecha_c31,
+                              incbte.c31,
+                              incbte.id_gestion,
+                              incbte.periodo,
+                              incbte.forma_cambio
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
@@ -582,7 +587,12 @@ BEGIN
                               incbte.cbte_reversion,
                               incbte.volcado,
                               incbte.id_proceso_wf,
-                              incbte.id_estado_wf
+                              incbte.id_estado_wf,
+                              incbte.fecha_c31,
+                              incbte.c31,
+                              incbte.id_gestion,
+                              incbte.periodo,
+                              incbte.forma_cambio
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf

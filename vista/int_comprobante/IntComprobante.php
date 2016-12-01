@@ -161,8 +161,9 @@ header("content-type: text/javascript; charset=UTF-8");
 		iniciarEventos : function() {
 
 			
-			this.Cmp.id_moneda.on('select', this.getConfigCambiaria, this);
-			this.Cmp.fecha.on('select', this.getConfigCambiaria, this);
+			this.Cmp.id_moneda.on('select', function(){this.getConfigCambiaria('si')}, this);
+			this.Cmp.fecha.on('select', function(){this.getConfigCambiaria('si')}, this);
+			this.Cmp.forma_cambio.on('select', function(){this.getConfigCambiaria('si')}, this);
 
 			this.Cmp.id_clase_comprobante.on('select', this.habilitaMomentos, this);
 
@@ -564,7 +565,36 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : true
-		}, {
+		}, 
+		
+		
+		{
+			config : {
+				name : 'forma_cambio',
+				fieldLabel : 'Cambio',
+				qtip : 'Tipo cambio oficial, compra, venta o convenido',
+				allowBlank : false,
+				gwidth : 100,
+				width : 250,
+				typeAhead : true,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'local',
+				valueField : 'oficial',
+				store : ['oficial', 'compra','venta','convenido']
+			},
+			type : 'ComboBox',
+			id_grupo : 2,
+			filters : {
+				type : 'list',
+				pfiltro : 'incbte.forma_cambio',
+				options : ['oficial', 'compra','venta','convenido'],
+			},
+			grid : true,
+			form : true
+		},
+		
+		{
 			config : {
 				name : 'tipo_cambio',
 				readOnly : true,
@@ -583,7 +613,11 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 2,
 			grid : true,
 			form : true
-		}, {
+		}, 
+		
+		
+		
+		{
 			config : {
 				name : 'tipo_cambio_2',
 				fieldLabel : '(TC)',
@@ -1116,7 +1150,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
 		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 
 		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 
-		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31'],
+		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio'],
 
 		rowExpander : new Ext.ux.grid.RowExpander({
 			tpl : new Ext.Template('<br>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Clase cbte:&nbsp;&nbsp;</b> {desc_clase_comprobante}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Origen:&nbsp;&nbsp;</b> {desc_subsistema}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Beneficiario:&nbsp;&nbsp;</b> {beneficiario}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa1} {glosa2}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Frima 1:&nbsp;&nbsp;</b> {desc_firma1} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 2:&nbsp;&nbsp;</b> {desc_firma2} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 3:&nbsp;&nbsp;</b> {desc_firma3} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>')

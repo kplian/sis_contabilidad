@@ -46,6 +46,7 @@ DECLARE
     va_tc2 					varchar[];
     v_valor_tc1				numeric;
     v_valor_tc2				numeric;
+    v_forma_cambio			varchar;
 			    
 BEGIN
 
@@ -187,7 +188,17 @@ BEGIN
 
 		begin
 		
-             
+            
+              
+              IF v_parametros.forma_cambio in ('convenido','oficial') THEN
+                v_forma_cambio = 'O';
+              ELSEIF v_parametros.forma_cambio in ('compra') THEN
+               v_forma_cambio = 'C';
+              ELSE
+                v_forma_cambio = 'V';
+              END IF;
+              
+              
              SELECT  
                po_id_config_cambiaria ,
                po_valor_tc1 ,
@@ -196,7 +207,7 @@ BEGIN
                po_tc2 
              into
               v_registros_cc
-             FROM conta.f_get_tipo_cambio_segu_config(v_parametros.id_moneda, v_parametros.fecha,v_parametros.localidad,v_parametros.sw_valores);
+             FROM conta.f_get_tipo_cambio_segu_config(v_parametros.id_moneda, v_parametros.fecha,v_parametros.localidad,v_parametros.sw_valores, v_forma_cambio);
              
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','recupera configuracion'); 
