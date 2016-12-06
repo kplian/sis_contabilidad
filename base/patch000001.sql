@@ -3407,3 +3407,17 @@ COMMENT ON COLUMN conta.tint_comprobante.forma_cambio
 IS 'oficial, compra, venta, convenido';
 
 /***********************************F-SCP-RAC-CONTA-0-01/12/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-05/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN movimiento VARCHAR(20) DEFAULT 'diario' NOT NULL;
+
+COMMENT ON COLUMN conta.tclase_comprobante.movimiento
+IS 'diario, ingreso o egreso';
+
+/***********************************F-SCP-RAC-CONTA-0-05/12/2016****************************************/
+

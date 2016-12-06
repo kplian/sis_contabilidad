@@ -242,6 +242,32 @@ Phx.vista.ClaseComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		
+		{
+			config:{
+				name: 'movimiento',
+				fieldLabel: 'Movimiento?',
+				qtip:'Identifica el movimiento del comprobante para haver validaciones',
+				allowBlank: false,
+				anchor: '40%',
+				gwidth: 100,
+				typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio',       		    
+       		    store:['diario','ingreso','egreso']
+			},
+			type:'ComboBox',
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'ccom.movimiento',
+	       				 options: ['diario','ingreso','egreso'],	
+	       		 	},
+			grid:true,
+			form:true
+		},
+		
 		
 		
 		{
@@ -342,7 +368,7 @@ Phx.vista.ClaseComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},'desc_doc',
 		'momento_comprometido',
 		'momento_ejecutado',
-		'momento_pagado','codigo','tiene_apertura'
+		'momento_pagado','codigo','tiene_apertura','movimiento'
 		
 	],
 	sortInfo:{

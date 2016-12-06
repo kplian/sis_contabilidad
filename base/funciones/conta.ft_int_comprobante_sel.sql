@@ -214,9 +214,12 @@ BEGIN
                                    inc.glosa2,
                                    cc.id_clase_comprobante,
                                    cc.codigo,
-                                   cc.descripcion
+                                   cc.descripcion,
+                                   mon.codigo::text AS desc_moneda
                                    
-                            from conta.tint_comprobante inc
+                            from conta.vint_comprobante inc
+                            inner JOIN param.tmoneda mon ON mon.id_moneda = inc.id_moneda
+                            inner JOIN param.tperiodo per ON per.id_periodo = inc.id_periodo
                             inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = inc.id_clase_comprobante
                             where  ';
 			
@@ -241,7 +244,9 @@ BEGIN
 		begin
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_int_comprobante)
-			             from conta.tint_comprobante inc
+			             from conta.vint_comprobante inc
+                         inner JOIN param.tmoneda mon ON mon.id_moneda = inc.id_moneda
+                         inner JOIN param.tperiodo per ON per.id_periodo = inc.id_periodo
                          inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = inc.id_clase_comprobante
                          where ';
 			

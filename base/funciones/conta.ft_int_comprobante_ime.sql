@@ -316,7 +316,8 @@ BEGIN
                 id_moneda_tri,
                 nro_tramite,
                 id_proceso_wf,
-                id_estado_wf
+                id_estado_wf,
+                forma_cambio
           	) values(
                 v_parametros.id_clase_comprobante,  			
                 v_id_subsistema,
@@ -357,7 +358,8 @@ BEGIN
                 v_id_moneda_tri,
                 v_num_tramite,
                 v_id_proceso_wf,
-                v_id_estado_wf
+                v_id_estado_wf,
+                v_parametros.forma_cambio
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
@@ -531,7 +533,8 @@ BEGIN
                 momento_pagado =  v_momento_pagado,
                 fecha_costo_ini = v_parametros.fecha_costo_ini,
                 fecha_costo_fin = v_parametros.fecha_costo_fin,
-                tipo_cambio_2 = v_tc_2
+                tipo_cambio_2 = v_tc_2,
+                forma_cambio = v_parametros.forma_cambio
 			where id_int_comprobante = v_parametros.id_int_comprobante;
             
             
@@ -758,10 +761,14 @@ BEGIN
                raise exception 'No puede volcar un cbte de reversión';
             END IF;
             
-             
-            IF  not conta.f_revisar_dependencias(v_parametros.id_int_comprobante)  THEN
-               raise exception 'error por dependencias';
-            END IF;
+            -- RAC 2/12/2016
+            -- solo revisa dependnecia en cbte de reversion total
+            -- los parciales peuden tener dependencias
+            IF v_parametros.sw_validar = 'si' then 
+              IF  not conta.f_revisar_dependencias(v_parametros.id_int_comprobante)  THEN
+                 raise exception 'error por dependencias';
+              END IF;
+        	END IF;
             
            
             
@@ -858,7 +865,8 @@ BEGIN
                 sw_tipo_cambio,
                 cbte_reversion,
                 id_proceso_wf,
-                id_estado_wf
+                id_estado_wf,
+                forma_cambio
           	) values(
               v_reg_cbte.id_clase_comprobante,  			
               v_reg_cbte.id_subsistema,
@@ -898,11 +906,12 @@ BEGIN
               v_reg_cbte.localidad,
               v_reg_cbte.id_moneda_tri,
               v_num_tramite,
-              'no',  -- sw_editable 
-              'si', -- sw_tipo_cambio 
+              'si',  -- sw_editable 
+              v_reg_cbte.sw_tipo_cambio, -- RAC 05/12/2016 ....  'si', -- sw_tipo_cambio 
 			  'si', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
-              v_id_estado_wf		
+              v_id_estado_wf,
+              v_reg_cbte.forma_cambio		
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
            update wf.tproceso_wf p set
@@ -997,8 +1006,9 @@ BEGIN
                     )RETURNING id_int_transaccion into v_id_int_transaccion;
                     
                     
-                     --  si el comprobante tiene relaciones de devenago (si es un cbte de pago)
-                     --  asociamos el pago al nuevo comprobante
+                     --  si el comprobante tiene relaciones de devenago ...(aolo si es un cbte de pago)
+                     --  asociamos el pago al nuevo comprobante 
+                     --  con montos negativos
                      
                      FOR  v_registros_dev in (
                                               select 
@@ -1069,15 +1079,20 @@ BEGIN
               volcado = 'si'
             where c.id_int_comprobante =  v_parametros.id_int_comprobante;                
             
-            --solictar validacion del comprobante 
-            v_result = conta.f_validar_cbte(p_id_usuario, 
-            								   v_parametros._id_usuario_ai, 
-                                               v_parametros._nombre_usuario_ai, 
-                                               v_id_int_comprobante, 
-                                               'si');
-               
+            IF v_parametros.sw_validar = 'si' then
+                --solictar validacion del comprobante 
+                v_result = conta.f_validar_cbte(p_id_usuario, 
+                                                   v_parametros._id_usuario_ai, 
+                                                   v_parametros._nombre_usuario_ai, 
+                                                   v_id_int_comprobante, 
+                                                   'si');
+               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado y validado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
+           
+           	else
+               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado en borrador el cbte : id '||v_parametros.id_int_comprobante::varchar); 
+            end if;   
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
+            
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
               
             --Devuelve la respuesta
@@ -1513,9 +1528,6 @@ BEGIN
             where cc.id_clase_comprobante = v_reg_cbte.id_clase_comprobante;   
             
             
-            
-             
-            
             -----------------------------
         	--REGISTRO DEL COMPROBANTE
         	-----------------------------
@@ -1560,7 +1572,8 @@ BEGIN
                 sw_tipo_cambio,
                 cbte_reversion,
                 id_proceso_wf,
-                id_estado_wf
+                id_estado_wf,
+                forma_cambio
           	) values(
               v_reg_cbte.id_clase_comprobante,  			
               v_reg_cbte.id_subsistema,
@@ -1602,7 +1615,8 @@ BEGIN
               'si', -- sw_tipo_cambio 
 			  'no', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
-              v_id_estado_wf		
+              v_id_estado_wf,
+              v_reg_cbte.forma_cambio		
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
             update wf.tproceso_wf p set
@@ -1699,7 +1713,7 @@ BEGIN
                         
                     )RETURNING id_int_transaccion into v_id_int_transaccion;
                     
-                      /*
+                      /*   
                     
                      --  si el comprobante tiene relaciones de devenago (si es un cbte de pago)
                      --  asociamos el pago al nuevo comprobante

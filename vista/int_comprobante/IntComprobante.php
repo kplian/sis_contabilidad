@@ -10,8 +10,8 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 	Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
-		fheight : 500,
-		fwidth : 850,
+		fheight : '90%',
+		fwidth : '90%',
 		nombreVista : 'IntComprobante',
 		constructor : function(config) {
 			this.maestro = config.maestro;
@@ -161,7 +161,12 @@ header("content-type: text/javascript; charset=UTF-8");
 		iniciarEventos : function() {
 
 			
-			this.Cmp.id_moneda.on('select', function(){this.getConfigCambiaria('si')}, this);
+			this.Cmp.id_moneda.on('select', function(){
+												this.getConfigCambiaria('si');
+											    this.Cmp.id_int_comprobante_fks.reset();
+											    this.Cmp.id_int_comprobante_fks.modificado = true;
+											}, this);
+											
 			this.Cmp.fecha.on('select', function(){this.getConfigCambiaria('si')}, this);
 			this.Cmp.forma_cambio.on('select', function(){this.getConfigCambiaria('si')}, this);
 
@@ -178,6 +183,26 @@ header("content-type: text/javascript; charset=UTF-8");
 				}
 
 			}, this);
+			
+			this.Cmp.id_int_comprobante_fks.on('beforequery',function( queryEvent ){
+				 var id_m = this.Cmp.id_moneda.getValue(),
+				     id_g = this.cmbGestion.getValue();
+				if(id_m && id_g){
+					this.Cmp.id_int_comprobante_fks.store.baseParams.id_moneda  = id_m;
+					this.Cmp.id_int_comprobante_fks.store.baseParams.id_gestion = id_g;
+					this.Cmp.id_int_comprobante_fks.store.modificado = true;
+				
+				} 
+				else{
+					queryEvent.cancel = true;
+				}
+			
+				
+				
+			},this);
+			
+			
+			
 
 		},
 
@@ -508,16 +533,16 @@ header("content-type: text/javascript; charset=UTF-8");
 					root : 'datos',
 					sortInfo : {
 						field : 'id_int_comprobante',
-						direction : 'ASC'
+						direction : 'desc'
 					},
 					totalProperty : 'total',
-					fields : ['id_int_comprobante', 'nro_cbte', 'nro_tramite', 'fecha', 'glosa1', 'glosa2', 'id_clase_comprobante', 'codigo', 'descripcion'],
+					fields : ['id_int_comprobante', 'nro_cbte', 'nro_tramite', 'fecha', 'glosa1', 'glosa2','desc_moneda', 'id_clase_comprobante', 'codigo', 'descripcion'],
 					remoteSort : true,
 					baseParams : {
 						par_filtro : 'inc.id_int_comprobante#inc.nro_cbte#inc.fecha#inc.glosa1#inc.glosa2#inc.nro_tramite'
 					}
 				}),
-				tpl : new Ext.XTemplate('<tpl for="."><div class="awesomecombo-5item {checked}">', '<p>(ID: {id_int_comprobante}), Nro: {nro_cbte}</p>', '<p>Fecha: <strong>{fecha}</strong></p>', '<p>TR: {nro_tramite}</p>', '<p>GLS: {glosa1}</p>', '</div></tpl>'),
+				tpl : new Ext.XTemplate('<tpl for="."><div class="awesomecombo-5item {checked}">', '<p>(ID: {id_int_comprobante}), Nro: {nro_cbte} , ({desc_moneda})</p>', '<p>Fecha: <strong>{fecha}</strong></p>', '<p>TR: {nro_tramite}</p>', '<p>GLS: {glosa1}</p>', '</div></tpl>'),
 				itemSelector : 'div.awesomecombo-5item',
 
 				valueField : 'id_int_comprobante',
@@ -1005,20 +1030,20 @@ header("content-type: text/javascript; charset=UTF-8");
 				items : [{
 					xtype : 'fieldset',
 					columns : 2,
-					title : 'Tipo  Comprobante',
+					title : 'Tipo de Cambio',
 					autoHeight : true,
 					items : [],
-					id_grupo : 1
+					id_grupo : 2
 				}]
 			}, {
 				bodyStyle : 'padding-left:5px;',
 				items : [{
 					xtype : 'fieldset',
 					columns : 2,
-					title : 'Tipo de Cambio',
+					title : 'Tipo  Comprobante',
 					autoHeight : true,
 					items : [],
-					id_grupo : 2
+					id_grupo : 1
 				}]
 			}, {
 				bodyStyle : 'padding-left:5px;',

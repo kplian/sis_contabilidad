@@ -431,10 +431,10 @@ BEGIN
              FOR v_registros in  (
                                        select 
                                             itp.id_int_transaccion,
-                                            itp.importe_debe as importe_debe_pag,
-                                            itp.importe_haber as importe_haber_pag,
-                                            sum(itd.importe_debe) as importe_debe_dev,
-                                            sum(itd.importe_haber) as importe_haber_dev,
+                                            itp.importe_gasto as importe_gasto_pag,
+                                            itp.importe_recurso as importe_recurso_pag,
+                                            sum(itd.importe_gasto) as importe_gasto_dev,
+                                            sum(itd.importe_recurso) as importe_recurso_dev,
                                             sum(rd.monto_pago ) as total
                                        from conta.tint_rel_devengado rd
                                        inner join conta.tint_transaccion itp on rd.id_int_transaccion_pag = itp.id_int_transaccion
@@ -442,18 +442,34 @@ BEGIN
                                        where itp.id_int_comprobante = v_rec_cbte.id_int_comprobante
                                        group by  
                                             itp.id_int_transaccion,
-                                            itp.importe_debe ,
-                                            itp.importe_haber ) LOOP
-               
-              
-                                  IF v_registros.total < v_registros.importe_debe_pag and v_registros.importe_haber_pag = 0   THEN
-                                    raise exception 'a) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_debe_pag;
-                                  END IF;
+                                            itp.importe_gasto ,
+                                            itp.importe_recurso ) LOOP
+                                            
+                                         
+                                  --validacion de  pago o  reversión de pago segun el signo
+              					  
+                                  IF v_registros.total > 0 THEN
                                   
-                                  IF v_registros.total < v_registros.importe_haber_pag and v_registros.importe_debe_pag = 0   THEN
-                                    raise exception 'b) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_haber_pag;
+                                      IF v_registros.total < v_registros.importe_gasto_pag and v_registros.importe_recurso_pag = 0   THEN
+                                        raise exception 'a) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_gasto_pag;
+                                      END IF;
+                                      
+                                      IF v_registros.total < v_registros.importe_recurso_pag and v_registros.importe_gasto_pag = 0   THEN
+                                        raise exception 'b) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_recurso_pag;
+                                      END IF;
+                                 
+             					  ELSEIF v_registros.total < 0 THEN
+                                   
+                                   --Si es una transaccion de reversion ...
+                                   
+                                      IF (v_registros.total*-1) < v_registros.importe_gasto_pag and v_registros.importe_recurso_pag = 0   THEN
+                                        raise exception 'a) El monto relacionado/devengado (%) no es suficiente para realizar la reversion (%), verifique la relación devengado -  pago',(v_registros.total*-1),v_registros.importe_gasto_pag;
+                                      END IF;
+                                      
+                                      IF (v_registros.total*-1) < v_registros.importe_gasto_pag and v_registros.importe_recurso_pag = 0   THEN
+                                        raise exception 'b) El monto relacioando/devengado (%) no es suficiente para realizar la reversion (%), verifique la relación devengado - pago',(v_registros.total*-1),v_registros.importe_recurso_pag;
+                                      END IF;
                                   END IF;
-                                  
                                   v_sw_rel = FALSE;
                                   
              

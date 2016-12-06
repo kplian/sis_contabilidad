@@ -189,7 +189,15 @@ BEGIN
                                        IF v_registros.id_partida_ejecucion is not NULL THEN                                       
                                            raise exception 'El comprobante no puede estar marcado para comprometer, si ya existe un comprometido';
                                        END IF;
+                                       
                                 END IF; --IF comprometido 
+                                
+                                --- TODO revisar si esto esta bien
+                                IF v_registros_comprobante.momento_comprometido = 'si' THEN
+                                     IF v_registros.id_partida_ejecucion is  NULL THEN                                       
+                                         raise exception 'El comprobante esta marcado  para no comprometer, y no tiene un origen comprometido';
+                                      END IF; 
+                                END IF;
                                 
                                 
                                 -- solo procesamos si es una partida presupuestaria y no de flujo

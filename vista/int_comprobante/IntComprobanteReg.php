@@ -84,11 +84,8 @@ Phx.vista.IntComprobanteReg = {
          else{
          	this.mostrarComponente(this.Cmp.tipo_cambio);
             this.mostrarComponente(this.Cmp.tipo_cambio_2);
-                       
-          
-            
              
-            //RAC 1/12/2016 valor origanl en no
+            //RAC 1/12/2016 valor origal en no
             //cambio para que al editar se peuda cambiar la forma de pago y se recalcule el tipo de cambio ...
             // hay que ver que implicaciones va tener esto ....
             // si despues queire editar el combo de forma de pago estan en si va recalcular los tipo o permitir editar
@@ -177,14 +174,12 @@ Phx.vista.IntComprobanteReg = {
 		        else{
 		        	 this.getBoton('btnSwEditble').setDisabled(true);
 		        }
-		        this.getBoton('sig_estado').enable();
-            
+		        this.getBoton('sig_estado').enable();            
 				this.getBoton('btnImprimir').enable();
 				this.getBoton('btnRelDev').enable();
 				this.getBoton('btnIgualarCbte').enable();
 				this.getBoton('btnDocCmpVnt').enable();
-				this.getBoton('chkpresupuesto').enable();
-				
+				this.getBoton('chkpresupuesto').enable();				
 				this.getBoton('btnChequeoDocumentosWf').enable();
                 this.getBoton('diagrama_gantt').enable();
                 this.getBoton('btnObs').enable(); 
