@@ -239,7 +239,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 				displayField: 'nro_cuenta',
 				valueField: 'nro_cuenta',
    				origen:'CUENTA',
-   				allowBlank:true,
+   				allowBlank:false,
    				fieldLabel: 'Cuenta',
    				gwidth:200,
    				width: 180,
