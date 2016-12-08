@@ -898,6 +898,7 @@ class MODDocCompraVenta extends MODbase{
 		  $this->setParametro('tipo_lcv','tipo_lcv','VARCHAR');
 		  $this->setParametro('fecha_ini','fecha_ini','date');
 		  $this->setParametro('fecha_fin','fecha_fin','date');
+		  $this->setParametro('id_usuario','id_usuario','integer');
 		   		
 		  //Definicion de la lista del resultado del query		
 		  $this->captura('id_doc_compra_venta','BIGINT');
@@ -933,7 +934,6 @@ class MODDocCompraVenta extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

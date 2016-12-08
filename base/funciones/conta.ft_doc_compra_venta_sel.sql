@@ -443,6 +443,9 @@ BEGIN
                v_filtro =  ' (lcv.fecha::Date between '''||v_parametros.fecha_ini||'''::Date  and '''||v_parametros.fecha_fin||'''::date)  ';
            END IF;
            
+           IF v_parametros.id_usuario != 0 THEN
+           		v_filtro = v_filtro || ' and lcv.id_usuario_reg='||v_parametros.id_usuario||' ';
+           END IF;
            
           IF v_parametros.tipo_lcv = 'lcv_compras' or v_parametros.tipo_lcv='endesis_erp' THEN
               v_tipo = 'compra';

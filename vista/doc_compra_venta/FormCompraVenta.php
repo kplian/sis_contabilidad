@@ -1858,8 +1858,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
  	    this.Cmp.nro_autorizacion.modificado = true;
 		this.Cmp.fecha.setReadOnly(false);
     	this.accionFormulario = 'EDIT';
+    	if(this.data.datosOriginales){
+    		this.loadForm(this.data.datosOriginales);
+    	}
     	
-    	this.loadForm(this.data.datosOriginales);
     	
     	this.esconderImportes();
         //carga configuracion de plantilla
