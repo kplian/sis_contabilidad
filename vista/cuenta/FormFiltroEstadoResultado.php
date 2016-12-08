@@ -10,7 +10,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 
 <script>
-Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
+Phx.vista.FormFiltroEstadoResultado = Ext.extend(Phx.frmInterfaz,{
     constructor:function(config)
     {   
     	this.panelResumen = new Ext.Panel({html:'Hola Prueba'});
@@ -27,7 +27,7 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
 				     this.panelResumen
 				    ];
 				    
-        Phx.vista.FormFiltroBalance.superclass.constructor.call(this,config);
+        Phx.vista.FormFiltroEstadoResultado.superclass.constructor.call(this,config);
         this.init(); 
         this.iniciarEventos();   
        
@@ -186,7 +186,7 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
              
              Ext.Ajax.request({
 						url : '../../sis_contabilidad/control/Cuenta/reporteBalanceGeneral',
-						params : Ext.apply(parametros,{'codigos': codigos, 'tipo_balance':'general'}),
+						params : Ext.apply(parametros,{'codigos': codigos, 'tipo_balance':'resultado'}),
 						success : this.successExport,
 						failure : this.conexionFailure,
 						timeout : this.timeout,

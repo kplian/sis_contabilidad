@@ -3421,3 +3421,17 @@ IS 'diario, ingreso o egreso';
 
 /***********************************F-SCP-RAC-CONTA-0-05/12/2016****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-0-07/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tconfig_tipo_cuenta
+  ADD COLUMN movimiento VARCHAR(20) DEFAULT 'diario' NOT NULL;
+
+COMMENT ON COLUMN conta.tconfig_tipo_cuenta.movimiento
+IS 'Con que tiemo de comprobantes de mueven estan cuentas, diario, ingreso, movimiento';
+
+
+/***********************************F-SCP-RAC-CONTA-0-07/12/2016****************************************/
+

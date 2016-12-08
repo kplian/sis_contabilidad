@@ -47,18 +47,19 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						ctc.id_cofig_tipo_cuenta,
-						ctc.nro_base,
-						ctc.tipo_cuenta,
-						ctc.estado_reg,
-						ctc.id_usuario_reg,
-						ctc.fecha_reg,
-						ctc.fecha_mod,
-						ctc.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        ctc.incremento,
-                        array_to_string( ctc.eeff, '','',''null'')::varchar	 as eeff
+                            ctc.id_cofig_tipo_cuenta,
+                            ctc.nro_base,
+                            ctc.tipo_cuenta,
+                            ctc.estado_reg,
+                            ctc.id_usuario_reg,
+                            ctc.fecha_reg,
+                            ctc.fecha_mod,
+                            ctc.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            ctc.incremento,
+                            array_to_string( ctc.eeff, '','',''null'')::varchar	 as eeff,
+                            movimiento
 						from conta.tconfig_tipo_cuenta ctc
 						inner join segu.tusuario usu1 on usu1.id_usuario = ctc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ctc.id_usuario_mod

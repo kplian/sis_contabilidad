@@ -50,27 +50,28 @@ BEGIN
         begin
         	--Sentencia de la insercion
         	insert into conta.tconfig_tipo_cuenta(
-			nro_base,
-			tipo_cuenta,
-			estado_reg,
-			id_usuario_reg,
-			fecha_reg,
-			fecha_mod,
-			id_usuario_mod,
-            incremento,
-            eeff
+              nro_base,
+              tipo_cuenta,
+              estado_reg,
+              id_usuario_reg,
+              fecha_reg,
+              fecha_mod,
+              id_usuario_mod,
+              incremento,
+              eeff,
+              movimiento
           	) 
             values(
-			v_parametros.nro_base,
-			v_parametros.tipo_cuenta,
-			'activo',
-			p_id_usuario,
-			now(),
-			null,
-			null,
-            v_parametros.incremento,
-            string_to_array(v_parametros.eeff,',')::varchar[]
-							
+              v_parametros.nro_base,
+              v_parametros.tipo_cuenta,
+              'activo',
+              p_id_usuario,
+              now(),
+              null,
+              null,
+              v_parametros.incremento,
+              string_to_array(v_parametros.eeff,',')::varchar[],
+              v_parametros.movimiento							
 			)RETURNING id_cofig_tipo_cuenta into v_id_cofig_tipo_cuenta;
 			
 			--Definicion de la respuesta
@@ -94,12 +95,13 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update conta.tconfig_tipo_cuenta set
-			nro_base = v_parametros.nro_base,
-			tipo_cuenta = v_parametros.tipo_cuenta,
-			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario,
-            incremento = v_parametros.incremento,
-            eeff = string_to_array(v_parametros.eeff,',')::varchar[]
+              nro_base = v_parametros.nro_base,
+              tipo_cuenta = v_parametros.tipo_cuenta,
+              fecha_mod = now(),
+              id_usuario_mod = p_id_usuario,
+              incremento = v_parametros.incremento,
+              eeff = string_to_array(v_parametros.eeff,',')::varchar[],
+              movimiento = v_parametros.movimiento
 			where id_cofig_tipo_cuenta=v_parametros.id_cofig_tipo_cuenta;
                
 			--Definicion de la respuesta

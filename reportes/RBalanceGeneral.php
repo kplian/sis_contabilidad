@@ -39,7 +39,13 @@ class RBalanceGeneral extends  ReportePDF {
 		$this->Image(dirname(__FILE__).'/../../lib'.$_SESSION['_DIR_LOGO'], $this->ancho_hoja, 5, 30, 10);
 		$this->ln(5);
 		$this->SetFont('','BU',12);
-		$this->Cell(0,5,'BALANCE GENERAL (BS)',0,1,'C');
+		if($this->tipo_balance == 'resultado'){
+			$this->Cell(0,5,'ESTADO DE RESULTADOS (BS)',0,1,'C');
+		}
+		else{
+			$this->Cell(0,5,'BALANCE GENERAL (BS)',0,1,'C');
+		}
+		
 		$this->SetFont('','BU',11);
 		$this->Cell(0,5,'Depto: ('.$this->codigos.')',0,1,'C');
 		$this->SetFont('','BU',10);		
@@ -61,19 +67,19 @@ class RBalanceGeneral extends  ReportePDF {
 		//reporte de dos columnas de montos
 		if($this->nivel == 2 ){
 			//Titulos de columnas superiores
-			$this->Cell(140,3.5,'Cuentas','',0,'C');
-			$this->Cell(20,3.5,'Mon','',0,'R');
-			$this->Cell(20,3.5,'tos (Bs)','',0,'L');
+			$this->Cell(154,3.5,'Cuentas','',0,'C');
+			$this->Cell(23,3.5,'Mon','',0,'R');
+			$this->Cell(23,3.5,'tos (Bs)','',0,'L');
 			$this->ln();	
 			
 		}
 		
 		if($this->nivel == 3 ){
 			//Titulos de columnas superiores
-			$this->Cell(140,3.5,'Cuentas','',0,'C');
-			$this->Cell(20,3.5,'','',0,'R');
-			$this->Cell(20,3.5,'Montos (Bs)','',0,'C');
-			$this->Cell(20,3.5,'','',0,'L');
+			$this->Cell(131,3.5,'Cuentas','',0,'C');
+			$this->Cell(23,3.5,'','',0,'R');
+			$this->Cell(23,3.5,'Montos (Bs)','',0,'C');
+			$this->Cell(23,3.5,'','',0,'L');
 			$this->ln();
 			
 		}
@@ -107,6 +113,8 @@ class RBalanceGeneral extends  ReportePDF {
 		$tpatrimonio = number_format( $this->total_patrimonio , 2 , '.' , ',' );
 		$tingreso = number_format( $this->total_ingreso , 2 , '.' , ',' );
 		$tegreso = number_format( $this->total_egreso , 2 , '.' , ',' );
+		$resultado = $this->total_ingreso - $this->total_egreso;
+		$resultado = number_format( $resultado , 2 , '.' , ',' );
 		 $sw_dif = 0;
 		if($this->tipo_balance == 'general'){
 			$formula = "ACTIVO =  PASIVO + PATRIMONIO";
@@ -115,6 +123,18 @@ class RBalanceGeneral extends  ReportePDF {
 			if(($this->total_activo +  $this->total_egreso) !=($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso)){
 				$this->SetTextColor(0,100,100,0,false,'');
 			    $sw_dif = 1;
+			}
+			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);	
+		}
+		elseif($this->tipo_balance == 'resultado'){
+			$formula = "RESULTADO =  INGRESOS - EGRESOS";
+			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
+			
+			$formula = "$resultado =  $tingreso - $tegreso";
+			
+			if(($this->total_ingreso - $this->total_egreso) < 0){
+				$this->SetTextColor(0,100,100,0,false,'');
+			  
 			}
 			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);	
 		}
@@ -153,27 +173,12 @@ class RBalanceGeneral extends  ReportePDF {
 			$this->total_patrimonio = $val['monto'];
 		}
 		
-		//calculo total de egreso
-		
-		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'egreso'){
+		//calculo total de egreso		
+		if($val ["nivel"] == 1 && $val ["movimiento"] == 'egreso'){
 			$this->total_egreso = $this->total_egreso + $val['monto'];
 		}
-	    if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'costo'){
-			$this->total_egreso = $this->total_egreso + $val['monto'];
-		}
-		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'gasto'){
-			$this->total_egreso = $this->total_egreso + $val['monto'];
-		}
-		//RAC... 13/07/2014  no me convence esto ....
-		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'resultado'){
-			$this->total_egreso = $this->total_egreso + $val['monto'];
-		}
-		
 		//calculo ingreso
-		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'ventas'){
-			$this->total_ingreso = $this->total_ingreso + $val['monto'];
-		}
-		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'ingreso'){
+		if($val ["nivel"] == 1 && $val ["movimiento"] == 'ingreso'){
 			$this->total_ingreso = $this->total_ingreso + $val['monto'];
 		}
 		
@@ -196,12 +201,27 @@ class RBalanceGeneral extends  ReportePDF {
 		    } 
         	  
 	      
-			$this->Cell(160,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'LTR',0,'L');
+			$this->Cell(160,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'',0,'L');
 			//si el monto es menor a cero color rojo codigo CMYK
 			if($val['monto']*1 < 0){
 				$this->SetTextColor(0,100,100,0,false,'');
 			}
-			$this->Cell(40,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'LTR',0,'R');
+           if($val['nivel'] == 1){
+           	   $this->SetFont('','BU',11);
+			   $this->Cell(40,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'',0,'R');
+			   $this->SetFont('','',9);
+			  
+			}
+		   if($val['nivel'] == 2){
+           	   $this->SetFont('','BU',10);
+			   $this->Cell(40,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'',0,'R');
+			   $this->SetFont('','',9);
+			  
+			}
+			else{
+				$this->Cell(40,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'',0,'R');
+			}
+			
 			$this->ln();
 			
 			//colores por defecto
@@ -209,8 +229,8 @@ class RBalanceGeneral extends  ReportePDF {
 				
 			
 		}	//Titulos de columnas inferiores 
-			$this->Cell(160,3.5,'','T',0,'L');
-			$this->Cell(40,3.5,'','T',0,'R');			
+			$this->Cell(160,3.5,'','',0,'L');
+			$this->Cell(40,3.5,'','',0,'R');			
 			$this->ln();
 	}
 	
@@ -233,20 +253,20 @@ class RBalanceGeneral extends  ReportePDF {
 			}
         	  
 	       // $this->Cell(40,3.5,,'LTR',0,'L');
-			$this->Cell(140,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'LTR',0,'L');
+			$this->Cell(154,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'',0,'L');
 			
 			if($val['monto']*1 < 0){
 				$this->SetTextColor(0,100,100,0,false,'');
 			}
 			
 			if($val['nivel'] == 2){
-			   $this->Cell(20,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'LT',0,'R');
-			   $this->Cell(20,3.5,"",'TR',0,'R');
+			   $this->Cell(23,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'',0,'R');
+			   $this->Cell(23,3.5,"",'',0,'R');
 			}
 			else{
 				$this->SetFont('','BU',10);
-		        $this->Cell(20,3.5, "" ,'LT',0,'R');
-				$this->Cell(20,3.5, number_format( $val['monto'], 2 , '.' , ',' ) ,'TR',0,'R');	
+		        $this->Cell(23,3.5, "" ,'',0,'R');
+				$this->Cell(23,3.5, number_format( $val['monto'], 2 , '.' , ',' ) ,'',0,'R');	
 				$this->SetFont('','',9);
 			}
 			
@@ -255,9 +275,9 @@ class RBalanceGeneral extends  ReportePDF {
 			
 		}	//Titulos de columnas inferiores 
 			//$this->Cell(40,3.5,'','LBR',0,'L');	
-			$this->Cell(140,3.5,'','T',0,'L');
-			$this->Cell(20,3.5,'','T',0,'R');	
-			$this->Cell(20,3.5,'','T',0,'R');					
+			$this->Cell(154,3.5,'','',0,'L');
+			$this->Cell(23,3.5,'','',0,'R');	
+			$this->Cell(23,3.5,'','',0,'R');					
 			$this->ln();
 	}
 
@@ -284,7 +304,7 @@ class RBalanceGeneral extends  ReportePDF {
 			
         	  
 	       // $this->Cell(40,3.5,,'LTR',0,'L');
-			$this->Cell(140,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'LTR',0,'L');
+			$this->Cell(131,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'',0,'L');
 			
 			//si el monto es menor a cero color rojo codigo CMYK
 			if($val['monto']*1 < 0){
@@ -292,23 +312,23 @@ class RBalanceGeneral extends  ReportePDF {
 			}
 			
 			if($val['nivel'] == 3){
-			   $this->Cell(20,3.5, number_format( $val['monto'] ,2 , '.' , ',' ) ,'LT',0,'R');
-			   $this->Cell(20,3.5,"",'T',0,'R');
-			   $this->Cell(20,3.5,"",'TR',0,'R');
+			   $this->Cell(23,3.5, number_format( $val['monto'] ,2 , '.' , ',' ) ,'',0,'R');
+			   $this->Cell(23,3.5,"",'',0,'R');
+			   $this->Cell(23,3.5,"",'',0,'R');
 			}
 			elseif($val['nivel'] == 2){
 			   $this->SetFont('','B',10);
-			   $this->Cell(20,3.5,"",'LT',0,'R');
-			   $this->Cell(20,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'T',0,'R');
-			   $this->Cell(20,3.5,"",'TR',0,'R');
+			   $this->Cell(25,3.5,"",'',0,'R');
+			   $this->Cell(22,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'',0,'R');
+			   $this->Cell(22,3.5,"",'',0,'R');
 			   $this->SetFont('','',9);
 			  
 			}
 			else{
 				$this->SetFont('','BU',11);
-		        $this->Cell(20,3.5, "" ,'LT',0,'R');
-				$this->Cell(20,3.5,"",'T',0,'R');
-				$this->Cell(20,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'TR',0,'R');	
+		        $this->Cell(25,3.5, "" ,'',0,'R');
+				$this->Cell(22,3.5,"",'',0,'R');
+				$this->Cell(22,3.5, number_format( $val['monto'] , 2 , '.' , ',' ) ,'',0,'R');	
 				
 				$this->SetFont('','',9);
 			}
@@ -320,10 +340,10 @@ class RBalanceGeneral extends  ReportePDF {
 			
 		}	//Titulos de columnas inferiores 
 			//$this->Cell(40,3.5,'','LBR',0,'L');	
-			$this->Cell(140,3.5,'','T',0,'L');
-			$this->Cell(20,3.5,'','T',0,'R');	
-			$this->Cell(20,3.5,'','T',0,'R');
-			$this->Cell(20,3.5,'','T',0,'R');						
+			$this->Cell(131,3.5,'','',0,'L');
+			$this->Cell(25,3.5,'','',0,'R');	
+			$this->Cell(22,3.5,'','',0,'R');
+			$this->Cell(22,3.5,'','',0,'R');						
 			$this->ln();
 	}  
 }

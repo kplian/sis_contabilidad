@@ -1193,3 +1193,13 @@ select pxp.f_insert_testructura_gui ('ENTR', 'CBTE.1');
 /**********************************F-DAT-RAC-CONTA-1-17/11/2016*****************************************/
 
 
+/**********************************I-DAT-RAC-CONTA-1-07/12/2016*****************************************/
+
+select pxp.f_insert_tgui ('Estado de Resultados', 'Estado de Resultados', 'REPESTRE', 'si', 2, 'sis_contabilidad/vista/cuenta/FormFiltroEstadoResultado.php', 3, '', 'FormFiltroEstadoResultado', 'CONTA');
+select pxp.f_insert_testructura_gui ('REPESTRE', 'REPCON');
+select pxp.f_insert_tgui ('Balance de cuentas', 'Balance general', 'BALCON', 'si', 1, 'sis_contabilidad/vista/cuenta/FormFiltroBalanceCuentas.php', 3, '', 'FormFiltroBalanceCuentas', 'CONTA');
+
+/**********************************F-DAT-RAC-CONTA-1-07/12/2016*****************************************/
+
+
+

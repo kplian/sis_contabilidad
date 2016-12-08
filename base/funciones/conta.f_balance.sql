@@ -70,7 +70,8 @@ BEGIN
                                 id_cuenta_padre integer,
                                 monto numeric,
                                 nivel integer,
-                                tipo_cuenta varchar
+                                tipo_cuenta varchar,
+                                movimiento	varchar
                                      ) ON COMMIT DROP;
     
           
@@ -98,7 +99,8 @@ BEGIN
                                     id_cuenta_padre,
                                     monto,
                                     nivel,
-                                    tipo_cuenta
+                                    tipo_cuenta,
+                                    movimiento
                                 FROM temp_balancef 
                                     order by nro_cuenta) LOOP
                    RETURN NEXT v_registros;
@@ -111,7 +113,8 @@ BEGIN
                                     id_cuenta_padre,
                                     monto,
                                     nivel,
-                                    tipo_cuenta
+                                    tipo_cuenta,
+                                    movimiento
                                 FROM temp_balancef 
                                 WHERE monto != 0
                                     order by nro_cuenta) LOOP
