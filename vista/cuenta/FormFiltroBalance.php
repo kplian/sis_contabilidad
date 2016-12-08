@@ -144,7 +144,7 @@ Phx.vista.FormFiltroBalance=Ext.extend(Phx.frmInterfaz,{
 	      {
 	       		config:{
 	       			name: 'incluir_sinmov',
-	       			qtip : 'Incluir slo cuentas con movimiento?',
+	       			qtip : 'Incluir solo cuentas con movimiento?',
 	       			fieldLabel: 'Solo con movimiento',
 	       			allowBlank: false,
 	       			emptyText:'Tipo...',

@@ -657,7 +657,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 					id_moneda: this.maestro.id_moneda,
 					localidad: localidad,
 					sw_valores: 'no',
-					tipo: 'O'
+					forma_cambio: 'Oficial'
 				}, success: function(resp) {
 					
 					Phx.CP.loadingHide();

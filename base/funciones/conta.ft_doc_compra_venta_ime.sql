@@ -1,10 +1,12 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
+RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
@@ -40,7 +42,8 @@ DECLARE
   v_id_cliente			integer;
   v_id_tipo_doc_compra_venta integer;
   v_codigo_estado			varchar;
-  v_estado_rendicion		varchar;
+  v_estado_rendicion		varchar;	
+  v_id_int_comprobante		integer;
 
 BEGIN
 
@@ -106,6 +109,11 @@ BEGIN
         END IF;
 
       END IF;
+      
+      
+      if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
+          v_id_int_comprobante = v_parametros.id_int_comprobante;
+      end if;
 
 
       --recupera parametrizacion de la plantilla
@@ -190,7 +198,8 @@ BEGIN
         id_proveedor,
         id_cliente,
         id_auxiliar,
-        id_tipo_doc_compra_venta
+        id_tipo_doc_compra_venta,
+        id_int_comprobante
       ) values(
         v_parametros.tipo,
         v_parametros.importe_excento,
@@ -228,7 +237,8 @@ BEGIN
         v_id_proveedor,
         v_id_cliente,
         v_parametros.id_auxiliar,
-        v_id_tipo_doc_compra_venta
+        v_id_tipo_doc_compra_venta,
+        v_id_int_comprobante
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -267,6 +277,8 @@ BEGIN
 
     begin
 
+    /*  03/11/2016 se comenta ---TODO ojo pensar en alguna alternativa no intrusiva
+      
       select COALESCE(cd.estado,efe.estado) into v_estado_rendicion
       from conta.tdoc_compra_venta d
         left join cd.trendicion_det ren on ren.id_doc_compra_venta = d.id_doc_compra_venta
@@ -274,8 +286,8 @@ BEGIN
         left join tes.tsolicitud_rendicion_det det on det.id_documento_respaldo=d.id_doc_compra_venta
         left join tes.tsolicitud_efectivo efe on efe.id_solicitud_efectivo=det.id_solicitud_efectivo
       where d.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
-
-      -- recuepra el periodo de la fecha ...
+      
+       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
@@ -283,6 +295,15 @@ BEGIN
         -- valida que period de libro de compras y ventas este abierto
         v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
       END IF;
+      
+      */
+
+      -- recuepra el periodo de la fecha ...
+      --Obtiene el periodo a partir de la fecha
+      v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+
+      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+      
 
       --revisa si el documento no esta marcado como revisado
       select
@@ -341,6 +362,10 @@ BEGIN
         END IF;
 
       END IF;
+      
+      if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
+          v_id_int_comprobante = v_parametros.id_int_comprobante;
+      end if;
 
 
       --Sentencia de la modificacion
@@ -372,7 +397,8 @@ BEGIN
         importe_neto = v_parametros.importe_neto,
         id_proveedor = v_id_proveedor,
         id_cliente = v_id_cliente,
-        id_auxiliar = v_parametros.id_auxiliar
+        id_auxiliar = v_parametros.id_auxiliar,
+        id_int_comprobante = v_id_int_comprobante
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
@@ -413,6 +439,7 @@ BEGIN
       if (v_codigo_estado = 'A') then
         update conta.tdoc_compra_venta set
           importe_iva = 0,
+          importe_excento = 0,
           importe_descuento = 0,
           importe_descuento_ley = 0,
           importe_pago_liquido = 0,

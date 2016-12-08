@@ -37,6 +37,8 @@ class MODClaseComprobante extends MODbase{
 		$this->captura('momento_pagado','varchar');
 		$this->captura('codigo','varchar');
 		$this->captura('tiene_apertura','varchar');
+		$this->captura('movimiento','varchar');
+		
 		
 		
 		
@@ -66,6 +68,8 @@ class MODClaseComprobante extends MODbase{
 		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
 		$this->setParametro('momento_pagado','momento_pagado','varchar');
 		$this->setParametro('tiene_apertura','tiene_apertura','varchar');
+		$this->setParametro('movimiento','movimiento','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -92,6 +96,7 @@ class MODClaseComprobante extends MODbase{
 		$this->setParametro('momento_ejecutado','momento_ejecutado','varchar');
 		$this->setParametro('momento_pagado','momento_pagado','varchar');
 		$this->setParametro('tiene_apertura','tiene_apertura','varchar');
+		$this->setParametro('movimiento','movimiento','varchar');
 		
 
 		//Ejecuta la instruccion

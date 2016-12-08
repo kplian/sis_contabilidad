@@ -21,6 +21,13 @@ class ACTIntTransaccion extends ACTbase{
 		if($this->objParam->getParametro('id_int_comprobante_fks')!=''){
 			$this->objParam->addFiltro("transa.id_int_comprobante in (".$this->objParam->getParametro('id_int_comprobante_fks').")");	
 		}
+		else{
+			if($this->objParam->getParametro('forzar_relacion')=='si'){
+				 throw new Exception("Primero defina con que comprobante esta relacionado", 3);
+				 $this->objParam->addFiltro("transa.id_int_comprobante in (0)");	
+		
+			}
+		}
 		
 		if($this->objParam->getParametro('solo_debe')=='si'){
 			$this->objParam->addFiltro("transa.importe_debe > 0 ");	
@@ -116,6 +123,10 @@ class ACTIntTransaccion extends ACTbase{
 			$this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));	
 		}
 		
+		if($this->objParam->getParametro('id_orden_trabajo')!=''){
+			$this->objParam->addFiltro("transa.id_orden_trabajo = ".$this->objParam->getParametro('id_orden_trabajo'));	
+		}
+		
 		
 		if($this->objParam->getParametro('id_auxiliar')!=''){
 			$this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));	
@@ -126,7 +137,7 @@ class ACTIntTransaccion extends ACTbase{
 		}
 		
 		if($this->objParam->getParametro('nro_tramite')!=''){
-			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite'))."%''";	
+			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");	
 		}
 
         if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){

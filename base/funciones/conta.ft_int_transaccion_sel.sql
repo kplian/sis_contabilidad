@@ -145,14 +145,16 @@ BEGIN
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
 						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
 						left join pre.tpartida par on par.id_partida = transa.id_partida
-						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
+						left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
 					    where ';
 			
+            
+           
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
-
+ raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -238,7 +240,10 @@ BEGIN
                         icbte.nro_tramite,
                         dep.nombre_corto,
                         icbte.fecha,
-                        icbte.glosa1
+                        icbte.glosa1,
+                        icbte.id_proceso_wf,
+                        icbte.id_estado_wf
+                        
 						from conta.tint_transaccion transa
                         inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
                         inner join param.tdepto dep on dep.id_depto = icbte.id_depto

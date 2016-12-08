@@ -3333,5 +3333,105 @@ IS 'esa calse de comprobantes admite cbte de apertura, esto es para saber si va 
 /***********************************F-SCP-RAC-CONTA-0-20/10/2016****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-17/11/2016****************************************/
 
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tentrega (
+  id_entrega SERIAL NOT NULL,
+  fecha_c31 DATE,
+  c31 VARCHAR(200),
+  estado VARCHAR(20) DEFAULT 'borrador' NOT NULL,
+  PRIMARY KEY(id_entrega)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tentrega.estado
+IS 'borrador o finalizado';
+
+
+CREATE TABLE conta.tentrega_det (
+  id_entrega_det SERIAL,
+  id_entrega INTEGER NOT NULL,
+  id_int_comprobante INTEGER,
+  CONSTRAINT tentrega_det_pkey PRIMARY KEY(id_entrega_det)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+/***********************************F-SCP-RAC-CONTA-0-17/11/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-17/11/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN obs VARCHAR;
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_tipo_relacion_comprobante INTEGER;
+  
+/***********************************F-SCP-RAC-CONTA-1-17/11/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-22/11/2016****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_depto_conta INTEGER;
+
+COMMENT ON COLUMN conta.tentrega.id_depto_conta
+IS 'indetifica el depto de contabilidad';
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-22/11/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-01/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN forma_cambio VARCHAR(20) DEFAULT 'oficial' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.forma_cambio
+IS 'oficial, compra, venta, convenido';
+
+/***********************************F-SCP-RAC-CONTA-0-01/12/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-05/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN movimiento VARCHAR(20) DEFAULT 'diario' NOT NULL;
+
+COMMENT ON COLUMN conta.tclase_comprobante.movimiento
+IS 'diario, ingreso o egreso';
+
+/***********************************F-SCP-RAC-CONTA-0-05/12/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-07/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tconfig_tipo_cuenta
+  ADD COLUMN movimiento VARCHAR(20) DEFAULT 'diario' NOT NULL;
+
+COMMENT ON COLUMN conta.tconfig_tipo_cuenta.movimiento
+IS 'Con que tiemo de comprobantes de mueven estan cuentas, diario, ingreso, movimiento';
+
+
+/***********************************F-SCP-RAC-CONTA-0-07/12/2016****************************************/
 

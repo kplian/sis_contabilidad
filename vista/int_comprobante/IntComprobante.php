@@ -10,15 +10,16 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 	Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
-		fheight : 500,
-		fwidth : 850,
+		fheight : '90%',
+		fwidth : '90%',
 		nombreVista : 'IntComprobante',
 		constructor : function(config) {
 			this.maestro = config.maestro;
-			this.initButtons = [this.cmbDepto];
+			this.initButtons = [this.cmbDepto, this.cmbGestion];
 
 			//llama al constructor de la clase padre
-			Phx.vista.IntComprobante.superclass.constructor.call(this, config);
+			Phx.vista.IntComprobante.superclass.constructor.call(this, config);			
+			this.bbar.add(this.cmbTipoCbte);
 			
 			//this.load({params:{start:0, limit:this.tam_pag}});
 
@@ -85,9 +86,34 @@ header("content-type: text/javascript; charset=UTF-8");
 			}, this);
 
 			this.cmbDepto.on('valid', function() {
-				this.capturaFiltros();
+				 if(this.cmbGestion.validate()){
+				   this.capturaFiltros();
+				}
+				
 
 			}, this);
+			
+			this.cmbGestion.on('select', function(){
+			    if( this.validarFiltros() ){
+	                  this.capturaFiltros();
+	             }
+			},this);
+			
+			
+			this.cmbTipoCbte.on('select', function(obj,newValue,oldValue){
+			    if( this.validarFiltros() ){			      	
+				    this.capturaFiltros();
+			     }
+			},this);
+			
+			this.cmbTipoCbte.on('clearcmb', function(obj,newValue,oldValue){
+			    if( this.validarFiltros() ){			      	
+				    this.capturaFiltros();
+			     }
+			},this); 
+			
+			
+			
 
 			this.iniciarEventos();
 		},
@@ -103,12 +129,22 @@ header("content-type: text/javascript; charset=UTF-8");
 		capturaFiltros : function(combo, record, index) {
 			this.desbloquearOrdenamientoGrid();
 			this.store.baseParams.id_deptos = this.cmbDepto.getValue();
+			this.store.baseParams.id_gestion = this.cmbGestion.getValue();
+			if(this.cmbTipoCbte.getValue()){
+				this.store.baseParams.id_clase_comprobante = this.cmbTipoCbte.getValue();
+			}
+			else{
+				delete this.store.baseParams.id_clase_comprobante;
+			}
+			this.store.baseParams.id_clase_comprobante = this.cmbTipoCbte.getValue();
 			this.store.baseParams.nombreVista = this.nombreVista
 			this.load();
 		},
 
 		validarFiltros : function() {
-			if (this.cmbDepto.validate()) {
+			console.log('values....', this.cmbDepto.getValue())
+			if (this.cmbDepto.getValue() != '' && this.cmbGestion.validate() ) {
+			
 				return true;
 			} else {
 				return false;
@@ -118,12 +154,21 @@ header("content-type: text/javascript; charset=UTF-8");
 			if (!this.validarFiltros()) {
 				alert('Especifique los filtros antes')
 			}
+			else{
+				 this.capturaFiltros();
+			}
 		},
 		iniciarEventos : function() {
 
 			
-			this.Cmp.id_moneda.on('select', this.getConfigCambiaria, this);
-			this.Cmp.fecha.on('select', this.getConfigCambiaria, this);
+			this.Cmp.id_moneda.on('select', function(){
+												this.getConfigCambiaria('si');
+											    this.Cmp.id_int_comprobante_fks.reset();
+											    this.Cmp.id_int_comprobante_fks.modificado = true;
+											}, this);
+											
+			this.Cmp.fecha.on('select', function(){this.getConfigCambiaria('si')}, this);
+			this.Cmp.forma_cambio.on('select', function(){this.getConfigCambiaria('si')}, this);
 
 			this.Cmp.id_clase_comprobante.on('select', this.habilitaMomentos, this);
 
@@ -138,6 +183,26 @@ header("content-type: text/javascript; charset=UTF-8");
 				}
 
 			}, this);
+			
+			this.Cmp.id_int_comprobante_fks.on('beforequery',function( queryEvent ){
+				 var id_m = this.Cmp.id_moneda.getValue(),
+				     id_g = this.cmbGestion.getValue();
+				if(id_m && id_g){
+					this.Cmp.id_int_comprobante_fks.store.baseParams.id_moneda  = id_m;
+					this.Cmp.id_int_comprobante_fks.store.baseParams.id_gestion = id_g;
+					this.Cmp.id_int_comprobante_fks.store.modificado = true;
+				
+				} 
+				else{
+					queryEvent.cancel = true;
+				}
+			
+				
+				
+			},this);
+			
+			
+			
 
 		},
 
@@ -223,11 +288,18 @@ header("content-type: text/javascript; charset=UTF-8");
 				name : 'nro_cbte',
 				fieldLabel : 'Nro.Cbte.',
 				gwidth : 135,
-				emptyText : 'Nro. de Cbte.'
+				emptyText : 'Nro. de Cbte.',
+				renderer: function(value,p,record){
+                         if(record.data.c31 && record.data.c31 !='' ){
+                             return String.format('<font color="#0000FF">{0}</font><br>{1}', value,record.data.c31);
+                         }
+                          return String.format('{0}', value);
+                       
+                 }
 			},
 			type : 'Field',
 			filters : {
-				pfiltro : 'incbte.nro_cbte',
+				pfiltro : 'incbte.nro_cbte#incbte.C31',
 				type : 'string'
 			},
 			id_grupo : 0,
@@ -461,16 +533,16 @@ header("content-type: text/javascript; charset=UTF-8");
 					root : 'datos',
 					sortInfo : {
 						field : 'id_int_comprobante',
-						direction : 'ASC'
+						direction : 'desc'
 					},
 					totalProperty : 'total',
-					fields : ['id_int_comprobante', 'nro_cbte', 'nro_tramite', 'fecha', 'glosa1', 'glosa2', 'id_clase_comprobante', 'codigo', 'descripcion'],
+					fields : ['id_int_comprobante', 'nro_cbte', 'nro_tramite', 'fecha', 'glosa1', 'glosa2','desc_moneda', 'id_clase_comprobante', 'codigo', 'descripcion'],
 					remoteSort : true,
 					baseParams : {
 						par_filtro : 'inc.id_int_comprobante#inc.nro_cbte#inc.fecha#inc.glosa1#inc.glosa2#inc.nro_tramite'
 					}
 				}),
-				tpl : new Ext.XTemplate('<tpl for="."><div class="awesomecombo-5item {checked}">', '<p>(ID: {id_int_comprobante}), Nro: {nro_cbte}</p>', '<p>Fecha: <strong>{fecha}</strong></p>', '<p>TR: {nro_tramite}</p>', '<p>GLS: {glosa1}</p>', '</div></tpl>'),
+				tpl : new Ext.XTemplate('<tpl for="."><div class="awesomecombo-5item {checked}">', '<p>(ID: {id_int_comprobante}), Nro: {nro_cbte} , ({desc_moneda})</p>', '<p>Fecha: <strong>{fecha}</strong></p>', '<p>TR: {nro_tramite}</p>', '<p>GLS: {glosa1}</p>', '</div></tpl>'),
 				itemSelector : 'div.awesomecombo-5item',
 
 				valueField : 'id_int_comprobante',
@@ -518,7 +590,36 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : true
-		}, {
+		}, 
+		
+		
+		{
+			config : {
+				name : 'forma_cambio',
+				fieldLabel : 'Cambio',
+				qtip : 'Tipo cambio oficial, compra, venta o convenido',
+				allowBlank : false,
+				gwidth : 100,
+				width : 250,
+				typeAhead : true,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'local',
+				valueField : 'oficial',
+				store : ['oficial', 'compra','venta','convenido']
+			},
+			type : 'ComboBox',
+			id_grupo : 2,
+			filters : {
+				type : 'list',
+				pfiltro : 'incbte.forma_cambio',
+				options : ['oficial', 'compra','venta','convenido'],
+			},
+			grid : true,
+			form : true
+		},
+		
+		{
 			config : {
 				name : 'tipo_cambio',
 				readOnly : true,
@@ -537,7 +638,11 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 2,
 			grid : true,
 			form : true
-		}, {
+		}, 
+		
+		
+		
+		{
 			config : {
 				name : 'tipo_cambio_2',
 				fieldLabel : '(TC)',
@@ -925,20 +1030,20 @@ header("content-type: text/javascript; charset=UTF-8");
 				items : [{
 					xtype : 'fieldset',
 					columns : 2,
-					title : 'Tipo  Comprobante',
+					title : 'Tipo de Cambio',
 					autoHeight : true,
 					items : [],
-					id_grupo : 1
+					id_grupo : 2
 				}]
 			}, {
 				bodyStyle : 'padding-left:5px;',
 				items : [{
 					xtype : 'fieldset',
 					columns : 2,
-					title : 'Tipo de Cambio',
+					title : 'Tipo  Comprobante',
 					autoHeight : true,
 					items : [],
-					id_grupo : 2
+					id_grupo : 1
 				}]
 			}, {
 				bodyStyle : 'padding-left:5px;',
@@ -1070,7 +1175,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
 		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 
 		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 
-		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado'],
+		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio'],
 
 		rowExpander : new Ext.ux.grid.RowExpander({
 			tpl : new Ext.Template('<br>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Clase cbte:&nbsp;&nbsp;</b> {desc_clase_comprobante}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Origen:&nbsp;&nbsp;</b> {desc_subsistema}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Beneficiario:&nbsp;&nbsp;</b> {beneficiario}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa1} {glosa2}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Frima 1:&nbsp;&nbsp;</b> {desc_firma1} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 2:&nbsp;&nbsp;</b> {desc_firma2} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 3:&nbsp;&nbsp;</b> {desc_firma3} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>')
@@ -1124,7 +1229,69 @@ header("content-type: text/javascript; charset=UTF-8");
 			resizable : true,
 			minChars : 2
 		}),
-
+		
+		
+      cmbGestion: new Ext.form.ComboBox({
+				fieldLabel: 'Gestion',
+				grupo:[0,1,2],
+				allowBlank: false,
+				blankText:'... ?',
+				emptyText:'Gestion...',
+				store:new Ext.data.JsonStore(
+				{
+					url: '../../sis_parametros/control/Gestion/listarGestion',
+					id: 'id_gestion',
+					root: 'datos',
+					sortInfo:{
+						field: 'gestion',
+						direction: 'DESC'
+					},
+					totalProperty: 'total',
+					fields: ['id_gestion','gestion'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams:{par_filtro:'gestion'}
+				}),
+				valueField: 'id_gestion',
+				triggerAction: 'all',
+				displayField: 'gestion',
+			    hiddenName: 'id_gestion',
+    			mode:'remote',
+				pageSize:50,
+				queryDelay:500,
+				listWidth:'280',
+				width:80
+			}),	
+			
+		cmbTipoCbte: new Ext.form.ClearCombo({
+				name : 'id_clase_comprobante',
+				fieldLabel : 'Tipo Cbte.',
+				allowBlank : true,
+				emptyText : 'Elija una opción...',
+				store : new Ext.data.JsonStore({
+					url : '../../sis_contabilidad/control/ClaseComprobante/listarClaseComprobante',
+					id : 'id_clase_comprobante',
+					root : 'datos',
+					sortInfo : {field : 'id_clase_comprobante',direction : 'ASC'},
+					totalProperty : 'total',
+					fields : ['id_clase_comprobante', 'tipo_comprobante', 'descripcion', 'codigo', 'momento_comprometido', 'momento_ejecutado', 'momento_pagado'],
+					remoteSort : true,
+					baseParams : {par_filtro : 'ccom.tipo_comprobante#ccom.descripcion'}
+				}),
+				valueField : 'id_clase_comprobante',
+				displayField : 'descripcion',				
+				hiddenName : 'id_clase_comprobante',
+				forceSelection : true,
+				typeAhead : false,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'remote',
+				pageSize : 15,
+				queryDelay : 1000,
+				width : 250,
+				minChars : 2,
+			}),		
+			
 		south : {
 			url : '../../../sis_contabilidad/vista/int_transaccion/IntTransaccion.php',
 			title : 'Transacciones',

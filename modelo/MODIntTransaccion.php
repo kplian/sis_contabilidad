@@ -265,6 +265,9 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('nombre_corto','varchar');
 		$this->captura('fecha','date');
 		$this->captura('glosa1','varchar');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_estado_wf','int4');
+		 
 		
 		
 		

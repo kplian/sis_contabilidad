@@ -84,16 +84,20 @@ Phx.vista.IntComprobanteReg = {
          else{
          	this.mostrarComponente(this.Cmp.tipo_cambio);
             this.mostrarComponente(this.Cmp.tipo_cambio_2);
-            //Actuizar label ...
-            this.sw_valores = 'no';
-            this.getConfigCambiaria();
+             
+            //RAC 1/12/2016 valor origal en no
+            //cambio para que al editar se peuda cambiar la forma de pago y se recalcule el tipo de cambio ...
+            // hay que ver que implicaciones va tener esto ....
+            // si despues queire editar el combo de forma de pago estan en si va recalcular los tipo o permitir editar
+            // si selecciona convenido
+            this.getConfigCambiaria('no');
+             
          }
          
        },
        
        onButtonNew:function(){
           this.swButton = 'NEW';
-          this.sw_valores = 'si';
           Phx.vista.IntComprobanteReg.superclass.onButtonNew.call(this); 
           this.Cmp.id_moneda.setReadOnly(false);
           this.Cmp.fecha.setReadOnly(false);
@@ -170,14 +174,12 @@ Phx.vista.IntComprobanteReg = {
 		        else{
 		        	 this.getBoton('btnSwEditble').setDisabled(true);
 		        }
-		        this.getBoton('sig_estado').enable();
-            
+		        this.getBoton('sig_estado').enable();            
 				this.getBoton('btnImprimir').enable();
 				this.getBoton('btnRelDev').enable();
 				this.getBoton('btnIgualarCbte').enable();
 				this.getBoton('btnDocCmpVnt').enable();
-				this.getBoton('chkpresupuesto').enable();
-				
+				this.getBoton('chkpresupuesto').enable();				
 				this.getBoton('btnChequeoDocumentosWf').enable();
                 this.getBoton('diagrama_gantt').enable();
                 this.getBoton('btnObs').enable(); 
@@ -204,13 +206,13 @@ Phx.vista.IntComprobanteReg = {
 			
 			
 		},
-		
+		/*
 		capturaFiltros : function(combo, record, index) {
 			this.desbloquearOrdenamientoGrid();
 			this.store.baseParams.id_deptos = this.cmbDepto.getValue();
 			this.store.baseParams.nombreVista = this.nombreVista;			
 			this.load();
-		},
+		},*/
 		
 		getTipoCambio : function() {
 			//Verifica que la fecha y la moneda hayan sido elegidos
@@ -238,8 +240,7 @@ Phx.vista.IntComprobanteReg = {
 			}
 
 		},
-        sw_valores:'si',
-		getConfigCambiaria : function() {
+        getConfigCambiaria : function(sw_valores) {
 
 			var localidad = 'nacional';
 			
@@ -250,16 +251,28 @@ Phx.vista.IntComprobanteReg = {
 			}
 
 			//Verifica que la fecha y la moneda hayan sido elegidos
-			if (this.Cmp.fecha.getValue() && this.Cmp.id_moneda.getValue()) {
+			if (this.Cmp.fecha.getValue() && this.Cmp.id_moneda.getValue() && this.Cmp.forma_cambio.getValue()) {
 				Phx.CP.loadingShow();
+				var forma_cambio = this.Cmp.forma_cambio.getValue();
+				if(forma_cambio=='convenido'){
+					this.Cmp.tipo_cambio.setReadOnly(false);
+					this.Cmp.tipo_cambio_2.setReadOnly(false);
+				}
+				else{
+					this.Cmp.tipo_cambio.setReadOnly(true);
+					this.Cmp.tipo_cambio_2.setReadOnly(true);
+				}
+				
+				
+				
 				Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/ConfigCambiaria/getConfigCambiaria',
 				params:{
 					fecha: this.Cmp.fecha.getValue(),
 					id_moneda: this.Cmp.id_moneda.getValue(),
 					localidad: localidad,
-					sw_valores: this.sw_valores,
-					tipo: 'O'
+					sw_valores: sw_valores,
+					forma_cambio: forma_cambio
 				}, success: function(resp) {
 					Phx.CP.loadingHide();
 					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
@@ -273,7 +286,7 @@ Phx.vista.IntComprobanteReg = {
 						
 						this.Cmp.tipo_cambio.label.update(reg.ROOT.datos.v_tc1 +' (tc)');
 						this.Cmp.tipo_cambio_2.label.update(reg.ROOT.datos.v_tc2 +' (tc)');
-						if (this.sw_valores == 'si'){
+						if (sw_valores == 'si'){
 						    //poner valores por defecto
 						 	this.Cmp.tipo_cambio.setValue(reg.ROOT.datos.v_valor_tc1);
 						    this.Cmp.tipo_cambio_2.setValue(reg.ROOT.datos.v_valor_tc2);

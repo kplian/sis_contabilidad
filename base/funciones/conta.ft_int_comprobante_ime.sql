@@ -150,7 +150,7 @@ BEGIN
              v_momento_comprometido = 'si';
             END IF;
             
-            
+          
             
             --momentos presupeustarios
             IF v_parametros.momento_ejecutado = 'true' THEN
@@ -316,7 +316,8 @@ BEGIN
                 id_moneda_tri,
                 nro_tramite,
                 id_proceso_wf,
-                id_estado_wf
+                id_estado_wf,
+                forma_cambio
           	) values(
                 v_parametros.id_clase_comprobante,  			
                 v_id_subsistema,
@@ -357,7 +358,8 @@ BEGIN
                 v_id_moneda_tri,
                 v_num_tramite,
                 v_id_proceso_wf,
-                v_id_estado_wf
+                v_id_estado_wf,
+                v_parametros.forma_cambio
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
@@ -531,7 +533,8 @@ BEGIN
                 momento_pagado =  v_momento_pagado,
                 fecha_costo_ini = v_parametros.fecha_costo_ini,
                 fecha_costo_fin = v_parametros.fecha_costo_fin,
-                tipo_cambio_2 = v_tc_2
+                tipo_cambio_2 = v_tc_2,
+                forma_cambio = v_parametros.forma_cambio
 			where id_int_comprobante = v_parametros.id_int_comprobante;
             
             
@@ -758,10 +761,14 @@ BEGIN
                raise exception 'No puede volcar un cbte de reversión';
             END IF;
             
-             
-            IF  not conta.f_revisar_dependencias(v_parametros.id_int_comprobante)  THEN
-               raise exception 'error por dependencias';
-            END IF;
+            -- RAC 2/12/2016
+            -- solo revisa dependnecia en cbte de reversion total
+            -- los parciales peuden tener dependencias
+            IF v_parametros.sw_validar = 'si' then 
+              IF  not conta.f_revisar_dependencias(v_parametros.id_int_comprobante)  THEN
+                 raise exception 'error por dependencias';
+              END IF;
+        	END IF;
             
            
             
@@ -858,7 +865,8 @@ BEGIN
                 sw_tipo_cambio,
                 cbte_reversion,
                 id_proceso_wf,
-                id_estado_wf
+                id_estado_wf,
+                forma_cambio
           	) values(
               v_reg_cbte.id_clase_comprobante,  			
               v_reg_cbte.id_subsistema,
@@ -898,11 +906,12 @@ BEGIN
               v_reg_cbte.localidad,
               v_reg_cbte.id_moneda_tri,
               v_num_tramite,
-              'no',  -- sw_editable 
-              'si', -- sw_tipo_cambio 
+              'si',  -- sw_editable 
+              v_reg_cbte.sw_tipo_cambio, -- RAC 05/12/2016 ....  'si', -- sw_tipo_cambio 
 			  'si', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
-              v_id_estado_wf		
+              v_id_estado_wf,
+              v_reg_cbte.forma_cambio		
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
            update wf.tproceso_wf p set
@@ -997,8 +1006,9 @@ BEGIN
                     )RETURNING id_int_transaccion into v_id_int_transaccion;
                     
                     
-                     --  si el comprobante tiene relaciones de devenago (si es un cbte de pago)
-                     --  asociamos el pago al nuevo comprobante
+                     --  si el comprobante tiene relaciones de devenago ...(aolo si es un cbte de pago)
+                     --  asociamos el pago al nuevo comprobante 
+                     --  con montos negativos
                      
                      FOR  v_registros_dev in (
                                               select 
@@ -1069,15 +1079,20 @@ BEGIN
               volcado = 'si'
             where c.id_int_comprobante =  v_parametros.id_int_comprobante;                
             
-            --solictar validacion del comprobante 
-            v_result = conta.f_validar_cbte(p_id_usuario, 
-            								   v_parametros._id_usuario_ai, 
-                                               v_parametros._nombre_usuario_ai, 
-                                               v_id_int_comprobante, 
-                                               'si');
-               
+            IF v_parametros.sw_validar = 'si' then
+                --solictar validacion del comprobante 
+                v_result = conta.f_validar_cbte(p_id_usuario, 
+                                                   v_parametros._id_usuario_ai, 
+                                                   v_parametros._nombre_usuario_ai, 
+                                                   v_id_int_comprobante, 
+                                                   'si');
+               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado y validado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
+           
+           	else
+               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado en borrador el cbte : id '||v_parametros.id_int_comprobante::varchar); 
+            end if;   
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
+            
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
               
             --Devuelve la respuesta
@@ -1296,7 +1311,8 @@ BEGIN
             ic.id_proceso_wf,
             ic.estado_reg,
             pwf.id_tipo_proceso,
-            ic.id_estado_wf
+            ic.id_estado_wf,
+            ic.nro_tramite
         into 
             v_rec            
         from conta.tint_comprobante  ic
@@ -1401,7 +1417,7 @@ BEGIN
 
 		begin
         
-        
+          
             select 
              ic.*,
              p.id_gestion 
@@ -1449,30 +1465,54 @@ BEGIN
               IF v_codigo_tipo_proceso is NULL THEN
                raise exception 'No existe un proceso inicial para el proceso macro indicado % (Revise la configuración)',v_codigo_proceso_macro;
               END IF;
-                  
-             -- inciar el tramite en el sistema de WF
-              SELECT 
-                 ps_num_tramite ,
-                 ps_id_proceso_wf ,
-                 ps_id_estado_wf ,
-                 ps_codigo_estado 
-                into
-                 v_num_tramite,
-                 v_id_proceso_wf,
-                 v_id_estado_wf,
-                 v_codigo_estado   
-                        
-              FROM wf.f_inicia_tramite(
-                 p_id_usuario,
-                 v_parametros._id_usuario_ai,
-                 v_parametros._nombre_usuario_ai,
-                 v_reg_cbte.id_gestion, 
-                 v_codigo_tipo_proceso, 
-                 null,--v_parametros.id_funcionario,
-                 v_reg_cbte.id_depto,
-                 'Registro de Cbte manual',
-                 '' );        
+              
+              -- preguntar si se quiere clonar el  con el nro de tramite  nro_tramite
+             IF    v_parametros.sw_tramite = 'si'  THEN     
+                	 -- inciar el proceso con un nuevo nro  de  tramite en el sistema de WF
+                    SELECT 
+                       ps_num_tramite ,
+                       ps_id_proceso_wf ,
+                       ps_id_estado_wf ,
+                       ps_codigo_estado 
+                      into
+                       v_num_tramite,
+                       v_id_proceso_wf,
+                       v_id_estado_wf,
+                       v_codigo_estado   
+                              
+                    FROM wf.f_inicia_tramite(
+                       p_id_usuario,
+                       v_parametros._id_usuario_ai,
+                       v_parametros._nombre_usuario_ai,
+                       v_reg_cbte.id_gestion, 
+                       v_codigo_tipo_proceso, 
+                       null,--v_parametros.id_funcionario,
+                       v_reg_cbte.id_depto,
+                       'Registro de Cbte manual/clonado',
+                       '' );        
                
+              ELSE
+                  
+                    SELECT
+                                 ps_id_proceso_wf,
+                                 ps_id_estado_wf,
+                                 ps_codigo_estado,
+                                 ps_nro_tramite
+                       into
+                                 v_id_proceso_wf,
+                                 v_id_estado_wf,
+                                 v_codigo_estado,
+                                 v_num_tramite
+                   FROM wf.f_registra_proceso_disparado_wf(
+                                p_id_usuario,
+                                v_parametros._id_usuario_ai,
+                                v_parametros._nombre_usuario_ai,
+                                v_reg_cbte.id_estado_wf, 
+                                NULL,  --id_funcionario wf
+                                v_reg_cbte.id_depto,
+                                'Cbte Clonado',
+                                'CBTE','');
+              END IF;
                
               IF  v_codigo_estado != 'borrador' THEN
                 raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
@@ -1532,7 +1572,8 @@ BEGIN
                 sw_tipo_cambio,
                 cbte_reversion,
                 id_proceso_wf,
-                id_estado_wf
+                id_estado_wf,
+                forma_cambio
           	) values(
               v_reg_cbte.id_clase_comprobante,  			
               v_reg_cbte.id_subsistema,
@@ -1558,7 +1599,7 @@ BEGIN
               v_reg_cbte.cbte_cierre,
               v_reg_cbte.cbte_apertura,
               v_reg_cbte.cbte_aitb,
-              'no',
+              'si', ---comprobantes clonados se registran como  manaules
               v_reg_cbte.momento_comprometido,
               v_reg_cbte.momento_ejecutado,
               v_reg_cbte.momento_pagado,
@@ -1570,11 +1611,12 @@ BEGIN
               v_reg_cbte.localidad,
               v_reg_cbte.id_moneda_tri,
               v_num_tramite,
-              'no',  -- sw_editable 
+              'si',  -- sw_editable 
               'si', -- sw_tipo_cambio 
 			  'no', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
-              v_id_estado_wf		
+              v_id_estado_wf,
+              v_reg_cbte.forma_cambio		
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
             update wf.tproceso_wf p set
@@ -1666,12 +1708,12 @@ BEGIN
                         v_registros.importe_gasto_mt, 
                         v_registros.triangulacion ,
                         v_registros.actualizacion, 
-                        v_registros.id_partida_ejecucion,
-                        v_registros.id_partida_ejecucion_dev
+                        NULL,--v_registros.id_partida_ejecucion,       --com oestamos clonado , es mejor no hacer refencia al id_partida ejecucion original
+                        NULL --v_registros.id_partida_ejecucion_dev
                         
                     )RETURNING id_int_transaccion into v_id_int_transaccion;
                     
-                      /*
+                      /*   
                     
                      --  si el comprobante tiene relaciones de devenago (si es un cbte de pago)
                      --  asociamos el pago al nuevo comprobante

@@ -63,7 +63,8 @@ BEGIN
                         ccom.momento_ejecutado,
                         ccom.momento_pagado,
                         ccom.codigo,
-                        ccom.tiene_apertura
+                        ccom.tiene_apertura,
+                        ccom.movimiento
 						from conta.tclase_comprobante ccom
                         inner join param.tdocumento doc on ccom.id_documento = doc.id_documento
 						inner join segu.tusuario usu1 on usu1.id_usuario = ccom.id_usuario_reg

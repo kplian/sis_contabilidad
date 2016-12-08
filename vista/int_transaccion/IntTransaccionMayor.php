@@ -6,18 +6,15 @@
 *@date 01-09-2013 18:10:12
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
-   
-	constructor:function(config){
-		
+    title:'Mayor',
+	constructor:function(config){		
 		var me = this;
 		this.maestro=config.maestro;
 		 //Agrega combo de moneda
-		
 		
 		this.Atributos = [
 			{
@@ -333,19 +330,49 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		
     	//llama al constructor de la clase padre
 		Phx.vista.IntTransaccionMayor.superclass.constructor.call(this,config);
+		
+		this.addButton('chkdep',{	text:'Dependencias',
+				iconCls: 'blist',
+				disabled: true,
+				handler: this.checkDependencias,
+				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
+			});
+			
+		 this.addButton('btnChequeoDocumentosWf',
+	            {
+	                text: 'Documentos',
+	                grupo:[0,1,2,3],
+	                iconCls: 'bchecklist',
+	                disabled: true,
+	                handler: this.loadCheckDocumentosWf,
+	                tooltip: '<b>Documentos del Trámite</b><br/>Permite ver los documentos asociados al NRO de trámite.'
+	            }
+	        );	
+	      
+	      this.addButton('chkpresupuesto',{text:'Chk Presupuesto',
+				iconCls: 'blist',
+				disabled: true,
+				handler: this.checkPresupuesto,
+				tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>'
+			});
+			
+		 this.addButton('btnImprimir', {
+				text : 'Imprimir',
+				iconCls : 'bprint',
+				disabled : true,
+				handler : this.imprimirCbte,
+				tooltip : '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
+		});
+			
+			
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
 		this.init();
-		
-		
-		
-		
 		
 	},
 	
 	
 	tam_pag: 50,	
-	title:'Transacción',
 	
 	ActList: '../../sis_contabilidad/control/IntTransaccion/listarIntTransaccionMayor',
 	id_store: 'id_int_transaccion',
@@ -378,7 +405,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		{ name:'desc_auxiliar', type: 'string'},
 		{ name:'desc_partida', type: 'string'},
 		{ name:'desc_centro_costo', type: 'string'},
-		'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1'
+		'tipo_partida','id_orden_trabajo','desc_orden',
+		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1','id_proceso_wf','id_estado_wf'
 		
 	],
 	
@@ -418,18 +446,36 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		this.load( { params: { start:0, limit: this.tam_pag } });
 	},
 	
-	preparaMenu:function(){
-		var rec = this.sm.getSelected();
-		var tb = this.tbar;
+	preparaMenu : function(n) {
+		var rec=this.sm.getSelected();
 		if(rec.data.tipo_reg != 'summary'){
-			return Phx.vista.IntTransaccionMayor.superclass.preparaMenu.call(this);
+			var tb = Phx.vista.IntTransaccionMayor.superclass.preparaMenu.call(this);
+			this.getBoton('chkdep').enable();
+			this.getBoton('btnChequeoDocumentosWf').enable();
+			this.getBoton('btnImprimir').enable();
+			this.getBoton('chkpresupuesto').enable();
+			
+			return tb;
 		}
 		else{
-			 tb.items.get('b-edit-' + this.idContenedor).disable();
-			 tb.items.get('b-del-' + this.idContenedor).disable();
-		}
-		
+			 this.getBoton('chkdep').disable();
+			 this.getBoton('btnChequeoDocumentosWf').disable();
+			 this.getBoton('btnImprimir').disable();
+			 this.getBoton('chkpresupuesto').disable();
+		 }
+			
+         return undefined;
 	},
+	liberaMenu : function() {
+			var tb = Phx.vista.IntTransaccionMayor.superclass.liberaMenu.call(this);
+			this.getBoton('chkdep').disable();
+			this.getBoton('btnChequeoDocumentosWf').disable();
+			this.getBoton('btnImprimir').disable();
+			this.getBoton('chkpresupuesto').disable();
+			
+	},
+	
+	
 	getGestion:function(x){
 		if(Ext.isDate(x)){
 	        Ext.Ajax.request({ 
@@ -444,6 +490,63 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			alert('Error al obtener gestión: fecha inválida')
 		}
 	},
+	
+	checkDependencias: function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/CbteDependencias.php',
+										'Dependencias',
+										{
+											modal:true,
+											width: '80%',
+											height: '80%'
+										}, 
+										  {id_int_comprobante: rec.data.id_int_comprobante}, 
+										  this.idContenedor,
+										 'CbteDependencias');
+			   
+	},
+	imprimirCbte : function() {
+			var rec = this.sm.getSelected();
+			var data = rec.data;
+			if (data) {
+				Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
+					params : {
+						'id_proceso_wf' : data.id_proceso_wf
+					},
+					success : this.successExport,
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			}
+
+		},
+	checkPresupuesto:function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
+										'Estado del Presupuesto',
+										{
+											modal:true,
+											width:700,
+											height:450
+										}, {
+											data:{
+											   nro_tramite: rec.data.nro_tramite								  
+											}}, this.idContenedor,'ChkPresupuesto',
+										{
+											config:[{
+													  event:'onclose',
+													  delegate: this.onCloseChk												  
+													}],
+											
+											scope:this
+										 });
+			   
+	 },
 	successGestion: function(resp){
 		var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
         if(!reg.ROOT.error){
@@ -457,6 +560,39 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
             alert('Error al obtener la gestión. Cierre y vuelva a intentarlo')
         } 
 	},
+	 loadCheckDocumentosWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Documentos del Proceso',
+                    {
+                        width:'90%',
+                        height:500
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DocumentoWf'
+        )
+    },
+	
+	ExtraColumExportDet:[{ 
+		   	    label:'Partida',
+				name:'desc_partida',
+				width:'200',
+				type:'string',
+				gdisplayField:'desc_partida',
+				value:'desc_partida'
+			},
+			{ 
+		   	    label:'Cbte',
+				name:'nro_cbte',
+				width:'100',
+				type:'string',
+				gdisplayField:'nro_cbte',
+				value:'nro_cbte'
+			}],
+	
+	
     bnew : false,
     bedit: false,
     bdel:  false

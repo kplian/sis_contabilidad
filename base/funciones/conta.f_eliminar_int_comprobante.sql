@@ -36,9 +36,9 @@ BEGIN
     from conta.tint_comprobante
     where id_int_comprobante = p_id_int_comprobante;
         
-    ---------------------------------------
+    --------------------------------------
     -- Si el comprobante esta en borrador
-    ---------------------------------------
+    --------------------------------------
     
     
     IF   v_rec_cbte.estado_reg = 'borrador'  THEN
@@ -89,7 +89,14 @@ BEGIN
                      
                  END IF;       
    
+              -- si es un cbte de reversion reseta la bandera en el original 
               
+              
+              IF v_rec_cbte.cbte_reversion = 'si' THEN
+                 update conta.tint_comprobante set
+                    volcado = 'no'
+                 where id_int_comprobante =ANY( v_rec_cbte.id_int_comprobante_fks);
+              END IF;
     
              
     

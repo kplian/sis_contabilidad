@@ -42,6 +42,8 @@ DECLARE
     v_monto_total_devengado	numeric;
     va_montos  				numeric[];
     v_registros_dev			record;
+    v_sw_reversion			varchar;
+    v_importe_dev			numeric;
 			    
 BEGIN
 
@@ -65,7 +67,9 @@ BEGIN
              it.importe_haber,
              it.tipo_cambio as tipo_cambio_t,
              it.tipo_cambio_2 as tipo_cambio_2_t,
-             it.id_moneda as id_moneda_t
+             it.id_moneda as id_moneda_t,
+             it.importe_recurso,
+             it.importe_gasto
             into
              v_registros
             from conta.tint_comprobante ic
@@ -78,6 +82,8 @@ BEGIN
              ic.*,
              it.importe_debe,
              it.importe_haber,
+             it.importe_gasto,
+             it.importe_recurso,
              it.tipo_cambio as tipo_cambio_t,
              it.tipo_cambio_2 as tipo_cambio_2_t,
              it.id_moneda as id_moneda_t
@@ -89,7 +95,7 @@ BEGIN
             
             
             IF v_registros.estado_reg = 'validado' THEN
-               raise exception 'No puede insertar esta relación por que el cbte esta validado';
+               raise exception 'No puede insertar esta relación por que el cbte de pago ya esta validado';
             END IF;
             
          -- Obtener la moneda base
@@ -115,6 +121,7 @@ BEGIN
             
             v_monto_pago_mb  =  va_montos[1];
             v_monto_pago_mt = va_montos[2];
+           
           
           ELSE
           
@@ -137,28 +144,45 @@ BEGIN
            where rd.id_int_transaccion_dev = v_parametros.id_int_transaccion_dev
            and rd.estado_reg = 'activo'; 
            
+          
+          
+          -- obtengo el importe del devengado a ser validado
+          IF v_registros_dev.importe_gasto = 0 THEN
+          		v_importe_dev = v_registros.importe_recurso;
+          ELSE
+          		v_importe_dev = v_registros_dev.importe_gasto;
+          END IF; 
+          
+          -------------------------------------------------------------- 
+          --Si  NO es una reversion
+          --------------------------------------------------------------
+          IF v_parametros.monto_pago > 0  THEN         
+                 
+                --  el monto a pagar tiene que ser menor o igual  que (el monto devengado menos los montos  pagados ya registrados)
+                --  en caso contrario lanzar error
+                IF  v_parametros.monto_pago >   v_importe_dev - COALESCE(v_monto_total_x_pagar,0)  THEN
+                   raise exception 'el monto a pagar supera el saldo pendiente devengado (%)', v_importe_dev - COALESCE(v_monto_total_x_pagar,0);
+                END IF;
+                 
+                 v_sw_reversion = 'no';
+               
+          --------------------------------------------------------------
+          --Si es reversion el monto es negativo las validaciones son diferentes
+          --------------------------------------------------------------      
+          ELSE
+                --  el monto a revertir   tiene que ser menor o igual  que los montos pagasdos ya registrados
+                --  en caso contrario lanzar error
+                IF  (v_parametros.monto_pago*-1) >   COALESCE(v_monto_total_x_pagar,0)  THEN
+                   raise exception 'el monto a revertir supera el saldo pagado (%)', COALESCE(v_monto_total_x_pagar,0);
+                END IF;
+                
+                v_sw_reversion = 'si';
+          END IF; 
            
-           IF v_registros.importe_haber = 0 and (v_registros_dev.importe_haber <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
-           END IF;
-           
-           
-           IF v_registros.importe_debe = 0 and (v_registros_dev.importe_debe <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
-           END IF;
-           
-           IF v_registros.importe_haber = 0 and (v_registros.importe_debe <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
-           END IF;
-           
-           
-           IF v_registros.importe_debe = 0 and (v_registros.importe_haber <  COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
-           END IF;
            
            
         	--Sentencia de la insercion
-        	insert into conta.tint_rel_devengado(
+        	insert into conta.tint_rel_devengado (
                 id_int_transaccion_pag,
                 id_int_transaccion_dev,
                 monto_pago,
@@ -170,7 +194,8 @@ BEGIN
                 usuario_ai,
                 id_usuario_reg,
                 fecha_mod,
-                id_usuario_mod
+                id_usuario_mod,
+                sw_reversion
              ) values(
                 v_parametros.id_int_transaccion_pag,
                 v_parametros.id_int_transaccion_dev,
@@ -183,7 +208,8 @@ BEGIN
                 v_parametros._nombre_usuario_ai,
                 p_id_usuario,
                 null,
-                null
+                null,
+                v_sw_reversion
 			) RETURNING id_int_rel_devengado into v_id_int_rel_devengado;
 			
             
@@ -220,7 +246,9 @@ BEGIN
              it.importe_haber,
              it.tipo_cambio as tipo_cambio_t,
              it.tipo_cambio_2 as tipo_cambio_2_t,
-             it.id_moneda as id_moneda_t
+             it.id_moneda as id_moneda_t,
+             it.importe_recurso,
+             it.importe_gasto
             into
              v_registros
             from conta.tint_comprobante ic
@@ -235,7 +263,9 @@ BEGIN
              it.importe_haber,
              it.tipo_cambio as tipo_cambio_t,
              it.tipo_cambio_2 as tipo_cambio_2_t,
-             it.id_moneda as id_moneda_t
+             it.id_moneda as id_moneda_t,
+             it.importe_recurso,
+             it.importe_gasto
             into
              v_registros_dev
             from conta.tint_comprobante ic
@@ -251,49 +281,61 @@ BEGIN
                raise exception 'No puede modificar esta relación por que el cbte esta validado';
             END IF;
             
-         --  validar que el monto a pagar  no sobre pase el monto ejecutado
-        
-           SELECT
-             sum(rd.monto_pago)
-           into
-             v_monto_total_x_pagar
-           from conta.tint_rel_devengado rd
-           where rd.id_int_transaccion_dev = v_parametros.id_int_transaccion_dev
-                 and rd.estado_reg = 'activo'; 
-           
-           SELECT
-            rd.*
-           into
-             v_registros_rel
-           from conta.tint_rel_devengado rd
-           where rd.id_int_rel_devengado = v_parametros.id_int_rel_devengado
-                 and rd.estado_reg = 'activo';
-           
-           
-           
-           
-           IF v_registros.importe_haber = 0 and (v_registros_dev.importe_haber <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago);
-           END IF; 
-           
-           
-           IF v_registros.importe_debe = 0 and (v_registros_dev.importe_debe <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
-              raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
-           END IF; 
-           
-           
-           IF v_registros.importe_haber = 0 and (v_registros.importe_debe <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
-             raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago);
-           END IF; 
-           
-           
-           IF v_registros.importe_debe = 0 and (v_registros_dev.importe_haber <  (COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago - v_registros_rel.monto_pago)) THEN
-              raise exception 'El monto a pagar  (%) es menor al monto devengado (%)', v_parametros.monto_pago, COALESCE(v_monto_total_x_pagar,0) + v_parametros.monto_pago;
-           END IF;  
-           
-           
             
-            
+            /*******************************************************************
+            --  validar que el monto a pagar  no sobre pase el monto ejecutado
+            **********************************************************************/
+             SELECT
+               sum(rd.monto_pago)
+             into
+               v_monto_total_x_pagar
+             from conta.tint_rel_devengado rd
+             where rd.id_int_transaccion_dev = v_parametros.id_int_transaccion_dev
+                   and rd.estado_reg = 'activo'
+                   and id_int_rel_devengado != v_parametros.id_int_rel_devengado; 
+             
+             SELECT
+              rd.*
+             into
+               v_registros_rel
+             from conta.tint_rel_devengado rd
+             where rd.id_int_rel_devengado = v_parametros.id_int_rel_devengado
+                   and rd.estado_reg = 'activo';
+             
+             -- obtengo el importe del devengado a ser validado
+            IF v_registros_dev.importe_gasto = 0 THEN
+                  v_importe_dev = v_registros.importe_recurso;
+            ELSE
+                  v_importe_dev = v_registros_dev.importe_gasto;
+            END IF;  
+             
+            -------------------------------------------------------------- 
+            --Si  NO es una reversion
+            --------------------------------------------------------------
+            IF v_parametros.monto_pago > 0  THEN         
+                   
+                  --  el monto a pagar tiene que ser menor o igual  que (el monto devengado menos los montos  pagados ya registrados)
+                  --  en caso contrario lanzar error
+                  IF  v_parametros.monto_pago >   v_importe_dev - (COALESCE(v_monto_total_x_pagar,0))  THEN
+                     raise exception 'el monto a pagar supera el saldo pendiente por devengar (%)', v_importe_dev - COALESCE(v_monto_total_x_pagar,0);
+                  END IF;
+                   
+                   v_sw_reversion = 'no';
+                 
+            --------------------------------------------------------------
+            --Si es reversion el monto es negativo las validaciones son diferentes
+            --------------------------------------------------------------      
+            ELSE
+                  --  el monto a revertir   tiene que ser menor o igual  que los montos pagasdos ya registrados
+                  --  en caso contrario lanzar error
+                  IF  (v_parametros.monto_pago*-1) >   (COALESCE(v_monto_total_x_pagar,0))  THEN
+                     raise exception 'el monto a revertir supera el saldo pagao (%)', COALESCE(v_monto_total_x_pagar,0);
+                  END IF;
+                  
+                  v_sw_reversion = 'si';
+            END IF;
+           
+          
             -- Obtener la moneda base
             v_id_moneda_base = param.f_get_moneda_base();
             v_id_moneda_tri  = param.f_get_moneda_triangulacion();
@@ -330,7 +372,8 @@ BEGIN
               fecha_mod = now(),
               id_usuario_mod = p_id_usuario,
               id_usuario_ai = v_parametros._id_usuario_ai,
-              usuario_ai = v_parametros._nombre_usuario_ai
+              usuario_ai = v_parametros._nombre_usuario_ai,
+              sw_reversion = v_sw_reversion
 			where id_int_rel_devengado=v_parametros.id_int_rel_devengado;
             
             -- TODO recalcular tipo de cambio en transacciones  de pago

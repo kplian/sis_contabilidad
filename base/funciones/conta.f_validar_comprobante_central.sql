@@ -72,7 +72,7 @@ BEGIN
     	v_nombre_conexion = p_conexion;
     end if;
     
-    --raise exception '%..', v_nombre_conexion;
+    
     
     --mandamos el codigo de la estacion  y el idel del cbte de la regional
     
@@ -81,7 +81,7 @@ BEGIN
     
     --------------------------------------
     --modicar localidad del cbte original
-     -------------------------------------
+    -------------------------------------
      
     v_consulta = 'update conta.tint_comprobante set 
     				sw_tipo_cambio = '''||v_int_comprobante.sw_tipo_cambio||''',

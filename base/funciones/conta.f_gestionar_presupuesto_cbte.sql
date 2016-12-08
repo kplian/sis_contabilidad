@@ -285,15 +285,16 @@ BEGIN
                             --  o (compromentemos, ejecutamos y pagamos)     
                                 
                                 -- si  el comprobante tiene que comprometer
-                                IF v_registros_comprobante.momento_comprometido = 'si'  then
-                                  
-                                      -- validamos que si tiene que comprometer la id_partida_ejecucion tiene que ser nulo
-                                      
+                                IF v_registros_comprobante.momento_comprometido = 'si'  then                                  
+                                      -- validamos que si tiene que comprometer la id_partida_ejecucion tiene que ser nulo                                      
                                        IF v_registros.id_partida_ejecucion is not NULL THEN                                       
                                            raise exception 'EL comprobante no puede estar marcada para comprometer, si ya existe un comprometido';
                                        END IF;
-                                      
-                                       
+                                ELSE  
+                                    --RAC 02/12/2016...   
+                                    IF v_registros.id_partida_ejecucion is  NULL THEN                                       
+                                           raise exception 'El comprobante esta marcado  para no comprometer, y no tiene un origen comprometido';
+                                    END IF;      
                                 END IF; --IF comprometido  
                                 
                                      

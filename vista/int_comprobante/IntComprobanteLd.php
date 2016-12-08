@@ -24,21 +24,8 @@ Phx.vista.IntComprobanteLd = {
 	constructor: function(config) {
 	    Phx.vista.IntComprobanteLd.superclass.constructor.call(this,config);
 	    
-	    this.addButton('btnVolcar', {
-				text : 'Volcar',
-				iconCls : 'balert',
-				disabled : true,
-				handler : this.volcarCbte,
-				tooltip : '<b>Volcar</b><br/>Genera un cbte volcado que revierte el actual'
-		});
-		
-		this.addButton('btnClonar', {
-				text : 'Clonar',
-				iconCls : 'balert',
-				disabled : true,
-				handler : this.clonarCbte,
-				tooltip : '<b>Clonar</b><br/>Clonar Cbte (genera nuevo nro de trámite)'
-		});
+	    this.addBotonesVolcar();
+		this.addBotonesClonar();
 		
 		this.addButton('chkdep',{	text:'Dependencias',
 				iconCls: 'blist',
@@ -46,12 +33,17 @@ Phx.vista.IntComprobanteLd = {
 				handler: this.checkDependencias,
 				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
 			});
-	    
+		
+		
+	   
 	   this.init();	 
+	},
+    
+    volcarCbteBorrador: function(){
+    	this.volcarCbte('no');
     
     },
-    
-     volcarCbte: function() {
+    volcarCbte: function(sw_validar) {
 			  
 			 if(confirm("Esta seguro de volcar el cbte,  este proceso no puede revertirse (Si tiene presupuesto será revertido)!")){
 			 	 if(confirm("¿Esta realmente seguro?")){
@@ -60,7 +52,8 @@ Phx.vista.IntComprobanteLd = {
 					Ext.Ajax.request({
 						url : '../../sis_contabilidad/control/IntComprobante/volcarCbte',
 						params : {
-							id_int_comprobante : rec.id_int_comprobante
+							id_int_comprobante : rec.id_int_comprobante,
+							sw_validar: sw_validar=='si'?'si':'no'
 						},
 						success : function(resp) {
 							Phx.CP.loadingHide();
@@ -68,7 +61,7 @@ Phx.vista.IntComprobanteLd = {
 							if (reg.ROOT.error) {
 								Ext.Msg.alert('Error', 'Al volcar el cbte: ' + reg.ROOT.error)
 							} else {
-								this.reload();
+								this.reload()
 							}
 						},
 						failure : this.conexionFailure,
@@ -80,8 +73,11 @@ Phx.vista.IntComprobanteLd = {
 			    
 	},
 	
-   clonarCbte: function() {
-			  
+	clonarCbteSt: function(){
+		this.clonarCbte('si');
+	},
+    clonarCbte: function(sw_tramite) {
+	 		  
 			 if(confirm("Esta seguro de clonar  el cbte")){
 			 	 if(confirm("¿Esta realmente seguro?")){
 				 	var rec = this.sm.getSelected().data;
@@ -89,7 +85,8 @@ Phx.vista.IntComprobanteLd = {
 					Ext.Ajax.request({
 						url : '../../sis_contabilidad/control/IntComprobante/clonarCbte',
 						params : {
-							id_int_comprobante : rec.id_int_comprobante
+							id_int_comprobante : rec.id_int_comprobante,
+							sw_tramite: sw_tramite=='si'?'si':'no'
 						},
 						success : function(resp) {
 							Phx.CP.loadingHide();
@@ -127,6 +124,7 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
             this.getBoton('btnObs').enable();
+            
 			
 			return tb;
 	},
@@ -156,8 +154,60 @@ Phx.vista.IntComprobanteLd = {
 										}, 
 										  rec.data, 
 										  this.idContenedor,
-										 'CbteDependencias');
-			   
-	 }
+										 'CbteDependencias');			   
+	},
+	addBotonesClonar: function() {
+        this.menuClonar = new Ext.Toolbar.SplitButton({
+            id: 'b-btnClonar-' + this.idContenedor,
+            text: 'Clonar',
+            disabled: true,
+            grupo:[0,1,2,3],
+            iconCls : 'balert',
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-sint-' + this.idContenedor,
+                text: 'Clonar sin  Trámite',
+                tooltip: '<b>Clonar el cbte sin mantener el nro de trámite</b>',
+                handler:this.clonarCbteSt,
+                scope: this
+            }, {
+                id:'b-cont-' + this.idContenedor,
+                text: 'Clonar con Trámite',
+                tooltip: '<b>Clonar el cbte manteniendo el nro de trámite</b>',
+                handler:this.clonarCbte,
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuClonar	);
+    },
+    
+    addBotonesVolcar: function() {
+        this.menuClonar = new Ext.Toolbar.SplitButton({
+            id: 'b-btnVolcar-' + this.idContenedor,
+            text: 'Volcar',
+            disabled: true,
+            grupo:[0,1,2,3],
+            iconCls : 'balert',
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-volb-' + this.idContenedor,
+                text: 'Volcar en borrador',
+                tooltip: '<b>Al volcar en borrador tiene la opción de revertir parcialmente</b>',
+                handler:this.volcarCbteBorrador,
+                scope: this
+            }, {
+                id:'b-vol-' + this.idContenedor,
+                text: 'Volcar Validado',
+                tooltip: '<b>Al volcar y validar se revierte el 100%</b>',
+                handler:this.volcarCbte,
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuClonar	);
+    },
 };
 </script>

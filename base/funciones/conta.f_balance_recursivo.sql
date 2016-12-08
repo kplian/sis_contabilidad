@@ -44,10 +44,12 @@ BEGIN
      IF p_id_cuenta_padre is not null THEN
        select
          cue.tipo_cuenta,
-         cue.sw_transaccional
+         cue.sw_transaccional,
+         cc.movimiento
        into
          v_registros
        from conta.tcuenta cue
+       inner join conta.tconfig_tipo_cuenta cc on cc.tipo_cuenta = cue.tipo_cuenta
        where cue.id_cuenta_padre = p_id_cuenta_padre;
        
        IF v_registros.sw_transaccional = 'movimiento' THEN
@@ -79,12 +81,16 @@ BEGIN
                                      c.nombre_cuenta,
                                      c.nivel_cuenta,
                                      c.id_cuenta_padre,
-                                     c.tipo_cuenta
+                                     c.tipo_cuenta,
+                                     cc.movimiento
                                    from conta.tcuenta c
+                                   inner join conta.tconfig_tipo_cuenta cc on cc.tipo_cuenta = c.tipo_cuenta
                                    where c.id_cuenta_padre = p_id_cuenta_padre 
                                          and c.estado_reg = 'activo' 
                                          and (    (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff)) 
                                                or 
+                                                  (p_tipo_balance = 'resultado'  and  'resultado' = ANY(c.eeff)) 
+                                               or
                                                   (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
                                              )
                                     )   LOOP
@@ -100,7 +106,8 @@ BEGIN
                                     id_cuenta_padre,
                                     monto,
                                     nivel,
-                                    tipo_cuenta)
+                                    tipo_cuenta,
+                                    movimiento)
                                   VALUES(
                                    v_registros.id_cuenta,
                                    v_registros.nro_cuenta,
@@ -108,7 +115,8 @@ BEGIN
                                    v_registros.id_cuenta_padre,
                                    v_mayor,
                                    p_nivel_ini,
-                                   v_registros.tipo_cuenta );
+                                   v_registros.tipo_cuenta,
+                                   v_registros.movimiento );
                     
                     
                  
@@ -131,11 +139,15 @@ BEGIN
                                          c.nombre_cuenta,
                                          c.nivel_cuenta,
                                          c.id_cuenta_padre,
-                                         c.tipo_cuenta
-                                       from conta.tcuenta c  
-                                        where c.id_cuenta_padre is NULL 
+                                         c.tipo_cuenta,
+                                         cc.movimiento
+                                       from conta.tcuenta c
+                                       inner join conta.tconfig_tipo_cuenta cc on cc.tipo_cuenta = c.tipo_cuenta  
+                                       where c.id_cuenta_padre is NULL 
                                         and c.estado_reg = 'activo' 
                                         and (    (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff)) 
+                                               or 
+                                                  (p_tipo_balance = 'resultado'  and  'resultado' = ANY(c.eeff))
                                                or 
                                                   (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
                                              )
@@ -152,7 +164,8 @@ BEGIN
                                         id_cuenta_padre,
                                         monto,
                                         nivel,
-                                        tipo_cuenta)
+                                        tipo_cuenta,
+                                        movimiento)
                                       VALUES(
                                        v_registros.id_cuenta,
                                        v_registros.nro_cuenta,
@@ -160,7 +173,8 @@ BEGIN
                                        v_registros.id_cuenta_padre,
                                        v_mayor,
                                        p_nivel_ini,
-                                       v_registros.tipo_cuenta );
+                                       v_registros.tipo_cuenta,
+                                       v_registros.movimiento );
                         
                         
                      
@@ -195,13 +209,17 @@ BEGIN
                                  c.nombre_cuenta,
                                  c.nivel_cuenta,
                                  c.id_cuenta_padre,
-                                 c.tipo_cuenta
-                                from conta.tcuenta c  
+                                 c.tipo_cuenta,
+                                 cc.movimiento
+                                from conta.tcuenta c
+                                inner join conta.tconfig_tipo_cuenta cc on cc.tipo_cuenta = c.tipo_cuenta   
                                 where c.id_cuenta_padre is NULL and c.id_gestion = v_id_gestion 
                                 and c.estado_reg = 'activo' 
-                                and ( (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff)) 
-                                       or 
-                                      (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
+                                and (  (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff))
+                                         or 
+                                       (p_tipo_balance = 'resultado'  and  'resultado' = ANY(c.eeff)) 
+                                          or 
+                                       (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
                                      )
                                 )   LOOP
                 
@@ -226,7 +244,8 @@ BEGIN
                                   id_cuenta_padre,
                                   monto,
                                   nivel,
-                                  tipo_cuenta)
+                                  tipo_cuenta,
+                                  movimiento)
                                 VALUES(
                                  v_registros.id_cuenta,
                                  v_registros.nro_cuenta,
@@ -234,7 +253,8 @@ BEGIN
                                  v_registros.id_cuenta_padre,
                                  v_mayor,
                                  p_nivel_ini,
-                                 v_registros.tipo_cuenta );
+                                 v_registros.tipo_cuenta,
+                                 v_registros.movimiento );
                                  
                                  
                -- incrementamos suma
@@ -253,11 +273,15 @@ BEGIN
                                  c.nombre_cuenta,
                                  c.nivel_cuenta,
                                  c.id_cuenta_padre,
-                                 c.tipo_cuenta
-                                from conta.tcuenta c  
+                                 c.tipo_cuenta,
+                                 cc.movimiento
+                                from conta.tcuenta c 
+                                inner join conta.tconfig_tipo_cuenta cc on cc.tipo_cuenta = c.tipo_cuenta    
                                 where     c.id_cuenta_padre = p_id_cuenta_padre  
                                       and c.estado_reg = 'activo' 
-                                      and ( (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff)) 
+                                      and ( (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff))
+                                             or 
+                                            (p_tipo_balance = 'resultado'  and  'resultado' = ANY(c.eeff)) 
                                              or 
                                             (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
                                      ) )   LOOP
@@ -282,7 +306,8 @@ BEGIN
                                   id_cuenta_padre,
                                   monto,
                                   nivel,
-                                  tipo_cuenta)
+                                  tipo_cuenta,
+                                  movimiento)
                                 VALUES(
                                  v_registros.id_cuenta,
                                  v_registros.nro_cuenta,
@@ -290,7 +315,8 @@ BEGIN
                                  v_registros.id_cuenta_padre,
                                  v_mayor,
                                  p_nivel_ini,
-                                 v_registros.tipo_cuenta );
+                                 v_registros.tipo_cuenta,
+                                 v_registros.movimiento );
                 -- incrementamos suma
                 v_suma = v_suma + COALESCE(v_mayor,0);
               END LOOP;

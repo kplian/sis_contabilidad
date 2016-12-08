@@ -32,6 +32,7 @@ class MODConfigTipoCuenta extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('incremento','varchar');
 		$this->captura('eeff','varchar');
+		$this->captura('movimiento','varchar');
 		
 		
 		//Ejecuta la instruccion
@@ -54,6 +55,7 @@ class MODConfigTipoCuenta extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('incremento','incremento','varchar');
 		$this->setParametro('eeff','eeff','varchar');
+		$this->setParametro('movimiento','movimiento','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -76,6 +78,7 @@ class MODConfigTipoCuenta extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('incremento','incremento','varchar');
 		$this->setParametro('eeff','eeff','varchar');
+		$this->setParametro('movimiento','movimiento','varchar');
 		
 
 		//Ejecuta la instruccion
