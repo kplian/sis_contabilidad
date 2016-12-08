@@ -91,38 +91,35 @@ BEGIN
        
       raise notice '------------------------------------------------> total %', v_total;
       
-      IF v_incluir_sinmov = 'no' THEN
-          FOR v_registros in (SELECT                                   
-                                    id_cuenta,
-                                    nro_cuenta,
-                                    nombre_cuenta,
-                                    id_cuenta_padre,
-                                    monto,
-                                    nivel,
-                                    tipo_cuenta,
-                                    movimiento
-                                FROM temp_balancef 
-                                    order by nro_cuenta) LOOP
+      
+      
+      v_consulta = 'SELECT                                   
+                            id_cuenta,
+                            nro_cuenta,
+                            nombre_cuenta,
+                            id_cuenta_padre,
+                            monto,
+                            nivel,
+                            tipo_cuenta,
+                            movimiento
+                        FROM temp_balancef  ';
+                        
+                        
+       IF v_incluir_sinmov != 'no' THEN                          
+          v_consulta = v_consulta|| ' WHERE monto != 0 ' ;
+       END IF; 
+       
+       IF v_parametros.tipo_balance = 'resultado' THEN 
+           v_consulta = v_consulta|| ' order by movimiento desc, nro_cuenta asc' ;
+       ELSE
+           v_consulta = v_consulta|| ' order by  nro_cuenta';                  
+       END IF;
+       
+       FOR v_registros in EXECUTE(v_consulta) LOOP
                    RETURN NEXT v_registros;
-         END LOOP;
-     ELSE
-       FOR v_registros in (SELECT                                   
-                                    id_cuenta,
-                                    nro_cuenta,
-                                    nombre_cuenta,
-                                    id_cuenta_padre,
-                                    monto,
-                                    nivel,
-                                    tipo_cuenta,
-                                    movimiento
-                                FROM temp_balancef 
-                                WHERE monto != 0
-                                    order by nro_cuenta) LOOP
-                   RETURN NEXT v_registros;
-         END LOOP;
-     
-     END IF;
-  
+       END LOOP;
+       
+      
 
 END IF;
 
