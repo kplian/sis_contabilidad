@@ -6,7 +6,6 @@
 *@date 01-09-2013 18:10:12
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -14,9 +13,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    
 	constructor:function(config){
 		
-		
-		this.maestro=config.maestro;
-		
+		this.maestro=config.maestro;		
     	//llama al constructor de la clase padre
 		Phx.vista.IntTransaccion.superclass.constructor.call(this,config);
 		this.grid.getTopToolbar().disable();
@@ -24,7 +21,6 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		this.init();
 		
 		this.obtenerVariableGlobal();
-		
 		
 		this.Cmp.importe_debe.on('change',function(cmp){
 			this.Cmp.importe_haber.suspendEvents();
@@ -51,6 +47,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Detalle del Pago</b><br/>Si la transaccion afecta bancos esta opción permite regitrar datos relacioandos (forma de pago, etc) '
             }
         );
+        
+       
 		
 	},
 		
@@ -100,13 +98,10 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			   					retorno = retorno + String.format('<b>Aux.:</b>{0}</br>', record.data['desc_auxiliar']);
 			   				}
 		   					
-		   					
 		   					if(record.data['desc_partida']){
 			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
 			   				}
 		   					
-		   					
-			   				
 			   				if(record.data['desc_orden']){
 			   					retorno = retorno + '<b>Ot.:</b> '+record.data['desc_orden'];
 			   				}	

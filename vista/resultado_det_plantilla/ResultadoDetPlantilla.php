@@ -11,7 +11,8 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
-
+    fheight : '90%',
+	fwidth : '50%',
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
@@ -19,6 +20,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		this.init();
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
+		this.iniciarEventos();
 	},
 			
 	Atributos:[
@@ -44,7 +46,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'codigo',
 				fieldLabel: 'Código',
-				qtip:'El código se utiliza en las formulas',
+				qtip:'El código se utiliza para identificar de manera única el registro y principalmente como variable en las formulas',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
@@ -76,7 +78,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'orden_cbte',
-				qtip: 'Orden en el que se inserta en comprobante o el que se muestrna en el reporte',
+				qtip: 'Orden en el que se insertar en comprobante o el orden en el que se muestra en el reporte',
 				fieldLabel: 'Orden Cbte',
 				allowBlank: false,
 				anchor: '80%',
@@ -93,7 +95,10 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'destino',
                 fieldLabel: 'Destino',
-                qtip: 'reporte (no se utiliza para generar comprobantes, solo como calculo auxiliar),  (no entra en combaste), debe (al debe si es positivo si no al haber), haber (al haber si espositivo si no al contrario) o segun_saldo (lo suficiente para cuadrar al debe o al haber)',
+                qtip: '(1) reporte (no se utiliza para generar comprobantes, solo como calculo auxiliar),<br> '+ 
+                 	  '(2) debe (al debe si es positivo si no al haber), <br>'+
+                	  '(3) haber (al haber si espositivo si no al contrario) <br>'+
+                	  '(4) segun_saldo (lo suficiente para cuadrar al debe o al haber)',
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -125,8 +130,14 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'origen',
-                fieldLabel: 'Origen',
-                qtip: 'Como calcula el monto, (1)  en caso de detalle agregar Nivel detalle <br>(2) en caso de formula especificar el campoformula <br>(3) en caso de sumatoria especificar orden inicial y final en campo formula ejmplo 1-10 <br>(4) En caso de formula usar los codigo entre llaves como variables ejemplo, {ACT} + {DEP.ACT} <br>(5) en el caso de formula detalle, la formula se aplcan sobre el detalle de las cuentas',
+                fieldLabel: 'Operación',
+                qtip: 'Como calcula el monto, <br>'+
+                	  '(1) balance -> Realiza un balance de la cuenta señalada<br>'+
+                	  '(2) detalle -> Desglosa la cuenta según su composición y nivel detalle especificado<br>'+
+                	  '(3) titulo -> Solo colocara la "Etiqueta" que se especifique en el campo "Nombre Texto" (Solo se utiliza en Reportes)<br>'+
+                	  '(4) formula -> Señala que se tiene que usar una formula para calcular el valor de la línea<br>'+
+                	  '(5) sumatoria -> Para realizar la suma en un rango determinado, especificar orden inicial y final en campo formula ejemplo 1-10 <br>'+
+                	  '(6) detalle_formula -> la formula se aplicará sobre el detalle/desglose de las cuentas según el nivel especificado',
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -143,6 +154,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                          options: ['balance','detalle','titulo','formula','sumatoria','detalle_formula']  
                     },
             grid:true,
+            valorInicial: 'balance',
             egrid: true,
             form:true
         },
@@ -150,7 +162,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'nivel_detalle',
 				fieldLabel: 'Nivel Detalle',
-				qtip: 'si el origen es detalle, el nivel especifica cuantos anidar a partir de la cuenta raiz (Código cuenta)',
+				qtip: 'Si la  operación es detalle o detalle_formula, el nivel especifica cuantos niveles anidar a partir de la cuenta raiz (Código cuenta)',
 				allowBlank: false,
 				anchor: '40%',
                 gwidth: 80,
@@ -172,7 +184,10 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'tipo_saldo',
 				fieldLabel: 'Tipo saldo',
-				qtip: 'Solo se aplica cuando  el tipo de saldo es balance. <br>(1) balance: la diferencia entre saldo deudor y acreedor  (2) Deudor: solo suma los montos del debe (3) Acreedor: solo suma los montos al haber',
+				qtip: 'Solo se aplica cuando  la operación es balance. <br>'+
+				      '(1) balance: la diferencia entre saldo deudor y acreedor'+
+				      '(2) Deudor: solo suma los montos del debe'+
+				      '(3) Acreedor: solo suma los montos al haber',
 				allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -194,7 +209,10 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'signo_balance',
 				fieldLabel: 'Signo Balance',
-				qtip: '(1) defecto cuenta: regresa el signo del monto según el tipo de cuenta,  (2) Deudor: monto = saldo duedor - saldo acreedor (3) Acredor: monto = saldo acreedor - saldo deudor',
+				qtip: 'Se aplicará al resultado de los saldos en operaciones de balance<br>'+
+					  '(1) Defecto cuenta -> regresa el signo del monto según el tipo de cuenta<br>'+
+				      '(2) Deudor ->   monto = saldo duedor - saldo acreedor <br>'+
+				      '(3) Acredor ->  monto = saldo acreedor - saldo deudor',
 				allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -216,6 +234,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    			config:{
    				sysorigen:'sis_contabilidad',
        		    name: 'codigo_cuenta',
+       		    qtip: 'Define la cuenta sobre las que se realizan las operaciones',
 				fieldLabel: 'Código cuenta',
 				displayField: 'nro_cuenta',
 				valueField: 'nro_cuenta',
@@ -249,7 +268,8 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'formula',
 				fieldLabel: 'Formula',
-				qtip: 'Si el origen es formula,  ejm  {C1} + {C2} - {C3}',
+				qtip: 'Si el operación del tipo formula,  ejm  {C1} + {C2} - {C3}<br>'+
+					  'Si es una sumatoria especificar el rango de filas ejm: 1-10 (Sumará los resultados desde la fla 1 hasta la 10)',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -266,7 +286,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'nombre_variable',
 				fieldLabel: 'Nombre Texto',
-				qtip: 'El nombre de que se coloca par aeste registro , prevalece sobre el nombre de la cuenta',
+				qtip: 'El nombre de que se coloca para este registro , prevalece sobre el nombre de la cuenta',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -282,7 +302,12 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'incluir_cierre',
-				qtip: 'icluye en el balance los comprobantes de cierre, no -> ninguno, balance -> solo el balance de cierre, resultado -> solo el cierrede resutlados, o solo_cierre',
+				qtip: 'Incluye en las operaciones de tipo balance los comprobantes de cierre,<br>'+
+				      '(1) no -> no incluye ningun tipo de cierre <br>'+
+				      '(2) todos -> inclyes todos los tipos de cierre <br>'+
+				      '(3) balance -> solo  incluye cierres del tipo balance <br>'+
+				      '(4) resultado -> solo incluye cierres del tipo  resutlados <br>'+
+				      '(5) solo_cierre -> solo incluye los cbte de cierre de cualqueir tipo',
 				fieldLabel: 'Incluir cierre',
 				allowBlank: false,
                 anchor: '40%',
@@ -304,7 +329,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{
 			config: {
 				name: 'incluir_apertura',
-				qtip: 'icluye en el balance de apertura',
+				qtip: 'Incluye en las operaciones de tipo balance los cbte de  apertura',
 				fieldLabel: 'Icluir apertura',
 				allowBlank: false,
                 anchor: '40%',
@@ -326,7 +351,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{
 			config: {
 				name: 'incluir_aitb',
-				qtip: 'incluir comprobantes de  ajuste por inflancion y tenencia de bienes',
+				qtip: 'Incluye en las operaciones de tipo balance los cbts de  ajuste por inflación y tenencia de bienes',
 				fieldLabel: 'Icluir AITBs',
 				allowBlank: false,
                 anchor: '40%',
@@ -350,7 +375,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'visible',
                 fieldLabel: 'Visible',
-                qtip: 'Se muestra en el reporte',
+                qtip: 'Cuando el destino es reporte define si la fila se muestra o no',
                 allowBlank: true,
                 anchor: '40%',
                 gwidth: 80,
@@ -395,7 +420,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'subrayar',
                 fieldLabel: 'Subrayar',
-                qtip: 'Subraya el texto',
+                qtip: 'Subraya el texto en reportes',
                 allowBlank: true,
                 anchor: '40%',
                 gwidth: 80,
@@ -417,7 +442,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'negrita',
                 fieldLabel: 'Negrita',
-                qtip: 'Negrita',
+                qtip: 'Negrita del texto en reportes',
                 allowBlank: true,
                 anchor: '40%',
                 gwidth: 80,
@@ -461,7 +486,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'espacio_previo',
                 fieldLabel: 'Espacios',
-                qtip: 'Espacios previos antes de introducir el registro',
+                qtip: 'Espacios previos antes de introducir el registro en reportes',
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -483,7 +508,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'montopos',
                 fieldLabel: 'Pos. Monto',
-                qtip: 'Posición del monto',
+                qtip: 'Posición del monto en reportes',
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -505,7 +530,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'posicion',
 				fieldLabel: 'Aling',
-				qtip: 'Posicion del texto',
+				qtip: 'Posicion del texto en reportes',
 				allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -527,7 +552,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'signo',
 				fieldLabel: 'Signo',
-				qtip: 'Añade significado de signo  al monto, (+) (-)',
+				qtip: 'Añade significado de signo  al monto, (+) (-), solo para reportes',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -544,6 +569,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 	   	{
    			config:{
    				sysorigen:'sis_contabilidad',
+   				qtip: 'Auxiliar para cbtes, prevalece sobre la relacion contable',
        		    name:'id_auxiliar',
    				origen:'AUXILIAR',
    				allowBlank:true,
@@ -569,6 +595,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    			config:{
    				name: 'codigo_partida',
        		    hiddenName: 'codigo_partida',
+       		    qtip:'Partidas para comprobantes,  prevalece sobre la relación contable',
    				valueField: 'codigo',
    				displayField: 'nombre_partida',
    				allowBlank: true,
@@ -631,7 +658,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             config: {
                 name: 'relacion_contable',
                 fieldLabel: 'Relación Contable',
-                qtip: 'Codigo de la relacion contable de donde se obtendran la partida, cuenta y auxiliar',
+                qtip: 'Codigo de la relacion contable de donde se obtendran la partida, cuenta y auxiliar (Solo se utilza cuando el destino es diferente a Reportes)',
                 allowBlank: true,
                 emptyText: 'Elija Relación Contable...',
                 store: new Ext.data.JsonStore({
@@ -853,9 +880,41 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 						}
 						else{
 							this.Cmp.id_resultado_plantilla.setValue(this.maestro.id_resultado_plantilla);
+							
+							if(this.maestro.tipo =='reporte'){
+								this.Cmp.destino.disable();
+								this.Cmp.relacion_contable.disable();
+								this.Cmp.codigo_partida.disable();
+								this.Cmp.id_auxiliar.disable();
+							}else{
+								this.Cmp.destino.enable();
+								this.Cmp.relacion_contable.enable();
+								this.Cmp.codigo_partida.enable();
+								this.Cmp.id_auxiliar.enable();
+							}
 						}
 					}
 				},
+	iniciarEventos: function(){
+       	this.Cmp.origen.on('select',function(cmb,rec,ind){
+	       		
+	       		if(cmb.getValue() == 'formula' || cmb.getValue() == 'detalle_formula' || cmb.getValue() == 'sumatoria'){
+	       			this.Cmp.formula.enable();
+	       		}
+	       		else{
+	       			this.Cmp.formula.disable();
+	       		}
+	       		
+	       		if(cmb.getValue() == 'balance' || cmb.getValue() == 'detalle_formula' || cmb.getValue() == 'detalle'){
+	       			this.Cmp.codigo_cuenta.allowBlank = false;
+	       		}
+	       		else{
+	       			this.Cmp.codigo_cuenta.allowBlank = true;
+	       		}
+	       		
+	       		
+	    },this);
+    },			
 	bdel:true,
 	bsave:true
 	}
