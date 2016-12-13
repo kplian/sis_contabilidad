@@ -28,6 +28,8 @@ class MODIntTransaccion extends MODbase{
 		$this->capturaCount('total_haber_mb','numeric');
 		$this->capturaCount('total_debe_mt','numeric');
 		$this->capturaCount('total_haber_mt','numeric');
+		$this->capturaCount('total_gasto','numeric');
+		$this->capturaCount('total_recurso','numeric');
 		
 				
 		//Definicion de la lista del resultado del query
@@ -80,12 +82,6 @@ class MODIntTransaccion extends MODbase{
 		
 		$this->captura('actualizacion','varchar');
 		$this->captura('triangulacion','varchar');
-		
-		
-		
-		
-		
-                       
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

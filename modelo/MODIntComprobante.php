@@ -445,9 +445,11 @@ class MODIntComprobante extends MODbase{
 		$this->captura('nombre_auxiliar','varchar');
 		$this->captura('cc','text');
 		$this->captura('codigo_partida','varchar');
-		$this->captura('nombre_partida','varchar');
+		$this->captura('nombre_partida','varchar'); 
 		$this->captura('desc_orden','varchar');
 		$this->captura('glosa','varchar');
+		$this->captura('importe_gasto','numeric');
+		$this->captura('importe_recurso','numeric');
 		$this->captura('importe_debe','numeric');
 		$this->captura('importe_haber','numeric');
 		$this->captura('importe_debe_mb','numeric');

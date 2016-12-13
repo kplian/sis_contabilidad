@@ -1,3 +1,4 @@
+
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_calcular_monedas_transaccion (
@@ -9,7 +10,7 @@ $body$
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_config_cambiaria_ime
  DESCRIPCION:   en funcion a los codigos de las moendas regresa el tipo de cambio correspondiente
-                la conversion se ha pasando por moneda base, si no encuentra regresa NULL
+                la conversion  ha pasando por moneda base, si no encuentra regresa NULL
  AUTOR: 		 (rac)  kplian
  FECHA:	        05-11-2015 12:39:12
  COMENTARIOS:	
@@ -48,7 +49,11 @@ v_temp_debe  			numeric;
 v_temp_haber  			numeric; 
 va_montos 				numeric[];
 v_registros				record;
-v_registros_rel			record; 
+v_registros_rel			record;
+v_valor_gasto_mt 		numeric;
+v_valor_recurso_mt 		numeric;
+v_valor_gasto_mb 		numeric;
+v_valor_recurso_mb 		numeric; 
 
  
 
@@ -115,18 +120,28 @@ BEGIN
               va_montos  = conta.f_calcular_monedas_segun_config(v_registros.id_moneda, v_id_moneda_base, v_id_moneda_tri, v_registros.tipo_cambio, v_registros.tipo_cambio_2, v_registros.importe_haber, v_registros.id_config_cambiaria, v_registros.fecha);
               v_valor_haber_mb = va_montos[1];
               v_valor_haber_mt = va_montos[2];
+              
+              --calcular los mosntos presupeustarios
+              
+              va_montos  = conta.f_calcular_monedas_segun_config(v_registros.id_moneda, v_id_moneda_base, v_id_moneda_tri, v_registros.tipo_cambio, v_registros.tipo_cambio_2, v_registros.importe_recurso, v_registros.id_config_cambiaria, v_registros.fecha);
+              v_valor_gasto_mb = va_montos[1];
+              v_valor_gasto_mt = va_montos[2];
+              
+              va_montos  = conta.f_calcular_monedas_segun_config(v_registros.id_moneda, v_id_moneda_base, v_id_moneda_tri, v_registros.tipo_cambio, v_registros.tipo_cambio_2, v_registros.importe_recurso, v_registros.id_config_cambiaria, v_registros.fecha);
+              v_valor_recurso_mb = va_montos[1];
+              v_valor_recurso_mt = va_montos[2];
              
               -- modificar valores en la transaccion
     
               update conta.tint_transaccion t set
                 importe_debe_mb = v_valor_debe_mb,
-                importe_haber_mb = v_valor_haber_mb,
+                importe_haber_mb = v_valor_haber_mb,                
                 importe_gasto_mb = v_valor_debe_mb,
-                importe_recurso_mb = v_valor_haber_mb,
+                importe_recurso_mb = v_valor_haber_mb,                
                 importe_debe_mt = v_valor_debe_mt,
-                importe_haber_mt = v_valor_haber_mt,
+                importe_haber_mt = v_valor_haber_mt,                
                 importe_gasto_mt = v_valor_debe_mt,
-                importe_recurso_mt = v_valor_haber_mt
+                importe_recurso_mt = v_valor_haber_mt                
               where id_int_transaccion = p_id_int_transaccion;
            
      
@@ -179,14 +194,20 @@ BEGIN
                    
                    v_registros.importe_debe_mt = v_valor_debe_mt;
                    v_registros.importe_haber_mt = v_valor_haber_mt;
-                  
-                  
+                   
+                   v_valor_gasto_mt =  param.f_convertir_moneda (v_registros.id_moneda, v_id_moneda_tri,   v_registros.importe_gasto, v_registros.fecha,'CUS',50, v_registros.tipo_cambio, 'no');
+                   v_valor_recurso_mt =  param.f_convertir_moneda(v_registros.id_moneda, v_id_moneda_tri,   v_registros.importe_recurso, v_registros.fecha,'CUS',50, v_registros.tipo_cambio, 'no');
+                   
+                   v_registros.importe_gasto_mt = v_valor_gasto_mt;
+                   v_registros.importe_recurso_mt = v_valor_recurso_mt;
+                   
+                   
                    --modificamos transaccion 
                    update conta.tint_transaccion t set
                     importe_debe_mt = v_valor_debe_mt,
                     importe_haber_mt = v_valor_haber_mt,
-                    importe_gasto_mt = v_valor_debe_mt,
-                    importe_recurso_mt = v_valor_haber_mt
+                    importe_gasto_mt = v_valor_gasto_mt,
+                    importe_recurso_mt = v_valor_recurso_mt
                   where id_int_transaccion = p_id_int_transaccion;
               
               END IF;
@@ -248,10 +269,6 @@ BEGIN
       
       END IF;
          
-    
-     
-    
-
 
 EXCEPTION
 				

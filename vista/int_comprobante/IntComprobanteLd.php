@@ -39,11 +39,7 @@ Phx.vista.IntComprobanteLd = {
 	   this.init();	 
 	},
     
-    volcarCbteBorrador: function(){
-    	this.volcarCbte('no');
-    
-    },
-    volcarCbte: function(sw_validar) {
+   volcarCbte: function(sw_validar) {
 			  
 			 if(confirm("Esta seguro de volcar el cbte,  este proceso no puede revertirse (Si tiene presupuesto será revertido)!")){
 			 	 if(confirm("¿Esta realmente seguro?")){
@@ -53,7 +49,7 @@ Phx.vista.IntComprobanteLd = {
 						url : '../../sis_contabilidad/control/IntComprobante/volcarCbte',
 						params : {
 							id_int_comprobante : rec.id_int_comprobante,
-							sw_validar: sw_validar=='si'?'si':'no'
+							sw_validar: (sw_validar=='si')?'si':'no'
 						},
 						success : function(resp) {
 							Phx.CP.loadingHide();
@@ -169,13 +165,13 @@ Phx.vista.IntComprobanteLd = {
                 id:'b-sint-' + this.idContenedor,
                 text: 'Clonar sin  Trámite',
                 tooltip: '<b>Clonar el cbte sin mantener el nro de trámite</b>',
-                handler:this.clonarCbteSt,
+                handler:function(){this.clonarCbteSt()},
                 scope: this
             }, {
                 id:'b-cont-' + this.idContenedor,
                 text: 'Clonar con Trámite',
                 tooltip: '<b>Clonar el cbte manteniendo el nro de trámite</b>',
-                handler:this.clonarCbte,
+                handler:function(){this.clonarCbte()},
                 scope: this
             }
         ]}
@@ -196,13 +192,13 @@ Phx.vista.IntComprobanteLd = {
                 id:'b-volb-' + this.idContenedor,
                 text: 'Volcar en borrador',
                 tooltip: '<b>Al volcar en borrador tiene la opción de revertir parcialmente</b>',
-                handler:this.volcarCbteBorrador,
+                handler:function(){this.volcarCbte('no')},
                 scope: this
             }, {
                 id:'b-vol-' + this.idContenedor,
                 text: 'Volcar Validado',
                 tooltip: '<b>Al volcar y validar se revierte el 100%</b>',
-                handler:this.volcarCbte,
+                handler:function(){this.volcarCbte('si')},
                 scope: this
             }
         ]}

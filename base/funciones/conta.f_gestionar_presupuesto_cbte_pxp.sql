@@ -50,6 +50,11 @@ DECLARE
   v_monto_rev						numeric;
   v_monto_rev_mb					numeric;
   
+  v_importe_gasto 					numeric;
+  v_importe_recurso 					numeric;
+  v_importe_gasto_mb 				numeric;
+  v_importe_recurso_mb 				numeric;
+  
     
 BEGIN
    
@@ -166,15 +171,15 @@ BEGIN
                            
                            --selecciona la moneda de trabajo
                          IF v_sw_moneda_base = 'si' THEN
-                              v_importe_debe = v_registros.importe_debe_mb;
-                              v_importe_haber =  v_registros.importe_haber_mb;
+                              v_importe_gasto = v_registros.importe_gasto_mb;
+                              v_importe_recurso =  v_registros.importe_recurso_mb;
                          ELSE
-                              v_importe_debe = v_registros.importe_debe;
-                              v_importe_haber =  v_registros.importe_haber;
+                              v_importe_gasto = v_registros.importe_gasto;
+                              v_importe_recurso =  v_registros.importe_recurso;
                          END IF; 
                   
-                         v_importe_debe_mb = v_registros.importe_debe_mb;
-                         v_importe_haber_mb =  v_registros.importe_haber_mb;
+                         v_importe_gasto_mb = v_registros.importe_gasto_mb;
+                         v_importe_recurso_mb =  v_registros.importe_recurso_mb;
             
                       
                           IF    v_momento_aux = 'todo' or   v_momento_aux='solo ejecutar'  THEN
@@ -192,12 +197,7 @@ BEGIN
                                        
                                 END IF; --IF comprometido 
                                 
-                                --- TODO revisar si esto esta bien
-                                IF v_registros_comprobante.momento_comprometido = 'si' THEN
-                                     IF v_registros.id_partida_ejecucion is  NULL THEN                                       
-                                         raise exception 'El comprobante esta marcado  para no comprometer, y no tiene un origen comprometido';
-                                      END IF; 
-                                END IF;
+                                
                                 
                                 
                                 -- solo procesamos si es una partida presupuestaria y no de flujo
@@ -205,27 +205,34 @@ BEGIN
                                        
                                          v_monto_cmp = 0;
                                          
+                                         ---  revisar si esto esta bien
+                                         IF v_registros_comprobante.momento_comprometido = 'no' THEN
+                                               IF v_registros.id_partida_ejecucion is  NULL THEN                                       
+                                                   raise exception 'El comprobante esta marcado  para no comprometer, y no tiene un origen comprometido';
+                                                END IF; 
+                                         END IF;
+                                         
                                          IF v_registros.tipo = 'gasto'  THEN
                                              -- importe debe ejecucion
-                                             IF v_importe_debe > 0 THEN
-                                                 v_monto_cmp  = v_importe_debe;
-                                                 v_monto_cmp_mb =v_importe_debe_mb;
+                                             IF v_importe_gasto > 0 THEN
+                                                 v_monto_cmp  = v_importe_gasto;
+                                                 v_monto_cmp_mb =v_importe_gasto_mb;
                                                                                            
                                              END IF;
                                              --importe haber es reversion, multiplicar por -1
-                                             IF v_importe_haber > 0 THEN
-                                                 v_monto_cmp  = v_importe_haber * (-1);
-                                                 v_monto_cmp_mb = v_importe_haber_mb*(-1);
+                                             IF v_importe_recurso > 0 THEN
+                                                 v_monto_cmp  = v_importe_recurso * (-1);
+                                                 v_monto_cmp_mb = v_importe_recurso_mb * (-1);
                                              END IF;
                                          ELSE
-                                             IF v_importe_haber > 0 THEN
-                                               v_monto_cmp  = v_importe_haber;
-                                               v_monto_cmp_mb = v_importe_haber_mb;                                           
+                                             IF v_importe_recurso > 0 THEN
+                                               v_monto_cmp  = v_importe_recurso;
+                                               v_monto_cmp_mb = v_importe_recurso_mb;                                           
                                              END IF;
                                              --importe debe es reversion, multiplicar por -1
-                                             IF v_importe_debe > 0 THEN
-                                                 v_monto_cmp  = v_importe_debe * (-1);
-                                                 v_monto_cmp_mb = v_importe_debe_mb(-1);                                              
+                                             IF v_importe_gasto > 0 THEN
+                                                 v_monto_cmp  = v_importe_gasto * (-1);
+                                                 v_monto_cmp_mb = v_importe_gasto_mb(-1);                                              
                                              END IF;
                                          END IF;
                                 

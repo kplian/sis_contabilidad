@@ -1,4 +1,4 @@
-
+<font size="8">
 <table width="100%" cellpadding="5px"  rules="cols" border="1">
 <tbody>	
 		<tr>
@@ -15,4 +15,4 @@
 		    <?php } ?>
 		</tr>
 </tbody>
-</table>
+</table></font>

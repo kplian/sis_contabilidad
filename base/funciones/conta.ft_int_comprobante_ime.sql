@@ -71,22 +71,22 @@ DECLARE
     v_id_depto 						integer;
     v_obs							varchar;
     v_acceso_directo 				varchar;
-    v_clase 				varchar;
+    v_clase 						varchar;
     v_parametros_ad 				varchar;
-    v_tipo_noti 				varchar;
-    v_titulo  			varchar;
+    v_tipo_noti 					varchar;
+    v_titulo  						varchar;
     v_id_estado_actual 				integer;
-    v_registros_proc 			record;
-    v_codigo_tipo_pro   	varchar;
-    v_id_cuenta_bancaria 		integer;
-    v_id_depto_lb 		integer;
-    v_id_depto_conta 		integer;
+    v_registros_proc 				record;
+    v_codigo_tipo_pro   			varchar;
+    v_id_cuenta_bancaria 			integer;
+    v_id_depto_lb 					integer;
+    v_id_depto_conta 				integer;
     v_id_cuenta_bancaria_mov 		integer;
-    v_operacion 	varchar;
-    v_id_funcionario		integer;
-    v_id_usuario_reg	integer;
-    v_id_estado_wf_ant	integer;
-    v_clcbt_desc	varchar;
+    v_operacion 					varchar;
+    v_id_funcionario				integer;
+    v_id_usuario_reg				integer;
+    v_id_estado_wf_ant				integer;
+    v_clcbt_desc					varchar;
     
    
    
@@ -940,10 +940,12 @@ BEGIN
                         glosa,
                         id_int_comprobante,
                         id_auxiliar,
+                        
                         importe_debe,
                         importe_haber,
                         importe_gasto,
                         importe_recurso,
+                        
                         id_usuario_reg,
                         fecha_reg,
                         id_usuario_mod,
@@ -977,10 +979,12 @@ BEGIN
                         v_registros.glosa,
                         v_id_int_comprobante,  --referencia al cbte volcado
                         v_registros.id_auxiliar,
+                        
                         v_registros.importe_haber,   --  insercion volcada de estos registros
                         v_registros.importe_debe, --  insercion volcada de estos registros
-                        v_registros.importe_haber, --  insercion volcada de estos registros
-                        v_registros.importe_debe, --  insercion volcada de estos registros
+                        v_registros.importe_recurso, --  insercion volcada de estos registros
+                        v_registros.importe_gasto, --  insercion volcada de estos registros
+                        
                         p_id_usuario,
                         now(),
                         null,
@@ -990,13 +994,16 @@ BEGIN
                         v_registros.tipo_cambio_2,
                         v_registros.id_moneda,
                         v_registros.id_moneda_tri,
+                        
                         v_registros.importe_haber_mb,--  insercion volcada de estos registros
                         v_registros.importe_debe_mb,
                         v_registros.importe_gasto_mb,--  insercion volcada de estos registros
                         v_registros.importe_recurso_mb,                        
+                        
                         v_registros.importe_haber_mt,--  insercion volcada de estos registros
                         v_registros.importe_debe_mt,                        
                         v_registros.importe_recurso_mt, --  insercion volcada de estos registros
+                        
                         v_registros.importe_gasto_mt,
                         v_registros.triangulacion ,
                         v_registros.actualizacion, 
@@ -1086,7 +1093,8 @@ BEGIN
                                                    v_parametros._nombre_usuario_ai, 
                                                    v_id_int_comprobante, 
                                                    'si');
-               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado y validado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
+               
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado y validado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
            
            	else
                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado en borrador el cbte : id '||v_parametros.id_int_comprobante::varchar); 

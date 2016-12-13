@@ -1,4 +1,4 @@
-<table width="100%" style="width: 100%; text-align: center;" cellspacing="0" cellpadding="1" border="1">	
+<font size="8"><table width="100%" style="width: 100%; text-align: center;" cellspacing="0" cellpadding="1" border="1">	
 <tbody>
 	<tr>
 		<td style="width: 23%; color: #444444;" rowspan="4">
@@ -17,4 +17,4 @@
 		<td style="width: 23%; color: #444444;"><b>Moneda</b> <?php  echo $this->cabecera[0]['desc_moneda']; ?> </td>
 	</tr>
 </tbody>
-</table>
+</table></font>

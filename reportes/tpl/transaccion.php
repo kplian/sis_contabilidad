@@ -1,6 +1,6 @@
-<font size="9"><table width="100%" cellpadding="5px"  rules="cols" border="1">
+<font size="7"><table width="100%" cellpadding="1px"  rules="cols" border="0">
 <tr>
-		    <td width="<?php  echo $with_col; ?>" ><div>
+		    <td width="<?php  echo $with_col; ?>" style="border-left: 1px solid #000;"><div><br>
 				<b>CC:</b> <?php  echo  $val['cc']; ?> 
 			<?php if  ($val['codigo_partida']!=''){ ?>	
 	   			<br/><b>Ptda.:</b> <?php  echo $val['codigo_partida'].'-'.$val['nombre_partida']; ?>
@@ -21,17 +21,18 @@
 		<?php 
 		  if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base']){
 		 ?>
-			
-			<td width="20%" align="right" ><span><?php  if ($val['importe_debe']>0) {echo  number_format($val['importe_debe'], 2, '.', ',');} ?></span></td>
-			<td width="20%" align="right" ><span><?php  if ($val['importe_haber']>0) {echo  number_format($val['importe_haber'], 2, '.', ',');} ?></span></td>
+			<td width="15%" align="right" style="border-left: 0px solid #000;"><span><?php  if ($val['importe_gasto']>0) {echo  number_format($val['importe_gasto'], 2, '.', ',');}else{echo  number_format($val['importe_recurso'], 2, '.', ',');} ?></span></td>
+			<td width="15%" align="right" style="border-left: 0px solid #000;"><span><?php  if ($val['importe_debe']>0) {echo  number_format($val['importe_debe'], 2, '.', ',');} ?></span></td>
+			<td width="15%" align="right" style="border-left: 0px solid #000;border-right: 1px solid #000;"><span><?php  if ($val['importe_haber']>0) {echo  number_format($val['importe_haber'], 2, '.', ',');} ?></span></td>
 		<?php	
-		  }
+		  } 
 		 else{  
 		?>
-		    <td width="12.5%" align="right" ><span><?php  if ($val['importe_debe']>0) {echo   number_format($val['importe_debe'], 2, '.', ','); }?></span></td>
-			<td width="12.5%" align="right" ><span><?php  if ($val['importe_haber']>0) {echo   number_format($val['importe_haber'], 2, '.', ',');} ?></span></td>
-			<td width="12.5%" align="right" ><span><?php  if ($val['importe_debe_mb']>0) {echo   number_format($val['importe_debe_mb'], 2, '.', ',');} ?></span></td>
-			<td width="12.5%" align="right" ><span><?php  if ($val['importe_haber_mb']>0) {echo   number_format($val['importe_haber_mb'], 2, '.', ',');} ?></span></td>
+		    <td width="11%" align="right" style="border-left: 0px solid #000;"><span><?php  if ($val['importe_gasto']>0) {echo  number_format($val['importe_gasto'], 2, '.', ',');}else{echo  number_format($val['importe_recurso'], 2, '.', ',');} ?></span></td>
+			<td width="11%" align="right" style="border-left: 0px solid #000;"><span><?php  if ($val['importe_debe']>0) {echo   number_format($val['importe_debe'], 2, '.', ','); }?></span></td>
+			<td width="11%" align="right" style="border-left: 0px solid #000;"><span><?php  if ($val['importe_haber']>0) {echo   number_format($val['importe_haber'], 2, '.', ',');} ?></span></td>
+			<td width="11%" align="right" style="border-left: 0px solid #000;"><span><?php  if ($val['importe_debe_mb']>0) {echo   number_format($val['importe_debe_mb'], 2, '.', ',');} ?></span></td>
+			<td width="11%" align="right" style="border-left: 0px solid #000;border-right: 1px solid #000;"><span><?php  if ($val['importe_haber_mb']>0) {echo   number_format($val['importe_haber_mb'], 2, '.', ',');} ?></span></td>
 		
 		<?php } ?>
 </tr>

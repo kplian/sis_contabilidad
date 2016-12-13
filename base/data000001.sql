@@ -1203,3 +1203,15 @@ select pxp.f_insert_tgui ('Balance de cuentas', 'Balance general', 'BALCON', 'si
 
 
 
+/**********************************I-DAT-RAC-CONTA-1-13/12/2016*****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_ejecucion_igual_pres_conta', E'si', E'si o no, define si laejecucion presupuestaria sera igual a la contabe, ejemplo el caso de algunas empresas ejecutar el 100 % de las facturas y no solo el 13 %, en ese caso definir como no');
+
+
+/**********************************F-DAT-RAC-CONTA-1-13/12/2016*****************************************/
+
+
+

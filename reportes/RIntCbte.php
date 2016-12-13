@@ -22,7 +22,7 @@ class RIntCbte extends  ReportePDF {
 	        $this->detalleCbte = $detalle->getParameter('detalleCbte');			
 			$this->ancho_hoja = $this->getPageWidth() - PDF_MARGIN_LEFT - PDF_MARGIN_RIGHT-10;
 			$this->datos_detalle = $detalle;
-		 	$this->SetMargins(15, 35, 5);
+		 	$this->SetMargins(15, 30, 5);
 		 
 		 
 	}
@@ -39,7 +39,7 @@ class RIntCbte extends  ReportePDF {
 				$this->writeHTML($content, true, false, true, false, '');
 		}
 		else{
-		       $this->SetMargins(15, 60, 5);
+		        $this->SetMargins(15, 42, 5);
 			    ob_start();
 				include(dirname(__FILE__).'/../reportes/tpl/cabecera.php');
 		        $content = ob_get_clean();
@@ -47,7 +47,7 @@ class RIntCbte extends  ReportePDF {
 			    ob_start();
 				include(dirname(__FILE__).'/../reportes/tpl/cabeceraDetalle.php');
 		        $content = ob_get_clean();
-				$this->writeHTML($content, true, false, true, false, '');
+				$this->writeHTML($content, false, false, true, false, '');
 		 }
 	}
 	
@@ -65,10 +65,10 @@ class RIntCbte extends  ReportePDF {
 		$tot_debe = 0;
 		$tot_haber = 0;
 		if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base']){
-		    $this->with_col = '60%';
+		    $this->with_col = '55%';
 	    }
 	    else{
-		   $this->with_col = '50%';
+		   $this->with_col = '45%';
 	    }
 		
 		$with_col = $this->with_col;
@@ -82,7 +82,9 @@ class RIntCbte extends  ReportePDF {
 		ob_start();
 		include(dirname(__FILE__).'/../reportes/tpl/cabeceraDetalle.php');
         $content2 = ob_get_clean();
-		$this->writeHTML($content.$content2, true, false, true, false, '');
+		$this->writeHTML($content.$content2, false, false, true, false, '');
+		
+		$this->SetFont ('helvetica', '', 5 , '', 'default', true );
 		
 		
 		foreach($this->detalleCbte as $key=>$val){
@@ -116,7 +118,7 @@ class RIntCbte extends  ReportePDF {
 		// $content = ob_get_clean();
 		//$this->writeHTML($content, true, false, true, false, '');
 		
-		$this->Ln();
+		//$this->Ln();
 	    $this->subtotales('TOTALES');	
 		
 		$this->Ln(2);
@@ -159,7 +161,7 @@ class RIntCbte extends  ReportePDF {
 		//if (($startY + 10 * 6) + $dimensions['bm'] > ($dimensions['hk'])) {
 		    
 		if ($startY +  $test > 250) {
-			$this->Ln();
+			//$this->Ln();
 			//$this->subtotales('Pasa a la siguiente página. '.$startY);
 			$this->subtotales('Pasa a la siguiente página');
 			$startY = $this->GetY();			

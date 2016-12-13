@@ -10,7 +10,9 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
-   
+    fheight : '90%',
+	fwidth : '60%',
+		
 	constructor:function(config){
 		
 		this.maestro=config.maestro;		
@@ -20,23 +22,68 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		this.grid.getBottomToolbar().disable();
 		this.init();
 		
-		this.obtenerVariableGlobal();
+		this.obtenerVariableGlobal('conta_partidas');
+		
+		 this.Cmp.importe_gasto.on('change',function(cmp,value){
+			this.Cmp.importe_haber.suspendEvents();
+			this.Cmp.importe_haber.setValue(0);			
+			this.Cmp.importe_haber.resumeEvents();
+			
+			this.Cmp.importe_recurso.suspendEvents();
+			this.Cmp.importe_recurso.setValue(0);			
+			this.Cmp.importe_recurso.resumeEvents();
+			
+			this.Cmp.importe_debe.suspendEvents();
+			this.Cmp.importe_debe.setValue(value);				
+			this.Cmp.importe_debe.resumeEvents();
+			
+			
+		},this);  
+		
+		this.Cmp.importe_recurso.on('change',
+		    function(cmp,value){
+			    this.Cmp.importe_debe.suspendEvents();
+				this.Cmp.importe_debe.setValue(0);				
+				this.Cmp.importe_debe.resumeEvents();
+				
+				this.Cmp.importe_haber.suspendEvents();
+			    this.Cmp.importe_haber.setValue(value);			
+			    this.Cmp.importe_haber.resumeEvents();
+				
+				this.Cmp.importe_gasto.suspendEvents();
+				this.Cmp.importe_gasto.setValue(0);				
+				this.Cmp.importe_gasto.resumeEvents();
+				
+				
+			
+		   },this);
+		   
 		
 		this.Cmp.importe_debe.on('change',function(cmp){
 			this.Cmp.importe_haber.suspendEvents();
-			this.Cmp.importe_haber.setValue(0);
+			this.Cmp.importe_haber.setValue(0);			
 			this.Cmp.importe_haber.resumeEvents();
+			
+			this.Cmp.importe_recurso.suspendEvents();
+			this.Cmp.importe_recurso.setValue(0);			
+			this.Cmp.importe_recurso.resumeEvents();
+			
 			
 		},this);
 		
 		this.Cmp.importe_haber.on('change',
 		    function(cmp){
 			    this.Cmp.importe_debe.suspendEvents();
-				this.Cmp.importe_debe.setValue(0);
+				this.Cmp.importe_debe.setValue(0);				
 				this.Cmp.importe_debe.resumeEvents();
-			  
+				
+				this.Cmp.importe_gasto.suspendEvents();
+				this.Cmp.importe_gasto.setValue(0);				
+				this.Cmp.importe_gasto.resumeEvents();
 		   },this);
 		   
+		   
+		
 		
 		this.addButton('btnBanco',
             {
@@ -207,6 +254,40 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
             grid:false,
             form:true
         },
+        {
+			config: {
+				name: 'importe_gasto',
+				fieldLabel: 'Gasto',
+				qtip:'Monto para ejecutar el gasto  presupuestario',
+				allowBlank: true,
+				width: '100%',
+				gwidth: 100,
+				maxLength: 100
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_gasto',type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			bottom_filter: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'importe_recurso',
+				fieldLabel: 'Recurso',
+				qtip:'Monto para ejecutar el recurso presupeustario',
+				allowBlank: true,
+				width: '100%',
+				gwidth: 100,
+				maxLength: 100
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_recurso',type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			bottom_filter: true,
+			form: true
+		},
 		{
 			config: {
 				name: 'importe_debe',
@@ -600,13 +681,13 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			alert('Error al obtener gestión: fecha inválida')
 		}
 	},
-	obtenerVariableGlobal: function(){
+	obtenerVariableGlobal: function(param){
 		//Verifica que la fecha y la moneda hayan sido elegidos
 		Phx.CP.loadingShow();
 		Ext.Ajax.request({
 				url:'../../sis_seguridad/control/Subsistema/obtenerVariableGlobal',
 				params:{
-					codigo: 'conta_partidas'  
+					codigo: param  
 				},
 				success: function(resp){
 					Phx.CP.loadingHide();
@@ -615,9 +696,21 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 					if (reg.ROOT.error) {
 						Ext.Msg.alert('Error','Error a recuperar la variable global')
 					} else {
-						if(reg.ROOT.datos.valor == 'no'){
-							this.ocultarComponente(this.Cmp.id_partida);
+						if (param == 'conta_partidas'){
+							if(reg.ROOT.datos.valor == 'no'){
+								this.ocultarComponente(this.Cmp.id_partida);
+							}
+							
+							this.obtenerVariableGlobal('conta_ejecucion_igual_pres_conta');
 						}
+						
+						if (param == 'conta_ejecucion_igual_pres_conta'){
+							if(reg.ROOT.datos.valor == 'si'){
+								this.ocultarComponente(this.Cmp.importe_gasto);
+								this.ocultarComponente(this.Cmp.importe_recurso);
+							}	
+						}
+						
 					}
 				},
 				failure: this.conexionFailure,

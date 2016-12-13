@@ -68,6 +68,13 @@ DECLARE
     v_id_tipo_estado				integer;
     v_id_estado_actual 				integer;
     v_tiene_apertura				varchar;
+    
+    v_gasto 						numeric;
+    v_recurso 						numeric;
+    v_gasto_mb 						numeric;
+    v_recurso_mb 					numeric;
+    v_gasto_mt						numeric; 
+    v_recurso_mt 					numeric;
      
 
 BEGIN
@@ -189,14 +196,26 @@ BEGIN
          sum(tra.importe_debe_mb), 
          sum(tra.importe_haber_mb),
          sum(tra.importe_debe_mt), 
-         sum(tra.importe_haber_mt)
+         sum(tra.importe_haber_mt),
+         sum(tra.importe_gasto), 
+         sum(tra.importe_recurso),
+         sum(tra.importe_gasto_mb), 
+         sum(tra.importe_recurso_mb),
+         sum(tra.importe_gasto_mt), 
+         sum(tra.importe_recurso_mt)
     into 
        v_debe, 
        v_haber,
        v_debe_mb, 
        v_haber_mb,
        v_debe_mt, 
-       v_haber_mt
+       v_haber_mt,
+       v_gasto, 
+       v_recurso,
+       v_gasto_mb, 
+       v_recurso_mb,
+       v_gasto_mt, 
+       v_recurso_mt
     from conta.tint_transaccion tra
     where tra.id_int_comprobante = p_id_int_comprobante;
     
@@ -230,6 +249,39 @@ BEGIN
             
     if  v_variacion_mt != 0  then
         v_errores = 'El comprobante no iguala en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
+    end if;
+    
+    --verifica los monstos presupuestarios
+    
+    if v_gasto < v_recurso then
+       v_variacion = v_recurso - v_gasto;
+    elsif v_gasto > v_recurso then
+       v_variacion = v_gasto - v_recurso;
+    end if;
+    
+    if v_gasto_mb < v_recurso_mb then
+       v_variacion_mb = v_recurso_mb - v_gasto_mb;
+    elsif v_gasto_mb > v_recurso_mb then
+       v_variacion_mb =  v_gasto_mb - v_recurso_mb;
+    end if;
+    
+     if v_gasto_mt < v_recurso_mt then
+       v_variacion_mt = v_recurso_mt - v_gasto_mt;
+    elsif v_gasto_mt > v_recurso_mt then
+       v_variacion_mt = v_gasto_mt -  v_recurso_mt;
+    end if;
+    
+    
+    if  v_variacion != 0  then
+         v_errores = 'El comprobante no iguala presupuestariamente: Diferencia '||v_variacion::varchar;
+    end if;
+            
+    if  v_variacion_mb != 0  then
+         v_errores = 'El comprobante no iguala presupuestariamente en moneda base: Diferencia '||v_variacion_mb::varchar;
+    end if;
+            
+    if  v_variacion_mt != 0  then
+        v_errores = 'El comprobante no iguala presupuestariamente en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
     end if;
                   
     
