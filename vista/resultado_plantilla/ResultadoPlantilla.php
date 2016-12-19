@@ -38,6 +38,7 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
             }
         );
         
+        this.iniciarEventos();
         
 		this.load({params:{start:0, limit:this.tam_pag}});
 	},
@@ -176,7 +177,9 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{
 			config: {
 				name: 'periodo_calculo',
-				qtip: 'para los calculo con balance de cuentas es necesario especificar el inicio y el fin',
+				qtip: '<b>(gestion, diario, rango)</b> <BR>'+
+					  'para los calculo con balance de cuentas es necesario especificar el inicio y el fin<br>'+
+					  '<b>(cbte)</b> <br>la plantilla se aplica a un cbte o a un grupo seleccionado desde libro diario',
 				fieldLabel: 'Periodo',
 				allowBlank: false,
                 anchor: '40%',
@@ -185,11 +188,11 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender:true,
                 mode: 'local',
-                store: ['gestion' ,'diario','rango']
+                store: ['gestion' ,'diario','rango','cbte']
             },
             type:'ComboBox',
 			filters: { pfiltro: 'resplan.periodo_calculo', type: 'string' },
-			valorInicial: 'no',
+			valorInicial: 'rango',
 			id_grupo: 1,
 			grid: true,
 			egrid: true,
@@ -254,6 +257,86 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
+		
+		{
+			config : {
+				name : 'id_tipo_relacion_comprobante',
+				fieldLabel : 'Tipo Rel.',
+				qtip : 'Tipo de relacion entre comprobantes',
+				allowBlank : false,
+				emptyText : 'Elija una opción...',
+				store : new Ext.data.JsonStore({
+					url : '../../sis_contabilidad/control/TipoRelacionComprobante/listarTipoRelacionComprobante',
+					id : 'id_tipo_relacion_comprobante',
+					root : 'datos',
+					sortInfo : {
+						field : 'id_tipo_relacion_comprobante',
+						direction : 'ASC'
+					},
+					totalProperty : 'total',
+					fields : ['id_tipo_relacion_comprobante', 'codigo', 'nombre'],
+					remoteSort : true,
+					baseParams : {
+						par_filtro : 'tiprelco.nombre#tiprelco.codigo'
+					}
+				}),
+				valueField : 'id_tipo_relacion_comprobante',
+				displayField : 'nombre',
+				gdisplayField : 'desc_tipo_relacion_comprobante',
+				hiddenName : 'id_tipo_relacion_comprobante',
+				//forceSelection: true,
+				typeAhead : false,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'remote',
+				pageSize : 15,
+				queryDelay : 1000,
+				width : 250,
+				anchor : '100%',
+				gwidth : 150,
+				minChars : 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_tipo_relacion_comprobante']);
+				}
+			},
+			type : 'ComboBox',
+			id_grupo : 1,
+			
+			filters : {
+				pfiltro : 'trc.nombre',
+				type : 'string'
+			},
+			grid : true,
+			form : true
+		},
+		
+		{
+			config : {
+				name : 'relacion_unica',
+				fieldLabel : 'Relación Unica',
+				qtip : 'Si la relación es unica valida que el cbte original solo tengo una relación del tipo seleccionado',
+				allowBlank : false,
+				gwidth : 100,
+				width : 250,
+				typeAhead : true,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'local',
+				valueField : 'oficial',
+				store : ['si', 'no']
+			},
+			type : 'ComboBox',
+			id_grupo : 2,
+			valorInicial : 'no',
+			filters : {
+				type : 'list',
+				pfiltro : 'incbte.relacion_unica',
+				options : ['si', 'no'],
+			},
+			grid : true,
+			form : true
+		},
+		
 		
 		{
 			config:{
@@ -389,7 +472,10 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
         'periodo_calculo',
         'id_clase_comprobante',
         'glosa',
-        'desc_clase_comprobante'
+        'desc_clase_comprobante',
+        'relacion_unica',
+        'id_tipo_relacion_comprobante',
+        'desc_tipo_relacion_comprobante'
 		
 	],
 	sortInfo:{
@@ -459,6 +545,48 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 		   width:'70%',
 		   cls: 'ResultadoDep'
 		 }],
+		 
+	 onButtonNew:function(){
+          
+                  
+          Phx.vista.ResultadoPlantilla.superclass.onButtonNew.call(this);           
+          this.ocultarComponente(this.Cmp.id_tipo_relacion_comprobante);
+		  this.ocultarComponente(this.Cmp.relacion_unica);
+     },	
+     
+    onButtonEdit:function(){ 
+    	var rec = this.sm.getSelected().data;
+     	Phx.vista.ResultadoPlantilla.superclass.onButtonEdit.call(this); 
+     	if(rec.periodo_calculo == 'cbte'){
+        	this.mostrarComponente(this.Cmp.id_tipo_relacion_comprobante);
+				this.mostrarComponente(this.Cmp.relacion_unica);			
+		}
+		else{
+			this.ocultarComponente(this.Cmp.id_tipo_relacion_comprobante);
+			this.ocultarComponente(this.Cmp.relacion_unica);
+		}
+    },
+	
+	iniciarEventos: function(){
+		
+		
+		
+		this.Cmp.periodo_calculo.on('select',function(combo, record, index){
+			var tmp = combo.getValue();
+			if(tmp == 'cbte'){				
+				this.mostrarComponente(this.Cmp.id_tipo_relacion_comprobante);
+				this.mostrarComponente(this.Cmp.relacion_unica);			
+			}
+			else{
+				this.ocultarComponente(this.Cmp.id_tipo_relacion_comprobante);
+				this.ocultarComponente(this.Cmp.relacion_unica);
+			}
+			
+			
+		},this);
+		
+	} ,
+		 
 	bdel:true,
 	bsave:true
 })

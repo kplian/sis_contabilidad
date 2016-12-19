@@ -7,6 +7,7 @@ CREATE OR REPLACE FUNCTION conta.f_resultado_procesar_plantilla (
   p_hasta date,
   p_id_deptos varchar,
   p_id_gestion integer,
+  p_int_comprobante integer,
   p_force_invisible boolean = false,
   p_multiple_col boolean = false
 )
@@ -14,27 +15,28 @@ RETURNS boolean AS
 $body$
 DECLARE
 
+    v_parametros  			record;
+    v_registros 			record;
+    v_nombre_funcion   		text;
+    v_resp					varchar;
+    v_nivel					integer;
+    v_suma					numeric;
+    v_mayor					numeric;
+    v_id_gestion  			integer;
+    v_id_cuentas			integer[];
+    v_monto					numeric;
+    v_monto_partida			numeric;
+    v_monto_mayor			numeric[];
+    v_reg_cuenta			record;
+    v_visible				varchar; 
+    v_nombre_variable		varchar;
+    v_destino				varchar;
+    v_id_cuenta				integer;
+    v_force_invisible		boolean;
+    v_registros_plan		record;
+    v_id_prioridad			integer;
+    v_columnas_formula		varchar[];
 
-v_parametros  			record;
-v_registros 			record;
-v_nombre_funcion   		text;
-v_resp					varchar;
-v_nivel					integer;
-v_suma					numeric;
-v_mayor					numeric;
-v_id_gestion  			integer;
-v_id_cuentas			integer[];
-v_monto					numeric;
-v_monto_mayor			numeric[];
-v_reg_cuenta			record;
-v_visible				varchar; 
-v_nombre_variable		varchar;
-v_destino				varchar;
-v_id_cuenta				integer;
-v_force_invisible		boolean;
-v_registros_plan		record;
-v_id_prioridad			integer;
-v_columnas_formula		varchar[];
 
 BEGIN
      
@@ -64,6 +66,7 @@ BEGIN
                                                                   p_hasta, 
                                                                   p_id_deptos,
                                                                   p_id_gestion,
+                                                                  p_int_comprobante,
                                                                   TRUE,
                                                                   p_multiple_col) THEN
                                                                   
@@ -95,7 +98,7 @@ BEGIN
                              where rdp.id_resultado_plantilla = p_id_resultado_plantilla  order by rdp.orden asc) LOOP 
                   
                   
-                  --   2.0)  determna visibilidad
+                  --   2.0)  determina visibilidad
                   IF v_force_invisible THEN
                      v_visible = 'no';
                   ELSE
@@ -128,10 +131,14 @@ BEGIN
                                                         v_registros.incluir_apertura, 
                                                         v_registros.incluir_aitb,
                                                         v_registros.signo_balance,
-                                                        v_registros.tipo_saldo);
+                                                        v_registros.tipo_saldo,
+                                                        NULL,
+                                                        p_int_comprobante
+                                                        );
                                                         
                                                         
-                        v_monto   = v_monto_mayor[1];                           
+                        v_monto   = v_monto_mayor[1];
+                        v_monto_partida   = v_monto_mayor[3];                        
                  		
                         --	 2.1.3)  insertamos en la tabla temporal
                         insert into temp_balancef (
@@ -162,7 +169,8 @@ BEGIN
                                 codigo_partida,
                                 id_auxiliar,
                                 destino,
-                                orden_cbte
+                                orden_cbte,
+                                monto_partida
                                 )
                             values (
                                 p_plantilla,
@@ -192,7 +200,8 @@ BEGIN
                                 v_registros.codigo_partida,
                                 v_registros.id_auxiliar,
                                 v_registros.destino,
-                                v_registros.orden_cbte);
+                                v_registros.orden_cbte,
+                                v_monto_partida);
                         
                   --    2.2) si el origen es detall
                   ELSIF  v_registros.origen = 'detalle' or (v_registros.origen = 'balance' and v_registros.destino != 'reporte') THEN
@@ -232,7 +241,8 @@ BEGIN
                                                         v_registros.incluir_aitb,
                                                         v_registros.signo_balance,
                                                         v_registros.tipo_saldo,
-                                                        v_registros.origen) ) THEN     
+                                                        v_registros.origen,
+                                                        p_int_comprobante) ) THEN     
                                 raise exception 'Error al calcular balance del detalle en el nivel %', 0;
                             END IF;
                         
@@ -246,9 +256,12 @@ BEGIN
                                                   v_registros.incluir_apertura, 
                                                   v_registros.incluir_aitb,
                                                   v_registros.signo_balance,
-                                                  v_registros.tipo_saldo);
+                                                  v_registros.tipo_saldo,
+                                                  NULL,
+                                                  p_int_comprobante);
                                                   
-                            v_monto = v_monto_mayor[1];                    
+                            v_monto = v_monto_mayor[1];
+                            v_monto_partida = v_monto_mayor[3];                 
                        
                           --	insertamos en la tabla temporal
                           insert into temp_balancef (
@@ -257,14 +270,16 @@ BEGIN
                               desc_cuenta,
                               codigo_cuenta,
                               monto,
-                              id_resultado_det_plantilla)
+                              id_resultado_det_plantilla,
+                              monto_partida)
                           values (
                               
                               v_reg_cuenta.id_cuenta,
                               v_reg_cuenta.nombre_cuenta,
                               v_reg_cuenta.nro_cuenta,
                               v_monto,
-                              v_registros.id_resultado_det_plantilla); 
+                              v_registros.id_resultado_det_plantilla,
+                              v_monto_partida); 
                         END IF;
                        
                         --  2.2.3)  modificamos los registors de la tabla temporal comunes
@@ -324,7 +339,8 @@ BEGIN
                                                         v_registros.formula,
                                                         p_plantilla,
                                                         v_registros.destino,
-                                                        NULL --p_columnas_formula 
+                                                        NULL, --p_columnas_formula 
+                                                        p_int_comprobante
                                                         );
                             
                         
@@ -333,10 +349,12 @@ BEGIN
                            
                            SELECT 
                                po_columnas_formula,
-                               po_monto
+                               po_monto,
+                               po_monto_partida
                            into 
                                v_columnas_formula,
-                               v_monto
+                               v_monto,
+                               v_monto_partida
                                
                            FROM conta.f_evaluar_resultado_detalle_formula(
                                                v_registros.formula, 
@@ -353,14 +371,16 @@ BEGIN
                               desc_cuenta,
                               codigo_cuenta,
                               monto,
-                              id_resultado_det_plantilla)
+                              id_resultado_det_plantilla,
+                              monto_partida)
                           values (
                               
                               v_reg_cuenta.id_cuenta,
                               v_reg_cuenta.nombre_cuenta,
                               v_reg_cuenta.nro_cuenta,
                               v_monto,
-                              v_registros.id_resultado_det_plantilla); 
+                              v_registros.id_resultado_det_plantilla,
+                              v_monto_partida); 
                         END IF;
                        
                         --  2.2.3)  modificamos los registors de la tabla temporal comunes
@@ -429,7 +449,9 @@ BEGIN
                             v_nombre_variable = v_registros.nombre_variable;
                           END IF;
                           -- 2.3.1)  calculamos el monto para la formula
-                           v_monto = conta.f_evaluar_resultado_formula(v_registros.formula, p_plantilla, v_registros.destino);
+                          v_monto_mayor  = conta.f_evaluar_resultado_formula(v_registros.formula, p_plantilla, v_registros.destino);
+                          v_monto = v_monto_mayor[1];
+                          v_monto_partida = v_monto_mayor[2];
                           
                           
                           
@@ -441,6 +463,7 @@ BEGIN
                             ELSE
                                v_destino = 'debe';
                                v_monto = v_monto *(-1);
+                               v_monto_partida = v_monto_partida *(-1);
                             END IF;
                             
                           else
@@ -475,7 +498,8 @@ BEGIN
                                 id_auxiliar,
                                 destino,
                                 orden_cbte,
-                                id_cuenta)
+                                id_cuenta,
+                                monto_partida)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -502,7 +526,8 @@ BEGIN
                                 v_registros.id_auxiliar,
                                 v_destino,
                                 v_registros.orden_cbte,
-                                v_id_cuenta);
+                                v_id_cuenta,
+                                v_monto_partida);
                                 
                                
                   --   2.4) si el origen es sumatoria
@@ -513,7 +538,9 @@ BEGIN
                            END IF;
                   
                           -- 2.3.1)  calculamos el monto para la formula
-                           v_monto = conta.f_evaluar_sumatoria(v_registros.formula, p_plantilla);
+                            v_monto_mayor  = conta.f_evaluar_sumatoria(v_registros.formula, p_plantilla);
+                            v_monto = v_monto_mayor[1];
+                            v_monto_partida = v_monto_mayor[2];
                           -- 2.3.2)  insertamos el registro en tabla temporal        
                           insert into temp_balancef (
                                 plantilla,
@@ -540,7 +567,8 @@ BEGIN
                                 codigo_partida,
                                 id_auxiliar,
                                 destino,
-                                orden_cbte)
+                                orden_cbte,
+                                monto_partida)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -566,7 +594,8 @@ BEGIN
                                 v_registros.codigo_partida,
                                 v_registros.id_auxiliar,
                                 v_registros.destino,
-                                v_registros.orden_cbte);  
+                                v_registros.orden_cbte,
+                                v_monto_partida);  
                                            
                    --   2.4) si el origen es titulo
 	               ELSEIF  v_registros.origen = 'titulo' THEN
@@ -596,7 +625,8 @@ BEGIN
                                 codigo_partida,
                                 id_auxiliar,
                                 destino,
-                                orden_cbte)
+                                orden_cbte,
+                                monto_partida)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -622,7 +652,8 @@ BEGIN
                                 v_registros.codigo_partida,
                                 v_registros.id_auxiliar,
                                 v_registros.destino,
-                                v_registros.orden_cbte);
+                                v_registros.orden_cbte,
+                                0.0);
                   END IF;
           END LOOP;
         

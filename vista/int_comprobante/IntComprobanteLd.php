@@ -33,6 +33,15 @@ Phx.vista.IntComprobanteLd = {
 				handler: this.checkDependencias,
 				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
 			});
+			
+		this.addButton('btnWizard', {
+					text : 'Plantilla',
+					iconCls : 'bgear',
+					disabled : true,
+					handler : this.loadWizard,
+					scope:this,
+					tooltip : '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
+			});	
 		
 		
 	   
@@ -120,6 +129,7 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
             this.getBoton('btnObs').enable();
+            this.getBoton('btnWizard').enable()  
             
 			
 			return tb;
@@ -135,7 +145,9 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('chkdep').disable();
 			this.getBoton('btnChequeoDocumentosWf').disable();
             this.getBoton('diagrama_gantt').disable();
-            this.getBoton('btnObs').disable() 
+            this.getBoton('btnObs').disable()
+            this.getBoton('btnWizard').disable()  
+           
 			
 	},
 	checkDependencias: function(){                   
@@ -203,7 +215,20 @@ Phx.vista.IntComprobanteLd = {
             }
         ]}
         });
-		this.tbar.add(this.menuClonar	);
+		this.tbar.add(this.menuClonar);
     },
+    
+    
+    loadWizard : function() {
+			
+			var rec = this.sm.getSelected();			
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardCbteDiario.php', 'Generar comprobante desde plantilla ...', {
+				width : '40%',
+				height : 300
+			}, {
+				'id_int_comprobante': rec.data.id_int_comprobante,
+				'id_depto': this.cmbDepto.getValue()
+			   }, this.idContenedor, 'WizardCbteDiario')
+		},
 };
 </script>

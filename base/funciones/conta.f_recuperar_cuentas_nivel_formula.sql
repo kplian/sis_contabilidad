@@ -9,7 +9,8 @@ CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel_formula (
   p_formula varchar,
   p_plantilla varchar,
   p_destino varchar,
-  p_columnas_formula varchar []
+  p_columnas_formula varchar [],
+  p_int_comprobante integer
 )
 RETURNS varchar [] AS
 $body$
@@ -28,6 +29,7 @@ v_id_gestion  		integer;
 v_id_cuentas		integer[];
 v_monto				numeric;
 v_columnas_formula	varchar[];
+v_monto_partida		numeric;
  
 
 BEGIN
@@ -51,17 +53,20 @@ BEGIN
                  --calculamos la formula para el nivel deseado                             
                  SELECT 
                      po_columnas_formula,
-                     po_monto
+                     po_monto,
+                     po_monto_partida
                  into 
                      v_columnas_formula,
-                     v_monto
+                     v_monto,
+                     v_monto_partida
                      
                  FROM conta.f_evaluar_resultado_detalle_formula(
                                      p_formula, 
                                      p_plantilla, 
                                      p_destino, 
                                      p_columnas_formula, 
-                                     v_registros.nro_cuenta);                               
+                                     v_registros.nro_cuenta,
+                                     p_int_comprobante);                               
                  		
                   p_columnas_formula = v_columnas_formula;
                   
@@ -72,14 +77,16 @@ BEGIN
                           desc_cuenta,
                           codigo_cuenta,
                           monto,
-                          id_resultado_det_plantilla)
+                          id_resultado_det_plantilla,
+                          monto_partida)
                       values (
                           
                           v_registros.id_cuenta,
                           v_registros.nombre_cuenta,
                           v_registros.nro_cuenta,
                           v_monto,
-                          p_id_resultado_det_plantilla);          
+                          p_id_resultado_det_plantilla,
+                          v_monto_partida);          
        
        END LOOP;
     
@@ -104,10 +111,13 @@ BEGIN
                          
                           SELECT 
                                po_columnas_formula,
-                               po_monto
+                               po_monto,
+                               po_monto_partida
+                               
                            into 
                                v_columnas_formula,
-                               v_monto
+                               v_monto,
+                               v_monto_partida
                                
                            FROM conta.f_evaluar_resultado_detalle_formula(
                                                p_formula, 
@@ -125,14 +135,16 @@ BEGIN
                               desc_cuenta,
                               codigo_cuenta,
                               monto,
-                              id_resultado_det_plantilla)
+                              id_resultado_det_plantilla,
+                              monto_partida)
                           values (
                               
                               v_registros.id_cuenta,
                               v_registros.nombre_cuenta,
                               v_registros.nro_cuenta,
                               v_monto,
-                              p_id_resultado_det_plantilla); 
+                              p_id_resultado_det_plantilla,
+                              v_monto_partida); 
                      
                      ELSE
                      
@@ -145,7 +157,8 @@ BEGIN
                                                         p_formula,
                                                         p_plantilla,
                                                         p_destino,
-                                                        p_columnas_formula
+                                                        p_columnas_formula,
+                                                        p_int_comprobante
                                                         );
                                                         
                                                          

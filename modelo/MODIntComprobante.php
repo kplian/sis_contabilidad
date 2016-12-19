@@ -356,6 +356,7 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('desde','desde','date');
 		$this->setParametro('hasta','hasta','date');
 		$this->setParametro('fecha','fecha','date');
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 		
 
 		//Ejecuta la instruccion

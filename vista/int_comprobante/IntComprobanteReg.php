@@ -25,17 +25,7 @@ Phx.vista.IntComprobanteReg = {
 		    me.bMedios = [];
             me.addButtonCustom(config.idContenedor, 'sig_estado', { text: 'Aprobar', iconCls: 'badelante', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>' });
         
-	    
 	        Phx.vista.IntComprobanteReg.superclass.constructor.call(this,config);
-	        
-	        //Botón para Validación del Comprobante
-			/*this.addButton('btnValidar', {
-					text : 'Validación',
-					iconCls : 'bchecklist',
-					disabled : true,
-					handler : this.validarCbte,
-					tooltip : '<b>Validación</b><br/>Validación del Comprobante'
-			});*/
 				
 		    this.addButton('btnWizard', {
 					text : 'Plantilla',
@@ -45,8 +35,6 @@ Phx.vista.IntComprobanteReg = {
 					tooltip : '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
 			});
 
-			
-			
 			this.addButton('btnIgualarCbte', {
 				text : 'Igualar',
 				iconCls : 'bengineadd',
@@ -335,6 +323,13 @@ Phx.vista.IntComprobanteReg = {
 					});
 				}
 			}, this);
+		},
+		loadWizard : function() {			
+			var rec = this.sm.getSelected();			
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardCbte.php', 'Generar comprobante desde plantilla ...', {
+				width : '40%',
+				height : 300
+			}, rec, this.idContenedor, 'WizardCbte')
 		}
 		
 	

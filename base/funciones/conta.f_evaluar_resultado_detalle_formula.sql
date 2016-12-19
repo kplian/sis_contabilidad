@@ -7,7 +7,8 @@ CREATE OR REPLACE FUNCTION conta.f_evaluar_resultado_detalle_formula (
   p_columnas_formula varchar [],
   p_codigo_cuenta varchar,
   out po_columnas_formula varchar [],
-  out po_monto numeric
+  out po_monto numeric,
+  out po_monto_partida numeric
 )
 RETURNS record AS
 $body$
@@ -24,6 +25,7 @@ v_mayor				numeric;
 v_id_gestion  		integer;
 v_tmp_formula		varchar;
 v_formula_evaluado	varchar;
+v_formula_evaluado_partida	varchar;
 v_columna			varchar;
 v_columna_nueva     varchar[];
 v_sw_busqueda		boolean;
@@ -32,6 +34,7 @@ v_k					integer;
 va_variables		varchar[];
 v_monto_haber		numeric;
 v_monto_debe		numeric;
+v_monto_partida			numeric;
  
 
 BEGIN
@@ -39,6 +42,7 @@ BEGIN
          v_nombre_funcion = 'conta.f_evaluar_resultado_detalle_formula';
          v_tmp_formula = p_formula;
          v_formula_evaluado = p_formula;
+         v_formula_evaluado_partida = p_formula;
          
          raise notice '----------> Evaluando la formula: %', p_formula;
          ------------------------------------------------------------------------
@@ -118,9 +122,12 @@ BEGIN
                        --raise exception '... %' , 
                       -- si la variable no contiene el caracters especial ".", buscamos en la plantilla correspondiente
                        SELECT 
-                         COALESCE(monto,0)
+                         COALESCE(monto,0),
+                         COALESCE(monto_partida,0)
+                         
                        into
-                         v_monto
+                         v_monto,
+                         v_monto_partida
                        FROM  temp_balancef
                        WHERE  codigo = va_variables[2]  
                               and lower(plantilla) = lower(va_variables[1])
@@ -133,6 +140,7 @@ BEGIN
                    --  REMPLAZA VALROES DE LAS VARIABLES
                    --------------------------------------------
                    v_formula_evaluado = replace(v_formula_evaluado, '{'||v_columna_nueva[v_i]||'}', v_monto::varchar);
+                   v_formula_evaluado_partida = replace(v_formula_evaluado_partida, '{'||v_columna_nueva[v_i]||'}', v_monto_partida::varchar);
                                       
              END LOOP;
              
@@ -144,10 +152,17 @@ BEGIN
              IF v_formula_evaluado is not NULL THEN
                 execute ('SELECT '||v_formula_evaluado) into v_monto;
              END IF;
+             
+             IF v_formula_evaluado is not NULL THEN
+                execute ('SELECT '||v_formula_evaluado_partida) into v_monto_partida;
+             END IF;
+             
+             
    
    
            --retorna resultado
            po_monto =  v_monto;
+           po_monto_partida =  v_monto_partida;
 
 
 EXCEPTION

@@ -184,8 +184,10 @@ BEGIN
             
            -- raise exception 'sss ---  %  ',va_id_int_cbte_fk; 
         	IF va_id_int_cbte_fk is not null and va_id_int_cbte_fk [1] is not null THEN
+                
                 --  dispara proceso
-                -- si tiene  un cbte relacion recuperar el nro de tramite
+                --  si tiene  un cbte relacion recuperar el nro de tramite
+                
                  select 
                     cbte.nro_tramite,
                     cbte.id_proceso_wf,
@@ -199,9 +201,9 @@ BEGIN
                  -- dispara el comprobante
                  ----------------------------------
                    SELECT
-                                 ps_id_proceso_wf,ps_id_estado_wf, ps_codigo_estado, ps_nro_tramite
+                             ps_id_proceso_wf,ps_id_estado_wf, ps_codigo_estado, ps_nro_tramite
                        into
-                                 v_id_proceso_wf,v_id_estado_wf,v_codigo_estado, v_num_tramite
+                             v_id_proceso_wf,v_id_estado_wf,v_codigo_estado, v_num_tramite
                    FROM wf.f_registra_proceso_disparado_wf(
                                 p_id_usuario,
                                 v_parametros._id_usuario_ai,
@@ -213,8 +215,6 @@ BEGIN
                                 'CBTE', --dispara proceso del comprobante
                                 '');
                 
-                
-             
             ELSE
                     --  inicia tramite nuevo 
                     v_codigo_proceso_macro = pxp.f_get_variable_global('conta_codigo_macro_wf_cbte');

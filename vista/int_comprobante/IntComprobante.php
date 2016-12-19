@@ -21,8 +21,6 @@ header("content-type: text/javascript; charset=UTF-8");
 			Phx.vista.IntComprobante.superclass.constructor.call(this, config);			
 			this.bbar.add(this.cmbTipoCbte);
 			
-			//this.load({params:{start:0, limit:this.tam_pag}});
-
 			//Botón para Imprimir el Comprobante
 			this.addButton('btnImprimir', {
 				text : 'Imprimir',
@@ -118,14 +116,6 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.iniciarEventos();
 		},
 
-		loadWizard : function() {
-			var rec = this.sm.getSelected();
-			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardCbte.php', 'Generar comprobante desde plantilla ...', {
-				width : '40%',
-				height : 300
-			}, rec, this.idContenedor, 'WizardCbte')
-		},
-
 		capturaFiltros : function(combo, record, index) {
 			this.desbloquearOrdenamientoGrid();
 			this.store.baseParams.id_deptos = this.cmbDepto.getValue();
@@ -167,9 +157,9 @@ header("content-type: text/javascript; charset=UTF-8");
 											    this.Cmp.id_int_comprobante_fks.modificado = true;
 											}, this);
 											
-			this.Cmp.fecha.on('select', function(){this.getConfigCambiaria('si')}, this);
-			this.Cmp.forma_cambio.on('select', function(){this.getConfigCambiaria('si')}, this);
-
+											
+			this.Cmp.fecha.on('select', function(){ this.getConfigCambiaria('si') }, this);
+			this.Cmp.forma_cambio.on('select', function(){ this.getConfigCambiaria('si') }, this);
 			this.Cmp.id_clase_comprobante.on('select', this.habilitaMomentos, this);
 
 			this.Cmp.id_tipo_relacion_comprobante.on('valid', function() {
@@ -190,20 +180,12 @@ header("content-type: text/javascript; charset=UTF-8");
 				if(id_m && id_g){
 					this.Cmp.id_int_comprobante_fks.store.baseParams.id_moneda  = id_m;
 					this.Cmp.id_int_comprobante_fks.store.baseParams.id_gestion = id_g;
-					this.Cmp.id_int_comprobante_fks.store.modificado = true;
-				
+					this.Cmp.id_int_comprobante_fks.store.modificado = true;				
 				} 
 				else{
 					queryEvent.cancel = true;
-				}
-			
-				
-				
+				}			
 			},this);
-			
-			
-			
-
 		},
 
 		Atributos : [{
@@ -470,7 +452,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 1,
 			grid : true,
 			form : true
-		}, {
+		}, 
+		{
 			config : {
 				name : 'id_tipo_relacion_comprobante',
 				fieldLabel : 'Tipo Rel.',
@@ -1184,7 +1167,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		arrayDefaultColumHidden : ['id_funcionario_firma1', 'id_funcionario_firma2', 'id_funcionario_firma3', 'id_subsistema', 'id_tipo_relacion_comprobante', 'momento_comprometido', 'momento_ejecutado', 'momento_pagado', 'fecha_mod', 'usr_reg', 'usr_mod', 'id_depto', 'estado', 'glosa1', 'id_clase_comprobante', 'momento', 'glosa2', 'desc_subsistema', 'desc_clase_comprobante', 'estado_reg', 'fecha_reg'],
 
 		sortInfo : {
-			field : 'fecha',
+			field : 'id_int_comprobante',
 			direction : 'desc'
 		},
 		bdel : true,

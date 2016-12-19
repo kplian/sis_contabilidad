@@ -121,7 +121,8 @@ BEGIN
                                     destino  varchar,
                                     orden_cbte numeric,
                                     nombre_columna varchar,
-                                    prioridad numeric
+                                    prioridad numeric,
+                                    monto_partida numeric
                                     ) ON COMMIT DROP;
              
          
@@ -143,6 +144,7 @@ BEGIN
                                                             v_parametros.hasta, 
                                                             v_parametros.id_deptos,
                                                             v_id_gestion,
+                                                            NULL, --id_int_comprobante
                                                             TRUE,
                                                             v_multiple_col) THEN
                                                             
@@ -158,6 +160,7 @@ BEGIN
                                                       v_parametros.hasta, 
                                                       v_parametros.id_deptos,
                                                       v_id_gestion,
+                                                      NULL, --id_int_comprobante
                                                       false,
                                                       v_multiple_col) THEN
              raise exception 'Error al procesar la plantilla principal';                                                  

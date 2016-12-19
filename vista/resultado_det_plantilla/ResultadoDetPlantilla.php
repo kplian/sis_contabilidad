@@ -865,8 +865,8 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    },
    
    onSubmit : function(o) {
-		this.Cmp.formula.setValue(encodeURIComponent(this.Cmp.formula.getValue()));
-		this.Cmp.signo.setValue(encodeURIComponent(this.Cmp.signo.getValue()));
+		//this.Cmp.formula.setValue(encodeURIComponent(this.Cmp.formula.getValue()));
+		//this.Cmp.signo.setValue(encodeURIComponent(this.Cmp.signo.getValue()));
 		console.log(this.Cmp.signo.getValue(), this.Cmp.formula.getValue())
 		Phx.vista.ResultadoDetPlantilla.superclass.onSubmit.call(this,o);
 	},

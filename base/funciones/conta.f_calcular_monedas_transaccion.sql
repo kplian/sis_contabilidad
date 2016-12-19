@@ -1,4 +1,3 @@
-
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.f_calcular_monedas_transaccion (
@@ -136,12 +135,12 @@ BEGIN
               update conta.tint_transaccion t set
                 importe_debe_mb = v_valor_debe_mb,
                 importe_haber_mb = v_valor_haber_mb,                
-                importe_gasto_mb = v_valor_debe_mb,
-                importe_recurso_mb = v_valor_haber_mb,                
+                importe_gasto_mb = v_valor_gasto_mb,
+                importe_recurso_mb = v_valor_recurso_mb,                
                 importe_debe_mt = v_valor_debe_mt,
                 importe_haber_mt = v_valor_haber_mt,                
-                importe_gasto_mt = v_valor_debe_mt,
-                importe_recurso_mt = v_valor_haber_mt                
+                importe_gasto_mt = v_valor_gasto_mt,
+                importe_recurso_mt = v_valor_recurso_mt                
               where id_int_transaccion = p_id_int_transaccion;
            
      
@@ -221,14 +220,19 @@ BEGIN
            
                v_valor_debe_mb =   param.f_convertir_moneda (v_id_moneda_tri, v_id_moneda_base,    v_registros.importe_debe_mt,  v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_2, 'no');
                v_valor_haber_mb =  param.f_convertir_moneda (v_id_moneda_tri, v_id_moneda_base,    v_registros.importe_haber_mt, v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_2, 'no');
-                
+               
+               v_valor_gasto_mb =   param.f_convertir_moneda (v_id_moneda_tri, v_id_moneda_base,    v_registros.importe_gasto_mt,  v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_2, 'no');
+               v_valor_recurso_mb =  param.f_convertir_moneda (v_id_moneda_tri, v_id_moneda_base,    v_registros.importe_recurso_mt, v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_2, 'no');
+                 
+               
+               
               -- modificar valores en la transaccion
     
               update conta.tint_transaccion t set
                 importe_debe_mb = v_valor_debe_mb,
                 importe_haber_mb = v_valor_haber_mb,
-                importe_gasto_mb = v_valor_debe_mb,
-                importe_recurso_mb = v_valor_haber_mb
+                importe_gasto_mb = v_valor_gasto_mb,
+                importe_recurso_mb = v_valor_recurso_mb
               where id_int_transaccion = p_id_int_transaccion;
               
               

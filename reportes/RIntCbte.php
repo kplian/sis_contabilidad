@@ -119,6 +119,7 @@ class RIntCbte extends  ReportePDF {
 		//$this->writeHTML($content, true, false, true, false, '');
 		
 		//$this->Ln();
+		$this->revisarfinPagina($content);
 	    $this->subtotales('TOTALES');	
 		
 		$this->Ln(2);
@@ -160,7 +161,12 @@ class RIntCbte extends  ReportePDF {
 		
 		//if (($startY + 10 * 6) + $dimensions['bm'] > ($dimensions['hk'])) {
 		    
-		if ($startY +  $test > 250) {
+		//if ($startY +  $test > 250) {
+		$auxiliar = 250;
+		//if($this->page==1){
+		//	$auxiliar = 250;	
+		//}
+		if ($startY +  $test > $auxiliar) {
 			//$this->Ln();
 			//$this->subtotales('Pasa a la siguiente página. '.$startY);
 			$this->subtotales('Pasa a la siguiente página');

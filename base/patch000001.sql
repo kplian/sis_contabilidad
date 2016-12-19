@@ -3435,3 +3435,26 @@ IS 'Con que tiemo de comprobantes de mueven estan cuentas, diario, ingreso, movi
 
 /***********************************F-SCP-RAC-CONTA-0-07/12/2016****************************************/
 
+
+
+/*********************************** I-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN id_tipo_relacion_comprobante INTEGER;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.id_tipo_relacion_comprobante
+IS 'se utiliza cuando el periodode calculo es igual a cbte, determina el tipo de relacion con el comprobante original';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN relacion_unica VARCHAR(6) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.relacion_unica
+IS 'si o no, solo se utiliza cuando el preiodo de calculo es giual a cbte, sirve apra validar que el comprobante origen solo tenga una relacion de este tipo y no mas';
+
+/*********************************** F-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+
