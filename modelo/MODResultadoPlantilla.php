@@ -180,6 +180,9 @@ class MODResultadoPlantilla extends MODbase{
 	        $this->captura('id_clase_comprobante','integer');
 	        $this->captura('glosa','varchar');
 			$this->captura('codigo_clase_comprobante','varchar');
+			$this->captura('id_tipo_relacion_comprobante','int4');
+		    $this->captura('relacion_unica','varchar');
+		    $this->captura('codigo_tipo_relacion_comprobante','varchar');
 		
 		$this->armarConsulta();	
 		
@@ -243,9 +246,7 @@ class MODResultadoPlantilla extends MODbase{
 			$this->captura('desc_partida','varchar');
 			$this->captura('codigo_resultado_plantilla','varchar');
 			
-			$this->captura('id_tipo_relacion_comprobante','int4');
-			$this->captura('relacion_unica','varchar');
-			$this->captura('desc_tipo_relacion_comprobante','varchar');
+			
 			
 			
 		

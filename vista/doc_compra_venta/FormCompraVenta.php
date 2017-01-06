@@ -955,7 +955,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                    totalProperty:'total',
 	                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
 	                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
-	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice','tipo_excento','valor_excento','sw_qr','sw_nit','plantilla_qr'],
+	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ic','tipo_excento','valor_excento','sw_qr','sw_nit','plantilla_qr'],
 	                    remoteSort: true,
 	                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
 	                }),
@@ -1541,6 +1541,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                this.ocultarComponente(this.Cmp.codigo_control);
 	            }
 	            
+	           
+	            
 	         
 	            if(rec.data.sw_nro_dui == 'si'){
 	               this.Cmp.nro_dui.allowBlank =false;
@@ -1834,9 +1836,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
      	if( datos.porc_iva_df !== '0'){
      		this.mostrarComponente(this.Cmp.importe_iva);
      	}
-     	if( datos.porc_ice !== '0'){
-     		this.mostrarComponente(this.Cmp.importe_ice);
-     	}
+     	
      	if( datos.descuento_porc !== '0'){
      		this.mostrarComponente(this.Cmp.importe_descuento_ley);
      	}

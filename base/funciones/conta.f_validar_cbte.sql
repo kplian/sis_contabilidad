@@ -23,8 +23,14 @@ $body$
     
      -------------------- Ediciones
     AUTOR: RAC KPLIAN
-    FECHA: 20/11/"016
+    FECHA: 20/11/2016
     DESCRIPCION   Se invirte la migraicon de cbte PXP -> ENDESIS
+    
+    
+   -------------------- Ediciones
+    AUTOR: RAC KPLIAN
+    FECHA: 22/12/2016
+    DESCRIPCION   validacion de numeracion en cbtes
     
     
     
@@ -110,13 +116,33 @@ BEGIN
         c.nro_tramite,
         c.id_estado_wf,
         c.estado_reg,
-        c.id_depto
+        c.id_depto,
+        c.id_clase_comprobante,
+        c.fecha,
+        c.id_periodo,
+        cc.id_documento   --documento con que se genera la numeracion
         
 	  into 
         v_rec_cbte
     from conta.tint_comprobante c
+    inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = c.id_clase_comprobante
     inner join param.tperiodo p on p.id_periodo = c.id_periodo
     where id_int_comprobante = p_id_int_comprobante;
+    
+    
+     --Obtiene el documento para la numeración
+    select 
+       doc.codigo,
+       ccbte.codigo,
+       ccbte.tiene_apertura
+    into 
+      v_doc,
+      v_codigo_clase_cbte,
+      v_tiene_apertura
+    from conta.tclase_comprobante ccbte
+    inner join param.tdocumento doc
+    on doc.id_documento = ccbte.id_documento
+    where ccbte.id_clase_comprobante = v_rec_cbte.id_clase_comprobante;
    
     
     --  si  es un comprobante que se migrara a la central, abrimos conexion  (
@@ -325,21 +351,7 @@ BEGIN
     --6. Numeración del comprobante
     if v_errores = '' then
     	
-            --Obtiene el documento para la numeración
-            select 
-               doc.codigo,
-               ccbte.codigo,
-               ccbte.tiene_apertura
-            into 
-              v_doc,
-              v_codigo_clase_cbte,
-              v_tiene_apertura
-            from conta.tclase_comprobante ccbte
-            inner join param.tdocumento doc
-            on doc.id_documento = ccbte.id_documento
-            where ccbte.id_clase_comprobante = v_rec_cbte.id_clase_comprobante;
-            
-            
+           
             
             --Se obtiene el periodo
             select po_id_periodo 
@@ -382,21 +394,52 @@ BEGIN
            END IF;
             
             
-           -----------------------------------------
+           ---------------------------------------------------
            --  OBTENCION DE LA NUMERACION DEL CBTE
-           -------------------------------------------- 
+           --    considera que cada clase de comprobante puede 
+           --    terner diferentes o los mismo documentos
+           --    encargados de generar la numeracion
+           ----------------------------------------------------- 
             
            --  Obtención del número de comprobante, si no tiene un numero asignado
            IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte  = '' THEN
+           
+           
+                --  validamos que la numeracion sea coherente con la fecha y correlativo
+                 IF  v_rec_cbte.cbte_apertura = 'no' then
+                      IF exists (select
+                                        1
+                                  from conta.tint_comprobante c
+                                  inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = c.id_clase_comprobante
+                                  where c.id_depto = v_rec_cbte.id_depto
+                                        --and c.id_clase_comprobante = v_rec_cbte.id_clase_comprobante
+                                        and  cc.id_documento = v_rec_cbte.id_documento
+                                        and c.id_periodo = v_rec_cbte.id_periodo
+                                        and c.fecha > v_rec_cbte.fecha
+                                        and (c.nro_cbte is not null or v_rec_cbte.nro_cbte  != '') ) THEN
+                        
+                                raise exception 'Existen comprobantes validados con fecha superior al % para este periodo, cambie la fecha', v_rec_cbte.fecha;
+                       END IF;
+                 else
+                   -- si un comprobante de apertura  
+                   if   to_char(v_rec_cbte.fecha::date, 'MM')::varchar != '01'  then
+                        raise exception 'los cbte de apertura debe ser de enero';
+                   end if;
+                   
+                    if   to_char(v_rec_cbte.fecha::date, 'DD')::integer  > 5  then
+                        raise exception 'los cbte de apertura deben estar en los primeros 5 dias del año ';
+                   end if;  
+                   
+                   -- 
+                 end if;
                
-               
+             
                 -- Si no es un cbte de apertura (pero su clase de cbte admite cbte de apertura) 
-                -- y estamos en enero fuerza el saltar inicio
+                -- y estamos en enero fuerza el saltar inicio (dejar el primer numero para el cbte de apertura)
                 
                 IF  v_tiene_apertura = 'si' and v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
                      
                 
-                       
                        v_nro_cbte =  param.f_obtener_correlativo(
                                  v_doc, 
                                  v_id_periodo,-- par_id, 
@@ -426,7 +469,7 @@ BEGIN
                                  NULL);
                 
                 
-                ELSE
+                 ELSEIF v_rec_cbte.cbte_apertura = 'si' THEN
                    --si es un comprobante de inicio fuerza a optener el primer numero
                     v_nro_cbte =  param.f_obtener_correlativo(
                                v_doc, 
@@ -445,7 +488,8 @@ BEGIN
                                'no',  --par_saltar_inicio
                                'si'); --par_forzar_inicio
                    
-                
+                ELSE
+                  raise exception 'tipo de cbte no previsto';
                 END IF;
                 
            ELSE
@@ -535,7 +579,7 @@ BEGIN
           
          
            
-         ----------------------------------------------------------------------------------- 
+         ---------------------------------------------------------------------------------------- 
          -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
          ----------------------------------------------------------------------------------------
            

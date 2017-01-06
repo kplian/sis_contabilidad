@@ -1,4 +1,4 @@
---------------- SQL ---------------
+ --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
@@ -154,6 +154,9 @@ BEGIN
 
 
       --si tiene habilitado el ic copiamos el monto excento
+      -- OJO considerar que todos los calculos con el monto excento ya estaran 
+      -- considerando el ice, par ano hacer mayores cambios
+      
       v_importe_ice = NULL;
       IF v_registros.sw_ic = 'si' then
         v_importe_ice = v_parametros.importe_excento;

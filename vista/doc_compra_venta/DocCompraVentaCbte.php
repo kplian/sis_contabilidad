@@ -32,11 +32,11 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
         
         this.addButton('btnNewDoc',
             {
-                text: 'Nuevo Cbte',
+                text: 'Relacionar Doc.',
                 iconCls: 'blist',
                 disabled: false,
                 handler: this.newDoc,
-                tooltip: 'Permite registrar documentos directamente asociados al Cbte'
+                tooltip: 'Permite relacionar un documento existente al Cbte'
             }
         );
         
@@ -736,34 +736,39 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
    
    
 	
-   showDoc:  function() {
-        this.abrirFormulario('edit', this.sm.getSelected());
-   },
-   
-   newDoc: function() {
-        this.abrirFormulario('new',undefined, this.maestro) 
-   },
-   
+  
    agregarArgsExtraSubmit: function() {
        
        this.argumentExtraSubmit = { id_int_comprobante: this.id_int_comprobante };
    
    },
    
-   onButtonNew:function(){         
-            Phx.vista.DocCompraVentaCbte.superclass.onButtonNew.call(this);
+   onButtonNew:function(){ 
+   	
+   	   this.abrirFormulario('new',undefined, this.maestro)         
+        
             
            
-            
-            
-            this.Cmp.id_doc_compra_venta.store.baseParams = Ext.apply(this.Cmp.id_doc_compra_venta.store.baseParams,
-            	  {
+    },
+    
+   showDoc:  function() {
+        this.abrirFormulario('edit', this.sm.getSelected());
+   },
+   
+   newDoc: function() {
+   	  
+   	  Phx.vista.DocCompraVentaCbte.superclass.onButtonNew.call(this);
+   	  this.Cmp.id_doc_compra_venta.store.baseParams = Ext.apply(this.Cmp.id_doc_compra_venta.store.baseParams,
+      {
             	  fecha_cbte: this.fecha, 
             	  sin_cbte: 'si',
             	  manual: 'si'}); 
             	  
-            this.Cmp.id_doc_compra_venta.modificado = true;
-    },
+      this.Cmp.id_doc_compra_venta.modificado = true;
+       
+   },
+   
+   
     preparaMenu:function(tb){
         
         Phx.vista.DocCompraVentaCbte.superclass.preparaMenu.call(this,tb)

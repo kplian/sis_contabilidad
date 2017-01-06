@@ -81,6 +81,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    		sum_debe = '';
 		   			    		sum_haber = haber - debe;
 		   			    	}
+		   			    	Ext.util.Format.number(value,'0,000.00')
 		   			    	
 		   			    	var html = String.format("<table style='width:70%; border-collapse:collapse;'> \
 		   			    							  <tr>\
@@ -94,7 +95,10 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 													  <tr>\
 													    <td style='padding: 15px; border-right: solid #000000;'>{2}</td>\
 													    <td style='padding: 15px;' >{3}</td>\
-													  </tr><table>" ,debe, haber, sum_debe, sum_haber);
+													  </tr><table>" ,Ext.util.Format.number(debe,'0,000.00'), 
+													  				 Ext.util.Format.number(haber,'0,000.00'), 
+													  				 Ext.util.Format.number(sum_debe,'0,000.00'),
+													  				 Ext.util.Format.number(sum_haber,'0,000.00'));
 		   			    	
 		   			    	//var html = String.format('<p>DEBE: {0} <br> HABER: {1} </br> SALDO: {2}</p>' ,debe, haber, debe - haber);
 		   			    	
@@ -204,8 +208,17 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 					fieldLabel: 'Debe',
 					allowBlank: true,
 					width: '100%',
-					gwidth: 100,
-					maxLength: 100
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 				},
 				type: 'NumberField',
 				filters: {pfiltro: 'transa.importe_debe_mb',type: 'numeric'},
@@ -219,8 +232,17 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 					fieldLabel: 'Haber',
 					allowBlank: true,
 					width: '100%',
-					gwidth: 100,
-					maxLength: 100
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 				},
 				type: 'NumberField',
 				filters: {pfiltro: 'transa.importe_haber_mb',type: 'numeric'},

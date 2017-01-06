@@ -569,7 +569,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 	   	{
    			config:{
    				sysorigen:'sis_contabilidad',
-   				qtip: 'Auxiliar para cbtes, prevalece sobre la relacion contable',
+   				qtip: 'Auxiliar para cbtes, prevalece sobre la relacion contable (No se usa en reporte)',
        		    name:'id_auxiliar',
    				origen:'AUXILIAR',
    				allowBlank:true,
@@ -595,7 +595,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    			config:{
    				name: 'codigo_partida',
        		    hiddenName: 'codigo_partida',
-       		    qtip:'Partidas para comprobantes,  prevalece sobre la relación contable',
+       		    qtip:'Partidas para comprobantes,  prevalece sobre la relación contable  (No se usa en reporte)',
    				valueField: 'codigo',
    				displayField: 'nombre_partida',
    				allowBlank: true,

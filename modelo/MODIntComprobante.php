@@ -456,6 +456,11 @@ class MODIntComprobante extends MODbase{
 		$this->captura('importe_debe_mb','numeric');
 		$this->captura('importe_haber_mb','numeric');
 		
+		$this->captura('sw_movimiento','varchar');
+		$this->captura('tipo_partida','varchar');
+		
+		
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

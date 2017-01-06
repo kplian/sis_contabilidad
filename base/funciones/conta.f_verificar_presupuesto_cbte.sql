@@ -30,7 +30,7 @@ DECLARE
     v_registros_comprobante 	record;
     v_reg  						record;
     v_registros 				record;
-    
+    v_reg_par_eje				record;
     v_i 					integer;
     v_cont 					integer;
     --array para gestionar presupuesto
@@ -106,10 +106,13 @@ BEGIN
     
     select    
       ic.*,
-      cl.codigo as codigo_clase_cbte
+      cl.codigo as codigo_clase_cbte,
+      per.id_gestion
     into v_registros_comprobante
     from conta.tint_comprobante ic
     inner join conta.tclase_comprobante cl  on ic.id_clase_comprobante =  cl.id_clase_comprobante
+    inner join param.tperiodo per on per.id_periodo = ic.id_periodo
+
     where ic.id_int_comprobante  =  p_id_int_comprobante;
     
     
@@ -169,9 +172,9 @@ BEGIN
                 v_momento_aux='solo pagar';  
                 
             ELSIF v_registros_comprobante.momento_comprometido = 'si'  and  v_registros_comprobante.momento_ejecutado = 'no'  and    v_registros_comprobante.momento_pagado = 'no' then
-              raise exception 'Solo comprometer no esta implmentado';
+                raise exception 'Solo comprometer no esta implementado';
             ELSE 
-                raise exception 'Combinacion de momentos no contemplada';  
+                raise exception 'Combinación de momentos no contemplada';  
             END IF;
           
             v_aux = '';
@@ -238,7 +241,27 @@ BEGIN
                           
                             -- si solo ejecutamos el presupuesto 
                             --  o (compromentemos y ejecutamos) 
-                            --  o (compromentemos, ejecutamos y pagamos)     
+                            --  o (compromentemos, ejecutamos y pagamos) 
+                            
+                            -- si tiene partida ejecucionde comprometido y nose correponde con la gestion
+                            --  lo ponemos en null para que comprometa    
+                            
+                             IF v_registros.id_partida_ejecucion is not NULL THEN                                       
+                                   
+                                   select
+                                       par.id_gestion
+                                   into
+                                      v_reg_par_eje
+                                   from pre.tpartida_ejecucion pe
+                                   inner join pre.tpartida par on par.id_partida = pe.id_partida
+                                   where pe.id_partida_ejecucion = v_registros.id_partida_ejecucion;
+                                   
+                                    if v_reg_par_eje.id_gestion != v_registros_comprobante.id_gestion  then
+                                        v_registros.id_partida_ejecucion = NULL;
+                                    end if;
+                                   
+                                   
+                                END IF;
                                 
                                 -- si  el comprobante tiene que comprometer
                                 IF v_registros_comprobante.momento_comprometido = 'si'  then

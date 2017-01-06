@@ -439,16 +439,13 @@ BEGIN
               v_tipo_comprobante
             from conta.tclase_comprobante cc 
             where cc.id_clase_comprobante = v_parametros.id_clase_comprobante;
-            
+            /*
             --revisa momentos presupeustario
             v_momento_comprometido = v_reg_cbte.momento_comprometido;
             v_momento_ejecutado = v_reg_cbte.momento_ejecutado;
-            v_momento_pagado =  v_reg_cbte.momento_pagado;
+            v_momento_pagado =  v_reg_cbte.momento_pagado;*/
             
-            IF  v_reg_cbte.manual = 'si' THEN
-              
-              
-              --momentos presupeustarios
+            --momentos presupeustarios
               
               IF v_parametros.momento_comprometido = 'true' THEN
                  v_momento_comprometido = 'si';
@@ -469,7 +466,20 @@ BEGIN
                  v_momento_pagado = 'no';
               END IF;
             
-            ELSE
+            --RAC 29/12/2016 ...  dejamos modificar momentos si el cbte es editable
+            IF  v_reg_cbte.manual != 'si'   THEN
+              
+              
+                 IF v_reg_cbte.sw_editable != 'si' THEN
+                   -- RAC 29/12/2016
+                   -- si es un cbte editable solo puede modificar el momento comprometido
+                   -- para los casos devengados de fin de gestion
+                   -- dond esea necesario comprometer en el presupeusto de la sigueinte gestion
+                   
+                 		IF v_momento_comprometido != v_reg_cbte.momento_comprometido THEN
+                  			 raise exception 'No puede cambiar el momento comprometido en cbtes automaticos';
+               			END IF;
+                 END IF;
             
                IF v_momento_ejecutado != v_reg_cbte.momento_ejecutado  or  v_momento_pagado != v_reg_cbte.momento_pagado THEN
                    raise exception 'No puede cambiar los momentos en cbte automaticos';
@@ -481,8 +491,7 @@ BEGIN
                 
             END IF;
             
-            
-             --  el tipo de cambio puede variar solo si sw_tipo_cambio = 'no' ... 
+            --  el tipo de cambio puede variar solo si sw_tipo_cambio = 'no' ... 
             IF  v_reg_cbte.sw_tipo_cambio = 'si' THEN
             
               v_tc_1 = v_reg_cbte.tipo_cambio;

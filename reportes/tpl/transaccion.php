@@ -2,9 +2,15 @@
 <tr>
 		    <td width="<?php  echo $with_col; ?>" style="border-left: 1px solid #000;"><div><br>
 				<b>CC:</b> <?php  echo  $val['cc']; ?> 
-			<?php if  ($val['codigo_partida']!=''){ ?>	
-	   			<br/><b>Ptda.:</b> <?php  echo $val['codigo_partida'].'-'.$val['nombre_partida']; ?>
-	   		<?php } ?>		
+			<?php if  ($val['codigo_partida']!=''){ 
+				
+				   if ($val['sw_movimiento']=='presupuestaria'){  ?>	
+	   			      <br/><font color="green"><b>Ptda.:</b> <?php  echo $val['codigo_partida'].'-'.$val['nombre_partida']; ?></font>
+	   		<?php }
+				   else {?>
+				   	  <br/><font color="red"><b>Ptda.:</b> <?php  echo $val['codigo_partida'].'-'.$val['nombre_partida']; ?></font>				
+				      <?php  }
+			 } ?>		
 	   			<br/><b>Cta.:</b> <?php  echo $val['nro_cuenta'].' - '.$val['nombre_cuenta']; ?>
 	   		<?php if  ($val['codigo_auxiliar']!=''){ ?>	
 	   			<br/><b>Aux.:</b> <?php  echo $val['codigo_auxiliar'].' - '.$val['nombre_auxiliar']; ?>

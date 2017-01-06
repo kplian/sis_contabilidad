@@ -128,8 +128,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				fieldLabel:'Cuenta',
    				gdisplayField:'desc_cuenta',//mapea al store del grid
    				gwidth:600,
-   				width: 350,
-   				listWidth: 350,
+   				width: 380,
+   				listWidth: 380,
    				
 	   			renderer:function (value, p, record){
 	   			    var color = 'green';
@@ -179,8 +179,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				fieldLabel:'Auxiliar',
    				gdisplayField:'desc_auxiliar',//mapea al store del grid
    				gwidth:200,
-   				width: 350,
-   				listWidth: 350,
+   				width: 380,
+   				listWidth: 380,
    				//anchor: '80%',
 	   			renderer:function (value, p, record){return String.format('{0}', record.data['desc_auxiliar']);}
        	     },
@@ -203,8 +203,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				fieldLabel:'Partida',
    				gdisplayField:'desc_partida',//mapea al store del grid
    				gwidth:200,
-   				width: 350,
-   				listWidth: 350
+   				width: 380,
+   				listWidth: 380
        	     },
    			type:'ComboRec',
    			id_grupo:0,
@@ -225,8 +225,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                 tinit:false,
                 origen:'CENTROCOSTO',
                 gdisplayField: 'desc_centro_costo',
-                width: 350,
-   				listWidth: 350,
+                width: 380,
+   				listWidth: 380,
                 gwidth: 300
             },
             type:'ComboRec',
@@ -244,8 +244,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	       		    origen:'OT',
                     allowBlank:true,
                     gwidth:200,
-                    width: 350,
-   				    listWidth: 350
+                    width: 380,
+   				    listWidth: 380
             
             },
             type:'ComboRec',
@@ -262,7 +262,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_gasto',type: 'numeric'},
@@ -279,7 +288,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_recurso',type: 'numeric'},
@@ -295,7 +313,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_debe',type: 'numeric'},
@@ -311,7 +338,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_haber',type: 'numeric'},
@@ -327,7 +363,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_debe_mb',type: 'numeric'},
@@ -342,7 +387,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_haber_mb',type: 'numeric'},
@@ -358,7 +412,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_debe_mt', type: 'numeric'},
@@ -373,7 +436,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
-				maxLength: 100
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
 			type: 'NumberField',
 			filters: {pfiltro: 'transa.importe_haber_mt',type: 'numeric'},
@@ -389,6 +461,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank : false,
 				anchor : '80%',
 				gwidth : 70,
+				galign: 'right ',
 				maxLength : 20,
 				decimalPrecision : 6
 			},
@@ -406,6 +479,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel : 'TC 2',
 				allowBlank : false,
 				anchor : '80%',
+				galign: 'right ',
 				gwidth : 70,
 				maxLength : 20,
 				decimalPrecision : 6
@@ -784,16 +858,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	         this.swButton = 'EDIT';
 	         var rec = this.sm.getSelected().data;
 	         Phx.vista.IntTransaccion.superclass.onButtonEdit.call(this); 
+	         this.setModificadoCombos();
 	         this.setLabelsTc();
 	       
-	         
-         
        },
        
        onButtonNew: function(){
           this.swButton = 'NEW';
           this.sw_valores = 'si';
           Phx.vista.IntTransaccion.superclass.onButtonNew.call(this); 
+          this.setModificadoCombos()
           this.Cmp.tipo_cambio.setValue(this.maestro.tipo_cambio);
           this.Cmp.tipo_cambio_2.setValue(this.maestro.tipo_cambio_2);
           this.setLabelsTc();

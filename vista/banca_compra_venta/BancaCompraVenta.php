@@ -308,7 +308,7 @@ fheight: '80%',
 				fieldLabel: 'tipo',
 				allowBlank: true,
 				emptyText: 'tipo...',
-				typeAhead: true,
+				typeAhead: true,1
 				triggerAction: 'all',
 				lazyRender: true,
 				mode: 'local',
@@ -433,7 +433,7 @@ fheight: '80%',
 				width: 200,
 				type: 'ComboBox',
 
-    }),
+			}),
     
 	
 	

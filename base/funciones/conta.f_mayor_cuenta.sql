@@ -11,7 +11,9 @@ CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
   p_signo_balance varchar = 'defecto_cuenta'::character varying,
   p_tipo_saldo varchar = 'balance'::character varying,
   p_id_auxiliar integer = NULL::integer,
-  p_id_int_comprobante_ori integer = 0
+  p_id_int_comprobante_ori integer = NULL::integer,
+  p_id_ot integer = NULL::integer,
+  p_id_centro_costo integer = NULL::integer
 )
 RETURNS numeric [] AS
 $body$
@@ -99,9 +101,6 @@ BEGIN
      END IF;
      
    
-     
-     
-     
 	
      --iniciamos acumulador en cero
      v_resp_mayor = 0;
@@ -161,7 +160,7 @@ BEGIN
               c.cbte_apertura = ANY(va_cbte_apertura) AND
               c.cbte_aitb = ANY(va_cbte_aitb) AND
               (
-                CASE  WHEN p_id_int_comprobante_ori = 0  THEN
+                CASE  WHEN p_id_int_comprobante_ori is NULL  THEN
               				c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin 
                       ELSE
                             c.id_int_comprobante = p_id_int_comprobante_ori
@@ -172,7 +171,19 @@ BEGIN
                          0=0 
                     ELSE
                        t.id_auxiliar = p_id_auxiliar 
+                    END) AND 
+              (CASE WHEN p_id_ot is NULL  THEN  
+                         0=0 
+                    ELSE
+                       t.id_orden_trabajo = p_id_ot 
+                    END) AND 
+              (CASE WHEN p_id_centro_costo is NULL  THEN  
+                         0=0 
+                    ELSE
+                       t.id_centro_costo = p_id_centro_costo 
                     END);
+                    
+       
           
         --------------------------------
         --  calculo de tipo de resultado
@@ -235,6 +246,9 @@ BEGIN
           
           v_resp_final[3] = v_resp_mayor_partida;
           v_resp_final[4] = v_resp_mayor_partida_mt;
+          
+          
+          raise notice '##################  RESULTADO BASICO %, %',v_resp_mayor,p_id_cuenta;
         
           return v_resp_final;  
           
@@ -259,7 +273,17 @@ BEGIN
                                                  p_tipo_saldo,
                                                  p_id_int_comprobante_ori);
                
-               
+         
+               raise notice 'XXXXXXXXXXXXXX parametros   %,%,%,%,%,%,%,%,%,%',v_registros.id_cuenta,p_fecha_ini,p_fecha_fin,
+               													p_id_deptos, 
+                                                                 p_incluir_cierre,
+                                                                 p_incluir_apertura,
+                                                                 p_incluir_aitb, 
+                                                                 p_signo_balance, 
+                                                                 p_tipo_saldo,
+                                                                 p_id_int_comprobante_ori;
+                        
+               raise notice '>>>>>>> % regresa maryo = %',v_registros.id_cuenta, v_resp_mayor;
                v_resp_mayor = v_resp_mayor + v_resp_aux[1];               
                v_resp_mayor_mt = v_resp_mayor_mt + v_resp_aux[2];               
                v_resp_mayor_partida = v_resp_mayor_partida + v_resp_aux[3];               

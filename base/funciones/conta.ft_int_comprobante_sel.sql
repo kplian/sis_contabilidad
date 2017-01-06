@@ -334,7 +334,7 @@ BEGIN
 		
 	/*********************************    
  	#TRANSACCION:  'CONTA_DETCBT_SEL'
- 	#DESCRIPCION:	Cabecera para el reporte de Comprobante
+ 	#DESCRIPCION:	detalle para el reporte de Comprobante
  	#AUTOR:			RCM	
  	#FECHA:			10/09/2013
 	***********************************/
@@ -359,7 +359,9 @@ BEGIN
                                 importe_debe, 
                                 importe_haber,
                                 importe_debe_mb,
-                                importe_haber_mb
+                                importe_haber_mb,
+                                sw_movimiento,
+                                tipo_partida
                                 FROM ((select
                                                   CASE 
                                                     WHEN  (sum(tra.importe_debe) > 0 or sum(tra.importe_debe_mb) >0) then  1 
@@ -380,7 +382,9 @@ BEGIN
                                                   sum(tra.importe_debe) as importe_debe, 
                                                   sum(tra.importe_haber) as importe_haber,
                                                   sum(tra.importe_debe_mb) as importe_debe_mb,
-                                                  sum(tra.importe_haber_mb) as importe_haber_mb
+                                                  sum(tra.importe_haber_mb) as importe_haber_mb,
+                                                  par.sw_movimiento,
+                                                  par.tipo as tipo_partida
                                                 from conta.tint_transaccion tra
                                                 inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
                                                 inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
@@ -399,7 +403,9 @@ BEGIN
                                                   par.codigo ,
                                                   par.nombre_partida,
                                                   ot.desc_orden,
-                                                  tra.glosa
+                                                  tra.glosa,
+                                                  par.sw_movimiento,
+                                                  par.tipo
                                           )
                                           
                                                   

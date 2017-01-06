@@ -319,13 +319,15 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: false,
 					anchor: '80%',
 					gwidth: 80,
+					galign: 'right ',
 					maxLength:1179650,
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}',  Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							Ext.util.Format.usMoney
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -333,6 +335,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},			
@@ -343,12 +346,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -356,6 +360,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type: 'NumberField',
 					filters: {pfiltro:'dcv.importe_excento',type:'numeric'},
 					id_grupo:1,
+					
 					grid: true,
 					form: false
 			},			
@@ -366,12 +371,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -379,6 +385,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -389,13 +396,14 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: false,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					maxLength:1179650,
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -413,19 +421,21 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: false,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					maxLength:1179650,
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value );
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00') );
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
 				},
 					type:'NumberField',
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},			
@@ -437,12 +447,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					readOnly:true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -450,6 +461,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type: 'NumberField',
 					filters: { pfiltro:'dcv.importe_iva',type:'numeric'},
 					id_grupo: 1,
+					
 					grid: true,
 					form: false
 			},			
@@ -461,12 +473,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					readOnly:true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -474,6 +487,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_pago_liquido',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form: false
 			},			
@@ -702,12 +716,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -715,6 +730,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_pendiente',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -726,12 +742,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -750,12 +767,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -763,6 +781,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_retgar',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -774,12 +793,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					readOnly:true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -787,6 +807,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_descuento_ley',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -797,12 +818,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -810,6 +832,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_ice',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -821,12 +844,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					anchor: '80%',
 					readOnly:true,
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -834,6 +858,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_it',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form: false
 			},			

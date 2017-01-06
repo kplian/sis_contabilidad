@@ -51,7 +51,7 @@ BEGIN
      
     /*********************************   
      #TRANSACCION:    'CONTA_RESUTADO_SEL'
-     #DESCRIPCION:    Listado para el reporte del resultados
+     #DESCRIPCION:    Listado para el reporte de resultados
      #AUTOR:          rensi arteaga copari  kplian
      #FECHA:          08-07-2015
     ***********************************/
@@ -169,40 +169,7 @@ BEGIN
          
          raise notice 'INICIA CONSULTA....';
          
-         IF v_incluir_sinmov = 'no' THEN
-             -- 3) retorno de resultados
-             FOR v_registros in (SELECT                                   
-                                        subrayar,
-                                        font_size,
-                                        posicion,
-                                        signo,
-                                        id_cuenta,
-                                        desc_cuenta,
-                                        codigo_cuenta,
-                                        codigo,
-                                        origen,
-                                        orden,
-                                        nombre_variable,
-                                        montopos,
-                                        monto,
-                                        id_resultado_det_plantilla,
-                                        id_cuenta_raiz,
-                                        visible,
-                                        incluir_cierre,
-                                        incluir_apertura,
-                                        negrita,
-                                        cursiva,
-                                        espacio_previo,
-                                        id,
-                                        plantilla,
-                                        nombre_columna
-                                    FROM temp_balancef 
-                                        order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
-                       RETURN NEXT v_registros;
-             END LOOP;
-        
-        ELSE
-          
+       
           FOR v_registros in (SELECT                                   
                                         subrayar,
                                         font_size,
@@ -229,17 +196,19 @@ BEGIN
                                         plantilla,
                                         nombre_columna
                                     FROM temp_balancef 
-                                    WHERE (monto != 0 or origen = 'titulo')
-                                        order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
+                                    WHERE 
+                                       case  when v_incluir_sinmov = 'no' then 
+                                                  0 = 0
+                                             else 
+                                              (monto != 0 or origen = 'titulo')
+                                            end
+                                       
+                                       order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
                        RETURN NEXT v_registros;
-             END LOOP;
+           END LOOP; 
       
-      
-     
-     END IF; 
-  
-
-END IF;
+       
+  END IF;
 
 EXCEPTION
 				

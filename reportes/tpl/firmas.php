@@ -12,9 +12,9 @@
 		
 	</tr>
 	<tr>
-		<td width="34%" class="td_label"><span></span></td>
-		<td width="33%" class="td_label"><span></span></td>
-		<td width="33%" class="td_label"><span></span></td>
+		<td width="34%" class="td_label"><span>&nbsp;&nbsp;<font size="7"><?php  echo $this->cabecera[0]['desc_firma1']; ?></font></span></td>
+		<td width="33%" class="td_label"><span>&nbsp;&nbsp;<font size="7"><?php  echo $this->cabecera[0]['desc_firma2']; ?></font></span></td>
+		<td width="33%" class="td_label"><span>&nbsp;&nbsp;<font size="7"><?php  echo $this->cabecera[0]['desc_firma3']; ?></font></span></td>
 		
 	</tr>
 </tbody></table>

@@ -123,7 +123,8 @@ BEGIN
                         
                         --raise exception '%, %', v_registros.codigo_cuenta, p_id_gestion;
                 		--   2.1.2)  calculamos el balance de la cuenta para las fechas indicadas
-                         v_monto_mayor = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, 
+                         raise notice '>>>>>>>>>   %,%,%,%,%,%,%,%',p_desde,p_hasta,p_id_deptos,v_registros.incluir_cierre,v_registros.incluir_apertura,v_registros.incluir_aitb ,v_registros.signo_balance,v_registros.tipo_saldo;
+                         v_monto_mayor = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta,
                         								p_desde, 
                                                         p_hasta, 
                                                         p_id_deptos, 

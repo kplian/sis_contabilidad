@@ -179,7 +179,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				     id_g = this.cmbGestion.getValue();
 				if(id_m && id_g){
 					this.Cmp.id_int_comprobante_fks.store.baseParams.id_moneda  = id_m;
-					this.Cmp.id_int_comprobante_fks.store.baseParams.id_gestion = id_g;
+					//RAC 29/!2/2016 comentado por que hay pagos de 2017 que necesitan relacion con cbte 2016
+					//this.Cmp.id_int_comprobante_fks.store.baseParams.id_gestion = id_g;
 					this.Cmp.id_int_comprobante_fks.store.modificado = true;				
 				} 
 				else{
@@ -1558,9 +1559,6 @@ header("content-type: text/javascript; charset=UTF-8");
         resp.argument.wizard.panel.destroy()
         this.reload();
     }
-		
-		
-		
 })
 </script>
 
