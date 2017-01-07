@@ -2510,6 +2510,8 @@ AS
 
 /**********************************I-DEP-RAC-CONTA-0-11/07/2016****************************************/
 
+DROP VIEW conta.vint_rel_devengado;
+
 
 CREATE OR REPLACE VIEW conta.vint_rel_devengado( 
     id_int_rel_devengado,

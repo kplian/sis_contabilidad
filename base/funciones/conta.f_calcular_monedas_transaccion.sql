@@ -122,7 +122,7 @@ BEGIN
               
               --calcular los mosntos presupeustarios
               
-              va_montos  = conta.f_calcular_monedas_segun_config(v_registros.id_moneda, v_id_moneda_base, v_id_moneda_tri, v_registros.tipo_cambio, v_registros.tipo_cambio_2, v_registros.importe_recurso, v_registros.id_config_cambiaria, v_registros.fecha);
+              va_montos  = conta.f_calcular_monedas_segun_config(v_registros.id_moneda, v_id_moneda_base, v_id_moneda_tri, v_registros.tipo_cambio, v_registros.tipo_cambio_2, v_registros.importe_gasto, v_registros.id_config_cambiaria, v_registros.fecha);
               v_valor_gasto_mb = va_montos[1];
               v_valor_gasto_mt = va_montos[2];
               

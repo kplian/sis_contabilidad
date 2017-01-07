@@ -142,7 +142,7 @@ BEGIN
              
            
            
-            --listado de as transacciones con partidas presupuestaria
+            --listado de las transacciones con partidas presupuestaria
             FOR v_registros in (
                                   select
                                      it.id_int_transaccion,
@@ -185,6 +185,8 @@ BEGIN
                   
                          v_importe_gasto_mb = v_registros.importe_gasto_mb;
                          v_importe_recurso_mb =  v_registros.importe_recurso_mb;
+                         
+                       
             
                       
                           IF    v_momento_aux = 'todo' or   v_momento_aux='solo ejecutar'  THEN
@@ -196,7 +198,9 @@ BEGIN
                                 -- si tiene partida ejecucionde comprometido y nose correponde con la gestion
                                 --  lo ponemos en null para que comprometa
                                 
-                                IF v_registros.id_partida_ejecucion is not NULL THEN                                       
+                                IF v_registros.id_partida_ejecucion is not NULL THEN 
+                                
+                                                                      
                                    
                                    select
                                        par.id_gestion
@@ -208,13 +212,10 @@ BEGIN
                                    
                                     if v_reg_par_eje.id_gestion != v_registros_comprobante.id_gestion  then
                                         v_registros.id_partida_ejecucion = NULL;
-                                        
                                         update conta.tint_transaccion set 
                                            id_partida_ejecucion = NULL
                                         where id_int_transaccion = v_registros.id_int_transaccion;
-                                        
                                     end if;
-                                   
                                    
                                 END IF;
                                 
@@ -244,6 +245,8 @@ BEGIN
                                                 END IF; 
                                          END IF;
                                          
+                                         
+                                         
                                          IF v_registros.tipo = 'gasto'  THEN
                                              -- importe debe ejecucion
                                              IF v_importe_gasto > 0  or v_importe_gasto_mb > 0 THEN
@@ -255,6 +258,7 @@ BEGIN
                                                  v_monto_cmp  = v_importe_recurso * (-1);
                                                  v_monto_cmp_mb = v_importe_recurso_mb * (-1);
                                              END IF;
+                                            
                                          ELSE
                                              IF v_importe_recurso > 0 or v_importe_recurso_mb THEN
                                                v_monto_cmp  = v_importe_recurso;
@@ -266,6 +270,8 @@ BEGIN
                                                  v_monto_cmp_mb = v_importe_gasto_mb(-1);                                              
                                              END IF;
                                          END IF;
+                                         
+                                       -- raise exception 'entra.. % --  %',v_monto_cmp, v_monto_cmp_mb;
                                 
                               
                                         -- llamamos a la funcion de ejecucion

@@ -317,7 +317,8 @@ BEGIN
     --  (por ejm esta llamada se usa en tesorera para revertir el presupuesto comprometido originamente)
     ---------------------------------------------------------------------------------------------------------
     
-    IF   v_rec_cbte.sw_editable = 'si' and  (v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte = '' )    THEN
+   
+    IF   v_rec_cbte.sw_editable = 'si' and  (v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte = '' )   THEN
           
           IF v_rec_cbte.id_plantilla_comprobante is not null THEN
           
@@ -336,6 +337,8 @@ BEGIN
          END IF;
     
     END IF;
+    
+    
    
     ------------------------------------------------------------------------------------------------
     --  Validacion presupuestaria del comprobante no se ejecuta solo verifica 
@@ -343,9 +346,19 @@ BEGIN
     -----------------------------------------------------------------------------------------------
     
      --solo verifica en cbte que no son de reversion
-     IF v_pre_integrar_presupuestos = 'true' and  v_rec_cbte.cbte_reversion ='no' THEN    
+     
+     
+     
+     IF v_pre_integrar_presupuestos = 'true' and  v_rec_cbte.cbte_reversion ='no'   THEN 
+         
      	v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
      END IF;
+     
+       
+     
+     
+     
+     
   
    
     --6. Numeración del comprobante
@@ -495,8 +508,7 @@ BEGIN
            ELSE
               v_nro_cbte = v_rec_cbte.nro_cbte; 
            END IF;
-            
-          
+           
           -----------------------------------------------------
           -- Llevar e estado de WF del cbte a validado
           --   
@@ -509,7 +521,7 @@ BEGIN
                                                   'Cbte validado');
     
     
-            
+           
            --Se guarda el número del comprobante 
             update conta.tint_comprobante set
               nro_cbte = v_nro_cbte
@@ -577,7 +589,7 @@ BEGIN
                 
           END IF;
           
-         
+          
            
          ---------------------------------------------------------------------------------------- 
          -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
@@ -606,7 +618,7 @@ BEGIN
            
          END IF;
            
-        
+         
           
          --------------------------------------------------
          -- Validaciones sobre el cbte y sus transacciones
@@ -644,20 +656,28 @@ BEGIN
          --  TODO ...para que revisa si no es ajuste ..???? ...no migre lso cbtes de ajuste?
          ----------------------------------------------------------------------------------------------------
          
-         IF (v_sincronizar = 'true'   and  v_rec_cbte.id_ajuste is null)THEN
+       
+         IF (v_sincronizar = 'true'   and  v_rec_cbte.id_ajuste is null and  v_rec_cbte.fecha <= '31/12/2016'::Date)THEN
              -- si sincroniza locamente con endesis, 
              -- marcando la bandera que proviene de regional internacional  (TODO ver para que es esta bandera ????)
+             
              v_resp_int_endesis =  migra.f_migrar_cbte_endesis(p_id_int_comprobante, v_nombre_conexion, 'si');
+         
          END IF;
+         
+         
           
          -----------------------------------------------------------------------------------------------
          --  Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
          --  si es de una regional internacional y es moneda diferente de dolares convertimos a Bolivianos
          ------------------------------------------------------------------------------------------------
+       --raise exception 'lelga %',v_rec_cbte.fecha;
          IF v_pre_integrar_presupuestos = 'true' THEN  --en las regionales internacionales la sincro de presupeustos esta deshabilitada
          
-             IF v_sincronizar = 'true' THEN
+             IF v_sincronizar = 'true' and  v_rec_cbte.fecha <= '31/12/2016'::Date THEN
+               
                 v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
+             
              ELSE
             
                 v_resp =  conta.f_gestionar_presupuesto_cbte_pxp(p_id_usuario, p_id_int_comprobante, 'no', p_fecha_ejecucion, v_nombre_conexion);
@@ -665,7 +685,7 @@ BEGIN
          END IF;
          
         
-         
+       
          -------------------------------------------------- 
          --10.cerrar conexiones dblink si es que existe 
          -------------------------------------------------
@@ -684,7 +704,7 @@ BEGIN
     	raise exception 'Validación no realizada: %', v_errores;
     end if;
     
-  
+ 
     
     --8. Respuesta
     return 'Comprobante validado';
