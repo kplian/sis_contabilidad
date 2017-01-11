@@ -92,7 +92,6 @@ BEGIN
                                IF v_conta_integrar_libro_bancos = 'si' THEN 
                                     -- si alguna transaccion tiene banco habilitado para pago
                                     IF  not tes.f_integracion_libro_bancos(p_id_usuario,p_id_int_comprobante) THEN
-									  --raise exception 'error al registrar transacción en libro de bancos, comprobante %', p_id_int_comprobante;
                                     END IF;
                                     
                                END IF;

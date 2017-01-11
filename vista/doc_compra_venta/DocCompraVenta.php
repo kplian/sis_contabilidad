@@ -129,9 +129,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                	   if(value == 'si'){
 	                	      checked = 'checked';
 	                	   }
-	                	   if(record.data.id_int_comprobante){
+	                	   /*if(record.data.id_int_comprobante){
 	                	      state = 'disabled';
-	                	   }
+	                	   }*/
 	                	   if(record.data.tipo_reg != 'summary'){
 	            	         return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
 	            	       }
