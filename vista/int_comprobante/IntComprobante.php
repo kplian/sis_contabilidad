@@ -1549,7 +1549,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
             success: this.successWizard,
             failure: this.conexionFailure, 
-            argument: { wizard:wizard },
+            argument: { wizard:wizard , id_proceso_wf : resp.id_proceso_wf_act},
             timeout: this.timeout,
             scope: this
         });
@@ -1558,6 +1558,22 @@ header("content-type: text/javascript; charset=UTF-8");
         Phx.CP.loadingHide();
         resp.argument.wizard.panel.destroy()
         this.reload();
+        
+        if (resp.argument.id_proceso_wf) {
+				Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
+					params : {
+						'id_proceso_wf' : resp.argument.id_proceso_wf
+					},
+					success : this.successExport,
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			}
+        
+        
     }
 })
 </script>

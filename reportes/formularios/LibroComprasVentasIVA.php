@@ -74,7 +74,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	        	fields: ['ID', 'valor'],
 	        	data :	[
 						['endesis_erp','Libro de Compras Estandar'],
-	        	        //['lcv_compras','Libro de Compras Estandar'],
+	        	        ['lcv_compras','Libro de Compras Estandar (nueva versión)'],
 	        	        ['lcv_ventas','Libro de Ventas Estandar'],	
 						['LCNCD','Libro de Compras NCD']					
 						]	        				
