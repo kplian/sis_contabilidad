@@ -287,7 +287,7 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 	],
 	sortInfo:{
 		field: 'id_entrega',
-		direction: 'ASC'
+		direction: 'DESC'
 	},
 	south : {
 			url : '../../../sis_contabilidad/vista/entrega_det/EntregaDet.php',

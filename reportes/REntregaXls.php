@@ -207,6 +207,10 @@ class REntregaXls
 				$importe = $value['importe_haber_mb_completo'];
 			}
 			
+			 $importe_neto = round ($importe_neto,2);
+			 $importe = round ($importe,2);
+			 
+			
 			//validamos agrupadores
 			if($sw){
 				$sw = false;
