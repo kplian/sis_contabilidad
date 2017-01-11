@@ -6,7 +6,6 @@
 *@date 17-11-2016 19:50:19
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -19,8 +18,8 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Entrega.superclass.constructor.call(this,config);
 		
         
-        this.addButton('cam_estado', {
-				text : 'Rel Dev',
+        this.addButton('fin_entrega', {
+				text : 'Finalizar Entrega',
 				iconCls : 'btag_accept',
 				disabled : true,
 				handler : this.cambiarEstado,
@@ -97,7 +96,7 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'id_entrega',
-				fieldLabel: 'ID',
+				fieldLabel: 'Nro',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
@@ -345,14 +344,20 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
     
     preparaMenu : function(n) {
 			var tb = Phx.vista.Entrega.superclass.preparaMenu.call(this,n);
-			this.getBoton('cam_estado').enable();
+			var rec=this.sm.getSelected();
+			if(rec.data.estado == 'finalizado'){
+				this.getBoton('fin_entrega').disable();
+			}else{
+				this.getBoton('fin_entrega').enable();
+			}
+			
 			this.getBoton('btnImprimir').enable();
 			
 			return tb;
 	},
 	liberaMenu : function() {
 			var tb = Phx.vista.Entrega.superclass.liberaMenu.call(this);
-			this.getBoton('cam_estado').disable();
+			this.getBoton('fin_entrega').disable();
 			this.getBoton('btnImprimir').disable();
 			
 	},  

@@ -308,7 +308,7 @@ fheight: '80%',
 				fieldLabel: 'tipo',
 				allowBlank: true,
 				emptyText: 'tipo...',
-				typeAhead: true,1
+				typeAhead: true,
 				triggerAction: 'all',
 				lazyRender: true,
 				mode: 'local',

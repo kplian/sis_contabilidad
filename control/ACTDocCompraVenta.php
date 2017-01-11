@@ -33,10 +33,10 @@ class ACTDocCompraVenta extends ACTbase{
 		if($this->objParam->getParametro('sin_cbte')=='si'){
             $this->objParam->addFiltro("dcv.id_int_comprobante is NULL");    
         }
-		
+		/* en algunos casos es necesario relacionar con documentos con fechas mayores
 		if($this->objParam->getParametro('manual')!=''){
             $this->objParam->addFiltro("dcv.manual = ''".$this->objParam->getParametro('manual')."''");    
-        }
+        }*/
 		
 		if($this->objParam->getParametro('fecha_cbte')!=''){
             $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    

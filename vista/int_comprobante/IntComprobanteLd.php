@@ -194,7 +194,7 @@ Phx.vista.IntComprobanteLd = {
     addBotonesVolcar: function() {
         this.menuClonar = new Ext.Toolbar.SplitButton({
             id: 'b-btnVolcar-' + this.idContenedor,
-            text: 'Volcar',
+            text: 'Revertir',
             disabled: true,
             grupo:[0,1,2,3],
             iconCls : 'balert',
@@ -202,13 +202,13 @@ Phx.vista.IntComprobanteLd = {
             menu:{
             items: [{
                 id:'b-volb-' + this.idContenedor,
-                text: 'Volcar en borrador',
+                text: 'Reversión Parcial (borrador)',
                 tooltip: '<b>Al volcar en borrador tiene la opción de revertir parcialmente</b>',
                 handler:function(){this.volcarCbte('no')},
                 scope: this
             }, {
                 id:'b-vol-' + this.idContenedor,
-                text: 'Volcar Validado',
+                text: 'Reversión Total (Validado)',
                 tooltip: '<b>Al volcar y validar se revierte el 100%</b>',
                 handler:function(){this.volcarCbte('si')},
                 scope: this

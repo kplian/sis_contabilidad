@@ -550,9 +550,12 @@ BEGIN
 
         v_host:='dbname=dbendesis host=192.168.100.30 user=ende_pxp password=ende_pxp';
 
-        --creacion de tabla temporal del endesis 
+        --creacion de tabla temporal del endesis
+        v_consulta = conta.f_obtener_string_documento_bancarizacion();
 
-        v_consulta:= ' WITH tabla_temporal_documentos AS (
+
+
+       /* v_consulta:= ' WITH tabla_temporal_documentos AS (
               SELECT * FROM dblink(''' || v_host || ''',
           ''select tctcomp.id_int_comprobante,
           tctdoc.razon_social,
@@ -612,7 +615,7 @@ BEGIN
                    importe_recurso numeric(10,2),
                     fecha_entrega date )
               )';
-
+*/
 
         v_consulta:= v_consulta || 'select pg_pagado.id_plan_pago,
       pg_devengado.id_plan_pago,

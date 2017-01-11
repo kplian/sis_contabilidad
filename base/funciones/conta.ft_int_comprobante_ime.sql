@@ -1603,7 +1603,7 @@ BEGIN
               v_reg_cbte.tipo_cambio,
               v_reg_cbte.beneficiario,  			
               'borrador',
-              'CBTE CLONADO(id:'||v_reg_cbte.id_int_comprobante||' )',
+              v_reg_cbte.glosa1||' (clonado)',
               v_reg_cbte.fecha,
               v_reg_cbte.glosa2,  			
               --v_parametros.momento,
@@ -1629,7 +1629,7 @@ BEGIN
               v_reg_cbte.id_moneda_tri,
               v_num_tramite,
               'si',  -- sw_editable 
-              'si', -- sw_tipo_cambio 
+              'no', -- sw_tipo_cambio   
 			  'no', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
               v_id_estado_wf,

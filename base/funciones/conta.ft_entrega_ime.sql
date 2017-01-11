@@ -293,10 +293,6 @@ BEGIN
                          -- llamda a libro de bnacos
                          v_aux = tes.f_integracion_libro_bancos(p_id_usuario,v_registros_ent.id_int_comprobante); --si es una esntrega 
 
-                         IF v_aux = 'f' THEN
-                              raise exception 'falla en la integracion con libro de bancos';
-                         END IF;
-                         
                      END IF;
                   
                      --  marca si tiene cbtes 
