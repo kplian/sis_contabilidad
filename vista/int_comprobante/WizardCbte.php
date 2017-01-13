@@ -216,8 +216,19 @@ Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
 		    	this.Cmp.hasta.setMinValue(d1);    			
     		}
     		else{
-    			this.Cmp.desde.setReadOnly(false);
-    	        this.Cmp.hasta.setReadOnly(false);
+    			
+    			
+    			if(record.data.periodo_calculo == 'diario'){
+    				this.Cmp.desde.setReadOnly(true);
+    	            this.Cmp.hasta.setReadOnly(true);
+    				this.Cmp.desde.setValue(this.Cmp.fecha.getValue());
+    				this.Cmp.hasta.setValue(this.Cmp.fecha.getValue());
+    			}
+    			else{
+    				this.Cmp.desde.setReadOnly(false);
+    	            this.Cmp.hasta.setReadOnly(false);
+    			}	
+    			
     		}
     	},this);
     }
