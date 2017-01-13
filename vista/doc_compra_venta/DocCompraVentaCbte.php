@@ -696,7 +696,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel: true,
-	bedit: false,
+	bedit: true,
 	bsave: false,
 	abrirFormulario: function(tipo, record, maestro){
    	       
@@ -714,9 +714,9 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 	                                	 id_int_comprobante: (maestro)? maestro.id_int_comprobante: undefined,
 	                                	 tipo_form : (record)?record.data.tipo:'new',
 	                                	 datosOriginales: record,
-	                                	 readOnly: (tipo=='edit')? true: false
+	                                	 readOnly: (tipo=='noedit')? true: false
 	                                	},
-	                                    bsubmit: (tipo=='edit')? false: true ,
+	                                    bsubmit: (tipo=='noedit')? false: true ,
 	                                    id_moneda_defecto : me.maestro.id_moneda,
 	                                    regitrarDetalle: 'no'
 	                                }, 
@@ -744,15 +744,15 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
    },
    
    onButtonNew:function(){ 
-   	
-   	   this.abrirFormulario('new',undefined, this.maestro)         
-        
-            
-           
-    },
+   	  this.abrirFormulario('new',undefined, this.maestro)         
+   },
+    
+   onButtonEdit:function(){
+     	this.abrirFormulario('edit', this.sm.getSelected())
+   },
     
    showDoc:  function() {
-        this.abrirFormulario('edit', this.sm.getSelected());
+        this.abrirFormulario('noedit', this.sm.getSelected());
    },
    
    newDoc: function() {
@@ -769,19 +769,17 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
    },
    
    
-    preparaMenu:function(tb){
-        
+    preparaMenu:function(tb){        
         Phx.vista.DocCompraVentaCbte.superclass.preparaMenu.call(this,tb)
         this.getBoton('btnShowDoc').enable();
-        
-        
-           
     },
     
     liberaMenu:function(tb){
         Phx.vista.DocCompraVentaCbte.superclass.liberaMenu.call(this,tb);
         this.getBoton('btnShowDoc').disable();
     },
+    
+    
    
     
     

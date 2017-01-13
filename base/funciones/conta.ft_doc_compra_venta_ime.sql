@@ -1,4 +1,4 @@
- --------------- SQL ---------------
+--------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
@@ -300,6 +300,14 @@ BEGIN
       END IF;
       
       */
+      
+       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+      
+      -- 13/01/2017
+      --TODO RAC, me parece buena idea  que al cerrar el periodo revise que no existan documentos pendientes  antes de cerrar
+      -- valida que period de libro de compras y ventas este abierto
+      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+     
 
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
@@ -339,9 +347,18 @@ BEGIN
 
 
       -- validar que no tenga un comprobante asociado
-
-      IF  v_registros.id_int_comprobante is not NULL THEN
+      --RAC 13/01/2017 , se levanta esta restriccion por que es encesario 
+      -- por posibles errores al registrar
+      /* IF  v_registros.id_int_comprobante is not NULL THEN
         raise exception 'No puede editar por que el documento esta acociado al cbte id(%), primero quite esta relacion', v_registros.id_int_comprobante;
+      END IF;*/
+      
+      if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
+          v_id_int_comprobante = v_parametros.id_int_comprobante;
+      end if;
+      
+      IF v_id_int_comprobante is null THEN
+        v_id_int_comprobante = v_registros.id_int_comprobante;
       END IF;
 
       -- recupera parametrizacion de la plantilla
@@ -366,11 +383,7 @@ BEGIN
 
       END IF;
       
-      if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
-          v_id_int_comprobante = v_parametros.id_int_comprobante;
-      end if;
-
-
+      
       --Sentencia de la modificacion
       update conta.tdoc_compra_venta set
         tipo = v_parametros.tipo,
