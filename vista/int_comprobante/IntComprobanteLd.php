@@ -119,9 +119,14 @@ Phx.vista.IntComprobanteLd = {
 	},
 	preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobanteLd.superclass.preparaMenu.call(this);
+			var rec = this.sm.getSelected();
 			this.getBoton('btnImprimir').enable();
 			this.getBoton('btnRelDev').enable();
-			this.getBoton('btnDocCmpVnt').enable();
+			if (rec.data.desc_clase_comprobante == 'Comprobante de Diario Presupuestario') {
+				this.getBoton('btnDocCmpVnt').enable();
+			}else{
+				this.getBoton('btnDocCmpVnt').disable();
+			}
 			this.getBoton('chkpresupuesto').enable();
 			this.getBoton('btnVolcar').enable();
 			this.getBoton('btnClonar').enable();

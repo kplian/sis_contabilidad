@@ -146,7 +146,6 @@ Phx.vista.IntComprobanteReg = {
        preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobanteReg.superclass.preparaMenu.call(this);
 			var rec = this.sm.getSelected();
-		
 		    if(rec.data.tipo_reg == 'summary'){
 		    	this.getBoton('btnSwEditble').disable();
 				this.getBoton('sig_estado').disable();
@@ -166,7 +165,11 @@ Phx.vista.IntComprobanteReg = {
 				this.getBoton('btnImprimir').enable();
 				this.getBoton('btnRelDev').enable();
 				this.getBoton('btnIgualarCbte').enable();
-				this.getBoton('btnDocCmpVnt').enable();
+				if (rec.data.desc_clase_comprobante == 'Comprobante de Diario Presupuestario') {
+					this.getBoton('btnDocCmpVnt').enable();
+				}else{
+					this.getBoton('btnDocCmpVnt').disable();
+				}
 				this.getBoton('chkpresupuesto').enable();				
 				this.getBoton('btnChequeoDocumentosWf').enable();
                 this.getBoton('diagrama_gantt').enable();
