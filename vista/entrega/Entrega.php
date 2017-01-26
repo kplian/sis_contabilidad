@@ -17,6 +17,7 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
     	this.initButtons = [this.cmbDepto];
 		Phx.vista.Entrega.superclass.constructor.call(this,config);
+        this.store.baseParams.pes_estado = ' ';
 
         this.addButton('ant_estado',{
             grupo: [0,1,2,3,4,5],
