@@ -18,7 +18,8 @@ class MODEntrega extends MODbase{
 		$this->procedimiento='conta.ft_entrega_sel';
 		$this->transaccion='CONTA_ENT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
+
+        $this->setParametro('pes_estado','pes_estado','varchar');
 		//Definicion de la lista del resultado del query
 		$this->captura('id_entrega','int4');
 		$this->captura('fecha_c31','date');
@@ -34,6 +35,9 @@ class MODEntrega extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('id_depto_conta','int4');
+		$this->captura('id_estado_wf','int4');
+        $this->captura('id_proceso_wf','int4');
+
 		
 		
 		//Ejecuta la instruccion
@@ -112,7 +116,11 @@ class MODEntrega extends MODbase{
 		$this->setParametro('id_int_comprobantes','id_int_comprobantes','varchar');
 		$this->setParametro('total_cbte','total_cbte','int4');
 		$this->setParametro('id_depto_conta','id_depto_conta','int4');
-		
+
+
+        //$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+       // $this->setParametro('id_estado_wf','id_estado_wf','int4');
+       // $this->setParametro('estado','estado','varchar');
 		
 		
 
@@ -136,6 +144,8 @@ class MODEntrega extends MODbase{
 		$this->setParametro('fecha_c31','fecha_c31','date');
 		$this->setParametro('obs','obs','varchar');
 		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
+         //$this->setParametro('estados','estados','varchar');
+         
 		
 		
 
@@ -156,7 +166,8 @@ class MODEntrega extends MODbase{
 		  
 		  //captura parametros adicionales para el count
 		  $this->setParametro('id_entrega','id_entrega','int4');
-		  
+
+
 		 
 		
 		//Definicion de la lista del resultado del query
@@ -197,6 +208,53 @@ class MODEntrega extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	function ListarSiguienteEstado()
+    {
+        $this->procedimiento='conta.ft_entrega_ime';
+        $this->transaccion='CONTA_SIG_INS';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
+        $this->setParametro('id_estado_wf_act','id_estado_wf_act','int4');
+        $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+        $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
+        $this->setParametro('id_funcionario_wf','id_funcionario_wf','int4');
+        $this->setParametro('id_depto_wf','id_depto_wf','int4');
+        $this->setParametro('obs','obs','text');
+        $this->setParametro('json_procesos','json_procesos','text');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //var_dump($this->respuesta); exit;
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function ListarAnteriorEstado(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='conta.ft_entrega_ime';
+        $this->transaccion='CONTA_ANT_INS';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_solicitud','id_solicitud','int4');
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+        $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+        $this->setParametro('operacion','operacion','varchar');
+
+        $this->setParametro('id_funcionario','id_funcionario','int4');
+        $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
+        $this->setParametro('id_estado_wf','id_estado_wf','int4');
+        $this->setParametro('obs','obs','text');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 	
 	
 			

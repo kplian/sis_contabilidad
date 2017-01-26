@@ -18,6 +18,9 @@ class ACTEntrega extends ACTbase{
 		if($this->objParam->getParametro('id_depto')!=''){
 			$this->objParam->addFiltro("ent.id_depto_conta = ".$this->objParam->getParametro('id_depto'));	
 		}
+        if ($this->objParam->getParametro('pes_estado') == 'EntregaConsulta') {
+            $this->objParam->addFiltro("ent.estado  in (''borrador'',''supconta'',''vbconta'',''finalizado'',''registrado'')");
+        }
 		
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
@@ -100,6 +103,22 @@ class ACTEntrega extends ACTbase{
 				$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 				$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		
-	}	
+	}
+    function siguienteEstado(){
+        $this->objFunc=$this->create('MODEntrega');
+
+        $this->objParam->addParametro('id_funcionario_usu',$_SESSION["id_usuario_reg"]);
+
+        $this->res=$this->objFunc->ListarSiguienteEstado($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function retrosederEstado(){
+        $this->objFunc=$this->create('MODEntrega');
+        $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
+        $this->res=$this->objFunc->ListarAnteriorEstado($this->objParam);
+
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 ?>
