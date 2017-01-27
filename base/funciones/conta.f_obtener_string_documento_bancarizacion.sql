@@ -1,4 +1,5 @@
 CREATE OR REPLACE FUNCTION conta.f_obtener_string_documento_bancarizacion (
+p_gestion INTEGER
 )
   RETURNS varchar AS
 $body$
@@ -24,13 +25,15 @@ DECLARE
   v_host                VARCHAR;
 
 BEGIN
+
   v_nombre_funcion:='conta.f_obtener_string_documento_bancarizacion';
   v_respuesta=false;
 
   v_host:='dbname=dbendesis host=192.168.100.30 user=ende_pxp password=ende_pxp';
 
    --verificamos la configuracion para ver de donde sacamos los documentos
-  IF pxp.f_get_variable_global('conexion_documento_bancarizacion') = 'endesis'
+  --todas los años menor  o igual al 2016 iran a sacar los documentos desde el endesis
+  IF p_gestion <= 2016
     THEN
 
       v_resp:= ' WITH tabla_temporal_documentos AS (
@@ -96,8 +99,43 @@ BEGIN
 
 
   ELSE
-      RAISE EXCEPTION 'es pxps';
-  END IF;
+    --los documentos mayor o igual a 2017 se buscara todo en el pxp
+      --RAISE EXCEPTION 'es pxps';
+
+
+    v_resp := 'WITH tabla_temporal_documentos AS (
+        select
+          doc.id_int_comprobante,
+          doc.razon_social,
+          doc.id_doc_compra_venta as id_documento,
+          doc.importe_neto as importe_total,
+          doc.id_moneda,
+          doc.nro_documento,
+          doc.nro_autorizacion,
+          doc.fecha as fecha_documento,
+          doc.nit as nro_nit,
+          0 as importe_debe,
+          0 as importe_gasto
+        FROM conta.tdoc_compra_venta doc
+          INNER JOIN conta.tint_comprobante comp on comp.id_int_comprobante = doc.id_int_comprobante
+
+    ) ,tabla_temporal_sigma AS (
+
+        select
+          comp.id_int_comprobante,
+          comp.c31 as comprobante_c31,
+          0 as importe_haber,
+          0 as importe_recurso,
+          comp.fecha_c31 as fecha_entrega
+
+        FROM conta.tint_comprobante comp
+    )';
+
+
+
+
+
+      END IF;
 
 
 
