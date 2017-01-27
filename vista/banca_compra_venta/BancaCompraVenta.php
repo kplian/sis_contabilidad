@@ -245,9 +245,11 @@ fheight: '80%',
 
 
 
+		this.addButton('Clonar',{argument: {imprimir: 'Clonar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Clonar',/*iconCls:'' ,*/disabled:false,handler:this.Clonar});
 
-		
-        
+
+
+
 		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
 	
@@ -2167,6 +2169,25 @@ fheight: '80%',
 				params:{'id_periodo':id_periodo,'id_depto_conta':id_depto_conta,'numero_tramite':numero_tramite},
 				success: this.successAuto,
 			
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+    },
+	Clonar : function(){
+    	Phx.CP.loadingShow();
+
+
+
+			var rec = this.sm.getSelected();
+
+			var id_banca_compra_venta = rec.data.id_banca_compra_venta;
+
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/clonar',
+				params:{'id_banca_compra_venta':id_banca_compra_venta},
+				success: this.successAuto,
+
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
