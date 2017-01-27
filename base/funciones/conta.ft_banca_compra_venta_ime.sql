@@ -81,6 +81,9 @@ DECLARE
   v_id_obligacion_pago    INTEGER;
 
 
+  v_banca RECORD;
+
+
 BEGIN
 
   v_nombre_funcion = 'conta.ft_banca_compra_venta_ime';
@@ -540,18 +543,20 @@ BEGIN
 
 
         SELECT
-          fecha_ini,
-          fecha_fin,
-          param.f_literal_periodo(id_periodo) AS periodo
+          per.fecha_ini,
+          per.fecha_fin,
+          param.f_literal_periodo(per.id_periodo) AS periodo,
+          ges.gestion
         INTO v_periodo
-        FROM param.tperiodo
-        WHERE id_periodo = v_parametros.id_periodo;
+        FROM param.tperiodo per
+          INNER JOIN param.tgestion ges on ges.id_gestion = per.id_gestion
+        WHERE per.id_periodo = v_parametros.id_periodo;
 
 
         v_host:='dbname=dbendesis host=192.168.100.30 user=ende_pxp password=ende_pxp';
 
         --creacion de tabla temporal del endesis
-        v_consulta = conta.f_obtener_string_documento_bancarizacion();
+        v_consulta = conta.f_obtener_string_documento_bancarizacion(v_periodo.gestion::INTEGER);
 
 
 
@@ -691,7 +696,7 @@ where pg_pagado.estado=''pagado'' and pg_devengado.estado = ''devengado''
 and (libro.tipo=''cheque'' or  pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago = ''cheque'')
 and ( pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago=''cheque'')
  and plantilla.tipo_informe in (''lcv'',''retenciones'')
-and (libro.estado in (''cobrado'',''entregado'',''anulado'') or libro.estado is null )
+and (libro.estado in (''cobrado'',''entregado'') or libro.estado is null )
 and ((doc.fecha_documento >= ''' || v_periodo.fecha_ini || '''::date and doc.fecha_documento <=''' ||
                      v_periodo.fecha_fin || '''::date)
 or (libro.fecha >= ''' || v_periodo.fecha_ini || '''::date and libro.fecha <=''' || v_periodo.fecha_fin || '''::date)
@@ -1324,7 +1329,7 @@ where pg_pagado.estado=''pagado'' and pg_devengado.estado = ''devengado''
 and (libro.tipo=''cheque'' or  pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago = ''cheque'')
 and ( pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago=''cheque'')
  and plantilla.tipo_informe in (''lcv'',''retenciones'')
-and (libro.estado in (''cobrado'',''entregado'',''anulado'') or libro.estado is null )
+and (libro.estado in (''cobrado'',''entregado'') or libro.estado is null )
 
 and (
 (doc.importe_total >= 50000)
@@ -1655,6 +1660,139 @@ and (
         RETURN v_resp;
 
       END;
+
+
+
+
+      /*********************************
+       #TRANSACCION: 'CONTA_BANCA_CLON'
+       #DESCRIPCION:	clona de registros
+       #AUTOR:		admin
+       #FECHA:		11-09-2015 14:36:46
+      ***********************************/
+
+  ELSIF (p_transaccion='CONTA_BANCA_CLON')
+    THEN
+
+      BEGIN
+        --Sentencia de la eliminacion
+
+        SELECT *
+        INTO v_banca
+        FROM conta.tbanca_compra_venta
+        WHERE id_banca_compra_venta = v_parametros.id_banca_compra_venta;
+
+
+        INSERT INTO conta.tbanca_compra_venta (id_usuario_reg,
+                                               id_usuario_mod,
+                                               fecha_reg,
+                                               fecha_mod,
+                                               estado_reg,
+                                               id_usuario_ai,
+                                               usuario_ai,
+
+                                               tipo,
+                                               modalidad_transaccion,
+                                               fecha_documento,
+                                               tipo_transaccion,
+                                               nit_ci,
+                                               razon,
+                                               num_documento,
+                                               num_contrato,
+                                               importe_documento,
+                                               autorizacion,
+                                               num_cuenta_pago,
+                                               monto_pagado,
+                                               monto_acumulado,
+                                               nit_entidad,
+                                               num_documento_pago,
+                                               tipo_documento_pago,
+                                               fecha_de_pago,
+                                               id_depto_conta,
+                                               id_periodo,
+                                               revisado,
+                                               id_proveedor,
+                                               id_contrato,
+                                               id_cuenta_bancaria,
+                                               id_documento,
+                                               periodo_servicio,
+                                               numero_cuota,
+                                               saldo,
+                                               resolucion,
+                                               tramite_cuota,
+                                               id_proceso_wf,
+                                               retencion_cuota,
+                                               multa_cuota,
+                                               estado_libro,
+                                               lista_negra,
+                                               registro,
+                                               tipo_bancarizacion
+        )
+
+
+
+
+        VALUES
+          (
+            p_id_usuario,
+            v_banca.id_usuario_mod,
+            now(),
+            v_banca.fecha_mod,
+            v_banca.estado_reg,
+            v_parametros._id_usuario_ai,
+            v_parametros._nombre_usuario_ai,
+
+            v_banca.tipo,
+            v_banca.modalidad_transaccion,
+            v_banca.fecha_documento,
+            v_banca.tipo_transaccion,
+            v_banca.nit_ci,
+            v_banca.razon,
+            v_banca.num_documento,
+            v_banca.num_contrato,
+            v_banca.importe_documento,
+            v_banca.autorizacion,
+            v_banca.num_cuenta_pago,
+            v_banca.monto_pagado,
+            v_banca.monto_acumulado,
+            v_banca.nit_entidad,
+            v_banca.num_documento_pago,
+            v_banca.tipo_documento_pago,
+            v_banca.fecha_de_pago,
+            v_banca.id_depto_conta,
+            v_banca.id_periodo,
+            v_banca.revisado,
+            v_banca.id_proveedor,
+            v_banca.id_contrato,
+            v_banca.id_cuenta_bancaria,
+            v_banca.id_documento,
+            v_banca.periodo_servicio,
+            v_banca.numero_cuota,
+            v_banca.saldo,
+            v_banca.resolucion,
+            v_banca.tramite_cuota,
+            v_banca.id_proceso_wf,
+            v_banca.retencion_cuota,
+            v_banca.multa_cuota,
+            v_banca.estado_libro,
+            v_banca.lista_negra,
+            v_banca.registro,
+            'clonado'
+          );
+
+
+
+        --Definicion de la respuesta
+        v_resp = pxp.f_agrega_clave(v_resp, 'mensaje', 'bancarizacion clonado(a)');
+        v_resp = pxp.f_agrega_clave(v_resp, 'id_banca_compra_venta', v_parametros.id_banca_compra_venta :: VARCHAR);
+
+        --Devuelve la respuesta
+        RETURN v_resp;
+
+      END;
+
+
+
 
 
   ELSE
