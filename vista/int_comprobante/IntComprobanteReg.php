@@ -165,11 +165,7 @@ Phx.vista.IntComprobanteReg = {
 				this.getBoton('btnImprimir').enable();
 				this.getBoton('btnRelDev').enable();
 				this.getBoton('btnIgualarCbte').enable();
-				if (rec.data.desc_clase_comprobante == 'Comprobante de Diario Presupuestario') {
-					this.getBoton('btnDocCmpVnt').enable();
-				}else{
-					this.getBoton('btnDocCmpVnt').disable();
-				}
+				this.getBoton('btnDocCmpVnt').enable();
 				this.getBoton('chkpresupuesto').enable();				
 				this.getBoton('btnChequeoDocumentosWf').enable();
                 this.getBoton('diagrama_gantt').enable();
