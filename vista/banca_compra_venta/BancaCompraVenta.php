@@ -246,6 +246,7 @@ fheight: '80%',
 
 
 		this.addButton('Clonar',{argument: {imprimir: 'Clonar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Clonar',/*iconCls:'' ,*/disabled:false,handler:this.Clonar});
+		this.addButton('airbp',{argument: {imprimir: 'airbp'},text:'<i class="fa fa-file-text-o fa-2x"></i> airbp',/*iconCls:'' ,*/disabled:false,handler:this.airbp});
 
 
 
@@ -751,13 +752,16 @@ fheight: '80%',
 					}else{
 						css = "";
 					}
-					
-					
+
+
 					var devolucion = '';
 					if(record.json.tipo_bancarizacion == 'devolucion'){
 						devolucion = '<div style="color:blue; font-weight:bold;" >(devolucion)</div>'
 					}
 
+					if(record.json.tipo_bancarizacion == 'clonado'){
+						devolucion = '<div style="color:orange; font-weight:bold;" >(clonado)</div>'
+					}
 
             	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}{2}{3}</span></div>',css,resp,lista_negra,devolucion);
 
@@ -2192,6 +2196,19 @@ fheight: '80%',
 				timeout:this.timeout,
 				scope:this
 			});
+    },
+	airbp : function(){
+
+
+
+
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/plan_pago_documento_airbp/PlanPagoDocumentoAirbp.php',
+			'PlanPagoDocumentoAirbp',
+			{
+				width:900,
+				height:400
+			},'',this.idContenedor,'PlanPagoDocumentoAirbp')
+
     }
     
     
