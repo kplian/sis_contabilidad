@@ -28,6 +28,7 @@ v_nivel_inicial		integer;
 v_total 			numeric;
 v_tipo_cuenta		varchar;
 v_incluir_cierre	varchar;
+v_incluir_sinmov	varchar;
  
 
 BEGIN
@@ -54,6 +55,12 @@ BEGIN
         end if;
         
         
+        v_incluir_sinmov = 'no';
+        if pxp.f_existe_parametro(p_tabla,'incluir_sinmov') then
+          v_incluir_sinmov = v_parametros.incluir_sinmov;
+        end if;
+        
+        
         -- 1) Crea una tabla temporal con los datos que se utilizaran 
 
         CREATE TEMPORARY TABLE temp_balancef (
@@ -63,7 +70,8 @@ BEGIN
                                 id_cuenta_padre integer,
                                 monto numeric,
                                 nivel integer,
-                                tipo_cuenta varchar
+                                tipo_cuenta varchar,
+                                movimiento	varchar
                                      ) ON COMMIT DROP;
     
           
@@ -83,19 +91,35 @@ BEGIN
        
       raise notice '------------------------------------------------> total %', v_total;
       
-      FOR v_registros in (SELECT                                   
-       							id_cuenta,
-                                nro_cuenta,
-                                nombre_cuenta,
-                                id_cuenta_padre,
-                                monto,
-                                nivel,
-                                tipo_cuenta
-       						FROM temp_balancef 
-                                order by nro_cuenta) LOOP
-               RETURN NEXT v_registros;
-     END LOOP;
-  
+      
+      
+      v_consulta = 'SELECT                                   
+                            id_cuenta,
+                            nro_cuenta,
+                            nombre_cuenta,
+                            id_cuenta_padre,
+                            monto,
+                            nivel,
+                            tipo_cuenta,
+                            movimiento
+                        FROM temp_balancef  ';
+                        
+                        
+       IF v_incluir_sinmov != 'no' THEN                          
+          v_consulta = v_consulta|| ' WHERE monto != 0 ' ;
+       END IF; 
+       
+       IF v_parametros.tipo_balance = 'resultado' THEN 
+           v_consulta = v_consulta|| ' order by movimiento desc, nro_cuenta asc' ;
+       ELSE
+           v_consulta = v_consulta|| ' order by  nro_cuenta';                  
+       END IF;
+       
+       FOR v_registros in EXECUTE(v_consulta) LOOP
+                   RETURN NEXT v_registros;
+       END LOOP;
+       
+      
 
 END IF;
 

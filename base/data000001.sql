@@ -1175,3 +1175,43 @@ select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','REN','pendiente'
 
 
 
+
+/**********************************I-DAT-RAC-CONTA-1-29/06/2016*****************************************/
+
+
+select pxp.f_insert_tgui ('Estados Financieros', 'Reportes de Estados Financieros (desde la plantilla de resultados)', 'REPRES', 'si', 2, 'sis_contabilidad/vista/cuenta/FormFiltroResultado.php', 3, '', 'FormFiltroResultado', 'CONTA');
+
+/**********************************F-DAT-RAC-CONTA-1-29/06/2016*****************************************/
+
+
+
+/**********************************I-DAT-RAC-CONTA-1-17/11/2016*****************************************/
+
+select pxp.f_insert_tgui ('Entrega C31', 'Entrega C31', 'ENTR', 'si', 4, 'sis_contabilidad/vista/entrega/Entrega.php', 3, '', 'Entrega', 'CONTA');
+select pxp.f_insert_testructura_gui ('ENTR', 'CBTE.1');
+
+/**********************************F-DAT-RAC-CONTA-1-17/11/2016*****************************************/
+
+
+/**********************************I-DAT-RAC-CONTA-1-07/12/2016*****************************************/
+
+select pxp.f_insert_tgui ('Estado de Resultados', 'Estado de Resultados', 'REPESTRE', 'si', 2, 'sis_contabilidad/vista/cuenta/FormFiltroEstadoResultado.php', 3, '', 'FormFiltroEstadoResultado', 'CONTA');
+select pxp.f_insert_testructura_gui ('REPESTRE', 'REPCON');
+select pxp.f_insert_tgui ('Balance de cuentas', 'Balance general', 'BALCON', 'si', 1, 'sis_contabilidad/vista/cuenta/FormFiltroBalanceCuentas.php', 3, '', 'FormFiltroBalanceCuentas', 'CONTA');
+
+/**********************************F-DAT-RAC-CONTA-1-07/12/2016*****************************************/
+
+
+
+/**********************************I-DAT-RAC-CONTA-1-13/12/2016*****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_ejecucion_igual_pres_conta', E'si', E'si o no, define si laejecucion presupuestaria sera igual a la contabe, ejemplo el caso de algunas empresas ejecutar el 100 % de las facturas y no solo el 13 %, en ese caso definir como no');
+
+
+/**********************************F-DAT-RAC-CONTA-1-13/12/2016*****************************************/
+
+
+

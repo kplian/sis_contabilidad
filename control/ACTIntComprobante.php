@@ -25,12 +25,24 @@ class ACTIntComprobante extends ACTbase{
             $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
         }
 		
-		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'){
+		if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("incbte.id_gestion in (".$this->objParam->getParametro('id_gestion').")");    
+        }
+		
+		if($this->objParam->getParametro('id_clase_comprobante')!=''){
+            $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");    
+        }
+		
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'  || $this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
             $this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
         }
 		else{
 			$this->objParam->addFiltro("incbte.estado_reg in (''borrador'', ''edicion'')");
 		}
+		
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
+            $this->objParam->addFiltro(" (incbte.c31 = '''' or incbte.c31 is null )" );      
+        }
 		
 		if($this->objParam->getParametro('momento')!= ''){
 			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
@@ -93,6 +105,14 @@ class ACTIntComprobante extends ACTbase{
 		
 		if($this->objParam->getParametro('id_deptos')!=''){
             $this->objParam->addFiltro("inc.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
+        }
+        
+        if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));    
+        }
+		
+		 if($this->objParam->getParametro('id_moneda')!=''){
+            $this->objParam->addFiltro("inc.id_moneda = ".$this->objParam->getParametro('id_moneda'));    
         }
         
 		
@@ -375,7 +395,7 @@ class ACTIntComprobante extends ACTbase{
 
    function reporteCbte(){
 			
-		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
+		$nombreArchivo = uniqid(md5(session_id()).'-Cbte') . '.pdf'; 
 		$dataSource = $this->recuperarDatosCbte();	
 		
 		//parametros basicos

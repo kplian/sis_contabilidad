@@ -133,7 +133,12 @@ BEGIN
                               incbte.cbte_reversion,
                               incbte.volcado,
                               incbte.id_proceso_wf,
-                              incbte.id_estado_wf
+                              incbte.id_estado_wf,
+                              incbte.fecha_c31,
+                              incbte.c31,
+                              incbte.id_gestion,
+                              incbte.periodo,
+                              incbte.forma_cambio
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
@@ -209,9 +214,12 @@ BEGIN
                                    inc.glosa2,
                                    cc.id_clase_comprobante,
                                    cc.codigo,
-                                   cc.descripcion
+                                   cc.descripcion,
+                                   mon.codigo::text AS desc_moneda
                                    
-                            from conta.tint_comprobante inc
+                            from conta.vint_comprobante inc
+                            inner JOIN param.tmoneda mon ON mon.id_moneda = inc.id_moneda
+                            inner JOIN param.tperiodo per ON per.id_periodo = inc.id_periodo
                             inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = inc.id_clase_comprobante
                             where  ';
 			
@@ -236,7 +244,9 @@ BEGIN
 		begin
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_int_comprobante)
-			             from conta.tint_comprobante inc
+			             from conta.vint_comprobante inc
+                         inner JOIN param.tmoneda mon ON mon.id_moneda = inc.id_moneda
+                         inner JOIN param.tperiodo per ON per.id_periodo = inc.id_periodo
                          inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = inc.id_clase_comprobante
                          where ';
 			
@@ -324,7 +334,7 @@ BEGIN
 		
 	/*********************************    
  	#TRANSACCION:  'CONTA_DETCBT_SEL'
- 	#DESCRIPCION:	Cabecera para el reporte de Comprobante
+ 	#DESCRIPCION:	detalle para el reporte de Comprobante
  	#AUTOR:			RCM	
  	#FECHA:			10/09/2013
 	***********************************/
@@ -332,41 +342,76 @@ BEGIN
 	elsif(p_transaccion='CONTA_DETCBT_SEL')then
      				
     	begin
-        
+       
     		--Sentencia de la consulta
-			v_consulta:='select
-                            cue.nro_cuenta,
-                            cue.nombre_cuenta,
-                            aux.codigo_auxiliar,
-                            aux.nombre_auxiliar,
-                            cc.codigo_cc as cc,
-                            par.codigo as codigo_partida,
-                            par.nombre_partida,
-                            ot.desc_orden,
-                            tra.glosa::varchar as glosa,
-                            sum(tra.importe_debe) as importe_debe, 
-                            sum(tra.importe_haber) as importe_haber,
-                            sum(tra.importe_debe_mb) as importe_debe_mb,
-                            sum(tra.importe_haber_mb) as importe_haber_mb
-                          from conta.tint_transaccion tra
-                          inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
-                          inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
-                          inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
-                          left join pre.tpartida par on par.id_partida = tra.id_partida
-                          left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
-                          left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
-                          where cbte.id_proceso_wf = '||v_parametros.id_proceso_wf||'
-                          group by 
-                            cue.nro_cuenta,
-                            cue.nombre_cuenta,
-                            aux.codigo_auxiliar,
-                            aux.nombre_auxiliar,
-                            cc.codigo_cc ,
-                            par.codigo ,
-                            par.nombre_partida,
-                            ot.desc_orden,
-                            tra.glosa
-                          order by importe_debe desc, importe_haber desc';
+			v_consulta:='select    
+                                nro_cuenta,
+                                nombre_cuenta,
+                                codigo_auxiliar,
+                                nombre_auxiliar,
+                                ccc,
+                                codigo_partida,
+                                nombre_partida,
+                                desc_orden,
+                                glosa,
+                                importe_gasto, 
+                                importe_recurso,
+                                importe_debe, 
+                                importe_haber,
+                                importe_debe_mb,
+                                importe_haber_mb,
+                                sw_movimiento,
+                                tipo_partida
+                                FROM ((select
+                                                  CASE 
+                                                    WHEN  (sum(tra.importe_debe) > 0 or sum(tra.importe_debe_mb) >0) then  1 
+                                                    ELSE   2
+                                                   END as tipo,
+                                                  max(tra.orden) as orden_rank,
+                                                  cue.nro_cuenta,
+                                                  cue.nombre_cuenta,
+                                                  aux.codigo_auxiliar,
+                                                  aux.nombre_auxiliar,
+                                                  cc.codigo_cc as ccc,
+                                                  par.codigo as codigo_partida,
+                                                  par.nombre_partida,
+                                                  ot.desc_orden,
+                                                  tra.glosa::varchar as glosa,
+                                                  sum(tra.importe_gasto) as importe_gasto,
+                                                  sum(tra.importe_recurso) as importe_recurso,
+                                                  sum(tra.importe_debe) as importe_debe, 
+                                                  sum(tra.importe_haber) as importe_haber,
+                                                  sum(tra.importe_debe_mb) as importe_debe_mb,
+                                                  sum(tra.importe_haber_mb) as importe_haber_mb,
+                                                  par.sw_movimiento,
+                                                  par.tipo as tipo_partida
+                                                from conta.tint_transaccion tra
+                                                inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
+                                                inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
+                                                inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
+                                                left join pre.tpartida par on par.id_partida = tra.id_partida
+                                                left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
+                                                left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
+                                                where cbte.id_proceso_wf =  '||v_parametros.id_proceso_wf||'
+                                                
+                                                group by 
+                                                  cue.nro_cuenta,
+                                                  cue.nombre_cuenta,
+                                                  aux.codigo_auxiliar,
+                                                  aux.nombre_auxiliar,
+                                                  cc.codigo_cc ,
+                                                  par.codigo ,
+                                                  par.nombre_partida,
+                                                  ot.desc_orden,
+                                                  tra.glosa,
+                                                  par.sw_movimiento,
+                                                  par.tipo
+                                          )
+                                          
+                                                  
+                                ) iii 
+                                
+                                order by tipo, orden_rank';
 						
 			
 			--Devuelve la respuesta
@@ -557,7 +602,12 @@ BEGIN
                               incbte.cbte_reversion,
                               incbte.volcado,
                               incbte.id_proceso_wf,
-                              incbte.id_estado_wf
+                              incbte.id_estado_wf,
+                              incbte.fecha_c31,
+                              incbte.c31,
+                              incbte.id_gestion,
+                              incbte.periodo,
+                              incbte.forma_cambio
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf

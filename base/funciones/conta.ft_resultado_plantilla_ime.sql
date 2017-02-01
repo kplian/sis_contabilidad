@@ -51,39 +51,43 @@ BEGIN
         begin
         	--Sentencia de la insercion
         	insert into conta.tresultado_plantilla(
-			codigo,
-			estado_reg,
-			nombre,
-			id_usuario_reg,
-			usuario_ai,
-			fecha_reg,
-			id_usuario_ai,
-			fecha_mod,
-			id_usuario_mod,
-            tipo,
-            cbte_aitb,
-            cbte_apertura,
-            cbte_cierre,
-            periodo_calculo,
-            id_clase_comprobante,
-            glosa
+              codigo,
+              estado_reg,
+              nombre,
+              id_usuario_reg,
+              usuario_ai,
+              fecha_reg,
+              id_usuario_ai,
+              fecha_mod,
+              id_usuario_mod,
+              tipo,
+              cbte_aitb,
+              cbte_apertura,
+              cbte_cierre,
+              periodo_calculo,
+              id_clase_comprobante,
+              glosa,
+              id_tipo_relacion_comprobante,
+              relacion_unica
           	) values(
-			v_parametros.codigo,
-			'activo',
-			v_parametros.nombre,
-			p_id_usuario,
-			v_parametros._nombre_usuario_ai,
-			now(),
-			v_parametros._id_usuario_ai,
-			null,
-			null,
-            v_parametros.tipo,
-            v_parametros.cbte_aitb,
-            v_parametros.cbte_apertura,
-            v_parametros.cbte_cierre,
-            v_parametros.periodo_calculo,
-            v_parametros.id_clase_comprobante,
-            v_parametros.glosa
+              v_parametros.codigo,
+              'activo',
+              v_parametros.nombre,
+              p_id_usuario,
+              v_parametros._nombre_usuario_ai,
+              now(),
+              v_parametros._id_usuario_ai,
+              null,
+              null,
+              v_parametros.tipo,
+              v_parametros.cbte_aitb,
+              v_parametros.cbte_apertura,
+              v_parametros.cbte_cierre,
+              v_parametros.periodo_calculo,
+              v_parametros.id_clase_comprobante,
+              v_parametros.glosa,
+              v_parametros.id_tipo_relacion_comprobante,
+              v_parametros.relacion_unica
 							
 			
 			
@@ -122,7 +126,9 @@ BEGIN
               cbte_cierre = v_parametros.cbte_cierre,
               periodo_calculo = v_parametros.periodo_calculo,
               id_clase_comprobante = v_parametros.id_clase_comprobante,
-              glosa = v_parametros.glosa
+              glosa = v_parametros.glosa,
+              id_tipo_relacion_comprobante = v_parametros.id_tipo_relacion_comprobante,
+              relacion_unica = v_parametros.relacion_unica
 			where id_resultado_plantilla = v_parametros.id_resultado_plantilla;
                
 			--Definicion de la respuesta
@@ -177,7 +183,9 @@ BEGIN
              rp.cbte_cierre,
              rp.id_clase_comprobante,
              rp.tipo,
-             rp.periodo_calculo
+             rp.periodo_calculo,
+             rp.id_tipo_relacion_comprobante,
+             rp.relacion_unica
             into
               v_registros 
             from conta.tresultado_plantilla rp 
@@ -195,7 +203,9 @@ BEGIN
                   cbte_cierre,
                   id_clase_comprobante,
                   tipo,
-                  periodo_calculo
+                  periodo_calculo,
+                  id_tipo_relacion_comprobante,
+                  relacion_unica
                 )
                 VALUES (
                    p_id_usuario,
@@ -208,7 +218,9 @@ BEGIN
                    v_registros.cbte_cierre,
                    v_registros.id_clase_comprobante,
                    v_registros.tipo,
-                   v_registros.periodo_calculo
+                   v_registros.periodo_calculo,
+              	   v_registros.id_tipo_relacion_comprobante,
+             	   v_registros.relacion_unica
                 )  RETURNING id_resultado_plantilla into v_id_resultado_plantilla;
             
             ----------------------------------------------

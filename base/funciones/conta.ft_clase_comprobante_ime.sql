@@ -50,31 +50,35 @@ BEGIN
         begin
         	--Sentencia de la insercion
         	insert into conta.tclase_comprobante(
-			id_documento,
-			tipo_comprobante,
-			descripcion,
-			estado_reg,
-			id_usuario_reg,
-			fecha_reg,
-			fecha_mod,
-			id_usuario_mod,
-            codigo,
-            momento_comprometido,
-            momento_ejecutado,
-            momento_pagado
+                id_documento,
+                tipo_comprobante,
+                descripcion,
+                estado_reg,
+                id_usuario_reg,
+                fecha_reg,
+                fecha_mod,
+                id_usuario_mod,
+                codigo,
+                momento_comprometido,
+                momento_ejecutado,
+                momento_pagado,
+                tiene_apertura,
+                movimiento
           	) values(
-			v_parametros.id_documento,
-			v_parametros.tipo_comprobante,
-			v_parametros.descripcion,
-			'activo',
-			p_id_usuario,
-			now(),
-			null,
-			null,
-            v_parametros.codigo,
-            v_parametros.momento_comprometido,
-            v_parametros.momento_ejecutado,
-            v_parametros.momento_pagado
+              v_parametros.id_documento,
+              v_parametros.tipo_comprobante,
+              v_parametros.descripcion,
+              'activo',
+              p_id_usuario,
+              now(),
+              null,
+              null,
+              v_parametros.codigo,
+              v_parametros.momento_comprometido,
+              v_parametros.momento_ejecutado,
+              v_parametros.momento_pagado,
+              v_parametros.tiene_apertura,
+              v_parametros.movimiento
 							
 			)RETURNING id_clase_comprobante into v_id_clase_comprobante;
 			
@@ -99,15 +103,17 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update conta.tclase_comprobante set
-			id_documento = v_parametros.id_documento,
-			tipo_comprobante = v_parametros.tipo_comprobante,
-			descripcion = v_parametros.descripcion,
-			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario,
-            codigo = v_parametros.codigo,
-            momento_comprometido = v_parametros.momento_comprometido,
-            momento_ejecutado = v_parametros.momento_ejecutado,
-            momento_pagado = v_parametros.momento_pagado
+                id_documento = v_parametros.id_documento,
+                tipo_comprobante = v_parametros.tipo_comprobante,
+                descripcion = v_parametros.descripcion,
+                fecha_mod = now(),
+                id_usuario_mod = p_id_usuario,
+                codigo = v_parametros.codigo,
+                momento_comprometido = v_parametros.momento_comprometido,
+                momento_ejecutado = v_parametros.momento_ejecutado,
+                momento_pagado = v_parametros.momento_pagado,
+                tiene_apertura = v_parametros.tiene_apertura,
+                movimiento = v_parametros.movimiento
 			where id_clase_comprobante=v_parametros.id_clase_comprobante;
                
 			--Definicion de la respuesta

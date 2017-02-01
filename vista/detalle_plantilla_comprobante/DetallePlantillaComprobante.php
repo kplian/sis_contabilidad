@@ -837,8 +837,8 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 	],
 	
 	onSubmit : function(o) {
-		this.Cmp.campo_monto_pres.setValue(encodeURIComponent(this.Cmp.campo_monto_pres.getValue()));
-		this.Cmp.campo_monto.setValue(encodeURIComponent(this.Cmp.campo_monto.getValue()));
+		//this.Cmp.campo_monto_pres.setValue(encodeURIComponent(this.Cmp.campo_monto_pres.getValue()));
+		//this.Cmp.campo_monto.setValue(encodeURIComponent(this.Cmp.campo_monto.getValue()));
 		Phx.vista.DetallePlantillaComprobante.superclass.onSubmit.call(this,o);
 	},
 	

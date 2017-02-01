@@ -88,7 +88,11 @@ BEGIN
                             tipo_partida_dev,
     						tipo_partida_pag,
                             desc_auxiliar_dev,
-                            desc_auxiliar_pag
+                            desc_auxiliar_pag,
+                            importe_gasto_pag,
+                            importe_recurso_pag,
+                            importe_gasto_dev,
+                            importe_recurso_dev
                           FROM 
                             conta.vint_rel_devengado
                           where  ';

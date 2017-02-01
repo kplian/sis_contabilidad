@@ -15,6 +15,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
     tabEnter: true,
     constructor:function(config){
 		var me = this;
+		this.maestro = config;
 		//llama al constructor de la clase padre
 		Phx.vista.DocCompraVentaCbte.superclass.constructor.call(this,config);
 		
@@ -26,6 +27,16 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
                 disabled: true,
                 handler: this.showDoc,
                 tooltip: 'Muestra el detalle del documento'
+            }
+        );
+        
+        this.addButton('btnNewDoc',
+            {
+                text: 'Relacionar Doc.',
+                iconCls: 'blist',
+                disabled: false,
+                handler: this.newDoc,
+                tooltip: 'Permite relacionar un documento existente al Cbte'
             }
         );
         
@@ -336,7 +347,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 		{
 			config:{
@@ -365,7 +376,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'dcv.importe_pendiente',type:'numeric'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 		{
 			config:{
@@ -380,7 +391,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'dcv.importe_anticipo',type:'numeric'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 		{
 			config:{
@@ -395,7 +406,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'dcv.importe_retgar',type:'numeric'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 		{
 			config:{
@@ -685,12 +696,12 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel: true,
-	bedit: false,
+	bedit: true,
 	bsave: false,
-	abrirFormulario: function(tipo, record){
+	abrirFormulario: function(tipo, record, maestro){
    	       
    	       var me = this;
-	       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVenta.php',
+	       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVentaCbte.php',
 	                                'Formulario de Documento Compra/Venta',
 	                                {
 	                                    modal:true,
@@ -698,16 +709,19 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 	                                    height:'100%'
 	                                }, { data: { 
 	                                	 objPadre: me ,
-	                                	 tipoDoc: record.data.tipo,
-	                                	 id_depto: record.data.id_depto_conta,
-	                                	 tipo_form : record.data.tipo,
+	                                	 tipoDoc: (record)?record.data.tipo:'compra',
+	                                	 id_depto: (record)?record.data.id_depto_conta:maestro.id_depto,
+	                                	 id_int_comprobante: (maestro)? maestro.id_int_comprobante: undefined,
+	                                	 tipo_form : (record)?record.data.tipo:'new',
 	                                	 datosOriginales: record,
-	                                	 readOnly: true
+	                                	 readOnly: (tipo=='noedit')? true: false
 	                                	},
-	                                    bsubmit: false
+	                                    bsubmit: (tipo=='noedit')? false: true ,
+	                                    id_moneda_defecto : me.maestro.id_moneda,
+	                                    regitrarDetalle: 'no'
 	                                }, 
 	                                this.idContenedor,
-	                                'FormCompraVenta',
+	                                'FormCompraVentaCbte',
 	                                {
 	                                    config:[{
 	                                              event:'successsave',
@@ -722,39 +736,50 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
    
    
 	
-	showDoc:  function() {
-        this.abrirFormulario('edit', this.sm.getSelected());
-   },
-   
+  
    agregarArgsExtraSubmit: function() {
        
        this.argumentExtraSubmit = { id_int_comprobante: this.id_int_comprobante };
    
    },
    
-   onButtonNew:function(){         
-            Phx.vista.DocCompraVentaCbte.superclass.onButtonNew.call(this);
-            
-            this.Cmp.id_doc_compra_venta.store.baseParams = Ext.apply(this.Cmp.id_doc_compra_venta.store.baseParams,
-            	  {
+   onButtonNew:function(){ 
+   	  this.abrirFormulario('new',undefined, this.maestro)         
+   },
+    
+   onButtonEdit:function(){
+     	this.abrirFormulario('edit', this.sm.getSelected())
+   },
+    
+   showDoc:  function() {
+        this.abrirFormulario('noedit', this.sm.getSelected());
+   },
+   
+   newDoc: function() {
+   	  
+   	  Phx.vista.DocCompraVentaCbte.superclass.onButtonNew.call(this);
+   	  this.Cmp.id_doc_compra_venta.store.baseParams = Ext.apply(this.Cmp.id_doc_compra_venta.store.baseParams,
+      {
             	  fecha_cbte: this.fecha, 
             	  sin_cbte: 'si',
             	  manual: 'si'}); 
             	  
-            this.Cmp.id_doc_compra_venta.modificado = true;
-    },
-    preparaMenu:function(tb){
-        
+      this.Cmp.id_doc_compra_venta.modificado = true;
+       
+   },
+   
+   
+    preparaMenu:function(tb){        
         Phx.vista.DocCompraVentaCbte.superclass.preparaMenu.call(this,tb)
         this.getBoton('btnShowDoc').enable();
-           
     },
     
     liberaMenu:function(tb){
         Phx.vista.DocCompraVentaCbte.superclass.liberaMenu.call(this,tb);
         this.getBoton('btnShowDoc').disable();
-                    
     },
+    
+    
    
     
     

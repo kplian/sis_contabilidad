@@ -129,9 +129,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                	   if(value == 'si'){
 	                	      checked = 'checked';
 	                	   }
-	                	   if(record.data.id_int_comprobante){
+	                	   /*if(record.data.id_int_comprobante){
 	                	      state = 'disabled';
-	                	   }
+	                	   }*/
 	                	   if(record.data.tipo_reg != 'summary'){
 	            	         return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
 	            	       }
@@ -275,8 +275,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					name: 'razon_social',
 					fieldLabel: 'Razón Social',
 					allowBlank: false,
-					maskRe: /[A-Za-z0-9 ]/,
-	                fieldStyle: 'text-transform:uppercase',
+					//maskRe: /[A-Za-z0-9 ]/,
+	                //fieldStyle: 'text-transform:uppercase',
+					style:'text-transform:uppercase;',
 	                listeners:{
 				          'change': function(field, newValue, oldValue){
 				          			  console.log('keyup ...  ')
@@ -318,13 +319,15 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: false,
 					anchor: '80%',
 					gwidth: 80,
+					galign: 'right ',
 					maxLength:1179650,
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}',  Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							Ext.util.Format.usMoney
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -332,22 +335,24 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},			
 			{
 				config:{
 					name: 'importe_excento',
-					fieldLabel: 'Excento',
+					fieldLabel: 'Exento',
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -355,6 +360,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type: 'NumberField',
 					filters: {pfiltro:'dcv.importe_excento',type:'numeric'},
 					id_grupo:1,
+					
 					grid: true,
 					form: false
 			},			
@@ -365,12 +371,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -378,23 +385,25 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_descuento',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
 			{
 				config:{
 					name: 'importe_neto',
-					fieldLabel: 'Neto',
+					fieldLabel: 'Importe c/d',
 					allowBlank: false,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					maxLength:1179650,
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -402,6 +411,31 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_doc',type:'numeric'},
 					id_grupo:1,
+					grid:true,
+					form:false
+			},	
+			{
+				config:{
+					name: 'importe_aux_neto',
+					fieldLabel: 'Neto',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					galign: 'right ',
+					maxLength:1179650,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00') );
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+						
+					}
+				},
+					type:'NumberField',
+					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},			
@@ -413,12 +447,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					readOnly:true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -426,6 +461,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type: 'NumberField',
 					filters: { pfiltro:'dcv.importe_iva',type:'numeric'},
 					id_grupo: 1,
+					
 					grid: true,
 					form: false
 			},			
@@ -437,12 +473,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					readOnly:true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -450,6 +487,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_pago_liquido',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form: false
 			},			
@@ -657,7 +695,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			{
 				config:{
 					name: 'obs',
-					fieldLabel: 'Obs',
+					fieldLabel: 'Observaciones',
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
@@ -678,12 +716,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -691,6 +730,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_pendiente',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -702,12 +742,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -726,12 +767,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -739,6 +781,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_retgar',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -750,12 +793,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					readOnly:true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -763,6 +807,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_descuento_ley',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -773,12 +818,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -786,6 +832,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_ice',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form:false
 			},
@@ -797,12 +844,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					anchor: '80%',
 					readOnly:true,
 					gwidth: 100,
+					galign: 'right ',
 					renderer:function (value,p,record){
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', value);
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
 						}
 						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', value);
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
 						}
 						
 					}
@@ -810,6 +858,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'NumberField',
 					filters:{pfiltro:'dcv.importe_it',type:'numeric'},
 					id_grupo:1,
+					
 					grid:true,
 					form: false
 			},			
@@ -974,12 +1023,6 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			}
 		],
 			
-		
-		
-		
-		
-		
-		
 		
 		//llama al constructor de la clase padre
 		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
@@ -1151,7 +1194,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					root: 'datos',
 					sortInfo:{
 						field: 'gestion',
-						direction: 'ASC'
+						direction: 'DESC'
 					},
 					totalProperty: 'total',
 					fields: ['id_gestion','gestion'],
@@ -1186,14 +1229,14 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_periodo','periodo','id_gestion'],
+					fields: ['id_periodo','periodo','id_gestion','literal'],
 					// turn on remote sorting
 					remoteSort: true,
 					baseParams:{par_filtro:'gestion'}
 				}),
 				valueField: 'id_periodo',
 				triggerAction: 'all',
-				displayField: 'periodo',
+				displayField: 'literal',
 			    hiddenName: 'id_periodo',
     			mode:'remote',
 				pageSize:50,
@@ -1249,7 +1292,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		{name:'importe_retgar', type: 'numeric'},
 		{name:'importe_neto', type: 'numeric'},
 		'desc_depto','desc_plantilla',
-		'importe_descuento_ley',
+		'importe_descuento_ley','importe_aux_neto',
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
 		'desc_tipo_doc_compra_venta','id_tipo_doc_compra_venta','nro_tramite',
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg'
@@ -1276,7 +1319,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
         }
     },
    
-   formTitulo: 'Formulario de Documento Compra',
+   formTitulo: 'Registro de Documento Compra',
    abrirFormulario: function(tipo, record){
    	       var me = this;
    	       console.log(' me.regitrarDetalle', me.regitrarDetalle)
@@ -1284,8 +1327,18 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                                me.formTitulo,
 	                                {
 	                                    modal:true,
-	                                    width:'100%',
-	                                    height:'100%'
+	                                    width:'90%',
+										height:'60%'
+
+										/*if (me.regitrarDetalle == 'si')
+									    {
+										   height:'100%'
+									    }
+										else
+	   									{
+	   										height:'50%'
+	   									}*/
+
 	                                    
 	                                }, { data: { 
 		                                	 objPadre: me ,

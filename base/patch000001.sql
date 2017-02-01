@@ -19,7 +19,7 @@ CREATE TABLE conta.tcuenta (
   nro_cuenta VARCHAR(20), 
   id_gestion INTEGER, 
   id_moneda INTEGER, 
-  nombre_cuenta VARCHAR(100), 
+  nombre_cuenta VARCHAR(200), 
   desc_cuenta VARCHAR(500), 
   nivel_cuenta INTEGER, 
   tipo_cuenta VARCHAR(30), 
@@ -3271,4 +3271,190 @@ ALTER TABLE conta.tint_comprobante
 
 /***********************************F-SCP-JRR-CONTA-0-15/08/2016****************************************/
 
+/***********************************I-SCP-RAC-CONTA-0-31/08/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN orden NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.orden
+IS 'este campo define el orden de impresion, inicialmente se copia el id, pero al ser nuemric permite mover el orden usando decimales';
+
+
+/***********************************F-SCP-RAC-CONTA-0-31/08/2016****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-03/10/2016****************************************/
+
+
+CREATE TABLE conta.tcuenta_tmp (
+  codigo VARCHAR,
+  c1 VARCHAR,
+  c2 VARCHAR,
+  c3 VARCHAR,
+  c4 VARCHAR,
+  c5 VARCHAR,
+  mov VARCHAR(10) NOT NULL,
+  aux VARCHAR(16),
+  nivel INTEGER,
+  c6 VARCHAR,
+  eeff VARCHAR(12) DEFAULT 'B'::character varying,
+  saldo VARCHAR(12) DEFAULT 'D'::character varying NOT NULL,
+  tipo_cuenta VARCHAR(30) DEFAULT 'activo'::character varying NOT NULL
+) 
+WITH (oids = false);
+
+ALTER TABLE conta.tcuenta_tmp
+  ALTER COLUMN codigo SET STATISTICS 0;
+
+COMMENT ON TABLE conta.tcuenta_tmp
+IS 'tabla para migrar desde un excel y transofrmar al formato arbol';
+
+
+/***********************************F-SCP-RAC-CONTA-0-03/10/2016****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-20/10/2016****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN tiene_apertura VARCHAR(8) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tclase_comprobante.tiene_apertura
+IS 'esa calse de comprobantes admite cbte de apertura, esto es para saber si va saltar la numeracion o no';
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-20/10/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-17/11/2016****************************************/
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tentrega (
+  id_entrega SERIAL NOT NULL,
+  fecha_c31 DATE,
+  c31 VARCHAR(200),
+  estado VARCHAR(20) DEFAULT 'borrador' NOT NULL,
+  PRIMARY KEY(id_entrega)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tentrega.estado
+IS 'borrador o finalizado';
+
+
+CREATE TABLE conta.tentrega_det (
+  id_entrega_det SERIAL,
+  id_entrega INTEGER NOT NULL,
+  id_int_comprobante INTEGER,
+  CONSTRAINT tentrega_det_pkey PRIMARY KEY(id_entrega_det)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+/***********************************F-SCP-RAC-CONTA-0-17/11/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-17/11/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN obs VARCHAR;
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_tipo_relacion_comprobante INTEGER;
+  
+/***********************************F-SCP-RAC-CONTA-1-17/11/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-22/11/2016****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_depto_conta INTEGER;
+
+COMMENT ON COLUMN conta.tentrega.id_depto_conta
+IS 'indetifica el depto de contabilidad';
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-22/11/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-01/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN forma_cambio VARCHAR(20) DEFAULT 'oficial' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.forma_cambio
+IS 'oficial, compra, venta, convenido';
+
+/***********************************F-SCP-RAC-CONTA-0-01/12/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-05/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tclase_comprobante
+  ADD COLUMN movimiento VARCHAR(20) DEFAULT 'diario' NOT NULL;
+
+COMMENT ON COLUMN conta.tclase_comprobante.movimiento
+IS 'diario, ingreso o egreso';
+
+/***********************************F-SCP-RAC-CONTA-0-05/12/2016****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-07/12/2016****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tconfig_tipo_cuenta
+  ADD COLUMN movimiento VARCHAR(20) DEFAULT 'diario' NOT NULL;
+
+COMMENT ON COLUMN conta.tconfig_tipo_cuenta.movimiento
+IS 'Con que tiemo de comprobantes de mueven estan cuentas, diario, ingreso, movimiento';
+
+
+/***********************************F-SCP-RAC-CONTA-0-07/12/2016****************************************/
+
+
+
+/*********************************** I-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN id_tipo_relacion_comprobante INTEGER;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.id_tipo_relacion_comprobante
+IS 'se utiliza cuando el periodode calculo es igual a cbte, determina el tipo de relacion con el comprobante original';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN relacion_unica VARCHAR(6) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.relacion_unica
+IS 'si o no, solo se utiliza cuando el preiodo de calculo es giual a cbte, sirve apra validar que el comprobante origen solo tenga una relacion de este tipo y no mas';
+
+/*********************************** F-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
 

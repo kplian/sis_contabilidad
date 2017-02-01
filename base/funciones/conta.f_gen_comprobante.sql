@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_tabla_valor integer,
   p_codigo varchar,
@@ -85,6 +87,8 @@ DECLARE
     v_id_estado_wf				integer;
     v_codigo_estado   			varchar;
     v_clcbt_desc  				varchar;
+    v_gestion_fecha				integer;
+    v_gestion_aux				integer;
   
 BEGIN
 
@@ -308,6 +312,26 @@ BEGIN
 	end if;
 
     v_resp:=v_this;
+    
+    -- RAC 23/23/2016 
+    --forzamos que la fecha se quede en los limites de la gestion    
+    v_gestion_fecha =  date_part('year', v_this.columna_fecha);
+    
+    select 
+      g.gestion
+     into
+      v_gestion_aux
+    from param.tgestion g
+    where g.id_gestion = v_this.columna_gestion;
+    
+    
+    if v_gestion_fecha < v_gestion_aux then
+       -- forzamos  1ro de enero
+       v_this.columna_fecha = (v_gestion_aux||'-01-01')::date;   
+    elseif v_gestion_fecha > v_gestion_aux then
+      -- forzamos 31 de diciembre
+      v_this.columna_fecha = (v_gestion_aux||'-12-31')::date;
+    end if;
     
     
     
@@ -617,16 +641,12 @@ BEGIN
     -- ver el problema de conexion en estaciones internacionales para tener roollback
      
     --Si la sincronizacion esta habilitada
-    IF (v_sincronizar = 'true') THEN
-  	 	
-        -- si sincroniza localmente con endesis
-         IF(not p_sincronizar_internacional)THEN
-           v_resp_int_endesis =  migra.f_migrar_cbte_endesis(v_id_int_comprobante, p_conexion);
-        
-         ELSE
-         -- si es necesario migrar a contabilidad internacional (soo comprobante temporales)....
-            v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante, p_id_tabla_valor);
+    IF (v_sincronizar = 'true') THEN  	 	
+         -- si sincroniza localmente con endesis
+         IF(p_sincronizar_internacional)THEN
+           v_resp_int_endesis =  migra.f_migrar_cbte_a_regionales(v_id_int_comprobante, p_id_tabla_valor);
          END IF;
+    
     END IF;
    
      

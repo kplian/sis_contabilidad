@@ -10,7 +10,7 @@
 class ACTIntTransaccion extends ACTbase{    
 			
 	function listarIntTransaccion(){
-		$this->objParam->defecto('ordenacion','id_int_transaccion');
+		$this->objParam->defecto('ordenacion','orden');
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
 		if($this->objParam->getParametro('id_int_comprobante')!=''){
@@ -20,6 +20,13 @@ class ACTIntTransaccion extends ACTbase{
 		
 		if($this->objParam->getParametro('id_int_comprobante_fks')!=''){
 			$this->objParam->addFiltro("transa.id_int_comprobante in (".$this->objParam->getParametro('id_int_comprobante_fks').")");	
+		}
+		else{
+			if($this->objParam->getParametro('forzar_relacion')=='si'){
+				 throw new Exception("Primero defina con que comprobante esta relacionado", 3);
+				 $this->objParam->addFiltro("transa.id_int_comprobante in (0)");	
+		
+			}
 		}
 		
 		if($this->objParam->getParametro('solo_debe')=='si'){
@@ -62,6 +69,8 @@ class ACTIntTransaccion extends ACTbase{
 			$temp['importe_haber_mb'] = $this->res->extraData['total_haber_mb'];
 			$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
 			$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
+			$temp['importe_gasto'] = $this->res->extraData['total_gasto'];
+			$temp['importe_recurso'] = $this->res->extraData['total_recurso'];
 			$temp['glosa'] = 'Sumas iguales';
 			$temp['tipo_reg'] = 'summary';
 			$temp['id_int_transaccion'] = 0;
@@ -116,6 +125,10 @@ class ACTIntTransaccion extends ACTbase{
 			$this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));	
 		}
 		
+		if($this->objParam->getParametro('id_orden_trabajo')!=''){
+			$this->objParam->addFiltro("transa.id_orden_trabajo = ".$this->objParam->getParametro('id_orden_trabajo'));	
+		}
+		
 		
 		if($this->objParam->getParametro('id_auxiliar')!=''){
 			$this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));	
@@ -126,7 +139,7 @@ class ACTIntTransaccion extends ACTbase{
 		}
 		
 		if($this->objParam->getParametro('nro_tramite')!=''){
-			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite'))."%''";	
+			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");	
 		}
 
         if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){

@@ -60,14 +60,14 @@ header("content-type: text/javascript; charset=UTF-8");
 				lazyRender : true,
 				mode : 'local',
 				gwidth : 100,
-				store : ['activo', 'pasivo', 'patrimonio', 'resultado','ingreso','gasto','costo','cierre', 'orden']
+				store : ['activo', 'pasivo', 'patrimonio', 'resultado','ingreso','gasto','costo','cierre', 'orden','transitoria']
 			},
 			type : 'ComboBox',
 			id_grupo : 0,
 			filters : {
 				type : 'list',
 				pfiltro : 'tipo_cuenta',
-				options : ['activo', 'pasivo', 'patrimonio', 'resultado','ingreso','gasto','costo','cierre', 'orden']
+				options : ['activo', 'pasivo', 'patrimonio', 'resultado','ingreso','gasto','costo','cierre', 'orden','transitoria']
 			},
 			grid : true,
 			form : true
@@ -127,6 +127,32 @@ header("content-type: text/javascript; charset=UTF-8");
        			grid:true,
        			form:true
        	},
+       	{
+			config:{
+				name: 'movimiento',
+				fieldLabel: 'Movimiento',
+				qtip: 'Sirve para identificar el movimiento de la cuenta y relacionar con el movimiento de la clase de comprobante ',
+				allowBlank: false,
+				anchor: '40%',
+				gwidth: 100,
+				typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio',       		    
+       		    store:['diario','ingreso','egreso']
+			},
+			type:'ComboBox',
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'ctc.movimiento',
+	       				 options: ['diario','ingreso','egreso'],	
+	       		 	},
+			grid:true,
+			form:true
+		},
+		
 		{
 			config : {
 				name : 'estado_reg',
@@ -257,7 +283,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		}, {
 			name : 'usr_mod',
 			type : 'string'
-		}, 'incremento','eeff'],
+		}, 'incremento','eeff','movimiento'],
 		sortInfo : {
 			field : 'id_cofig_tipo_cuenta',
 			direction : 'ASC'

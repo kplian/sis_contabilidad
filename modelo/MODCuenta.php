@@ -55,45 +55,41 @@ class MODCuenta extends MODbase{
 	}
 
  function listarCuentaArb(){
-    //Definicion de variables para ejecucion del procedimientp
-    $this->procedimiento='conta.f_cuenta_sel';
-    $this-> setCount(false);
-    $this->transaccion='CONTA_CTA_ARB_SEL';
-    $this->tipo_procedimiento='SEL';//tipo de transaccion
-    
-    $id_padre = $this->objParam->getParametro('id_padre');
-    
-    $this->setParametro('id_padre','id_padre','varchar'); 
-	$this->setParametro('id_gestion','id_gestion','integer');       
-            
-    //Definicion de la lista del resultado del query
-     $this->captura('id_cuenta','int4');
-     $this->captura('id_cuenta_padre','int4');
-     $this->captura('nombre_cuenta','varchar');
-     $this->captura('tipo_nodo','varchar');
-	 $this->captura('nro_cuenta','varchar');
-	 $this->captura('desc_cuenta','varchar');
-	 $this->captura('id_moneda','integer');
-	 $this->captura('desc_moneda','varchar');
-	 $this->captura('tipo_cuenta','varchar');
-	 $this->captura('sw_auxiliar','varchar');
-	 $this->captura('tipo_cuenta_pat','varchar');
-	 $this->captura('sw_transaccional','varchar');
-	 $this->captura('id_gestion','integer');
-	 $this->captura('valor_incremento','varchar');
-	 $this->captura('eeff','varchar');
-	 $this->captura('sw_control_efectivo','varchar');
-	 
-	 
-
-    
-    
-     //Ejecuta la instruccion
-     $this->armarConsulta();
-	 $this->ejecutarConsulta();
-    
-    return $this->respuesta;       
- }
+		    //Definicion de variables para ejecucion del procedimientp
+		    $this->procedimiento='conta.f_cuenta_sel';
+		    $this-> setCount(false);
+		    $this->transaccion='CONTA_CTA_ARB_SEL';
+		    $this->tipo_procedimiento='SEL';//tipo de transaccion
+		    
+		    $id_padre = $this->objParam->getParametro('id_padre');
+		    
+		    $this->setParametro('id_padre','id_padre','varchar'); 
+			$this->setParametro('id_gestion','id_gestion','integer');       
+		            
+		    //Definicion de la lista del resultado del query
+		     $this->captura('id_cuenta','int4');
+		     $this->captura('id_cuenta_padre','int4');
+		     $this->captura('nombre_cuenta','varchar');
+		     $this->captura('tipo_nodo','varchar');
+			 $this->captura('nro_cuenta','varchar');
+			 $this->captura('desc_cuenta','varchar');
+			 $this->captura('id_moneda','integer');
+			 $this->captura('desc_moneda','varchar');
+			 $this->captura('tipo_cuenta','varchar');
+			 $this->captura('sw_auxiliar','varchar');
+			 $this->captura('tipo_cuenta_pat','varchar');
+			 $this->captura('sw_transaccional','varchar');
+			 $this->captura('id_gestion','integer');
+			 $this->captura('valor_incremento','varchar');
+			 $this->captura('eeff','varchar');
+			 $this->captura('sw_control_efectivo','varchar');
+			 
+		     //Ejecuta la instruccion
+		     $this->armarConsulta();
+			 $this->ejecutarConsulta();
+		    
+		    return $this->respuesta;       
+    }
 			
 	function insertarCuenta(){
 		//Definicion de variables para ejecucion del procedimiento
@@ -209,7 +205,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('id_deptos','id_deptos','varchar'); 		
 		$this->setParametro('tipo_cuenta','tipo_cuenta','varchar'); 
 		$this->setParametro('incluir_cierre','incluir_cierre','varchar');  
-		$this->setParametro('tipo_balance','tipo_balance','varchar');       
+		$this->setParametro('tipo_balance','tipo_balance','varchar'); 
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');      
 	            
 	    //Definicion de la lista del resultado del query
 	     $this->captura('id_cuenta','int4');     
@@ -219,6 +216,7 @@ class MODCuenta extends MODbase{
 		 $this->captura('monto','numeric');
 		 $this->captura('nivel','int4');
 		 $this->captura('tipo_cuenta','varchar');
+		 $this->captura('movimiento','varchar');
 		 
 		//Ejecuta la instruccion
 	    $this->armarConsulta();
@@ -241,7 +239,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('hasta','hasta','date');
 		$this->setParametro('id_resultado_plantilla','id_resultado_plantilla','integer');
 		$this->setParametro('id_deptos','id_deptos','varchar'); 
-		$this->setParametro('extendido','extendido','varchar');       
+		$this->setParametro('extendido','extendido','varchar');
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');        
 	            
 	    //Definicion de la lista del resultado del query
 	    $this->captura('subrayar','varchar'); 

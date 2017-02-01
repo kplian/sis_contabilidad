@@ -94,8 +94,8 @@ BEGIN
                             dcv.nro_dui,
                             dcv.id_moneda,
                             mon.codigo as desc_moneda,
-                            dcv.id_int_comprobante,
-                            COALESCE(ic.nro_tramite,cd.nro_tramite),
+                            dcv.id_int_comprobante,                           
+                            ic.nro_tramite,
                             COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
                             COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
                             COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
@@ -105,7 +105,8 @@ BEGIN
                             aux.codigo_auxiliar,
                             aux.nombre_auxiliar,
                             dcv.id_tipo_doc_compra_venta,
-                            (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta
+                            (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta,
+                            (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto
                         
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
@@ -116,8 +117,6 @@ BEGIN
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
-                          left join cd.trendicion_det ren on ren.id_doc_compra_venta=dcv.id_doc_compra_venta
-					      left join cd.tcuenta_doc cd on cd.id_cuenta_doc=ren.id_cuenta_doc
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -153,7 +152,8 @@ BEGIN
                               COALESCE(sum(dcv.importe_pendiente),0)::numeric  as tota_importe_pendiente,                              
                               COALESCE(sum(dcv.importe_neto),0)::numeric  as total_importe_neto,
                               COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
-                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as tota_importe_pago_liquido
+                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
+                              COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
                               
 					   from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
@@ -342,7 +342,7 @@ BEGIN
                         where      lcv.tipo = '''||v_parametros.tipo||'''
                                and lcv.id_periodo = '||v_parametros.id_periodo||'
                                and id_depto_conta in ( '||v_id_deptos||')
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
@@ -418,7 +418,7 @@ BEGIN
                         where  lcv.tipo = '''||v_tipo||'''
                                and id_moneda = '||param.f_get_moneda_base()||'
                                and '||v_filtro||'
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
@@ -521,7 +521,7 @@ BEGIN
                         where  lcv.tipo = '''||v_tipo||'''
                                and id_moneda = '||param.f_get_moneda_base()||'
                                and '||v_filtro||'
-                        order by fecha';
+                        order by fecha, id_doc_compra_venta';
 			
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta

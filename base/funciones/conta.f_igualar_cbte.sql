@@ -52,7 +52,25 @@ DECLARE
     v_cont_tc2						integer;
     v_relacion						varchar;
     v_id_int_transaccion			integer;
+    
     v_glosa							varchar;
+    v_gasto 						numeric;
+    v_recurso 						numeric;
+    v_gasto_mb 						numeric;
+    v_recurso_mb 					numeric;
+    v_gasto_mt						numeric; 
+    v_recurso_mt 					numeric;
+    
+    v_variacion_pre					numeric;
+    v_variacion_pre_mb				numeric;
+    v_variacion_pre_mt				numeric;
+    
+     v_monto_gasto_mt				numeric;
+     v_monto_recurso_mt				numeric;
+     v_monto_gasto_mb				numeric;
+     v_monto_recurso_mb				numeric;
+     v_monto_gasto					numeric;
+     v_monto_recurso				numeric;
 
  
 
@@ -87,14 +105,26 @@ BEGIN
                    sum(tra.importe_debe_mb), 
                    sum(tra.importe_haber_mb),
                    sum(tra.importe_debe_mt), 
-                   sum(tra.importe_haber_mt)
+                   sum(tra.importe_haber_mt),
+                   sum(tra.importe_gasto), 
+                   sum(tra.importe_recurso),
+                   sum(tra.importe_gasto_mb), 
+                   sum(tra.importe_recurso_mb),
+                   sum(tra.importe_gasto_mt), 
+                   sum(tra.importe_recurso_mt)
               into 
                  v_debe, 
                  v_haber,
                  v_debe_mb, 
                  v_haber_mb,
                  v_debe_mt, 
-                 v_haber_mt
+                 v_haber_mt,
+                 v_gasto, 
+                 v_recurso,
+                 v_gasto_mb, 
+                 v_recurso_mb,
+                 v_gasto_mt, 
+                 v_recurso_mt
               from conta.tint_transaccion tra
               where tra.id_int_comprobante = p_id_int_comprobante;
               
@@ -139,12 +169,66 @@ BEGIN
               elsif v_debe_mt > v_haber_mt then
                  
                  v_variacion_mt = v_debe_mt -  v_haber_mt;
-                  v_monto_debe_mt =  0;
+                 v_monto_debe_mt =  0;
                  v_monto_haber_mt =  v_variacion_mt;
               else
                  v_monto_debe_mt =  0;
                  v_monto_haber_mt =  0;
               end if;
+              
+              
+              -- revisa los campos presupeustarios
+              
+              
+              if v_gasto < v_recurso then
+                 v_variacion_pre = v_recurso - v_gasto;
+                 v_monto_gasto =  v_variacion_pre;
+                 v_monto_recurso =  0;
+              elsif v_gasto > v_recurso then
+                 v_variacion_pre = v_gasto - v_recurso;
+                 v_monto_gasto =  0;
+                 v_monto_recurso =  v_variacion_pre;
+              else
+                 v_monto_gasto =  0;
+                 v_monto_recurso =  0;
+              end if;   
+                 
+              --presupeustos moenda base
+              
+              if v_gasto_mb < v_recurso_mb then
+                 v_variacion_pre_mb = v_recurso_mb - v_gasto_mb;
+                 v_monto_gasto_mb =  v_variacion_pre_mb;
+                 v_monto_recurso_mb =  0;
+              elsif v_gasto_mb > v_recurso_mb then
+                 v_variacion_pre_mb =  v_gasto_mb - v_recurso_mb;
+                 v_monto_gasto_mb =  0;
+                 v_monto_recurso_mb =  v_variacion_pre_mb;
+              else
+                 v_monto_gasto_mb =  0;
+                 v_monto_recurso_mb =  0;
+              end if;
+              
+              --presupeustos moenda de triangulacion
+              
+               if v_gasto_mt < v_recurso_mt then
+                 v_variacion_pre_mt = v_recurso_mt - v_gasto_mt;
+                 v_monto_gasto_mt =  v_variacion_pre_mt;
+                 v_monto_recurso_mt =  0;
+              elsif v_gasto_mt > v_recurso_mt then
+                 v_variacion_pre_mt = v_gasto_mt -  v_recurso_mt;
+                 v_monto_gasto_mt =  0;
+                 v_monto_recurso_mt =  v_variacion_pre_mt;
+              else
+                 v_monto_gasto_mt =  0;
+                 v_monto_recurso_mt =  0;
+              end if;
+              
+             
+              
+              
+              
+              
+              
               
               ----------------------------------------
               --determina si exiten diferencias
@@ -162,6 +246,18 @@ BEGIN
                   
               if  v_variacion_mt > 0  then
                   v_errores = 'El comprobante no iguala en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
+              end if;
+              
+              if  v_variacion_pre > 0  then
+                  v_errores = 'El comprobante no iguala: Diferencia '||v_variacion_pre::varchar;
+              end if;
+                  
+              if  v_variacion_pre_mb > 0  then
+                  v_errores = 'El comprobante no iguala en moneda base: Diferencia '||v_variacion_pre_mb::varchar;
+              end if;
+                  
+              if  v_variacion_pre_mt > 0  then
+                  v_errores = 'El comprobante no iguala en moneda de triangulación: Diferencia  '||v_variacion_pre_mt::varchar;
               end if;
                   
               IF v_errores = '' THEN
@@ -203,94 +299,98 @@ BEGIN
             
                
               if  v_variacion > 0  then
-                  IF v_conta_error_limite_redondeo < v_variacion THEN
-                     raise exception 'La diferencia   en moneda transaccional, (%),  excede el margen establecido de (%),  igualé  manualmente, ',v_variacion, v_conta_error_limite_redondeo;
-                  ELSE
-                  
-                 
-                  IF v_debe >  v_haber   THEN
-                    v_relacion = 'GAN-RD';
-                  ELSE
-                    v_relacion = 'PER-RD';
-                  END IF;
-                    
-                    
-                -- determinar relacion contable de perdida o ganacia por redondeo
-                  SELECT 
-                    * 
-                   into 
-                     v_registros_rel
-                 FROM conta.f_get_config_relacion_contable(v_relacion, -- relacion contable que almacena los centros de costo por departamento
-                                                           v_registros.id_gestion,  
-                                                           v_registros.id_depto, 
-                                                           NULL);  --id_dento_costo 
-                     
-                    
-                    
-                    -- insertar transaccion para igual moneda de transaccion
-                     
-                    insert into conta.tint_transaccion(
-                        id_partida,
-                        id_auxiliar,
-                        id_centro_costo,
-                        estado_reg,
-                        id_cuenta,
-                        glosa,
-                        id_int_comprobante,
-                      
-                        importe_debe,
-                        importe_haber,
-                        importe_gasto,
-                        importe_recurso,
-                        id_usuario_reg,
-                        fecha_reg,
-                        tipo_cambio,
-                        tipo_cambio_2,
-                        id_moneda,
-                        id_moneda_tri
                         
-                    ) values(
-                        v_registros_rel.ps_id_partida,
-                        v_registros_rel.ps_id_auxiliar,
-                        v_registros_rel.ps_id_centro_costo,
-                        'activo',
-                        v_registros_rel.ps_id_cuenta,
-                        'Igualación por diferencia de redondeo',
-                        v_registros.id_int_comprobante,
-                      
                         
-                        v_monto_debe,
-                        v_monto_haber,
-                        v_monto_debe,
-                        v_monto_haber,
-                       
-                        p_id_usuario,
-                        now(),
-                        v_registros.tipo_cambio,
-                        v_registros.tipo_cambio_2,
-                        v_registros.id_moneda,
-                        v_registros.id_moneda_tri
-                    )RETURNING id_int_transaccion into v_id_int_transaccion;
-                    
-                      -- calcular moneda base y triangulacion
-                       PERFORM  conta.f_calcular_monedas_transaccion(v_id_int_transaccion);
-                          
-                      --llamada recursiva para igualar por redondeo o tipo de cambio
-                       IF not conta.f_igualar_cbte(p_id_int_comprobante, p_id_usuario, FALSE) THEN
-                         raise exception 'error al igual recursivamente';
-                       END IF;
-                       
-                      RETURN TRUE;
-                  END IF;
+                        IF v_conta_error_limite_redondeo < v_variacion  or v_conta_error_limite_redondeo < v_variacion_pre THEN
+                             raise exception 'La diferencia   en moneda transaccional, (%),  excede el margen establecido de (%),  igualé  manualmente, ',v_variacion, v_conta_error_limite_redondeo;
+                        ELSE
+                        
+                              IF v_debe >  v_haber   THEN
+                                v_relacion = 'GAN-RD';
+                              ELSE
+                                v_relacion = 'PER-RD';
+                              END IF;
+                                
+                                
+                            -- determinar relacion contable de perdida o ganacia por redondeo
+                              SELECT 
+                                * 
+                               into 
+                                 v_registros_rel
+                             FROM conta.f_get_config_relacion_contable(v_relacion, -- relacion contable que almacena los centros de costo por departamento
+                                                                       v_registros.id_gestion,  
+                                                                       v_registros.id_depto, 
+                                                                       NULL);  --id_dento_costo 
+                                 
+                                
+                                
+                                -- insertar transaccion para igual moneda de transaccion
+                                 
+                                insert into conta.tint_transaccion(
+                                    id_partida,
+                                    id_auxiliar,
+                                    id_centro_costo,
+                                    estado_reg,
+                                    id_cuenta,
+                                    glosa,
+                                    id_int_comprobante,
+                                  
+                                    importe_debe,
+                                    importe_haber,
+                                    importe_gasto,
+                                    importe_recurso,
+                                    id_usuario_reg,
+                                    fecha_reg,
+                                    tipo_cambio,
+                                    tipo_cambio_2,
+                                    id_moneda,
+                                    id_moneda_tri
+                                    
+                                ) values(
+                                    v_registros_rel.ps_id_partida,
+                                    v_registros_rel.ps_id_auxiliar,
+                                    v_registros_rel.ps_id_centro_costo,
+                                    'activo',
+                                    v_registros_rel.ps_id_cuenta,
+                                    'Igualación por diferencia de redondeo',
+                                    v_registros.id_int_comprobante,
+                                    
+                                    v_monto_debe,
+                                    v_monto_haber,
+                                    v_monto_gasto,
+                                    v_monto_recurso,
+                                   
+                                    p_id_usuario,
+                                    now(),
+                                    v_registros.tipo_cambio,
+                                    v_registros.tipo_cambio_2,
+                                    v_registros.id_moneda,
+                                    v_registros.id_moneda_tri
+                                )RETURNING id_int_transaccion into v_id_int_transaccion;
+                                
+                                  -- calcular moneda base y triangulacion
+                                   PERFORM  conta.f_calcular_monedas_transaccion(v_id_int_transaccion);
+                                      
+                                  --llamada recursiva para igualar por redondeo o tipo de cambio
+                                   IF not conta.f_igualar_cbte(p_id_int_comprobante, p_id_usuario, FALSE) THEN
+                                     raise exception 'error al igual recursivamente';
+                                   END IF;
+                             
+                            	  RETURN TRUE;
+                        END IF;
               end if;
              
              
-             
+             -----------------------------------------------------------------
+             -- tenemos diferencia por tipo de cambio, 
+             -- solo si en la moneda de la transaccion el cbte esta igualando
+             -----------------------------------------------------------------
               
+             --TODO por que este 2?? ....
+             -- con 2 quiere decir que el comprobnate tiene mas de un tipo de cambio en diferentes transacciones
+             
               IF v_cont_tc2 >= 2 or v_cont_tc1 >= 2 THEN
-                --------------------------------------
-                --tenemos diferencia por tipo de cambio
-                ---------------------------------------
+                
                 
                    IF v_debe_mb >  v_haber_mb   or  v_debe_mt  >  v_haber_mt THEN
                      v_relacion = 'GAN-DCB';
@@ -382,13 +482,13 @@ BEGIN
                         
                         v_monto_debe_mb,
                         v_monto_haber_mb,
-                        v_monto_debe_mb,
-                        v_monto_haber_mb,
+                        v_monto_gasto_mb,
+                        v_monto_recurso_mb,
                         
                         v_monto_debe_mt,
                         v_monto_haber_mt,
-                        v_monto_debe_mt,
-                        v_monto_haber_mt,
+                        v_monto_gasto_mt,
+                        v_monto_recurso_mt,
                        
                         p_id_usuario,
                         now(),

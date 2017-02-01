@@ -120,6 +120,9 @@ class MODConfigCambiaria extends MODbase{
 		$this->setParametro('id_moneda','id_moneda','int4');
 		$this->setParametro('localidad','localidad','varchar');
 		$this->setParametro('sw_valores','sw_valores','varchar');
+		$this->setParametro('forma_cambio','forma_cambio','varchar');
+		
+		
 		
 		
 

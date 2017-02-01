@@ -21,7 +21,8 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
         this.load({params:{start:0, limit:this.tam_pag}});
         
         this.Cmp.id_int_transaccion_pag.store.baseParams = Ext.apply(this.Cmp.id_int_transaccion_pag.store.baseParams,{id_int_comprobante: this.id_int_comprobante, resumen: 'no'}); 
-	    this.Cmp.id_int_transaccion_dev.store.baseParams = Ext.apply(this.Cmp.id_int_transaccion_dev.store.baseParams,{id_int_comprobante_fks: this.id_int_comprobante_fks, resumen: 'no', pres_gasto_recurso: 'si'}); 
+	    //this.Cmp.id_int_transaccion_dev.store.baseParams = Ext.apply(this.Cmp.id_int_transaccion_dev.store.baseParams,{id_int_comprobante_fks: this.id_int_comprobante_fks, resumen: 'no', pres_gasto_recurso: 'si'}); 
+		this.Cmp.id_int_transaccion_dev.store.baseParams = Ext.apply(this.Cmp.id_int_transaccion_dev.store.baseParams,{id_int_comprobante_fks: this.id_int_comprobante_fks, resumen: 'no',forzar_relacion:'si'}); 
 	
 	
 	},
@@ -86,7 +87,7 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_int_transaccion', 'desc_cuenta', 'desc_centro_costo', 'desc_auxiliar','desc_partida','importe_debe','importe_haber','desc_orden'],
+					fields: ['id_int_transaccion', 'desc_cuenta', 'desc_centro_costo', 'desc_auxiliar','desc_partida','importe_debe','importe_haber','desc_orden','importe_gasto','importe_recurso'],
 					remoteSort: true,
 					baseParams: {par_filtro: 'transa.id_int_comprobante#transa.id_int_transaccion#cue.nro_cuenta#cc.codigo_cc#aux.codigo_auxiliar#par.nombre_partida#par.codigo#ot.desc_orden'}
 				}),
@@ -103,15 +104,14 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 				anchor: '100%',
 				gwidth: 350,
 				minChars: 2,
-				
-			    tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item">'+
+				tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item">'+
 			          '<b>CC:</b>{desc_centro_costo}<br>'+
 			          '<b>Cta.:</b>{desc_cuenta}<br>'+
 					  '<b>Aux.:</b>{desc_auxiliar}</br>'+
                       '<b>Ptda.:</b> <font color="black">{desc_partida}</font><br>'+
                       '<b>Ot.: {desc_orden}</b></br> '+
-                      '<b>Monto Debe.: {importe_debe}</b></br> '+
-                      '<b>Monto Haber.: {importe_haber}</b>,   ID; {id_int_transaccion}</div></tpl>'),
+                      '<b>Monto Gasto.: {importe_gasto}</b></br> '+
+                      '<b>Monto Recurso.: {importe_recurso}</b>,   ID; {id_int_transaccion}</div></tpl>'),
                       
 				renderer:function (value, p, record){
 	   			        var color = 'green';
@@ -150,24 +150,24 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 		
 		{
 			config:{
-				name: 'importe_debe_pag',
+				name: 'importe_gasto_pag',
 				fieldLabel: 'Cbte Pago',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:1179650,
 				renderer:function (value, p, record){
-					if(record.data.importe_debe_pag > 0 ){
-						return record.data.importe_debe_pag;
+					if(record.data.importe_gasto_pag > 0 ){
+						return record.data.importe_gasto_pag;
 					}
 					else{
-						return record.data.importe_haber_pag;
+						return record.data.importe_recurso_pag;
 					}
 					 
 				}
 			},
 				type:'NumberField',
-				filters:{pfiltro:'importe_debe_pag',type:'numeric'},
+				filters:{pfiltro:'importe_gasto_pag#importe_recurso_pag',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -189,7 +189,7 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_int_transaccion', 'id_int_comprobante','desc_cuenta', 'desc_centro_costo', 'desc_auxiliar','desc_partida','importe_debe','importe_haber','desc_orden'],
+					fields: ['id_int_transaccion', 'id_int_comprobante','desc_cuenta', 'desc_centro_costo', 'desc_auxiliar','desc_partida','importe_debe','importe_haber','desc_orden','importe_recurso','importe_gasto'],
 					remoteSort: true,
 					baseParams: {par_filtro: 'transa.id_int_comprobante#transa.id_int_transaccion#cue.nro_cuenta#cc.codigo_cc#aux.codigo_auxiliar#par.nombre_partida#par.codigo#ot.desc_orden'}
 				}),
@@ -214,8 +214,8 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 					  '<b>Aux.:</b>{desc_auxiliar}</br>'+
                       '<b>Ptda.:</b> <font color="black">{desc_partida}</font><br>'+
                       '<b>Ot.: {desc_orden}</b></br> '+
-                      '<b>Monto Debe.: {importe_debe}</b></br> '+  
-                      '<b>Monto Haber.: {importe_haber}</b>, ID; {id_int_transaccion}</div></tpl>'),
+                      '<b>Monto Gasto.: {importe_gasto}</b></br> '+  
+                      '<b>Monto Recurso.: {importe_recurso}</b>, ID; {id_int_transaccion}</div></tpl>'),
                       
 				renderer:function (value, p, record){
 	   			        var color = 'green';
@@ -253,7 +253,7 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'importe_debe_dev',
+				name: 'importe_gasto_dev',
 				fieldLabel: 'Cbte Dev',
 				allowBlank: true,
 				anchor: '80%',
@@ -261,16 +261,16 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 				maxLength:1179650,
 				renderer:function (value, p, record){
 					if(record.data.importe_debe_pag > 0 ){
-						return record.data.importe_debe_dev;
+						return record.data.importe_gasto_dev;
 					}
 					else{
-						return record.data.importe_haber_dev;
+						return record.data.importe_recurso_dev;
 					}
 					 
 				}
 			},
 				type:'NumberField',
-				filters:{pfiltro:'importe_debe_dev',type:'numeric'},
+				filters:{pfiltro:'importe_gasto_dev#importe_recurso_dev',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -430,7 +430,11 @@ Phx.vista.IntRelDevengado=Ext.extend(Phx.gridInterfaz,{
 		'tipo_partida_dev',
         'tipo_partida_pag',
         'desc_auxiliar_dev',
-        'desc_auxiliar_pag'
+        'desc_auxiliar_pag',
+        'importe_gasto_pag',
+	    'importe_recurso_pag',
+	    'importe_gasto_dev',
+	    'importe_recurso_dev'
 
 	],
 	sortInfo:{

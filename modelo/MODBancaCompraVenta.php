@@ -599,7 +599,24 @@ class MODBancaCompraVenta extends MODbase{
 		return $this->respuesta;
 		
 	}
-	
+
+	function clonar(){
+		$this->procedimiento='conta.ft_banca_compra_venta_ime';
+		$this->transaccion='CONTA_BANCA_CLON';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_banca_compra_venta','id_banca_compra_venta','int4');
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 	
 
 

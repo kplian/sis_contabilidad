@@ -13,7 +13,8 @@ CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel (
   p_incluir_aitb varchar,
   p_signo_balance varchar,
   p_tipo_balance varchar,
-  p_origen varchar
+  p_origen varchar,
+  p_int_comprobante integer
 )
 RETURNS boolean AS
 $body$
@@ -31,6 +32,7 @@ va_mayor			numeric[];
 v_id_gestion  		integer;
 v_id_cuentas		integer[];
 v_monto				numeric;
+v_monto_partida		numeric;
  
 
 BEGIN
@@ -58,9 +60,12 @@ BEGIN
                                                  p_incluir_apertura, 
                                                  p_incluir_aitb,
                                                  p_signo_balance,
-                                                 p_tipo_balance);
+                                                 p_tipo_balance,
+                                                 NULL,
+                                                 p_int_comprobante);
                  		
                   v_monto  =  va_mayor[1];
+                  v_monto_partida  =  va_mayor[3];
                   
                   --	insertamos en la tabla temporal
                   insert into temp_balancef (
@@ -69,14 +74,16 @@ BEGIN
                           desc_cuenta,
                           codigo_cuenta,
                           monto,
-                          id_resultado_det_plantilla)
+                          id_resultado_det_plantilla,
+                          monto_partida)
                       values (
                           
                           v_registros.id_cuenta,
                           v_registros.nombre_cuenta,
                           v_registros.nro_cuenta,
                           v_monto,
-                          p_id_resultado_det_plantilla);          
+                          p_id_resultado_det_plantilla,
+                          v_monto_partida);          
        
        END LOOP;
     
@@ -95,11 +102,7 @@ BEGIN
                           cue.id_cuenta_padre = p_id_cuenta   
                          and cue.estado_reg = 'activo') LOOP
                      
-               --si viene de un balance verificamos si la cuenta es de moviemitno y calculamos el mayor
-               IF p_origen = 'balance'  THEN
-               
-             
-                
+              
                      IF  v_registros.sw_transaccional = 'movimiento'  THEN
                          
                           va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
@@ -110,9 +113,12 @@ BEGIN
                                                  p_incluir_apertura, 
                                                  p_incluir_aitb,
                                                  p_signo_balance,
-                                                 p_tipo_balance);
+                                                 p_tipo_balance,
+                                                 NULL,
+                                                 p_int_comprobante);
                                                  
                           v_monto =  va_mayor[1];
+                          v_monto_partida  =  va_mayor[3];
                        
                           --	insertamos en la tabla temporal
                           insert into temp_balancef (
@@ -121,41 +127,40 @@ BEGIN
                               desc_cuenta,
                               codigo_cuenta,
                               monto,
-                              id_resultado_det_plantilla)
+                              id_resultado_det_plantilla,
+                              monto_partida)
                           values (
                               
                               v_registros.id_cuenta,
                               v_registros.nombre_cuenta,
                               v_registros.nro_cuenta,
                               v_monto,
-                              p_id_resultado_det_plantilla); 
+                              p_id_resultado_det_plantilla,
+                              v_monto_partida); 
+                     
+                     ELSE
+                     
+                             IF ( not conta.f_recuperar_cuentas_nivel(
+                                                    v_registros.id_cuenta, 
+                                                    p_nivel_ini + 1, 
+                                                    p_nivel_final, 
+                                                    p_id_resultado_det_plantilla, 
+                                                    p_desde, 
+                                                    p_hasta, 
+                                                    p_id_deptos,
+                                                    p_incluir_cierre,
+                                                    p_incluir_apertura,
+                                                    p_incluir_aitb,
+                                                    p_signo_balance,
+                                                    p_tipo_balance,
+                                                    p_origen,
+                                                    p_int_comprobante) ) THEN     
+                                raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
+                          END IF;
+                     
                      
                      END IF;
                
-                     
-                      
-               
-               END IF;
-               
-               
-               
-               
-               IF ( not conta.f_recuperar_cuentas_nivel(
-                							v_registros.id_cuenta, 
-                                            p_nivel_ini + 1, 
-                                            p_nivel_final, 
-                                            p_id_resultado_det_plantilla, 
-                                            p_desde, 
-                                            p_hasta, 
-                                            p_id_deptos,
-                                            p_incluir_cierre,
-                                            p_incluir_apertura,
-                                            p_incluir_aitb,
-                                            p_signo_balance,
-                                            p_tipo_balance,
-                                            p_origen) ) THEN     
-                  raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
-               END IF;
        END LOOP;  
     
     END IF;

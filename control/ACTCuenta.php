@@ -36,12 +36,12 @@ class ACTCuenta extends ACTbase{
         if($this->objParam->getParametro('sw_transaccional')!=''){
             $this->objParam->addFiltro("cta.sw_transaccional = ''".$this->objParam->getParametro('sw_transaccional')."''"); 
         }
-        
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODCuenta','listarCuenta');
-		} else{
+		} 
+		else{
 			$this->objFunc=$this->create('MODCuenta');
 			
 			$this->res=$this->objFunc->listarCuenta($this->objParam);
@@ -202,7 +202,12 @@ class ACTCuenta extends ACTbase{
 		//parametros basicos
 		$tamano = 'LETTER';
 		$orientacion = 'P';
-		$titulo = 'Balance General';
+		if($this->objParam->getParametro('tipo_balance')!='resultado'){
+		   $titulo = 'Balance General';
+		}
+		else{
+			$titulo = 'Estado de Resultados';
+		}
 		
 		$this->objParam->addParametro('orientacion',$orientacion);
 		$this->objParam->addParametro('tamano',$tamano);		
@@ -222,14 +227,16 @@ class ACTCuenta extends ACTbase{
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		
-	}
+   }
+
    function clonarCuentasGestion(){
 		$this->objFunc=$this->create('MODCuenta');	
 		$this->res=$this->objFunc->clonarCuentasGestion($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
+   }
+   
    function recuperarDatosResultados(){
-    	
+   	    	
 		$this->objFunc = $this->create('MODCuenta');
 		$cbteHeader = $this->objFunc->listarDetResultados($this->objParam);
 		if($cbteHeader->getTipo() == 'EXITO'){
@@ -252,7 +259,7 @@ class ACTCuenta extends ACTbase{
 			//parametros basicos
 			$tamano = 'LETTER';
 			$orientacion = 'P';
-			$titulo = 'Estado de Resultados';
+			$titulo = 'Estados Financieros';
 			
 			$this->objParam->addParametro('orientacion',$orientacion);
 			$this->objParam->addParametro('tamano',$tamano);		

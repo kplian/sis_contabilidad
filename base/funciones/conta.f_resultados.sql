@@ -35,6 +35,7 @@ v_registros_plantilla	record;
 v_multiple_col 			boolean;
 v_forzar_visible		boolean;
 v_prioridad				integer;
+v_incluir_sinmov    	varchar;
  
 
 BEGIN
@@ -50,7 +51,7 @@ BEGIN
      
     /*********************************   
      #TRANSACCION:    'CONTA_RESUTADO_SEL'
-     #DESCRIPCION:    Listado para el reporte del resultados
+     #DESCRIPCION:    Listado para el reporte de resultados
      #AUTOR:          rensi arteaga copari  kplian
      #FECHA:          08-07-2015
     ***********************************/
@@ -73,6 +74,11 @@ BEGIN
           IF v_id_gestion is NULL THEN  
           		raise exception 'No se encontro gestion para la fecha % en %', v_parametros.desde, v_gestion;
           END IF;
+          
+          v_incluir_sinmov = 'no';
+          if pxp.f_existe_parametro(p_tabla,'incluir_sinmov') then
+            v_incluir_sinmov = v_parametros.incluir_sinmov;
+          end if;
           
           select 
             rp.codigo,
@@ -115,7 +121,8 @@ BEGIN
                                     destino  varchar,
                                     orden_cbte numeric,
                                     nombre_columna varchar,
-                                    prioridad numeric
+                                    prioridad numeric,
+                                    monto_partida numeric
                                     ) ON COMMIT DROP;
              
          
@@ -137,6 +144,7 @@ BEGIN
                                                             v_parametros.hasta, 
                                                             v_parametros.id_deptos,
                                                             v_id_gestion,
+                                                            NULL, --id_int_comprobante
                                                             TRUE,
                                                             v_multiple_col) THEN
                                                             
@@ -152,6 +160,7 @@ BEGIN
                                                       v_parametros.hasta, 
                                                       v_parametros.id_deptos,
                                                       v_id_gestion,
+                                                      NULL, --id_int_comprobante
                                                       false,
                                                       v_multiple_col) THEN
              raise exception 'Error al procesar la plantilla principal';                                                  
@@ -159,39 +168,47 @@ BEGIN
            
          
          raise notice 'INICIA CONSULTA....';
-         -- 3) retorno de resultados
-         FOR v_registros in (SELECT                                   
-                                    subrayar,
-                                    font_size,
-                                    posicion,
-                                    signo,
-                                    id_cuenta,
-                                    desc_cuenta,
-                                    codigo_cuenta,
-                                    codigo,
-                                    origen,
-                                    orden,
-                                    nombre_variable,
-                                    montopos,
-                                    monto,
-                                    id_resultado_det_plantilla,
-                                    id_cuenta_raiz,
-                                    visible,
-                                    incluir_cierre,
-                                    incluir_apertura,
-                                    negrita,
-                                    cursiva,
-                                    espacio_previo,
-                                    id,
-                                    plantilla,
-                                    nombre_columna
-                                FROM temp_balancef 
-                                    order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
-                   RETURN NEXT v_registros;
-         END LOOP;
-  
-
-END IF;
+         
+       
+          FOR v_registros in (SELECT                                   
+                                        subrayar,
+                                        font_size,
+                                        posicion,
+                                        signo,
+                                        id_cuenta,
+                                        desc_cuenta,
+                                        codigo_cuenta,
+                                        codigo,
+                                        origen,
+                                        orden,
+                                        nombre_variable,
+                                        montopos,
+                                        monto,
+                                        id_resultado_det_plantilla,
+                                        id_cuenta_raiz,
+                                        visible,
+                                        incluir_cierre,
+                                        incluir_apertura,
+                                        negrita,
+                                        cursiva,
+                                        espacio_previo,
+                                        id,
+                                        plantilla,
+                                        nombre_columna
+                                    FROM temp_balancef 
+                                    WHERE 
+                                       case  when v_incluir_sinmov = 'no' then 
+                                                  0 = 0
+                                             else 
+                                              (monto != 0 or origen = 'titulo')
+                                            end
+                                       
+                                       order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
+                       RETURN NEXT v_registros;
+           END LOOP; 
+      
+       
+  END IF;
 
 EXCEPTION
 				

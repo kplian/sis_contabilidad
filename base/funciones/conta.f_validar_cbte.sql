@@ -15,6 +15,26 @@ $body$
 	Autor: RCM
     Fecha: 05-09-2013
     Descripción: Función que se encarga de verificar la integridad del comprobante para posteriormente validarlo.
+    
+    -------------------- Ediciones
+    AUTOR: RAC KPLIAN
+    FECHA: 2015
+    DESCRIPCION   Ejecucion presupeustaria, Integracion con ENDESIS -> PXP
+    
+     -------------------- Ediciones
+    AUTOR: RAC KPLIAN
+    FECHA: 20/11/2016
+    DESCRIPCION   Se invirte la migraicon de cbte PXP -> ENDESIS
+    
+    
+   -------------------- Ediciones
+    AUTOR: RAC KPLIAN
+    FECHA: 22/12/2016
+    DESCRIPCION   validacion de numeracion en cbtes
+    
+    
+    
+    
 */
 DECLARE
 
@@ -24,6 +44,7 @@ DECLARE
     v_rec_cbte 		record;
     v_registros		record;
     v_doc			varchar;
+    v_codigo_clase_cbte			varchar;
     v_nro_cbte		varchar;
     v_id_periodo 	integer;
     v_filas			bigint;
@@ -52,6 +73,14 @@ DECLARE
     v_sw_rel						boolean;
     v_id_tipo_estado				integer;
     v_id_estado_actual 				integer;
+    v_tiene_apertura				varchar;
+    
+    v_gasto 						numeric;
+    v_recurso 						numeric;
+    v_gasto_mb 						numeric;
+    v_recurso_mb 					numeric;
+    v_gasto_mt						numeric; 
+    v_recurso_mt 					numeric;
      
 
 BEGIN
@@ -87,17 +116,38 @@ BEGIN
         c.nro_tramite,
         c.id_estado_wf,
         c.estado_reg,
-        c.id_depto
+        c.id_depto,
+        c.id_clase_comprobante,
+        c.fecha,
+        c.id_periodo,
+        cc.id_documento   --documento con que se genera la numeracion
         
 	  into 
         v_rec_cbte
     from conta.tint_comprobante c
+    inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = c.id_clase_comprobante
     inner join param.tperiodo p on p.id_periodo = c.id_periodo
     where id_int_comprobante = p_id_int_comprobante;
+    
+    
+     --Obtiene el documento para la numeración
+    select 
+       doc.codigo,
+       ccbte.codigo,
+       ccbte.tiene_apertura
+    into 
+      v_doc,
+      v_codigo_clase_cbte,
+      v_tiene_apertura
+    from conta.tclase_comprobante ccbte
+    inner join param.tdocumento doc
+    on doc.id_documento = ccbte.id_documento
+    where ccbte.id_clase_comprobante = v_rec_cbte.id_clase_comprobante;
    
     
-    --  si el origen es endesis  o es un comprobante que se migrara a la central, abrimos conexion
-    if p_origen  = 'endesis' or v_sincornizar_central = 'true' then
+    --  si  es un comprobante que se migrara a la central, abrimos conexion  (
+    --  esto quiere decir que estamos en una regional internacional y se migrara al pxp central
+    if v_sincornizar_central = 'true' then
     
           --si el comprobante viene de endesis y tenemso fecha de ejecucion actualizamos la fecha del comprobante intermedio
          IF p_fecha_ejecucion is NOT NULL THEN
@@ -112,28 +162,26 @@ BEGIN
     
     -- TODO revisar cuando abrir conexion ....
     --abrimo conexion dblink
-    IF v_conta_codigo_estacion != 'CENTRAL'  or v_sincronizar = 'true' or p_origen  = 'endesis' THEN
+    IF v_conta_codigo_estacion != 'CENTRAL'  or v_sincronizar = 'true' THEN
         select * into v_nombre_conexion from migra.f_crear_conexion(); 
     END IF;
      
     
 	
     -- si es un comprobante editado internacionales , abrimos una segunda conexion 
+    -- TODO,...para que ???
   
     IF v_rec_cbte.sw_editable = 'si' and  v_rec_cbte.vbregional = 'si' and  v_conta_codigo_estacion = 'CENTRAL' and v_rec_cbte.localidad != 'nacional'  THEN
          v_conexion_int_act = migra.f_crear_conexion(NULL,'tes.testacion', v_rec_cbte.codigo_estacion_origen);
     END IF;
     
-    --raise exception '% . % ,% ,%', v_rec_cbte.sw_editable,v_rec_cbte.vbregional,v_conta_codigo_estacion ,v_rec_cbte.localidad ;
-   
     
     
     --validar que el periodo al que se agregara este abierto
-    IF  p_origen != 'endesis' THEN
-      IF not param.f_periodo_subsistema_abierto(v_rec_cbte.fecha::date, 'CONTA') THEN
+    IF not param.f_periodo_subsistema_abierto(v_rec_cbte.fecha::date, 'CONTA') THEN
         raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_rec_cbte.fecha;
-      END IF;
     END IF;
+    
     
     --Verificación de existencia de al menos 2 transacciones
     select coalesce(count(id_int_transaccion),0)
@@ -174,14 +222,26 @@ BEGIN
          sum(tra.importe_debe_mb), 
          sum(tra.importe_haber_mb),
          sum(tra.importe_debe_mt), 
-         sum(tra.importe_haber_mt)
+         sum(tra.importe_haber_mt),
+         sum(tra.importe_gasto), 
+         sum(tra.importe_recurso),
+         sum(tra.importe_gasto_mb), 
+         sum(tra.importe_recurso_mb),
+         sum(tra.importe_gasto_mt), 
+         sum(tra.importe_recurso_mt)
     into 
        v_debe, 
        v_haber,
        v_debe_mb, 
        v_haber_mb,
        v_debe_mt, 
-       v_haber_mt
+       v_haber_mt,
+       v_gasto, 
+       v_recurso,
+       v_gasto_mb, 
+       v_recurso_mb,
+       v_gasto_mt, 
+       v_recurso_mt
     from conta.tint_transaccion tra
     where tra.id_int_comprobante = p_id_int_comprobante;
     
@@ -205,30 +265,51 @@ BEGIN
     end if;
     
     
-    --si el origen es endesis confiamos en las validaciones
-    if p_origen != 'endesis' then
-        
-            if  v_variacion != 0  then
-                v_errores = 'El comprobante no iguala: Diferencia '||v_variacion::varchar;
-            end if;
+    if  v_variacion != 0  then
+         v_errores = 'El comprobante no iguala: Diferencia '||v_variacion::varchar;
+    end if;
             
-            if  v_variacion_mb != 0  then
-                v_errores = 'El comprobante no iguala en moneda base: Diferencia '||v_variacion_mb::varchar;
-            end if;
+    if  v_variacion_mb != 0  then
+         v_errores = 'El comprobante no iguala en moneda base: Diferencia '||v_variacion_mb::varchar;
+    end if;
             
-            if  v_variacion_mt != 0  then
-                v_errores = 'El comprobante no iguala en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
-            end if;
+    if  v_variacion_mt != 0  then
+        v_errores = 'El comprobante no iguala en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
+    end if;
+    
+    --verifica los monstos presupuestarios
+    
+    if v_gasto < v_recurso then
+       v_variacion = v_recurso - v_gasto;
+    elsif v_gasto > v_recurso then
+       v_variacion = v_gasto - v_recurso;
+    end if;
+    
+    if v_gasto_mb < v_recurso_mb then
+       v_variacion_mb = v_recurso_mb - v_gasto_mb;
+    elsif v_gasto_mb > v_recurso_mb then
+       v_variacion_mb =  v_gasto_mb - v_recurso_mb;
+    end if;
+    
+     if v_gasto_mt < v_recurso_mt then
+       v_variacion_mt = v_recurso_mt - v_gasto_mt;
+    elsif v_gasto_mt > v_recurso_mt then
+       v_variacion_mt = v_gasto_mt -  v_recurso_mt;
+    end if;
+    
+    
+    if  v_variacion != 0  then
+         v_errores = 'El comprobante no iguala presupuestariamente: Diferencia '||v_variacion::varchar;
+    end if;
+            
+    if  v_variacion_mb != 0  then
+         v_errores = 'El comprobante no iguala presupuestariamente en moneda base: Diferencia '||v_variacion_mb::varchar;
+    end if;
+            
+    if  v_variacion_mt != 0  then
+        v_errores = 'El comprobante no iguala presupuestariamente en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
+    end if;
                   
-            
-            
-            IF(v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'no' )THEN
-               -- raise exception 'No se pueden validar comprobantes desde PXP en BOA';
-            END IF;
-        
-     
-     end if;
-      
     
     ---------------------------------------------------------------------------------------------------------
     --  Llamar a funcion de comprobante editado, 
@@ -236,7 +317,8 @@ BEGIN
     --  (por ejm esta llamada se usa en tesorera para revertir el presupuesto comprometido originamente)
     ---------------------------------------------------------------------------------------------------------
     
-    IF   v_rec_cbte.sw_editable = 'si' and  (v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte = '' )    THEN
+   
+    IF   v_rec_cbte.sw_editable = 'si' and  (v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte = '' )   THEN
           
           IF v_rec_cbte.id_plantilla_comprobante is not null THEN
           
@@ -255,6 +337,8 @@ BEGIN
          END IF;
     
     END IF;
+    
+    
    
     ------------------------------------------------------------------------------------------------
     --  Validacion presupuestaria del comprobante no se ejecuta solo verifica 
@@ -262,23 +346,25 @@ BEGIN
     -----------------------------------------------------------------------------------------------
     
      --solo verifica en cbte que no son de reversion
-     IF v_pre_integrar_presupuestos = 'true' and  v_rec_cbte.cbte_reversion ='no' THEN    
+     
+     
+     
+     IF v_pre_integrar_presupuestos = 'true' and  v_rec_cbte.cbte_reversion ='no'   THEN 
+         
      	v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
      END IF;
+     
+       
+     
+     
+     
+     
   
    
     --6. Numeración del comprobante
     if v_errores = '' then
     	
-            --Obtiene el documento para la numeración
-            select doc.codigo
-            into v_doc
-            from conta.tclase_comprobante ccbte
-            inner join param.tdocumento doc
-            on doc.id_documento = ccbte.id_documento
-            where ccbte.id_clase_comprobante = v_rec_cbte.id_clase_comprobante;
-            
-            
+           
             
             --Se obtiene el periodo
             select po_id_periodo 
@@ -306,26 +392,67 @@ BEGIN
                END IF;
                
                --el comprobante de apertura solo puede ser un comprobante de diaraio
-               IF v_doc != 'CDIR' THEN
-                 raise exception 'El comprobante de paertura solo puede ser del tipo DIARIO (CDIR) no %', v_doc;
+               IF v_codigo_clase_cbte != 'DIARIO' THEN
+                 raise exception 'El comprobante de paertura solo puede ser del tipo DIARIO (CDIR) no %', v_codigo_clase_cbte;
                END IF;
                
                
             END IF;
             
-           -----------------------------------------
+            
+           --valida cbte de apertura
+           
+           IF v_tiene_apertura = 'no' and  v_rec_cbte.cbte_apertura = 'si' THEN
+               raise exception 'Esta clase de cbte no permite registros de apertura';           
+           END IF;
+            
+            
+           ---------------------------------------------------
            --  OBTENCION DE LA NUMERACION DEL CBTE
-           -------------------------------------------- 
+           --    considera que cada clase de comprobante puede 
+           --    terner diferentes o los mismo documentos
+           --    encargados de generar la numeracion
+           ----------------------------------------------------- 
             
            --  Obtención del número de comprobante, si no tiene un numero asignado
            IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte  = '' THEN
+           
+           
+                --  validamos que la numeracion sea coherente con la fecha y correlativo
+                 IF  v_rec_cbte.cbte_apertura = 'no' then
+                      IF exists (select
+                                        1
+                                  from conta.tint_comprobante c
+                                  inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = c.id_clase_comprobante
+                                  where c.id_depto = v_rec_cbte.id_depto
+                                        --and c.id_clase_comprobante = v_rec_cbte.id_clase_comprobante
+                                        and  cc.id_documento = v_rec_cbte.id_documento
+                                        and c.id_periodo = v_rec_cbte.id_periodo
+                                        and c.fecha > v_rec_cbte.fecha
+                                        and (c.nro_cbte is not null or v_rec_cbte.nro_cbte  != '') ) THEN
+                        
+                                raise exception 'Existen comprobantes validados con fecha superior al % para este periodo, cambie la fecha', v_rec_cbte.fecha;
+                       END IF;
+                 else
+                   -- si un comprobante de apertura  
+                   if   to_char(v_rec_cbte.fecha::date, 'MM')::varchar != '01'  then
+                        raise exception 'los cbte de apertura debe ser de enero';
+                   end if;
+                   
+                    if   to_char(v_rec_cbte.fecha::date, 'DD')::integer  > 5  then
+                        raise exception 'los cbte de apertura deben estar en los primeros 5 dias del año ';
+                   end if;  
+                   
+                   -- 
+                 end if;
                
-               
-                -- Si no es un cbte de apertura y estamso en enero fuerza el saltar inicio
-                IF  v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
+             
+                -- Si no es un cbte de apertura (pero su clase de cbte admite cbte de apertura) 
+                -- y estamos en enero fuerza el saltar inicio (dejar el primer numero para el cbte de apertura)
+                
+                IF  v_tiene_apertura = 'si' and v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
                      
                 
-                       
                        v_nro_cbte =  param.f_obtener_correlativo(
                                  v_doc, 
                                  v_id_periodo,-- par_id, 
@@ -355,7 +482,7 @@ BEGIN
                                  NULL);
                 
                 
-                ELSE
+                 ELSEIF v_rec_cbte.cbte_apertura = 'si' THEN
                    --si es un comprobante de inicio fuerza a optener el primer numero
                     v_nro_cbte =  param.f_obtener_correlativo(
                                v_doc, 
@@ -374,14 +501,14 @@ BEGIN
                                'no',  --par_saltar_inicio
                                'si'); --par_forzar_inicio
                    
-                
+                ELSE
+                  raise exception 'tipo de cbte no previsto';
                 END IF;
                 
            ELSE
               v_nro_cbte = v_rec_cbte.nro_cbte; 
            END IF;
-            
-          
+           
           -----------------------------------------------------
           -- Llevar e estado de WF del cbte a validado
           --   
@@ -394,7 +521,7 @@ BEGIN
                                                   'Cbte validado');
     
     
-            
+           
            --Se guarda el número del comprobante 
             update conta.tint_comprobante set
               nro_cbte = v_nro_cbte
@@ -412,10 +539,10 @@ BEGIN
              FOR v_registros in  (
                                        select 
                                             itp.id_int_transaccion,
-                                            itp.importe_debe as importe_debe_pag,
-                                            itp.importe_haber as importe_haber_pag,
-                                            sum(itd.importe_debe) as importe_debe_dev,
-                                            sum(itd.importe_haber) as importe_haber_dev,
+                                            itp.importe_gasto as importe_gasto_pag,
+                                            itp.importe_recurso as importe_recurso_pag,
+                                            sum(itd.importe_gasto) as importe_gasto_dev,
+                                            sum(itd.importe_recurso) as importe_recurso_dev,
                                             sum(rd.monto_pago ) as total
                                        from conta.tint_rel_devengado rd
                                        inner join conta.tint_transaccion itp on rd.id_int_transaccion_pag = itp.id_int_transaccion
@@ -423,18 +550,34 @@ BEGIN
                                        where itp.id_int_comprobante = v_rec_cbte.id_int_comprobante
                                        group by  
                                             itp.id_int_transaccion,
-                                            itp.importe_debe ,
-                                            itp.importe_haber ) LOOP
-               
-              
-                                  IF v_registros.total < v_registros.importe_debe_pag and v_registros.importe_haber_pag = 0   THEN
-                                    raise exception 'a) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_debe_pag;
-                                  END IF;
+                                            itp.importe_gasto ,
+                                            itp.importe_recurso ) LOOP
+                                            
+                                         
+                                  --validacion de  pago o  reversión de pago segun el signo
+              					  
+                                  IF v_registros.total > 0 THEN
                                   
-                                  IF v_registros.total < v_registros.importe_haber_pag and v_registros.importe_debe_pag = 0   THEN
-                                    raise exception 'b) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_haber_pag;
+                                      IF v_registros.total < v_registros.importe_gasto_pag and v_registros.importe_recurso_pag = 0   THEN
+                                        raise exception 'a) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_gasto_pag;
+                                      END IF;
+                                      
+                                      IF v_registros.total < v_registros.importe_recurso_pag and v_registros.importe_gasto_pag = 0   THEN
+                                        raise exception 'b) El monto devengado (%) no es suficiente para realizar el pago (%), verifique la relación devengado pago',v_registros.total,v_registros.importe_recurso_pag;
+                                      END IF;
+                                 
+             					  ELSEIF v_registros.total < 0 THEN
+                                   
+                                   --Si es una transaccion de reversion ...
+                                   
+                                      IF (v_registros.total*-1) < v_registros.importe_gasto_pag and v_registros.importe_recurso_pag = 0   THEN
+                                        raise exception 'a) El monto relacionado/devengado (%) no es suficiente para realizar la reversion (%), verifique la relación devengado -  pago',(v_registros.total*-1),v_registros.importe_gasto_pag;
+                                      END IF;
+                                      
+                                      IF (v_registros.total*-1) < v_registros.importe_gasto_pag and v_registros.importe_recurso_pag = 0   THEN
+                                        raise exception 'b) El monto relacioando/devengado (%) no es suficiente para realizar la reversion (%), verifique la relación devengado - pago',(v_registros.total*-1),v_registros.importe_recurso_pag;
+                                      END IF;
                                   END IF;
-                                  
                                   v_sw_rel = FALSE;
                                   
              
@@ -446,9 +589,9 @@ BEGIN
                 
           END IF;
           
-         
+          
            
-         ----------------------------------------------------------------------------------- 
+         ---------------------------------------------------------------------------------------- 
          -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
          ----------------------------------------------------------------------------------------
            
@@ -475,7 +618,7 @@ BEGIN
            
          END IF;
            
-        
+         
           
          --------------------------------------------------
          -- Validaciones sobre el cbte y sus transacciones
@@ -497,7 +640,7 @@ BEGIN
          
          
          ---------------------------------------------------------------------------
-         --  Se estamos en la CENTRAL y el comprobante es  internacional  debemos  actualizar las modificaciones
+         --  Si estamos en la CENTRAL y el comprobante es  internacional  debemos  actualizar las modificaciones
          --  que pudieran haber sido realizadas al cbte en la estación regioanl
          ----------------------------------------------------------------------------
          
@@ -506,23 +649,35 @@ BEGIN
           END IF;
          
          
-         -----------------------------------------------------------------------------------------------------------------------
-         -- SI el comprobante se valida en central y es de  una regional internacional y la sincronizacion esta habilitada migramos el cbte a ENDESIS
-         -- si la moneda  no es dolares debemos convertir a Bolivianos
-         ------------------------------------------------------------------------------------------------------------------------
-         IF (v_sincronizar = 'true'  and v_rec_cbte.vbregional = 'si' and  v_rec_cbte.id_ajuste is null)THEN
-             -- si sincroniza locamente con endesis, marcando la bandera que proviene de regional internacional
+         ---------------------------------------------------------------------------------------------------
+         --  SI el comprobante se valida en central (v_sincronizar = 'true' solo la central debe tener esta variable) 
+         --  y  la sincronizacion esta habilitada  migramos el cbte a ENDESIS
+         --  si la moneda  no es dolares debemos convertir a Bolivianos
+         --  TODO ...para que revisa si no es ajuste ..???? ...no migre lso cbtes de ajuste?
+         ----------------------------------------------------------------------------------------------------
+         
+       
+         IF (v_sincronizar = 'true'   and  v_rec_cbte.id_ajuste is null and  v_rec_cbte.fecha <= '31/12/2016'::Date)THEN
+             -- si sincroniza locamente con endesis, 
+             -- marcando la bandera que proviene de regional internacional  (TODO ver para que es esta bandera ????)
+             
              v_resp_int_endesis =  migra.f_migrar_cbte_endesis(p_id_int_comprobante, v_nombre_conexion, 'si');
+         
          END IF;
+         
+         
           
          -----------------------------------------------------------------------------------------------
          --  Valifacion presupuestaria del comprobante  (ejecutamos el devengado o ejecutamos el pago)
-         --   si es de uan regioanl internacion y es moenda diferente de doalres convertimos a Bolivianos
+         --  si es de una regional internacional y es moneda diferente de dolares convertimos a Bolivianos
          ------------------------------------------------------------------------------------------------
+       --raise exception 'lelga %',v_rec_cbte.fecha;
          IF v_pre_integrar_presupuestos = 'true' THEN  --en las regionales internacionales la sincro de presupeustos esta deshabilitada
          
-             IF v_sincronizar = 'true' THEN
+             IF v_sincronizar = 'true' and  v_rec_cbte.fecha <= '31/12/2016'::Date THEN
+               
                 v_resp =  conta.f_gestionar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion, v_nombre_conexion);
+             
              ELSE
             
                 v_resp =  conta.f_gestionar_presupuesto_cbte_pxp(p_id_usuario, p_id_int_comprobante, 'no', p_fecha_ejecucion, v_nombre_conexion);
@@ -530,12 +685,12 @@ BEGIN
          END IF;
          
         
-         
+       
          -------------------------------------------------- 
          --10.cerrar conexiones dblink si es que existe 
          -------------------------------------------------
          
-         --cerrar la conexion de actulizacion (que peude ser paralela a la de jecucion de presupesutos)  central -> regional
+         --cerrar la conexion de actulizacion (que puede ser paralela a la de jecucion de presupesutos)  central -> regional
          if  v_conexion_int_act is not null then
               select * into v_resp from migra.f_cerrar_conexion(v_conexion_int_act,'exito'); 
          end if;
@@ -549,7 +704,7 @@ BEGIN
     	raise exception 'Validación no realizada: %', v_errores;
     end if;
     
-  
+ 
     
     --8. Respuesta
     return 'Comprobante validado';

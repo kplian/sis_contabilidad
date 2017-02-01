@@ -42,6 +42,13 @@ class MODResultadoPlantilla extends MODbase{
 		$this->captura('desc_clase_comprobante','varchar');
 		
 		
+		$this->captura('id_tipo_relacion_comprobante','int4');
+		$this->captura('relacion_unica','varchar');
+		$this->captura('desc_tipo_relacion_comprobante','varchar');
+		
+		
+		
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -67,6 +74,8 @@ class MODResultadoPlantilla extends MODbase{
         $this->setParametro('periodo_calculo','periodo_calculo','varchar');
         $this->setParametro('id_clase_comprobante','id_clase_comprobante','integer');
         $this->setParametro('glosa','glosa','varchar');
+		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
+		$this->setParametro('relacion_unica','relacion_unica','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -94,6 +103,8 @@ class MODResultadoPlantilla extends MODbase{
         $this->setParametro('periodo_calculo','periodo_calculo','varchar');
         $this->setParametro('id_clase_comprobante','id_clase_comprobante','integer');
         $this->setParametro('glosa','glosa','varchar');
+		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
+		$this->setParametro('relacion_unica','relacion_unica','varchar');
 		
 
 		//Ejecuta la instruccion
@@ -169,6 +180,9 @@ class MODResultadoPlantilla extends MODbase{
 	        $this->captura('id_clase_comprobante','integer');
 	        $this->captura('glosa','varchar');
 			$this->captura('codigo_clase_comprobante','varchar');
+			$this->captura('id_tipo_relacion_comprobante','int4');
+		    $this->captura('relacion_unica','varchar');
+		    $this->captura('codigo_tipo_relacion_comprobante','varchar');
 		
 		$this->armarConsulta();	
 		
@@ -231,6 +245,11 @@ class MODResultadoPlantilla extends MODbase{
 			$this->captura('codigo_auxiliar','varchar');
 			$this->captura('desc_partida','varchar');
 			$this->captura('codigo_resultado_plantilla','varchar');
+			
+			
+			
+			
+		
 			
 			
 			$this->armarConsulta();

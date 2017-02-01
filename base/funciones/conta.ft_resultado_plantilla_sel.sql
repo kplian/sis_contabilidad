@@ -49,29 +49,34 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						resplan.id_resultado_plantilla,
-						resplan.codigo,
-						resplan.estado_reg,
-						resplan.nombre,
-						resplan.id_usuario_reg,
-						resplan.usuario_ai,
-						resplan.fecha_reg,
-						resplan.id_usuario_ai,
-						resplan.fecha_mod,
-						resplan.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	,
-                        resplan.tipo,
-                        resplan.cbte_aitb,
-                        resplan.cbte_apertura,
-                        resplan.cbte_cierre,
-                        resplan.periodo_calculo,
-                        resplan.id_clase_comprobante,
-                        resplan.glosa,
-                        cc.descripcion as desc_clase_comprobante
-						from conta.tresultado_plantilla resplan
+                            resplan.id_resultado_plantilla,
+                            resplan.codigo,
+                            resplan.estado_reg,
+                            resplan.nombre,
+                            resplan.id_usuario_reg,
+                            resplan.usuario_ai,
+                            resplan.fecha_reg,
+                            resplan.id_usuario_ai,
+                            resplan.fecha_mod,
+                            resplan.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod	,
+                            resplan.tipo,
+                            resplan.cbte_aitb,
+                            resplan.cbte_apertura,
+                            resplan.cbte_cierre,
+                            resplan.periodo_calculo,
+                            resplan.id_clase_comprobante,
+                            resplan.glosa,
+                            cc.descripcion as desc_clase_comprobante,
+                            resplan.id_tipo_relacion_comprobante,
+                            resplan.relacion_unica,
+                            resplan.nombre as desc_tipo_relacion_comprobante
+						
+                        from conta.tresultado_plantilla resplan
                         inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
-						 left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante
+						left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante                        
+						left join conta.ttipo_relacion_comprobante trc on trc.id_tipo_relacion_comprobante = resplan.id_tipo_relacion_comprobante
 						left join segu.tusuario usu2 on usu2.id_usuario = resplan.id_usuario_mod
 				        where  ';
                         
@@ -100,7 +105,8 @@ BEGIN
 			v_consulta:='select count(id_resultado_plantilla)
 					    from conta.tresultado_plantilla resplan
                         inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
-						 left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante
+						left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante                        
+						left join conta.ttipo_relacion_comprobante trc on trc.id_tipo_relacion_comprobante = resplan.id_tipo_relacion_comprobante
 						left join segu.tusuario usu2 on usu2.id_usuario = resplan.id_usuario_mod
 				        where ';
 			
@@ -144,10 +150,14 @@ BEGIN
                             resplan.periodo_calculo,
                             resplan.id_clase_comprobante,
                             resplan.glosa,
-                            cc.codigo as codigo_clase_comprobante
+                            cc.codigo as codigo_clase_comprobante,
+                            resplan.id_tipo_relacion_comprobante,
+                            resplan.relacion_unica,
+                            resplan.codigo as codigo_tipo_relacion_comprobante
                       from conta.tresultado_plantilla resplan
                       inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
-                      left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante
+                      left join conta.ttipo_relacion_comprobante trc on trc.id_tipo_relacion_comprobante = resplan.id_tipo_relacion_comprobante
+ 					  left join conta.tclase_comprobante cc on cc.id_clase_comprobante = resplan.id_clase_comprobante
                       left join segu.tusuario usu2 on usu2.id_usuario = resplan.id_usuario_mod
                       where  resplan.id_resultado_plantilla = '||v_parametros.id_resultado_plantilla;
 			
@@ -231,12 +241,12 @@ BEGIN
                           par.nombre_partida as desc_partida,
                           rp.codigo as codigo_resultado_plantilla
                       from conta.tresultado_det_plantilla resdet
-                      inner join conta.tresultado_plantilla rp  on rp.id_resultado_plantilla = resdet.id_resultado_plantilla
-                      inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
-                      left  join conta.tauxiliar aux on aux.id_auxiliar = resdet.id_auxiliar
-                      left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||' 
-                      left join pre.tpartida par on par.estado_reg = ''activo'' and par.codigo = resdet.codigo_partida and par.id_gestion = '||v_id_gestion::varchar||' 
-                      left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
+                       inner join conta.tresultado_plantilla rp  on rp.id_resultado_plantilla = resdet.id_resultado_plantilla
+                       inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
+                       left  join conta.tauxiliar aux on aux.id_auxiliar = resdet.id_auxiliar
+                       left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||' 
+                       left join pre.tpartida par on par.estado_reg = ''activo'' and par.codigo = resdet.codigo_partida and par.id_gestion = '||v_id_gestion::varchar||' 
+                       left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
 				      where  resdet.id_resultado_plantilla = '||v_parametros.id_resultado_plantilla;
                         
 			--Devuelve la respuesta

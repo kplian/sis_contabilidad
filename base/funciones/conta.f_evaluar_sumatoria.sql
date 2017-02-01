@@ -1,8 +1,10 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_evaluar_sumatoria (
   p_formula varchar,
   p_plantilla varchar
 )
-RETURNS numeric AS
+RETURNS numeric [] AS
 $body$
 DECLARE
 
@@ -23,6 +25,8 @@ v_sw_busqueda		boolean;
 v_i					integer;
 v_k					integer;
 va_variables		varchar[];
+v_monto_partida				numeric;
+va_retrono			numeric[];
  
 
 BEGIN
@@ -34,9 +38,11 @@ BEGIN
    IF p_formula is NULL or p_formula = '' THEN
    
          select 
-          sum(monto)
+          sum(monto),
+          sum(monto_partida)
          into
-          v_monto
+          v_monto,
+          v_monto_partida
          from temp_balancef
          where plantilla = p_plantilla;
    ELSE
@@ -52,9 +58,11 @@ BEGIN
      end if;
      
      select 
-      sum(monto)
+      sum(monto),
+      sum(monto_partida)
      into
-      v_monto
+      v_monto,
+      v_monto_partida
      from temp_balancef
      where plantilla = p_plantilla  and orden >= (trim(va_variables[1]))::int4 and orden <= (trim(va_variables[2]))::int4;
      
@@ -62,9 +70,11 @@ BEGIN
    
    
    
+   va_retrono[1] =  v_monto;
+   va_retrono[2] =  v_monto_partida;
    
    --retorna resultado
-   RETURN v_monto;
+   RETURN va_retrono;
 
 
 EXCEPTION

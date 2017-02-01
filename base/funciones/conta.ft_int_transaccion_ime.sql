@@ -44,6 +44,9 @@ DECLARE
      v_tc_2 				numeric;
      v_monto 				numeric;
      v_factor				numeric;
+     v_conta_ejecucion_igual_pres_conta		varchar;
+     v_monto_recurso 						numeric;
+     v_monto_gasto 							numeric;
  
 BEGIN
 
@@ -61,6 +64,7 @@ BEGIN
 					
         begin
         
+             
              select
                cbt.id_moneda,
                cbt.id_moneda_tri,
@@ -91,6 +95,19 @@ BEGIN
               where id_int_comprobante =  v_parametros.id_int_comprobante;
             
             END IF;
+            
+            --verifica si presupeusto y iguala con la contabilidad
+            
+            v_conta_ejecucion_igual_pres_conta = pxp.f_get_variable_global('conta_ejecucion_igual_pres_conta');
+        
+            IF v_conta_ejecucion_igual_pres_conta  = 'no' THEN            
+               v_monto_gasto = v_parametros.importe_gasto;
+               v_monto_recurso = v_parametros.importe_recurso;
+            ELSE
+               v_monto_gasto = v_parametros.importe_debe;
+               v_monto_recurso = v_parametros.importe_haber;
+            END IF;
+            
           
          
        
@@ -129,8 +146,8 @@ BEGIN
                 v_parametros.id_auxiliar,
                 v_parametros.importe_debe,
                 v_parametros.importe_haber,
-                v_parametros.importe_debe,
-                v_parametros.importe_haber,
+                v_monto_gasto,
+                v_monto_recurso,
                
                 p_id_usuario,
                 now(),
@@ -187,11 +204,6 @@ BEGIN
              from conta.tint_comprobante cbt
              where  cbt.id_int_comprobante = v_parametros.id_int_comprobante;
              
-             
-         
-             
-             
-             
             -- si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
             -- para que no actulice automaricamente las transacciones si es modificada
             IF  v_registros.tipo_cambio !=  v_parametros.tipo_cambio or v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 THEN
@@ -233,6 +245,17 @@ BEGIN
             END LOOP;
             
             
+            v_conta_ejecucion_igual_pres_conta = pxp.f_get_variable_global('conta_ejecucion_igual_pres_conta');
+        
+            IF v_conta_ejecucion_igual_pres_conta  = 'no' THEN            
+               v_monto_gasto = v_parametros.importe_gasto;
+               v_monto_recurso = v_parametros.importe_recurso;
+            ELSE
+               v_monto_gasto = v_parametros.importe_debe;
+               v_monto_recurso = v_parametros.importe_haber;
+            END IF;
+            
+            
             
 			--------------------------------
 			--MODIFICACION DE LA TRANSACCION
@@ -251,8 +274,8 @@ BEGIN
               tipo_cambio_2 = v_parametros.tipo_cambio_2,
               importe_debe = v_parametros.importe_debe,
               importe_haber = v_parametros.importe_haber,
-              importe_gasto = v_parametros.importe_debe,
-              importe_recurso = v_parametros.importe_haber
+              importe_gasto = v_monto_gasto,
+              importe_recurso = v_monto_recurso
              
 			where id_int_transaccion = v_parametros.id_int_transaccion;
             

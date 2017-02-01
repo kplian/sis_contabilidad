@@ -44,12 +44,21 @@ v_id_cuenta				integer;
 v_monto_debe			numeric;
 v_monto_haber			numeric;
 v_id_proceso_macro		integer;
-v_codigo_proceso_macro 		varchar;
-v_codigo_tipo_proceso 		varchar;
-v_num_tramite 				varchar;
-v_id_proceso_wf				integer;
-v_id_estado_wf				integer;
-v_codigo_estado   			varchar;
+v_codigo_proceso_macro 				varchar;
+v_codigo_tipo_proceso 				varchar;
+v_num_tramite 						varchar;
+v_id_proceso_wf						integer;
+v_id_estado_wf						integer;
+v_codigo_estado   					varchar;
+v_desde								date;
+v_hasta								date;
+v_id_int_comprobante_ori			integer;
+v_registros_cbte					record;
+v_monto_gasto						numeric;
+v_monto_recurso						numeric;
+v_id_int_comprobante_fk				integer[];
+v_id_tipo_relacion_comprobante		integer;
+
  
 
 BEGIN
@@ -66,24 +75,53 @@ BEGIN
     ***********************************/
 
 	IF(p_transaccion = 'CONTA_GENCBTERES_IME')then
-         
     
-    
-         --  0) recuperamos la gestion segun fecha inicial   
-         
-         v_gestion =  EXTRACT(YEAR FROM  v_parametros.desde::Date)::varchar;
+          if pxp.f_existe_parametro(p_tabla,'desde')  then
+          	v_desde = v_parametros.desde;
+            v_hasta = v_parametros.hasta;
+          end if;
+          
+          
+          --  0) recuperamos la gestion
+          
+          if pxp.f_existe_parametro(p_tabla,'id_int_comprobante')  then
+          	
+                v_id_int_comprobante_ori = v_parametros.id_int_comprobante;
+                v_id_int_comprobante_fk[1] = v_parametros.id_int_comprobante;
+                select 
+                  p.id_gestion,
+                  c.id_proceso_wf,
+                  c.id_estado_wf,
+                  c.nro_tramite,
+                  c.id_depto
+                into
+                  v_registros_cbte
+                from conta.tint_comprobante c
+                inner join param.tperiodo p on p.id_periodo = c.id_periodo
+                where c.id_int_comprobante = v_id_int_comprobante_ori;
+                
+                v_id_gestion = v_registros_cbte.id_gestion;
+               
             
-          select 
-            ges.id_gestion
-          into
-            v_id_gestion
-          from param.tgestion ges 
-          where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
+          else
+          --  0) recuperamos la gestion segun fecha inicial
+              v_gestion =  EXTRACT(YEAR FROM  v_desde::Date)::varchar;
+              
+              select 
+                ges.id_gestion
+              into
+                v_id_gestion
+              from param.tgestion ges 
+              where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
+              
+              IF v_id_gestion is NULL THEN  
+                    raise exception 'No se encontro gestion para la fecha % en %', v_desde, v_gestion;
+              END IF;
           
-          IF v_id_gestion is NULL THEN  
-          		raise exception 'No se encontro gestion para la fecha % en %', v_parametros.desde, v_gestion;
-          END IF;
           
+          end if;
+         
+    
           
          --  1) recuperamos la gestion para el comprobante   
          
@@ -108,6 +146,32 @@ BEGIN
            v_registros_plantilla
           from conta.tresultado_plantilla rp
           where rp.id_resultado_plantilla = v_parametros.id_resultado_plantilla;
+          
+          
+          
+          -- si es un comprobante origen recuepramos el tipo de relacion del cbte
+          IF v_id_int_comprobante_ori is not null THEN 
+                v_id_int_comprobante_fk[1] = v_id_int_comprobante_ori;
+                v_id_tipo_relacion_comprobante = v_registros_plantilla.id_tipo_relacion_comprobante;
+                
+                IF v_registros_plantilla.relacion_unica = 'si' THEN
+                 
+                     --comprobamos que el cbte origan no tenga una relacion de este tipo
+                     
+                     IF exists(select 
+                                   1
+                               from conta.tint_comprobante c 
+                               where  c.id_tipo_relacion_comprobante = v_id_tipo_relacion_comprobante 
+                                      and c.estado_reg  in ('borrador','validado')
+                                      and v_id_int_comprobante_ori = ANY (c.id_int_comprobante_fks))  THEN
+                                 
+                            raise exception 'este comprobante  tiene una relación existente, revise las dependencias' ;    
+                     END IF;
+                END IF;
+          END IF;
+          
+          
+          
           
           
          --  1) Crear una tabla temporal con los datos que se utilizaran 
@@ -142,7 +206,8 @@ BEGIN
                                     destino  varchar,
                                     orden_cbte numeric,
                                     nombre_columna  varchar,
-                                    prioridad numeric
+                                    prioridad numeric,
+                                    monto_partida numeric
                                     ) ON COMMIT DROP;
              
          
@@ -161,10 +226,11 @@ BEGIN
                 IF  not conta.f_resultado_procesar_plantilla(
                                                             v_registros.plantilla,
                                                             v_registros.id_resultado_plantilla_hijo, 
-                                                            v_parametros.desde, 
-                                                            v_parametros.hasta, 
+                                                            v_desde, 
+                                                            v_hasta, 
                                                             v_str_id_deptos,
                                                             v_id_gestion,
+                                                            v_id_int_comprobante_ori,
                                                             true) THEN
                                                             
                      raise exception 'error al procesa la plantilla %', v_registros.codigo;                                       
@@ -175,10 +241,11 @@ BEGIN
          -- 3) Procesar plantilla principal
          IF not conta.f_resultado_procesar_plantilla(v_registros_plantilla.codigo,
                                                       v_parametros.id_resultado_plantilla, 
-                                                      v_parametros.desde, 
-                                                      v_parametros.hasta, 
+                                                      v_desde, 
+                                                      v_hasta, 
                                                       v_str_id_deptos,
                                                       v_id_gestion,
+                                                      v_id_int_comprobante_ori,
                                                       false) THEN
              raise exception 'Error al procesar la plantilla principal';                                                  
          END IF;
@@ -230,34 +297,64 @@ BEGIN
           IF v_codigo_tipo_proceso is NULL THEN
            raise exception 'No existe un proceso inicial para el proceso macro indicado % (Revise la configuración)',v_codigo_proceso_macro;
           END IF;
-                    
-        -- inciar el tramite en el sistema de WF
-          SELECT 
-             ps_num_tramite ,
-             ps_id_proceso_wf ,
-             ps_id_estado_wf ,
-             ps_codigo_estado 
-            into
-             v_num_tramite,
-             v_id_proceso_wf,
-             v_id_estado_wf,
-             v_codigo_estado   
-                          
-          FROM wf.f_inicia_tramite(
-             p_id_usuario,
-             v_parametros._id_usuario_ai,
-             v_parametros._nombre_usuario_ai,
-             v_rec.po_id_gestion, 
-             v_codigo_tipo_proceso, 
-             null,--v_parametros.id_funcionario,
-             v_parametros.id_depto,
-             'Registrado a trave de plantilla',
-             '' );        
-                 
+          
+          
+          ---------------------------------------------------------------------------
+          -- si no viene de un comprobante continuar con el tramite original 
+          --------------------------------------------------------------------------
+          
+          IF v_id_int_comprobante_ori is null THEN          
+                          -- inciar el tramite en el sistema de WF
+                          SELECT 
+                             ps_num_tramite ,
+                             ps_id_proceso_wf ,
+                             ps_id_estado_wf ,
+                             ps_codigo_estado 
+                            into
+                             v_num_tramite,
+                             v_id_proceso_wf,
+                             v_id_estado_wf,
+                             v_codigo_estado   
+                                          
+                          FROM wf.f_inicia_tramite(
+                             p_id_usuario,
+                             v_parametros._id_usuario_ai,
+                             v_parametros._nombre_usuario_ai,
+                             v_rec.po_id_gestion, 
+                             v_codigo_tipo_proceso, 
+                             null,--v_parametros.id_funcionario,
+                             v_parametros.id_depto,
+                             'Registrado a trave de plantilla',
+                             '' );        
+           
+          ELSE
+          
+               SELECT
+                                     ps_id_proceso_wf,
+                                     ps_id_estado_wf,
+                                     ps_codigo_estado,
+                                     ps_nro_tramite
+                           into
+                                     v_id_proceso_wf,
+                                     v_id_estado_wf,
+                                     v_codigo_estado,
+                                     v_num_tramite
+                       FROM wf.f_registra_proceso_disparado_wf(
+                                    p_id_usuario,
+                                    v_parametros._id_usuario_ai,
+                                    v_parametros._nombre_usuario_ai,
+                                    v_registros_cbte.id_estado_wf, 
+                                    NULL,  --id_funcionario wf
+                                    v_registros_cbte.id_depto,
+                                    'Cbte generado desde plantilla',
+                                    'CBTE','');
+          END IF;      
                  
           IF  v_codigo_estado != 'borrador' THEN
             raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
           END IF;
+          
+         
                     
          ------------------------------------
          --  registro de comprobante
@@ -279,7 +376,9 @@ BEGIN
               cbte_aitb,
               nro_tramite,
               id_proceso_wf,
-              id_estado_wf
+              id_estado_wf,
+              id_int_comprobante_fks,
+              id_tipo_relacion_comprobante
           	) 
             values(
               v_registros_plantilla.id_clase_comprobante,			
@@ -298,7 +397,9 @@ BEGIN
               v_registros_plantilla.cbte_aitb,
               v_num_tramite,
               v_id_proceso_wf,
-              v_id_estado_wf
+              v_id_estado_wf,
+              v_id_int_comprobante_fk,
+              v_id_tipo_relacion_comprobante
 		   )RETURNING id_int_comprobante into v_id_int_comprobante;
             
             
@@ -332,7 +433,8 @@ BEGIN
                     into 
                      v_id_partida
                     FROM pre.tpartida par 
-                    WHERE par.id_gestion = v_id_gestion_cbte and par.codigo = v_registros.codigo_partida;
+                    WHERE    par.id_gestion = v_id_gestion_cbte 
+                         and par.codigo = v_registros.codigo_partida;
                     
                      -- TODO recupera relacion contable
                     
@@ -355,17 +457,25 @@ BEGIN
                         if v_registros.destino = 'debe' then
                            v_monto_debe = v_registros.monto;
                            v_monto_haber = 0;
+                           v_monto_gasto = v_registros.monto_partida;
+                           v_monto_recurso = 0;
                         else
                            v_monto_debe = 0;
                            v_monto_haber = v_registros.monto;
+                           v_monto_gasto = 0;
+                           v_monto_recurso = v_registros.monto_partida;
                         end if;
                      ELSE
                          if v_registros.destino = 'haber' then
                            v_monto_debe = v_registros.monto*(-1);
                            v_monto_haber = 0;
+                           v_monto_gasto = v_registros.monto_partida*(-1);
+                           v_monto_recurso = 0;
                         else
                            v_monto_debe = 0;
                            v_monto_haber = v_registros.monto*(-1);
+                           v_monto_gasto = 0;
+                           v_monto_recurso = v_registros.monto_partida*(-1);
                         end if;
                      
                      END IF;
@@ -400,17 +510,27 @@ BEGIN
                       v_registros.id_auxiliar,
                       v_monto_debe,
                       v_monto_haber,
+                      v_monto_gasto,
+                      v_monto_recurso,
                       v_monto_debe,
                       v_monto_haber,
-                      v_monto_debe,
-                      v_monto_haber,
-                      v_monto_debe,
-                      v_monto_haber,
+                      v_monto_gasto,
+                      v_monto_recurso,
                       p_id_usuario,
                       now()
                   );
             END IF;
          END LOOP;
+         
+         
+      ----------------------------------------------------------------
+      -- definir tipos de cambio 
+      ----------------------------------------------------------------
+    
+      IF not  conta.f_act_trans_cbte_generados(v_id_int_comprobante) THEN
+      	raise exception 'error al generar comprobante';
+      END IF;
+    
            
   
 

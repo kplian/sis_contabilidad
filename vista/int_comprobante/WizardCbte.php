@@ -8,7 +8,6 @@
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
-
 <script>
 Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
     constructor:function(config)
@@ -112,7 +111,9 @@ Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
 						fields: ['id_resultado_plantilla','nombre','codigo','periodo_calculo'],
 						// turn on remote sorting
 						remoteSort: true,
-						baseParams: { par_filtro:'resplan.nombre#resplan.codigo',tipo: 'cbte'}
+						baseParams: { par_filtro:'resplan.nombre#resplan.codigo',
+									  tipo: 'cbte',
+									  periodo: 'rangos'} //para que solo liste las plantilal aplicable a rengos de fecha
 	                }),
 	                valueField: 'id_resultado_plantilla',
 	   				displayField: 'nombre',
@@ -174,10 +175,8 @@ Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
 						failure : this.conexionFailure,
 						timeout : this.timeout,
 						scope : this
-					})
-                    
+					})                    
         }
-
     },
     
     successGen: function(resp){
@@ -202,8 +201,7 @@ Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
     		this.Cmp.desde.reset();
     		this.Cmp.hasta.reset();
     		this.Cmp.id_resultado_plantilla.reset();
-    	} ,this)
-    	
+    	} ,this);
     	
     	
     	this.Cmp.id_resultado_plantilla.on('select',function(combo, record, index ){
@@ -211,17 +209,26 @@ Phx.vista.WizardCbte=Ext.extend(Phx.frmInterfaz,{
     			this.Cmp.desde.setReadOnly(true);
     	        this.Cmp.hasta.setReadOnly(true);
     	        this.Cmp.desde.setValue(d1);
-    	        this.Cmp.hasta.setValue(d2);
-    	        
+    	        this.Cmp.hasta.setValue(d2);    	        
     	        this.Cmp.desde.setMaxValue(d2);
 		    	this.Cmp.desde.setMinValue(d1);
 		    	this.Cmp.hasta.setMaxValue(d2);
-		    	this.Cmp.hasta.setMinValue(d1);
-    			
+		    	this.Cmp.hasta.setMinValue(d1);    			
     		}
     		else{
-    			this.Cmp.desde.setReadOnly(false);
-    	        this.Cmp.hasta.setReadOnly(false);
+    			
+    			
+    			if(record.data.periodo_calculo == 'diario'){
+    				this.Cmp.desde.setReadOnly(true);
+    	            this.Cmp.hasta.setReadOnly(true);
+    				this.Cmp.desde.setValue(this.Cmp.fecha.getValue());
+    				this.Cmp.hasta.setValue(this.Cmp.fecha.getValue());
+    			}
+    			else{
+    				this.Cmp.desde.setReadOnly(false);
+    	            this.Cmp.hasta.setReadOnly(false);
+    			}	
+    			
     		}
     	},this);
     }

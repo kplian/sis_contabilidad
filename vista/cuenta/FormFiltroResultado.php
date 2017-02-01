@@ -190,7 +190,27 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 	       		id_grupo:0,
 	       		valorInicial: 'pdf',
 	       		form:true
-	     }],
+	     },
+	      {
+	       		config:{
+	       			name: 'incluir_sinmov',
+	       			qtip : 'Incluir slo cuentas con movimiento?',
+	       			fieldLabel: 'Solo con movimiento',
+	       			allowBlank: false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['no','si']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		valorInicial: 'no',
+	       		grid:true,
+	       		form:true
+	       	}],
     labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
     title: 'Filtro de mayores',
     // Funcion guardar del formulario

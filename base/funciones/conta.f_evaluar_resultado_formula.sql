@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION conta.f_evaluar_resultado_formula (
   p_plantilla varchar,
   p_destino varchar
 )
-RETURNS numeric AS
+RETURNS numeric [] AS
 $body$
 DECLARE
 
@@ -19,15 +19,21 @@ v_monto				numeric;
 v_mayor				numeric;
 v_id_gestion  		integer;
 v_tmp_formula		varchar;
-v_formula_evaluado	varchar;
-v_columna			varchar;
-v_columna_nueva     varchar[];
-v_sw_busqueda		boolean;
-v_i					integer;
-v_k					integer;
-va_variables		varchar[];
-v_monto_haber		numeric;
-v_monto_debe		numeric;
+v_formula_evaluado				varchar;
+v_formula_evaluado_partida		varchar;
+v_columna						varchar;
+v_columna_nueva     			varchar[];
+v_sw_busqueda					boolean;
+v_i								integer;
+v_k								integer;
+va_variables					varchar[];
+v_monto_haber					numeric;
+v_monto_debe					numeric;
+v_monto_partida					numeric;
+v_monto_recurso					numeric;
+v_monto_gasto					numeric;
+v_monto_retorno					numeric[];
+
  
 
 BEGIN
@@ -35,6 +41,7 @@ BEGIN
    v_nombre_funcion = 'conta.f_evaluar_resultado_formula';
    v_tmp_formula = p_formula;
    v_formula_evaluado = p_formula;
+   v_formula_evaluado_partida = p_formula;
    
    raise notice '----------> Evaluando la formula: %', p_formula;
    ------------------------------------------------------------------------
@@ -86,12 +93,16 @@ BEGIN
              va_variables[2] = NULL;
              va_variables[1] = split_part(v_columna_nueva[v_i], '.', 1);
              va_variables[2] = split_part(v_columna_nueva[v_i], '.', 2);
+             
              IF va_variables[2] is NULL or va_variables[2]  = '' THEN
                  -- si la variable no contiene el caracters especial "."
                  SELECT 
-                   sum(COALESCE(monto,0))
+                   sum(COALESCE(monto,0)),
+                   sum(COALESCE(monto_partida,0))
+                   
                  into
-                   v_monto
+                   v_monto,
+                   v_monto_partida
                  FROM  temp_balancef
                  WHERE  codigo =  va_variables[1]  and lower(plantilla) = lower(p_plantilla);
              ELSE
@@ -109,6 +120,7 @@ BEGIN
              --  REMPLAZA VALROES DE LAS VARIABLES
              --------------------------------------------
              v_formula_evaluado = replace(v_formula_evaluado, '{'||v_columna_nueva[v_i]||'}', v_monto::varchar);
+             v_formula_evaluado_partida = replace(v_formula_evaluado_partida, '{'||v_columna_nueva[v_i]||'}', v_monto_partida::varchar);
                                 
        END LOOP;
        
@@ -120,6 +132,13 @@ BEGIN
        IF v_formula_evaluado is not NULL THEN
           execute ('SELECT '||v_formula_evaluado) into v_monto;
        END IF;
+       
+       IF v_formula_evaluado is not NULL THEN
+          execute ('SELECT '||v_formula_evaluado_partida) into v_monto_partida;
+       END IF;
+       
+       v_monto_retorno[1] = v_monto;
+       v_monto_retorno[2] = v_monto_partida;
    
    
    ELSE
@@ -127,32 +146,38 @@ BEGIN
      -- Si la formula es segun saldo, hacemos los balances del debe y el haber
      ------------------------------------------------------------------------
          SELECT 
-           sum(COALESCE(monto,0))
+           sum(COALESCE(monto,0)),
+           sum(COALESCE(monto_partida,0))
          into
-           v_monto_debe
+           v_monto_debe,
+           v_monto_gasto
          FROM  temp_balancef
          WHERE  destino = 'debe'  
                 and lower(plantilla) = lower(p_plantilla);
    
          SELECT 
-           sum(COALESCE(monto,0))
+           sum(COALESCE(monto,0)),
+           sum(COALESCE(monto_partida,0))
          into
-           v_monto_haber
+           v_monto_haber,
+           v_monto_recurso
          FROM  temp_balancef
          WHERE  destino = 'haber'  
                 and lower(plantilla) = lower(p_plantilla);
    
         IF  v_monto_debe > v_monto_haber  THEN
-             return v_monto_debe - v_monto_haber;
+             v_monto_retorno[1]= v_monto_debe - v_monto_haber;
+             v_monto_retorno[2]= v_monto_gasto - v_monto_recurso;
         ELSE
-             return  (v_monto_haber - v_monto_debe)*(-1);
+             v_monto_retorno[1]= (v_monto_haber - v_monto_debe)*(-1);
+             v_monto_retorno[2]= (v_monto_recurso - v_monto_gasto)*(-1);
         END IF;
         
    
    END IF;
    
    --retorna resultado
-   RETURN v_monto;
+   RETURN v_monto_retorno;
 
 
 EXCEPTION

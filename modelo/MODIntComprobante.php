@@ -78,8 +78,12 @@ class MODIntComprobante extends MODbase{
 		$this->captura('cbte_reversion','varchar');
 		$this->captura('volcado','varchar');		
 		$this->captura('id_proceso_wf','int4');
-		$this->captura('id_estado_wf','int4');
-		
+		$this->captura('id_estado_wf','int4');		
+		$this->captura('fecha_c31','date');
+		$this->captura('c31','varchar');
+		$this->captura('id_gestion','int4');
+		$this->captura('periodo','int4');
+		$this->captura('forma_cambio','varchar');
 		
 		
 		//Ejecuta la instruccion
@@ -159,6 +163,13 @@ class MODIntComprobante extends MODbase{
 		$this->captura('volcado','varchar');		
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_estado_wf','int4');
+		$this->captura('fecha_c31','date');
+		$this->captura('c31','varchar');
+		$this->captura('id_gestion','int4');
+		$this->captura('periodo','int4');
+		$this->captura('forma_cambio','varchar');
+		
+		
 		
 		
 		//Ejecuta la instruccion
@@ -186,6 +197,8 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_clase_comprobante','int4');
 		$this->captura('codigo','varchar');
 		$this->captura('descripcion','varchar');
+		$this->captura('desc_moneda','text');
+		
 		
 		
 		//Ejecuta la instruccion
@@ -232,6 +245,7 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('fecha_costo_fin','fecha_costo_fin','date');	
 		$this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
 		$this->setParametro('id_config_cambiaria','id_config_cambiaria','integer');
+		$this->setParametro('forma_cambio','forma_cambio','varchar');
 		
 		
 
@@ -283,6 +297,7 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
 		$this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
 		$this->setParametro('id_config_cambiaria','id_config_cambiaria','integer');
+		$this->setParametro('forma_cambio','forma_cambio','varchar');
 		
 
 		//Ejecuta la instruccion
@@ -341,6 +356,7 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('desde','desde','date');
 		$this->setParametro('hasta','hasta','date');
 		$this->setParametro('fecha','fecha','date');
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 		
 
 		//Ejecuta la instruccion
@@ -430,13 +446,20 @@ class MODIntComprobante extends MODbase{
 		$this->captura('nombre_auxiliar','varchar');
 		$this->captura('cc','text');
 		$this->captura('codigo_partida','varchar');
-		$this->captura('nombre_partida','varchar');
+		$this->captura('nombre_partida','varchar'); 
 		$this->captura('desc_orden','varchar');
 		$this->captura('glosa','varchar');
+		$this->captura('importe_gasto','numeric');
+		$this->captura('importe_recurso','numeric');
 		$this->captura('importe_debe','numeric');
 		$this->captura('importe_haber','numeric');
 		$this->captura('importe_debe_mb','numeric');
 		$this->captura('importe_haber_mb','numeric');
+		
+		$this->captura('sw_movimiento','varchar');
+		$this->captura('tipo_partida','varchar');
+		
+		
 		
 		
 		//Ejecuta la instruccion
@@ -490,6 +513,7 @@ class MODIntComprobante extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('sw_validar','sw_validar','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -581,6 +605,8 @@ class MODIntComprobante extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('sw_tramite','sw_tramite','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

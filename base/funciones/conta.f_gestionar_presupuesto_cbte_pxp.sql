@@ -50,6 +50,12 @@ DECLARE
   v_monto_rev						numeric;
   v_monto_rev_mb					numeric;
   
+  v_importe_gasto 					numeric;
+  v_importe_recurso 					numeric;
+  v_importe_gasto_mb 				numeric;
+  v_importe_recurso_mb 				numeric;
+  v_reg_par_eje						record;
+  
     
 BEGIN
    
@@ -75,10 +81,13 @@ BEGIN
       ic.vbregional,
       ic.temporal,
       ic.nro_tramite,
-      ic.cbte_reversion
+      ic.cbte_reversion,
+      per.id_gestion,
+      ic.id_int_comprobante_fks
     into v_registros_comprobante
     from conta.tint_comprobante ic
     inner join conta.tclase_comprobante cl  on ic.id_clase_comprobante =  cl.id_clase_comprobante
+    inner join param.tperiodo per on per.id_periodo = ic.id_periodo
     where ic.id_int_comprobante  =  p_id_int_comprobante;
     
     
@@ -133,7 +142,7 @@ BEGIN
              
            
            
-            --listado de as transacciones con partidas presupuestaria
+            --listado de las transacciones con partidas presupuestaria
             FOR v_registros in (
                                   select
                                      it.id_int_transaccion,
@@ -155,7 +164,8 @@ BEGIN
                                      pr.id_presupuesto,
                                      it.importe_reversion,
                                      it.factor_reversion,
-                                     par.codigo as codigo_partida
+                                     par.codigo as codigo_partida,
+                                     it.actualizacion
                                   from conta.tint_transaccion it
                                   inner join pre.tpartida par on par.id_partida = it.id_partida
                                   inner join pre.tpresupuesto pr on pr.id_centro_costo = 
@@ -166,15 +176,17 @@ BEGIN
                            
                            --selecciona la moneda de trabajo
                          IF v_sw_moneda_base = 'si' THEN
-                              v_importe_debe = v_registros.importe_debe_mb;
-                              v_importe_haber =  v_registros.importe_haber_mb;
+                              v_importe_gasto = v_registros.importe_gasto_mb;
+                              v_importe_recurso =  v_registros.importe_recurso_mb;
                          ELSE
-                              v_importe_debe = v_registros.importe_debe;
-                              v_importe_haber =  v_registros.importe_haber;
+                              v_importe_gasto = v_registros.importe_gasto;
+                              v_importe_recurso =  v_registros.importe_recurso;
                          END IF; 
                   
-                         v_importe_debe_mb = v_registros.importe_debe_mb;
-                         v_importe_haber_mb =  v_registros.importe_haber_mb;
+                         v_importe_gasto_mb = v_registros.importe_gasto_mb;
+                         v_importe_recurso_mb =  v_registros.importe_recurso_mb;
+                         
+                       
             
                       
                           IF    v_momento_aux = 'todo' or   v_momento_aux='solo ejecutar'  THEN
@@ -182,14 +194,42 @@ BEGIN
                                 -- si solo ejecutamos el presupuesto 
                                 --  o (compromentemos y ejecutamos) 
                                 --  o (compromentemos, ejecutamos y pagamos)     
-                                -- si  el comprobante tiene que comprometer
                                 
+                                -- si tiene partida ejecucionde comprometido y nose correponde con la gestion
+                                --  lo ponemos en null para que comprometa
+                                
+                                IF v_registros.id_partida_ejecucion is not NULL THEN 
+                                
+                                                                      
+                                   
+                                   select
+                                       par.id_gestion
+                                   into
+                                      v_reg_par_eje
+                                   from pre.tpartida_ejecucion pe
+                                   inner join pre.tpartida par on par.id_partida = pe.id_partida
+                                   where pe.id_partida_ejecucion = v_registros.id_partida_ejecucion;
+                                   
+                                    if v_reg_par_eje.id_gestion != v_registros_comprobante.id_gestion  then
+                                        v_registros.id_partida_ejecucion = NULL;
+                                        update conta.tint_transaccion set 
+                                           id_partida_ejecucion = NULL
+                                        where id_int_transaccion = v_registros.id_int_transaccion;
+                                    end if;
+                                   
+                                END IF;
+                                
+                                
+                                -- si  el comprobante tiene que comprometer
                                 IF v_registros_comprobante.momento_comprometido = 'si' and v_registros_comprobante.cbte_reversion = 'no'  then
                                       -- validamos que si tiene que comprometer la id_partida_ejecucion tiene que ser nulo
                                        IF v_registros.id_partida_ejecucion is not NULL THEN                                       
                                            raise exception 'El comprobante no puede estar marcado para comprometer, si ya existe un comprometido';
                                        END IF;
+                                       
                                 END IF; --IF comprometido 
+                                
+                                
                                 
                                 
                                 -- solo procesamos si es una partida presupuestaria y no de flujo
@@ -197,29 +237,41 @@ BEGIN
                                        
                                          v_monto_cmp = 0;
                                          
+                                         ---  revisar si esto esta bien
+                                         IF v_registros_comprobante.momento_comprometido = 'no' THEN
+                                                -- solo permite comprometer partidas de actulizacion (transaccion que igualan el comprobante)
+                                               IF v_registros.id_partida_ejecucion is null  and v_registros.actualizacion = 'no'  THEN                                       
+                                                   raise exception 'El comprobante  no esta marcado para comprometer, y no tiene un origen comprometido';
+                                                END IF; 
+                                         END IF;
+                                         
+                                         
+                                         
                                          IF v_registros.tipo = 'gasto'  THEN
                                              -- importe debe ejecucion
-                                             IF v_importe_debe > 0 THEN
-                                                 v_monto_cmp  = v_importe_debe;
-                                                 v_monto_cmp_mb =v_importe_debe_mb;
-                                                                                           
+                                             IF v_importe_gasto > 0  or v_importe_gasto_mb > 0 THEN
+                                                 v_monto_cmp  = v_importe_gasto;
+                                                 v_monto_cmp_mb = v_importe_gasto_mb;                                                                                           
                                              END IF;
                                              --importe haber es reversion, multiplicar por -1
-                                             IF v_importe_haber > 0 THEN
-                                                 v_monto_cmp  = v_importe_haber * (-1);
-                                                 v_monto_cmp_mb = v_importe_haber_mb*(-1);
+                                             IF v_importe_recurso > 0 or v_importe_recurso_mb > 0THEN
+                                                 v_monto_cmp  = v_importe_recurso * (-1);
+                                                 v_monto_cmp_mb = v_importe_recurso_mb * (-1);
                                              END IF;
+                                            
                                          ELSE
-                                             IF v_importe_haber > 0 THEN
-                                               v_monto_cmp  = v_importe_haber;
-                                               v_monto_cmp_mb = v_importe_haber_mb;                                           
+                                             IF v_importe_recurso > 0 or v_importe_recurso_mb THEN
+                                               v_monto_cmp  = v_importe_recurso;
+                                               v_monto_cmp_mb = v_importe_recurso_mb;                                           
                                              END IF;
                                              --importe debe es reversion, multiplicar por -1
-                                             IF v_importe_debe > 0 THEN
-                                                 v_monto_cmp  = v_importe_debe * (-1);
-                                                 v_monto_cmp_mb = v_importe_debe_mb(-1);                                              
+                                             IF v_importe_gasto > 0 or v_importe_gasto_mb THEN
+                                                 v_monto_cmp  = v_importe_gasto * (-1);
+                                                 v_monto_cmp_mb = v_importe_gasto_mb(-1);                                              
                                              END IF;
                                          END IF;
+                                         
+                                       -- raise exception 'entra.. % --  %',v_monto_cmp, v_monto_cmp_mb;
                                 
                               
                                         -- llamamos a la funcion de ejecucion
@@ -359,8 +411,19 @@ BEGIN
                           
                           ELSIF  v_momento_aux='solo pagar'  THEN
                                 
-                                 -- raise exception 'entro ...';
+                                 --  RAC 29/12/2016
+                                 --  para los comprobantes de pago verificar que el devenga tenga gestion 
+                                 --  menor o igual a la gestion del pago
+                                 
+                                 IF exists ( select 1
+                                             from conta.tint_comprobante ic
+                                             inner join param.tperiodo per on per.id_periodo = ic.id_periodo
+                                             where ic.id_int_comprobante = ANY(v_registros_comprobante.id_int_comprobante_fks)
+                                                   and per.id_gestion > v_registros_comprobante.id_gestion) THEN
+                                       raise exception 'No puede pagar, por que la fecha de pago no es coherente con la fecha del devengado';
+                                 END IF;
                           
+                         
                                  -- si es solo pagar debemos identificar las transacciones del devengado 
                                  FOR  v_registros_dev in (
                                                                   select 

@@ -24,21 +24,8 @@ Phx.vista.IntComprobanteLd = {
 	constructor: function(config) {
 	    Phx.vista.IntComprobanteLd.superclass.constructor.call(this,config);
 	    
-	    this.addButton('btnVolcar', {
-				text : 'Volcar',
-				iconCls : 'balert',
-				disabled : true,
-				handler : this.volcarCbte,
-				tooltip : '<b>Volcar</b><br/>Genera un cbte volcado que revierte el actual'
-		});
-		
-		this.addButton('btnClonar', {
-				text : 'Clonar',
-				iconCls : 'balert',
-				disabled : true,
-				handler : this.clonarCbte,
-				tooltip : '<b>Clonar</b><br/>Clonar Cbte (genera nuevo nro de trámite)'
-		});
+	    this.addBotonesVolcar();
+		this.addBotonesClonar();
 		
 		this.addButton('chkdep',{	text:'Dependencias',
 				iconCls: 'blist',
@@ -46,12 +33,22 @@ Phx.vista.IntComprobanteLd = {
 				handler: this.checkDependencias,
 				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
 			});
-	    
+			
+		this.addButton('btnWizard', {
+					text : 'Plantilla',
+					iconCls : 'bgear',
+					disabled : true,
+					handler : this.loadWizard,
+					scope:this,
+					tooltip : '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
+			});	
+		
+		
+	   
 	   this.init();	 
+	},
     
-    },
-    
-     volcarCbte: function() {
+   volcarCbte: function(sw_validar) {
 			  
 			 if(confirm("Esta seguro de volcar el cbte,  este proceso no puede revertirse (Si tiene presupuesto será revertido)!")){
 			 	 if(confirm("¿Esta realmente seguro?")){
@@ -60,7 +57,8 @@ Phx.vista.IntComprobanteLd = {
 					Ext.Ajax.request({
 						url : '../../sis_contabilidad/control/IntComprobante/volcarCbte',
 						params : {
-							id_int_comprobante : rec.id_int_comprobante
+							id_int_comprobante : rec.id_int_comprobante,
+							sw_validar: (sw_validar=='si')?'si':'no'
 						},
 						success : function(resp) {
 							Phx.CP.loadingHide();
@@ -68,7 +66,7 @@ Phx.vista.IntComprobanteLd = {
 							if (reg.ROOT.error) {
 								Ext.Msg.alert('Error', 'Al volcar el cbte: ' + reg.ROOT.error)
 							} else {
-								this.reload();
+								this.reload()
 							}
 						},
 						failure : this.conexionFailure,
@@ -80,8 +78,11 @@ Phx.vista.IntComprobanteLd = {
 			    
 	},
 	
-   clonarCbte: function() {
-			  
+	clonarCbteSt: function(){
+		this.clonarCbte('si');
+	},
+    clonarCbte: function(sw_tramite) {
+	 		  
 			 if(confirm("Esta seguro de clonar  el cbte")){
 			 	 if(confirm("¿Esta realmente seguro?")){
 				 	var rec = this.sm.getSelected().data;
@@ -89,7 +90,8 @@ Phx.vista.IntComprobanteLd = {
 					Ext.Ajax.request({
 						url : '../../sis_contabilidad/control/IntComprobante/clonarCbte',
 						params : {
-							id_int_comprobante : rec.id_int_comprobante
+							id_int_comprobante : rec.id_int_comprobante,
+							sw_tramite: sw_tramite=='si'?'si':'no'
 						},
 						success : function(resp) {
 							Phx.CP.loadingHide();
@@ -117,6 +119,7 @@ Phx.vista.IntComprobanteLd = {
 	},
 	preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobanteLd.superclass.preparaMenu.call(this);
+			var rec = this.sm.getSelected();
 			this.getBoton('btnImprimir').enable();
 			this.getBoton('btnRelDev').enable();
 			this.getBoton('btnDocCmpVnt').enable();
@@ -127,6 +130,8 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
             this.getBoton('btnObs').enable();
+            this.getBoton('btnWizard').enable()  
+            
 			
 			return tb;
 	},
@@ -141,7 +146,9 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('chkdep').disable();
 			this.getBoton('btnChequeoDocumentosWf').disable();
             this.getBoton('diagrama_gantt').disable();
-            this.getBoton('btnObs').disable() 
+            this.getBoton('btnObs').disable()
+            this.getBoton('btnWizard').disable()  
+           
 			
 	},
 	checkDependencias: function(){                   
@@ -156,8 +163,73 @@ Phx.vista.IntComprobanteLd = {
 										}, 
 										  rec.data, 
 										  this.idContenedor,
-										 'CbteDependencias');
-			   
-	 }
+										 'CbteDependencias');			   
+	},
+	addBotonesClonar: function() {
+        this.menuClonar = new Ext.Toolbar.SplitButton({
+            id: 'b-btnClonar-' + this.idContenedor,
+            text: 'Clonar',
+            disabled: true,
+            grupo:[0,1,2,3],
+            iconCls : 'balert',
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-sint-' + this.idContenedor,
+                text: 'Clonar sin  Trámite',
+                tooltip: '<b>Clonar el cbte sin mantener el nro de trámite</b>',
+                handler:function(){this.clonarCbteSt()},
+                scope: this
+            }, {
+                id:'b-cont-' + this.idContenedor,
+                text: 'Clonar con Trámite',
+                tooltip: '<b>Clonar el cbte manteniendo el nro de trámite</b>',
+                handler:function(){this.clonarCbte()},
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuClonar	);
+    },
+    
+    addBotonesVolcar: function() {
+        this.menuClonar = new Ext.Toolbar.SplitButton({
+            id: 'b-btnVolcar-' + this.idContenedor,
+            text: 'Revertir',
+            disabled: true,
+            grupo:[0,1,2,3],
+            iconCls : 'balert',
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-volb-' + this.idContenedor,
+                text: 'Reversión Parcial (borrador)',
+                tooltip: '<b>Al volcar en borrador tiene la opción de revertir parcialmente</b>',
+                handler:function(){this.volcarCbte('no')},
+                scope: this
+            }, {
+                id:'b-vol-' + this.idContenedor,
+                text: 'Reversión Total (Validado)',
+                tooltip: '<b>Al volcar y validar se revierte el 100%</b>',
+                handler:function(){this.volcarCbte('si')},
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuClonar);
+    },
+    
+    
+    loadWizard : function() {
+			
+			var rec = this.sm.getSelected();			
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardCbteDiario.php', 'Generar comprobante desde plantilla ...', {
+				width : '40%',
+				height : 300
+			}, {
+				'id_int_comprobante': rec.data.id_int_comprobante,
+				'id_depto': this.cmbDepto.getValue()
+			   }, this.idContenedor, 'WizardCbteDiario')
+		},
 };
 </script>

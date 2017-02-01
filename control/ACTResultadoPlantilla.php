@@ -15,6 +15,16 @@ class ACTResultadoPlantilla extends ACTbase{
 		if($this->objParam->getParametro('tipo')!=''){
 			$this->objParam->addFiltro("resplan.tipo = ''".$this->objParam->getParametro('tipo')."''");	
 		}
+		
+		if($this->objParam->getParametro('periodo')=='cbte'){
+			$this->objParam->addFiltro("resplan.periodo_calculo = ''cbte''");	
+		}
+		
+		if($this->objParam->getParametro('periodo')=='rangos'){
+			$this->objParam->addFiltro("resplan.periodo_calculo  != ''cbte''");	
+		}
+		
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODResultadoPlantilla','listarResultadoPlantilla');
@@ -98,8 +108,10 @@ class ACTResultadoPlantilla extends ACTbase{
 							 (is_null($row['cbte_apertura'])?'NULL':"'".$row['cbte_apertura']."'") ."," .							 
 							 (is_null($row['cbte_cierre'])?'NULL':"'".$row['cbte_cierre']."'") ."," .							 
 							 (is_null($row['periodo_calculo'])?'NULL':"'".$row['periodo_calculo']."'") ."," .							 
-							 (is_null($row['glosa'])?'NULL':"'".$row['glosa']."'") ."," .							 
-							 (is_null($row['codigo_clase_comprobante'])?'NULL':"'".$row['codigo_clase_comprobante']."'").");\r\n");			
+							 (is_null($row['glosa'])?'NULL':"'".$row['glosa']."'") ."," .
+							 (is_null($row['codigo_clase_comprobante'])?'NULL':"'".$row['codigo_clase_comprobante']."'") ."," .	
+							 (is_null($row['relacion_unica'])?'NULL':"'".$row['relacion_unica']."'") ."," .								 
+							 (is_null($row['codigo_tipo_relacion_comprobante'])?'NULL':"'".$row['codigo_tipo_relacion_comprobante']."'").");\r\n");			
 							 	
 				
 			 } else if ($row['tipo_reg'] == 'detalle') {
