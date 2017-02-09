@@ -152,7 +152,8 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'ent.c31',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:true,
+                bottom_filter:true
 		},
 		{
 			config:{
@@ -184,7 +185,8 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'ent.estado',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:true,
+                bottom_filter:true
 		},
 		{
 			config:{

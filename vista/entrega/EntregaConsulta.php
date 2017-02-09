@@ -13,7 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
         require: '../../../sis_contabilidad/vista/entrega/Entrega.php',
         requireclase: 'Phx.vista.Entrega',
         title: 'Solicitud',
-        nombreVista: 'Entrega Consulta',
+        nombreVista: 'EntregaConsulta',
         constructor: function (config) {
             Phx.vista.EntregaConsulta.superclass.constructor.call(this, config);
             //this.maestro = config.maestro;
