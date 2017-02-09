@@ -233,7 +233,7 @@ fheight: '80%',
 
 
 		 
-		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT',/*iconCls:'' ,*/disabled:true,handler:this.generar_txt});
+		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT - SIN',/*iconCls:'' ,*/disabled:true,handler:this.generar_txt});
 
 		this.addButton('Importar',{argument: {imprimir: 'Importar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Importar TXT',/*iconCls:'' ,*/disabled:true,handler:this.importar_txt});
 
@@ -249,6 +249,8 @@ fheight: '80%',
 		this.addButton('airbp',{argument: {imprimir: 'airbp'},text:'<i class="fa fa-file-text-o fa-2x"></i> airbp',/*iconCls:'' ,*/disabled:false,handler:this.airbp});
 
 
+
+		this.addButton('exportarGestionCompleta',{argument: {imprimir: 'exportarGestionCompleta'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar Gestion TXT - SIN',/*iconCls:'' ,*/disabled:false,handler:this.exportarGestionCompleta});
 
 
 		//this.load({params:{start:0, limit:this.tam_pag}})
@@ -1907,7 +1909,29 @@ fheight: '80%',
 	        
 	        var texto = objRes.datos;
 	        window.open('../../../reportes_generados/'+texto+'.txt')
-		}, 
+		},
+		exportarGestionCompleta:function(){
+			var rec = this.cmbPeriodo.getValue();
+			var tipo = this.tipoBan;
+
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/exporta_txt',
+				params:{'gestion':'si','id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,'acumulado':'no','resolucion':this.cmbResolucion.getValue()},
+				success: this.successExportarGestionCompleta,
+
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+		},
+
+		successExportarGestionCompleta:function(resp){
+			Phx.CP.loadingHide();
+	        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+
+	        var texto = objRes.datos;
+	        window.open('../../../reportes_generados/'+texto+'.txt')
+		},
 	
 	/*
 		successGeneracion_txt: function (resp) {
