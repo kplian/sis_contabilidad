@@ -254,8 +254,6 @@ BEGIN
                           inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
                           left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
-                          left join vef.tpunto_venta pv on pv.id_punto_venta = dcv.id_punto_venta
-                          left join obingresos.tagencia age on age.id_agencia = dcv.id_agencia
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where  ';
@@ -302,6 +300,8 @@ BEGIN
                           inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
                           left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
+                          left join vef.tpunto_venta pv on pv.id_punto_venta = dcv.id_punto_venta
+                          left join obingresos.tagencia age on age.id_agencia = dcv.id_agencia
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where  ';
