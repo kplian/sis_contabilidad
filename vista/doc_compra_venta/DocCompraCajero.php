@@ -937,7 +937,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'nombre',
-                        fieldLabel: 'Punto de Venta',
+                        fieldLabel: 'Punto de Venta/Agencia IATA',
                         allowBlank: true,
                         anchor: '80%',
                         gwidth: 100,
@@ -953,7 +953,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'codigo_noiata',
-                        fieldLabel: 'Agencia',
+                        fieldLabel: 'Agencia No Iata',
                         allowBlank: true,
                         anchor: '80%',
                         gwidth: 100,

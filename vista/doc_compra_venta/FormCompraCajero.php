@@ -1232,7 +1232,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'id_punto_venta',
-                        fieldLabel: 'Punto de Venta',
+                        fieldLabel: 'Punto de Venta/Agencia IATA',
                         allowBlank: true,
                         emptyText:'Elija un punto de venta...',
                         store:new Ext.data.JsonStore(
@@ -1272,7 +1272,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'id_agencia',
-                        fieldLabel: 'Agencia',
+                        fieldLabel: 'Agencia/Agencia No IATA',
                         allowBlank: true,
                         emptyText:'Elija una agencia...',
                         store:new Ext.data.JsonStore(
