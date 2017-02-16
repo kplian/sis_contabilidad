@@ -10,6 +10,7 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 require_once(dirname(__FILE__).'/../reportes/RLcv.php');
 require_once(dirname(__FILE__).'/../reportes/RLcvVentas.php');
+require_once(dirname(__FILE__).'/../reportes/RLcvXls.php');
 
 class ACTDocCompraVentaForm extends ACTbase{    
 			
@@ -119,7 +120,42 @@ class ACTDocCompraVentaForm extends ACTbase{
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		}
-		else{
+
+		if($this->objParam->getParametro('formato_reporte') == 'xls'){
+
+		    $this->objFun=$this->create('MODDocCompraVenta');
+
+            if($this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
+                $this->res = $this->objFun->listarRepLCVFormErpEndesis();
+            }else{
+                $this->res = $this->objFun->listarRepLCVForm();
+            }
+
+            if($this->res->getTipo()=='ERROR'){
+                $this->res->imprimirRespuesta($this->res->generarJson());
+                exit;
+            }
+            //obtener titulo de reporte
+            $titulo ='Lcv';
+            //Genera el nombre del archivo (aleatorio + titulo)
+            $nombreArchivo=uniqid(md5(session_id()).$titulo);
+            $nombreArchivo.='.xls';
+
+            $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+            $this->objParam->addParametro('datos',$this->res->datos);
+            //Instancia la clase de excel
+            $this->objReporteFormato=new RLcvXls($this->objParam);
+            $this->objReporteFormato->generarDatos();
+            $this->objReporteFormato->generarReporte();
+
+            $this->mensajeExito=new Mensaje();
+            $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+                'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+            $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+            $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+
+        }
+        else{
 			$this->exportarTxtLcvLCV();
 		}
 	}
