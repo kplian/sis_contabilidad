@@ -3437,7 +3437,7 @@ IS 'Con que tiemo de comprobantes de mueven estan cuentas, diario, ingreso, movi
 
 
 
-/*********************************** I-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+/***********************************I-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
 
 --------------- SQL ---------------
 
@@ -3457,4 +3457,23 @@ COMMENT ON COLUMN conta.tresultado_plantilla.relacion_unica
 IS 'si o no, solo se utiliza cuando el preiodo de calculo es giual a cbte, sirve apra validar que el comprobante origen solo tenga una relacion de este tipo y no mas';
 
 /*********************************** F-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-20/02/2017 ****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_estado_wf INTEGER;
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_proceso_wf INTEGER;
+  
+  
+/***********************************F-SCP-RAC-CONTA-0-20/02/2017 ****************************************/
+  
 
