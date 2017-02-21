@@ -1119,7 +1119,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         pageSize:20,
                         queryDelay:500,
                         anchor: '80%',
-                        minChars:1
+                        minChars:1,
+                        maskRe: /[0-9/-]+/i,
+                        regex: /[0-9/-]+/i
                     },
                     type:'ComboBox',
                     id_grupo: 0,
@@ -1155,9 +1157,11 @@ header("content-type: text/javascript; charset=UTF-8");
                         fieldLabel: 'Nro Factura / Doc',
                         allowBlank: false,
                         anchor: '80%',
-                        maxLength:100
+                        maxLength:100,
+                        maskRe: /[0-9/-]+/i,
+                        regex: /[0-9/-]+/i
                     },
-                    type:'TextField',
+                    type:'NumberField',
                     id_grupo:1,
                     form:true
                 },
@@ -1216,13 +1220,13 @@ header("content-type: text/javascript; charset=UTF-8");
                         triggerAction: 'all',
                         lazyRender: true,
                         mode: 'local',
-                        store: ['CBB','LPB','SRZ','CIJ','TJA','POI','ORU','TDD','SRE','UYU']
+                        store: ['CBB','LPB','SRZ','CIJ','TJA','POI','ORU','TDD','SRE','UYU', 'CCA', 'RIB', 'RBQ', 'GYA', 'BYC']
                     },
                     type:'ComboBox',
                     id_grupo:1,
                     filters:{
                         type: 'list',
-                        options: ['CBB','LPB','SRZ','CIJ','TJA','POI','ORU','TDD','SRE','UYU']
+                        options: ['CBB','LPB','SRZ','CIJ','TJA','POI','ORU','TDD','SRE','UYU', 'CCA', 'RIB', 'RBQ', 'GYA', 'BYC']
                     },
                     grid:true,
                     egrid: true,
@@ -1285,11 +1289,11 @@ header("content-type: text/javascript; charset=UTF-8");
                                     direction:'ASC'
                                 },
                                 totalProperty:'total',
-                                fields: ['id_agencia','nombre','codigo_noiata'],
+                                fields: ['id_agencia','nombre','codigo_noiata','codigo'],
                                 remoteSort: true,
-                                baseParams:{par_filtro:'age.nombre#age.codigo_noiata', tipo_agencia: 'noiata'}
+                                baseParams:{par_filtro:'age.nombre#age.codigo_noiata#age.codigo', tipo_agencia: 'noiata'}
                             }),
-                        tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>{codigo_noiata}</p></div></tpl>',
+                        tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>Codigo Global: {codigo}</p><p>Codigo NO IATA: {codigo_noiata}</p></div></tpl>',
                         valueField: 'id_agencia',
                         hiddenValue: 'id_agencia',
                         displayField: 'codigo_noiata',
@@ -1698,7 +1702,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
-                if (newValue[3] == '4' || newValue[3] == '8'){
+                if (newValue[3] == '4' || newValue[3] == '8' || newValue[3] == '6'){
                     this.mostrarComponente(this.Cmp.codigo_control);
                     this.Cmp.codigo_control.allowBlank = false;
                 }
