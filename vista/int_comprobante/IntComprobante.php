@@ -38,6 +38,16 @@ header("content-type: text/javascript; charset=UTF-8");
 				tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
 			});
 
+			this.addButton('btnAIRBP',
+					{
+						text: 'Subir AIRBP',
+						iconCls: 'blist',
+						disabled: false,
+						handler: this.onButtonAIRBP,
+						tooltip: 'Subir archivo facturas AIRBP'
+					}
+			);
+
 			this.addButton('btnRelDev', {
 				text : 'Rel Dev',
 				iconCls : 'btag_accept',
@@ -1165,7 +1175,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			tpl : new Ext.Template('<br>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Clase cbte:&nbsp;&nbsp;</b> {desc_clase_comprobante}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Origen:&nbsp;&nbsp;</b> {desc_subsistema}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Beneficiario:&nbsp;&nbsp;</b> {beneficiario}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa1} {glosa2}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Frima 1:&nbsp;&nbsp;</b> {desc_firma1} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 2:&nbsp;&nbsp;</b> {desc_firma2} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 3:&nbsp;&nbsp;</b> {desc_firma3} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>')
 		}),
 
-		arrayDefaultColumHidden : ['id_funcionario_firma1', 'id_funcionario_firma2', 'id_funcionario_firma3', 'id_subsistema', 'id_tipo_relacion_comprobante', 'momento_comprometido', 'momento_ejecutado', 'momento_pagado', 'fecha_mod', 'usr_reg', 'usr_mod', 'id_depto', 'estado', 'glosa1', 'momento', 'glosa2', 'desc_subsistema', 'desc_clase_comprobante', 'estado_reg', 'fecha_reg'],
+		arrayDefaultColumHidden : ['id_funcionario_firma1', 'id_funcionario_firma2', 'id_funcionario_firma3', 'id_subsistema', 'id_tipo_relacion_comprobante', 'fecha_mod', 'usr_reg', 'usr_mod', 'id_depto', 'estado', 'glosa1', 'momento', 'glosa2', 'desc_subsistema', 'desc_clase_comprobante', 'estado_reg', 'fecha_reg'],
 
 		sortInfo : {
 			field : 'id_int_comprobante',
@@ -1574,7 +1584,18 @@ header("content-type: text/javascript; charset=UTF-8");
 			}
         
         
-    }
+    },
+
+	onButtonAIRBP : function() {
+		var rec=this.sm.getSelected();
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/archivo_airbp/FormArchivoAIRBP.php',
+		'Subir Archivo AIRBP',
+		{
+			modal:true,
+			width:450,
+			height:200
+		},rec.data,this.idContenedor,'FormArchivoAIRBP')
+	}
 })
 </script>
 
