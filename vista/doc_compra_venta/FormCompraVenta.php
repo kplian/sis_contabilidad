@@ -1003,7 +1003,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                fieldLabel:'Moneda',
 	                gdisplayField:'desc_moneda',
 	                gwidth:100,
-	                width:250
+	                width:180
 	             },
 	            type:'ComboRec',
 	            id_grupo:0,
@@ -1422,8 +1422,12 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 		}, this);
 		
 		this.Cmp.nro_autorizacion.on('select', function(cmb,rec,i){
-			this.Cmp.nit.setValue(rec.data.nit);
-			this.Cmp.razon_social.setValue(rec.data.razon_social);
+			
+			if(this.data.tipoDoc == 'compra'){
+				this.Cmp.nit.setValue(rec.data.nit);
+			    this.Cmp.razon_social.setValue(rec.data.razon_social);
+			}
+			
 		} ,this);
 		
 		
@@ -1570,7 +1574,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
         
         
         this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
-        	if (newValue[3] == '4' || newValue[3] == '8'){
+        	if (newValue[3] == '4' || newValue[3] == '8'|| newValue[3] == '6'){
         		this.mostrarComponente(this.Cmp.codigo_control);
 	            this.Cmp.codigo_control.allowBlank = false;
         	}
