@@ -32,128 +32,47 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
 		{
+			//configuracion del componente
 			config:{
-				name: 'estado_reg',
-				fieldLabel: 'Estado Reg.',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:10
+				labelSeparator:'',
+				inputType:'hidden',
+				name: 'id_doc_compra_venta'
 			},
-				type:'TextField',
-				filters:{pfiltro:'docc.estado_reg',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:false
+			type:'Field',
+			form:true
 		},
 		{
-			config: {
-				name: 'id_orden_trabajo',
-				fieldLabel: 'id_orden_trabajo',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_orden_trabajo',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				}
+			//configuracion del componente
+			config:{
+				labelSeparator:'',
+				inputType:'hidden',
+				name: 'precio_total_final'
 			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
-		},
-		{
-			config: {
-				name: 'id_centro_costo',
-				fieldLabel: 'id_centro_costo',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_centro_costo',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				}
-			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
+			type:'Field',
+			form:true
 		},
 		{
 			config: {
 				name: 'id_concepto_ingas',
-				fieldLabel: 'id_concepto_ingas',
+				fieldLabel: 'Concepto Ingas',
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
+					url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
+					id: 'id_concepto_ingas',
 					root: 'datos',
 					sortInfo: {
-						field: 'nombre',
+						field: 'desc_ingas',
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
+					fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
+					baseParams: {par_filtro: 'conig.desc_ingas#par.codigo', movimiento:'gasto'}
 				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
+				valueField: 'id_concepto_ingas',
+				displayField: 'desc_ingas',
+				gdisplayField: 'desc_concepto_ingas',
 				hiddenName: 'id_concepto_ingas',
 				forceSelection: true,
 				typeAhead: false,
@@ -166,7 +85,95 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 150,
 				minChars: 2,
 				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
+					return String.format('{0}', record.data['desc_concepto_ingas']);
+				},
+				tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>Partida:{desc_partida}</p></div></tpl>'
+			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'movtip.nombre',type: 'string'},
+			grid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'id_centro_costo',
+				fieldLabel: 'Centro Costo',
+				allowBlank: true,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
+					id: 'id_centro_costo',
+					root: 'datos',
+					sortInfo: {
+						field: 'codigo_cc',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_centro_costo', 'codigo_cc', 'codigo_uo', 'nombre_uo'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'cec.id_centro_costo#cec.codigo_cc',tipo_pres:'gasto', filtrar:'grupo_ep'}
+				}),
+				valueField: 'id_centro_costo',
+				displayField: 'codigo_cc',
+				gdisplayField: 'desc_centro_costo',
+				hiddenName: 'id_centro_costo',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '100%',
+				gwidth: 150,
+				minChars: 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_centro_costo']);
+				},
+				tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{codigo_cc}</b></p><strong>Unidad:{nombre_uo}</strong></div></tpl>',
+			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'movtip.nombre',type: 'string'},
+			grid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'id_orden_trabajo',
+				fieldLabel: 'Orden Trabajo',
+				allowBlank: true,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_/control/Clase/Metodo',
+					id: 'id_',
+					root: 'datos',
+					sortInfo: {
+						field: 'nombre',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_', 'nombre', 'codigo'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
+				}),
+				valueField: 'id_',
+				displayField: 'nombre',
+				gdisplayField: 'desc_orden_trabajo',
+				hiddenName: 'id_orden_trabajo',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '100%',
+				gwidth: 150,
+				minChars: 2,
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_orden_trabajo']);
 				}
 			},
 			type: 'ComboBox',
@@ -178,11 +185,11 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'descripcion',
-				fieldLabel: 'descripcion',
+				fieldLabel: 'Descripcion',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:-5
+				maxLength:50
 			},
 				type:'TextField',
 				filters:{pfiltro:'docc.descripcion',type:'string'},
@@ -192,8 +199,8 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'cantidad',
-				fieldLabel: 'cantidad',
+				name: 'cantidad_sol',
+				fieldLabel: 'Cantidad',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -208,7 +215,7 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'precio_unitario',
-				fieldLabel: 'precio_unitario',
+				fieldLabel: 'Precio Unitario',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
@@ -223,7 +230,7 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'precio_total',
-				fieldLabel: 'precio_total',
+				fieldLabel: 'Precio Total',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
@@ -234,6 +241,21 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:true
+		},
+		{
+			config:{
+				name: 'estado_reg',
+				fieldLabel: 'Estado Reg.',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:10
+			},
+			type:'TextField',
+			filters:{pfiltro:'docc.estado_reg',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
 		},
 		{
 			config:{
@@ -338,12 +360,16 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_doc_concepto', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
 		{name:'id_orden_trabajo', type: 'numeric'},
+		{name:'desc_orden_trabajo', type: 'numeric'},
 		{name:'id_centro_costo', type: 'numeric'},
+		{name:'desc_centro_costo', type: 'numeric'},
 		{name:'id_concepto_ingas', type: 'numeric'},
+		{name:'desc_concepto_ingas', type: 'numeric'},
 		{name:'descripcion', type: 'string'},
-		{name:'cantidad', type: 'numeric'},
+		{name:'cantidad_sol', type: 'numeric'},
 		{name:'precio_unitario', type: 'numeric'},
 		{name:'precio_total', type: 'numeric'},
+		{name:'precio_total_final', type: 'numeric'},
 		{name:'id_usuario_reg', type: 'numeric'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_ai', type: 'numeric'},
@@ -358,6 +384,13 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_doc_concepto',
 		direction: 'ASC'
 	},
+
+	loadValoresIniciales: function() {
+
+		Phx.vista.DocConcepto.superclass.loadValoresIniciales.call(this);
+		this.Cmp.id_doc_compra_venta.setValue(this.id_doc_compra_venta);
+	},
+
 	bdel:true,
 	bsave:true
 	}
