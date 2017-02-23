@@ -32,6 +32,8 @@ header("content-type: text/javascript; charset=UTF-8");
         cargarValores:function(){
             Phx.vista.DocConceptoCtaDoc.superclass.loadValoresIniciales.call(this);
             this.Cmp.id_centro_costo.store.baseParams.id_depto = this.id_depto;
+            this.Cmp.id_concepto_ingas.store.baseParams.autorizacion = 'fondo_avance';
+            this.Cmp.id_concepto_ingas.store.baseParams.autorizacion_nulos = 'no';
             this.Cmp.descripcion.disable();
             this.Cmp.cantidad_sol.disable();
             this.Cmp.precio_unitario.disable();
@@ -114,9 +116,9 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.CP.loadingHide();
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(!reg.ROOT.error){
-                console.log(reg.ROOT.datos.id_gestion);
                 this.id_gestion = reg.ROOT.datos.id_gestion;
                 this.Cmp.id_centro_costo.store.baseParams.id_gestion = this.id_gestion;
+                this.Cmp.id_concepto_ingas.store.baseParams.id_gestion = this.id_gestion;
             }else{
 
                 alert('ocurrio al obtener la gestion')
