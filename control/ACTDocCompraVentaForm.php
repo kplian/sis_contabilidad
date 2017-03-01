@@ -154,10 +154,12 @@ class ACTDocCompraVentaForm extends ACTbase{
             $this->mensajeExito->setArchivoGenerado($nombreArchivo);
             $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 
+        }  if($this->objParam->getParametro('formato_reporte')!='pdf' && $this->objParam->getParametro('formato_reporte')!='xls'){
+            $this->exportarTxtLcvLCV();
         }
-        else{
+        /*else{
 			$this->exportarTxtLcvLCV();
-		}
+		}*/
 	}
 
     function exportarTxtLcvLCV(){
