@@ -301,7 +301,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         tabeast:[
             {
-                url: '../../../sis_contabilidad/vista/tipo_costo_cuenta/TipoCostoCuenta.php',
+                url: '../../sis_contabilidad/vista/tipo_costo_cuenta/TipoCostoCuenta.php',
                 title: 'Cuentas y Auxiliares',
                 width: 400,
                 cls: 'TipoCostoCuenta'
