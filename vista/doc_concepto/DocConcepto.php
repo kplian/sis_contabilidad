@@ -377,8 +377,12 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 	},
 
 	loadValoresIniciales: function() {
+
 		Phx.vista.DocConcepto.superclass.loadValoresIniciales.call(this);
-		this.Cmp.id_doc_compra_venta.setValue(this.id_doc_compra_venta);
+		if(typeof this.id_doc_compra_venta == 'undefined')
+			this.Cmp.id_doc_compra_venta.setValue(this.data.id_doc_compra_venta);
+		else
+			this.Cmp.id_doc_compra_venta.setValue(this.id_doc_compra_venta);
 	},
 
 	bdel:true,
