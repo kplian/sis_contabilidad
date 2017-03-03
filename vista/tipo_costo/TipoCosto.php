@@ -298,7 +298,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
         },
-
+        ///hola
         tabeast:[
             {
                 url: '../../../sis_contabilidad/vista/tipo_costo_cuenta/TipoCostoCuenta.php',
