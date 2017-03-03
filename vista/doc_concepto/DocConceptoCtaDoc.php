@@ -14,12 +14,13 @@ header("content-type: text/javascript; charset=UTF-8");
         requireclase:'Phx.vista.DocConcepto',
         title:'Conceptos',
         nombreVista: 'DocConceptoCtaDoc',
-        bdel:false,
+        bdel:true,
         bsave:false,
-        bnew:false,
+        bnew:true,
         id_gestion:0,
 
         constructor: function(config) {
+            this.config = config;
             Phx.vista.DocConceptoCtaDoc.superclass.constructor.call(this, config);
             this.store.baseParams={id_doc_compra_venta:this.data.id_doc_compra_venta};
             this.init();
@@ -34,11 +35,11 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.id_centro_costo.store.baseParams.id_depto = this.id_depto;
             this.Cmp.id_concepto_ingas.store.baseParams.autorizacion = 'fondo_avance';
             this.Cmp.id_concepto_ingas.store.baseParams.autorizacion_nulos = 'no';
-            this.Cmp.descripcion.disable();
-            this.Cmp.cantidad_sol.disable();
-            this.Cmp.precio_unitario.disable();
+            //this.Cmp.descripcion.disable();
+            //this.Cmp.cantidad_sol.disable();
+            //this.Cmp.precio_unitario.disable();
             this.Cmp.precio_total.disable();
-            this.Cmp.id_orden_trabajo.disable();
+            //this.Cmp.id_orden_trabajo.disable();
         },
 
         onButtonEdit: function() {
@@ -47,9 +48,14 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         iniciarEventos: function(){
+
+            this.Cmp.id_concepto_ingas.on('change',function( cmb, rec, ind){
+                this.Cmp.id_orden_trabajo.reset();
+            },this);
+
             this.Cmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
                 console.log('concepto_gasto ' + rec);
-                /*this.Cmp.id_orden_trabajo.store.baseParams = {
+                this.Cmp.id_orden_trabajo.store.baseParams = {
                     filtro_ot:rec.data.filtro_ot,
                     requiere_ot:rec.data.requiere_ot,
                     id_grupo_ots:rec.data.id_grupo_ots
@@ -64,13 +70,21 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.Cmp.id_orden_trabajo.setReadOnly(true);
                 }
                 this.Cmp.id_orden_trabajo.reset();
-                */
+
                 var idcc = this.Cmp.id_centro_costo.getValue();
                 if(idcc){
                     this.checkRelacionConcepto({id_centro_costo: idcc , id_concepto_ingas: rec.data.id_concepto_ingas, id_gestion :  this.id_gestion});
                 }
 
             },this);
+
+            this.Cmp.precio_unitario.on('valid',function(field){
+                this.calcularTotales()
+            } ,this);
+
+            this.Cmp.cantidad_sol.on('valid',function(field){
+                this.calcularTotales()
+            } ,this);
         },
 
         checkRelacionConcepto: function(cfg){
@@ -124,5 +138,50 @@ header("content-type: text/javascript; charset=UTF-8");
                 alert('ocurrio al obtener la gestion')
             }
         },
+
+        calcularTotales: function(){
+            var porc_descuento  = this.data.importe_descuento/this.data.importe_doc;
+            var pTot = this.Cmp.cantidad_sol.getValue() * this.Cmp.precio_unitario.getValue();
+            this.Cmp.precio_total.setValue(pTot);
+            this.Cmp.precio_total_final.setValue(pTot - (pTot * porc_descuento) );
+        },
+
+        onDestroy: function() {
+            var numberItems = this.store.data.getCount();
+            if(numberItems > 0){
+                var total_factura = 0.00;
+                for(i=0; i < numberItems; i++){
+                    total_factura = parseFloat(this.store.data.items[i].data.precio_total) + parseFloat(total_factura);
+                }
+                if(total_factura != parseFloat(this.data.importe_doc)){
+                    Ext.MessageBox.alert('Alerta', 'La suma de los conceptos no iguala con el total de la factura, importe total debe ser ' + this.data.importe_doc + ' ' + this.data.desc_moneda, function()
+                        {
+                            Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_concepto/DocConceptoCtaDoc.php', 'DocConceptoCtaDoc', {
+                                modal : true,
+                                width : '95%',
+                                height : '95%',
+                            }, {
+                                data : this.data,
+                                id_doc_compra_venta : this.data.id_doc_compra_venta,
+                                id_depto : this.data.id_depto_conta
+                            }, this.idContenedorPadre, 'DocConceptoCtaDoc');
+                        },this
+                    );
+                }
+            }else{
+                Ext.MessageBox.alert('Alerta', 'No existen apropiaciones registradas', function()
+                    {
+                        Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_concepto/DocConceptoCtaDoc.php', 'DocConceptoCtaDoc', {
+                            modal : true,
+                            width : '95%',
+                            height : '95%',
+                        }, {
+                            data : this.data,
+                            id_depto : this.id_depto_conta
+                        }, this.idContenedorPadre, 'DocConceptoCtaDoc');
+                    },this
+                );
+            }
+        }
     };
 </script>

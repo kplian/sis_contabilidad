@@ -42,20 +42,10 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		{
-			//configuracion del componente
-			config:{
-				labelSeparator:'',
-				inputType:'hidden',
-				name: 'precio_total_final'
-			},
-			type:'Field',
-			form:true
-		},
-		{
 			config: {
 				name: 'id_concepto_ingas',
 				fieldLabel: 'Concepto Ingas',
-				allowBlank: true,
+				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
 					url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
@@ -99,7 +89,7 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 			config: {
 				name: 'id_centro_costo',
 				fieldLabel: 'Centro Costo',
-				allowBlank: true,
+				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
 					url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
@@ -144,22 +134,11 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 				name: 'id_orden_trabajo',
 				fieldLabel: 'Orden Trabajo',
 				allowBlank: true,
+				sysorigen:'sis_contabilidad',
+				origen:'OT',
 				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
+				valueField: 'id_orden_trabajo',
+				displayField: 'desc_orden',
 				gdisplayField: 'desc_orden_trabajo',
 				hiddenName: 'id_orden_trabajo',
 				forceSelection: true,
@@ -176,7 +155,7 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 					return String.format('{0}', record.data['desc_orden_trabajo']);
 				}
 			},
-			type: 'ComboBox',
+			type: 'ComboRec',
 			id_grupo: 0,
 			filters: {pfiltro: 'movtip.nombre',type: 'string'},
 			grid: true,
@@ -201,10 +180,10 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'cantidad_sol',
 				fieldLabel: 'Cantidad',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:-5
+				maxLength:10
 			},
 				type:'NumberField',
 				filters:{pfiltro:'docc.cantidad',type:'numeric'},
@@ -241,6 +220,18 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:true
+		},
+		{
+			//configuracion del componente
+			config:{
+				labelSeparator:'',
+				fieldLabel: 'Importe Neto',
+				inputType:'hidden',
+				name: 'precio_total_final'
+			},
+			type:'Field',
+			grid: true,
+			form:true
 		},
 		{
 			config:{
@@ -386,7 +377,6 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 	},
 
 	loadValoresIniciales: function() {
-
 		Phx.vista.DocConcepto.superclass.loadValoresIniciales.call(this);
 		this.Cmp.id_doc_compra_venta.setValue(this.id_doc_compra_venta);
 	},
