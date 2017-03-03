@@ -146,7 +146,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
             allowBlank:true,
             emptyText:'Cuenta...',
             store: new Ext.data.JsonStore({
-                url: '../../sis_contabilidad/control/TipoCostoCuenta/listarCuentas',
+                url: '../../sis_costos/control/TipoCostoCuenta/listarCuentas',
                 id: 'id_cuenta',
                 root: 'datos',
                 sortInfo:{
