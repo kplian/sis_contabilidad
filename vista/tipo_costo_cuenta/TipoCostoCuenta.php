@@ -72,7 +72,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 egrid: true,
                 form: true
             },
-            //id_auxiliares',
+            //id_auxiliares',asdasdas
             {
                 config: {
                     resizable: true,
