@@ -15,7 +15,7 @@ class MODTipoCostoCuenta extends MODbase{
 			
 	function listarTipoCostoCuenta(){
 		//Definicion de variables para ejecucion del procedimientp
-		$this->procedimiento='cos.ft_tipo_costo_cuenta_sel';
+		$this->procedimiento='conta.ft_tipo_costo_cuenta_sel';
 		$this->transaccion='COS_COC_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
@@ -46,7 +46,7 @@ class MODTipoCostoCuenta extends MODbase{
 			
 	function insertarTipoCostoCuenta(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='cos.ft_tipo_costo_cuenta_ime';
+		$this->procedimiento='conta.ft_tipo_costo_cuenta_ime';
 		$this->transaccion='COS_COC_INS';
 		$this->tipo_procedimiento='IME';
 				
@@ -66,7 +66,7 @@ class MODTipoCostoCuenta extends MODbase{
 			
 	function modificarTipoCostoCuenta(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='cos.ft_tipo_costo_cuenta_ime';
+		$this->procedimiento='conta.ft_tipo_costo_cuenta_ime';
 		$this->transaccion='COS_COC_MOD';
 		$this->tipo_procedimiento='IME';
 				
@@ -87,7 +87,7 @@ class MODTipoCostoCuenta extends MODbase{
 			
 	function eliminarTipoCostoCuenta(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='cos.ft_tipo_costo_cuenta_ime';
+		$this->procedimiento='conta.ft_tipo_costo_cuenta_ime';
 		$this->transaccion='COS_COC_ELI';
 		$this->tipo_procedimiento='IME';
 				
@@ -103,7 +103,7 @@ class MODTipoCostoCuenta extends MODbase{
 	}
 	function listarCuentas(){
         //Definicion de variables para ejecucion del procedimientp
-        $this->procedimiento='cos.ft_tipo_costo_cuenta_sel';
+        $this->procedimiento='conta.ft_tipo_costo_cuenta_sel';
         $this->transaccion='COS_CUEN_SEL';
         $this->tipo_procedimiento='SEL';//tipo de transaccion
 
