@@ -168,7 +168,7 @@ Phx.vista.DocConcepto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:50
+				maxLength:1200
 			},
 				type:'TextField',
 				filters:{pfiltro:'docc.descripcion',type:'string'},
