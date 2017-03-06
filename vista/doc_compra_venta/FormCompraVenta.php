@@ -955,7 +955,8 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                    totalProperty:'total',
 	                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
 	                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
-	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ic','tipo_excento','valor_excento','sw_qr','sw_nit','plantilla_qr'],
+	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ic','tipo_excento','valor_excento','sw_qr','sw_nit','plantilla_qr',
+						'sw_estacion','sw_punto_venta','sw_codigo_no_iata'],
 	                    remoteSort: true,
 	                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
 	                }),
@@ -1204,7 +1205,108 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					id_grupo:1,
 					form:true
 			},
-			
+			{
+				config:{
+					name: 'estacion',
+					fieldLabel: 'Estacion',
+					qtip: 'Estacion donde se encentra el punto de venta y la agencia',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 120,
+					typeAhead: true,
+					triggerAction: 'all',
+					lazyRender: true,
+					mode: 'local',
+					store: ['CBB','LPB','SRZ','CIJ','TJA','POI','ORU','TDD','SRE','UYU', 'CCA', 'RIB', 'RBQ', 'GYA', 'BYC']
+				},
+				type:'ComboBox',
+				id_grupo:1,
+				filters:{
+					type: 'list',
+					options: ['CBB','LPB','SRZ','CIJ','TJA','POI','ORU','TDD','SRE','UYU', 'CCA', 'RIB', 'RBQ', 'GYA', 'BYC']
+				},
+				grid:true,
+				egrid: true,
+				form:true
+			},
+			{
+				config:{
+					name: 'id_punto_venta',
+					fieldLabel: 'Punto de Venta/Agencia IATA',
+					allowBlank: true,
+					emptyText:'Elija un punto de venta...',
+					store:new Ext.data.JsonStore(
+							{
+								url: '../../sis_ventas_facturacion/control/PuntoVenta/listarPuntoVenta',
+								id: 'id_punto_venta',
+								root:'datos',
+								sortInfo:{
+									field:'codigo',
+									direction:'ASC'
+								},
+								totalProperty:'total',
+								fields: ['id_punto_venta','nombre','codigo'],
+								remoteSort: true,
+								baseParams:{par_filtro:'puve.nombre#puve.codigo'}
+							}),
+					tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>{codigo}</p></div></tpl>',
+					valueField: 'id_punto_venta',
+					hiddenValue: 'id_punto_venta',
+					displayField: 'nombre',
+					gdisplayField:'nombre',
+					listWidth:'280',
+					forceSelection:true,
+					typeAhead: false,
+					triggerAction: 'all',
+					lazyRender:true,
+					mode:'remote',
+					pageSize:20,
+					queryDelay:500,
+					minChars:2
+				},
+				type:'ComboBox',
+				id_grupo: 1,
+				form: true
+			},
+			{
+				config:{
+					name: 'id_agencia',
+					fieldLabel: 'Agencia/Agencia No IATA',
+					allowBlank: true,
+					emptyText:'Elija una agencia...',
+					store:new Ext.data.JsonStore(
+							{
+								url: '../../sis_obingresos/control/Agencia/listarAgencia',
+								id: 'id_agencia',
+								root:'datos',
+								sortInfo:{
+									field:'codigo_noiata',
+									direction:'ASC'
+								},
+								totalProperty:'total',
+								fields: ['id_agencia','nombre','codigo_noiata','codigo'],
+								remoteSort: true,
+								baseParams:{par_filtro:'age.nombre#age.codigo_noiata#age.codigo', tipo_agencia: 'noiata'}
+							}),
+					tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>Codigo Global: {codigo}</p><p>Codigo NO IATA: {codigo_noiata}</p></div></tpl>',
+					valueField: 'id_agencia',
+					hiddenValue: 'id_agencia',
+					displayField: 'codigo_noiata',
+					gdisplayField:'codigo_noiata',
+					listWidth:'280',
+					forceSelection:true,
+					typeAhead: false,
+					triggerAction: 'all',
+					lazyRender:true,
+					mode:'remote',
+					pageSize:20,
+					queryDelay:500,
+					minChars:2
+				},
+				type:'ComboBox',
+				id_grupo: 1,
+				form: true
+			},
 			{
 				config:{
 					name: 'obs',
@@ -1560,7 +1662,30 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 	                this.ocultarComponente(this.Cmp.nro_dui);
 	                this.Cmp.nro_documento.setReadOnly(false);
 	            }
-			
+
+				if(rec.data.sw_estacion == 'si'){
+					this.mostrarComponente(this.Cmp.estacion);
+				}
+				else{
+					this.ocultarComponente(this.Cmp.estacion);
+					this.Cmp.estacion.reset();
+				}
+
+				if(rec.data.sw_punto_venta == 'si'){
+					this.mostrarComponente(this.Cmp.id_punto_venta);
+				}
+				else{
+					this.ocultarComponente(this.Cmp.id_punto_venta);
+					this.Cmp.id_punto_venta.reset();
+				}
+
+				if(rec.data.sw_codigo_no_iata == 'si'){
+					this.mostrarComponente(this.Cmp.id_agencia);
+				}
+				else{
+					this.ocultarComponente(this.Cmp.id_agencia);
+					this.Cmp.id_agencia.reset();
+				}
         },this);
         
         this.Cmp.importe_doc.on('change',this.calculaMontoPago,this);
@@ -1811,8 +1936,10 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
      	this.ocultarComponente(this.Cmp.importe_anticipo);
      	this.ocultarComponente(this.Cmp.importe_retgar);
      	this.ocultarComponente(this.Cmp.id_auxiliar);
-     	
-     	
+
+		this.ocultarComponente(this.Cmp.estacion);
+		this.ocultarComponente(this.Cmp.id_punto_venta);
+		this.ocultarComponente(this.Cmp.id_agencia);
      },
      iniciarImportes:function(){
      	this.Cmp.importe_excento.setValue(0);

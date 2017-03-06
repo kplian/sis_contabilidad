@@ -97,6 +97,11 @@ class MODDocCompraVenta extends MODbase{
 		
 		$this->captura('importe_aux_neto','numeric');
 
+		$this->captura('estacion','varchar');
+		$this->captura('id_punto_venta','integer');
+		$this->captura('nombre','varchar');
+		$this->captura('id_agencia','integer');
+		$this->captura('codigo_noiata','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -388,7 +393,7 @@ class MODDocCompraVenta extends MODbase{
 		
 				
 		//Definicion de la lista del resultado del query
-		$this->captura('nro_autorizacion','varchar');
+		$this->captura('nro_autorizacion','numeric');
 		$this->captura('nit','varchar');		
 		$this->captura('razon_social','varchar');
 
@@ -409,7 +414,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->setParametro('nit','nit','varchar');
 		
 		//Definicion de la lista del resultado del query
-		$this->captura('nit','varchar');		
+		$this->captura('nit','integer');
 		$this->captura('razon_social','varchar');
 
 		//Ejecuta la instruccion
@@ -476,7 +481,10 @@ class MODDocCompraVenta extends MODbase{
 		    $this->setParametro('id_auxiliar','id_auxiliar','integer');
 			$this->setParametro('id_int_comprobante','id_int_comprobante','integer');
 
-			
+			$this->setParametro('estacion','estacion','varchar');
+			$this->setParametro('id_punto_venta','id_punto_venta','integer');
+			$this->setParametro('id_agencia','id_agencia','integer');
+
 			//Ejecuta la instruccion
             $this->armarConsulta();
 			$stmt = $link->prepare($this->consulta);		  
@@ -838,7 +846,10 @@ class MODDocCompraVenta extends MODbase{
 			$this->setParametro('id_auxiliar','id_auxiliar','integer');
 			$this->setParametro('id_int_comprobante','id_int_comprobante','integer');
 
-			
+			$this->setParametro('estacion','estacion','varchar');
+			$this->setParametro('id_punto_venta','id_punto_venta','integer');
+			$this->setParametro('id_agencia','id_agencia','integer');
+
 			//Ejecuta la instruccion
             $this->armarConsulta();
 			$stmt = $link->prepare($this->consulta);		  

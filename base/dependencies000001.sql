@@ -3229,6 +3229,21 @@ AS
   
     
 /**********************************F-DEP-RAC-CONTA-0-22/12/2016****************************************/
-  
-   
 
+/**********************************I-DEP-RAC-CONTA-0-12/01/2017****************************************/
+
+ALTER TABLE conta.tfactura_airbp
+  ADD CONSTRAINT fk_tfactura_airbp__id_doc_compra_venta FOREIGN KEY (id_doc_compra_venta)
+    REFERENCES conta.tdoc_compra_venta(id_doc_compra_venta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE conta.tfactura_airbp_concepto
+  ADD CONSTRAINT fk_tfactura_airbp_concepto__id_factura_airbp FOREIGN KEY (id_factura_airbp)
+    REFERENCES conta.tfactura_airbp(id_factura_airbp)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/**********************************F-DEP-RAC-CONTA-0-12/01/2017****************************************/

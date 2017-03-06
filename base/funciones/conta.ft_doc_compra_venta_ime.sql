@@ -64,7 +64,9 @@ BEGIN
 
 
       --  calcula valores pode defecto para el tipo de doc compra venta
-
+		IF v_parametros.id_moneda is null THEN
+          raise EXCEPTION 'Es necesario indicar la Moneda del documento, revise los datos.';
+      END IF;
 
       IF v_parametros.tipo = 'compra' THEN
         -- paracompras por defecto es
@@ -88,6 +90,9 @@ BEGIN
 
       END IF;
 
+		IF v_parametros.id_moneda is null THEN
+          raise EXCEPTION 'Es necesario indicar la Moneda del documento, revise los datos.';
+      END IF;
 
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
@@ -105,12 +110,12 @@ BEGIN
       IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
 
         IF v_parametros.id_auxiliar is null THEN
-          raise EXCEPTION 'es necesario indicar una cuenta corriente';
+          raise EXCEPTION 'Es necesario indicar una cuenta corriente, revise los datos.';
         END IF;
 
       END IF;
-      
-      
+
+
       if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
           v_id_int_comprobante = v_parametros.id_int_comprobante;
       end if;
@@ -134,7 +139,6 @@ BEGIN
                            and dcv.nro_autorizacion = v_parametros.nro_autorizacion
                            and dcv.nro_documento = v_parametros.nro_documento
                            and dcv.nro_dui = v_parametros.nro_dui
-                           and dcv.fecha = v_parametros.fecha
                            and dcv.id_plantilla = v_parametros.id_plantilla
                            and dcv.razon_social = upper(trim(v_parametros.razon_social))) then
 
@@ -154,9 +158,9 @@ BEGIN
 
 
       --si tiene habilitado el ic copiamos el monto excento
-      -- OJO considerar que todos los calculos con el monto excento ya estaran 
+      -- OJO considerar que todos los calculos con el monto excento ya estaran
       -- considerando el ice, par ano hacer mayores cambios
-      
+
       v_importe_ice = NULL;
       IF v_registros.sw_ic = 'si' then
         v_importe_ice = v_parametros.importe_excento;
@@ -202,7 +206,10 @@ BEGIN
         id_cliente,
         id_auxiliar,
         id_tipo_doc_compra_venta,
-        id_int_comprobante
+        id_int_comprobante,
+        estacion,
+        id_punto_venta,
+        id_agencia
       ) values(
         v_parametros.tipo,
         v_parametros.importe_excento,
@@ -241,7 +248,10 @@ BEGIN
         v_id_cliente,
         v_parametros.id_auxiliar,
         v_id_tipo_doc_compra_venta,
-        v_id_int_comprobante
+        v_id_int_comprobante,
+        v_parametros.estacion,
+        v_parametros.id_punto_venta,
+        v_parametros.id_agencia
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -304,6 +314,10 @@ BEGIN
 
       END IF;
 
+      IF v_parametros.id_moneda is null THEN
+          raise EXCEPTION 'Es necesario indicar la Moneda del documento, revise los datos.';
+      END IF;
+
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
@@ -315,10 +329,12 @@ BEGIN
       --validar que no exsita un documento con el mismo nro y misma razon social  ...?
       --validar que no exista un documento con el mismo nro_autorizacion, nro_factura , y nit y razon social
 
+
+
       IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
 
         IF v_parametros.id_auxiliar is null THEN
-          raise EXCEPTION 'es necesario indicar una cuenta corriente';
+          raise EXCEPTION 'Es necesario indicar una cuenta corriente, revise los datos.';
         END IF;
 
       END IF;
@@ -629,7 +645,10 @@ BEGIN
         id_proveedor = v_id_proveedor,
         id_cliente = v_id_cliente,
         id_auxiliar = v_parametros.id_auxiliar,
-        id_int_comprobante = v_id_int_comprobante
+        id_int_comprobante = v_id_int_comprobante,
+        estacion = v_parametros.estacion,
+        id_punto_venta = v_parametros.id_punto_venta,
+        id_agencia = v_parametros.id_agencia
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then

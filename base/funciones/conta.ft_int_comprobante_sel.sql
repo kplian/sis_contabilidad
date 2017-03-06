@@ -71,7 +71,10 @@ BEGIN
                 from param.tdepto_usuario depu 
                 where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
             
-                v_filtro = ' ( incbte.id_usuario_reg = '||p_id_usuario::varchar ||'  or   (ew.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))) and ';
+            	IF v_parametros.nombreVista != 'IntComprobanteLd' THEN
+	                v_filtro = ' ( incbte.id_usuario_reg = '||p_id_usuario::varchar ||'  or   (ew.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))) and ';
+                END IF;
+
             END IF;
     		--Sentencia de la consulta
 			v_consulta := 'select
@@ -101,7 +104,7 @@ BEGIN
                               incbte.usr_mod,
                               incbte.desc_clase_comprobante,
                               incbte.desc_subsistema,
-                              incbte.desc_depto,	
+                              incbte.desc_depto,
                               incbte.desc_moneda,
                               incbte.desc_firma1,
                               incbte.desc_firma2,
@@ -143,42 +146,45 @@ BEGIN
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
                           where  incbte.estado_reg in (''borrador'',''validado'') and '||v_filtro;
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-            
-            --raise exception '--> %', v_consulta;	
+
+            --raise exception '--> %', v_consulta;
             raise notice  '-- % --', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_INCBTE_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
 
 	elsif(p_transaccion='CONTA_INCBTE_CONT')then
 
 		begin
-        
+
             v_filtro = ' 0 = 0 and ';
-        
+
            -- si no es administrador, solo puede listar al responsable del depto o al usuario que creo e documentos
-            IF p_administrador !=1 THEN  
-               
-                select  
+            IF p_administrador !=1 THEN
+
+                select
                    pxp.aggarray(depu.id_depto)
-                into 
+                into
                    va_id_depto
-                from param.tdepto_usuario depu 
+                from param.tdepto_usuario depu
                 where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
-            
-                v_filtro = ' ( incbte.id_usuario_reg = '||p_id_usuario::varchar ||'  or  (ew.id_depto  in ('||COALESCE(array_to_string(va_id_depto,','),'0')||'))) and ';
+
+            	IF v_parametros.nombreVista != 'IntComprobanteLd' THEN
+	                v_filtro = ' ( incbte.id_usuario_reg = '||p_id_usuario::varchar ||'  or  (ew.id_depto  in ('||COALESCE(array_to_string(va_id_depto,','),'0')||'))) and ';
+                END IF;
+
             END IF;
 			
             --Sentencia de la consulta de conteo de registros
