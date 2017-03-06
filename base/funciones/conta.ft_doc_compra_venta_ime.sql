@@ -14,13 +14,13 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
  AUTOR: 		 (admin)
  FECHA:	        18-08-2015 15:57:09
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	 	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -42,7 +42,7 @@ DECLARE
   v_id_cliente			integer;
   v_id_tipo_doc_compra_venta integer;
   v_codigo_estado			varchar;
-  v_estado_rendicion		varchar;	
+  v_estado_rendicion		varchar;
   v_id_int_comprobante		integer;
 
 BEGIN
@@ -206,10 +206,7 @@ BEGIN
         id_cliente,
         id_auxiliar,
         id_tipo_doc_compra_venta,
-        id_int_comprobante,
-        estacion,
-        id_punto_venta,
-        id_agencia
+        id_int_comprobante
       ) values(
         v_parametros.tipo,
         v_parametros.importe_excento,
@@ -248,10 +245,7 @@ BEGIN
         v_id_cliente,
         v_parametros.id_auxiliar,
         v_id_tipo_doc_compra_venta,
-        v_id_int_comprobante,
-        v_parametros.estacion,
-        v_parametros.id_punto_venta,
-        v_parametros.id_agencia
+        v_id_int_comprobante
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -266,6 +260,33 @@ BEGIN
 
           update conta.tdoc_compra_venta
           set id_tipo_doc_compra_venta = v_parametros.id_tipo_compra_venta
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
+	  if (pxp.f_existe_parametro(p_tabla,'estacion')) then
+        if(v_parametros.estacion is not null) then
+
+          update conta.tdoc_compra_venta
+          set estacion = v_parametros.estacion
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+        if(v_parametros.id_punto_venta is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_punto_venta = v_parametros.id_punto_venta
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia')) then
+        if(v_parametros.id_agencia is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_agencia = v_parametros.id_agencia
           where id_doc_compra_venta = v_id_doc_compra_venta;
         end if;
       end if;
@@ -645,10 +666,7 @@ BEGIN
         id_proveedor = v_id_proveedor,
         id_cliente = v_id_cliente,
         id_auxiliar = v_parametros.id_auxiliar,
-        id_int_comprobante = v_id_int_comprobante,
-        estacion = v_parametros.estacion,
-        id_punto_venta = v_parametros.id_punto_venta,
-        id_agencia = v_parametros.id_agencia
+        id_int_comprobante = v_id_int_comprobante
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
@@ -660,6 +678,32 @@ BEGIN
         end if;
       end if;
 
+	  if (pxp.f_existe_parametro(p_tabla,'estacion')) then
+        if(v_parametros.estacion is not null) then
+
+          update conta.tdoc_compra_venta
+          set estacion = v_parametros.estacion
+          where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+        if(v_parametros.id_punto_venta is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_punto_venta = v_parametros.id_punto_venta
+          where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia')) then
+        if(v_parametros.id_agencia is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_agencia = v_parametros.id_agencia
+          where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+        end if;
+      end if;
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta modificado(a)');
       v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
