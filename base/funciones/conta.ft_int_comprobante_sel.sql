@@ -70,8 +70,8 @@ BEGIN
                    va_id_depto
                 from param.tdepto_usuario depu 
                 where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
-            
-            	IF v_parametros.nombreVista != 'IntComprobanteLd' THEN
+
+				IF v_parametros.nombreVista != 'IntComprobanteLd' THEN
 	                v_filtro = ' ( incbte.id_usuario_reg = '||p_id_usuario::varchar ||'  or   (ew.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))) and ';
                 END IF;
 
@@ -186,30 +186,30 @@ BEGIN
                 END IF;
 
             END IF;
-			
+
             --Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_int_comprobante)
 					     from conta.vint_comprobante incbte
                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                          inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
                          where  incbte.estado_reg in (''borrador'',''validado'') and '||v_filtro;
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-        
-    /*********************************    
+
+    /*********************************
  	#TRANSACCION:  'CONTA_ICSIM_SEL'
  	#DESCRIPCION:	Consulta simplificada de comprobantes intermedios
- 	#AUTOR:		rac	
+ 	#AUTOR:		rac
  	#FECHA:		29-12-2014 00:28:30
 	***********************************/
     elseif(p_transaccion='CONTA_ICSIM_SEL') then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta :=  'select inc.id_int_comprobante,
@@ -222,26 +222,26 @@ BEGIN
                                    cc.codigo,
                                    cc.descripcion,
                                    mon.codigo::text AS desc_moneda
-                                   
+
                             from conta.vint_comprobante inc
                             inner JOIN param.tmoneda mon ON mon.id_moneda = inc.id_moneda
                             inner JOIN param.tperiodo per ON per.id_periodo = inc.id_periodo
                             inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = inc.id_clase_comprobante
                             where  ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-            
+
 			--Devuelve la respuesta
 			return v_consulta;
-						
-		end;    
-	
-    /*********************************    
+
+		end;
+
+    /*********************************
  	#TRANSACCION:  'CONTA_ICSIM_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
 
@@ -255,36 +255,36 @@ BEGIN
                          inner JOIN param.tperiodo per ON per.id_periodo = inc.id_periodo
                          inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = inc.id_clase_comprobante
                          where ';
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-    
-    	
-	/*********************************    
+
+
+	/*********************************
  	#TRANSACCION:  'CONTA_CABCBT_SEL'
  	#DESCRIPCION:	Cabecera para el reporte de Comprobante
- 	#AUTOR:			RAC	
+ 	#AUTOR:			RAC
  	#FECHA:			22/05/2015
 	***********************************/
 
 	elsif(p_transaccion='CONTA_CABCBT_SEL')then
-     				
+
     	begin
              v_id_moneda_base=param.f_get_moneda_base();
-             
+
             --recuperar el codigo de la moneda base
-            
-            select 
+
+            select
                m.codigo into v_codigo_moneda_base
             from param.tmoneda m
-            where m.id_moneda = v_id_moneda_base; 
-            
-            
+            where m.id_moneda = v_id_moneda_base;
+
+
     		--Sentencia de la consulta
 			v_consulta:='select
                             incbte.id_int_comprobante,
@@ -313,7 +313,7 @@ BEGIN
                             incbte.usr_mod,
                             incbte.desc_clase_comprobante,
                             incbte.desc_subsistema,
-                            incbte.desc_depto,	
+                            incbte.desc_depto,
                             incbte.desc_moneda,
                             incbte.desc_firma1,
                             incbte.desc_firma2,
@@ -326,9 +326,9 @@ BEGIN
                             incbte.id_tipo_relacion_comprobante,
                             incbte.desc_tipo_relacion_comprobante,
                             '||v_id_moneda_base::VARCHAR||'::integer as id_moneda_base,
-                            '''||v_codigo_moneda_base::VARCHAR||'''::varchar as codigo_moneda_base,                            
-                            incbte.codigo_depto
-                          
+                            '''||v_codigo_moneda_base::VARCHAR||'''::varchar as codigo_moneda_base,
+                            incbte.codigo_depto,
+                            conta.f_recuperar_nro_documento_facturas_comprobante(incbte.id_int_comprobante) as documentos
                           from conta.vint_comprobante incbte
                           
                           where incbte.id_proceso_wf = '||v_parametros.id_proceso_wf;

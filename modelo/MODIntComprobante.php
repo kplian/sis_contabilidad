@@ -422,6 +422,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_moneda_base','int4');
 		$this->captura('codigo_moneda_base','varchar');		
 		$this->captura('codigo_depto','varchar');
+		$this->captura('documentos','varchar');
 		//$this->captura('nro_tramite','varchar');
 		
 		
