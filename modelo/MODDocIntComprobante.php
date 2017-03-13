@@ -169,8 +169,8 @@ class MODDocIntComprobante extends MODbase{
 	function listarDocCompraVentaIntComprobante(){
 
 		//Definicion de variables para ejecucion del procedimientp
-		$this->procedimiento='conta.f_doc_compra_venta_int_comprobante';
-		$this->transaccion='CONTA_DOCINTCOMP_REP';
+		$this->procedimiento='conta.ft_doc_int_comprobante_ime';
+		$this->transaccion='CONTA_DOCINTCOMP_INS';
 		$this->tipo_procedimiento='IME';//tipo de transaccion
 		$this->setCount(false);
 		//$this->setTipoRetorno('record');
