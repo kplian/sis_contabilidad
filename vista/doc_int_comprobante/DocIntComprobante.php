@@ -383,7 +383,7 @@ Phx.vista.DocIntComprobante=Ext.extend(Phx.gridInterfaz,{
 					remoteSort: true,
 					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
 				}),
-				valueField: 'id_',
+				valueField: 'id_int_comprobante',
 				displayField: 'nombre',
 				gdisplayField: 'desc_',
 				hiddenName: 'id_int_comprobante',
@@ -398,7 +398,7 @@ Phx.vista.DocIntComprobante=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 150,
 				minChars: 2,
 				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
+					return String.format('{0}', record.data['id_int_comprobante']);
 				}
 			},
 			type: 'ComboBox',
@@ -441,7 +441,7 @@ Phx.vista.DocIntComprobante=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 150,
 				minChars: 2,
 				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
+					return String.format('{0}', record.data['id_doc_compra_venta']);
 				}
 			},
 			type: 'ComboBox',
