@@ -384,7 +384,7 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-                           DISTINCT(dcv.nit)::integer,
+                           DISTINCT(dcv.nit)::bigint,
                            dcv.razon_social
                           from conta.tdoc_compra_venta dcv
                         where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';

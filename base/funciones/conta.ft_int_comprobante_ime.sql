@@ -87,7 +87,7 @@ DECLARE
     v_id_usuario_reg				integer;
     v_id_estado_wf_ant				integer;
     v_clcbt_desc					varchar;
-    
+    v_id_partida_ejecucion			integer;
    
    
 			    
@@ -936,6 +936,12 @@ BEGIN
                      it.id_int_comprobante = v_parametros.id_int_comprobante) LOOP
                      
                    --  insertar transaccion volcada
+
+                   IF v_reg_cbte.momento_comprometido ='si' and v_reg_cbte.momento_ejecutado ='si' and v_reg_cbte.momento_pagado='si' THEN
+                   		v_id_partida_ejecucion = NULL;
+                   ELSE
+                   		v_id_partida_ejecucion = v_registros.id_partida_ejecucion;
+                   END IF;
                    
                     -----------------------------
                     --REGISTRO DE LA TRANSACCIÓN
