@@ -44,7 +44,7 @@ class MODDocIntComprobante extends MODbase{
 		$this->captura('codigo','varchar');
 		$this->captura('nro_cuenta','varchar');
 		$this->captura('origen','varchar');
-		$this->captura('id_int_comprobante','int4');
+		$this->captura('id_int_comprobante','varchar');
 		$this->captura('id_doc_compra_venta','int4');
 		$this->captura('usuario','varchar');
 		$this->captura('id_usuario_reg','int4');
@@ -94,7 +94,7 @@ class MODDocIntComprobante extends MODbase{
 		$this->setParametro('codigo','codigo','varchar');
 		$this->setParametro('nro_cuenta','nro_cuenta','varchar');
 		$this->setParametro('origen','origen','varchar');
-		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('id_int_comprobante','id_int_comprobante','varchar');
 		$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
 		$this->setParametro('usuario','usuario','varchar');
 
@@ -137,7 +137,7 @@ class MODDocIntComprobante extends MODbase{
 		$this->setParametro('codigo','codigo','varchar');
 		$this->setParametro('nro_cuenta','nro_cuenta','varchar');
 		$this->setParametro('origen','origen','varchar');
-		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('id_int_comprobante','id_int_comprobante','varchar');
 		$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
 		$this->setParametro('usuario','usuario','varchar');
 
@@ -156,7 +156,7 @@ class MODDocIntComprobante extends MODbase{
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_doc_int_comprobante','id_doc_int_comprobante','int4');
+		$this->setParametro('id_doc_int_comprobante','id_doc_int_comprobante','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -173,39 +173,12 @@ class MODDocIntComprobante extends MODbase{
 		$this->transaccion='CONTA_DOCINTCOMP_INS';
 		$this->tipo_procedimiento='IME';//tipo de transaccion
 		$this->setCount(false);
-		//$this->setTipoRetorno('record');
 
 		//captura parametros adicionales para el count
 
 		$this->setParametro('fecha_ini','fecha_ini','date');
 		$this->setParametro('fecha_fin','fecha_fin','date');
-
-		//Definicion de la lista del resultado del query
-		/*$this->captura('fecha','DATE');
-        $this->captura('nit','VARCHAR');
-        $this->captura('razon_social','VARCHAR');
-        $this->captura('desc_plantilla','VARCHAR');
-        $this->captura('nro_documento','VARCHAR');
-        $this->captura('nro_dui','VARCHAR');
-        $this->captura('nro_autorizacion','VARCHAR');
-        $this->captura('codigo_control','VARCHAR');
-        $this->captura('importe_doc','NUMERIC');
-        $this->captura('importe_ice','NUMERIC');
-        $this->captura('importe_descuento','NUMERIC');
-        $this->captura('importe_excento','NUMERIC');
-        $this->captura('liquido','NUMERIC');
-        $this->captura('importe_sujeto','NUMERIC');
-        $this->captura('importe_iva','NUMERIC');
-        $this->captura('importe_gasto','NUMERIC');
-        $this->captura('porc_gasto_prorrateado','NUMERIC');
-        $this->captura('sujeto_prorrateado','NUMERIC');
-        $this->captura('iva_prorrateado','NUMERIC');
-        $this->captura('codigo','VARCHAR');
-        $this->captura('nro_cuenta','VARCHAR');
-        $this->captura('origen','VARCHAR');
-        $this->captura('id_int_comprobante','INTEGER');
-        $this->captura('id_doc_compra_venta','INTEGER');
-        */
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

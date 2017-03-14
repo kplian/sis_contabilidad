@@ -81,22 +81,12 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.FormRepDocCompraVentaIntComprobante.superclass.onSubmit.call(this,o, x, force);
             this.onEnablePanel(this.idContenedor + '-east');
         },
-        /*
+
         successSave :function(resp){
             Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if (reg.ROOT.error) {
-                alert('error al procesar');
-                return
-            }
 
-            var nomRep = reg.ROOT.detalle.archivo_generado;
-            if(Phx.CP.config_ini.x==1){
-                nomRep = Phx.CP.CRIPT.Encriptar(nomRep);
-            }
+            window.open('http://sms.obairlines.bo/ReportesERP2/Home/ReporteComprobanteDocumento');
 
-            window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
-
-        }*/
+        }
     })
 </script>

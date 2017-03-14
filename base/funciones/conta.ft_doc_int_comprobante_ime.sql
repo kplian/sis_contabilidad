@@ -216,9 +216,10 @@ BEGIN
 
     			FOR v_registros IN (
                   SELECT doc.fecha::date, doc.nit::varchar, doc.razon_social::varchar, pla.desc_plantilla::varchar, doc.nro_documento::varchar, doc.nro_dui::varchar,
-                 doc.nro_autorizacion::varchar, doc.codigo_control::varchar, doc.importe_doc::numeric, doc.importe_ice::numeric, doc.importe_descuento::numeric,
-                 doc.importe_excento::numeric, doc.importe_pago_liquido::numeric as liquido,
-                 (doc.importe_pago_liquido - COALESCE(doc.importe_excento, 0))::numeric as importe_sujeto,
+                 doc.nro_autorizacion::varchar, doc.codigo_control::varchar, doc.importe_doc::numeric, COALESCE(doc.importe_ice,0)::numeric as importe_ice,
+                  COALESCE(doc.importe_descuento,0)::numeric as importe_descuento,
+                 COALESCE(doc.importe_excento,0)::numeric as importe_excento, doc.importe_pago_liquido::numeric as liquido,
+                 COALESCE((doc.importe_pago_liquido - COALESCE(doc.importe_excento, 0)),0)::numeric as importe_sujeto,
                  doc.importe_iva::numeric,
                  con.precio_total_final::numeric as importe_gasto,
                  (con.precio_total_final / doc.importe_pago_liquido)::numeric as porc_gasto_prorrateado,
@@ -239,7 +240,7 @@ BEGIN
                  case when doc.tabla_origen = 'cd.trendicion_det' then 'Fondo en Avance'::varchar
                  when doc.tabla_origen = 'tes.tsolicitud_rendicion_det' then 'Caja Chica'::varchar
                  end as origen,
-                 doc.id_int_comprobante::integer,
+                 COALESCE(doc.id_int_comprobante::varchar,'') as id_int_comprobante,
                  doc.id_doc_compra_venta::integer,
                  usu.cuenta
           FROM conta.tdoc_compra_venta doc
@@ -257,9 +258,10 @@ BEGIN
                 pla.tipo_informe = 'lcv'
           UNION ALL
           SELECT doc.fecha::date, doc.nit::varchar, doc.razon_social::varchar, pla.desc_plantilla::varchar, doc.nro_documento::varchar, doc.nro_dui::varchar,
-                 doc.nro_autorizacion::varchar, doc.codigo_control::varchar, doc.importe_doc::numeric, doc.importe_ice::numeric, doc.importe_descuento::numeric,
-                 doc.importe_excento::numeric, doc.importe_pago_liquido::numeric as liquido,
-                 (doc.importe_neto - doc.importe_excento)::numeric as importe_sujeto,
+                 doc.nro_autorizacion::varchar, doc.codigo_control::varchar, doc.importe_doc::numeric, COALESCE(doc.importe_ice,0)::numeric as importe_ice,
+                  COALESCE(doc.importe_descuento,0)::numeric as importe_descuento,
+                 COALESCE(doc.importe_excento,0)::numeric as importe_excento, doc.importe_pago_liquido::numeric as liquido,
+                 COALESCE((doc.importe_neto - doc.importe_excento),0)::numeric as importe_sujeto,
                  doc.importe_iva::numeric,
                  round((tra.importe_gasto /(1 - tra.factor_reversion)),2)::numeric as importe_gasto,
                  (tra.importe_gasto /(1 - tra.factor_reversion) / conta.f_importe_gasto_comprobante(cmp.id_int_comprobante))::numeric as porc_gasto_prorrateado,
@@ -271,8 +273,9 @@ BEGIN
                  else doc.importe_iva::numeric end as iva_prorrateado,
                  par.codigo::varchar,
                  cta.nro_cuenta::varchar,
-                 case when doc.tabla_origen is null then 'Pago a Proveedor'::varchar end as origen,
-                 doc.id_int_comprobante::integer,
+                 case when pla.desc_plantilla ='Facturas por Comisiones' then 'Ingresos'
+                 else 'Pago a Proveedor'::varchar end as origen,
+                 COALESCE(doc.id_int_comprobante::varchar,'') as id_int_comprobante,
                  doc.id_doc_compra_venta::integer,
                  usu.cuenta
           FROM conta.tdoc_compra_venta doc
