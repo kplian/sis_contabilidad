@@ -56,6 +56,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
                 console.log('concepto_gasto ' + rec);
                 this.Cmp.id_orden_trabajo.store.baseParams = {
+                    par_filtro:'desc_orden#motivo_orden',
                     filtro_ot:rec.data.filtro_ot,
                     requiere_ot:rec.data.requiere_ot,
                     id_grupo_ots:rec.data.id_grupo_ots
