@@ -414,7 +414,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->setParametro('nit','nit','varchar');
 		
 		//Definicion de la lista del resultado del query
-		$this->captura('nit','integer');
+		$this->captura('nit','bigint');
 		$this->captura('razon_social','varchar');
 
 		//Ejecuta la instruccion
