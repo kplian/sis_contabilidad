@@ -1022,7 +1022,7 @@ BEGIN
                         v_registros.importe_gasto_mt,
                         v_registros.triangulacion ,
                         v_registros.actualizacion, 
-                        v_registros.id_partida_ejecucion,
+                        v_id_partida_ejecucion,
                         v_registros.id_partida_ejecucion_dev
                         
                     )RETURNING id_int_transaccion into v_id_int_transaccion;
