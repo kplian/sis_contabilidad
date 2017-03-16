@@ -8,13 +8,13 @@ FUNCION: 		conta.ft_banca_compra_venta_ime
 DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tbanca_compra_venta'
 AUTOR: 		 (admin)
 FECHA:	        11-09-2015 14:36:46
-COMENTARIOS:	
+COMENTARIOS:
 ***************************************************************************
 HISTORIAL DE MODIFICACIONES:
 
-DESCRIPCION:	
-AUTOR:			
-FECHA:		
+DESCRIPCION:
+AUTOR:
+FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -77,11 +77,12 @@ DECLARE
   v_numeros_de_tramites                           VARCHAR;
 
   v_record_retencion_original                     RECORD;
-  
+
   v_id_obligacion_pago    INTEGER;
 
 
   v_banca RECORD;
+  v_estado_gestion VARCHAR;
 
 
 BEGIN
@@ -89,10 +90,10 @@ BEGIN
   v_nombre_funcion = 'conta.ft_banca_compra_venta_ime';
   v_parametros = pxp.f_get_record(p_tabla);
 
-  /*********************************    
+  /*********************************
    #TRANSACCION: 'CONTA_BANCA_INS'
    #DESCRIPCION:	Insercion de registros
-   #AUTOR:		admin	
+   #AUTOR:		admin
    #FECHA:		11-09-2015 14:36:46
   ***********************************/
 
@@ -100,6 +101,21 @@ BEGIN
   THEN
 
     BEGIN
+
+      --verificamos la gestion si esta abierta
+      select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+        INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+        inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+      where per.id_periodo = v_parametros.id_periodo;
+
+      IF v_estado_gestion = 'Bloqueado' THEN
+        RAISE EXCEPTION '%','GESTION BLOQUEADA';
+      END IF;
+
+
+
+
+
 
 
       --fechas fecha_documento y fecha_de_pago
@@ -117,6 +133,8 @@ BEGIN
       ELSE
         v_id_periodo = v_parametros.id_periodo;
       END IF;
+
+
 
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
@@ -211,10 +229,10 @@ BEGIN
 
     END;
 
-    /*********************************    
+    /*********************************
      #TRANSACCION: 'CONTA_BANCA_MOD'
      #DESCRIPCION:	Modificacion de registros
-     #AUTOR:		admin	
+     #AUTOR:		admin
      #FECHA:		11-09-2015 14:36:46
     ***********************************/
 
@@ -222,6 +240,8 @@ BEGIN
     THEN
 
       BEGIN
+
+
 
 
         IF (v_parametros.fecha_documento :: VARCHAR != '' AND v_parametros.fecha_de_pago :: VARCHAR != '')
@@ -267,6 +287,19 @@ BEGIN
 
         END IF;
 
+
+
+        --verificamos la gestion si esta abierta
+        select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+          INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+          inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+        where per.id_periodo = v_id_periodo;
+        IF v_estado_gestion = 'Bloqueado' THEN
+          RAISE EXCEPTION '%','GESTION BLOQUEADA';
+        END IF;
+        ----------------------------
+
+
         --revisa si el documento no esta marcado como revisado
         SELECT dcv.revisado
         INTO
@@ -280,10 +313,30 @@ BEGIN
         END IF;
 
 
-        v_monto_contrato = v_parametros.monto_contrato;
+
+         v_monto_contrato = v_parametros.monto_contrato;
         v_monto_acumulado = v_parametros.monto_acumulado;
 
+        SELECT banca.id_contrato,contrato.tipo_monto
+        into v_banca
+        from conta.tbanca_compra_venta banca
+        LEFT JOIN leg.tcontrato contrato on contrato.id_contrato = banca.id_contrato
+        where banca.id_banca_compra_venta = v_parametros.id_banca_compra_venta;
+
+
+        IF v_banca.tipo_monto = 'abierto' THEN
+           v_monto_contrato = v_parametros.importe_documento::NUMERIC;
+        END IF;
+
+     -- RAISE EXCEPTION '%',v_banca;
+
+
+
+
         v_saldo = v_monto_contrato - v_monto_acumulado;
+
+
+
 
         --Sentencia de la modificacion
         UPDATE conta.tbanca_compra_venta
@@ -329,10 +382,10 @@ BEGIN
 
       END;
 
-      /*********************************    
+      /*********************************
        #TRANSACCION: 'CONTA_BANCA_ELI'
        #DESCRIPCION:	Eliminacion de registros
-       #AUTOR:		admin	
+       #AUTOR:		admin
        #FECHA:		11-09-2015 14:36:46
       ***********************************/
 
@@ -340,10 +393,29 @@ BEGIN
     THEN
 
       BEGIN
+
+
+        select * into v_rec from conta.tbanca_compra_venta where id_banca_compra_venta = v_parametros.id_banca_compra_venta;
+        --verificamos la gestion si esta abierta
+        select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+          INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+          inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+        where per.id_periodo = v_rec.id_periodo;
+        IF v_estado_gestion = 'Bloqueado' THEN
+          RAISE EXCEPTION '%','GESTION BLOQUEADA';
+        END IF;
+
+
+
+        IF v_rec.revisado = 'si' THEN
+          RAISE EXCEPTION '%','NO PUEDES ELIMINAR UN REGISTRO REVISADO';
+        END IF;
+        ----------------------------
+
         --Sentencia de la eliminacion
         DELETE FROM conta.tbanca_compra_venta
         WHERE id_banca_compra_venta = v_parametros.id_banca_compra_venta;
-        
+
         --Definicion de la respuesta
         v_resp = pxp.f_agrega_clave(v_resp, 'mensaje', 'bancarizacion eliminado(a)');
         v_resp = pxp.f_agrega_clave(v_resp, 'id_banca_compra_venta', v_parametros.id_banca_compra_venta :: VARCHAR);
@@ -353,10 +425,10 @@ BEGIN
 
       END;
 
-      /*********************************    
+      /*********************************
      #TRANSACCION: 'CONTA_BANCA_ELITO'
      #DESCRIPCION:	ELIMINA TODOS LOS REGISTROS
-     #AUTOR:		admin	
+     #AUTOR:		admin
      #FECHA:		11-09-2015 14:36:46
     ***********************************/
 
@@ -365,6 +437,16 @@ BEGIN
 
       BEGIN
         --Sentencia de la eliminacion
+
+
+        --verificamos la gestion si esta abierta
+        select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+          INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+          inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+        where per.id_periodo =  v_parametros.id_periodo;
+        IF v_estado_gestion = 'Bloqueado' THEN
+          RAISE EXCEPTION '%','GESTION BLOQUEADA';
+        END IF;
 
 
 
@@ -384,10 +466,10 @@ BEGIN
 
       END;
 
-      /*********************************    
+      /*********************************
  #TRANSACCION: 'CONTA_BANCA_IMP'
  #DESCRIPCION:	Importacion de archivo txt
- #AUTOR:		admin	
+ #AUTOR:		admin
  #FECHA:		22-09-2015 14:36:46
 ***********************************/
 
@@ -395,6 +477,10 @@ BEGIN
     THEN
 
       BEGIN
+
+
+
+
 
         --select * into v_registros_json from json('{"name":"depesz","password":"super simple","grades":[1,3,1,1,1,2],"skills":{"a":"b", "c":[1,2,3]}}');
 
@@ -440,14 +526,31 @@ BEGIN
           INTO v_id_txt_importacion_bcv;
 
 
+
+
         FOR v_registros_json IN (SELECT *
-                                 FROM json_populate_recordset(NULL :: conta.json_imp_banca_compra_venta,
+                                 FROM json_populate_recordset(NULL :: conta.json_imp_banca_compra_venta_dos,
                                                               v_parametros.arra_json :: JSON)) LOOP
 
-          
-                  v_rec = param.f_get_periodo_gestion(v_registros_json.fecha_documento);
+          IF v_registros_json.fecha_documento::DATE >= v_registros_json.fecha_de_pago::DATE THEN
+            v_rec = param.f_get_periodo_gestion(v_registros_json.fecha_documento::DATE);
+            ELSE
+              v_rec = param.f_get_periodo_gestion(v_registros_json.fecha_de_pago::DATE);
 
-          
+          END IF;
+
+
+          --verificamos la gestion si esta abierta
+          select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+            INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+            inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+          where per.id_periodo =   v_rec.po_id_periodo;
+          IF v_estado_gestion = 'Bloqueado' THEN
+            RAISE EXCEPTION '%','GESTION BLOQUEADA';
+          END IF;
+
+
+
           INSERT INTO conta.tbanca_compra_venta (
             num_cuenta_pago,
             tipo_documento_pago,
@@ -479,26 +582,27 @@ BEGIN
             id_proveedor,
             id_cuenta_bancaria,
             resolucion,
-            revisado
+            revisado,
+            tramite_cuota
           ) VALUES (
             v_registros_json.num_cuenta_pago,
-            v_registros_json.tipo_documento_pago,
+            v_registros_json.tipo_documento_pago::numeric,
             v_registros_json.num_documento,
-            v_registros_json.monto_acumulado,
+            v_registros_json.monto_acumulado::numeric,
             'activo',
             v_registros_json.nit_ci,
-            v_registros_json.importe_documento,
-            v_registros_json.fecha_documento,
-            v_registros_json.modalidad_transaccion,
-            v_registros_json.tipo_transaccion,
-            v_registros_json.autorizacion,
-            v_registros_json.monto_pagado,
-            v_registros_json.fecha_de_pago,
+            v_registros_json.importe_documento::numeric,
+            v_registros_json.fecha_documento::date,
+            v_registros_json.modalidad_transaccion::INTEGER,
+            v_registros_json.tipo_transaccion::INTEGER,
+            v_registros_json.autorizacion::numeric,
+            v_registros_json.monto_pagado::numeric,
+            v_registros_json.fecha_de_pago::date,
             v_registros_json.razon,
             v_parametros.tipo,
             v_registros_json.num_documento_pago,
             --v_registros_json.num_contrato,
-            v_registros_json.nit_entidad,
+            v_registros_json.nit_entidad::numeric,
             v_rec.po_id_periodo,
             now(),
             v_parametros._nombre_usuario_ai,
@@ -508,10 +612,11 @@ BEGIN
             NULL,
             'importado',
             4,
-            398,
-            61,
+            242,
+            69,
             '10-0017-15',
-            'si'
+            'si',
+            'SIN TRAMITE'
 
 
           );
@@ -527,10 +632,10 @@ BEGIN
       END;
 
 
-      /*********************************    
+      /*********************************
     #TRANSACCION: 'CONTA_BANCA_AUT'
     #DESCRIPCION:	Inserccion de registros automatico desde endesis y pxp
-    #AUTOR:		ffigueroa	
+    #AUTOR:		ffigueroa
     #FECHA:		18-03-2016 14:36:46
    ***********************************/
 
@@ -540,6 +645,17 @@ BEGIN
       BEGIN
 
         --raise exception '%',v_parametros.id_depto_conta;
+
+
+        --verificamos la gestion si esta abierta
+        select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+          INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+          inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+        where per.id_periodo =   v_parametros.id_periodo;
+        IF v_estado_gestion = 'Bloqueado' THEN
+          RAISE EXCEPTION '%','GESTION BLOQUEADA';
+        END IF;
+
 
 
         SELECT
@@ -578,7 +694,7 @@ BEGIN
           inner JOIN sci.tct_transac_valor traval on traval.id_transaccion = tcttra.id_transaccion
           inner join sci.tct_documento tctdoc on tctdoc.id_transaccion = tcttra.id_transaccion
           inner join sci.tct_documento_valor docval on docval.id_documento = tctdoc.id_documento
-          where   docval.id_moneda = 1 and traval.id_moneda=1 
+          where   docval.id_moneda = 1 and traval.id_moneda=1
            ''
                    ) AS d (id_int_comprobante integer,
                    razon_social varchar(500),
@@ -608,13 +724,13 @@ BEGIN
             inner join sci.tct_transac_valor traval on traval.id_transaccion = tcttra.id_transaccion and traval.id_moneda = 1
           inner join sci.tct_entrega_comprobante entrecom on entrecom.id_comprobante = tctcomp.id_comprobante
           inner join sci.tct_entrega entre on entre.id_entrega = entrecom.id_entrega
-          
+
            ''
                    ) AS d (
                    id_int_comprobante integer,
-                   
+
                     id_comprobante integer,
-                   
+
                     comprobante_c31 VARCHAR(20),
                      importe_haber numeric(10,2),
                    importe_recurso numeric(10,2),
@@ -644,7 +760,7 @@ BEGIN
       cuenta.id_cuenta_bancaria,
       cuenta.denominacion,
       cuenta.nro_cuenta,
-      
+
       provee.id_proveedor,
       contra.numero as numero_contrato,
       contra.id_contrato,
@@ -690,13 +806,13 @@ left join leg.tcontrato contra on contra.id_contrato = obliga.id_contrato
 inner join param.tproveedor provee on provee.id_proveedor = obliga.id_proveedor
 
 inner join tabla_temporal_documentos doc on doc.id_int_comprobante = pg_devengado.id_int_comprobante
- 
+
 
 where pg_pagado.estado=''pagado'' and pg_devengado.estado = ''devengado''
 and (libro.tipo=''cheque'' or  pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago = ''cheque'')
 and ( pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago=''cheque'')
- and plantilla.tipo_informe in (''lcv'',''retenciones'')
-and (libro.estado in (''cobrado'',''entregado'') or libro.estado is null )
+-- and plantilla.tipo_informe in (''lcv'',''retenciones'')
+and (libro.estado in (''cobrado'',''entregado'',''anulado'') or libro.estado is null )
 and ((doc.fecha_documento >= ''' || v_periodo.fecha_ini || '''::date and doc.fecha_documento <=''' ||
                      v_periodo.fecha_fin || '''::date)
 or (libro.fecha >= ''' || v_periodo.fecha_ini || '''::date and libro.fecha <=''' || v_periodo.fecha_fin || '''::date)
@@ -789,7 +905,7 @@ and (
                   v_tipo_transaccion = 2;
               END IF;
 
-              --vemos el tipo de documento de pago segun la cuenta bancaria 
+              --vemos el tipo de documento de pago segun la cuenta bancaria
               IF v_record_plan_pago_pxp.id_cuenta_bancaria_plan_pago = 61
               THEN
                 v_tipo_documento_pago = 4; --es transeferencia de fondos
@@ -805,8 +921,8 @@ and (
                 /*if (v_record_plan_pago_pxp.fecha_documento::date >= '2015-07-01'::DATE ) THEN
                   --entra a la nueva resolucion
                   v_resolucion = '10-0017-15';
-                  
-                  ELSE 
+
+                  ELSE
                   --entra a la antigua resolucion
                   v_resolucion = '10-0011-11';
                 END IF;*/
@@ -865,7 +981,7 @@ and (
                                                                 (v_record_plan_pago_pxp.monto_pago -
                                                                  v_record_plan_pago_pxp.descuento_inter_serv);
 
-              --obtenemos la retencion 
+              --obtenemos la retencion
               v_retencion_cuota =
               (v_record_plan_pago_pxp.importe_total * v_porciento_en_relacion_a_monto_total_plan_pago) / 100;
 
@@ -884,7 +1000,7 @@ and (
 
               v_monto_pagado = v_record_plan_pago_pxp.importe_total;
 
-              --obtenemos el monto pagado de la factura menos la retencion 
+              --obtenemos el monto pagado de la factura menos la retencion
               v_monto_pagado = v_monto_pagado - v_retencion_cuota;
               --v_monto_pagado = v_monto_pagado - v_record_plan_pago_pxp.descuento_inter_serv;
 
@@ -897,41 +1013,41 @@ and (
               END IF;
 
               --si tiene retencion
-              /* if (v_record_plan_pago_pxp.monto_retgar_mo > 0) THEN 
-                 
+              /* if (v_record_plan_pago_pxp.monto_retgar_mo > 0) THEN
+
                  v_monto_pagado = v_record_plan_pago_pxp.importe_total;
-                 --obtenemos el monto pagado de la factura menos la retencion 
+                 --obtenemos el monto pagado de la factura menos la retencion
                  v_monto_pagado = v_monto_pagado - v_retencion_cuota;
                  v_monto_pagado_para_acumular = v_monto_pagado;
-                 
-            
-                 ELSE 
+
+
+                 ELSE
                  v_monto_pagado_para_acumular = v_record_plan_pago_pxp.importe_total;
-                 
+
                END IF;*/
 
               /*
               --si tiene multa
-              if (v_record_plan_pago_pxp.otros_descuentos > 0) THEN 
-                
+              if (v_record_plan_pago_pxp.otros_descuentos > 0) THEN
+
                  --RAISE EXCEPTION '%',v_retencion_cuota;
-                
-                --obtenemos el monto pagado de la factura menos la retencion 
+
+                --obtenemos el monto pagado de la factura menos la retencion
                 v_monto_pagado = v_monto_pagado - v_multa_cuota;
-                
-     
+
+
               END IF;
-              
-              
+
+
               --si tiene intercambio de servicios
-              if (v_record_plan_pago_pxp.descuento_inter_serv > 0) THEN 
-                
+              if (v_record_plan_pago_pxp.descuento_inter_serv > 0) THEN
+
                  --RAISE EXCEPTION '%',v_retencion_cuota;
-                
-                --obtenemos el monto pagado de la factura menos la retencion 
+
+                --obtenemos el monto pagado de la factura menos la retencion
                 v_monto_pagado = v_monto_pagado - v_intercambio_de_servicio_cuota;
-                
-     
+
+
               END IF;*/
 
 
@@ -943,7 +1059,7 @@ and (
               THEN
 
                 /*el monto acumulado se por primera vez se debe ingresar manualmente en el campo
-                ya que asi podremos tomar encuenta datos anteriores 
+                ya que asi podremos tomar encuenta datos anteriores
                 ya que el sistema no cuenta con datos anteriores al 2015.*/
 
                 v_monto_contrato = v_record_plan_pago_pxp.monto_contrato;
@@ -975,7 +1091,14 @@ and (
               IF v_record_plan_pago_pxp.bancarizacion = 'si' AND v_record_plan_pago_pxp.tipo_monto = 'abierto'
               THEN
 
-                v_monto_acumulado = v_monto_pagado;
+
+                select monto_acumulado INTO v_monto_acumulado from conta.tbanca_compra_venta where id_documento = v_record_plan_pago_pxp.id_documento;
+
+                IF v_monto_acumulado is NULL THEN
+
+                  v_monto_acumulado = 0;
+                END IF;
+                v_monto_acumulado = v_monto_acumulado + v_monto_pagado;
                 v_saldo = v_retencion_cuota;
 
 
@@ -1095,10 +1218,10 @@ and (
       END;
 
 
-      /*********************************    
+      /*********************************
      #TRANSACCION: 'CONTA_BANCA_ADDLN'
      #DESCRIPCION:	agrega a una lista negra
-     #AUTOR:		admin	
+     #AUTOR:		admin
      #FECHA:		31-05-2016 14:36:46
     ***********************************/
 
@@ -1109,13 +1232,37 @@ and (
         --Sentencia de la eliminacion
 
 
+        --verificamos la gestion si esta abierta
+        select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+          INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+          inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+        where per.id_periodo =   v_parametros.id_periodo;
+        IF v_estado_gestion = 'Bloqueado' THEN
+          RAISE EXCEPTION '%','GESTION BLOQUEADA';
+        END IF;
 
 
-        UPDATE conta.tbanca_compra_venta
+        SELECT * INTO v_banca from conta.tbanca_compra_venta
+          WHERE id_banca_compra_venta = v_parametros.id_banca_compra_venta;
+
+        IF v_banca.lista_negra = 'si' THEN
+
+          UPDATE conta.tbanca_compra_venta
+        SET lista_negra   = 'no' ,
+          saldo           = 0,
+          monto_acumulado = 0
+        WHERE id_banca_compra_venta = v_parametros.id_banca_compra_venta;
+
+          ELSE
+           UPDATE conta.tbanca_compra_venta
         SET lista_negra   = 'si',
           saldo           = 0,
           monto_acumulado = 0
         WHERE id_banca_compra_venta = v_parametros.id_banca_compra_venta;
+
+
+        END IF;
+
 
         --Definicion de la respuesta
         v_resp = pxp.f_agrega_clave(v_resp, 'mensaje', 'bancarizacion agregado a la lista negra(a)');
@@ -1127,10 +1274,10 @@ and (
       END;
 
 
-      /*********************************    
+      /*********************************
     #TRANSACCION: 'CONTA_BANCA_INSRET'
     #DESCRIPCION:	agrega las retenciones segun su periodo seleccionado
-    #AUTOR:		admin	
+    #AUTOR:		admin
     #FECHA:		31-05-2016 14:36:46
    ***********************************/
 
@@ -1140,6 +1287,14 @@ and (
       BEGIN
         --Sentencia de la eliminacion
 
+        --verificamos la gestion si esta abierta
+        select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+          INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+          inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+        where per.id_periodo =   v_parametros.id_periodo;
+        IF v_estado_gestion = 'Bloqueado' THEN
+          RAISE EXCEPTION '%','GESTION BLOQUEADA';
+        END IF;
 
         SELECT
           fecha_ini,
@@ -1149,41 +1304,41 @@ and (
         FROM param.tperiodo
         WHERE id_periodo = v_parametros.id_periodo;
 
-       
-        IF  v_parametros.numero_tramite = '' THEN
-          
-                 
 
-                
+        IF  v_parametros.numero_tramite = '' THEN
+
+
+
+
 
            --select pxp.list( '''' ||obliga.num_tramite|| '''')
             SELECT pxp.list(obliga.id_obligacion_pago :: VARCHAR)
             INTO v_numeros_de_tramites
             FROM tes.tplan_pago pla
-    
+
               INNER JOIN tes.tobligacion_pago obliga ON obliga.id_obligacion_pago = pla.id_obligacion_pago
               LEFT JOIN tes.tts_libro_bancos libro ON libro.id_int_comprobante = pla.id_int_comprobante
             WHERE pla.tipo = 'dev_garantia'
                   AND pla.estado = 'devuelto'
                   AND pla.fecha_dev >= v_periodo.fecha_ini :: DATE AND pla.fecha_dev <= v_periodo.fecha_fin :: DATE;
 
-          
+
         ELSE
-          
-          
+
+
           select id_obligacion_pago
           into v_id_obligacion_pago
             from tes.tobligacion_pago
               where num_tramite = split_part(v_parametros.numero_tramite, '(', 1);
-          
+
               v_numeros_de_tramites =  '('||v_id_obligacion_pago||')';
-          
-             
+
+
         END IF;
-        
+
           --RAISE EXCEPTION '%',v_id_obligacion_pago;
 
-        
+
 
         IF v_numeros_de_tramites IS NULL
         THEN
@@ -1192,7 +1347,7 @@ and (
 
         v_host:='dbname=dbendesis host=192.168.100.30 user=ende_pxp password=ende_pxp';
 
-        --creacion de tabla temporal del endesis 
+        --creacion de tabla temporal del endesis
 
         v_consulta:= ' WITH tabla_temporal_documentos AS (
               SELECT * FROM dblink(''' || v_host || ''',
@@ -1212,7 +1367,7 @@ and (
           inner JOIN sci.tct_transac_valor traval on traval.id_transaccion = tcttra.id_transaccion
           inner join sci.tct_documento tctdoc on tctdoc.id_transaccion = tcttra.id_transaccion
           inner join sci.tct_documento_valor docval on docval.id_documento = tctdoc.id_documento
-          where   docval.id_moneda = 1 and traval.id_moneda=1 
+          where   docval.id_moneda = 1 and traval.id_moneda=1
            ''
                    ) AS d (id_int_comprobante integer,
                    razon_social varchar(500),
@@ -1242,13 +1397,13 @@ and (
             inner join sci.tct_transac_valor traval on traval.id_transaccion = tcttra.id_transaccion and traval.id_moneda = 1
           inner join sci.tct_entrega_comprobante entrecom on entrecom.id_comprobante = tctcomp.id_comprobante
           inner join sci.tct_entrega entre on entre.id_entrega = entrecom.id_entrega
-          
+
            ''
                    ) AS d (
                    id_int_comprobante integer,
-                   
+
                     id_comprobante integer,
-                   
+
                     comprobante_c31 VARCHAR(20),
                      importe_haber numeric(10,2),
                    importe_recurso numeric(10,2),
@@ -1278,7 +1433,7 @@ and (
       cuenta.id_cuenta_bancaria,
       cuenta.denominacion,
       cuenta.nro_cuenta,
-      
+
       provee.id_proveedor,
       contra.numero as numero_contrato,
       contra.id_contrato,
@@ -1312,7 +1467,7 @@ inner join param.tplantilla plantilla  on plantilla.id_plantilla = pg_devengado.
 
 left join tabla_temporal_sigma sigma on sigma.id_int_comprobante = pg_pagado.id_int_comprobante
 left join tes.tts_libro_bancos libro on libro.id_int_comprobante = pg_pagado.id_int_comprobante
---left join tes.tts_libro_bancos libro_fk on libro_fk.id_libro_bancos_fk = libro.id_libro_bancos
+left join tes.tts_libro_bancos libro_fk on libro_fk.id_libro_bancos_fk = libro.id_libro_bancos
 
 
 left join tes.tcuenta_bancaria cuenta on cuenta.id_cuenta_bancaria = pg_pagado.id_cuenta_bancaria
@@ -1323,13 +1478,13 @@ left join leg.tcontrato contra on contra.id_contrato = obliga.id_contrato
 inner join param.tproveedor provee on provee.id_proveedor = obliga.id_proveedor
 
 inner join tabla_temporal_documentos doc on doc.id_int_comprobante = pg_devengado.id_int_comprobante
- 
+
 
 where pg_pagado.estado=''pagado'' and pg_devengado.estado = ''devengado''
 and (libro.tipo=''cheque'' or  pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago = ''cheque'')
 and ( pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago=''cheque'')
  and plantilla.tipo_informe in (''lcv'',''retenciones'')
-and (libro.estado in (''cobrado'',''entregado'') or libro.estado is null )
+and (libro.estado in (''cobrado'',''entregado'',''anulado'') or libro.estado is null )
 
 and (
 (doc.importe_total >= 50000)
@@ -1341,8 +1496,8 @@ and (
         --registro de retenciones RETENCIONESSSSSSSS
         FOR v_record_plan_pago_pxp IN EXECUTE v_consulta LOOP
 
-         
-          
+
+
 
           IF EXISTS(SELECT 0
                     FROM conta.tbanca_compra_venta
@@ -1371,7 +1526,7 @@ and (
                   AND pla.estado = 'devuelto' AND pla.id_obligacion_pago = v_record_plan_pago_pxp.id_obligacion_pago;
 
 
-            
+
 
             IF v_record_retencion_original.forma_pago = 'cheque'
             THEN
@@ -1379,16 +1534,16 @@ and (
               --si es cheque entonces ponemos el cheque con el cual se pago la retencion
               --recuperamos el numero cheque y la fecha
 
-             
-              
-              
+
+
+
               v_nro_cheque_o_sigma = v_record_retencion_original.nro_cheque;
               v_fecha_libro_o_entrega = v_record_retencion_original.fecha_dev;
-              
-             
-             
-              
-              
+
+
+
+
+
 
 
             ELSIF v_record_retencion_original.forma_pago = 'transferencia'
@@ -1399,9 +1554,9 @@ and (
 
                 v_fecha_libro_o_entrega = v_record_retencion_original.fecha_dev;
                 v_nro_cheque_o_sigma = v_record_plan_pago_pxp.comprobante_c31;
-              
-              
-              
+
+
+
 
             ELSE
             --RAISE EXCEPTION '%', 'esta mal la forma de pago no es ni tranferencia ni cheque';
@@ -1413,17 +1568,17 @@ and (
 
 
               v_rec = param.f_get_periodo_gestion(v_record_plan_pago_pxp.fecha_documento);
-              
+
               if v_fecha_libro_o_entrega is null  THEN
 
 
                 v_rec2 = param.f_get_periodo_gestion(v_periodo.fecha_fin::DATE);
-                ELSE 
+                ELSE
                 v_rec2 = param.f_get_periodo_gestion(v_fecha_libro_o_entrega);
               END IF;
-              
-              
-              
+
+
+
 
               --todo aca validar de mejor forma
               --me fijo si la fecha de factura es igual a la del pago
@@ -1445,7 +1600,7 @@ and (
                   v_tipo_transaccion = 2;
               END IF;
 
-              --vemos el tipo de documento de pago segun la cuenta bancaria 
+              --vemos el tipo de documento de pago segun la cuenta bancaria
               IF v_record_plan_pago_pxp.id_cuenta_bancaria_plan_pago = 61
               THEN
                 v_tipo_documento_pago = 4; --es transeferencia de fondos
@@ -1461,8 +1616,8 @@ and (
                 /*if (v_record_plan_pago_pxp.fecha_documento::date >= '2015-07-01'::DATE ) THEN
                   --entra a la nueva resolucion
                   v_resolucion = '10-0017-15';
-                  
-                  ELSE 
+
+                  ELSE
                   --entra a la antigua resolucion
                   v_resolucion = '10-0011-11';
                 END IF;*/
@@ -1494,7 +1649,7 @@ and (
                                                                 (v_record_plan_pago_pxp.monto_pago -
                                                                  v_record_plan_pago_pxp.descuento_inter_serv);
 
-              --obtenemos la retencion 
+              --obtenemos la retencion
               v_retencion_cuota =
               (v_record_plan_pago_pxp.importe_total * v_porciento_en_relacion_a_monto_total_plan_pago)
               / 100;
@@ -1541,8 +1696,14 @@ and (
               IF v_record_plan_pago_pxp.bancarizacion = 'si' AND v_record_plan_pago_pxp.tipo_monto = 'abierto'
               THEN
 
+              select monto_acumulado INTO v_monto_acumulado from conta.tbanca_compra_venta where id_documento = v_record_plan_pago_pxp.id_documento;
 
-                v_monto_acumulado = v_monto_pagado;
+                IF v_monto_acumulado is NULL THEN
+
+                  v_monto_acumulado = 0;
+                END IF;
+
+                v_monto_acumulado = v_monto_acumulado + v_monto_pagado;
                 v_saldo = 0;
 
 
@@ -1675,12 +1836,30 @@ and (
     THEN
 
       BEGIN
+
+
         --Sentencia de la eliminacion
 
         SELECT *
         INTO v_banca
         FROM conta.tbanca_compra_venta
         WHERE id_banca_compra_venta = v_parametros.id_banca_compra_venta;
+
+
+        IF v_banca.revisado = 'si' THEN
+          RAISE EXCEPTION '%','NO SE PUEDE CLONAR CUANDO ESTA REVISADO ';
+        END IF;
+
+
+        --verificamos la gestion si esta abierta
+        select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+          INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+          inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+        where per.id_periodo =   v_banca.id_periodo;
+        IF v_estado_gestion = 'Bloqueado' THEN
+          RAISE EXCEPTION '%','GESTION BLOQUEADA';
+        END IF;
+
 
 
         INSERT INTO conta.tbanca_compra_venta (id_usuario_reg,

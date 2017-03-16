@@ -2761,6 +2761,25 @@ CREATE TYPE conta.json_imp_banca_compra_venta AS (
 );
 
 
+CREATE TYPE conta.json_imp_banca_compra_venta_dos AS (
+  modalidad_transaccion VARCHAR(255),
+  fecha_documento VARCHAR(255),
+  tipo_transaccion VARCHAR(255),
+  nit_ci VARCHAR(255),
+  razon VARCHAR(255),
+  num_documento VARCHAR(255),
+  importe_documento VARCHAR(255),
+  autorizacion VARCHAR(255),
+  num_cuenta_pago VARCHAR(255),
+  monto_pagado VARCHAR(255),
+  monto_acumulado VARCHAR(255),
+  nit_entidad VARCHAR(255),
+  num_documento_pago VARCHAR(255),
+  tipo_documento_pago VARCHAR(255),
+  fecha_de_pago VARCHAR(255)
+);
+
+
 CREATE TABLE conta.ttxt_importacion_bcv (
  id_txt_importacion_bcv SERIAL,
   nombre_archivo varchar(255),
@@ -3457,4 +3476,101 @@ COMMENT ON COLUMN conta.tresultado_plantilla.relacion_unica
 IS 'si o no, solo se utiliza cuando el preiodo de calculo es giual a cbte, sirve apra validar que el comprobante origen solo tenga una relacion de este tipo y no mas';
 
 /*********************************** F-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+
+/*********************************** I-SCP-GSS-CONTA-0-12/01/2017 ****************************************/
+
+CREATE TABLE conta.tarchivo_airbp (
+  id_archivo_airbp SERIAL NOT NULL,
+  nombre_archivo VARCHAR(100),
+  mes INTEGER,
+  anio INTEGER,
+  PRIMARY KEY(id_archivo_airbp)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+CREATE TABLE conta.tfactura_airbp (
+  id_factura_airbp SERIAL NOT NULL,
+  id_doc_compra_venta INTEGER,
+  punto_venta VARCHAR(10),
+  tipo_cambio NUMERIC(8,2),
+  id_cliente INTEGER,
+  estado VARCHAR(1),
+  PRIMARY KEY(id_factura_airbp)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+CREATE TABLE conta.tfactura_airbp_concepto (
+  id_factura_airbp_concepto SERIAL,
+  id_factura_airbp INTEGER,
+  cantidad INTEGER,
+  precio_unitario NUMERIC(8,2),
+  total_bs NUMERIC(8,2),
+  ne VARCHAR(10),
+  articulo VARCHAR(10),
+  destino VARCHAR(5),
+  matricula VARCHAR(10),
+  PRIMARY KEY(id_factura_airbp_concepto)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+/*********************************** F-SCP-GSS-CONTA-0-12/01/2017 ****************************************/
+
+
+
+
+/*********************************** I-SCP-MMV-CONTA-0-27/12/2016 ****************************************/
+
+CREATE VIEW conta.ventrega_depto as (
+select
+                            ent.id_entrega,
+                            ent.fecha_c31,
+                            ent.c31,
+                            ent.estado,
+                            ent.estado_reg,
+                            ent.id_usuario_ai,
+                            ent.usuario_ai,
+                            ent.fecha_reg,
+                            ent.id_usuario_reg,
+                            ent.fecha_mod,
+                            ent.id_usuario_mod,
+                            ent.id_depto_conta,
+                            ent.id_estado_wf,
+                            ent.id_proceso_wf,
+                            de.prioridad
+						from conta.tentrega ent
+                        inner join param.tdepto de on de.id_depto = ent.id_depto_conta)
+/*********************************** F-SCP-MVN-CONTA-0-27/01/2017 ****************************************/
+
+
+/*********************************** I-SCP-FFP-CONTA-0-30/12/2016 ****************************************/
+
+
+/*
+CREATE TABLE conta.tplan_pago_documento_airbp (
+  id_plan_pago_documento_airbp SERIAL,
+  id_plan_pago INTEGER,
+  id_documento INTEGER,
+  monto_fac NUMERIC(10,2),
+  monto_usado NUMERIC(10,2),
+  monto_disponible NUMERIC(8,2),
+  usar VARCHAR(255),
+  PRIMARY KEY(id_plan_pago_documento_airbp)
+) INHERITS (pxp.tbase)
+WITH (oids = false);*/
+
+--ALTER TABLE conta.tplan_pago_documento_airbp ADD monto_acumulado NUMERIC(10,2) NULL;
+
+CREATE TABLE conta.tbancarizacion_gestion (
+  id_bancarizacion_gestion SERIAL,
+  id_gestion INTEGER,
+  estado VARCHAR(255),
+  PRIMARY KEY(id_bancarizacion_gestion)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+
+/*********************************** F-SCP-MVN-FFP-0-30/01/2017 ****************************************/
 

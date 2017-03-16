@@ -246,7 +246,7 @@ fheight: '80%',
 
 
 		this.addButton('Clonar',{argument: {imprimir: 'Clonar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Clonar',/*iconCls:'' ,*/disabled:false,handler:this.Clonar});
-		this.addButton('airbp',{argument: {imprimir: 'airbp'},text:'<i class="fa fa-file-text-o fa-2x"></i> airbp',/*iconCls:'' ,*/disabled:false,handler:this.airbp});
+		//this.addButton('airbp',{argument: {imprimir: 'airbp'},text:'<i class="fa fa-file-text-o fa-2x"></i> airbp',/*iconCls:'' ,*/disabled:false,handler:this.airbp});
 
 
 
@@ -2110,11 +2110,11 @@ fheight: '80%',
     },
     
     addListaNegra : function(){
-    	
+		var id_periodo = this.cmbPeriodo.getValue();
     	 var data = this.getSelectedData();
     	Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/agregarListarNegra',
-				params:{'id_banca_compra_venta':data.id_banca_compra_venta},
+				params:{'id_banca_compra_venta':data.id_banca_compra_venta,'id_periodo':id_periodo},
 				success: this.successAuto,
 			
 				failure: this.conexionFailure,
