@@ -221,7 +221,7 @@ class ACTArchivoAirbp extends ACTbase{
 				}
 				$this->objParam->addParametro('id_doc_compra_venta', $idDocumento);
 				$this->objParam->addParametro('importe_excento', $importeExcento);
-				$this->objParam->addParametro('importe_iva', $totalFactura * 0.13);
+				$this->objParam->addParametro('importe_iva', ($totalFactura-$importeExcento) * 0.13);
 				$this->objParam->addParametro('importe_pago_liquido', $totalFactura);
 				$this->objParam->addParametro('importe_doc', $totalFactura);
 				$this->objParam->addParametro('importe_neto', $totalFactura);
