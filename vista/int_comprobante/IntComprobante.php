@@ -305,6 +305,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel : 'Fecha',
 				allowBlank : false,
 				anchor : '80%',
+				maxValue : new Date(),
 				gwidth : 100,
 				format : 'd/m/Y',
 				renderer : function(value, p, record) {
