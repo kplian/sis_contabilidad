@@ -48,7 +48,19 @@ class ACTAuxiliar extends ACTbase{
 		$this->res=$this->objFunc->eliminarAuxiliar($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+
+	function conectar(){
+
+	    var_dump('Conectar sqlserver');exit;
+        $conexion = mssql_connect('172.17.45.133', 'UsrErp', 'Boa.2017');
+
+        if (!$conexion) {
+            die('Algo fue mal mientras se conectaba a MSSQL');
+        }
+        mssql_select_db('SSISDB', $conexion);
+
+        mssql_close($conexion);
+    }
 }
 
 ?>

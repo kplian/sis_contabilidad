@@ -583,7 +583,8 @@ BEGIN
             id_cuenta_bancaria,
             resolucion,
             revisado,
-            tramite_cuota
+            tramite_cuota,
+            num_contrato
           ) VALUES (
             v_registros_json.num_cuenta_pago,
             v_registros_json.tipo_documento_pago::numeric,
@@ -612,11 +613,12 @@ BEGIN
             NULL,
             'importado',
             4,
-            242,
-            69,
+            398,
+            61,
             '10-0017-15',
             'si',
-            'SIN TRAMITE'
+            'SIN TRAMITE',
+            0
 
 
           );

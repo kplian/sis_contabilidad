@@ -301,9 +301,10 @@ BEGIN
                 (v_registros.fecha, v_registros.nit, v_registros.razon_social, v_registros.desc_plantilla, v_registros.nro_documento, v_registros.nro_dui,
                 v_registros.nro_autorizacion, v_registros.codigo_control, v_registros.importe_doc, v_registros.importe_ice, v_registros.importe_descuento,
                 v_registros.importe_excento, v_registros.liquido, v_registros.importe_sujeto,
-                v_registros.importe_iva, v_registros.importe_gasto, v_registros.porc_gasto_prorrateado,
-                v_registros.sujeto_prorrateado, v_registros.iva_prorrateado, v_registros.codigo,
-                v_registros.nro_cuenta, v_registros.origen, v_registros.id_int_comprobante,
+                v_registros.importe_iva, COALESCE(v_registros.importe_gasto,0.00), COALESCE(v_registros.porc_gasto_prorrateado,0.00),
+                COALESCE(v_registros.sujeto_prorrateado,0.00), COALESCE(v_registros.iva_prorrateado,0.00),
+                COALESCE(v_registros.codigo,''),
+                COALESCE(v_registros.nro_cuenta,''), v_registros.origen, v_registros.id_int_comprobante,
                 v_registros.id_doc_compra_venta, v_registros.cuenta, p_id_usuario);
           END LOOP;
 

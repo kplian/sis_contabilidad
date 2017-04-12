@@ -17,7 +17,17 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.Auxiliar.superclass.constructor.call(this,config);
 		this.init();
-		this.load({params:{start:0, limit:50}})
+		this.load({params:{start:0, limit:50}});
+
+        this.addButton('replicar_aux',{
+            grupo: [0,1,2,3,4],
+            text: 'Replicar',
+            iconCls: 'bfolder',
+            disabled: false,
+            handler: this.replicarAux,
+            tooltip: '<b>Permite replicar un auxiliar recien registrado en la BD Ingresos</b>',
+            scope:this
+        });
 	},
 			
 	Atributos:[
@@ -232,7 +242,24 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+
+    replicarAux: function () {
+        Ext.Msg.alert('Replicar', 'Positivo');
+        Ext.Ajax.request({
+            url:'../../sis_contabilidad/control/Auxiliar/conectar',
+            params:{id_usuario: 0},
+            success:function(resp){
+                var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+
+                this.Cmp.id_oficina_registro_incidente.setValue(reg.ROOT.datos.id_oficina);
+
+            },
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });
+    }
 	}
 )
 </script>

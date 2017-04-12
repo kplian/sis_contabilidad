@@ -3574,3 +3574,12 @@ WITH (oids = false);
 
 /*********************************** F-SCP-MVN-FFP-0-30/01/2017 ****************************************/
 
+/*********************************** I-SCP-GVC-CONTA-0-04/04/2017 ****************************************/
+CREATE UNIQUE INDEX tauxiliar_idx ON conta.tauxiliar
+  USING btree ("codigo_auxiliar");
+
+CREATE UNIQUE INDEX tauxiliar_idx1 ON conta.tauxiliar
+  USING btree ("nombre_auxiliar");
+
+/*********************************** F-SCP-GVC-CONTA-0-04/04/2017 ****************************************/
+
