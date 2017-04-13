@@ -47,6 +47,7 @@ BEGIN
 
     	begin
     		--Sentencia de la consulta
+         v_filtro = '';
 
             SELECT vfcl.id_oficina, vfcl.nombre_cargo,  vfcl.oficina_nombre,
             tf.id_funcionario, vfcl.desc_funcionario1 INTO v_record
