@@ -1347,7 +1347,8 @@ class MODDocCompraVenta extends MODbase{
 		  $this->setParametro('tipo_lcv','tipo_lcv','VARCHAR');
 		 $this->setParametro('fecha_ini','fecha_ini','date');
 		  $this->setParametro('fecha_fin','fecha_fin','date');
-		   
+		  $this->setParametro('id_gestion','id_gestion','INTEGER');
+
 		   
 		  //captura parametros adicionales para el count
 		 /* $this->setParametro('id_gestion','id_gestion','INTEGER');

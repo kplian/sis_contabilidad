@@ -44,6 +44,7 @@ DECLARE
   v_codigo_estado			varchar;
   v_estado_rendicion		varchar;
   v_id_int_comprobante		integer;
+  v_tipo_informe			varchar;
 
 BEGIN
 
@@ -98,9 +99,14 @@ BEGIN
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
-      -- valida que period de libro de compras y ventas este abierto
-      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  select tipo_informe into v_tipo_informe
+      from param.tplantilla
+      where id_plantilla = v_parametros.id_plantilla;
 
+      IF v_tipo_informe = 'lcv' THEN
+      	  -- valida que periodO de libro de compras y ventas este abierto
+      	  v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
       --TODO
       --validar que no exsita un documento con el mismo nro y misma razon social  ...?
@@ -343,8 +349,14 @@ BEGIN
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
-      -- valida que period de libro de compras y ventas este abierto
-      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  select tipo_informe into v_tipo_informe
+      from param.tplantilla
+      where id_plantilla = v_parametros.id_plantilla;
+
+      IF v_tipo_informe = 'lcv' THEN
+      	  -- valida que period de libro de compras y ventas este abierto
+      	  v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
       --TODO
       --validar que no exsita un documento con el mismo nro y misma razon social  ...?

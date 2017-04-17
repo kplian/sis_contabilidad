@@ -37,21 +37,22 @@ DECLARE
     v_filtro     		varchar;
     v_tipo   			varchar;
     v_sincronizar		varchar;
-			    
+    v_gestion			integer;
+
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_doc_compra_venta_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_DCV_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
 	if(p_transaccion='CONTA_DCV_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -94,7 +95,7 @@ BEGIN
                             dcv.nro_dui,
                             dcv.id_moneda,
                             mon.codigo as desc_moneda,
-                            dcv.id_int_comprobante,                           
+                            dcv.id_int_comprobante,
                             ic.nro_tramite,
                             COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
                             COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
@@ -388,76 +389,76 @@ BEGIN
                            dcv.razon_social
                           from conta.tdoc_compra_venta dcv
                         where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
-         
-         
+
+
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-			
-			
+
+
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
-    /*********************************    
+    /*********************************
  	#TRANSACCION:  'CONTA_DCVNIT_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
 	elsif(p_transaccion='CONTA_DCVNIT_CONT')then
 
 		begin
-			
+
             v_consulta:='select
                           count(DISTINCT(dcv.nit))
                         from conta.tdoc_compra_venta dcv
-                        where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%'' ';            
-			
-			
+                        where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%'' ';
+
+
 			--Devuelve la respuesta
 			return v_consulta;
-           
+
 		end;
-    /*********************************    
+    /*********************************
  	#TRANSACCION:  'CONTA_REPLCV_SEL'
  	#DESCRIPCION:	listado para reporte de libro de compras y ventas
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
 	ELSEIF(p_transaccion='CONTA_REPLCV_SEL')then
-     				
+
     	begin
-        
-            
-           
-            
-            select 
+
+
+
+
+            select
               d.id_entidad,
               d.id_subsistema
             into
               v_registros
             from param.tdepto  d
             where  d.id_depto = v_parametros.id_depto;
-            
-           
+
+
             IF v_registros.id_entidad is null THEN
               raise exception 'El departamento contable no tiene definido la entidad a la que pertenece';
             END IF;
-             
+
             select
               pxp.list(d.id_depto::varchar)
             into
-              v_id_deptos            
+              v_id_deptos
             from param.tdepto d
-            where d.id_entidad  = v_registros.id_entidad 
+            where d.id_entidad  = v_registros.id_entidad
                   and  d.id_subsistema = v_registros.id_subsistema ;
-                  
-           
-             
+
+
+
     		--Sentencia de la consulta
-			v_consulta:='SELECT 
+			v_consulta:='SELECT
                               id_doc_compra_venta,
                               tipo,
                               fecha,
@@ -487,35 +488,39 @@ BEGIN
                               sujeto_df,
                               importe_ice,
                               importe_excento
-                        FROM 
+                        FROM
                           conta.vlcv lcv
                         where      lcv.tipo = '''||v_parametros.tipo||'''
                                and lcv.id_periodo = '||v_parametros.id_periodo||'
                                and id_depto_conta in ( '||v_id_deptos||')
                         order by fecha, id_doc_compra_venta';
-			
+
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
-						
-		end;				
-	
-    
-    /*********************************    
+
+		end;
+
+
+    /*********************************
  	#TRANSACCION:  'CONTA_REPLCV_FRM'
  	#DESCRIPCION:	listado para reporte de libro de compras y ventas  desde formualrio, incialmente usar datos de endesis
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
 	ELSEIF(p_transaccion='CONTA_REPLCV_FRM')then
-     				
+
     	begin
-        
-       
+
+
            v_sincronizar = pxp.f_get_variable_global('sincronizar');
-          
-           IF v_sincronizar = 'true' THEN
+
+           SELECT gestion into v_gestion
+           FROM param.tgestion
+           WHERE id_gestion=v_parametros.id_gestion;
+
+           IF v_gestion < 2017  THEN
               v_tabla_origen = 'conta.tlcv_endesis';
            ELSE
               v_tabla_origen = 'conta.vlcv';
