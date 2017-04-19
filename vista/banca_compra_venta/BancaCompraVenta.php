@@ -1760,7 +1760,7 @@ fheight: '80%',
 	    var d = record.data
         Ext.Ajax.request({
             url:'../../sis_contabilidad/control/BancaCompraVenta/cambiarRevision',
-            params:{ id_banca_compra_venta: d.id_banca_compra_venta,revisado:d.revisado},
+            params:{ id_banca_compra_venta: d.id_banca_compra_venta,revisado:d.revisado,id_periodo: this.cmbPeriodo.getValue()},
             success: this.successRevision,
             failure: this.conexionFailure,
             timeout: this.timeout,
