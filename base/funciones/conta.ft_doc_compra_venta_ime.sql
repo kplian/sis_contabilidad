@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -45,6 +43,10 @@ DECLARE
   v_estado_rendicion		varchar;
   v_id_int_comprobante		integer;
   v_tipo_informe			varchar;
+  v_razon_social			varchar;
+  v_nit						integer;
+  v_id_moneda				varchar;
+
 
 BEGIN
 
@@ -279,20 +281,20 @@ BEGIN
         end if;
       end if;
 
-      if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-        if(v_parametros.id_punto_venta is not null) then
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia_iata')) then
+        if(v_parametros.id_agencia_iata is not null) then
 
           update conta.tdoc_compra_venta
-          set id_punto_venta = v_parametros.id_punto_venta
+          set id_agencia_iata = v_parametros.id_agencia_iata
           where id_doc_compra_venta = v_id_doc_compra_venta;
         end if;
       end if;
 
-      if (pxp.f_existe_parametro(p_tabla,'id_agencia')) then
-        if(v_parametros.id_agencia is not null) then
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia_noiata')) then
+        if(v_parametros.id_agencia_noiata is not null) then
 
           update conta.tdoc_compra_venta
-          set id_agencia = v_parametros.id_agencia
+          set id_agencia_noiata = v_parametros.id_agencia_noiata
           where id_doc_compra_venta = v_id_doc_compra_venta;
         end if;
       end if;
@@ -699,20 +701,20 @@ BEGIN
         end if;
       end if;
 
-      if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-        if(v_parametros.id_punto_venta is not null) then
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia_iata')) then
+        if(v_parametros.id_agencia_iata is not null) then
 
           update conta.tdoc_compra_venta
-          set id_punto_venta = v_parametros.id_punto_venta
+          set id_agencia_iata = v_parametros.id_agencia_iata
           where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
         end if;
       end if;
 
-      if (pxp.f_existe_parametro(p_tabla,'id_agencia')) then
-        if(v_parametros.id_agencia is not null) then
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia_noiata')) then
+        if(v_parametros.id_agencia_noiata is not null) then
 
           update conta.tdoc_compra_venta
-          set id_agencia = v_parametros.id_agencia
+          set id_agencia_noiata = v_parametros.id_agencia_noiata
           where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
         end if;
       end if;
@@ -1122,6 +1124,39 @@ BEGIN
       return v_resp;
 
     end;
+/*********************************
+ #TRANSACCION:  'CONTA_RAZONXNIT_GET'
+ #DESCRIPCION:	recuperar razon social nit
+ #AUTOR:		MMV
+ #FECHA:		19-04-2017
+***********************************/
+
+  elsif(p_transaccion='CONTA_RAZONXNIT_GET')then
+
+    begin
+    --raise EXCEPTION 'esta llegando  %',v_parametros.nit;
+    select
+        DISTINCT(dcv.nit)::bigint,
+        dcv.razon_social,
+        m.moneda
+        into
+        v_nit,
+        v_razon_social,
+        v_id_moneda
+        from conta.tdoc_compra_venta dcv
+        inner join param.tmoneda m on m.id_moneda = dcv.id_moneda
+		where dcv.nit != '' and dcv.nit like ''||COALESCE(v_parametros.nit,'-')||'%';
+      --Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transaccion Exitosa');
+      v_resp = pxp.f_agrega_clave(v_resp,'razon_social',v_razon_social::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_id_moneda::varchar);
+      --Devuelve la respuesta
+      return v_resp;
+
+    end;
+
+
+
 
   else
 
