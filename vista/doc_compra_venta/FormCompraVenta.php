@@ -1723,7 +1723,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.codigo_qr.on('specialkey',function(cmb, e){
 
-              //  if(e.getKey() == e.ENTER) {
+               // if(e.getKey() == e.ENTER) {
                     var res = cmb.getValue().split("|"),
                         plt = this.plantilla_qr.split("|");
 
@@ -1749,14 +1749,69 @@ header("content-type: text/javascript; charset=UTF-8");
 
                             if(plt[i] == 'nit'){
                                 this.cargarRazonSocial();
-                                //this.controlFechas();
-                                //var objFecha =  Date(res[3]);
+                                var mesFactura =  res[3].substring(3,5);
+                                var text, text2;
+                                var ted = this.data;
+                                var mesPeriodo = this.data.tmpPeriodo>9?this.data.tmpPeriodo:'0'+this.data.tmpPeriodo;
+                                if(mesPeriodo == '01' ){
+                                    text = "Enero";
+                                }if(mesPeriodo == '02' ){
+                                    text = "Febrero";
+                                }if(mesPeriodo == '03'){
+                                    text = "Marzo";
+                                }if(mesPeriodo == '04'){
+                                    text = "Abril";
+                                }if(mesPeriodo == '05'){
+                                    text = "Mayo";
+                                }if(mesPeriodo == '06'){
+                                    text = "Junio";
+                                }if(mesPeriodo == '07'){
+                                    text = "Julio";
+                                }if(mesPeriodo == '08'){
+                                    text = "Agosto";
+                                }if(mesPeriodo == '09'){
+                                    text = "Septiembre";
+                                }if(mesPeriodo == '10'){
+                                    text = "Octubre";
+                                }if(mesPeriodo == '11'){
+                                    text = "Noviembre";
+                                }if(mesPeriodo == '12'){
+                                    text = "Diciembre";
+                                }if(mesFactura == '01'  ){
+                                    text2 = "Enero";
+                                }if(mesFactura == '02'  ){
+                                    text2 = "Febrero";
+                                }if(mesFactura == '03'  ){
+                                    text2 = "Marzo";
+                                }if( mesFactura == '04'  ){
+                                    text2 = "Abril";
+                                }if(mesFactura == '05'  ){
+                                    text2 = "Mayo";
+                                }if(mesFactura == '06'  ){
+                                    text2 = "Junio";
+                                }if(mesFactura == '07'  ){
+                                    text2 = "Julio";
+                                }if(mesFactura == '08'  ){
+                                    text2 = "Agosto";
+                                }if(mesFactura == '09'  ){
+                                    text2 = "Septiembre";
+                                }if(mesFactura == '10'  ){
+                                    text2 = "Octubre";
+                                }if(mesFactura == '11'  ){
+                                    text2 = "Noviembre";
+                                }if(mesFactura == '12'  ){
+                                    text2 = "Diciembre";
+                                }
+                                if (mesPeriodo != mesFactura){
+                                 this.mensaje_('ALERTA', 'Actualmente se encuentra en el periodo: '+text+', la factura corresponde al periodo de: '+text2, 'ERROR');
+                                 }
 
+                                console.log('texto2 '+ted);
                             }
                         }
                         console.log(plt[i]);
                     }
-                   // }
+                   //}
                     // else{
                     // 	alert('la plantilla de array no se corresponde con el QR');
                     //  }
@@ -2178,25 +2233,16 @@ header("content-type: text/javascript; charset=UTF-8");
                         Phx.CP.loadingHide();
                         var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                         var razonSocial=objRes.ROOT.datos.razon_social;
-                        //var moneda=objRes.ROOT.datos.moneda;
                         this.getComponente('razon_social').setValue(razonSocial);
-                       // this.getComponente('id_moneda').setValue(moneda);
+                        this.Cmp.id_moneda.setValue(objRes.ROOT.datos.id_nomeda);
+                        this.Cmp.id_moneda.setRawValue(objRes.ROOT.datos.moneda);
+
                     },
                     failure: this.conexionFailure,
                     timeout: this.timeout,
                     scope:this
                 });
             }
-        },
-        controlFechas:function (n) {
-            var jh = this.data.tmpPeriodo;
-
-            var pm = this.Cmp.fecha.getValue();
-            /*if (jh != mes){
-                this.mensaje_('ALERTA', 'La factura no corresponde al mes actual', 'ERROR');
-            }*/
-
-
         },
         mensaje_: function (titulo, mensaje) {
 

@@ -45,7 +45,8 @@ DECLARE
   v_tipo_informe			varchar;
   v_razon_social			varchar;
   v_nit						integer;
-  v_id_moneda				varchar;
+  v_id_moneda				integer;
+  v_nomeda					varchar;
 
 
 BEGIN
@@ -1138,18 +1139,21 @@ BEGIN
     select
         DISTINCT(dcv.nit)::bigint,
         dcv.razon_social,
+        m.id_moneda,
         m.moneda
         into
         v_nit,
         v_razon_social,
-        v_id_moneda
+        v_id_moneda,
+        v_nomeda
         from conta.tdoc_compra_venta dcv
         inner join param.tmoneda m on m.id_moneda = dcv.id_moneda
 		where dcv.nit != '' and dcv.nit like ''||COALESCE(v_parametros.nit,'-')||'%';
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transaccion Exitosa');
       v_resp = pxp.f_agrega_clave(v_resp,'razon_social',v_razon_social::varchar);
-      v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_id_moneda::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,'id_nomeda',v_id_moneda::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_nomeda::varchar);
       --Devuelve la respuesta
       return v_resp;
 
