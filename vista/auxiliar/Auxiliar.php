@@ -29,7 +29,23 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
             scope:this
         });
 	},
-			
+
+    replicarAux: function () {
+        Ext.Ajax.request({
+            url:'../../sis_contabilidad/control/Auxiliar/conectar',
+            params:{id_usuario: 0},
+            success:function(resp){
+                var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                //this.Cmp.id_oficina_registro_incidente.setValue(reg.ROOT.datos.id_oficina);
+                console.log('cambio exitoso');
+                Ext.Msg.alert('Aviso', 'Se replico toda la informacion de Auxiliares, Evite las replicaciones seguidas');
+            },
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });
+    },
+    
 	Atributos:[
 		{
 			//configuracion del componente
@@ -244,22 +260,6 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 	bdel:true,
 	bsave:true,
 
-    replicarAux: function () {
-        Ext.Msg.alert('Replicar', 'Positivo');
-        Ext.Ajax.request({
-            url:'../../sis_contabilidad/control/Auxiliar/conectar',
-            params:{id_usuario: 0},
-            success:function(resp){
-                var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-
-                this.Cmp.id_oficina_registro_incidente.setValue(reg.ROOT.datos.id_oficina);
-
-            },
-            failure: this.conexionFailure,
-            timeout:this.timeout,
-            scope:this
-        });
-    }
 	}
 )
 </script>
