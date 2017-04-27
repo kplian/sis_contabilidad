@@ -934,7 +934,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		   {
 			   config:{
 				   name: 'nombre',
-				   fieldLabel: 'Agencia IATA',
+				   fieldLabel: 'Agencia IATA/Agencia No IATA',
 				   allowBlank: true,
 				   anchor: '80%',
 				   gwidth: 200,
@@ -950,7 +950,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		   {
 			   config:{
 				   name: 'codigo_noiata',
-				   fieldLabel: 'Codigo NO iATA',
+				   fieldLabel: 'Codigo NO IATA',
 				   allowBlank: true,
 				   anchor: '80%',
 				   gwidth: 100,

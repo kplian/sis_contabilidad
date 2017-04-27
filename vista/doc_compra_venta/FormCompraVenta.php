@@ -1727,13 +1727,13 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.codigo_qr.on('specialkey',function(cmb, e){
 
-              // if(e.getKey() == e.ENTER) {
+              if(e.getKey() == e.ENTER) {
                    var res = cmb.getValue().split("|"),
                        plt = this.plantilla_qr.split("|");
 
                    console.log('........', res, plt);
 
-                 if(res.length == 12) {
+                 //if(res.length == 12) {
 
                      for (var i = 0; i < plt.length; i++) {
 
@@ -1780,11 +1780,8 @@ header("content-type: text/javascript; charset=UTF-8");
                          }
                          console.log(plt[i]);
                      }
-                 }else {
-                     this.mensaje_('ALERTA', 'la plantilla de array no se corresponde con el QR', 'ERROR');
-
-                 }
-                   //}
+                // }
+                   }
                     // else{
                     // 	alert('la plantilla de array no se corresponde con el QR');
                     //  }

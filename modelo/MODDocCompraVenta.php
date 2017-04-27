@@ -106,7 +106,7 @@ class MODDocCompraVenta extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+		//var_dump($this->respuesta); exit;
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
@@ -245,6 +245,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->setParametro('importe_retgar','importe_retgar','numeric');
 		$this->setParametro('importe_neto','importe_neto','numeric');
 		$this->setParametro('id_auxiliar','id_auxiliar','integer');
+        $this->setParametro('id_agencia','id_agencia','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
