@@ -930,13 +930,14 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   grid:true,
 			   form:false
 		   },
+
 		   {
 			   config:{
 				   name: 'nombre',
-				   fieldLabel: 'Punto de Venta/Agencia IATA',
+				   fieldLabel: 'Agencia IATA',
 				   allowBlank: true,
 				   anchor: '80%',
-				   gwidth: 100,
+				   gwidth: 200,
 				   maxLength :16,
 				   minLength:16
 			   },
@@ -949,7 +950,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		   {
 			   config:{
 				   name: 'codigo_noiata',
-				   fieldLabel: 'Agencia No Iata',
+				   fieldLabel: 'Codigo NO iATA',
 				   allowBlank: true,
 				   anchor: '80%',
 				   gwidth: 100,
@@ -1395,7 +1396,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		                                	 id_periodo: me.cmbPeriodo.getValue(),
 		                                	 id_depto: me.cmbDepto.getValue(),
 		                                	 tmpPeriodo: me.tmpPeriodo,
-		                                	 tmpGestion: me.tmpGestion,
+                                             tmpGestion: me.tmpGestion,
 		                                	 tipo_form : tipo,
 		                                	 datosOriginales: record
 	                                    },

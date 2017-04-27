@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,13 +12,13 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tdoc_compra_venta'
  AUTOR: 		 (admin)
  FECHA:	        18-08-2015 15:57:09
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -110,7 +108,7 @@ BEGIN
                             (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto,
                             dcv.estacion,
                             dcv.id_punto_venta,
-                            pv.nombre,
+                            (ob.nombre ||'' - ''|| upper(ob.tipo_agencia))::Varchar as nombre,
                             dcv.id_agencia,
                             age.codigo_noiata
 
@@ -121,7 +119,7 @@ BEGIN
                           inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
                           left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
-                          left join vef.tpunto_venta pv on pv.id_punto_venta = dcv.id_punto_venta
+                          left join obingresos.tagencia ob on ob.id_agencia = dcv.id_agencia
                           left join obingresos.tagencia age on age.id_agencia = dcv.id_agencia
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
@@ -525,20 +523,20 @@ BEGIN
            ELSE
               v_tabla_origen = 'conta.vlcv';
            END IF;
-               
-           IF v_parametros.filtro_sql = 'periodo'  THEN           
-               v_filtro =  ' (lcv.id_periodo = '||v_parametros.id_periodo||')  ';           
+
+           IF v_parametros.filtro_sql = 'periodo'  THEN
+               v_filtro =  ' (lcv.id_periodo = '||v_parametros.id_periodo||')  ';
            ELSE
                v_filtro =  ' (lcv.fecha::Date between '''||v_parametros.fecha_ini||'''::Date  and '''||v_parametros.fecha_fin||'''::date)  ';
            END IF;
-           
-           
+
+
           IF v_parametros.tipo_lcv = 'lcv_compras'  THEN
               v_tipo = 'compra';
           ELSE
               v_tipo = 'venta';
           END IF;
-          
+
           --Sentencia de la consulta
 		  v_consulta:='SELECT id_doc_compra_venta::BIGINT,
                                tipo::Varchar,
@@ -574,40 +572,40 @@ BEGIN
                                and id_moneda = '||param.f_get_moneda_base()||'
                                and '||v_filtro||'
                         order by fecha, id_doc_compra_venta';
-			
+
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
-						
-		end;				
-	
-    /*********************************    
+
+		end;
+
+    /*********************************
  	#TRANSACCION:  'CONTA_REPLCV_ENDESIS_ERP'
  	#DESCRIPCION:	listado consolidado para reporte de libro de compras y ventas  desde formulario, tanto del endesis como del erp
- 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
  	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
 	ELSEIF(p_transaccion='CONTA_REPLCV_ENDERP')then
-     				
+
     	begin
-        
-           IF v_parametros.filtro_sql = 'periodo'  THEN           
-               v_filtro =  ' (lcv.id_periodo = '||v_parametros.id_periodo||')  ';           
+
+           IF v_parametros.filtro_sql = 'periodo'  THEN
+               v_filtro =  ' (lcv.id_periodo = '||v_parametros.id_periodo||')  ';
            ELSE
                v_filtro =  ' (lcv.fecha::Date between '''||v_parametros.fecha_ini||'''::Date  and '''||v_parametros.fecha_fin||'''::date)  ';
            END IF;
-           
+
            IF v_parametros.id_usuario != 0 THEN
            		v_filtro = v_filtro || ' and lcv.id_usuario_reg='||v_parametros.id_usuario||' ';
            END IF;
-           
+
           IF v_parametros.tipo_lcv = 'lcv_compras' or v_parametros.tipo_lcv='endesis_erp' THEN
               v_tipo = 'compra';
           ELSE
               v_tipo = 'venta';
           END IF;
-          
+
           --Sentencia de la consulta
 		  v_consulta:='SELECT id_doc_compra_venta::BIGINT,
                                tipo::Varchar,
@@ -677,22 +675,22 @@ BEGIN
                                and id_moneda = '||param.f_get_moneda_base()||'
                                and '||v_filtro||'
                         order by fecha, id_doc_compra_venta';
-			
+
 			raise notice '%', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
-						
-		end;				
-    
-    
+
+		end;
+
+
     else
-					     
+
 		raise exception 'Transaccion inexistente';
-					         
+
 	end if;
-					
+
 EXCEPTION
-					
+
 	WHEN OTHERS THEN
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);

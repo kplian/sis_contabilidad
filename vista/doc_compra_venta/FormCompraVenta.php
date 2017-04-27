@@ -1154,7 +1154,11 @@ header("content-type: text/javascript; charset=UTF-8");
                         fieldLabel: 'Nro Factura / Doc',
                         allowBlank: false,
                         anchor: '80%',
-                        maxLength:100
+                        maxLength:100,
+                        maskRe: /[0-9/-]+/i,
+                        regex: /[0-9/-]+/i
+
+
                     },
                     type:'NumberField',
                     id_grupo:1,
@@ -1268,7 +1272,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'id_agencia',
-                        fieldLabel: 'Agencia/Agencia No IATA',
+                        fieldLabel: 'Agencia IATA/Agencia No IATA',
                         allowBlank: true,
                         emptyText:'Elija una agencia...',
                         store:new Ext.data.JsonStore(
@@ -1281,15 +1285,15 @@ header("content-type: text/javascript; charset=UTF-8");
                                     direction:'ASC'
                                 },
                                 totalProperty:'total',
-                                fields: ['id_agencia','nombre','codigo_noiata','codigo'],
+                                fields: ['id_agencia','nombre','codigo_noiata','codigo','tipo_agencia'],
                                 remoteSort: true,
-                                baseParams:{par_filtro:'age.nombre#age.codigo_noiata#age.codigo', tipo_agencia: 'noiata'}
+                                baseParams:{par_filtro:'age.nombre#age.codigo_noiata#age.codigo#age.tipo_agencia', tipo_agencia: ''}
                             }),
-                        tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>Codigo Global: {codigo}</p><p>Codigo NO IATA: {codigo_noiata}</p></div></tpl>',
+                        tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>Codigo IATA: {codigo}</p><p>Codigo NO IATA: {codigo_noiata}</p></div></tpl>',
                         valueField: 'id_agencia',
                         hiddenValue: 'id_agencia',
-                        displayField: 'codigo_noiata',
-                        gdisplayField:'codigo_noiata',
+                        displayField: 'nombre',//codigo_noiata
+                        gdisplayField:'nombre',//codigo_noiata
                         listWidth:'280',
                         forceSelection:true,
                         typeAhead: false,
@@ -1660,14 +1664,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.Cmp.nro_documento.setReadOnly(false);
                 }
                 if(rec.data.sw_estacion == 'si'){
-                    this.mostrarComponente(this.Cmp.estacion);
+                    this.mostrarComponente(this.Cmp.estacion);//en
                 }
                 else{
                     this.ocultarComponente(this.Cmp.estacion);
                     this.Cmp.estacion.reset();
                 }
                 if(rec.data.sw_punto_venta == 'si'){
-                    this.mostrarComponente(this.Cmp.id_punto_venta);
+                    this.ocultarComponente(this.Cmp.id_punto_venta);// modificado
                 }
                 else{
                     this.ocultarComponente(this.Cmp.id_punto_venta);
@@ -1723,94 +1727,63 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.codigo_qr.on('specialkey',function(cmb, e){
 
-               // if(e.getKey() == e.ENTER) {
-                    var res = cmb.getValue().split("|"),
-                        plt = this.plantilla_qr.split("|");
+              // if(e.getKey() == e.ENTER) {
+                   var res = cmb.getValue().split("|"),
+                       plt = this.plantilla_qr.split("|");
 
-                    console.log('........',res,plt);
+                   console.log('........', res, plt);
 
-                    //if(plt.length == res.length) {
+                 if(res.length == 12) {
 
-                    for(var i=0; i < plt.length; i ++){
+                     for (var i = 0; i < plt.length; i++) {
 
-                        if(this.Cmp[plt[i]]){
+                         if (this.Cmp[plt[i]]) {
 
-                            if(plt[i] == 'importe_excento'){
-                                var aux = 0;
-                                if(this.Cmp[plt[i]].getValue()){
-                                    aux = this.Cmp[plt[i]].getValue();
-                                }
-                                this.Cmp[plt[i]].setValue(res[i] + aux);
-                                console.log(res[i], aux)
-                            }
-                            else{
-                                this.Cmp[plt[i]].setValue(res[i]);
-                            }
+                             if (plt[i] == 'importe_excento') {
+                                 var aux = 0;
+                                 if (this.Cmp[plt[i]].getValue()) {
+                                     aux = this.Cmp[plt[i]].getValue();
+                                 }
+                                 this.Cmp[plt[i]].setValue(res[i] + aux);
+                                 console.log(res[i], aux)
+                             }
+                             else {
+                                 this.Cmp[plt[i]].setValue(res[i]);
+                             }
 
-                            if(plt[i] == 'nit'){
-                                this.cargarRazonSocial();
-                                var mesFactura =  res[3].substring(3,5);
-                                var text, text2;
-                                var ted = this.data;
-                                var mesPeriodo = this.data.tmpPeriodo>9?this.data.tmpPeriodo:'0'+this.data.tmpPeriodo;
-                                if(mesPeriodo == '01' ){
-                                    text = "Enero";
-                                }if(mesPeriodo == '02' ){
-                                    text = "Febrero";
-                                }if(mesPeriodo == '03'){
-                                    text = "Marzo";
-                                }if(mesPeriodo == '04'){
-                                    text = "Abril";
-                                }if(mesPeriodo == '05'){
-                                    text = "Mayo";
-                                }if(mesPeriodo == '06'){
-                                    text = "Junio";
-                                }if(mesPeriodo == '07'){
-                                    text = "Julio";
-                                }if(mesPeriodo == '08'){
-                                    text = "Agosto";
-                                }if(mesPeriodo == '09'){
-                                    text = "Septiembre";
-                                }if(mesPeriodo == '10'){
-                                    text = "Octubre";
-                                }if(mesPeriodo == '11'){
-                                    text = "Noviembre";
-                                }if(mesPeriodo == '12'){
-                                    text = "Diciembre";
-                                }if(mesFactura == '01'  ){
-                                    text2 = "Enero";
-                                }if(mesFactura == '02'  ){
-                                    text2 = "Febrero";
-                                }if(mesFactura == '03'  ){
-                                    text2 = "Marzo";
-                                }if( mesFactura == '04'  ){
-                                    text2 = "Abril";
-                                }if(mesFactura == '05'  ){
-                                    text2 = "Mayo";
-                                }if(mesFactura == '06'  ){
-                                    text2 = "Junio";
-                                }if(mesFactura == '07'  ){
-                                    text2 = "Julio";
-                                }if(mesFactura == '08'  ){
-                                    text2 = "Agosto";
-                                }if(mesFactura == '09'  ){
-                                    text2 = "Septiembre";
-                                }if(mesFactura == '10'  ){
-                                    text2 = "Octubre";
-                                }if(mesFactura == '11'  ){
-                                    text2 = "Noviembre";
-                                }if(mesFactura == '12'  ){
-                                    text2 = "Diciembre";
-                                }
-                                if (mesPeriodo != mesFactura){
-                                 this.mensaje_('ALERTA', 'Actualmente se encuentra en el periodo: '+text+', la factura corresponde al periodo de: '+text2, 'ERROR');
+                             if (plt[i] == 'nit') {
+                                 this.cargarRazonSocial();
+                             }
+                             if (plt[i]=='nro_documento'){
+                                 var nro_doc = Math.floor(res[1]);
+                                 this.getComponente('nro_documento').setValue(nro_doc);
+                             }
+                             if(plt[i]=='fecha'){
+
+                                 var mesPeriodo = this.data.tmpPeriodo > 9 ? this.data.tmpPeriodo : '0' + this.data.tmpPeriodo;
+                                 var fechaInt = this.data.tmpGestion + '-' + mesPeriodo + '-' + '30';
+                                 var mesPer = new Date(fechaInt).getMonth();
+                                 var mesFactura = res[3].split("/");
+                                 var fechaFac = mesFactura[2] + '-' + mesFactura[1] + '-' + mesFactura[0];
+                                 var mesFac = new Date(fechaFac).getMonth();
+                                 var monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Mayo",
+                                     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                                 ];
+                                 var literalFactura = monthNames[mesFac];
+                                 var literalPeriodo = monthNames[mesPer];
+                                 if (mesFactura[1] != mesPeriodo) {
+                                     this.mensaje_('ALERTA', 'Actualmente se encuentra en el periodo: ' + literalPeriodo + ', la factura corresponde al periodo de: ' + literalFactura, 'ERROR');
                                  }
 
-                                console.log('texto2 '+ted);
-                            }
-                        }
-                        console.log(plt[i]);
-                    }
+                             }
+
+                         }
+                         console.log(plt[i]);
+                     }
+                 }else {
+                     this.mensaje_('ALERTA', 'la plantilla de array no se corresponde con el QR', 'ERROR');
+
+                 }
                    //}
                     // else{
                     // 	alert('la plantilla de array no se corresponde con el QR');
@@ -2234,8 +2207,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                         var razonSocial=objRes.ROOT.datos.razon_social;
                         this.getComponente('razon_social').setValue(razonSocial);
-                        this.Cmp.id_moneda.setValue(objRes.ROOT.datos.id_nomeda);
-                        this.Cmp.id_moneda.setRawValue(objRes.ROOT.datos.moneda);
+                        this.getComponente('id_moneda').setValue(1);
+                        this.getComponente('id_moneda').setRawValue('Bolivianos');
 
                     },
                     failure: this.conexionFailure,
@@ -2243,6 +2216,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     scope:this
                 });
             }
+
         },
         mensaje_: function (titulo, mensaje) {
 
