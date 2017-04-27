@@ -550,6 +550,9 @@ BEGIN
           END IF;
 
 
+          --solo va para un registro de un excel despues comentar
+          v_saldo = v_registros_json.importe_documento::numeric - v_registros_json.monto_acumulado::numeric;
+
 
           INSERT INTO conta.tbanca_compra_venta (
             num_cuenta_pago,
@@ -584,7 +587,8 @@ BEGIN
             resolucion,
             revisado,
             tramite_cuota,
-            num_contrato
+            num_contrato,
+            saldo
           ) VALUES (
             v_registros_json.num_cuenta_pago,
             v_registros_json.tipo_documento_pago::numeric,
@@ -613,12 +617,13 @@ BEGIN
             NULL,
             'importado',
             4,
-            398,
+            178,--id del proveedor
             61,
             '10-0017-15',
             'si',
             'SIN TRAMITE',
-            0
+            0,
+            v_saldo
 
 
           );
@@ -978,6 +983,12 @@ and (
               --monto_retgar_mo retencion total del monto del plan de pago
               --importe_total es el importe del documento factura
 
+
+              --validamos que el intercambio de servicio no sea por el 100% por que si no no se debe bancarizar
+              IF ((v_record_plan_pago_pxp.monto_pago - v_record_plan_pago_pxp.descuento_inter_serv) > 0)
+              THEN
+
+
               --debemos sacar que porcentaje tiene esa retencion con el monto en el plan de pago
               v_porciento_en_relacion_a_monto_total_plan_pago = (v_record_plan_pago_pxp.monto_retgar_mo * 100) /
                                                                 (v_record_plan_pago_pxp.monto_pago -
@@ -1202,7 +1213,7 @@ and (
                 );
               END IF;
 
-
+              END IF;
             END IF;
 
           END IF;
@@ -1349,68 +1360,12 @@ and (
 
         v_host:='dbname=dbendesis host=192.168.100.30 user=ende_pxp password=ende_pxp';
 
+        v_consulta = conta.f_obtener_string_documento_bancarizacion(v_periodo.gestion::INTEGER);
+
+
         --creacion de tabla temporal del endesis
 
-        v_consulta:= ' WITH tabla_temporal_documentos AS (
-              SELECT * FROM dblink(''' || v_host || ''',
-          ''select tctcomp.id_int_comprobante,
-          tctdoc.razon_social,
-          tctdoc.id_documento,
-          docval.importe_total,
-          docval.id_moneda,
-          tctdoc.nro_documento,
-          tctdoc.nro_autorizacion,
-          tctdoc.fecha_documento,
-          tctdoc.nro_nit,
-          traval.importe_debe,
-          traval.importe_gasto
-          from sci.tct_comprobante tctcomp
-          inner join sci.tct_transaccion tcttra on tcttra.id_comprobante = tctcomp.id_comprobante
-          inner JOIN sci.tct_transac_valor traval on traval.id_transaccion = tcttra.id_transaccion
-          inner join sci.tct_documento tctdoc on tctdoc.id_transaccion = tcttra.id_transaccion
-          inner join sci.tct_documento_valor docval on docval.id_documento = tctdoc.id_documento
-          where   docval.id_moneda = 1 and traval.id_moneda=1
-           ''
-                   ) AS d (id_int_comprobante integer,
-                   razon_social varchar(500),
-                    id_documento integer,
-                    importe_total numeric(10,2),
-                    id_moneda INTEGER,
-                    nro_documento bigint,
-                    nro_autorizacion VARCHAR(20),
-                    fecha_documento date,
-                    nro_nit varchar(30),
-                     importe_debe numeric(10,2),
-                     importe_gasto numeric(10,2))
-              )';
 
-        v_consulta := v_consulta || ',tabla_temporal_sigma AS (
-              SELECT * FROM dblink(''' || v_host || ''',
-          ''select tctcomp.id_int_comprobante,
-          tctcomp.id_comprobante,
-          entre.comprobante_c31,
-            traval.importe_haber,
-  traval.importe_recurso,
-          entre.fecha_entrega
-
-          from sci.tct_comprobante tctcomp
-             inner join sci.tct_transaccion tcttra on tcttra.id_comprobante = tctcomp.id_comprobante
-            inner join sci.tct_cuenta cta on cta.id_cuenta=tcttra.id_cuenta and cta.tipo_cuenta=1
-            inner join sci.tct_transac_valor traval on traval.id_transaccion = tcttra.id_transaccion and traval.id_moneda = 1
-          inner join sci.tct_entrega_comprobante entrecom on entrecom.id_comprobante = tctcomp.id_comprobante
-          inner join sci.tct_entrega entre on entre.id_entrega = entrecom.id_entrega
-
-           ''
-                   ) AS d (
-                   id_int_comprobante integer,
-
-                    id_comprobante integer,
-
-                    comprobante_c31 VARCHAR(20),
-                     importe_haber numeric(10,2),
-                   importe_recurso numeric(10,2),
-                    fecha_entrega date )
-              )';
 
 
         v_consulta:= v_consulta || 'select pg_pagado.id_plan_pago,

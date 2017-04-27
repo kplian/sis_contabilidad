@@ -266,7 +266,6 @@ class MODBancaCompraVenta extends MODbase{
 	function cambiarRevision(){
 		
 
-		
 		$id_banca_compra_venta = $this->objParam->getParametro('id_banca_compra_venta');
 		$revisado = $this->objParam->getParametro('revisado');
 		
