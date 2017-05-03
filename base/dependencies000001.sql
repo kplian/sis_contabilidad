@@ -3247,3 +3247,21 @@ ALTER TABLE conta.tfactura_airbp_concepto
     NOT DEFERRABLE;
 
 /**********************************F-DEP-RAC-CONTA-0-12/01/2017****************************************/
+
+/**********************************I-DEP-JRR-CONTA-0-02/05/2017****************************************/
+
+ALTER TABLE orga.tcargo_centro_costo
+  ADD CONSTRAINT fk_tcargo_centro_costo__id_ot FOREIGN KEY (id_ot)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE orga.tcargo_presupuesto
+  ADD CONSTRAINT fk_tcargo_presupuesto__id_ot FOREIGN KEY (id_ot)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/**********************************F-DEP-JRR-CONTA-0-02/05/2017****************************************/
