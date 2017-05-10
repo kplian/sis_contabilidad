@@ -254,7 +254,7 @@ class ACTArchivoAirbp extends ACTbase{
 		if ($error == 'error_fatal') {
 
 			$this->mensajeRes=new Mensaje();
-			$this->mensajeRes->setMensaje('ERROR','ACTColumnaCalor.php',$mensaje_completo,
+			$this->mensajeRes->setMensaje('ERROR','ACTArchivoAirbp.php',$mensaje_completo,
 					$mensaje_completo,'control');
 			//si no es error fatal proceso el archivo
 		} else {

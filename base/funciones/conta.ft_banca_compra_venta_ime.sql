@@ -1311,12 +1311,14 @@ and (
         END IF;
 
         SELECT
-          fecha_ini,
-          fecha_fin,
-          param.f_literal_periodo(id_periodo) AS periodo
+          per.fecha_ini,
+          per.fecha_fin,
+          param.f_literal_periodo(per.id_periodo) AS periodo,
+          ges.gestion
         INTO v_periodo
-        FROM param.tperiodo
-        WHERE id_periodo = v_parametros.id_periodo;
+        FROM param.tperiodo per
+          INNER JOIN param.tgestion ges on ges.id_gestion = per.id_gestion
+        WHERE per.id_periodo = v_parametros.id_periodo;
 
 
         IF  v_parametros.numero_tramite = '' THEN
