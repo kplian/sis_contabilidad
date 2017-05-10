@@ -1310,6 +1310,7 @@ and (
           RAISE EXCEPTION '%','GESTION BLOQUEADA';
         END IF;
 
+        
         SELECT
           per.fecha_ini,
           per.fecha_fin,
