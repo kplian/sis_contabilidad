@@ -3265,3 +3265,15 @@ ALTER TABLE orga.tcargo_presupuesto
     NOT DEFERRABLE;
 
 /**********************************F-DEP-JRR-CONTA-0-02/05/2017****************************************/
+
+
+/**********************************I-DEP-GSS-CONTA-0-10/05/2017****************************************/
+
+ALTER TABLE conta.tgasto_sigep
+  ADD CONSTRAINT fk_tgasto_sigep__id_archivo_sigep FOREIGN KEY (id_archivo_sigep)
+    REFERENCES conta.tgasto_sigep(id_archivo_sigep)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/**********************************F-DEP-GSS-CONTA-0-10/05/2017****************************************/

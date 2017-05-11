@@ -3583,3 +3583,38 @@ CREATE UNIQUE INDEX tauxiliar_idx1 ON conta.tauxiliar
 
 /*********************************** F-SCP-GVC-CONTA-0-04/04/2017 ****************************************/
 
+/*********************************** I-SCP-GSS-CONTA-0-10/05/2017 ****************************************/
+
+CREATE TABLE conta.tarchivo_sigep (
+  id_archivo_sigep SERIAL,
+  nombre_archivo VARCHAR,
+  extension VARCHAR,
+  url VARCHAR,
+  CONSTRAINT tarchivo_sigep_pkey PRIMARY KEY(id_archivo_sigep)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+CREATE TABLE conta.tgasto_sigep (
+  id_gasto_sigep SERIAL,
+  gestion INTEGER,
+  objeto VARCHAR(10),
+  descripcion_gasto VARCHAR(150),
+  fuente INTEGER,
+  organismo INTEGER,
+  programa INTEGER,
+  proyecto INTEGER,
+  actividad INTEGER,
+  entidad_transferencia VARCHAR(20),
+  nro_preventivo INTEGER,
+  nro_devengado INTEGER,
+  nro_comprometido INTEGER,
+  id_archivo_sigep INTEGER,
+  monto NUMERIC,
+  estado VARCHAR(10),
+  CONSTRAINT tgasto_sigep_pkey PRIMARY KEY(id_gasto_sigep)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+/*********************************** F-SCP-GSS-CONTA-0-10/05/2017 ****************************************/
