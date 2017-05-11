@@ -24,7 +24,8 @@ class MODGastoSigep extends MODbase{
 		$this->captura('programa','int4');
 		$this->captura('gestion','int4');
 		$this->captura('actividad','int4');
-		$this->captura('nro_comprobante','int4');
+		$this->captura('nro_preventivo','int4');
+		$this->captura('nro_comprometido','int4');
 		$this->captura('nro_devengado','int4');
 		$this->captura('proyecto','int4');
 		$this->captura('organismo','int4');
@@ -32,7 +33,6 @@ class MODGastoSigep extends MODbase{
 		$this->captura('estado','varchar');
 		$this->captura('descripcion_gasto','varchar');
 		$this->captura('entidad_transferencia','varchar');
-		$this->captura('nro_preventivo','int4');
 		$this->captura('fuente','int4');
 		$this->captura('objeto','varchar');
 		$this->captura('monto','numeric');
@@ -63,14 +63,14 @@ class MODGastoSigep extends MODbase{
 		$this->setParametro('programa','programa','int4');
 		$this->setParametro('gestion','gestion','int4');
 		$this->setParametro('actividad','actividad','int4');
-		$this->setParametro('nro_comprobante','nro_comprobante','int4');
+		$this->setParametro('nro_preventivo','nro_preventivo','int4');
+		$this->setParametro('nro_comprometido','nro_comprometido','int4');
 		$this->setParametro('nro_devengado','nro_devengado','int4');
 		$this->setParametro('proyecto','proyecto','int4');
 		$this->setParametro('organismo','organismo','int4');
 		$this->setParametro('estado','estado','varchar');
 		$this->setParametro('descripcion_gasto','descripcion_gasto','varchar');
 		$this->setParametro('entidad_transferencia','entidad_transferencia','varchar');
-		$this->setParametro('nro_preventivo','nro_preventivo','int4');
 		$this->setParametro('fuente','fuente','int4');
 		$this->setParametro('objeto','objeto','varchar');
 		$this->setParametro('monto','monto','numeric');
@@ -94,7 +94,8 @@ class MODGastoSigep extends MODbase{
 		$this->setParametro('programa','programa','int4');
 		$this->setParametro('gestion','gestion','int4');
 		$this->setParametro('actividad','actividad','int4');
-		$this->setParametro('nro_comprobante','nro_comprobante','int4');
+		$this->setParametro('nro_preventivo','nro_preventivo','int4');
+		$this->setParametro('nro_comprometido','nro_comprometido','int4');
 		$this->setParametro('nro_devengado','nro_devengado','int4');
 		$this->setParametro('proyecto','proyecto','int4');
 		$this->setParametro('organismo','organismo','int4');
@@ -102,7 +103,6 @@ class MODGastoSigep extends MODbase{
 		$this->setParametro('estado','estado','varchar');
 		$this->setParametro('descripcion_gasto','descripcion_gasto','varchar');
 		$this->setParametro('entidad_transferencia','entidad_transferencia','varchar');
-		$this->setParametro('nro_preventivo','nro_preventivo','int4');
 		$this->setParametro('fuente','fuente','int4');
 		$this->setParametro('objeto','objeto','varchar');
 		$this->setParametro('monto','monto','numeric');

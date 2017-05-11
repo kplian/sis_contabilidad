@@ -13,8 +13,12 @@ class ACTGastoSigep extends ACTbase{
 			
 	function listarGastoSigep(){
 		$this->objParam->defecto('ordenacion','id_gasto_sigep');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
+
+		if($this->objParam->getParametro('id_archivo_sigep')!=''){
+			$this->objParam->addFiltro("gtsg.id_archivo_sigep = ".$this->objParam->getParametro('id_archivo_sigep'));
+		}
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODGastoSigep','listarGastoSigep');
@@ -49,6 +53,7 @@ class ACTGastoSigep extends ACTbase{
 
 		$arregloFiles = $this->objParam->getArregloFiles();
 		$ext = pathinfo($arregloFiles['archivo']['name']);
+		$nombreArchivo = $ext['filename'];
 		$extension = $ext['extension'];
 
 		$error = 'no';
@@ -67,6 +72,10 @@ class ACTGastoSigep extends ACTbase{
 			$arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
 			//var_dump($arrayArchivo); exit;
 			foreach ($arrayArchivo as $fila) {
+				if($fila['nro_preventivo'] == NULL || $fila['nro_preventivo']==0){
+					$mensaje_completo = "Error el archivo no cuenta con numero de preventivo";
+					$error = 'error_fatal';
+				}
 				$this->objParam->addParametro('gestion', $fila['gestion']);
 				$this->objParam->addParametro('objeto', $fila['objeto']);
 				$this->objParam->addParametro('descripcion_gasto', $fila['descripcion_gasto']);
@@ -76,7 +85,7 @@ class ACTGastoSigep extends ACTbase{
 				$this->objParam->addParametro('proyecto', $fila['proyecto'] == NULL ? 0 : $fila['proyecto']);
 				$this->objParam->addParametro('actividad', $fila['actividad'] == NULL ? 0 : $fila['actividad']);
 				$this->objParam->addParametro('nro_preventivo', $fila['nro_preventivo'] == NULL ? 0 : $fila['nro_preventivo']);
-				$this->objParam->addParametro('nro_comprobante', $fila['nro_comprobante'] == NULL ? 0 : $fila['nro_comprobante']);
+				$this->objParam->addParametro('nro_comprometido', $fila['nro_comprometido'] == NULL ? 0 : $fila['nro_comprometido']);
 				$this->objParam->addParametro('nro_devengado', $fila['nro_devengado'] == NULL ? 0 : $fila['nro_devengado']);
 				$this->objParam->addParametro('entidad_transferencia', $fila['entidad_transferencia'] == NULL ? 0 : $fila['entidad_transferencia']);
 				$this->objParam->addParametro('monto', $fila['monto'] == NULL ? 0.00 : $fila['monto']);
@@ -90,7 +99,7 @@ class ACTGastoSigep extends ACTbase{
 			}
 
 			//upload directory
-			$upload_dir = "/tmp/";
+			$upload_dir = "../../../sis_contabilidad/archivos/";
 			//create file name
 			$file_path = $upload_dir . $arregloFiles['archivo']['name'];
 
@@ -99,6 +108,16 @@ class ACTGastoSigep extends ACTbase{
 				//error moving upload file
 				$mensaje_completo = "Error al guardar el archivo en disco";
 				$error = 'error_fatal';
+			}else{
+				$this->objParam->addParametro('nombre_archivo', $nombreArchivo);
+				$this->objParam->addParametro('extension', $extension);
+				$this->objParam->addParametro('url', $file_path);
+				$this->objFunc = $this->create('sis_contabilidad/MODArchivoSigep');
+				$this->res = $this->objFunc->insertarArchivoSigep($this->objParam);
+				if($this->res->getTipo()=='ERROR'){
+					$error = 'error';
+					$mensaje_completo = "Error al guardar el archivo en la tabla ". $this->res->getMensajeTec();
+				}
 			}
 			// }
 		} else {
