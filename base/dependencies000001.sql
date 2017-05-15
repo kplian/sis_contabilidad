@@ -3232,3 +3232,80 @@ AS
   
    
 
+
+/**********************************I-DEP-RAC-CONTA-0-12/05/2017****************************************/
+
+
+CREATE OR REPLACE VIEW conta.vorden_trabajo(
+    id_orden_trabajo,
+    estado_reg,
+    fecha_final,
+    fecha_inicio,
+    desc_orden,
+    motivo_orden,
+    fecha_reg,
+    id_usuario_reg,
+    id_usuario_mod,
+    fecha_mod,
+    usr_reg,
+    usr_mod,
+    id_grupo_ots,
+    id_orden_trabajo_fk,
+    tipo,
+    movimiento,
+    codigo,
+    descripcion)
+AS
+  SELECT odt.id_orden_trabajo,
+         odt.estado_reg,
+         odt.fecha_final,
+         odt.fecha_inicio,
+         odt.desc_orden,
+         odt.motivo_orden,
+         odt.fecha_reg,
+         odt.id_usuario_reg,
+         odt.id_usuario_mod,
+         odt.fecha_mod,
+         usu1.cuenta AS usr_reg,
+         usu2.cuenta AS usr_mod,
+         pxp.aggarray(god.id_grupo_ot) AS id_grupo_ots,
+         odt.id_orden_trabajo_fk,
+         odt.tipo,
+         odt.movimiento,
+         odt.codigo,
+         (COALESCE(odt.codigo, ''::character varying)::text || ' '::text) ||
+           odt.desc_orden::text AS descripcion
+  FROM conta.torden_trabajo odt
+       JOIN segu.tusuario usu1 ON usu1.id_usuario = odt.id_usuario_reg
+       LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = odt.id_usuario_mod
+       LEFT JOIN conta.tgrupo_ot_det god ON god.id_orden_trabajo =
+         odt.id_orden_trabajo AND god.estado_reg::text = 'activo'::text
+  WHERE odt.estado_reg::text = 'activo'::text
+  GROUP BY odt.id_orden_trabajo,
+           odt.estado_reg,
+           odt.fecha_final,
+           odt.fecha_inicio,
+           odt.desc_orden,
+           odt.motivo_orden,
+           odt.fecha_reg,
+           odt.id_usuario_reg,
+           odt.id_usuario_mod,
+           odt.fecha_mod,
+           usu1.cuenta,
+           usu2.cuenta;
+           
+           
+           
+           
+ --------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD CONSTRAINT torden_trabajo_fk FOREIGN KEY (id_orden_trabajo_fk)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE; 
+   
+/**********************************F-DEP-RAC-CONTA-0-12/05/2017****************************************/
+
+

@@ -3475,5 +3475,47 @@ ALTER TABLE conta.tentrega
   
   
 /***********************************F-SCP-RAC-CONTA-0-20/02/2017 ****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-12/05/2017****************************************/
+
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD COLUMN id_orden_trabajo_fk INTEGER;
+
+COMMENT ON COLUMN conta.torden_trabajo.id_orden_trabajo_fk
+IS 'las ordene de trabajo se convierten en arbol, para poder estructurar un arbold e costos';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD COLUMN tipo VARCHAR(20) DEFAULT 'estadistica' NOT NULL;
+
+COMMENT ON COLUMN conta.torden_trabajo.tipo
+IS 'tipo de ordenes,   centro, pep, orden, estadistica';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD COLUMN movimiento VARCHAR(5) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN conta.torden_trabajo.movimiento
+IS 'los nodos de movimeitnos con movimiento se usan en las diferentes transacciones en caso contrario son solo agrupadores';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD COLUMN codigo VARCHAR(100) DEFAULT '' NOT NULL;
+
+
+/***********************************F-SCP-RAC-CONTA-0-12/05/2017****************************************/
+
   
 
