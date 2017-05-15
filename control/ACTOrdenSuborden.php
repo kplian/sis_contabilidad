@@ -13,6 +13,11 @@ class ACTOrdenSuborden extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_orden_suborden');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		if($this->objParam->getParametro('id_orden_trabajo')!=''){
+			$this->objParam->addFiltro("orsuo.id_orden_trabajo = ".$this->objParam->getParametro('id_orden_trabajo'));	
+		}
+		
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODOrdenSuborden','listarOrdenSuborden');
