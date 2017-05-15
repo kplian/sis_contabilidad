@@ -3515,7 +3515,44 @@ ALTER TABLE conta.torden_trabajo
   ADD COLUMN codigo VARCHAR(100) DEFAULT '' NOT NULL;
 
 
+
+
 /***********************************F-SCP-RAC-CONTA-0-12/05/2017****************************************/
 
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-15/05/2017****************************************/
+
+
+CREATE TABLE conta.tsuborden (
+  id_suborden SERIAL,
+  codigo VARCHAR(200) NOT NULL,
+  nombre VARCHAR,
+  estado VARCHAR(30) DEFAULT 'vigente'::character varying NOT NULL,
+  CONSTRAINT tsuborden_pkey PRIMARY KEY(id_suborden)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tsuborden.estado
+IS 'vigente o cerrada';
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.torden_suborden (
+  id_orden_suborden SERIAL NOT NULL,
+  id_orden_trabajo INTEGER NOT NULL,
+  id_suborden INTEGER NOT NULL,
+  PRIMARY KEY(id_orden_suborden)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+
+/***********************************F-SCP-RAC-CONTA-0-15/05/2017****************************************/
+
+  
   
 

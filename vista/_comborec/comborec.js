@@ -131,7 +131,48 @@ Phx.comborec.sis_contabilidad.configini = function (config){
                minChars:2
             }
 	}
-
+	if (config.origen == 'SUBORDEN') {
+		return {
+			    origen: 'SUBORDEN',
+			    name: 'id_suborden',
+                tinit:false,
+			    tasignacion:true,
+			    resizable:true,
+			    fieldLabel: 'Suborden',
+				allowBlank: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/Suborden/listarSuborden',
+					id: 'id_suborden',
+					root: 'datos',
+					sortInfo: {
+						field: 'nombre',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_suborden', 'nombre', 'codigo'],
+					remoteSort: true,
+					baseParams:Ext.apply({par_filtro: 'suo.nombre#suo.codigo'}, config.baseParams)
+					
+				}),
+				valueField: 'id_suborden',
+				displayField: 'nombre',
+				gdisplayField: 'desc_suborden',
+				hiddenName: 'id_suborden',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '100%',
+				listWidth:'280',
+				gwidth: 150,
+				minChars: 2
+             }     
+             
+	}
 
 }
 	    		

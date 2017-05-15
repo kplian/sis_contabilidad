@@ -276,6 +276,15 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},'tipo','movimiento','codigo','descripcion','id_orden_trabajo_fk'
 		
 	],
+	
+	tabeast:[
+		  {
+    		  url:'../../../sis_contabilidad/vista/orden_suborden/OrdenSuborden.php',
+    		  title:'Subordenes', 
+    		  width:'60%',
+    		  cls:'OrdenSuborden'
+		  }
+		],
 	sortInfo:{
 		field: 'id_orden_trabajo',
 		direction: 'ASC'

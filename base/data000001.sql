@@ -1211,3 +1211,23 @@ VALUES
 
 
 
+/**********************************I-DAT-RAC-CONTA-1-15/05/2017*****************************************/
+
+
+
+select pxp.f_insert_tgui ('Ordenes de Costo', 'Ordenes de Costo', 'ORDARB', 'si', 1, 'sis_contabilidad/vista/orden_trabajo/OrdenTrabajoArb.php', 3, '', 'OrdenTrabajoArb', 'CONTA');
+select pxp.f_insert_tgui ('Subordenes', 'Subordenes', 'SUOINT', 'si', 4, 'sis_contabilidad/vista/suborden/Suborden.php', 3, '', 'Suborden', 'CONTA');
+select pxp.f_insert_testructura_gui ('ORDARB', 'CROT');
+select pxp.f_insert_testructura_gui ('SUOINT', 'CROT');
+
+
+
+/**********************************F-DAT-RAC-CONTA-1-15/05/2017*****************************************/
+
+
+
+
+
+
+
+
