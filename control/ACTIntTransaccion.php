@@ -115,18 +115,14 @@ class ACTIntTransaccion extends ACTbase{
 			$this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));	
 		}
 		
-		/*
-		if($this->objParam->getParametro('id_cuenta')!=''){
-			$this->objParam->addFiltro("transa.id_cuenta = ".$this->objParam->getParametro('id_cuenta'));	
-		}
-		*/
+		
 		 
 		if($this->objParam->getParametro('id_partida')!=''){
 			$this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));	
 		}
 		
-		if($this->objParam->getParametro('id_orden_trabajo')!=''){
-			$this->objParam->addFiltro("transa.id_orden_trabajo = ".$this->objParam->getParametro('id_orden_trabajo'));	
+		if($this->objParam->getParametro('id_suborden')!=''){
+			$this->objParam->addFiltro("transa.id_subordeno = ".$this->objParam->getParametro('id_suborden'));	
 		}
 		
 		
@@ -170,6 +166,8 @@ class ACTIntTransaccion extends ACTbase{
 		$temp = Array();
 		$temp['importe_debe_mb'] = $this->res->extraData['total_debe'];
 		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
+		$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
+		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_int_transaccion'] = 0;
 		

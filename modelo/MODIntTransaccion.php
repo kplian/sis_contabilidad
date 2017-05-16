@@ -230,10 +230,13 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('id_moneda','id_moneda','int4');
 		$this->setParametro('id_cuenta','id_cuenta','int4');
 		$this->setParametro('id_partida','id_partida','int4');
+		$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
 		
 		//captura parametros adicionales para el count
 		$this->capturaCount('total_debe','numeric');
 		$this->capturaCount('total_haber','numeric');
+		$this->capturaCount('total_debe_mt','numeric');
+		$this->capturaCount('total_haber_mt','numeric');
 		
 				
 		//Definicion de la lista del resultado del query
@@ -253,10 +256,17 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		
 		$this->captura('importe_debe_mb','numeric');	
 		$this->captura('importe_haber_mb','numeric');
 		$this->captura('importe_gasto_mb','numeric');
 		$this->captura('importe_recurso_mb','numeric');
+		
+		$this->captura('importe_debe_mt','numeric');	
+		$this->captura('importe_haber_mt','numeric');
+		$this->captura('importe_gasto_mt','numeric');
+		$this->captura('importe_recurso_mt','numeric');
+		
 		$this->captura('desc_partida','text');
 		$this->captura('desc_centro_costo','text');
 		$this->captura('desc_cuenta','text');

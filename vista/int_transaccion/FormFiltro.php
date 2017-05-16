@@ -145,11 +145,25 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
         {
             config:{
                     name: 'id_orden_trabajo',
-                    fieldLabel: 'Orden Trabajo',
+                    fieldLabel: 'Ordenes',
+                    tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{codigo}</b></p><p>{desc_orden}</p> <p>Tipo:{tipo}</p></div></tpl>',
                     sysorigen: 'sis_contabilidad',
 	       		    origen: 'OT',
                     allowBlank: true,
                     gwidth: 200,
+                    store : new Ext.data.JsonStore({
+                            url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajoAll',
+                            id : 'id_orden_trabajo',
+                            root: 'datos',
+                            sortInfo:{
+                                    field: 'motivo_orden',
+                                    direction: 'ASC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden','codigo','tipo'],
+                            remoteSort: true,
+                            baseParams:{par_filtro:'desc_orden#motivo_orden'}
+                    }),
                     width: 150
             
             },
@@ -157,6 +171,25 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
             id_grupo: 0,
             form: true
         },
+         {
+            config:{
+                    name:'id_suborden',
+                    fieldLabel: 'Suborden',
+                    sysorigen:'sis_contabilidad',
+	       		    origen:'SUBORDEN',
+                    allowBlank:true,
+                    gwidth:200,
+                    width: 150,
+   				    listWidth: 380
+            
+            },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'suo.codigo#suo.nombre',type:'string'},
+            grid:false,
+            form:true
+        },
+        
         {
 			config: {
 				name: 'nro_tramite',

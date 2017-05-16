@@ -97,9 +97,9 @@ Phx.comborec.sis_contabilidad.configini = function (config){
 			 tasignacion:true,
 			 resizable:true,
 			 name: 'id_orden_trabajo',
-             fieldLabel: 'Orden Trabajo',
+             fieldLabel: 'Orden de Costo',
              allowBlank: true,
-             emptyText : 'OT...',
+             emptyText : 'Ordenes...',
              store : new Ext.data.JsonStore({
                             url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
                             id : 'id_orden_trabajo',
