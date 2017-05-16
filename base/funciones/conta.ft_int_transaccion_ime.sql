@@ -134,7 +134,8 @@ BEGIN
                 tipo_cambio,
                 tipo_cambio_2,
                 id_moneda,
-                id_moneda_tri
+                id_moneda_tri,
+                id_suborden
                 
           	) values(
                 v_parametros.id_partida,
@@ -157,7 +158,8 @@ BEGIN
                 v_parametros.tipo_cambio,
                 v_parametros.tipo_cambio_2,
                 v_registros.id_moneda,
-                v_registros.id_moneda_tri
+                v_registros.id_moneda_tri,
+                v_parametros.id_suborden
 			)RETURNING id_int_transaccion into v_id_int_transaccion;
             
             
@@ -275,7 +277,8 @@ BEGIN
               importe_debe = v_parametros.importe_debe,
               importe_haber = v_parametros.importe_haber,
               importe_gasto = v_monto_gasto,
-              importe_recurso = v_monto_recurso
+              importe_recurso = v_monto_recurso,
+              id_suborden = v_parametros.id_suborden
              
 			where id_int_transaccion = v_parametros.id_int_transaccion;
             

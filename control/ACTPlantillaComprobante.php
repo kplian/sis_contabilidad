@@ -90,7 +90,7 @@ class ACTPlantillaComprobante extends ACTbase{
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL.NULL);\r\n");
+							NULL,NULL,NULL,NULL,NULL,NULL);\r\n");
 							
 				} else {
 					fwrite ($file, 
@@ -124,7 +124,8 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['campo_depto_libro'])?'NULL':"'".$row['campo_depto_libro']."'")."," .							 
 							 (is_null($row['campo_fecha_costo_ini'])?'NULL':"'".$row['campo_fecha_costo_ini']."'") ."," .							 
 							 (is_null($row['campo_fecha_costo_fin'])?'NULL':"'".$row['campo_fecha_costo_fin']."'")."," .
-							 (is_null($row['funcion_comprobante_editado'])?'NULL':"'".$row['funcion_comprobante_editado']."'").");\r\n");			
+							 (is_null($row['funcion_comprobante_editado'])?'NULL':"'".$row['funcion_comprobante_editado']."'")."," .
+							 (is_null($row['desc_plantilla'])?'NULL':"'".$row['desc_plantilla']."'").");\r\n");				
 							 
 							 	
 				}
@@ -141,7 +142,7 @@ class ACTPlantillaComprobante extends ACTbase{
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,NULL);\r\n");	
+							NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);\r\n");	
 	
 			} else {
 					
@@ -185,8 +186,12 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['prioridad_documento'])?'NULL':"'".$row['prioridad_documento']."'") ."," .
 							 (is_null($row['campo_orden_trabajo'])?'NULL':"'".$row['campo_orden_trabajo']."'") ."," .
 							 (is_null($row['tabla_detalle'])?'NULL':"'".$row['tabla_detalle']."'") ."," .
-							 (is_null($row['codigo_fk'])?'NULL':"'".$row['codigo_fk']."'")."," .							 
-							 (is_null($row['campo_forma_pago'])?'NULL':"'".$row['campo_forma_pago']."'") .");\r\n");
+							 (is_null($row['codigo_fk'])?'NULL':"'".$row['codigo_fk']."'")."," .
+							 (is_null($row['campo_forma_pago'])?'NULL':"'".$row['campo_forma_pago']."'")."," .	
+							 
+							 (is_null($row['tipo_relacion_contable_cc'])?'NULL':"'".$row['tipo_relacion_contable_cc']."'")."," .
+							 (is_null($row['campo_relacion_contable_cc'])?'NULL':"'".$row['campo_relacion_contable_cc']."'")."," .	
+							 (is_null($row['campo_suborden'])?'NULL':"'".$row['campo_suborden']."'") .");\r\n");
 							 
 							 						
 				}

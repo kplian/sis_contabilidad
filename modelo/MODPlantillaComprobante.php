@@ -59,6 +59,8 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('funcion_comprobante_editado','text');
 		$this->captura('funcion_comprobante_prevalidado','text');
 		$this->captura('funcion_comprobante_validado_eliminado','text');
+		$this->captura('desc_plantilla','varchar');
+		
 		
         //Ejecuta la instruccion
 		$this->armarConsulta();
@@ -110,6 +112,9 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('funcion_comprobante_editado','funcion_comprobante_editado','text');
 		$this->setParametro('funcion_comprobante_prevalidado','funcion_comprobante_prevalidado','text');
 		$this->setParametro('funcion_comprobante_validado_eliminado','funcion_comprobante_validado_eliminado','text');
+		
+		$this->setParametro('desc_plantilla','desc_plantilla','varchar');
+		
 		
 		
 		
@@ -165,6 +170,7 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('funcion_comprobante_editado','funcion_comprobante_editado','text');
 		$this->setParametro('funcion_comprobante_prevalidado','funcion_comprobante_prevalidado','text');
 		$this->setParametro('funcion_comprobante_validado_eliminado','funcion_comprobante_validado_eliminado','text');
+		$this->setParametro('desc_plantilla','desc_plantilla','varchar');
 		
 		
         
@@ -241,6 +247,8 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('campo_fecha_costo_ini','text');
 			$this->captura('campo_fecha_costo_fin','text');
 			$this->captura('funcion_comprobante_editado','text');
+			$this->captura('desc_plantilla','varchar');
+			
 		
 		$this->armarConsulta();	
 		
@@ -307,9 +315,16 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('prioridad_documento','integer');
 			$this->captura('campo_orden_trabajo','varchar');
 			$this->captura('campo_forma_pago','varchar');
+			
+			
 			$this->captura('codigo_plantilla','varchar');
 		    $this->captura('codigo','varchar');
-			$this->captura('codigo_fk','varchar');
+			$this->captura('codigo_fk','varchar');	
+					
+			
+			$this->captura('tipo_relacion_contable_cc','varchar');
+		    $this->captura('campo_relacion_contable_cc','text');
+			$this->captura('campo_suborden','varchar');
 			
 		
 			

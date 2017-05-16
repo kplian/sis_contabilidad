@@ -82,6 +82,12 @@ class MODIntTransaccion extends MODbase{
 		
 		$this->captura('actualizacion','varchar');
 		$this->captura('triangulacion','varchar');
+		$this->captura('id_suborden','int4');
+		$this->captura('desc_suborden','varchar');
+		$this->captura('codigo_ot','varchar');
+		
+		
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -121,6 +127,7 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('id_moneda','id_moneda','INTEGER');
         $this->setParametro('tipo_cambio','tipo_cambio','numeric');
         $this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
+		$this->setParametro('id_suborden','id_suborden','int4');
 		
 
 		//Ejecuta la instruccion
@@ -162,6 +169,7 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('id_moneda','id_moneda','INTEGER');
         $this->setParametro('tipo_cambio','tipo_cambio','numeric');
         $this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
+		$this->setParametro('id_suborden','id_suborden','int4');
 		
 		
 

@@ -165,8 +165,7 @@ Phx.comborec.sis_contabilidad.configini = function (config){
 				lazyRender: true,
 				mode: 'remote',
 				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
+				queryDelay: 1000,				
 				listWidth:'280',
 				gwidth: 150,
 				minChars: 2

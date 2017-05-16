@@ -40,7 +40,10 @@ CREATE OR REPLACE FUNCTION conta.f_import_tdetalle_plantilla_comprobante (
   p_campo_orden_trabajo varchar,
   p_tabla_detalle varchar,
   p_codigo_fk varchar,
-  p_campo_forma_pago varchar
+  p_campo_forma_pago varchar,
+  p_tipo_relacion_contable_cc varchar = ''::character varying,
+  p_campo_relacion_contable_cc varchar = ''::character varying,
+  p_campo_suborden varchar = ''::character varying
 )
 RETURNS varchar AS
 $body$
@@ -125,7 +128,10 @@ BEGIN
                 prioridad_documento,
                 campo_orden_trabajo,
                 campo_forma_pago,
-                codigo
+                codigo,
+                tipo_relacion_contable_cc,
+                campo_relacion_contable_cc,
+                campo_suborden
           	) values(
                 v_id_plantilla_comprobante,
                 p_debe_haber,
@@ -170,7 +176,10 @@ BEGIN
                 p_prioridad_documento::INTEGER,
                 p_campo_orden_trabajo,
                 p_campo_forma_pago,
-                p_codigo
+                p_codigo,
+                p_tipo_relacion_contable_cc,
+                p_campo_relacion_contable_cc,
+                p_campo_suborden
 			);
            
                 
@@ -215,7 +224,10 @@ BEGIN
               prioridad_documento = p_prioridad_documento::INTEGER,
               campo_orden_trabajo = p_campo_orden_trabajo,
               campo_forma_pago = p_campo_forma_pago,
-              codigo = p_codigo
+              codigo = p_codigo,
+              tipo_relacion_contable_cc = p_tipo_relacion_contable_cc ,
+              campo_relacion_contable_cc = p_campo_relacion_contable_cc,
+              campo_suborden = p_campo_suborden
 			where id_detalle_plantilla_comprobante=v_id_detalle_plantilla_comprobante;
              
               

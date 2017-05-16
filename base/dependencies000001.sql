@@ -3309,3 +3309,44 @@ ALTER TABLE conta.torden_trabajo
 /**********************************F-DEP-RAC-CONTA-0-12/05/2017****************************************/
 
 
+
+/**********************************I-DEP-RAC-CONTA-0-15/05/2017****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT tint_transaccion__id_suborden_fk FOREIGN KEY (id_suborden)
+    REFERENCES conta.tsuborden(id_suborden)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+    
+    --------------- SQL ---------------
+
+ALTER TABLE conta.torden_suborden
+  ADD CONSTRAINT torden_suborden__id_suborden_fk FOREIGN KEY (id_suborden)
+    REFERENCES conta.tsuborden(id_suborden)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+    
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_suborden
+  ADD CONSTRAINT torden_suborden__id_orden_trabajo_fk FOREIGN KEY (id_orden_trabajo)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+    
+        
+
+
+/**********************************F-DEP-RAC-CONTA-0-15/05/2017****************************************/
+
+
+
+

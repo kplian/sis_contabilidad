@@ -3555,4 +3555,48 @@ WITH (oids = false);
 
   
   
+/***********************************I-SCP-RAC-CONTA-1-15/05/2017****************************************/
+  
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_suborden INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_suborden
+IS 'agruapdor de costos del tipo suborden';
+
+
+  
+/***********************************F-SCP-RAC-CONTA-1-15/05/2017****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-16/05/2017****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN desc_plantilla VARCHAR DEFAULT '' NOT NULL;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.desc_plantilla
+IS 'descripcion de la plantilla del comprobante, explica de que se trata';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_suborden VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_suborden
+IS 'para la definicion de usbordenes';
+
+
+  
+/***********************************F-SCP-RAC-CONTA-1-16/05/2017****************************************/
+
+
+
+
+
 

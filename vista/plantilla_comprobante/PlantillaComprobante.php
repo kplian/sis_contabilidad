@@ -73,6 +73,24 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		
+		{
+			config:{
+				name: 'desc_plantilla',
+				fieldLabel: 'Descripcion',
+				qtip:'Describe la utilidad de esta plantilla de comprobante, (no influye en el contenido del comprobante)',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:200
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.desc_plantilla',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		
 		{
            config:{
                 name:'momento_presupuestario',
@@ -675,7 +693,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 	    'campo_fecha_costo_ini',
 	    'campo_fecha_costo_fin',
 	    'funcion_comprobante_editado','funcion_comprobante_prevalidado',
-	    'funcion_comprobante_validado_eliminado'
+	    'funcion_comprobante_validado_eliminado','desc_plantilla'
         
 		
 	],
