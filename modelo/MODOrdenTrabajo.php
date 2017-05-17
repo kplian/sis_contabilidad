@@ -137,6 +137,9 @@ function listarOrdenTrabajoAll(){
 		$this->setParametro('fecha_inicio','fecha_inicio','date');
 		$this->setParametro('desc_orden','desc_orden','varchar');
 		$this->setParametro('motivo_orden','motivo_orden','varchar');
+		$this->setParametro('tipo','tipo','varchar');
+		$this->setParametro('movimiento','movimiento','varchar');
+		$this->setParametro('codigo','codigo','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -159,6 +162,9 @@ function listarOrdenTrabajoAll(){
 		$this->setParametro('fecha_inicio','fecha_inicio','date');
 		$this->setParametro('desc_orden','desc_orden','varchar');
 		$this->setParametro('motivo_orden','motivo_orden','varchar');
+		$this->setParametro('tipo','tipo','varchar');
+		$this->setParametro('movimiento','movimiento','varchar');
+		$this->setParametro('codigo','codigo','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

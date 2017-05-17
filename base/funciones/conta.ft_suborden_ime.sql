@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_suborden_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_suborden_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_suborden_ime
@@ -26,7 +31,8 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_suborden	integer;
+	v_id_suborden			integer;
+    v_registros				record;
 			    
 BEGIN
 
@@ -43,29 +49,39 @@ BEGIN
 	if(p_transaccion='CONTA_SUO_INS')then
 					
         begin
+           
+           IF EXISTS(
+              select 
+               1
+              from conta.tsuborden suo 
+              where suo.codigo = upper(v_parametros.codigo) 
+                    and suo.estado_reg = 'activo') THEN                  
+               raise exception 'ya existe otra suborden con el código %',v_parametros.codigo;      
+            END IF;  
+        
         	--Sentencia de la insercion
         	insert into conta.tsuborden(
-			estado_reg,
-			estado,
-			nombre,
-			codigo,
-			id_usuario_reg,
-			fecha_reg,
-			usuario_ai,
-			id_usuario_ai,
-			id_usuario_mod,
-			fecha_mod
+                estado_reg,
+                estado,
+                nombre,
+                codigo,
+                id_usuario_reg,
+                fecha_reg,
+                usuario_ai,
+                id_usuario_ai,
+                id_usuario_mod,
+                fecha_mod
           	) values(
-			'activo',
-			v_parametros.estado,
-			v_parametros.nombre,
-			v_parametros.codigo,
-			p_id_usuario,
-			now(),
-			v_parametros._nombre_usuario_ai,
-			v_parametros._id_usuario_ai,
-			null,
-			null
+                'activo',
+                v_parametros.estado,
+                v_parametros.nombre,
+                upper(v_parametros.codigo),
+                p_id_usuario,
+                now(),
+                v_parametros._nombre_usuario_ai,
+                v_parametros._id_usuario_ai,
+                null,
+                null
 							
 			
 			
@@ -90,15 +106,25 @@ BEGIN
 	elsif(p_transaccion='CONTA_SUO_MOD')then
 
 		begin
+        
+            IF EXISTS(
+              select 
+               1
+              from conta.tsuborden suo 
+              where suo.codigo = upper(v_parametros.codigo) 
+                    and suo.estado_reg = 'activo'
+                    and suo.id_suborden != v_parametros.id_suborden ) THEN                  
+               raise exception 'ya existe otra suborden con el código %',v_parametros.codigo;      
+            END IF; 
 			--Sentencia de la modificacion
 			update conta.tsuborden set
-			estado = v_parametros.estado,
-			nombre = v_parametros.nombre,
-			codigo = v_parametros.codigo,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+                estado = v_parametros.estado,
+                nombre = v_parametros.nombre,
+                codigo = upper(v_parametros.codigo),
+                id_usuario_mod = p_id_usuario,
+                fecha_mod = now(),
+                id_usuario_ai = v_parametros._id_usuario_ai,
+                usuario_ai = v_parametros._nombre_usuario_ai
 			where id_suborden=v_parametros.id_suborden;
                
 			--Definicion de la respuesta
@@ -149,7 +175,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_suborden_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

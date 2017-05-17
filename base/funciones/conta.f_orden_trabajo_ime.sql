@@ -51,29 +51,44 @@ BEGIN
 	if(p_transaccion='CONTA_ODT_INS')then
 					
         begin
+        
+            IF EXISTS(
+              select 
+               1
+              from conta.torden_trabajo ot 
+              where ot.codigo = upper(v_parametros.codigo) 
+                    and ot.estado_reg = 'activo') THEN                  
+               raise exception 'ya existe otra orden con el código %',v_parametros.codigo;      
+            END IF;
         	
         	
             --Sentencia de la insercion
         	insert into conta.torden_trabajo(
-			estado_reg,
-			fecha_final,
-			fecha_inicio,
-			desc_orden,
-			motivo_orden,
-			fecha_reg,
-			id_usuario_reg,
-			id_usuario_mod,
-			fecha_mod
+                estado_reg,
+                fecha_final,
+                fecha_inicio,
+                desc_orden,
+                motivo_orden,
+                fecha_reg,
+                id_usuario_reg,
+                id_usuario_mod,
+                fecha_mod,
+                codigo,
+                tipo,
+                movimiento
           	) values(
-			'activo',
-			v_parametros.fecha_final,
-			v_parametros.fecha_inicio,
-			v_parametros.desc_orden,
-			v_parametros.motivo_orden,
-			now(),
-			p_id_usuario,
-			null,
-			null
+                'activo',
+                v_parametros.fecha_final,
+                v_parametros.fecha_inicio,
+                v_parametros.desc_orden,
+                v_parametros.motivo_orden,
+                now(),
+                p_id_usuario,
+                null,
+                null,
+                upper(v_parametros.codigo),
+                v_parametros.tipo,
+                v_parametros.movimiento
 							
 			)RETURNING id_orden_trabajo into v_id_orden_trabajo;
 			
@@ -110,15 +125,28 @@ BEGIN
 	elsif(p_transaccion='CONTA_ODT_MOD')then
 
 		begin
+        
+           IF EXISTS(
+              select 
+               1
+              from conta.torden_trabajo ot 
+              where ot.codigo = upper(v_parametros.codigo) 
+                    and ot.estado_reg = 'activo'
+                    and ot.id_orden_trabajo != v_parametros.id_orden_trabajo) THEN                  
+               raise exception 'ya existe otra orden con el código %',v_parametros.codigo;      
+            END IF;
 			--Sentencia de la modificacion
 			update conta.torden_trabajo set
-			fecha_final = v_parametros.fecha_final,
-			fecha_inicio = v_parametros.fecha_inicio,
-			desc_orden = v_parametros.desc_orden,
-			motivo_orden = v_parametros.motivo_orden,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now()
-			where id_orden_trabajo=v_parametros.id_orden_trabajo;
+              fecha_final = v_parametros.fecha_final,
+              fecha_inicio = v_parametros.fecha_inicio,
+              desc_orden = v_parametros.desc_orden,
+              motivo_orden = v_parametros.motivo_orden,
+              id_usuario_mod = p_id_usuario,
+              fecha_mod = now(),
+              codigo =  upper(v_parametros.codigo),
+              tipo = v_parametros.tipo,
+              movimiento = v_parametros.movimiento
+           where id_orden_trabajo=v_parametros.id_orden_trabajo;
             
             if (pxp.f_get_variable_global('sincronizar') = 'true') then
                 	                
@@ -239,7 +267,7 @@ BEGIN
               p_id_usuario,
               null,
               null,
-              v_parametros.codigo,
+              upper(v_parametros.codigo),
               v_parametros.tipo,
               v_parametros.movimiento,
               v_id_orden_trabajo_fk
@@ -271,11 +299,13 @@ BEGIN
               IF v_parametros.id_orden_trabajo_fk != 'id' and v_parametros.id_orden_trabajo_fk != '' THEN
                    v_id_orden_trabajo_fk  = v_parametros.id_orden_trabajo_fk::integer;
               END IF;
+              
+              
              
         
                IF exists(SELECT 1
                         from conta.torden_trabajo c 
-                        where trim(c.codigo) = trim(v_parametros.codigo)                      
+                        where trim(upper(c.codigo)) = trim(upper(v_parametros.codigo))                      
                         and c.estado_reg = 'activo'
                          and c.id_orden_trabajo !=  v_parametros.id_orden_trabajo ) THEN
                   
@@ -293,7 +323,7 @@ BEGIN
                 motivo_orden = v_parametros.motivo_orden,
                 id_usuario_mod = p_id_usuario,
                 fecha_mod = now(),
-                codigo = v_parametros.codigo,
+                codigo = upper(v_parametros.codigo),
                 tipo = v_parametros.tipo,
                 movimiento = v_parametros.movimiento,
                 id_orden_trabajo_fk = v_id_orden_trabajo_fk
