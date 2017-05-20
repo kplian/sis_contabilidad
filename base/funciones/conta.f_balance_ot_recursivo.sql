@@ -31,6 +31,7 @@ v_gestion 			integer;
 v_sw_force			boolean;
 v_suma_mt			numeric;
 va_suma				numeric[];
+va_tipo				varchar[];
  
 
 BEGIN
@@ -42,9 +43,11 @@ BEGIN
     v_suma = 0;
     
     v_sw_force = FALSE;
+    va_tipo = string_to_array(p_tipo,',');
     
      --recupera datos de la cuenta padre
      IF p_id_orden_trabajo_fk is not null THEN
+       
        select
          ot.tipo,
          ot.movimiento,
@@ -68,7 +71,8 @@ BEGIN
      v_gestion = (SELECT EXTRACT(YEAR FROM now()::Date))::integer;
     
     --1) IF   si el nivel inicial es igual al nivel final calculamo el mayor de la cuenta, o es uan orden de movimmiento
-           
+    
+          
        IF p_nivel_ini  = p_nivel_final  or v_sw_force THEN  
          
        
@@ -78,19 +82,19 @@ BEGIN
                   FOR  v_registros in (select
                                          c.id_orden_trabajo,
                                          c.codigo,
-                                         c.desc_orden,
-                                         --c.nivel_cuenta,
+                                         c.desc_orden,                                        
                                          c.id_orden_trabajo_fk,
                                          c.tipo,
                                          c.movimiento
                                        from conta.torden_trabajo c
                                        where c.id_orden_trabajo_fk = p_id_orden_trabajo_fk 
-                                             and c.estado_reg = 'activo' 
+                                             and c.estado_reg = 'activo'
+                                             and c.tipo =ANY(va_tipo) 
                                             
                                         )   LOOP
                        
                        -- caculamos el mayor
-                        va_mayor = conta.f_mayor_orden(v_registros.id_orden, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
+                        va_mayor = conta.f_mayor_orden(v_registros.id_orden_trabajo, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
                         v_mayor = va_mayor[1];
                         v_mayor_mt = va_mayor[2];
                        -- insetamos en tabla temporal 
@@ -123,21 +127,23 @@ BEGIN
                     
                     END LOOP;
              ELSE
-             
+                 
+              raise notice '>>>>  antes de calcular el mayor % -  %  -  %',p_tipo, p_nivel_ini, p_nivel_final;
+      
                   
                  -- FOR listamos la cuentas hijos
                   FOR  v_registros in (select
                   
                                      c.id_orden_trabajo,
                                      c.codigo,
-                                     c.desc_orden,
-                                     --c.nivel_cuenta,
+                                     c.desc_orden,                                     
                                      c.id_orden_trabajo_fk,
                                      c.tipo,
                                      c.movimiento
-                                    from conta.torden_trabajo ot 
+                                    from conta.torden_trabajo c 
                                         where c.id_orden_trabajo_fk is NULL 
-                                        and c.estado_reg = 'activo' )   LOOP
+                                        and c.estado_reg = 'activo'
+                                        and c.tipo =ANY(va_tipo)  )   LOOP
                        
                        -- caculamos el mayor
                         va_mayor = conta.f_mayor_orden(v_registros.id_orden_trabajo, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
@@ -145,7 +151,7 @@ BEGIN
                         v_mayor_mt = va_mayor[2];
                        
                        -- insetamos en tabla temporal 
-                        insert  into temp_balancef (
+                        insert  into temp_balance_ot (
                                          id_orden_trabajo ,
                                           codigo ,
                                           desc_orden ,
@@ -186,36 +192,45 @@ BEGIN
            -- incremetmaos el nivel
            v_nivel = p_nivel_ini +1;
            
-           
+         
            
            -- FOR listado de cuenta basicas de la gestion 
            FOR  v_registros in (
                               select    
                                          c.id_orden_trabajo,
                                          c.codigo,
-                                         c.desc_orden,
-                                         --c.nivel_cuenta,
+                                         c.desc_orden,                                         
                                          c.id_orden_trabajo_fk,
                                          c.tipo,
                                          c.movimiento
                                 from conta.torden_trabajo c  
-                                where c.id_orden_trabajo_fk is NULL 
-                                and c.estado_reg = 'activo' 
+                                where     c.id_orden_trabajo_fk is NULL 
+                                      and c.estado_reg = 'activo'
+                                      and c.tipo =ANY(va_tipo)  
                                 
                                 )   LOOP
                 
                  -- llamada recursiva del balance general
+                 
+                 IF  v_registros.movimiento = 'si' THEN
+                     va_mayor = conta.f_mayor_orden(v_registros.id_orden_trabajo, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
+                        
+                 ELSE
+                 
+                     va_mayor = conta.f_balance_ot_recursivo(
+                                               p_desde, 
+                                               p_hasta, 
+                                               p_id_deptos, 
+                                               v_nivel, 
+                                               p_nivel_final, 
+                                               v_registros.id_orden_trabajo,
+                                               p_tipo,
+                                               p_incluir_cierre,
+                                               p_tipo_balance);
+                 END IF;
+                 
            
-                  va_mayor = conta.f_balance_ot_recursivo(
-                                           p_desde, 
-                                           p_hasta, 
-                                           p_id_deptos, 
-                                           v_nivel, 
-                                           p_nivel_final, 
-                                           v_registros.id_orden_trabajo,
-                                           p_tipo,
-                                           p_incluir_cierre,
-                                           p_tipo_balance);
+                  
                                            
                      v_mayor = va_mayor[1];
                      v_mayor_mt = va_mayor[2];                      
@@ -265,7 +280,8 @@ BEGIN
                                          c.movimiento
                                 from conta.torden_trabajo c    
                                 where     c.id_orden_trabajo_fk = p_id_orden_trabajo_fk  
-                                      and c.estado_reg = 'activo' 
+                                       and c.estado_reg = 'activo' 
+                                        and c.tipo =ANY(va_tipo)  
                                )   LOOP
                 
                 -- llamada recursiva del balance general
@@ -312,8 +328,8 @@ BEGIN
           
    --reronarmos la suma del balance ...
    
-   va_suma[1] = v_suma; 
-   va_suma[2] = v_suma_mt;
+   va_suma[1] = COALESCE(v_suma,0); 
+   va_suma[2] =  COALESCE(v_suma_mt,0);
    RETURN va_suma;
 
 

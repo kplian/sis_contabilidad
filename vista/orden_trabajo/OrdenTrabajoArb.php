@@ -149,7 +149,7 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
        		    lazyRender:true,
        		    mode: 'local',
        		    valueField: 'inicio',    
-       		    store:['centro','pep','orden','estadistico']
+       		    store:['centro','pep','orden','estadistica']
 			},
 			type:'ComboBox',
 			id_grupo:1,

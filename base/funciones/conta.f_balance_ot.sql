@@ -25,7 +25,9 @@ v_registros  record;  -- PARA ALMACENAR EL CONJUNTO DE DATOS RESULTADO DEL SELEC
 
 v_i integer;
 v_nivel_inicial		integer;
+va_total 			numeric[];
 v_total 			numeric;
+v_total_mt 			numeric;
 v_tipo		        varchar;
 v_incluir_cierre	varchar;
 v_incluir_sinmov	varchar;
@@ -78,35 +80,40 @@ BEGIN
           
       --llamada recusiva para llenar la tabla
       v_nivel_inicial = 1;
+     
       
-  
-      v_total =  conta.f_balance_recursivo_ot(
+      va_total =  conta.f_balance_ot_recursivo(
                                           v_parametros.desde, 
                                           v_parametros.hasta, 
                                           v_parametros.id_deptos, 
                                           1, 
                                           v_parametros.nivel,
-                                          NULL::integer,
+                                          NULL::integer,  --  id_orden_trabajo INICIAL  
                                           v_tipo,
                                           v_incluir_cierre,
                                           v_parametros.tipo_balance);
+      v_total = va_total[1];
+      v_total_mt = va_total[2];
+      
        
       raise notice '------------------------------------------------> total %', v_total;
       
       
       
       v_consulta = 'SELECT                                   
-                               id_orden_trabajo ,
+                                id_orden_trabajo ,
                                 codigo ,
                                 desc_orden ,
                                 id_orden_trabajo_fk ,
                                 monto ,
-                                monto_mt
+                                monto_mt,
                                 nivel ,
                                 tipo ,
                                 movimiento	
                         FROM temp_balance_ot  ';
                         
+                        
+                                            
                         
        IF v_incluir_sinmov != 'no' THEN                          
           v_consulta = v_consulta|| ' WHERE (monto != 0 and monto_mt !=0) and ' ;
@@ -118,11 +125,14 @@ BEGIN
            v_consulta = v_consulta|| ' order by  codigo';                  
        END IF;
        
+       raise notice 'consulta.. %',v_consulta;
+       
        FOR v_registros in EXECUTE(v_consulta) LOOP
                    RETURN NEXT v_registros;
        END LOOP;
        
-      
+ELSE
+   raise exception  'no se encontro el códidigo  de transacción:  %',p_transaccion;      
 
 END IF;
 

@@ -11,6 +11,7 @@ require_once(dirname(__FILE__).'/../reportes/RBalanceGeneral.php');
 require_once(dirname(__FILE__).'/../reportes/RResultados.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../reportes/RResultadosXls.php');
+require_once(dirname(__FILE__).'/../reportes/RBalanceOrdenes.php');
 
 class ACTCuenta extends ACTbase{    
 			
@@ -349,6 +350,51 @@ class ACTCuenta extends ACTbase{
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 				
 	}
+
+  function recuperarDatosBalanceOrdenes(){
+    	
+		$this->objFunc = $this->create('MODCuenta');
+		$cbteHeader = $this->objFunc->listarBalanceOrdenes($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){
+				
+			return $cbteHeader->getDatos();
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}              
+		
+    }
+   
+   function reporteBalanceOrdenes(){
+			
+		$nombreArchivo = uniqid(md5(session_id()).'Ordesnes') . '.pdf'; 
+		$dataSource = $this->recuperarDatosBalanceOrdenes();	
+		
+		//parametros basicos
+		$tamano = 'LETTER';
+		$orientacion = 'P';
+		$titulo = 'Árbol de Costos';
+		
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);		
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		//Instancia la clase de pdf
+		
+		$reporte = new RBalanceOrdenes($this->objParam);
+		$reporte->datosHeader($dataSource, $this->objParam->getParametro('nivel'), $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'), $this->objParam->getParametro('tipo_balance'), $this->objParam->getParametro('incluir_cierre'));
+		//$this->objReporteFormato->renderDatos($this->res2->datos);
+		
+		$reporte->generarReporte();
+		$reporte->output($reporte->url_archivo,'F');
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		
+   }
 
    
 			

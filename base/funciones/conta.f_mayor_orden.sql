@@ -16,9 +16,9 @@ CREATE OR REPLACE FUNCTION conta.f_mayor_orden (
 RETURNS numeric [] AS
 $body$
 /*
-Autor: RCM
-Fecha: 18/11/2013
-Descripcion: Funcion para la eliminacion de int comprobante
+Autor: RAC - KPLIAN
+Fecha: 20/05/2017
+Descripcion: funcion que calcula el mayor por orden de trabajo
 */
 
 DECLARE
@@ -200,7 +200,7 @@ BEGIN
           v_resp_final[4] = v_resp_mayor_partida_mt;
           
           
-          raise notice '##################  RESULTADO BASICO %, %',v_resp_mayor,p_id_cuenta;
+          raise notice '##################  RESULTADO BASICO %',v_resp_mayor;
         
           return v_resp_final;  
           
@@ -243,7 +243,9 @@ BEGIN
      v_resp_final[1] = 0;
      v_resp_final[2] = 0;
      v_resp_final[3] = 0;
-     v_resp_final[4] = 0;     
+     v_resp_final[4] = 0; 
+     
+     raise notice 'f_maryo_orden %',v_resp_final;    
      
      return v_resp_final;
      
