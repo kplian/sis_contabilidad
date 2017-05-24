@@ -72,10 +72,6 @@ class ACTGastoSigep extends ACTbase{
 			$arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
 			//var_dump($arrayArchivo); exit;
 			foreach ($arrayArchivo as $fila) {
-				if($fila['nro_preventivo'] == NULL || $fila['nro_preventivo']==0){
-					$mensaje_completo = "Error el archivo no cuenta con numero de preventivo";
-					$error = 'error_fatal';
-				}
 				$this->objParam->addParametro('gestion', $fila['gestion']);
 				$this->objParam->addParametro('objeto', $fila['objeto']);
 				$this->objParam->addParametro('descripcion_gasto', $fila['descripcion_gasto']);

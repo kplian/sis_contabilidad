@@ -154,7 +154,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 for(i=0; i < numberItems; i++){
                     total_factura = parseFloat(this.store.data.items[i].data.precio_total) + parseFloat(total_factura);
                 }
-                if(total_factura != parseFloat(this.data.importe_doc)){
+                if(total_factura.toFixed(2) != parseFloat(this.data.importe_doc)){
                     Ext.MessageBox.alert('Alerta', 'La suma de los conceptos no iguala con el total de la factura, importe total debe ser ' + this.data.importe_doc + ' ' + this.data.desc_moneda, function()
                         {
                             Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_concepto/DocConceptoCtaDoc.php', 'DocConceptoCtaDoc', {

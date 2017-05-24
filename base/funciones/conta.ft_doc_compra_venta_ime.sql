@@ -144,14 +144,14 @@ BEGIN
         IF EXISTS(select
                     1
                   from conta.tdoc_compra_venta dcv
+                  inner join param.tplantilla pla on pla.id_plantilla=dcv.id_plantilla
                   where    dcv.estado_reg = 'activo' and  dcv.nit = v_parametros.nit
                            and dcv.nro_autorizacion = v_parametros.nro_autorizacion
                            and dcv.nro_documento = v_parametros.nro_documento
                            and dcv.nro_dui = v_parametros.nro_dui
-                           and dcv.id_plantilla = v_parametros.id_plantilla
-                           and dcv.razon_social = upper(trim(v_parametros.razon_social))) then
+                           and pla.tipo_informe='lcv') then
 
-          raise exception 'Ya existe un documento registrado con el mismo nro,  razon social y fecha';
+          raise exception 'Ya existe un documento registrado con el mismo nro,  nit y nro de autorizacion';
 
         END IF;
 
@@ -393,15 +393,14 @@ BEGIN
         IF EXISTS(select
                     1
                   from conta.tdoc_compra_venta dcv
+                  inner join param.tplantilla pla on pla.id_plantilla=dcv.id_plantilla
                   where    dcv.estado_reg = 'activo' and  dcv.nit = v_parametros.nit
                            and dcv.nro_autorizacion = v_parametros.nro_autorizacion
                            and dcv.nro_documento = v_parametros.nro_documento
                            and dcv.nro_dui = v_parametros.nro_dui
-                           and dcv.fecha = v_parametros.fecha
-                           and dcv.id_plantilla = v_parametros.id_plantilla
-                           and dcv.razon_social = upper(trim(v_parametros.razon_social))) then
+                           and pla.tipo_informe='lcv') then
 
-          raise exception 'Ya existe un documento registrado con el mismo nro,  razon social y fecha';
+          raise exception 'Ya existe un documento registrado con el mismo nro,  nit y nro autorizacion';
 
         END IF;
 

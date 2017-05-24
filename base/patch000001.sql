@@ -3618,3 +3618,18 @@ CREATE TABLE conta.tgasto_sigep (
 WITH (oids = false);
 
 /*********************************** F-SCP-GSS-CONTA-0-10/05/2017 ****************************************/
+
+
+/*********************************** I-SCP-FFP-CONTA-0-04/05/2017 ****************************************/
+
+
+CREATE TABLE conta.tbancarizacion_periodo(
+  id_bancarizacion_periodo SERIAL NOT NULL,
+  id_periodo int4 NOT NULL,
+  estado VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id_bancarizacion_periodo))
+  INHERITS (pxp.tbase);
+
+/*********************************** F-SCP-FFP-CONTA-0-24/05/2017 ****************************************/
+
+

@@ -232,12 +232,12 @@ header("content-type: text/javascript; charset=UTF-8");
             bdel: true,
             bsave: true,
             abrirCerrarGestion: function () {
-                Phx.CP.loadWindows('../../../sis_contabilidad/vista/bancarizacion_gestion/BancarizacionGestion.php',
-                    'BancarizacionGestion',
+                Phx.CP.loadWindows('../../../sis_contabilidad/vista/bancarizacion_periodo/GestionBancarizacion.php',
+                    'GestionBancarizacion',
                     {
                         width:900,
                         height:400
-                    },'',this.idContenedor,'BancarizacionGestion')
+                    },'',this.idContenedor,'GestionBancarizacion')
             }
         }
     )
