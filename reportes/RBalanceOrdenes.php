@@ -43,7 +43,7 @@ class RBalanceOrdenes extends  ReportePDF {
 			$this->Cell(0,5,'ESTADO DE RESULTADOS (BS)',0,1,'C');
 		}
 		else{
-			$this->Cell(0,5,'BALANCE GENERAL (BS)',0,1,'C');
+			$this->Cell(0,5,'ÁRBOL DE ORDENES DE COSTOS (BS)',0,1,'C');
 		}
 		
 		$this->SetFont('','BU',11);
@@ -60,14 +60,14 @@ class RBalanceOrdenes extends  ReportePDF {
 		//REporte de unasola columna de monto
 		if($this->nivel == 1 || $this->nivel > 3 ){
 			//Titulos de columnas superiores
-			$this->Cell(160,3.5,'Nombre Cuenta','',0,'C');
+			$this->Cell(160,3.5,'Ordenes','',0,'C');
 			$this->Cell(40,3.5,'Montos (Bs)','',0,'C');
 			$this->ln();	
 		}
 		//reporte de dos columnas de montos
 		if($this->nivel == 2 ){
 			//Titulos de columnas superiores
-			$this->Cell(154,3.5,'Cuentas','',0,'C');
+			$this->Cell(154,3.5,'Ordenes','',0,'C');
 			$this->Cell(23,3.5,'Mon','',0,'R');
 			$this->Cell(23,3.5,'tos (Bs)','',0,'L');
 			$this->ln();	
@@ -76,7 +76,7 @@ class RBalanceOrdenes extends  ReportePDF {
 		
 		if($this->nivel == 3 ){
 			//Titulos de columnas superiores
-			$this->Cell(131,3.5,'Cuentas','',0,'C');
+			$this->Cell(131,3.5,'Ordenes','',0,'C');
 			$this->Cell(23,3.5,'','',0,'R');
 			$this->Cell(23,3.5,'Montos (Bs)','',0,'C');
 			$this->Cell(23,3.5,'','',0,'L');
@@ -201,7 +201,7 @@ class RBalanceOrdenes extends  ReportePDF {
 		    } 
         	  
 	      
-			$this->Cell(160,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'',0,'L');
+			$this->Cell(160,3.5,$tabs.'('.$val['codigo'].') '.$val['desc_orden'],'',0,'L');
 			//si el monto es menor a cero color rojo codigo CMYK
 			if($val['monto']*1 < 0){
 				$this->SetTextColor(0,100,100,0,false,'');
@@ -253,7 +253,7 @@ class RBalanceOrdenes extends  ReportePDF {
 			}
         	  
 	       // $this->Cell(40,3.5,,'LTR',0,'L');
-			$this->Cell(154,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'',0,'L');
+			$this->Cell(154,3.5,$tabs.'('.$val['codigo'].') '.$val['desc_orden'],'',0,'L');
 			
 			if($val['monto']*1 < 0){
 				$this->SetTextColor(0,100,100,0,false,'');
@@ -304,7 +304,7 @@ class RBalanceOrdenes extends  ReportePDF {
 			
         	  
 	       // $this->Cell(40,3.5,,'LTR',0,'L');
-			$this->Cell(131,3.5,$tabs.'('.$val['nro_cuenta'].') '.$val['nombre_cuenta'],'',0,'L');
+			$this->Cell(131,3.5,$tabs.'('.$val['codigo'].') '.$val['desc_orden'],'',0,'L');
 			
 			//si el monto es menor a cero color rojo codigo CMYK
 			if($val['monto']*1 < 0){

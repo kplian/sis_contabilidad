@@ -182,7 +182,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	       		    lazyRender:true,
 	       		    mode: 'local',
 	       		    gwidth: 100,
-	       		    store:['capital','reserva']
+	       		    store:['capital','reserva','resultado']
 	       		},
 	       		type:'ComboBox',
 	       		id_grupo:0,

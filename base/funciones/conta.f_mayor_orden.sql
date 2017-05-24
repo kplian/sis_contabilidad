@@ -198,7 +198,16 @@ BEGIN
           v_resp_final[2] = v_resp_mayor_mt;
           v_resp_final[3] = v_resp_mayor_partida;
           v_resp_final[4] = v_resp_mayor_partida_mt;
-          
+          --retornamos debe
+          v_resp_final[5] = COALESCE(v_sum_debe,0);
+          v_resp_final[6] = COALESCE(v_sum_debe_mt,0);
+          v_resp_final[7] = COALESCE(v_sum_gasto,0);
+          v_resp_final[8] = COALESCE(v_sum_gasto_mt,0);
+          --retornamos haber
+          v_resp_final[9] = COALESCE(v_sum_haber,0);
+          v_resp_final[10] = COALESCE(v_sum_haber_mt,0);
+          v_resp_final[11] = COALESCE(v_sum_recurso,0);
+          v_resp_final[12] = COALESCE(v_sum_recurso_mt,0);
           
           raise notice '##################  RESULTADO BASICO %',v_resp_mayor;
         

@@ -31,6 +31,7 @@ v_total_mt 			numeric;
 v_tipo		        varchar;
 v_incluir_cierre	varchar;
 v_incluir_sinmov	varchar;
+v_cont_nro_nodo		integer;
  
 
 BEGIN
@@ -72,9 +73,14 @@ BEGIN
                                 id_orden_trabajo_fk integer,
                                 monto numeric,
                                 monto_mt numeric,
+                                monto_debe numeric,
+                                monto_mt_debe numeric,
+                                monto_haber numeric,
+                                monto_mt_haber numeric,
                                 nivel integer,
                                 tipo varchar,
-                                movimiento	varchar
+                                movimiento	varchar,
+                                nro_nodo	integer
                            ) ON COMMIT DROP;
     
           
@@ -85,8 +91,9 @@ BEGIN
       va_total =  conta.f_balance_ot_recursivo(
                                           v_parametros.desde, 
                                           v_parametros.hasta, 
-                                          v_parametros.id_deptos, 
-                                          1, 
+                                          v_parametros.id_deptos,
+                                          0,--nro de nodo 
+                                          1,--  nivel                                           
                                           v_parametros.nivel,
                                           NULL::integer,  --  id_orden_trabajo INICIAL  
                                           v_tipo,
@@ -94,6 +101,7 @@ BEGIN
                                           v_parametros.tipo_balance);
       v_total = va_total[1];
       v_total_mt = va_total[2];
+      v_cont_nro_nodo = va_total[3]; 
       
        
       raise notice '------------------------------------------------> total %', v_total;
@@ -107,9 +115,13 @@ BEGIN
                                 id_orden_trabajo_fk ,
                                 monto ,
                                 monto_mt,
+                                monto_debe ,
+                                monto_mt_debe,
+                                monto_haber ,
+                                monto_mt_haber,
                                 nivel ,
                                 tipo ,
-                                movimiento	
+                                movimiento
                         FROM temp_balance_ot  ';
                         
                         
@@ -122,7 +134,7 @@ BEGIN
        IF v_parametros.tipo_balance = 'resultado' THEN 
            v_consulta = v_consulta|| ' order by movimiento desc, codigo asc' ;
        ELSE
-           v_consulta = v_consulta|| ' order by  codigo';                  
+           v_consulta = v_consulta|| ' order by  nro_nodo';                  
        END IF;
        
        raise notice 'consulta.. %',v_consulta;

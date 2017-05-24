@@ -326,6 +326,10 @@ class MODCuenta extends MODbase{
 		 $this->captura('id_orden_trabajo_fk','int4');
 		 $this->captura('monto','numeric');
 		 $this->captura('monto_mt','numeric');
+		 $this->captura('monto_debe','numeric');
+		 $this->captura('monto_mt_debe','numeric');
+		 $this->captura('monto_haber','numeric');
+		 $this->captura('monto_mt_haber','numeric');
 		 $this->captura('nivel','int4');
 		 $this->captura('tipo','varchar');
 		 $this->captura('movimiento','varchar');
