@@ -215,7 +215,7 @@ BEGIN
     			TRUNCATE conta.tdoc_int_comprobante;
 
     			FOR v_registros IN (
-                  SELECT doc.fecha::date, doc.nit::varchar, doc.razon_social::varchar, pla.desc_plantilla::varchar, doc.nro_documento::varchar, doc.nro_dui::varchar,
+                  SELECT DISTINCT doc.fecha::date, doc.nit::varchar, doc.razon_social::varchar, pla.desc_plantilla::varchar, doc.nro_documento::varchar, doc.nro_dui::varchar,
                  doc.nro_autorizacion::varchar, doc.codigo_control::varchar, doc.importe_doc::numeric, COALESCE(doc.importe_ice,0)::numeric as importe_ice,
                   COALESCE(doc.importe_descuento,0)::numeric as importe_descuento,
                  COALESCE(doc.importe_excento,0)::numeric as importe_excento, doc.importe_pago_liquido::numeric as liquido,
@@ -242,7 +242,8 @@ BEGIN
                  end as origen,
                  COALESCE(doc.id_int_comprobante::varchar,'') as id_int_comprobante,
                  doc.id_doc_compra_venta::integer,
-                 usu.cuenta
+                 usu.cuenta,
+                 con.id_doc_concepto
           FROM conta.tdoc_compra_venta doc
                INNER JOIN conta.tdoc_concepto con on con.id_doc_compra_venta =
                  doc.id_doc_compra_venta
@@ -261,7 +262,7 @@ BEGIN
                  doc.nro_autorizacion::varchar, doc.codigo_control::varchar, doc.importe_doc::numeric, COALESCE(doc.importe_ice,0)::numeric as importe_ice,
                   COALESCE(doc.importe_descuento,0)::numeric as importe_descuento,
                  COALESCE(doc.importe_excento,0)::numeric as importe_excento, doc.importe_pago_liquido::numeric as liquido,
-                 COALESCE((doc.importe_neto - doc.importe_excento),0)::numeric as importe_sujeto,
+                 COALESCE((doc.importe_neto - COALESCE(doc.importe_excento,0)),0)::numeric as importe_sujeto,
                  doc.importe_iva::numeric,
                  round((tra.importe_gasto /(1 - tra.factor_reversion)),2)::numeric as importe_gasto,
                  (tra.importe_gasto /(1 - tra.factor_reversion) / conta.f_importe_gasto_comprobante(cmp.id_int_comprobante))::numeric as porc_gasto_prorrateado,
@@ -277,7 +278,8 @@ BEGIN
                  else 'Pago a Proveedor'::varchar end as origen,
                  COALESCE(doc.id_int_comprobante::varchar,'') as id_int_comprobante,
                  doc.id_doc_compra_venta::integer,
-                 usu.cuenta
+                 usu.cuenta,
+                 0
           FROM conta.tdoc_compra_venta doc
                LEFT JOIN conta.tint_comprobante cmp on cmp.id_int_comprobante =
                  doc.id_int_comprobante
