@@ -3251,6 +3251,31 @@ ALTER TABLE conta.tfactura_airbp_concepto
 
 /**********************************F-DEP-RAC-CONTA-0-12/01/2017****************************************/
     
+    
+/***********************************I-DEP-MMV-CONTA-0-27/01/2017****************************************/
+
+CREATE VIEW conta.ventrega_depto as (
+select
+                            ent.id_entrega,
+                            ent.fecha_c31,
+                            ent.c31,
+                            ent.estado,
+                            ent.estado_reg,
+                            ent.id_usuario_ai,
+                            ent.usuario_ai,
+                            ent.fecha_reg,
+                            ent.id_usuario_reg,
+                            ent.fecha_mod,
+                            ent.id_usuario_mod,
+                            ent.id_depto_conta,
+                            ent.id_estado_wf,
+                            ent.id_proceso_wf,
+                            de.prioridad
+						from conta.tentrega ent
+                        inner join param.tdepto de on de.id_depto = ent.id_depto_conta);
+
+/***********************************F-DEP-MMV-CONTA-0-27/01/2017****************************************/
+
  
 /**********************************I-DEP-JRR-CONTA-0-02/05/2017****************************************/
 
@@ -3270,6 +3295,18 @@ ALTER TABLE orga.tcargo_presupuesto
  
 /**********************************F-DEP-JRR-CONTA-0-02/05/2017****************************************/
    
+/**********************************I-DEP-GSS-CONTA-0-10/05/2017****************************************/
+
+ 
+ALTER TABLE conta.tgasto_sigep
+  ADD CONSTRAINT fk_tgasto_sigep__id_archivo_sigep FOREIGN KEY (id_archivo_sigep)
+    REFERENCES conta.tarchivo_sigep(id_archivo_sigep)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/**********************************F-DEP-GSS-CONTA-0-10/05/2017****************************************/ 
+ 
   
     
 /**********************************I-DEP-RAC-CONTA-0-12/05/2017****************************************/
@@ -3385,15 +3422,5 @@ ALTER TABLE conta.torden_suborden
 /**********************************F-DEP-RAC-CONTA-0-15/05/2017****************************************/
 
 
-/**********************************I-DEP-GSS-CONTA-0-10/05/2017****************************************/
-
-ALTER TABLE conta.tgasto_sigep
-  ADD CONSTRAINT fk_tgasto_sigep__id_archivo_sigep FOREIGN KEY (id_archivo_sigep)
-    REFERENCES conta.tgasto_sigep(id_archivo_sigep)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
-
-/**********************************F-DEP-GSS-CONTA-0-10/05/2017****************************************/ 
 
 

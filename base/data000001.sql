@@ -1213,12 +1213,19 @@ VALUES
 
 /**********************************I-DAT-RAC-CONTA-1-15/05/2017*****************************************/
 
+select pxp.f_insert_tgui ('Parametrización de Ordenes de Trabajo', 'Ordenes de trabajo', 'CROT', 'si', 3, '', 2, '', '', 'CONTA');
+select pxp.f_insert_testructura_gui ('CROT', 'CONTA');
 
-
+select pxp.f_insert_tgui ('Grupos de OTs', 'Grupos de ordenes de trabajo', 'GRUOT', 'si', 0, 'sis_contabilidad/vista/grupo_ot/GrupoOt.php', 2, '', 'GrupoOt', 'CONTA');
 select pxp.f_insert_tgui ('Ordenes de Costo', 'Ordenes de Costo', 'ORDARB', 'si', 1, 'sis_contabilidad/vista/orden_trabajo/OrdenTrabajoArb.php', 3, '', 'OrdenTrabajoArb', 'CONTA');
 select pxp.f_insert_tgui ('Subordenes', 'Subordenes', 'SUOINT', 'si', 4, 'sis_contabilidad/vista/suborden/Suborden.php', 3, '', 'Suborden', 'CONTA');
+select pxp.f_insert_tgui ('OT por Oficina', 'OT por Oficina', 'OFIOT', 'si', 3, 'sis_contabilidad/vista/oficina_ot/OficinaOt.php', 3, '', 'OficinaOt', 'CONTA');
+
 select pxp.f_insert_testructura_gui ('ORDARB', 'CROT');
 select pxp.f_insert_testructura_gui ('SUOINT', 'CROT');
+select pxp.f_insert_testructura_gui ('ODT', 'CROT');
+select pxp.f_insert_testructura_gui ('GRUOT', 'CROT');
+select pxp.f_insert_testructura_gui ('OFIOT', 'CROT');
 
 
 
