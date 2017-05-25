@@ -85,7 +85,8 @@ BEGIN
                 campo_fecha_costo_fin,
                 funcion_comprobante_editado,
                 funcion_comprobante_prevalidado,
-                funcion_comprobante_validado_eliminado
+                funcion_comprobante_validado_eliminado,
+                desc_plantilla
              
           	) values(
                 v_parametros.codigo,
@@ -123,7 +124,8 @@ BEGIN
                 v_parametros.campo_fecha_costo_fin,
                 v_parametros.funcion_comprobante_editado,
                 v_parametros.funcion_comprobante_prevalidado,
-                v_parametros.funcion_comprobante_validado_eliminado
+                v_parametros.funcion_comprobante_validado_eliminado,
+                v_parametros.desc_plantilla
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -180,7 +182,8 @@ BEGIN
               campo_fecha_costo_fin = v_parametros.campo_fecha_costo_fin,
               funcion_comprobante_editado = v_parametros.funcion_comprobante_editado,
               funcion_comprobante_prevalidado = v_parametros.funcion_comprobante_prevalidado,
-              funcion_comprobante_validado_eliminado =v_parametros.funcion_comprobante_validado_eliminado
+              funcion_comprobante_validado_eliminado =v_parametros.funcion_comprobante_validado_eliminado,
+              desc_plantilla = v_parametros.desc_plantilla
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta

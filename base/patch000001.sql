@@ -3456,7 +3456,7 @@ IS 'Con que tiemo de comprobantes de mueven estan cuentas, diario, ingreso, movi
 
 
 
-/*********************************** I-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+/***********************************I-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
 
 --------------- SQL ---------------
 
@@ -3476,6 +3476,37 @@ COMMENT ON COLUMN conta.tresultado_plantilla.relacion_unica
 IS 'si o no, solo se utiliza cuando el preiodo de calculo es giual a cbte, sirve apra validar que el comprobante origen solo tenga una relacion de este tipo y no mas';
 
 /*********************************** F-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+
+
+
+/*********************************** I-SCP-FFP-CONTA-0-30/12/2016 ****************************************/
+
+
+/*
+CREATE TABLE conta.tplan_pago_documento_airbp (
+  id_plan_pago_documento_airbp SERIAL,
+  id_plan_pago INTEGER,
+  id_documento INTEGER,
+  monto_fac NUMERIC(10,2),
+  monto_usado NUMERIC(10,2),
+  monto_disponible NUMERIC(8,2),
+  usar VARCHAR(255),
+  PRIMARY KEY(id_plan_pago_documento_airbp)
+) INHERITS (pxp.tbase)
+WITH (oids = false);*/
+
+--ALTER TABLE conta.tplan_pago_documento_airbp ADD monto_acumulado NUMERIC(10,2) NULL;
+
+CREATE TABLE conta.tbancarizacion_gestion (
+  id_bancarizacion_gestion SERIAL,
+  id_gestion INTEGER,
+  estado VARCHAR(255),
+  PRIMARY KEY(id_bancarizacion_gestion)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+
+/*********************************** F-SCP-FFP-CONTA-0-30/12/2016 ****************************************/
 
 /*********************************** I-SCP-GSS-CONTA-0-12/01/2017 ****************************************/
 
@@ -3519,9 +3550,7 @@ WITH (oids = false);
 /*********************************** F-SCP-GSS-CONTA-0-12/01/2017 ****************************************/
 
 
-
-
-/*********************************** I-SCP-MMV-CONTA-0-27/12/2016 ****************************************/
+/***********************************I-SCP-MMV-CONTA-0-27/01/2017****************************************/
 
 CREATE VIEW conta.ventrega_depto as (
 select
@@ -3542,37 +3571,24 @@ select
                             de.prioridad
 						from conta.tentrega ent
                         inner join param.tdepto de on de.id_depto = ent.id_depto_conta)
-/*********************************** F-SCP-MVN-CONTA-0-27/01/2017 ****************************************/
+/***********************************F-SCP-MMV-CONTA-0-27/01/2017****************************************/
+
+/***********************************I-SCP-RAC-CONTA-0-20/02/2017 ****************************************/
 
 
-/*********************************** I-SCP-FFP-CONTA-0-30/12/2016 ****************************************/
+--------------- SQL ---------------
 
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_estado_wf INTEGER;
+  
+  --------------- SQL ---------------
 
-/*
-CREATE TABLE conta.tplan_pago_documento_airbp (
-  id_plan_pago_documento_airbp SERIAL,
-  id_plan_pago INTEGER,
-  id_documento INTEGER,
-  monto_fac NUMERIC(10,2),
-  monto_usado NUMERIC(10,2),
-  monto_disponible NUMERIC(8,2),
-  usar VARCHAR(255),
-  PRIMARY KEY(id_plan_pago_documento_airbp)
-) INHERITS (pxp.tbase)
-WITH (oids = false);*/
+ALTER TABLE conta.tentrega
+  ADD COLUMN id_proceso_wf INTEGER;
+  
+  
+/***********************************F-SCP-RAC-CONTA-0-20/02/2017 ****************************************/
 
---ALTER TABLE conta.tplan_pago_documento_airbp ADD monto_acumulado NUMERIC(10,2) NULL;
-
-CREATE TABLE conta.tbancarizacion_gestion (
-  id_bancarizacion_gestion SERIAL,
-  id_gestion INTEGER,
-  estado VARCHAR(255),
-  PRIMARY KEY(id_bancarizacion_gestion)
-) INHERITS (pxp.tbase)
-WITH (oids = false);
-
-
-/*********************************** F-SCP-MVN-FFP-0-30/01/2017 ****************************************/
 
 /*********************************** I-SCP-GVC-CONTA-0-04/04/2017 ****************************************/
 CREATE UNIQUE INDEX tauxiliar_idx ON conta.tauxiliar
@@ -3582,6 +3598,7 @@ CREATE UNIQUE INDEX tauxiliar_idx1 ON conta.tauxiliar
   USING btree ("nombre_auxiliar");
 
 /*********************************** F-SCP-GVC-CONTA-0-04/04/2017 ****************************************/
+
 
 /*********************************** I-SCP-GSS-CONTA-0-10/05/2017 ****************************************/
 
@@ -3620,7 +3637,127 @@ WITH (oids = false);
 /*********************************** F-SCP-GSS-CONTA-0-10/05/2017 ****************************************/
 
 
-/*********************************** I-SCP-FFP-CONTA-0-04/05/2017 ****************************************/
+/***********************************I-SCP-RAC-CONTA-0-12/05/2017****************************************/
+
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD COLUMN id_orden_trabajo_fk INTEGER;
+
+COMMENT ON COLUMN conta.torden_trabajo.id_orden_trabajo_fk
+IS 'las ordene de trabajo se convierten en arbol, para poder estructurar un arbold e costos';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD COLUMN tipo VARCHAR(20) DEFAULT 'estadistica' NOT NULL;
+
+COMMENT ON COLUMN conta.torden_trabajo.tipo
+IS 'tipo de ordenes,   centro, pep, orden, estadistica';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD COLUMN movimiento VARCHAR(5) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN conta.torden_trabajo.movimiento
+IS 'los nodos de movimeitnos con movimiento se usan en las diferentes transacciones en caso contrario son solo agrupadores';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD COLUMN codigo VARCHAR(100) DEFAULT '' NOT NULL;
+
+
+
+
+/***********************************F-SCP-RAC-CONTA-0-12/05/2017****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-0-15/05/2017****************************************/
+
+
+CREATE TABLE conta.tsuborden (
+  id_suborden SERIAL,
+  codigo VARCHAR(200) NOT NULL,
+  nombre VARCHAR,
+  estado VARCHAR(30) DEFAULT 'vigente'::character varying NOT NULL,
+  CONSTRAINT tsuborden_pkey PRIMARY KEY(id_suborden)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.tsuborden.estado
+IS 'vigente o cerrada';
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.torden_suborden (
+  id_orden_suborden SERIAL NOT NULL,
+  id_orden_trabajo INTEGER NOT NULL,
+  id_suborden INTEGER NOT NULL,
+  PRIMARY KEY(id_orden_suborden)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+  
+  
+  
+/***********************************F-SCP-RAC-CONTA-0-15/05/2017****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-15/05/2017****************************************/
+  
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_suborden INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_suborden
+IS 'agruapdor de costos del tipo suborden';
+
+
+  
+/***********************************F-SCP-RAC-CONTA-1-15/05/2017****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-16/05/2017****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN desc_plantilla VARCHAR DEFAULT '' NOT NULL;
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.desc_plantilla
+IS 'descripcion de la plantilla del comprobante, explica de que se trata';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_suborden VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_suborden
+IS 'para la definicion de usbordenes';
+
+
+  
+/***********************************F-SCP-RAC-CONTA-1-16/05/2017****************************************/
+
+
+
+/***********************************I-SCP-FFP-CONTA-0-24/05/2017****************************************/
 
 
 CREATE TABLE conta.tbancarizacion_periodo(
@@ -3630,6 +3767,7 @@ CREATE TABLE conta.tbancarizacion_periodo(
   PRIMARY KEY (id_bancarizacion_periodo))
   INHERITS (pxp.tbase);
 
-/*********************************** F-SCP-FFP-CONTA-0-24/05/2017 ****************************************/
+/***********************************F-SCP-FFP-CONTA-0-24/05/2017****************************************/
+
 
 

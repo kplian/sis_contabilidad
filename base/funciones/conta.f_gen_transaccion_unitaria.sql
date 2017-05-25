@@ -77,6 +77,7 @@ BEGIN
                         'campo_partida',
                         'campo_centro_costo',
                         'campo_orden_trabajo',
+                        'campo_suborden',
                         'campo_partida_ejecucion',
                         'campo_relacion_contable',
                         'campo_relacion_contable_cc',

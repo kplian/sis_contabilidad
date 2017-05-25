@@ -31,7 +31,8 @@ CREATE OR REPLACE FUNCTION conta.f_import_tplantilla_comprobante (
   p_campo_depto_libro varchar,
   p_campo_fecha_costo_ini varchar,
   p_campo_fecha_costo_fin varchar,
-  p_funcion_comprobante_editado varchar
+  p_funcion_comprobante_editado varchar,
+  p_desc_plantilla varchar = ''::character varying
 )
 RETURNS varchar AS
 $body$
@@ -87,7 +88,8 @@ BEGIN
                 campo_depto_libro,
                 campo_fecha_costo_ini,
                 campo_fecha_costo_fin,
-                funcion_comprobante_editado
+                funcion_comprobante_editado,
+                desc_plantilla
              
           	) values(
                 p_codigo,
@@ -123,7 +125,8 @@ BEGIN
                 p_campo_depto_libro,
                 p_campo_fecha_costo_ini,
                 p_campo_fecha_costo_fin,
-                p_funcion_comprobante_editado
+                p_funcion_comprobante_editado,
+                p_desc_plantilla
 							
 			);
               
@@ -159,7 +162,8 @@ BEGIN
                 campo_depto_libro = p_campo_depto_libro,
                 campo_fecha_costo_ini = p_campo_fecha_costo_ini,
                 campo_fecha_costo_fin = p_campo_fecha_costo_fin,
-                funcion_comprobante_editado = p_funcion_comprobante_editado
+                funcion_comprobante_editado = p_funcion_comprobante_editado,
+                desc_plantilla = p_desc_plantilla
 			where id_plantilla_comprobante  = v_id_plantilla_comprobante;      	
         end if;
     
