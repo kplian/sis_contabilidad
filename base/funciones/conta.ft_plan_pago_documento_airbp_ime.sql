@@ -1,21 +1,20 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_plan_pago_documento_airbp_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
+CREATE OR REPLACE FUNCTION conta.ft_plan_pago_documento_airbp_ime(p_administrador int4, p_id_usuario int4, p_tabla varchar, p_transaccion varchar)
+  RETURNS varchar
+AS
 $BODY$
-
-/**************************************************************************
+  /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_plan_pago_documento_airbp_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplan_pago_documento_airbp'
  AUTOR: 		 (admin)
  FECHA:	        30-01-2017 13:13:21
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -39,20 +38,21 @@ DECLARE
 	v_usar VARCHAR;
 
 	v_ids_documentos VARCHAR;
+  v_monto_fac_original  NUMERIC(10,2);
 BEGIN
 
     v_nombre_funcion = 'conta.ft_plan_pago_documento_airbp_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PPDAIRBP_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		30-01-2017 13:13:21
 	***********************************/
 
 	if(p_transaccion='CONTA_PPDAIRBP_INS')then
-					
+
         begin
         	--Sentencia de la insercion
         	insert into conta.tplan_pago_documento_airbp(
@@ -83,13 +83,13 @@ BEGIN
 			v_parametros._nombre_usuario_ai,
 			null,
 			null
-							
-			
-			
+
+
+
 			)RETURNING id_plan_pago_documento_airbp into v_id_plan_pago_documento_airbp;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan Pago Documento Airbp almacenado(a) con exito (id_plan_pago_documento_airbp'||v_id_plan_pago_documento_airbp||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan Pago Documento Airbp almacenado(a) con exito (id_plan_pago_documento_airbp'||v_id_plan_pago_documento_airbp||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago_documento_airbp',v_id_plan_pago_documento_airbp::varchar);
 
             --Devuelve la respuesta
@@ -97,10 +97,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PPDAIRBP_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		30-01-2017 13:13:21
 	***********************************/
 
@@ -120,20 +120,20 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
 			where id_plan_pago_documento_airbp=v_parametros.id_plan_pago_documento_airbp;
-               
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan Pago Documento Airbp modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan Pago Documento Airbp modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago_documento_airbp',v_parametros.id_plan_pago_documento_airbp::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PPDAIRBP_ELI'
  	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		30-01-2017 13:13:21
 	***********************************/
 
@@ -143,11 +143,11 @@ BEGIN
 			--Sentencia de la eliminacion
 			delete from conta.tplan_pago_documento_airbp
             where id_plan_pago_documento_airbp=v_parametros.id_plan_pago_documento_airbp;
-               
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan Pago Documento Airbp eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan Pago Documento Airbp eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago_documento_airbp',v_parametros.id_plan_pago_documento_airbp::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
@@ -165,11 +165,11 @@ BEGIN
 		begin
 
 
+
+
 			select * into v_gestion from param.tgestion where gestion = v_parametros.gestion;
 
-
 			v_host:='dbname=dbendesis host=192.168.100.30 user=ende_pxp password=ende_pxp';
-
 
 			FOR v_plan_pago in (select plan.fecha_tentativa,
 														plan.nro_cuota,
@@ -186,6 +186,7 @@ BEGIN
 																AND obliga.fecha >= v_gestion.fecha_ini::DATE
 																AND obliga.fecha <= v_gestion.fecha_fin::DATE
 													ORDER BY plan.nro_cuota asc)LOOP
+
 
 
 
@@ -260,7 +261,7 @@ BEGIN
 				FOR v_record_documentos_airbp IN EXECUTE v_consulta LOOP
 
 
-					RAISE EXCEPTION '%',v_record_documentos_airbp;
+					--RAISE EXCEPTION '%',v_record_documentos_airbp;
 
 
 					-- cuando es la primera cuota se debe tomar en cuenta que esto es
@@ -275,6 +276,7 @@ BEGIN
 
 					--7000000.00
 
+          v_monto_fac_original = v_record_documentos_airbp.importe_total;
 					IF v_record_documentos_airbp.usar = 'si' THEN
 						v_record_documentos_airbp.importe_total = v_record_documentos_airbp.monto_disponible;
 					END IF;
@@ -288,7 +290,7 @@ BEGIN
 						v_monto_usado_de_factura = v_record_documentos_airbp.importe_total;
 
 						--preguntamos otra vez por si ya igualo o esta mayor
-						IF v_plan_pago.monto <= v_monto_acumulado_con_facturas THEN
+						IF v_plan_pago.monto < v_monto_acumulado_con_facturas THEN
 
 							-- aca termina de la relacionar facturas por que ya esta igual o mayor
 							--sacamos la diferencia que quedo de una factura
@@ -314,9 +316,10 @@ BEGIN
 							fecha_reg,
 							usuario_ai,
 							id_usuario_mod,
-							fecha_mod
+							fecha_mod,
+              monto_acumulado
 						) values(
-							v_record_documentos_airbp.importe_total,
+							v_monto_fac_original,
 							v_monto_usado_de_factura,
 							v_record_documentos_airbp.id_documento,
 							v_diferencia,
@@ -328,7 +331,8 @@ BEGIN
 							now(),
 							v_parametros._nombre_usuario_ai,
 							null,
-							null
+							null,
+              (v_monto_acumulado_con_facturas-v_diferencia)
 
 
 
@@ -364,29 +368,27 @@ BEGIN
 
 			--Devuelve la respuesta
 			return v_resp;
-			
+
 
 
 
 		end;
 
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $BODY$
-LANGUAGE 'plpgsql' VOLATILE
-COST 100;
-ALTER FUNCTION "conta"."ft_plan_pago_documento_airbp_ime"(integer, integer, character varying, character varying) OWNER TO postgres;
+LANGUAGE plpgsql VOLATILE;

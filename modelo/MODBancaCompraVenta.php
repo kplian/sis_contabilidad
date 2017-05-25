@@ -265,7 +265,7 @@ class MODBancaCompraVenta extends MODbase{
 	
 	function cambiarRevision(){
 		
-		
+
 		$id_banca_compra_venta = $this->objParam->getParametro('id_banca_compra_venta');
 		$revisado = $this->objParam->getParametro('revisado');
 		
@@ -275,6 +275,7 @@ class MODBancaCompraVenta extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_banca_compra_venta','id_banca_compra_venta','int4');
+		$this->setParametro('id_periodo','id_periodo','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -333,6 +334,7 @@ class MODBancaCompraVenta extends MODbase{
 				$nombre_archivo = $arregloFiles['archivo']['name'];
 				$partes = explode('_',$nombre_archivo);
 				$fecha_archivo = $this->str_osplit($partes[2], 2);
+
 				$fecha_archivo = '01/'.$fecha_archivo[0].'/'.$fecha_archivo[1];
 				
 				
@@ -353,8 +355,9 @@ class MODBancaCompraVenta extends MODbase{
 					$arr_temp = $this->remove_utf8_bom($arr_temp);
 					
 					if($this->aParam->getParametro('tipo')=='Compras'){
-						
 
+
+					
 
 
 
@@ -565,7 +568,8 @@ class MODBancaCompraVenta extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_banca_compra_venta','id_banca_compra_venta','int4');
-	
+		$this->setParametro('id_periodo','id_periodo','int4');
+
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

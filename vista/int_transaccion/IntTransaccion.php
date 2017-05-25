@@ -149,9 +149,12 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
 			   				}
 		   					
-			   				if(record.data['desc_orden']){
-			   					retorno = retorno + '<b>Ot.:</b> '+record.data['desc_orden'];
+			   				if(record.data['desc_orden']){			   					
+			   					retorno = retorno + String.format('<b>Ord.:</b> <font>{0} {1}</font><br>', record.data['codigo_ot'], record.data['desc_orden']);
 			   				}	
+			   				if(record.data['desc_suborden']){
+			   					retorno = retorno + '<b>Sub.:</b> '+record.data['desc_suborden'];
+			   				}
 		   				return String.format('<div class="gridmultiline">{0}</div>',retorno);
 	   			    	
 	   			    }
@@ -164,7 +167,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro:'cue.nombre_cuenta#cue.nro_cuenta#cc.codigo_cc#cue.nro_cuenta#cue.nombre_cuenta#aux.codigo_auxiliar#aux.nombre_auxiliar#par.codigo#par.nombre_partida#ot.desc_orden',
+		        pfiltro:'cue.nombre_cuenta#cue.nro_cuenta#cc.codigo_cc#cue.nro_cuenta#cue.nombre_cuenta#aux.codigo_auxiliar#aux.nombre_auxiliar#par.codigo#par.nombre_partida#ot.desc_orden#suo.codigo#suo.nombre#ot.codigo',
 				type:'string'
 			},
    			grid:true,
@@ -239,7 +242,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                     name:'id_orden_trabajo',
-                    fieldLabel: 'Orden Trabajo',
+                    fieldLabel: 'Orden',
                     sysorigen:'sis_contabilidad',
 	       		    origen:'OT',
                     allowBlank:true,
@@ -255,6 +258,24 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
             form:true
         },
         {
+            config:{
+                    name:'id_suborden',
+                    fieldLabel: 'Suborden',
+                    sysorigen:'sis_contabilidad',
+	       		    origen:'SUBORDEN',
+                    allowBlank:true,
+                    gwidth:200,
+                    width: 380,
+   				    listWidth: 380
+            
+            },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'suo.codigo#suo.nombre',type:'string'},
+            grid:false,
+            form:true
+        },
+        {
 			config: {
 				name: 'importe_gasto',
 				fieldLabel: 'Gasto',
@@ -262,6 +283,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				width: '100%',
 				gwidth: 100,
+				width: 380,
 				galign: 'right ',
 				maxLength: 100,
 				renderer:function (value,p,record){
@@ -286,7 +308,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Recurso',
 				qtip:'Monto para ejecutar el recurso presupeustario',
 				allowBlank: true,
-				width: '100%',
+				width: 380,
 				gwidth: 100,
 				galign: 'right ',
 				maxLength: 100,
@@ -311,7 +333,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'importe_debe',
 				fieldLabel: 'Debe',
 				allowBlank: true,
-				width: '100%',
+				width: 380,
 				gwidth: 100,
 				galign: 'right ',
 				maxLength: 100,
@@ -336,7 +358,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'importe_haber',
 				fieldLabel: 'Haber',
 				allowBlank: true,
-				width: '100%',
+				width: 380,
 				gwidth: 100,
 				galign: 'right ',
 				maxLength: 100,
@@ -361,7 +383,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'importe_debe_mb',
 				fieldLabel: 'Debe MB',
 				allowBlank: true,
-				width: '100%',
+				width: 380,
 				gwidth: 100,
 				galign: 'right ',
 				maxLength: 100,
@@ -385,7 +407,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'importe_haber_mb',
 				fieldLabel: 'Haber MB',
 				allowBlank: true,
-				width: '100%',
+				width: 380,
 				gwidth: 100,
 				galign: 'right ',
 				maxLength: 100,
@@ -410,7 +432,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'importe_debe_mt',
 				fieldLabel: 'Debe MT',
 				allowBlank: true,
-				width: '100%',
+				width: 380,
 				gwidth: 100,
 				galign: 'right ',
 				maxLength: 100,
@@ -434,7 +456,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'importe_haber_mt',
 				fieldLabel: 'Haber MT',
 				allowBlank: true,
-				width: '100%',
+				width: 380,
 				gwidth: 100,
 				galign: 'right ',
 				maxLength: 100,
@@ -459,7 +481,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name : 'tipo_cambio',
 				fieldLabel : 'TC 1',
 				allowBlank : false,
-				anchor : '80%',
+				width: 380,
 				gwidth : 70,
 				galign: 'right ',
 				maxLength : 20,
@@ -478,7 +500,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name : 'tipo_cambio_2',
 				fieldLabel : 'TC 2',
 				allowBlank : false,
-				anchor : '80%',
+				width: 380,
 				galign: 'right ',
 				gwidth : 70,
 				maxLength : 20,
@@ -499,7 +521,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'glosa',
 				fieldLabel: 'Glosa',
 				allowBlank: true,
-				anchor: '80%',
+				width: 380,
 				gwidth: 300,
 				maxLength:1000,
 				renderer: function(val){if (val != ''){return '<div class="gridmultiline">'+val+'</div>';}}
@@ -518,7 +540,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
-				anchor: '80%',
+				width: 380,
 				gwidth: 100,
 				maxLength:10
 			},
@@ -534,7 +556,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'usr_reg',
 				fieldLabel: 'Creado por',
 				allowBlank: true,
-				anchor: '80%',
+				width: 380,
 				gwidth: 100,
 				maxLength:4
 			},
@@ -549,7 +571,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'fecha_reg',
 				fieldLabel: 'Fecha creación',
 				allowBlank: true,
-				anchor: '80%',
+				width: 380,
 				gwidth: 100,
 							format: 'd/m/Y', 
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
@@ -565,7 +587,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'usr_mod',
 				fieldLabel: 'Modificado por',
 				allowBlank: true,
-				anchor: '80%',
+				width: 380,
 				gwidth: 100,
 				maxLength:4
 			},
@@ -580,7 +602,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				name: 'fecha_mod',
 				fieldLabel: 'Fecha Modif.',
 				allowBlank: true,
-				anchor: '80%',
+				width: 380,
 				gwidth: 100,
 							format: 'd/m/Y', 
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
@@ -629,7 +651,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg',
 		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque',
 		'importe_debe_mt',	'importe_haber_mt','importe_gasto_mt','importe_recurso_mt',
-		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2','actualizacion','triangulacion'
+		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot'
 		
 	],
 	

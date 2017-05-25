@@ -97,9 +97,9 @@ Phx.comborec.sis_contabilidad.configini = function (config){
 			 tasignacion:true,
 			 resizable:true,
 			 name: 'id_orden_trabajo',
-             fieldLabel: 'Orden Trabajo',
+             fieldLabel: 'Orden de Costo',
              allowBlank: true,
-             emptyText : 'OT...',
+             emptyText : 'Ordenes...',
              store : new Ext.data.JsonStore({
                             url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
                             id : 'id_orden_trabajo',
@@ -132,6 +132,92 @@ Phx.comborec.sis_contabilidad.configini = function (config){
             }
 	}
 
+	if (config.origen == 'SUBORDEN') {
+		return {
+			    origen: 'SUBORDEN',
+			    name: 'id_suborden',
+                tinit:false,
+			    tasignacion:true,
+			    resizable:true,
+			    fieldLabel: 'Suborden',
+				allowBlank: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/Suborden/listarSuborden',
+					id: 'id_suborden',
+					root: 'datos',
+					sortInfo: {
+						field: 'nombre',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_suborden', 'nombre', 'codigo'],
+					remoteSort: true,
+					baseParams:Ext.apply({par_filtro: 'suo.nombre#suo.codigo'}, config.baseParams)
+					
+				}),
+				valueField: 'id_suborden',
+				displayField: 'nombre',
+				gdisplayField: 'desc_suborden',
+				hiddenName: 'id_suborden',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,				
+				listWidth:'280',
+				gwidth: 150,
+				minChars: 2
+             }     
+             
+	}
+
+    if (config.origen == 'CUENTAS') {
+        return {
+            origen: 'CUENTAS',
+            tinit:false,
+            tasignacion:true,
+            resizable:true,
+            tname:'id_cuenta',
+            tdisplayField:'nombre_cuenta',
+            pid:this.idContenedor,
+            name:'id_cuenta',
+            fieldLabel:'Cuenta',
+            allowBlank:true,
+            emptyText:'Cuenta...',
+            store: new Ext.data.JsonStore({
+                url: '../../sis_costos/control/TipoCostoCuenta/listarCuentas',
+                id: 'id_cuenta',
+                root: 'datos',
+                sortInfo:{
+                    field: 'nro_cuenta',
+                    direction: 'ASC'
+                },
+                totalProperty: 'total',
+                fields: ['id_cuenta','nombre_cuenta','desc_cuenta','nro_cuenta','gestion','desc_moneda'],
+                // turn on remote sorting
+                remoteSort: true,
+                baseParams:Ext.apply({par_filtro:'nro_cuenta#nombre_cuenta#desc_cuenta',sw_transaccional:'movimiento'}, config.baseParams)
+            }),
+            valueField: 'id_cuenta',
+            displayField: 'nombre_cuenta',
+            hiddenName: 'id_cuenta',
+            tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p><p>Nombre:{nombre_cuenta}</p> <p>({desc_moneda}) - {gestion}</p></div></tpl>',
+            forceSelection:true,
+            typeAhead: false,
+            triggerAction: 'all',
+            lazyRender:true,
+            mode:'remote',
+            pageSize:10,
+            queryDelay:1000,
+            width:250,
+            listWidth:'280',
+            minChars:2
+        }
+
+    }
 
 }
 	    		

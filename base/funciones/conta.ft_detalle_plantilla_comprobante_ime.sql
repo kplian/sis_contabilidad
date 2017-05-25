@@ -108,7 +108,8 @@ BEGIN
                 campo_forma_pago,
                 codigo,
                 tipo_relacion_contable_cc,
-                campo_relacion_contable_cc
+                campo_relacion_contable_cc,
+                campo_suborden
           	) values(
                 v_parametros.id_plantilla_comprobante,
                 v_parametros.debe_haber,
@@ -154,7 +155,8 @@ BEGIN
                 v_parametros.campo_forma_pago,
                 v_parametros.codigo,
                 v_parametros.tipo_relacion_contable_cc,
-                v_parametros.campo_relacion_contable_cc
+                v_parametros.campo_relacion_contable_cc,
+                v_parametros.campo_suborden
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 			
 			--Definicion de la respuesta
@@ -234,7 +236,8 @@ BEGIN
                 campo_forma_pago = v_parametros.campo_forma_pago,
                 codigo = v_parametros.codigo,
                 tipo_relacion_contable_cc = v_parametros.tipo_relacion_contable_cc,
-                campo_relacion_contable_cc = v_parametros.campo_relacion_contable_cc
+                campo_relacion_contable_cc = v_parametros.campo_relacion_contable_cc,
+                campo_suborden = v_parametros.campo_suborden
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta
