@@ -62,7 +62,10 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			   					
 				   				
 				   				if(record.data['desc_orden']){
-				   					retorno = retorno + '<br><b>Ot.:</b> '+record.data['desc_orden'];
+				   					retorno = retorno + '<br><b>Ord.:</b> '+record.data['desc_orden'];
+				   				}
+				   				if(record.data['desc_suborden']){
+				   					retorno = retorno + '<br><b>Sub.:</b> '+record.data['desc_suborden'];
 				   				}	
 			   				return retorno;	
 		   			    	
@@ -205,7 +208,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			{
 				config: {
 					name: 'importe_debe_mb',
-					fieldLabel: 'Debe',
+					fieldLabel: 'Debe MB',
 					allowBlank: true,
 					width: '100%',
 					gwidth: 110,
@@ -229,7 +232,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			{
 				config: {
 					name: 'importe_haber_mb',
-					fieldLabel: 'Haber',
+					fieldLabel: 'Haber MB',
 					allowBlank: true,
 					width: '100%',
 					gwidth: 110,
@@ -246,6 +249,55 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				},
 				type: 'NumberField',
 				filters: {pfiltro: 'transa.importe_haber_mb',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
+			
+			{
+				config: {
+					name: 'importe_debe_mt',
+					fieldLabel: 'Debe MT',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'transa.importe_debe_mt',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
+			{
+				config: {
+					name: 'importe_haber_mt',
+					fieldLabel: 'Haber MT',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'transa.importe_haber_mt',type: 'numeric'},
 				id_grupo: 1,
 				grid: true,
 				form: true
@@ -423,12 +475,18 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		{ name:'importe_haber_mb', type: 'numeric'},
 		{ name:'importe_gasto_mb', type: 'numeric'},
 		{ name:'importe_recurso_mb', type: 'numeric'},
+		
+		{ name:'importe_debe_mt', type: 'numeric'},
+		{ name:'importe_haber_mt', type: 'numeric'},
+		{ name:'importe_gasto_mt', type: 'numeric'},
+		{ name:'importe_recurso_mt', type: 'numeric'},
+		
 		{ name:'desc_cuenta', type: 'string'},
 		{ name:'desc_auxiliar', type: 'string'},
 		{ name:'desc_partida', type: 'string'},
 		{ name:'desc_centro_costo', type: 'string'},
 		'tipo_partida','id_orden_trabajo','desc_orden',
-		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1','id_proceso_wf','id_estado_wf'
+		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1','id_proceso_wf','id_estado_wf','id_suborden','desc_suborden',
 		
 	],
 	

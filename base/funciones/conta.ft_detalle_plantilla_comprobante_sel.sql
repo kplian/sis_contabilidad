@@ -95,7 +95,8 @@ BEGIN
                             cmpbdet.campo_forma_pago,
                             cmpbdet.codigo,
                             cmpbdet.tipo_relacion_contable_cc,
-                            cmpbdet.campo_relacion_contable_cc
+                            cmpbdet.campo_relacion_contable_cc,
+                            cmpbdet.campo_suborden
                             
                         
 						from conta.tdetalle_plantilla_comprobante cmpbdet

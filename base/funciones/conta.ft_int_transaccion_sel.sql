@@ -30,7 +30,9 @@ DECLARE
 	v_nombre_funcion   	text;
 	v_resp				varchar;
     v_cuentas			varchar;
+    v_ordenes			varchar;
     v_filtro_cuentas	varchar;
+    v_filtro_ordenes	varchar;
 			    
 BEGIN
 
@@ -100,7 +102,10 @@ BEGIN
                             transa.tipo_cambio,
                             transa.tipo_cambio_2,
                             transa.actualizacion,
-                            transa.triangulacion
+                            transa.triangulacion,
+                            suo.id_suborden,
+                            (''(''||suo.codigo||'') ''||suo.nombre)::varchar as desc_suborden,
+                            ot.codigo as codigo_ot
                         from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
@@ -109,6 +114,8 @@ BEGIN
 						left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
+                        left join conta.tsuborden suo on suo.id_suborden =  transa.id_suborden 
+                        
                         
 				        where ';
 			
@@ -142,15 +149,16 @@ BEGIN
                           sum(transa.importe_haber_mt) as total_haber_mt,
                           sum(transa.importe_gasto) as total_gasto,
                           sum(transa.importe_recurso) as total_recurso
-					    from conta.tint_transaccion transa
-                          inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
-                          inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
-                          left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
-                          left join pre.tpartida par on par.id_partida = transa.id_partida
-                          left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
-                          left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
-                          left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-					    where ';
+					     from conta.tint_transaccion transa
+						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
+						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
+						left join pre.tpartida par on par.id_partida = transa.id_partida
+						left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
+						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
+                        left join conta.tsuborden suo on suo.id_suborden =  transa.id_suborden
+                        where  ';
 			
             
            
@@ -174,6 +182,7 @@ BEGIN
         
             v_cuentas = '0';
             v_filtro_cuentas = '0=0';
+            v_filtro_ordenes = '0=0';
     		
              IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
              
@@ -200,6 +209,35 @@ BEGIN
                 END IF;
                 
             END IF;
+            
+            IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajo')  THEN
+             
+                  IF v_parametros.id_orden_trabajo is not NULL THEN
+                
+                      WITH RECURSIVE orden_rec (id_orden_trabajo, id_orden_trabajo_fk) AS (
+                        SELECT cue.id_orden_trabajo, cue.id_orden_trabajo_fk
+                        FROM conta.torden_trabajo cue
+                        WHERE cue.id_orden_trabajo = v_parametros.id_orden_trabajo and cue.estado_reg = 'activo'
+                      UNION ALL
+                        SELECT cue2.id_orden_trabajo, cue2.id_orden_trabajo_fk
+                        FROM orden_rec lrec 
+                        INNER JOIN conta.torden_trabajo cue2 ON lrec.id_orden_trabajo = cue2.id_orden_trabajo_fk
+                        where cue2.estado_reg = 'activo'
+                      )
+                    SELECT  pxp.list(id_orden_trabajo::varchar) 
+                      into 
+                        v_ordenes
+                    FROM orden_rec;
+                    
+                    
+                    
+                    v_filtro_ordenes = ' transa.id_orden_trabajo in ('||v_ordenes||') ';
+                END IF;
+                
+               
+                
+            END IF;
+            
            
             
             --Sentencia de la consulta
@@ -222,8 +260,13 @@ BEGIN
 						usu2.cuenta as usr_mod,
                         COALESCE(transa.importe_debe_mb,0) as importe_debe_mb,
                         COALESCE(transa.importe_haber_mb,0) as importe_haber_mb, 
-                       	COALESCE(transa.importe_gasto_mb,0),
-						COALESCE(transa.importe_recurso_mb,0),
+                       	COALESCE(transa.importe_gasto_mb,0) as importe_gasto_mb,
+						COALESCE(transa.importe_recurso_mb,0) as importe_recurso_mb,
+                        
+                        COALESCE(transa.importe_debe_mt,0) as importe_debe_mt,
+                        COALESCE(transa.importe_haber_mt,0) as importe_haber_mt, 
+                       	COALESCE(transa.importe_gasto_mt,0) as importe_gasto_mt,
+						COALESCE(transa.importe_recurso_mt,0) as importe_recurso_mt,
 						
                         CASE par.sw_movimiento
                         	WHEN ''flujo'' THEN
@@ -258,7 +301,7 @@ BEGIN
 						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-				        where icbte.estado_reg = ''validado'' and ' || v_filtro_cuentas||' and ';
+				        where icbte.estado_reg = ''validado'' and ' || v_filtro_cuentas||' and '||v_filtro_ordenes||' and ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -281,6 +324,7 @@ BEGIN
 		begin
              v_cuentas = '0';
              v_filtro_cuentas = '0=0';
+             v_filtro_ordenes = '0=0';
     		
              IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
              
@@ -307,18 +351,54 @@ BEGIN
                 END IF;
                 
             END IF;
-        
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select 
-                        count(transa.id_int_transaccion) as total,
-                        sum(CASE cue.valor_incremento 
+            
+             IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajo')  THEN
+             
+                  IF v_parametros.id_orden_trabajo is not NULL THEN
+                
+                      WITH RECURSIVE orden_rec (id_orden_trabajo, id_orden_trabajo_fk) AS (
+                        SELECT cue.id_orden_trabajo, cue.id_orden_trabajo_fk
+                        FROM conta.torden_trabajo cue
+                        WHERE cue.id_orden_trabajo = v_parametros.id_orden_trabajo and cue.estado_reg = 'activo'
+                      UNION ALL
+                        SELECT cue2.id_orden_trabajo, cue2.id_orden_trabajo_fk
+                        FROM orden_rec lrec 
+                        INNER JOIN conta.torden_trabajo cue2 ON lrec.id_orden_trabajo = cue2.id_orden_trabajo_fk
+                        where cue2.estado_reg = 'activo'
+                      )
+                    SELECT  pxp.list(id_orden_trabajo::varchar) 
+                      into 
+                        v_ordenes
+                    FROM orden_rec;
+                    
+                    
+                    
+                    v_filtro_ordenes =  ' transa.id_orden_trabajo in ('||v_ordenes||') ';
+                END IF;
+                
+            END IF;
+            
+            --RAC 16´/05/2017 quite esta suma de la consulta me parece incorecta, pero no estoy 100% seguro
+            
+            /*
+            
+            sum(CASE cue.valor_incremento 
                         	WHEN ''negativo'' THEN
 								COALESCE(transa.importe_debe_mb*-1,0)
                             ELSE
                             	COALESCE(transa.importe_debe_mb,0)
-                        	END)  as total_debe, 
+                        	END)  as total_debe,
+            */
+        
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select 
+                        count(transa.id_int_transaccion) as total,
+                         
                         
-                        sum(COALESCE(transa.importe_haber_mb,0)) as total_haber
+                        sum(COALESCE(transa.importe_debe_mb,0)) as total_debe,
+                        sum(COALESCE(transa.importe_haber_mb,0)) as total_haber,
+                        sum(COALESCE(transa.importe_debe_mt,0)) as total_debe_mt,
+                        sum(COALESCE(transa.importe_haber_mt,0)) as total_haber_mt
                         
 					    from conta.tint_transaccion transa
                         inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
@@ -332,10 +412,11 @@ BEGIN
 						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-				        where icbte.estado_reg = ''validado'' and ' || v_filtro_cuentas||' and ';
+				        where icbte.estado_reg = ''validado'' and ' || v_filtro_cuentas||' and '||v_filtro_ordenes||' and ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
+            --raise notice '%',v_consulta;
 
 			--Devuelve la respuesta
 			return v_consulta;

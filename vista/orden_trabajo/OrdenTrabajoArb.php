@@ -1,24 +1,33 @@
 <?php
 /**
 *@package pXP
-*@file OrdenTrabajo.php
+*@file OrdenTrabajoArb.php
 *@author  Gonzalo Sarmiento Sejas
-*@date 21-02-2013 21:08:55
+*@date 21-02-2013 15:04:03
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
+Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 
 	constructor:function(config){
-		this.maestro=config.maestro;
+		this.maestro=config.maestro;		
     	//llama al constructor de la clase padre
-		Phx.vista.OrdenTrabajo.superclass.constructor.call(this,config);
+		Phx.vista.OrdenTrabajoArb.superclass.constructor.call(this,config);
+		
 		this.init();
-		this.load({params:{start:0, limit:50}})
+		this.iniciarEventos();
+		
+		
+		
+		
+		
 	},
+	
+	
+	
+
 			
 	Atributos:[
 		{
@@ -27,6 +36,16 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 					labelSeparator:'',
 					inputType:'hidden',
 					name: 'id_orden_trabajo'
+			},
+			type:'Field',
+			form:true 
+		},
+		{
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_orden_trabajo_fk'
 			},
 			type:'Field',
 			form:true 
@@ -66,40 +85,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		
-		{
-			config:{
-				name: 'fecha_inicio',
-				fieldLabel: 'Fecha Inicio',
-				allowBlank: false,
-				anchor: '80%',
-				gwidth: 100,
-						format: 'd/m/Y', 
-						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-			},
-			type:'DateField',
-			filters:{pfiltro:'odt.fecha_inicio',type:'date'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
 		
-		
-		{
-			config:{
-				name: 'fecha_final',
-				fieldLabel: 'Fecha Final',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-						format: 'd/m/Y', 
-						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-			},
-			type:'DateField',
-			filters:{pfiltro:'odt.fecha_final',type:'date'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
 		
 		
 		{
@@ -163,7 +149,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
        		    lazyRender:true,
        		    mode: 'local',
        		    valueField: 'inicio',    
-       		    store:['centro','pep','orden','estadistico']
+       		    store:['centro','pep','orden','estadistica']
 			},
 			type:'ComboBox',
 			id_grupo:1,
@@ -176,6 +162,42 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		
+		{
+			config:{
+				name: 'fecha_inicio',
+				fieldLabel: 'Fecha Inicio',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'odt.fecha_inicio',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		
+		
+		{
+			config:{
+				name: 'fecha_final',
+				fieldLabel: 'Fecha Final',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'odt.fecha_final',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		
 		
 		{
 			config:{
@@ -256,13 +278,18 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	
-	title:'Ordenes de Costo',
-	ActSave:'../../sis_contabilidad/control/OrdenTrabajo/insertarOrdenTrabajo',
-	ActDel:'../../sis_contabilidad/control/OrdenTrabajo/eliminarOrdenTrabajo',
-	ActList:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
-	id_store:'id_orden_trabajo',
+	title:'Ordenes',
+	ActSave:'../../sis_contabilidad/control/OrdenTrabajo/insertarOrdenTrabajoArb',
+	ActDel:'../../sis_contabilidad/control/OrdenTrabajo/eliminarOrdenTrabajoArb',
+	ActList:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajoArb',
+	id_store:'id_cuenta',
+	
+	textRoot:'Ordenes de Costo',
+    id_nodo:'id_orden_trabajo',
+    id_nodo_p:'id_orden_trabajo_fk',
+	
 	fields: [
-		{name:'id_orden_trabajo', type: 'numeric'},
+	   {name:'id_orden_trabajo', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
 		{name:'fecha_final', type: 'date',dateFormat:'Y-m-d'},
 		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},
@@ -273,26 +300,34 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'tipo','movimiento','codigo','descripcion','id_orden_trabajo_fk'
+		{name:'usr_mod', type: 'string'},'tipo','movimiento','codigo','descripcion','id_orden_trabajo_fk','tipo_nodo'
+		
+		
 		
 	],
 	
-	tabeast:[
-		  {
-    		  url:'../../../sis_contabilidad/vista/orden_suborden/OrdenSuborden.php',
-    		  title:'Subordenes', 
-    		  width:'60%',
-    		  cls:'OrdenSuborden'
-		  }
-		],
 	sortInfo:{
 		field: 'id_orden_trabajo',
 		direction: 'ASC'
 	},
-	bdel:true,
-	bsave:true
-	}
-)
+	bdel: true,
+	bsave: false,
+	rootVisible: true,
+	expanded: false,
+	
+	
+    getTipoCuentaPadre: function(n) {
+			var direc
+			var padre = n.parentNode;
+            if (padre) {
+				if (padre.attributes.id != 'id') {
+					return this.getTipoCuentaPadre(padre);
+				} else {
+					return n.attributes.tipo_cuenta;
+				}
+			} else {
+				return undefined;
+			}
+		}
+})
 </script>
-		
-		

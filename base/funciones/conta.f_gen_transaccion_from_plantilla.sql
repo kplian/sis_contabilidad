@@ -304,7 +304,10 @@ BEGIN
                       v_record_int_tran.id_partida =   (v_this_hstore->'campo_partida')::integer;
                       v_record_int_tran.id_auxiliar =   (v_this_hstore->'campo_auxiliar')::integer;
                       v_record_int_tran.id_centro_costo =   (v_this_hstore->'campo_centro_costo')::integer;
+                      
                       v_record_int_tran.id_orden_trabajo =   (v_this_hstore->'campo_orden_trabajo')::integer;
+                      v_record_int_tran.id_suborden =   (v_this_hstore->'campo_suborden')::integer;
+                      
                       v_record_int_tran.id_partida_ejecucion = (v_this_hstore->'campo_partida_ejecucion')::integer;
                       v_record_int_tran.glosa = (v_this_hstore->'campo_concepto_transaccion')::varchar;
                       v_record_int_tran.id_int_comprobante = p_id_int_comprobante;
@@ -361,20 +364,34 @@ BEGIN
                            
                               IF (p_reg_det_plantilla->'id_detalle_plantilla_fk') is NULL  THEN
                               
-                                raise exception 'Es tipo de calculo "diferencia" necesita una columna base de referencia';
+                               
+                                
+                                     -- analizar la forma de calculo de los montos
+                              
+                                    Select  
+                                      sum(COALESCE(it.importe_debe,0)),sum(COALESCE(it.importe_haber,0))
+                                    into
+                                      v_sum_debe, v_sum_haber
+                                    from conta.tint_transaccion  it 
+                                     where it.id_int_comprobante = p_id_int_comprobante;
+                              
+                              
+                              ELSE
+                              
+                                   -- analizar la forma de calculo de los montos
+                                  
+                                  Select  
+                                    sum(COALESCE(it.importe_debe,0)),sum(COALESCE(it.importe_haber,0))
+                                  into
+                                    v_sum_debe, v_sum_haber
+                                  from conta.tint_transaccion  it 
+                                   where it.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_fk')::integer
+                                         and it.id_int_comprobante = p_id_int_comprobante;
                               
                               END IF;
                            
                               
-                              -- analizar la forma de calculo de los montos
-                              
-                              Select  
-                                sum(COALESCE(it.importe_debe,0)),sum(COALESCE(it.importe_haber,0))
-                              into
-                                v_sum_debe, v_sum_haber
-                              from conta.tint_transaccion  it 
-                               where it.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_fk')::integer
-                                     and it.id_int_comprobante = p_id_int_comprobante;
+                             
                                          
                                 
                                          

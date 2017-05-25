@@ -3230,6 +3230,9 @@ AS
     
 /**********************************F-DEP-RAC-CONTA-0-22/12/2016****************************************/
 
+
+
+
 /**********************************I-DEP-RAC-CONTA-0-12/01/2017****************************************/
 
 ALTER TABLE conta.tfactura_airbp
@@ -3247,7 +3250,8 @@ ALTER TABLE conta.tfactura_airbp_concepto
     NOT DEFERRABLE;
 
 /**********************************F-DEP-RAC-CONTA-0-12/01/2017****************************************/
-
+    
+ 
 /**********************************I-DEP-JRR-CONTA-0-02/05/2017****************************************/
 
 ALTER TABLE orga.tcargo_centro_costo
@@ -3259,12 +3263,126 @@ ALTER TABLE orga.tcargo_centro_costo
 
 ALTER TABLE orga.tcargo_presupuesto
   ADD CONSTRAINT fk_tcargo_presupuesto__id_ot FOREIGN KEY (id_ot)
+  REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+ 
+/**********************************F-DEP-JRR-CONTA-0-02/05/2017****************************************/
+   
+  
+    
+/**********************************I-DEP-RAC-CONTA-0-12/05/2017****************************************/
+
+
+CREATE OR REPLACE VIEW conta.vorden_trabajo(
+    id_orden_trabajo,
+    estado_reg,
+    fecha_final,
+    fecha_inicio,
+    desc_orden,
+    motivo_orden,
+    fecha_reg,
+    id_usuario_reg,
+    id_usuario_mod,
+    fecha_mod,
+    usr_reg,
+    usr_mod,
+    id_grupo_ots,
+    id_orden_trabajo_fk,
+    tipo,
+    movimiento,
+    codigo,
+    descripcion)
+AS
+  SELECT odt.id_orden_trabajo,
+         odt.estado_reg,
+         odt.fecha_final,
+         odt.fecha_inicio,
+         odt.desc_orden,
+         odt.motivo_orden,
+         odt.fecha_reg,
+         odt.id_usuario_reg,
+         odt.id_usuario_mod,
+         odt.fecha_mod,
+         usu1.cuenta AS usr_reg,
+         usu2.cuenta AS usr_mod,
+         pxp.aggarray(god.id_grupo_ot) AS id_grupo_ots,
+         odt.id_orden_trabajo_fk,
+         odt.tipo,
+         odt.movimiento,
+         odt.codigo,
+         (COALESCE(odt.codigo, ''::character varying)::text || ' '::text) ||
+           odt.desc_orden::text AS descripcion
+  FROM conta.torden_trabajo odt
+       JOIN segu.tusuario usu1 ON usu1.id_usuario = odt.id_usuario_reg
+       LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = odt.id_usuario_mod
+       LEFT JOIN conta.tgrupo_ot_det god ON god.id_orden_trabajo =
+         odt.id_orden_trabajo AND god.estado_reg::text = 'activo'::text
+  WHERE odt.estado_reg::text = 'activo'::text
+  GROUP BY odt.id_orden_trabajo,
+           odt.estado_reg,
+           odt.fecha_final,
+           odt.fecha_inicio,
+           odt.desc_orden,
+           odt.motivo_orden,
+           odt.fecha_reg,
+           odt.id_usuario_reg,
+           odt.id_usuario_mod,
+           odt.fecha_mod,
+           usu1.cuenta,
+           usu2.cuenta;
+           
+       
+ --------------- SQL ---------------
+
+ALTER TABLE conta.torden_trabajo
+  ADD CONSTRAINT torden_trabajo_fk FOREIGN KEY (id_orden_trabajo_fk)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE; 
+   
+/**********************************F-DEP-RAC-CONTA-0-12/05/2017****************************************/
+
+
+
+/**********************************I-DEP-RAC-CONTA-0-15/05/2017****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT tint_transaccion__id_suborden_fk FOREIGN KEY (id_suborden)
+    REFERENCES conta.tsuborden(id_suborden)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+    
+    --------------- SQL ---------------
+
+ALTER TABLE conta.torden_suborden
+  ADD CONSTRAINT torden_suborden__id_suborden_fk FOREIGN KEY (id_suborden)
+    REFERENCES conta.tsuborden(id_suborden)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+    
+--------------- SQL ---------------
+
+ALTER TABLE conta.torden_suborden
+  ADD CONSTRAINT torden_suborden__id_orden_trabajo_fk FOREIGN KEY (id_orden_trabajo)
     REFERENCES conta.torden_trabajo(id_orden_trabajo)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
+    
+    
+        
 
-/**********************************F-DEP-JRR-CONTA-0-02/05/2017****************************************/
+
+/**********************************F-DEP-RAC-CONTA-0-15/05/2017****************************************/
 
 
 /**********************************I-DEP-GSS-CONTA-0-10/05/2017****************************************/
@@ -3276,4 +3394,6 @@ ALTER TABLE conta.tgasto_sigep
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
 
-/**********************************F-DEP-GSS-CONTA-0-10/05/2017****************************************/
+/**********************************F-DEP-GSS-CONTA-0-10/05/2017****************************************/ 
+
+

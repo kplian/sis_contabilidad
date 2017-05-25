@@ -1,7 +1,7 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
-  p_id_cuenta integer,
+CREATE OR REPLACE FUNCTION conta.f_mayor_orden (
+  p_id_orden_trabajo integer,
   p_fecha_ini date,
   p_fecha_fin date,
   p_id_deptos varchar,
@@ -11,16 +11,14 @@ CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
   p_signo_balance varchar = 'defecto_cuenta'::character varying,
   p_tipo_saldo varchar = 'balance'::character varying,
   p_id_auxiliar integer = NULL::integer,
-  p_id_int_comprobante_ori integer = NULL::integer,
-  p_id_ot integer = NULL::integer,
   p_id_centro_costo integer = NULL::integer
 )
 RETURNS numeric [] AS
 $body$
 /*
-Autor: RCM
-Fecha: 18/11/2013
-Descripcion: Funcion para la eliminacion de int comprobante
+Autor: RAC - KPLIAN
+Fecha: 20/05/2017
+Descripcion: funcion que calcula el mayor por orden de trabajo
 */
 
 DECLARE
@@ -60,7 +58,7 @@ DECLARE
     v_resp_mayor_partida_mt				numeric;
  
 BEGIN
-  	 v_nombre_funcion:='conta.f_mayor_cuenta';
+  	 v_nombre_funcion:='conta.f_mayor_orden';
      
      
      va_cbte_cierre[1] = 'no';
@@ -108,28 +106,20 @@ BEGIN
      
      va_id_deptos = string_to_array(p_id_deptos,',')::INTEGER[];
      
-     -- identificamos si es de momiento o titular,  el incremento y el valor_incremento para la cuenta
+     -- identificamos si es de movimiento o titular,  el incremento y el valor_incremento para la cuenta
      select
-      c.tipo_cuenta,
-      c.eeff,
-      c.valor_incremento,
-      c.sw_transaccional,
-      ctc.incremento,
-      ctc.id_cofig_tipo_cuenta
+      c.tipo,
+      c.movimiento
      into
       v_registros
      from 
-     conta.tcuenta c
-     inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = c.tipo_cuenta
-     where c.id_cuenta = p_id_cuenta;
+     conta.torden_trabajo c
+     where c.id_orden_trabajo = p_id_orden_trabajo;
      
-     -- verificamos la cuenta
-     IF   v_registros.id_cofig_tipo_cuenta is NULL THEN
-        raise exception 'La cuenta con el id: % no tiene un tipo cuenta asociado',  p_id_cuenta;
-     END IF;
+    
      
      -- es una cuenta de movimiento
-     IF  v_registros.sw_transaccional = 'movimiento' THEN
+     IF  v_registros.movimiento = 'si' THEN
      
           -- sumar el debe y el haber para la cuenta
           select 
@@ -153,30 +143,21 @@ BEGIN
           from conta.tint_transaccion t
           inner join conta.tint_comprobante c on t.id_int_comprobante = c.id_int_comprobante
           where 
-              t.id_cuenta = p_id_cuenta AND 
+              t.id_orden_trabajo = p_id_orden_trabajo AND 
               t.estado_reg = 'activo'  AND 
               c.estado_reg = 'validado' AND
               c.cbte_cierre = ANY(va_cbte_cierre) AND
               c.cbte_apertura = ANY(va_cbte_apertura) AND
-              c.cbte_aitb = ANY(va_cbte_aitb) AND
-              (
-                CASE  WHEN p_id_int_comprobante_ori is NULL  THEN
-              				c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin 
-                      ELSE
-                            c.id_int_comprobante = p_id_int_comprobante_ori
-                      END
-              ) AND
+              c.cbte_aitb = ANY(va_cbte_aitb) AND              
               c.id_depto::integer = ANY(va_id_deptos) AND 
+              c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin AND
+              
               (CASE WHEN p_id_auxiliar is NULL  THEN  
                          0=0 
                     ELSE
                        t.id_auxiliar = p_id_auxiliar 
                     END) AND 
-              (CASE WHEN p_id_ot is NULL  THEN  
-                         0=0 
-                    ELSE
-                       t.id_orden_trabajo = p_id_ot 
-                    END) AND 
+              
               (CASE WHEN p_id_centro_costo is NULL  THEN  
                          0=0 
                     ELSE
@@ -190,79 +171,59 @@ BEGIN
         --------------------------------
           IF  p_tipo_saldo = 'balance' THEN
             
-                IF p_signo_balance = 'defecto_cuenta'  THEN
-                    -- si el incremento es debe 
-                    IF  v_registros.incremento = 'debe'   THEN
-                       v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
-                       v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0);
-                       
-                       v_resp_mayor_partida = COALESCE(v_sum_gasto,0) - COALESCE(v_sum_recurso,0);
-                       v_resp_mayor_partida_mt = COALESCE(v_sum_gasto_mt,0) - COALESCE(v_sum_recurso_mt,0);
-                    ELSE
-                    --si el incremento de haber 
-                       v_resp_mayor = COALESCE(v_sum_haber,0) - COALESCE(v_sum_debe,0); 
-                       v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0) - COALESCE(v_sum_debe_mt,0); 
-                       
-                       v_resp_mayor_partida = COALESCE(v_sum_recurso,0) - COALESCE(v_sum_gasto,0); 
-                       v_resp_mayor_partida_mt = COALESCE(v_sum_recurso_mt,0) - COALESCE(v_sum_gasto_mt,0); 
-                    END IF;  
-                   
-              
-                ELSIF   p_signo_balance = 'deudor' THEN
-                  --forzar saldo deudor
-                  v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
-                  v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0); 
-                  
-                  v_resp_mayor_partida = COALESCE(v_sum_gasto,0) - COALESCE(v_sum_recurso,0);
-                  v_resp_mayor_partida_mt = COALESCE(v_sum_gasto_mt,0) - COALESCE(v_sum_recurso_mt,0);    
-                ELSE
-                  --forzar saldo acredor 
-                  v_resp_mayor = COALESCE(v_sum_haber,0) - COALESCE(v_sum_debe,0);
-                  v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0) - COALESCE(v_sum_debe_mt,0);
-                  
-                  v_resp_mayor_partida = COALESCE(v_sum_recurso,0) - COALESCE(v_sum_gasto,0);
-                  v_resp_mayor_partida_mt = COALESCE(v_sum_recurso_mt,0) - COALESCE(v_sum_gasto_mt,0);
-                END IF;
-                
-               
-                -- raise exception 'bal %, %, %,--- % ,%', v_resp_mayor, p_signo_balance, p_tipo_saldo,  COALESCE(v_sum_debe,0),  COALESCE(v_sum_debe,0);
+               --forzar saldo deudor
+               v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
+               v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0); 
+               v_resp_mayor_partida = COALESCE(v_sum_gasto,0) - COALESCE(v_sum_recurso,0);
+               v_resp_mayor_partida_mt = COALESCE(v_sum_gasto_mt,0) - COALESCE(v_sum_recurso_mt,0);    
          
-          ELSEIF  p_tipo_saldo = 'deudor' THEN
-                v_resp_mayor = COALESCE(v_sum_debe,0);
-                v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0);
+         ELSEIF  p_tipo_saldo = 'deudor' THEN
                 
+                v_resp_mayor = COALESCE(v_sum_debe,0);
+                v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0);                
                 v_resp_mayor_partida = COALESCE(v_sum_gasto,0);
                 v_resp_mayor_partida_mt = COALESCE(v_sum_gasto_mt,0);
-          ELSEIF  p_tipo_saldo = 'acreedor' THEN
-               v_resp_mayor = COALESCE(v_sum_haber,0);
-               v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0);
+                
+         ELSEIF  p_tipo_saldo = 'acreedor' THEN
                
+               v_resp_mayor = COALESCE(v_sum_haber,0);
+               v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0);               
                v_resp_mayor_partida = COALESCE(v_sum_recurso,0);
                v_resp_mayor_partida_mt = COALESCE(v_sum_recurso_mt,0);
-          END IF; 
+               
+         END IF; 
+          
           -- retornamos el resultado 
           v_resp_final[1] = v_resp_mayor;
           v_resp_final[2] = v_resp_mayor_mt;
-          
           v_resp_final[3] = v_resp_mayor_partida;
           v_resp_final[4] = v_resp_mayor_partida_mt;
+          --retornamos debe
+          v_resp_final[5] = COALESCE(v_sum_debe,0);
+          v_resp_final[6] = COALESCE(v_sum_debe_mt,0);
+          v_resp_final[7] = COALESCE(v_sum_gasto,0);
+          v_resp_final[8] = COALESCE(v_sum_gasto_mt,0);
+          --retornamos haber
+          v_resp_final[9] = COALESCE(v_sum_haber,0);
+          v_resp_final[10] = COALESCE(v_sum_haber_mt,0);
+          v_resp_final[11] = COALESCE(v_sum_recurso,0);
+          v_resp_final[12] = COALESCE(v_sum_recurso_mt,0);
           
-          
-          raise notice '##################  RESULTADO BASICO %, %',v_resp_mayor,p_id_cuenta;
+          raise notice '##################  RESULTADO BASICO %',v_resp_mayor;
         
           return v_resp_final;  
           
           
      ELSE
-     -- si no es una cuenta titular
+     -- si no,  es una cuenta titular
         -- for, listamos los hijos de la cuenta 
          FOR v_registros in (select 
-                                 c.id_cuenta
-                             from conta.tcuenta c 
-                             where c.id_cuenta_padre = p_id_cuenta and c.estado_reg = 'activo') LOOP
+                                 c.id_orden_trabajo
+                             from conta.torden_trabajo c 
+                             where c.id_orden_trabajo_fk = p_id_orden_trabajo and c.estado_reg = 'activo') LOOP
                --    llamada recursiva
                
-               v_resp_aux = conta.f_mayor_cuenta(v_registros.id_cuenta, 
+               v_resp_aux = conta.f_mayor_orden(v_registros.id_orden_trabajo, 
                									 p_fecha_ini, 
                                                  p_fecha_fin, 
                                                  p_id_deptos, 
@@ -270,13 +231,8 @@ BEGIN
                                                  p_incluir_apertura,
                                                  p_incluir_aitb, 
                                                  p_signo_balance, 
-                                                 p_tipo_saldo,
-                                                 p_id_int_comprobante_ori,
-                                                 p_id_ot,
-                                                 p_id_centro_costo);
- 
-               
-               raise notice '>>>>>>> % regresa maryo = %',v_registros.id_cuenta, v_resp_mayor;
+                                                 p_tipo_saldo);
+         
                v_resp_mayor = v_resp_mayor + v_resp_aux[1];               
                v_resp_mayor_mt = v_resp_mayor_mt + v_resp_aux[2];               
                v_resp_mayor_partida = v_resp_mayor_partida + v_resp_aux[3];               
@@ -296,7 +252,9 @@ BEGIN
      v_resp_final[1] = 0;
      v_resp_final[2] = 0;
      v_resp_final[3] = 0;
-     v_resp_final[4] = 0;     
+     v_resp_final[4] = 0; 
+     
+     raise notice 'f_maryo_orden %',v_resp_final;    
      
      return v_resp_final;
      

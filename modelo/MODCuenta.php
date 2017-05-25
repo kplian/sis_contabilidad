@@ -301,6 +301,52 @@ class MODCuenta extends MODbase{
 		return $this->respuesta;
 	}
 
+    function listarBalanceOrdenes(){
+	    //Definicion de variables para ejecucion del procedimientp
+	    $this->procedimiento='conta.f_balance_ot';
+	    $this-> setCount(false);
+		$this->setTipoRetorno('record');
+	    $this->transaccion='CONTA_BALOT_SEL';
+	    $this->tipo_procedimiento='SEL';//tipo de transaccion
+	    
+	    $this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('nivel','nivel','integer');
+		$this->setParametro('id_deptos','id_deptos','varchar');
+		$this->setParametro('id_ordenes_trabajos','id_ordenes_trabajos','varchar'); 		
+		$this->setParametro('tipo','tipo','varchar'); 
+		$this->setParametro('incluir_cierre','incluir_cierre','varchar');  
+		$this->setParametro('tipo_balance','tipo_balance','varchar'); 
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');      
+	            
+	    //Definicion de la lista del resultado del query
+	     $this->captura('id_orden_trabajo','int4');     
+		 $this->captura('codigo','varchar');
+		 $this->captura('desc_orden','varchar');
+		 $this->captura('id_orden_trabajo_fk','int4');
+		 $this->captura('monto','numeric');
+		 $this->captura('monto_mt','numeric');
+		 $this->captura('monto_debe','numeric');
+		 $this->captura('monto_mt_debe','numeric');
+		 $this->captura('monto_haber','numeric');
+		 $this->captura('monto_mt_haber','numeric');
+		 $this->captura('nivel','int4');
+		 $this->captura('tipo','varchar');
+		 $this->captura('movimiento','varchar');
+		 
+		
+          
+		  
+		 
+		//Ejecuta la instruccion
+	    $this->armarConsulta();
+		//echo $this->getConsulta();
+		//exit;
+	    $this->ejecutarConsulta();
+	    
+	    return $this->respuesta;       
+ }
+
 			
 }
 ?>

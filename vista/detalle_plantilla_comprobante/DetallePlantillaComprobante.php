@@ -301,7 +301,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'campo_orden_trabajo',
-				fieldLabel: 'Campo Orden de Trabajo',
+				fieldLabel: 'Campo Orden de Costos',
 				qtip:'Algunas relaciones contables necesitan una OT para acumular costos',
 				allowBlank: true,
 				anchor: '80%',
@@ -310,6 +310,22 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpbdet.campo_orden_trabajo',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'campo_suborden',
+				fieldLabel: 'Campo Suborden',
+				qtip:'Algunas relaciones contables necesitan una Subordenes  para acumular costos',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_suborden',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -891,7 +907,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_porc_monto_excento_var',
         {name:'campo_nombre_cheque_trans', type: 'string'},
         'prioridad_documento',
-        'campo_orden_trabajo','campo_forma_pago','codigo','tipo_relacion_contable_cc','campo_relacion_contable_cc'
+        'campo_orden_trabajo','campo_forma_pago','codigo','tipo_relacion_contable_cc','campo_relacion_contable_cc','campo_suborden',
 		
 	],
 	sortInfo:{

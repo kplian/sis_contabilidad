@@ -74,9 +74,7 @@ class MODDetallePlantillaComprobante extends MODbase{
 		
 		$this->captura('tipo_relacion_contable_cc','varchar');
 		$this->captura('campo_relacion_contable_cc','text');
-		
-		
-		
+		$this->captura('campo_suborden','varchar');
 		
 		
 	
@@ -142,6 +140,8 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('tipo_relacion_contable_cc','tipo_relacion_contable_cc','varchar');
 		$this->setParametro('campo_relacion_contable_cc','campo_relacion_contable_cc','varchar');
 		
+		$this->setParametro('campo_suborden','campo_suborden','varchar');
+		
 		
         
 
@@ -205,6 +205,8 @@ class MODDetallePlantillaComprobante extends MODbase{
 		
 		$this->setParametro('tipo_relacion_contable_cc','tipo_relacion_contable_cc','varchar');
 		$this->setParametro('campo_relacion_contable_cc','campo_relacion_contable_cc','varchar');
+		
+		$this->setParametro('campo_suborden','campo_suborden','varchar');
 		
 
 		//Ejecuta la instruccion
