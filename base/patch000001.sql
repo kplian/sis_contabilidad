@@ -3456,7 +3456,7 @@ IS 'Con que tiemo de comprobantes de mueven estan cuentas, diario, ingreso, movi
 
 
 
-/***********************************I-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+/***********************************I-SCP-RAC-CONTA-0-19/12/2016****************************************/
 
 --------------- SQL ---------------
 
@@ -3475,11 +3475,11 @@ ALTER TABLE conta.tresultado_plantilla
 COMMENT ON COLUMN conta.tresultado_plantilla.relacion_unica
 IS 'si o no, solo se utiliza cuando el preiodo de calculo es giual a cbte, sirve apra validar que el comprobante origen solo tenga una relacion de este tipo y no mas';
 
-/*********************************** F-SCP-RAC-CONTA-0-19/12/2016 ****************************************/
+/***********************************F-SCP-RAC-CONTA-0-19/12/2016****************************************/
 
 
 
-/*********************************** I-SCP-FFP-CONTA-0-30/12/2016 ****************************************/
+/***********************************I-SCP-FFP-CONTA-0-30/12/2016****************************************/
 
 
 /*
@@ -3506,9 +3506,9 @@ CREATE TABLE conta.tbancarizacion_gestion (
 WITH (oids = false);
 
 
-/*********************************** F-SCP-FFP-CONTA-0-30/12/2016 ****************************************/
+/***********************************F-SCP-FFP-CONTA-0-30/12/2016****************************************/
 
-/*********************************** I-SCP-GSS-CONTA-0-12/01/2017 ****************************************/
+/***********************************I-SCP-GSS-CONTA-0-12/01/2017****************************************/
 
 CREATE TABLE conta.tarchivo_airbp (
   id_archivo_airbp SERIAL NOT NULL,
@@ -3547,33 +3547,12 @@ CREATE TABLE conta.tfactura_airbp_concepto (
 
 WITH (oids = false);
 
-/*********************************** F-SCP-GSS-CONTA-0-12/01/2017 ****************************************/
+/***********************************F-SCP-GSS-CONTA-0-12/01/2017***************************************/
 
 
-/***********************************I-SCP-MMV-CONTA-0-27/01/2017****************************************/
 
-CREATE VIEW conta.ventrega_depto as (
-select
-                            ent.id_entrega,
-                            ent.fecha_c31,
-                            ent.c31,
-                            ent.estado,
-                            ent.estado_reg,
-                            ent.id_usuario_ai,
-                            ent.usuario_ai,
-                            ent.fecha_reg,
-                            ent.id_usuario_reg,
-                            ent.fecha_mod,
-                            ent.id_usuario_mod,
-                            ent.id_depto_conta,
-                            ent.id_estado_wf,
-                            ent.id_proceso_wf,
-                            de.prioridad
-						from conta.tentrega ent
-                        inner join param.tdepto de on de.id_depto = ent.id_depto_conta)
-/***********************************F-SCP-MMV-CONTA-0-27/01/2017****************************************/
 
-/***********************************I-SCP-RAC-CONTA-0-20/02/2017 ****************************************/
+/***********************************I-SCP-RAC-CONTA-0-20/02/2017****************************************/
 
 
 --------------- SQL ---------------
@@ -3587,20 +3566,20 @@ ALTER TABLE conta.tentrega
   ADD COLUMN id_proceso_wf INTEGER;
   
   
-/***********************************F-SCP-RAC-CONTA-0-20/02/2017 ****************************************/
+/***********************************F-SCP-RAC-CONTA-0-20/02/2017****************************************/
 
 
-/*********************************** I-SCP-GVC-CONTA-0-04/04/2017 ****************************************/
+/***********************************I-SCP-GVC-CONTA-0-04/04/2017****************************************/
 CREATE UNIQUE INDEX tauxiliar_idx ON conta.tauxiliar
   USING btree ("codigo_auxiliar");
 
 CREATE UNIQUE INDEX tauxiliar_idx1 ON conta.tauxiliar
   USING btree ("nombre_auxiliar");
 
-/*********************************** F-SCP-GVC-CONTA-0-04/04/2017 ****************************************/
+/***********************************F-SCP-GVC-CONTA-0-04/04/2017****************************************/
 
 
-/*********************************** I-SCP-GSS-CONTA-0-10/05/2017 ****************************************/
+/***********************************I-SCP-GSS-CONTA-0-10/05/2017****************************************/
 
 CREATE TABLE conta.tarchivo_sigep (
   id_archivo_sigep SERIAL,
@@ -3634,7 +3613,7 @@ CREATE TABLE conta.tgasto_sigep (
 
 WITH (oids = false);
 
-/*********************************** F-SCP-GSS-CONTA-0-10/05/2017 ****************************************/
+/***********************************F-SCP-GSS-CONTA-0-10/05/2017****************************************/
 
 
 /***********************************I-SCP-RAC-CONTA-0-12/05/2017****************************************/
