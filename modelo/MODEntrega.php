@@ -37,6 +37,9 @@ class MODEntrega extends MODbase{
 		$this->captura('id_depto_conta','int4');
 		$this->captura('id_estado_wf','int4');
         $this->captura('id_proceso_wf','int4');
+        $this->captura('nro_tramite','varchar');
+
+
 
 		
 		

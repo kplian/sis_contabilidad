@@ -290,7 +290,8 @@ header("content-type: text/javascript; charset=UTF-8");
 	        	fields: ['ID', 'valor'],
 	        	data :	[['txt','TXT'],
 						['pdf','PDF'],	
-						['csv','CSV']]	        				
+						['csv','CSV'],
+                        ['xls','XLS']]
 	    		}),
 				valueField:'ID',
 				displayField:'valor',

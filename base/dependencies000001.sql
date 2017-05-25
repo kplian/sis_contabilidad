@@ -3229,10 +3229,49 @@ AS
   
     
 /**********************************F-DEP-RAC-CONTA-0-22/12/2016****************************************/
-  
+
+
+
+
+/**********************************I-DEP-RAC-CONTA-0-12/01/2017****************************************/
+
+ALTER TABLE conta.tfactura_airbp
+  ADD CONSTRAINT fk_tfactura_airbp__id_doc_compra_venta FOREIGN KEY (id_doc_compra_venta)
+    REFERENCES conta.tdoc_compra_venta(id_doc_compra_venta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE conta.tfactura_airbp_concepto
+  ADD CONSTRAINT fk_tfactura_airbp_concepto__id_factura_airbp FOREIGN KEY (id_factura_airbp)
+    REFERENCES conta.tfactura_airbp(id_factura_airbp)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/**********************************F-DEP-RAC-CONTA-0-12/01/2017****************************************/
+    
+ 
+/**********************************I-DEP-JRR-CONTA-0-02/05/2017****************************************/
+
+ALTER TABLE orga.tcargo_centro_costo
+  ADD CONSTRAINT fk_tcargo_centro_costo__id_ot FOREIGN KEY (id_ot)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE orga.tcargo_presupuesto
+  ADD CONSTRAINT fk_tcargo_presupuesto__id_ot FOREIGN KEY (id_ot)
+  REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+ 
+/**********************************F-DEP-JRR-CONTA-0-02/05/2017****************************************/
    
-
-
+  
+    
 /**********************************I-DEP-RAC-CONTA-0-12/05/2017****************************************/
 
 
@@ -3294,9 +3333,7 @@ AS
            usu1.cuenta,
            usu2.cuenta;
            
-           
-           
-           
+       
  --------------- SQL ---------------
 
 ALTER TABLE conta.torden_trabajo
@@ -3348,5 +3385,15 @@ ALTER TABLE conta.torden_suborden
 /**********************************F-DEP-RAC-CONTA-0-15/05/2017****************************************/
 
 
+/**********************************I-DEP-GSS-CONTA-0-10/05/2017****************************************/
+
+ALTER TABLE conta.tgasto_sigep
+  ADD CONSTRAINT fk_tgasto_sigep__id_archivo_sigep FOREIGN KEY (id_archivo_sigep)
+    REFERENCES conta.tgasto_sigep(id_archivo_sigep)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/**********************************F-DEP-GSS-CONTA-0-10/05/2017****************************************/ 
 
 
