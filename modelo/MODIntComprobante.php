@@ -18,6 +18,8 @@ class MODIntComprobante extends MODbase{
 		$this->procedimiento='conta.ft_int_comprobante_sel';
 		$this->transaccion='CONTA_INCBTE_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+		$this->setParametro('nombreVista','nombreVista','varchar');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_int_comprobante','int4');
@@ -88,7 +90,7 @@ class MODIntComprobante extends MODbase{
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
-		//echo $this->getConsulta();exit;         
+		//echo $this->getConsulta();exit;
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta
@@ -174,7 +176,7 @@ class MODIntComprobante extends MODbase{
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
-		//echo $this->getConsulta();exit;         
+		//echo $this->getConsulta();exit;
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta
@@ -420,6 +422,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_moneda_base','int4');
 		$this->captura('codigo_moneda_base','varchar');		
 		$this->captura('codigo_depto','varchar');
+		$this->captura('documentos','varchar');
 		//$this->captura('nro_tramite','varchar');
 		
 		

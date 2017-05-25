@@ -914,6 +914,55 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					bottom_filter: true,
 					form: false
 			},
+		   {
+			   config:{
+				   name: 'estacion',
+				   fieldLabel: 'Estacion',
+				   allowBlank: true,
+				   anchor: '80%',
+				   gwidth: 100,
+				   maxLength :16,
+				   minLength:16
+			   },
+			   type:'TextField',
+			   filters:{pfiltro:'dcv.estacion',type:'string'},
+			   id_grupo:0,
+			   grid:true,
+			   form:false
+		   },
+
+		   {
+			   config:{
+				   name: 'nombre',
+				   fieldLabel: 'Agencia IATA/Agencia No IATA',
+				   allowBlank: true,
+				   anchor: '80%',
+				   gwidth: 200,
+				   maxLength :16,
+				   minLength:16
+			   },
+			   type:'TextField',
+			   filters:{pfiltro:'pv.nombre',type:'string'},
+			   id_grupo:0,
+			   grid:true,
+			   form:false
+		   },
+		   {
+			   config:{
+				   name: 'codigo_noiata',
+				   fieldLabel: 'Codigo NO IATA',
+				   allowBlank: true,
+				   anchor: '80%',
+				   gwidth: 100,
+				   maxLength :16,
+				   minLength:16
+			   },
+			   type:'TextField',
+			   filters:{pfiltro:'age.codigo_noiata',type:'string'},
+			   id_grupo:0,
+			   grid:true,
+			   form:false
+		   },
 			{
 				config:{
 					name: 'estado_reg',
@@ -1295,8 +1344,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'importe_descuento_ley','importe_aux_neto',
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
 		'desc_tipo_doc_compra_venta','id_tipo_doc_compra_venta','nro_tramite',
-		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg'
-		
+		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg',
+		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata'
 	],
 	sortInfo:{
 		field: 'id_doc_compra_venta',
@@ -1347,7 +1396,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		                                	 id_periodo: me.cmbPeriodo.getValue(),
 		                                	 id_depto: me.cmbDepto.getValue(),
 		                                	 tmpPeriodo: me.tmpPeriodo,
-		                                	 tmpGestion: me.tmpGestion,
+                                             tmpGestion: me.tmpGestion,
 		                                	 tipo_form : tipo,
 		                                	 datosOriginales: record
 	                                    },

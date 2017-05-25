@@ -68,7 +68,7 @@ class MODDocConcepto extends MODbase{
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
 		$this->setParametro('descripcion','descripcion','text');
-		$this->setParametro('cantidad','cantidad','numeric');
+		$this->setParametro('cantidad_sol','cantidad_sol','numeric');
 		$this->setParametro('precio_unitario','precio_unitario','numeric');
 		$this->setParametro('precio_total','precio_total','numeric');
 		
@@ -96,7 +96,7 @@ class MODDocConcepto extends MODbase{
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
 		$this->setParametro('descripcion','descripcion','text');
-		$this->setParametro('cantidad','cantidad','numeric');
+		$this->setParametro('cantidad_sol','cantidad_sol','numeric');
 		$this->setParametro('precio_unitario','precio_unitario','numeric');
 		$this->setParametro('precio_total','precio_total','numeric');
 		$this->setParametro('precio_total_final','precio_total_final','numeric');

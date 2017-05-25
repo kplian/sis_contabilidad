@@ -9,13 +9,13 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-    Phx.vista.EntregaConsulta = {
+    Phx.vista.EntregaVB = {
         require: '../../../sis_contabilidad/vista/entrega/Entrega.php',
         requireclase: 'Phx.vista.Entrega',
         title: 'Solicitud',
-        nombreVista: 'EntregaConsulta',
+        nombreVista: 'EntregaVB',
         constructor: function (config) {
-            Phx.vista.EntregaConsulta.superclass.constructor.call(this, config);
+            Phx.vista.EntregaVB.superclass.constructor.call(this, config);
             //this.maestro = config.maestro;
             this.store.baseParams = {tipo_interfaz: this.nombreVista};
             this.store.baseParams.pes_estado = 'EntregaConsulta';
@@ -26,7 +26,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.getBoton('fin_entrega').setVisible(false);
         },
         preparaMenu : function(n) {
-            var tb = Phx.vista.EntregaConsulta.superclass.preparaMenu.call(this,n);
+            var tb = Phx.vista.EntregaVB.superclass.preparaMenu.call(this,n);
 
             this.getBoton('btnImprimir').enable();
             this.getBoton('diagrama_gantt').enable();
@@ -35,7 +35,7 @@ header("content-type: text/javascript; charset=UTF-8");
             return tb;
         },
         liberaMenu : function() {
-            var tb = Phx.vista.EntregaConsulta.superclass.liberaMenu.call(this);
+            var tb = Phx.vista.EntregaVB.superclass.liberaMenu.call(this);
             this.getBoton('sig_estado').disable();
             this.getBoton('btnImprimir').disable();
             this.getBoton('fin_entrega').disable();

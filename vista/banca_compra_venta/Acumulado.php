@@ -979,7 +979,7 @@ Phx.vista.Acumulado=Ext.extend(Phx.gridInterfaz,{
 		},
 		
 	],
-	tam_pag:50,	
+	tam_pag:1000,
 	title:'Acumulado',
 	ActList:'../../sis_contabilidad/control/BancaCompraVenta/listarBancaCompraVenta',
 	id_store:'id_banca_compra_venta',

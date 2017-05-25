@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,13 +12,13 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
  AUTOR: 		 (admin)
  FECHA:	        18-08-2015 15:57:09
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	 	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -42,8 +40,14 @@ DECLARE
   v_id_cliente			integer;
   v_id_tipo_doc_compra_venta integer;
   v_codigo_estado			varchar;
-  v_estado_rendicion		varchar;	
+  v_estado_rendicion		varchar;
   v_id_int_comprobante		integer;
+  v_tipo_informe			varchar;
+  v_razon_social			varchar;
+  v_nit						integer;
+  v_id_moneda				integer;
+  v_nomeda					varchar;
+
 
 BEGIN
 
@@ -64,7 +68,9 @@ BEGIN
 
 
       --  calcula valores pode defecto para el tipo de doc compra venta
-
+		IF v_parametros.id_moneda is null THEN
+          raise EXCEPTION 'Es necesario indicar la Moneda del documento, revise los datos.';
+      END IF;
 
       IF v_parametros.tipo = 'compra' THEN
         -- paracompras por defecto es
@@ -88,14 +94,22 @@ BEGIN
 
       END IF;
 
+		IF v_parametros.id_moneda is null THEN
+          raise EXCEPTION 'Es necesario indicar la Moneda del documento, revise los datos.';
+      END IF;
 
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
-      -- valida que period de libro de compras y ventas este abierto
-      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  select tipo_informe into v_tipo_informe
+      from param.tplantilla
+      where id_plantilla = v_parametros.id_plantilla;
 
+      IF v_tipo_informe = 'lcv' THEN
+      	  -- valida que periodO de libro de compras y ventas este abierto
+      	  v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
       --TODO
       --validar que no exsita un documento con el mismo nro y misma razon social  ...?
@@ -105,12 +119,12 @@ BEGIN
       IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
 
         IF v_parametros.id_auxiliar is null THEN
-          raise EXCEPTION 'es necesario indicar una cuenta corriente';
+          raise EXCEPTION 'Es necesario indicar una cuenta corriente, revise los datos.';
         END IF;
 
       END IF;
-      
-      
+
+
       if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
           v_id_int_comprobante = v_parametros.id_int_comprobante;
       end if;
@@ -130,15 +144,14 @@ BEGIN
         IF EXISTS(select
                     1
                   from conta.tdoc_compra_venta dcv
+                  inner join param.tplantilla pla on pla.id_plantilla=dcv.id_plantilla
                   where    dcv.estado_reg = 'activo' and  dcv.nit = v_parametros.nit
                            and dcv.nro_autorizacion = v_parametros.nro_autorizacion
                            and dcv.nro_documento = v_parametros.nro_documento
                            and dcv.nro_dui = v_parametros.nro_dui
-                           and dcv.fecha = v_parametros.fecha
-                           and dcv.id_plantilla = v_parametros.id_plantilla
-                           and dcv.razon_social = upper(trim(v_parametros.razon_social))) then
+                           and pla.tipo_informe='lcv') then
 
-          raise exception 'Ya existe un documento registrado con el mismo nro,  razon social y fecha';
+          raise exception 'Ya existe un documento registrado con el mismo nro,  nit y nro de autorizacion';
 
         END IF;
 
@@ -154,9 +167,9 @@ BEGIN
 
 
       --si tiene habilitado el ic copiamos el monto excento
-      -- OJO considerar que todos los calculos con el monto excento ya estaran 
+      -- OJO considerar que todos los calculos con el monto excento ya estaran
       -- considerando el ice, par ano hacer mayores cambios
-      
+
       v_importe_ice = NULL;
       IF v_registros.sw_ic = 'si' then
         v_importe_ice = v_parametros.importe_excento;
@@ -260,6 +273,33 @@ BEGIN
         end if;
       end if;
 
+	  if (pxp.f_existe_parametro(p_tabla,'estacion')) then
+        if(v_parametros.estacion is not null) then
+
+          update conta.tdoc_compra_venta
+          set estacion = v_parametros.estacion
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia_iata')) then
+        if(v_parametros.id_agencia_iata is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_agencia_iata = v_parametros.id_agencia_iata
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia_noiata')) then
+        if(v_parametros.id_agencia_noiata is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_agencia_noiata = v_parametros.id_agencia_noiata
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta almacenado(a) con exito (id_doc_compra_venta'||v_id_doc_compra_venta||')');
       v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_id_doc_compra_venta::varchar);
@@ -304,21 +344,33 @@ BEGIN
 
       END IF;
 
+      IF v_parametros.id_moneda is null THEN
+          raise EXCEPTION 'Es necesario indicar la Moneda del documento, revise los datos.';
+      END IF;
+
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
-      -- valida que period de libro de compras y ventas este abierto
-      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  select tipo_informe into v_tipo_informe
+      from param.tplantilla
+      where id_plantilla = v_parametros.id_plantilla;
+
+      IF v_tipo_informe = 'lcv' THEN
+      	  -- valida que period de libro de compras y ventas este abierto
+      	  v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
       --TODO
       --validar que no exsita un documento con el mismo nro y misma razon social  ...?
       --validar que no exista un documento con el mismo nro_autorizacion, nro_factura , y nit y razon social
 
+
+
       IF v_parametros.importe_pendiente > 0 or v_parametros.importe_anticipo > 0 or v_parametros.importe_retgar > 0 THEN
 
         IF v_parametros.id_auxiliar is null THEN
-          raise EXCEPTION 'es necesario indicar una cuenta corriente';
+          raise EXCEPTION 'Es necesario indicar una cuenta corriente, revise los datos.';
         END IF;
 
       END IF;
@@ -341,15 +393,14 @@ BEGIN
         IF EXISTS(select
                     1
                   from conta.tdoc_compra_venta dcv
+                  inner join param.tplantilla pla on pla.id_plantilla=dcv.id_plantilla
                   where    dcv.estado_reg = 'activo' and  dcv.nit = v_parametros.nit
                            and dcv.nro_autorizacion = v_parametros.nro_autorizacion
                            and dcv.nro_documento = v_parametros.nro_documento
                            and dcv.nro_dui = v_parametros.nro_dui
-                           and dcv.fecha = v_parametros.fecha
-                           and dcv.id_plantilla = v_parametros.id_plantilla
-                           and dcv.razon_social = upper(trim(v_parametros.razon_social))) then
+                           and pla.tipo_informe='lcv') then
 
-          raise exception 'Ya existe un documento registrado con el mismo nro,  razon social y fecha';
+          raise exception 'Ya existe un documento registrado con el mismo nro,  nit y nro autorizacion';
 
         END IF;
 
@@ -641,6 +692,32 @@ BEGIN
         end if;
       end if;
 
+	  if (pxp.f_existe_parametro(p_tabla,'estacion')) then
+        if(v_parametros.estacion is not null) then
+
+          update conta.tdoc_compra_venta
+          set estacion = v_parametros.estacion
+          where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia_iata')) then
+        if(v_parametros.id_agencia_iata is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_agencia_iata = v_parametros.id_agencia_iata
+          where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia_noiata')) then
+        if(v_parametros.id_agencia_noiata is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_agencia_noiata = v_parametros.id_agencia_noiata
+          where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+        end if;
+      end if;
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta modificado(a)');
       v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
@@ -1047,6 +1124,42 @@ BEGIN
       return v_resp;
 
     end;
+/*********************************
+ #TRANSACCION:  'CONTA_RAZONXNIT_GET'
+ #DESCRIPCION:	recuperar razon social nit
+ #AUTOR:		MMV
+ #FECHA:		19-04-2017
+***********************************/
+
+  elsif(p_transaccion='CONTA_RAZONXNIT_GET')then
+
+    begin
+    --raise EXCEPTION 'esta llegando  %',v_parametros.nit;
+    select
+        DISTINCT(dcv.nit)::bigint,
+        dcv.razon_social,
+        m.id_moneda,
+        m.moneda
+        into
+        v_nit,
+        v_razon_social,
+        v_id_moneda,
+        v_nomeda
+        from conta.tdoc_compra_venta dcv
+        inner join param.tmoneda m on m.id_moneda = dcv.id_moneda
+		where dcv.nit != '' and dcv.nit like ''||COALESCE(v_parametros.nit,'-')||'%';
+      --Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transaccion Exitosa');
+      v_resp = pxp.f_agrega_clave(v_resp,'razon_social',v_razon_social::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,'id_nomeda',v_id_moneda::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_nomeda::varchar);
+      --Devuelve la respuesta
+      return v_resp;
+
+    end;
+
+
+
 
   else
 
