@@ -3750,3 +3750,36 @@ CREATE TABLE conta.tbancarizacion_periodo(
 
 
 
+/***********************************I-SCP-FFP-RAC-0-26/05/2017****************************************/
+
+
+--Columnas olvidades de poner en archivo
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN estacion VARCHAR(4);
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.estacion
+IS 'esta es una columna propi ade boa para manejo de agencias';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_punto_venta INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_punto_venta
+IS 'columna propia de boa para manejo de agencias';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_agencia INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_agencia
+IS 'column apropia de boa para trabajr con agencias';
+
+/***********************************I-SCP-FFP-RAC-0-26/05/2017****************************************/
+
+
+
