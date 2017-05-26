@@ -927,14 +927,14 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   type:'TextField',
 			   filters:{pfiltro:'dcv.estacion',type:'string'},
 			   id_grupo:0,
-			   grid:true,
+			   grid:false,
 			   form:false
 		   },
 
 		   {
 			   config:{
 				   name: 'nombre',
-				   fieldLabel: 'Agencia IATA/Agencia No IATA',
+				   fieldLabel: 'IATA/No IATA',
 				   allowBlank: true,
 				   anchor: '80%',
 				   gwidth: 200,
@@ -944,13 +944,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   type:'TextField',
 			   filters:{pfiltro:'pv.nombre',type:'string'},
 			   id_grupo:0,
-			   grid:true,
+			   grid:false,
 			   form:false
 		   },
 		   {
 			   config:{
 				   name: 'codigo_noiata',
-				   fieldLabel: 'Codigo NO IATA',
+				   fieldLabel: 'Cod NO IATA',
 				   allowBlank: true,
 				   anchor: '80%',
 				   gwidth: 100,
@@ -960,7 +960,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   type:'TextField',
 			   filters:{pfiltro:'age.codigo_noiata',type:'string'},
 			   id_grupo:0,
-			   grid:true,
+			   grid:false,
 			   form:false
 		   },
 			{
@@ -1071,6 +1071,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					form:false
 			}
 		],
+		
+		//Esta funcion se sobre carga para la version de BOA
+		this.modificarAtributos();
 			
 		
 		//llama al constructor de la clase padre
@@ -1135,6 +1138,10 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		this.init();
 		this.grid.addListener('cellclick', this.oncellclick,this);
 		this.obtenerVariableGlobal();
+	},
+	
+	modificarAtributos: function(){
+		
 	},
 	
 	obtenerVariableGlobal: function(){
