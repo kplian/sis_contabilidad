@@ -11,29 +11,34 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.DocCompra = {
+Phx.vista.DocCompraBOA = {
     
 	require: '../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVenta.php',
+	ActList:'../../sis_contabilidad/control/DocCompraVenta/listarDocCompraCajero',
 	requireclase: 'Phx.vista.DocCompraVenta',
 	title: 'Libro de Compras',
 	nombreVista: 'DocCompra',
 	tipoDoc: 'compra',
 	formTitulo: 'Formulario de Documento Compra',
 	
-	constructor: function(config) {
-		
-	    Phx.vista.DocCompra.superclass.constructor.call(this,config);
-        //this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.tipoDoc});
+	constructor: function(config) {		
+	    Phx.vista.DocCompraBOA.superclass.constructor.call(this,config);
+    },
+    modificarAtributos: function(){
+        	this.Atributos[this.getIndAtributo('estacion')].grid=true;
+            this.Atributos[this.getIndAtributo('codigo_noiata')].grid=true;
+            this.Atributos[this.getIndAtributo('nombre')].grid=true; 
+
     },
     
     loadValoresIniciales: function() {
-    	Phx.vista.DocCompra.superclass.loadValoresIniciales.call(this);
-        //this.Cmp.tipo.setValue(this.tipoDoc); 
+    	Phx.vista.DocCompraBOA.superclass.loadValoresIniciales.call(this);
+        
         
    },
    capturaFiltros:function(combo, record, index){
         this.store.baseParams.tipo = this.tipoDoc;
-        Phx.vista.DocCompra.superclass.capturaFiltros.call(this,combo, record, index);
+        Phx.vista.DocCompraBOA.superclass.capturaFiltros.call(this,combo, record, index);
     },
     
     

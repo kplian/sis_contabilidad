@@ -89,83 +89,81 @@ class ACTDocCompraVenta extends ACTbase{
 		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-
-	function listarDocCompraCajero(){
+     //RAC 26/05/2017, para el listado de la grilla con  informacion de agencia
+    function listarDocCompraCajero(){
 		$this->objParam->defecto('ordenacion','id_doc_compra_venta');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
-
+		
 		if($this->objParam->getParametro('id_periodo')!=''){
-			$this->objParam->addFiltro("dcv.id_periodo = ".$this->objParam->getParametro('id_periodo'));
-		}
-
+            $this->objParam->addFiltro("dcv.id_periodo = ".$this->objParam->getParametro('id_periodo'));    
+        }
+		
 		if($this->objParam->getParametro('id_int_comprobante')!=''){
-			$this->objParam->addFiltro("dcv.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));
-		}
-
+            $this->objParam->addFiltro("dcv.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));    
+        }
+		
 		if($this->objParam->getParametro('tipo')!=''){
-			$this->objParam->addFiltro("dcv.tipo = ''".$this->objParam->getParametro('tipo')."''");
-		}
-
+            $this->objParam->addFiltro("dcv.tipo = ''".$this->objParam->getParametro('tipo')."''");    
+        }
+		
 		if($this->objParam->getParametro('sin_cbte')=='si'){
-			$this->objParam->addFiltro("dcv.id_int_comprobante is NULL");
-		}
-		/* en algunos casos es necesario relacionar con documentos con fechas mayores
-		if($this->objParam->getParametro('manual')!=''){
-            $this->objParam->addFiltro("dcv.manual = ''".$this->objParam->getParametro('manual')."''");
-        }*/
-
+            $this->objParam->addFiltro("dcv.id_int_comprobante is NULL");    
+        }
+		
 		if($this->objParam->getParametro('fecha_cbte')!=''){
-			$this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");
-		}
+            $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    
+        }
 
-		if($this->objParam->getParametro('filtro_usuario') == 'si'){
-			$this->objParam->addFiltro("dcv.id_usuario_reg = ".$_SESSION["ss_id_usuario"]);
-		}
-
+        if($this->objParam->getParametro('filtro_usuario') == 'si'){
+            $this->objParam->addFiltro("dcv.id_usuario_reg = ".$_SESSION["ss_id_usuario"]);
+        }
+		
 		if($this->objParam->getParametro('id_depto')!=''){
 			if($this->objParam->getParametro('id_depto')!=0)
-				$this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));
-		}
-
+				$this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
+        }
+		
 		if($this->objParam->getParametro('id_agrupador')!=''){
-			$this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");
-		}
-
+            $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
+        }
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
-			$this->res = $this->objReporte->generarReporteListado('MODDocCompraVenta','listarDocCompraVenta');
+			$this->res = $this->objReporte->generarReporteListado('MODDocCompraVenta','listarDocCompraCajero');
 		} else{
-			$this->objFunc=$this->create('MODDocCompraVenta');
+			$this->objFunc=$this->create('MODDocCompraVenta');			
 			$this->res=$this->objFunc->listarDocCompraCajero($this->objParam);
 		}
-
+		
 		$temp = Array();
-		$temp['importe_ice'] = $this->res->extraData['total_importe_ice'];
-		$temp['importe_excento'] = $this->res->extraData['total_importe_excento'];
-		$temp['importe_it'] = $this->res->extraData['total_importe_it'];
-		$temp['importe_iva'] = $this->res->extraData['total_importe_iva'];
-		$temp['importe_descuento'] = $this->res->extraData['total_importe_descuento'];
-		$temp['importe_doc'] = $this->res->extraData['total_importe_doc'];
-		$temp['importe_retgar'] = $this->res->extraData['total_importe_retgar'];
-		$temp['importe_anticipo'] = $this->res->extraData['total_importe_anticipo'];
-		$temp['importe_pendiente'] = $this->res->extraData['tota_importe_pendiente'];
-		$temp['importe_neto'] = $this->res->extraData['total_importe_neto'];
-		$temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
-		$temp['importe_pago_liquido'] = $this->res->extraData['total_importe_pago_liquido'];
-		$temp['importe_aux_neto'] = $this->res->extraData['total_importe_aux_neto'];
-
-		$temp['tipo_reg'] = 'summary';
-		$temp['id_doc_compra_venta'] = 0;
-
-
-		$this->res->total++;
-
-		$this->res->addLastRecDatos($temp);
-
-
+			$temp['importe_ice'] = $this->res->extraData['total_importe_ice'];
+			$temp['importe_excento'] = $this->res->extraData['total_importe_excento'];
+			$temp['importe_it'] = $this->res->extraData['total_importe_it'];
+			$temp['importe_iva'] = $this->res->extraData['total_importe_iva'];
+			$temp['importe_descuento'] = $this->res->extraData['total_importe_descuento'];
+			$temp['importe_doc'] = $this->res->extraData['total_importe_doc'];			
+			$temp['importe_retgar'] = $this->res->extraData['total_importe_retgar'];
+			$temp['importe_anticipo'] = $this->res->extraData['total_importe_anticipo'];
+			$temp['importe_pendiente'] = $this->res->extraData['tota_importe_pendiente'];
+			$temp['importe_neto'] = $this->res->extraData['total_importe_neto'];
+			$temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
+			$temp['importe_pago_liquido'] = $this->res->extraData['total_importe_pago_liquido'];	
+			$temp['importe_aux_neto'] = $this->res->extraData['total_importe_aux_neto'];	
+					
+			$temp['tipo_reg'] = 'summary';
+			$temp['id_doc_compra_venta'] = 0;
+			
+			
+			$this->res->total++;
+			
+			$this->res->addLastRecDatos($temp);
+		
+		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+
 
 	function listarNroAutorizacion(){
 		$this->objParam->defecto('ordenacion','nro_autorizacion');

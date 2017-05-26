@@ -1225,16 +1225,17 @@ select pxp.f_insert_testructura_gui ('ORDARB', 'CROT');
 select pxp.f_insert_testructura_gui ('SUOINT', 'CROT');
 select pxp.f_insert_testructura_gui ('ODT', 'CROT');
 select pxp.f_insert_testructura_gui ('GRUOT', 'CROT');
-select pxp.f_insert_testructura_gui ('OFIOT', 'CROT');
+select pxp.f_insert_testructura_gui ('OFIOT', 'CROT');  
 
 
 
 /**********************************F-DAT-RAC-CONTA-1-15/05/2017*****************************************/
 
 
+/**********************************I-DAT-RAC-CONTA-1-26/05/2017*****************************************/  
 
-
-
+select pxp.f_insert_tgui ('<i class="fa fa-signal  fa-2x"></i> SISTEMA DE CONTABILIDAD', '', 'CONTA', 'si', 17, '', 1, '', '', 'CONTA');
+/**********************************F-DAT-RAC-CONTA-1-26/05/2017*****************************************/
 
 
 

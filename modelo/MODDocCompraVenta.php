@@ -86,22 +86,15 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('importe_pendiente','numeric');
 		$this->captura('importe_anticipo','numeric');
 		$this->captura('importe_retgar','numeric');
-		$this->captura('importe_neto','numeric');
-		
+		$this->captura('importe_neto','numeric');		
 		$this->captura('id_auxiliar','integer');
 		$this->captura('codigo_auxiliar','varchar');
-		$this->captura('nombre_auxiliar','varchar');
-		
+		$this->captura('nombre_auxiliar','varchar');		
 		$this->captura('id_tipo_doc_compra_venta','integer');
-		$this->captura('desc_tipo_doc_compra_venta','varchar');
-		
+		$this->captura('desc_tipo_doc_compra_venta','varchar');		
 		$this->captura('importe_aux_neto','numeric');
 
-		$this->captura('estacion','varchar');
-		$this->captura('id_punto_venta','integer');
-		$this->captura('nombre','varchar');
-		$this->captura('id_agencia','integer');
-		$this->captura('codigo_noiata','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -111,12 +104,14 @@ class MODDocCompraVenta extends MODbase{
 		return $this->respuesta;
 	}
 
-	function listarDocCompraCajero(){
+
+
+   function listarDocCompraCajero(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_doc_compra_venta_sel';
 		$this->transaccion='CONTA_DCVCAJ_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-
+		
 		//captura parametros adicionales para el count
 		$this->capturaCount('total_importe_ice','numeric');
 		$this->capturaCount('total_importe_excento','numeric');
@@ -124,7 +119,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->capturaCount('total_importe_iva','numeric');
 		$this->capturaCount('total_importe_descuento','numeric');
 		$this->capturaCount('total_importe_doc','numeric');
-
+		
 		$this->capturaCount('total_importe_retgar','numeric');
 		$this->capturaCount('total_importe_anticipo','numeric');
 		$this->capturaCount('tota_importe_pendiente','numeric');
@@ -132,7 +127,10 @@ class MODDocCompraVenta extends MODbase{
 		$this->capturaCount('total_importe_descuento_ley','numeric');
 		$this->capturaCount('total_importe_pago_liquido','numeric');
 		$this->capturaCount('total_importe_aux_neto','numeric');
-
+		
+		
+		
+				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_doc_compra_venta','int8');
 		$this->captura('revisado','varchar');
@@ -166,6 +164,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		
 		$this->captura('desc_depto','varchar');
 		$this->captura('desc_plantilla','varchar');
 		$this->captura('importe_descuento_ley','numeric');
@@ -176,19 +175,20 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('id_int_comprobante','int4');
 		$this->captura('nro_tramite','varchar');
 		$this->captura('desc_comprobante','varchar');
-
+		
+		
 		$this->captura('importe_pendiente','numeric');
 		$this->captura('importe_anticipo','numeric');
 		$this->captura('importe_retgar','numeric');
 		$this->captura('importe_neto','numeric');
-
+		
 		$this->captura('id_auxiliar','integer');
 		$this->captura('codigo_auxiliar','varchar');
 		$this->captura('nombre_auxiliar','varchar');
-
+		
 		$this->captura('id_tipo_doc_compra_venta','integer');
 		$this->captura('desc_tipo_doc_compra_venta','varchar');
-
+		
 		$this->captura('importe_aux_neto','numeric');
 
 		$this->captura('estacion','varchar');
@@ -196,14 +196,16 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('nombre','varchar');
 		$this->captura('id_agencia','integer');
 		$this->captura('codigo_noiata','varchar');
-		
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-
+		//var_dump($this->respuesta); exit;
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+
 
 	function insertarDocCompraVenta(){
 		//Definicion de variables para ejecucion del procedimiento

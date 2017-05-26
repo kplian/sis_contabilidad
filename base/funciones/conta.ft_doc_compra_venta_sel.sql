@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -105,22 +107,15 @@ BEGIN
                             aux.nombre_auxiliar,
                             dcv.id_tipo_doc_compra_venta,
                             (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta,
-                            (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto,
-                            dcv.estacion,
-                            dcv.id_punto_venta,
-                            (ob.nombre ||'' - ''|| upper(ob.tipo_agencia))::Varchar as nombre,
-                            dcv.id_agencia,
-                            age.codigo_noiata
-
+                            (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto
+                            
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
                           inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
                           left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
-                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
-                          left join obingresos.tagencia ob on ob.id_agencia = dcv.id_agencia
-                          left join obingresos.tagencia age on age.id_agencia = dcv.id_agencia
+                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where  ';
@@ -133,12 +128,58 @@ BEGIN
 			return v_consulta;
 
 		end;
+     /*********************************
+ 	#TRANSACCION:  'CONTA_DCV_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-	/*********************************
+	elsif(p_transaccion='CONTA_DCV_CONT')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select
+                              count(dcv.id_doc_compra_venta),
+                              COALESCE(sum(dcv.importe_ice),0)::numeric  as total_importe_ice,
+                              COALESCE(sum(dcv.importe_excento),0)::numeric  as total_importe_excento,
+                              COALESCE(sum(dcv.importe_it),0)::numeric  as total_importe_it,
+                              COALESCE(sum(dcv.importe_iva),0)::numeric  as total_importe_iva,
+                              COALESCE(sum(dcv.importe_descuento),0)::numeric  as total_importe_descuento,
+                              COALESCE(sum(dcv.importe_doc),0)::numeric  as total_importe_doc,
+                              COALESCE(sum(dcv.importe_retgar),0)::numeric  as total_importe_retgar,
+                              COALESCE(sum(dcv.importe_anticipo),0)::numeric  as total_importe_anticipo,
+                              COALESCE(sum(dcv.importe_pendiente),0)::numeric  as tota_importe_pendiente,
+                              COALESCE(sum(dcv.importe_neto),0)::numeric  as total_importe_neto,
+                              COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
+                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
+                              COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
+
+					   from conta.tdoc_compra_venta dcv
+                          inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                          inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
+                          left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                          left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
+				        where  ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+            raise notice '%', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;   
+        
+        
+    /*********************************
  	#TRANSACCION:  'CONTA_DCVCAJ_SEL'
- 	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		Gonzalo Sarmiento
- 	#FECHA:		10-02-2017
+ 	#DESCRIPCION:	Consulta de libro de compras que considera agencias , propio de BOA
+ 	#AUTOR:		Gonzalos, ...  Modificado Rensi
+ 	#FECHA:		26-05-2017 15:57:09
 	***********************************/
 
 	elsif(p_transaccion='CONTA_DCVCAJ_SEL')then
@@ -200,9 +241,9 @@ BEGIN
                             (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto,
                             dcv.estacion,
                             dcv.id_punto_venta,
-                            pv.nombre,
+                            (ob.nombre ||'' - ''|| upper(ob.tipo_agencia))::Varchar as nombre,
                             dcv.id_agencia,
-                            age.codigo_noiata
+                            ob.codigo_noiata
 
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
@@ -211,8 +252,7 @@ BEGIN
                           inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
                           left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
-                          left join vef.tpunto_venta pv on pv.id_punto_venta = dcv.id_punto_venta
-                          left join obingresos.tagencia age on age.id_agencia = dcv.id_agencia
+                          left join obingresos.tagencia ob on ob.id_agencia = dcv.id_agencia
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where  ';
@@ -224,61 +264,13 @@ BEGIN
 			--Devuelve la respuesta
 			return v_consulta;
 
-		end;
-
-	/*********************************
- 	#TRANSACCION:  'CONTA_DCV_CONT'
+		end;  
+        
+     /*********************************
+ 	#TRANSACCION:  'CONTA_DCVCAJ_CONT'
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:		admin
  	#FECHA:		18-08-2015 15:57:09
-	***********************************/
-
-	elsif(p_transaccion='CONTA_DCV_CONT')then
-
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select
-                              count(dcv.id_doc_compra_venta),
-                              COALESCE(sum(dcv.importe_ice),0)::numeric  as total_importe_ice,
-                              COALESCE(sum(dcv.importe_excento),0)::numeric  as total_importe_excento,
-                              COALESCE(sum(dcv.importe_it),0)::numeric  as total_importe_it,
-                              COALESCE(sum(dcv.importe_iva),0)::numeric  as total_importe_iva,
-                              COALESCE(sum(dcv.importe_descuento),0)::numeric  as total_importe_descuento,
-                              COALESCE(sum(dcv.importe_doc),0)::numeric  as total_importe_doc,
-                              COALESCE(sum(dcv.importe_retgar),0)::numeric  as total_importe_retgar,
-                              COALESCE(sum(dcv.importe_anticipo),0)::numeric  as total_importe_anticipo,
-                              COALESCE(sum(dcv.importe_pendiente),0)::numeric  as tota_importe_pendiente,
-                              COALESCE(sum(dcv.importe_neto),0)::numeric  as total_importe_neto,
-                              COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
-                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
-                              COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
-
-					   from conta.tdoc_compra_venta dcv
-                          inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
-                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
-                          inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
-                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
-                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
-                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
-                          left join vef.tpunto_venta pv on pv.id_punto_venta = dcv.id_punto_venta
-                          left join obingresos.tagencia age on age.id_agencia = dcv.id_agencia
-                          left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
-                          left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
-				        where  ';
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-            raise notice '%', v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-
-    /*********************************
- 	#TRANSACCION:  'CONTA_DCVCAJ_CONT'
- 	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		Gonzalo Sarmiento
- 	#FECHA:		10-02-2017
 	***********************************/
 
 	elsif(p_transaccion='CONTA_DCVCAJ_CONT')then
@@ -301,15 +293,14 @@ BEGIN
                               COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
                               COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
 
-					   from conta.tdoc_compra_venta dcv
+					  from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
                           inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
                           left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
-                          left join vef.tpunto_venta pv on pv.id_punto_venta = dcv.id_punto_venta
-                          left join obingresos.tagencia age on age.id_agencia = dcv.id_agencia
+                          left join obingresos.tagencia ob on ob.id_agencia = dcv.id_agencia
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
 				        where  ';
@@ -320,7 +311,7 @@ BEGIN
 			--Devuelve la respuesta
 			return v_consulta;
 
-		end;
+		end;        
 
 	/*********************************
  	#TRANSACCION:  'CONTA_DCVNA_SEL'
