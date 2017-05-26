@@ -1384,16 +1384,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                                {
 	                                    modal:true,
 	                                    width:'90%',
-										height:'60%'
+										height:(me.regitrarDetalle == 'si')? '100%':'60%',
 
-										/*if (me.regitrarDetalle == 'si')
-									    {
-										   height:'100%'
-									    }
-										else
-	   									{
-	   										height:'50%'
-	   									}*/
 
 	                                    
 	                                }, { data: { 
