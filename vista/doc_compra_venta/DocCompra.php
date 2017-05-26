@@ -21,6 +21,7 @@ Phx.vista.DocCompra = {
 	formTitulo: 'Formulario de Documento Compra',
 	
 	constructor: function(config) {
+		
 	    Phx.vista.DocCompra.superclass.constructor.call(this,config);
         //this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.tipoDoc});
     },

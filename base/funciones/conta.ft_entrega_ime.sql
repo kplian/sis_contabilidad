@@ -163,7 +163,7 @@ BEGIN
            SELECT i.id_estado_wf
                     into v_estado_wf_com
 		   from conta.tint_comprobante i
-           WHERE i.id_int_comprobante = v_parametros.id_int_comprobantes::INTEGER;
+           WHERE i.id_int_comprobante::VARCHAR = ANY(string_to_array(v_parametros.id_int_comprobantes,','));
 
            ------------------------------
             --registra procesos disparados
@@ -188,12 +188,10 @@ BEGIN
                                --v_registros_proc.obs_pro,
                                'CONEN',
                                'CONEN');
-
-
-
-           if v_parametros.total_cbte < 1 then
+            if v_parametros.total_cbte < 1 then
                 raise exception 'No tiene comprobantes para entregar';
              end if;
+
            insert into conta.tentrega(
                       fecha_c31,
                       c31,
@@ -223,9 +221,7 @@ BEGIN
                       v_id_proceso_wf,
                       v_id_estado_wf
 			)RETURNING id_entrega into v_id_entrega;
-
             --
-
             v_ids = string_to_array(v_parametros.id_int_comprobantes,',');
             v_i = 1;
 
@@ -243,7 +239,6 @@ BEGIN
                  if v_c31 is not null  and trim(v_c31) != ''   then
                     raise exception 'El comprobantes (id: %)  ya se encuentra relacionado con la entrega o C31: %', v_ids[v_i] ,v_c31;
                  end if;
-
 
                  --Sentencia de la insercion
                 insert into conta.tentrega_det(
@@ -315,8 +310,7 @@ BEGIN
               c31 = v_parametros.c31,
               fecha_c31 = v_parametros.fecha_c31,
               obs = v_parametros.obs,
-              id_tipo_relacion_comprobante = v_parametros.id_tipo_relacion_comprobante,
-              estado = 'borrador'
+              id_tipo_relacion_comprobante = v_parametros.id_tipo_relacion_comprobante
             where id_entrega = v_parametros.id_entrega;
 
             v_sw_tmp = true;
@@ -454,7 +448,11 @@ BEGIN
              v_tipo_noti = 'notificacion';
              v_titulo  = 'Entrega';
 
-IF   v_codigo_estado_siguiente not in('borrador','supconta','vbconta','finalizado')THEN
+            IF v_codigo_estado_siguiente = 'finalizado' and v_entrega.c31 = '' THEN
+            	raise exception 'Debe ingresar numero de c31 antes de finalizar la entrega';
+            END IF;
+
+            IF   v_codigo_estado_siguiente not in('borrador','supconta','vbconta','finalizado')THEN
 
                   v_acceso_directo = '../../../sis_contabilidad/vista/entrega/Entrega.php';
                   v_clase = 'Entrega';

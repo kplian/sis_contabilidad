@@ -182,7 +182,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	       		    lazyRender:true,
 	       		    mode: 'local',
 	       		    gwidth: 100,
-	       		    store:['capital','reserva']
+	       		    store:['capital','reserva','resultado']
 	       		},
 	       		type:'ComboBox',
 	       		id_grupo:0,
@@ -610,7 +610,16 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				}
 				
 			},this);
-		}
-    }
-)
+		},
+		
+		tabeast:[
+		  {
+    		  url:'../../../sis_contabilidad/vista/cuenta_partida/CuentaPartida.php',
+    		  title:'Partidas', 
+    		  width:'60%',
+    		  cls:'CuentaPartida'
+		  }
+		  
+		]
+})
 </script>

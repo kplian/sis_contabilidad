@@ -66,7 +66,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
                     'desc_plantilla', 'desc_moneda','importe_doc','nro_documento',
                     'tipo','razon_social','fecha'],
                     remoteSort: true,
-                    baseParams:{par_filtro:'mon.codigo#pla.desc_plantilla#dcv.razon_social#dcv.nro_documento#dcv.nit'}
+                    baseParams:{par_filtro:'mon.codigo#pla.desc_plantilla#dcv.razon_social#dcv.nro_documento#dcv.nit#dcv.importe_doc'}
                 }),
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{razon_social},  NIT: {nit}</p><p>{desc_plantilla} </p><p>Doc: {nro_documento} de Fecha: {fecha}</p><p> {importe_doc} {desc_moneda}  </p></div></tpl>',
                 valueField: 'id_doc_compra_venta',

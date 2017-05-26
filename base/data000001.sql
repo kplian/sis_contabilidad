@@ -960,15 +960,6 @@ select pxp.f_insert_tgui ('Configuración Cambiaria', 'para configurar moneda de
 
 
 
-/* Data for the 'conta.ttipo_relacion_comprobante' table  (Records 1 - 4) */
-
-INSERT INTO conta.ttipo_relacion_comprobante ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "codigo", "nombre")
-VALUES 
-  (1, NULL, E'2014-12-17 16:13:43.521', NULL, E'activo', NULL, NULL, E'AJUSTE', E'Ajuste del comprobante'),
-  (1, NULL, E'2014-12-17 16:14:06.581', NULL, E'activo', NULL, NULL, E'PAGODEV', E'Pago del devengado'),
-  (1, NULL, E'2014-12-17 16:14:25.580', NULL, E'activo', NULL, NULL, E'REVERSION', E'Reversion del comprobante'),
-  (1, NULL, E'2014-12-17 16:15:09.388', NULL, E'activo', NULL, NULL, E'APLICACIONANT', E'Aplicación del anticipo');
-
 
 /***********************************F-DAT-RAC-CONTA-0-12/01/2016****************************************/
 
@@ -1153,6 +1144,11 @@ select wf.f_import_testructura_estado ('insert','borrador','validado','CBTE',1,'
 select wf.f_import_ttipo_documento_estado ('insert','CBTE','CBTE','borrador','CBTE','crear','superior','');
 select wf.f_import_ttipo_documento_estado ('insert','CBTE','CBTE','borrador','CBTE','insertar','superior','');
 select wf.f_import_ttipo_documento_estado ('insert','CBTE','CBTE','borrador','CBTE','eliminar','superior','');
+
+
+--estos origenes estan comentados por que necesitan estar previamente registros en WF
+
+/*
 select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','SFA','pendiente','manual','');
 select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','RFA','pendiente','manual','');
 select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','TPLAP','pendiente','manual','');
@@ -1166,7 +1162,7 @@ select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','PU_ANT_PAR','pen
 select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','PU_AP_ANT','pendiente','manual','');
 select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','CBTE','validado','manual','');
 select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','REPO','pendiente','manual','');
-select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','REN','pendiente','manual','');
+select wf.f_import_ttipo_proceso_origen ('insert','CBTE','CBT','REN','pendiente','manual','');*/
 
 
 
@@ -1212,6 +1208,34 @@ VALUES
 
 
 /**********************************F-DAT-RAC-CONTA-1-13/12/2016*****************************************/
+
+
+
+/**********************************I-DAT-RAC-CONTA-1-15/05/2017*****************************************/
+
+select pxp.f_insert_tgui ('Parametrización de Ordenes de Trabajo', 'Ordenes de trabajo', 'CROT', 'si', 3, '', 2, '', '', 'CONTA');
+select pxp.f_insert_testructura_gui ('CROT', 'CONTA');
+
+select pxp.f_insert_tgui ('Grupos de OTs', 'Grupos de ordenes de trabajo', 'GRUOT', 'si', 0, 'sis_contabilidad/vista/grupo_ot/GrupoOt.php', 2, '', 'GrupoOt', 'CONTA');
+select pxp.f_insert_tgui ('Ordenes de Costo', 'Ordenes de Costo', 'ORDARB', 'si', 1, 'sis_contabilidad/vista/orden_trabajo/OrdenTrabajoArb.php', 3, '', 'OrdenTrabajoArb', 'CONTA');
+select pxp.f_insert_tgui ('Subordenes', 'Subordenes', 'SUOINT', 'si', 4, 'sis_contabilidad/vista/suborden/Suborden.php', 3, '', 'Suborden', 'CONTA');
+select pxp.f_insert_tgui ('OT por Oficina', 'OT por Oficina', 'OFIOT', 'si', 3, 'sis_contabilidad/vista/oficina_ot/OficinaOt.php', 3, '', 'OficinaOt', 'CONTA');
+
+select pxp.f_insert_testructura_gui ('ORDARB', 'CROT');
+select pxp.f_insert_testructura_gui ('SUOINT', 'CROT');
+select pxp.f_insert_testructura_gui ('ODT', 'CROT');
+select pxp.f_insert_testructura_gui ('GRUOT', 'CROT');
+select pxp.f_insert_testructura_gui ('OFIOT', 'CROT');  
+
+
+
+/**********************************F-DAT-RAC-CONTA-1-15/05/2017*****************************************/
+
+
+/**********************************I-DAT-RAC-CONTA-1-26/05/2017*****************************************/  
+
+select pxp.f_insert_tgui ('<i class="fa fa-signal  fa-2x"></i> SISTEMA DE CONTABILIDAD', '', 'CONTA', 'si', 17, '', 1, '', '', 'CONTA');
+/**********************************F-DAT-RAC-CONTA-1-26/05/2017*****************************************/
 
 
 

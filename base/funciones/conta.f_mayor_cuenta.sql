@@ -271,18 +271,11 @@ BEGIN
                                                  p_incluir_aitb, 
                                                  p_signo_balance, 
                                                  p_tipo_saldo,
-                                                 p_id_int_comprobante_ori);
+                                                 p_id_int_comprobante_ori,
+                                                 p_id_ot,
+                                                 p_id_centro_costo);
+ 
                
-         
-               raise notice 'XXXXXXXXXXXXXX parametros   %,%,%,%,%,%,%,%,%,%',v_registros.id_cuenta,p_fecha_ini,p_fecha_fin,
-               													p_id_deptos, 
-                                                                 p_incluir_cierre,
-                                                                 p_incluir_apertura,
-                                                                 p_incluir_aitb, 
-                                                                 p_signo_balance, 
-                                                                 p_tipo_saldo,
-                                                                 p_id_int_comprobante_ori;
-                        
                raise notice '>>>>>>> % regresa maryo = %',v_registros.id_cuenta, v_resp_mayor;
                v_resp_mayor = v_resp_mayor + v_resp_aux[1];               
                v_resp_mayor_mt = v_resp_mayor_mt + v_resp_aux[2];               

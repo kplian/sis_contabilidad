@@ -233,7 +233,7 @@ fheight: '80%',
 
 
 		 
-		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT',/*iconCls:'' ,*/disabled:true,handler:this.generar_txt});
+		this.addButton('exportar',{argument: {imprimir: 'exportar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar TXT - SIN',/*iconCls:'' ,*/disabled:true,handler:this.generar_txt});
 
 		this.addButton('Importar',{argument: {imprimir: 'Importar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Importar TXT',/*iconCls:'' ,*/disabled:true,handler:this.importar_txt});
 
@@ -246,8 +246,11 @@ fheight: '80%',
 
 
 		this.addButton('Clonar',{argument: {imprimir: 'Clonar'},text:'<i class="fa fa-file-text-o fa-2x"></i> Clonar',/*iconCls:'' ,*/disabled:false,handler:this.Clonar});
+		//this.addButton('airbp',{argument: {imprimir: 'airbp'},text:'<i class="fa fa-file-text-o fa-2x"></i> airbp',/*iconCls:'' ,*/disabled:false,handler:this.airbp});
 
 
+
+		this.addButton('exportarGestionCompleta',{argument: {imprimir: 'exportarGestionCompleta'},text:'<i class="fa fa-file-text-o fa-2x"></i> Generar Gestion TXT - SIN',/*iconCls:'' ,*/disabled:false,handler:this.exportarGestionCompleta});
 
 
 		//this.load({params:{start:0, limit:this.tam_pag}})
@@ -751,13 +754,16 @@ fheight: '80%',
 					}else{
 						css = "";
 					}
-					
-					
+
+
 					var devolucion = '';
 					if(record.json.tipo_bancarizacion == 'devolucion'){
 						devolucion = '<div style="color:blue; font-weight:bold;" >(devolucion)</div>'
 					}
 
+					if(record.json.tipo_bancarizacion == 'clonado'){
+						devolucion = '<div style="color:orange; font-weight:bold;" >(clonado)</div>'
+					}
 
             	    return  String.format('<div style="vertical-align:middle;text-align:center;"><span style="{0}">{1}{2}{3}</span></div>',css,resp,lista_negra,devolucion);
 
@@ -1754,7 +1760,7 @@ fheight: '80%',
 	    var d = record.data
         Ext.Ajax.request({
             url:'../../sis_contabilidad/control/BancaCompraVenta/cambiarRevision',
-            params:{ id_banca_compra_venta: d.id_banca_compra_venta,revisado:d.revisado},
+            params:{ id_banca_compra_venta: d.id_banca_compra_venta,revisado:d.revisado,id_periodo: this.cmbPeriodo.getValue()},
             success: this.successRevision,
             failure: this.conexionFailure,
             timeout: this.timeout,
@@ -1903,7 +1909,29 @@ fheight: '80%',
 	        
 	        var texto = objRes.datos;
 	        window.open('../../../reportes_generados/'+texto+'.txt')
-		}, 
+		},
+		exportarGestionCompleta:function(){
+			var rec = this.cmbPeriodo.getValue();
+			var tipo = this.tipoBan;
+
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/BancaCompraVenta/exporta_txt',
+				params:{'gestion':'si','id_periodo':rec,'tipo':tipo,'start':0,'limit':100000,'acumulado':'no','resolucion':this.cmbResolucion.getValue()},
+				success: this.successExportarGestionCompleta,
+
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+		},
+
+		successExportarGestionCompleta:function(resp){
+			Phx.CP.loadingHide();
+	        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+
+	        var texto = objRes.datos;
+	        window.open('../../../reportes_generados/'+texto+'.txt')
+		},
 	
 	/*
 		successGeneracion_txt: function (resp) {
@@ -2082,11 +2110,11 @@ fheight: '80%',
     },
     
     addListaNegra : function(){
-    	
+		var id_periodo = this.cmbPeriodo.getValue();
     	 var data = this.getSelectedData();
     	Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/BancaCompraVenta/agregarListarNegra',
-				params:{'id_banca_compra_venta':data.id_banca_compra_venta},
+				params:{'id_banca_compra_venta':data.id_banca_compra_venta,'id_periodo':id_periodo},
 				success: this.successAuto,
 			
 				failure: this.conexionFailure,
@@ -2192,6 +2220,19 @@ fheight: '80%',
 				timeout:this.timeout,
 				scope:this
 			});
+    },
+	airbp : function(){
+
+
+
+
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/plan_pago_documento_airbp/PlanPagoDocumentoAirbp.php',
+			'PlanPagoDocumentoAirbp',
+			{
+				width:900,
+				height:400
+			},'',this.idContenedor,'PlanPagoDocumentoAirbp')
+
     }
     
     

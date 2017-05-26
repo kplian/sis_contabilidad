@@ -18,8 +18,8 @@ class ACTEntrega extends ACTbase{
 		if($this->objParam->getParametro('id_depto')!=''){
 			$this->objParam->addFiltro("ent.id_depto_conta = ".$this->objParam->getParametro('id_depto'));	
 		}
-        if ($this->objParam->getParametro('pes_estado') == 'EntregaConsulta') {
-            $this->objParam->addFiltro("ent.estado  in (''borrador'',''supconta'',''vbconta'',''finalizado'',''registrado'')");
+         if ($this->objParam->getParametro('pes_estado') == 'EntregaConsulta') {
+            $this->objParam->addFiltro("ent.estado  in (''vbconta'')");
         }
 		
 		

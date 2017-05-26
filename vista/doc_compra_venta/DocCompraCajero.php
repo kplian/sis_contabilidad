@@ -14,6 +14,7 @@ header("content-type: text/javascript; charset=UTF-8");
     Phx.vista.DocCompraCajero = {
 
         require: '../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVenta.php',
+        ActList:'../../sis_contabilidad/control/DocCompraVenta/listarDocCompraCajero',
         requireclase: 'Phx.vista.DocCompraVenta',
         title: 'Libro de Compras',
         nombreVista: 'DocCompraCajero',
@@ -21,7 +22,8 @@ header("content-type: text/javascript; charset=UTF-8");
         formTitulo: 'Formulario de Documento Compra',
         bsave:false,
         constructor: function(config) {
-
+        	
+        	
 
             Phx.vista.DocCompraCajero.superclass.constructor.call(this,config);
 
@@ -40,6 +42,14 @@ header("content-type: text/javascript; charset=UTF-8");
             this.getBoton('btnWizard').hide();
             this.store.baseParams.filtro_usuario = 'si';
         },
+        
+        modificarAtributos: function(){
+        	this.Atributos[this.getIndAtributo('estacion')].grid=true;
+            this.Atributos[this.getIndAtributo('codigo_noiata')].grid=true;
+            this.Atributos[this.getIndAtributo('nombre')].grid=true; 
+
+        },
+        
         arrayDefaultColumHidden:['revisado'],
 
         loadValoresIniciales: function() {

@@ -139,6 +139,23 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+        {
+            config:{
+                name: 'nro_tramite',
+                fieldLabel: 'Nro. Tramite',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:100
+
+            },
+            type:'TextField',
+            filters:{pfiltro:'com.nro_tramite',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false,
+            bottom_filter:true
+        },
 		{
 			config:{
 				name: 'c31',
@@ -152,7 +169,8 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'ent.c31',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:true,
+                bottom_filter:true
 		},
 		{
 			config:{
@@ -184,7 +202,8 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'ent.estado',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:true,
+                bottom_filter:true
 		},
 		{
 			config:{
@@ -293,6 +312,7 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false
 		}
+
 	],
 	tam_pag:50,	
 	title:'Entrega',
@@ -316,6 +336,7 @@ Phx.vista.Entrega=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},'id_depto_conta',
         {name:'id_estado_wf', type: 'numeric'},
         {name:'id_proceso_wf', type: 'numeric'},
+        {name:'nro_tramite', type: 'string'}
 
 
 		

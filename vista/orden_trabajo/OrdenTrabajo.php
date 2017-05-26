@@ -31,38 +31,24 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
+		
 		{
 			config:{
-				name: 'fecha_final',
-				fieldLabel: 'Fecha Final',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-						format: 'd/m/Y', 
-						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-			},
-			type:'DateField',
-			filters:{pfiltro:'odt.fecha_final',type:'date'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'fecha_inicio',
-				fieldLabel: 'Fecha Inicio',
+				name: 'codigo',
+				fieldLabel: 'Codigo Orden',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-						format: 'd/m/Y', 
-						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				maxLength:100
 			},
-			type:'DateField',
-			filters:{pfiltro:'odt.fecha_inicio',type:'date'},
+			type:'TextField',
+			filters:{pfiltro:'odt.codigo',type:'string'},
+			bottom_filter : true,
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
+		
 		{
 			config:{
 				name: 'desc_orden',
@@ -79,6 +65,43 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		
+		{
+			config:{
+				name: 'fecha_inicio',
+				fieldLabel: 'Fecha Inicio',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'odt.fecha_inicio',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		
+		
+		{
+			config:{
+				name: 'fecha_final',
+				fieldLabel: 'Fecha Final',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'odt.fecha_final',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		
+		
 		{
 			config:{
 				name: 'motivo_orden',
@@ -86,15 +109,74 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:500
+				maxLength:450
 			},
-			type:'TextField',
+			type:'TextArea',
 			filters:{pfiltro:'odt.motivo_orden',type:'string'},
 			bottom_filter : true,
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
+		
+		{
+			config:{
+				name: 'movimiento',
+				qtip:'los nodos transaccionales no tienen hijos, son lo que usan en las transacciones (por ejm solicitudes de compra)',
+				fieldLabel: 'Transaccional',
+				allowBlank: false,
+				anchor: '40%',
+				gwidth: 50,
+				maxLength:2,
+				emptyText:'si/no...',       			
+       			typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio', 
+       		    forcSselect:true,      		    
+       		   // displayField: 'descestilo',
+       		    store:['si','no']
+			},
+			type:'ComboBox',
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'odt.movimiento',
+	       				 options: ['si','no'],	
+	       		 	},
+	       	valorInicial:'si',
+			grid:true,
+			form:true
+		},
+		
+		{
+			config:{
+				name: 'tipo',
+				fieldLabel: 'Tipo de Aplicacion?',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 50,				
+				emptyText:'tipo...',       			
+       			typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    valueField: 'inicio',    
+       		    store:['centro','pep','orden','estadistico']
+			},
+			type:'ComboBox',
+			id_grupo:1,
+			filters:{	
+	       		         type: 'list',
+	       				 pfiltro:'odt.tipo',
+	       				 options: ['centro','pep','orden','estadistica']
+	       		 	},
+	        valorInicial:'estadistica',
+			grid:true,
+			form:true
+		},
+		
 		{
 			config:{
 				name: 'estado_reg',
@@ -174,7 +256,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	
-	title:'Ordenes de Trabajo',
+	title:'Ordenes de Costo',
 	ActSave:'../../sis_contabilidad/control/OrdenTrabajo/insertarOrdenTrabajo',
 	ActDel:'../../sis_contabilidad/control/OrdenTrabajo/eliminarOrdenTrabajo',
 	ActList:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
@@ -191,9 +273,18 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'tipo','movimiento','codigo','descripcion','id_orden_trabajo_fk'
 		
 	],
+	
+	tabeast:[
+		  {
+    		  url:'../../../sis_contabilidad/vista/orden_suborden/OrdenSuborden.php',
+    		  title:'Subordenes', 
+    		  width:'60%',
+    		  cls:'OrdenSuborden'
+		  }
+		],
 	sortInfo:{
 		field: 'id_orden_trabajo',
 		direction: 'ASC'

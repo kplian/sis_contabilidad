@@ -16,7 +16,7 @@ $body$
 Autor:  Rensi Arteaga Copari
 Fecha 27/08/2013
 Descripcion:     Esta funciona inicia la generacion de las transacciones del 
-				combronbates segun la definicion de la planilla
+				comprobantes segun la definicion de la planilla
 
 
 

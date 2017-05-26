@@ -97,7 +97,8 @@ BEGIN
           porc_monto_excento_var,
           nombre_cheque_trans,
           id_orden_trabajo,
-          forma_pago
+          forma_pago,
+          id_suborden
          ) 
         VALUES (
           (p_hstore_transaccion->'id_usuario_reg')::integer,
@@ -126,7 +127,8 @@ BEGIN
           COALESCE((p_hstore_transaccion->'porc_monto_excento_var')::numeric,0),
           (p_hstore_transaccion->'nombre_cheque_trans')::varchar,
           (p_hstore_transaccion->'id_orden_trabajo')::integer,
-          (p_hstore_transaccion->'forma_pago')::varchar
+          (p_hstore_transaccion->'forma_pago')::varchar,
+          (p_hstore_transaccion->'id_suborden')::integer
           
           
         ) RETURNING id_int_transaccion into v_id_transaccion;

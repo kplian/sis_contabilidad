@@ -33,7 +33,8 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_auxiliar	integer;
-			    
+  v_estado_gestion VARCHAR;
+
 BEGIN
 
     v_nombre_funcion = 'conta.ft_verificar_banca_compra_venta';
@@ -49,6 +50,19 @@ BEGIN
 	if(p_transaccion='CONTA_REVISAR_BANCA')then
 					
         begin
+
+
+        --verificamos la gestion si esta abierta
+      select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
+        INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
+        inner join param.tperiodo per on per.id_gestion = ges.id_gestion
+      where per.id_periodo = v_parametros.id_periodo;
+
+      IF v_estado_gestion = 'Bloqueado' THEN
+        RAISE EXCEPTION '%','GESTION BLOQUEADA';
+      END IF;
+
+
         	select * into v_record from conta.tbanca_compra_venta
             where id_banca_compra_venta = 	v_parametros.id_banca_compra_venta;
             
@@ -133,6 +147,10 @@ BEGIN
             set revisado = 'si' 
             where id_banca_compra_venta = v_parametros.id_banca_compra_venta;
             end if;
+
+
+
+
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Revision con exito (id_banca_compra_venta'||v_parametros.id_banca_compra_venta||')'); 

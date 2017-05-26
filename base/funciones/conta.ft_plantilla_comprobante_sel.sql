@@ -85,7 +85,8 @@ BEGIN
                           campo_fecha_costo_fin,
                           cmpb.funcion_comprobante_editado,
                           cmpb.funcion_comprobante_prevalidado,
-                          cmpb.funcion_comprobante_validado_eliminado
+                          cmpb.funcion_comprobante_validado_eliminado,
+                          cmpb.desc_plantilla::varchar
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod
@@ -94,7 +95,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+            raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -174,7 +175,8 @@ BEGIN
                           cmpb.campo_depto_libro,
                           campo_fecha_costo_ini,
                           campo_fecha_costo_fin,
-                          cmpb.funcion_comprobante_editado
+                          cmpb.funcion_comprobante_editado,
+                          cmpb.desc_plantilla
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod
@@ -245,7 +247,12 @@ BEGIN
                             cmpbdet.campo_forma_pago,
                             cmpb.codigo as codigo_plantilla,
                             cmpbdet.codigo,
-                            cmpbdet2.codigo as codigo_fk
+                            cmpbdet2.codigo as codigo_fk,
+                            
+                            cmpbdet.tipo_relacion_contable_cc,
+                            cmpbdet.campo_relacion_contable_cc,
+                            cmpbdet.campo_suborden
+                            
 						from conta.tdetalle_plantilla_comprobante cmpbdet
                         inner join conta.tplantilla_comprobante cmpb on cmpb.id_plantilla_comprobante = cmpbdet.id_plantilla_comprobante
 						left join  conta.tdetalle_plantilla_comprobante cmpbdet2 on cmpbdet2.id_detalle_plantilla_comprobante  = cmpbdet.id_detalle_plantilla_fk
