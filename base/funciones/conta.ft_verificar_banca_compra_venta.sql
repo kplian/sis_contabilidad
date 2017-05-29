@@ -53,14 +53,18 @@ BEGIN
 
 
         --verificamos la gestion si esta abierta
-      select banges.estado into v_estado_gestion from conta.tbancarizacion_gestion banges
-        INNER JOIN param.tgestion ges on ges.id_gestion = banges.id_gestion
-        inner join param.tperiodo per on per.id_gestion = ges.id_gestion
-      where per.id_periodo = v_parametros.id_periodo;
+
+
+      select bancaper.estado
+      into v_estado_gestion
+      from conta.tbancarizacion_periodo bancaper
+       where bancaper.id_periodo = v_parametros.id_periodo;
+
 
       IF v_estado_gestion = 'Bloqueado' THEN
-        RAISE EXCEPTION '%','GESTION BLOQUEADA';
+        RAISE EXCEPTION '%','PERIODO BLOQUEADO';
       END IF;
+
 
 
         	select * into v_record from conta.tbanca_compra_venta
