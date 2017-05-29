@@ -216,7 +216,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				type: 'string'
 			},
    		   
-   			grid:false,
+   			grid:true,
    			
    			form:true
 	   	},
@@ -675,7 +675,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	        )
     }),
     
-    arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','glosa','estado_reg','fecha_reg'],
+    arrayDefaultColumHidden:['id_partida','fecha_mod','usr_reg','usr_mod','glosa','estado_reg','fecha_reg'],
 
 
 
