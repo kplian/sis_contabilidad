@@ -3750,7 +3750,7 @@ CREATE TABLE conta.tbancarizacion_periodo(
 
 
 
-/***********************************I-SCP-FFP-RAC-0-26/05/2017****************************************/
+/***********************************I-SCP-RAC-CONTA-0-26/05/2017****************************************/
 
 
 --Columnas olvidades de poner en archivo
@@ -3779,7 +3779,7 @@ ALTER TABLE conta.tdoc_compra_venta
 COMMENT ON COLUMN conta.tdoc_compra_venta.id_agencia
 IS 'column apropia de boa para trabajr con agencias';
 
-/***********************************I-SCP-FFP-RAC-0-26/05/2017****************************************/
+/***********************************F-SCP-RAC-CONTA-0-26/05/2017****************************************/
 
 
 

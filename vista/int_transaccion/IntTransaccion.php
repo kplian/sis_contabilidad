@@ -197,6 +197,25 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    			grid:false,
    			form:true
 	   	},
+		{
+			config:{
+				name: 'id_centro_costo',
+				fieldLabel: 'Centro Costo',
+				allowBlank: false,
+				tinit:false,
+				origen:'CENTROCOSTO',
+				gdisplayField: 'desc_centro_costo',
+				width: 380,
+				listWidth: 380,
+				gwidth: 300
+			},
+			type:'ComboRec',
+			filters:{pfiltro:'cc.codigo_cc',type:'string'},
+			id_grupo:1,
+			grid:true,
+			bottom_filter: true,
+			form:true
+		},
 	   	{
    			config:{
    				sysorigen:'sis_presupuestos',
@@ -220,25 +239,6 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    			
    			form:true
 	   	},
-	   	{
-            config:{
-                name: 'id_centro_costo',
-                fieldLabel: 'Centro Costo',
-                allowBlank: false,
-                tinit:false,
-                origen:'CENTROCOSTO',
-                gdisplayField: 'desc_centro_costo',
-                width: 380,
-   				listWidth: 380,
-                gwidth: 300
-            },
-            type:'ComboRec',
-            filters:{pfiltro:'cc.codigo_cc',type:'string'},
-            id_grupo:1,
-            grid:false,
-            bottom_filter: true,
-            form:true
-        },
         {
             config:{
                     name:'id_orden_trabajo',
@@ -675,7 +675,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	        )
     }),
     
-    arrayDefaultColumHidden:['id_partida','fecha_mod','usr_reg','usr_mod','glosa','estado_reg','fecha_reg'],
+    arrayDefaultColumHidden:['id_centro_costo','id_partida','fecha_mod','usr_reg','usr_mod','glosa','estado_reg','fecha_reg'],
 
 
 
