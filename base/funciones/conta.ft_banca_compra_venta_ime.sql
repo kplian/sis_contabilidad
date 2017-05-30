@@ -837,7 +837,13 @@ where pg_pagado.estado=''pagado'' and pg_devengado.estado = ''devengado''
 and (libro.tipo=''cheque'' or  pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago = ''cheque'')
 and ( pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago=''cheque'')
 -- and plantilla.tipo_informe in (''lcv'',''retenciones'')
-and (libro.estado in (''cobrado'',''entregado'',''anulado'') or libro.estado is null )
+
+and (
+        libro.estado in (''cobrado'',''entregado'',''anulado'')
+        or libro.estado is null
+        or (pg_pagado.forma_pago = ''transferencia'' and libro.estado in(''cobrado'',''entregado'',''anulado'',''borrador'') )
+      )
+
 and ((doc.fecha_documento >= ''' || v_periodo.fecha_ini || '''::date and doc.fecha_documento <=''' ||
                      v_periodo.fecha_fin || '''::date)
 or (libro.fecha >= ''' || v_periodo.fecha_ini || '''::date and libro.fecha <=''' || v_periodo.fecha_fin || '''::date)
@@ -1467,7 +1473,12 @@ where pg_pagado.estado=''pagado'' and pg_devengado.estado = ''devengado''
 and (libro.tipo=''cheque'' or  pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago = ''cheque'')
 and ( pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago=''cheque'')
  and plantilla.tipo_informe in (''lcv'',''retenciones'')
-and (libro.estado in (''cobrado'',''entregado'',''anulado'') or libro.estado is null )
+
+and (
+        libro.estado in (''cobrado'',''entregado'',''anulado'')
+        or libro.estado is null
+        or (pg_pagado.forma_pago = ''transferencia'' and libro.estado in(''cobrado'',''entregado'',''anulado'',''borrador'') )
+      )
 
 and (
 (doc.importe_total >= 50000)
