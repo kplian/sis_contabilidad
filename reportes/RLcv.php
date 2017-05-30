@@ -202,26 +202,44 @@ class RLcv extends  ReportePDF {
         $this->tableborders=$conf_tableborders;
         $this->tabletextcolor=$conf_tabletextcolor;
 		
-		$RowArray = array(
-            			's0'  => 'Nº',
-                        's1' => 'FECHA DE LA FACTURA O DUI',    //ingreso_inicial
-                        's2' => "NIT\nPROVEEDOR",        //ingreso_colectas
-                        's3' => 'NOMBRE O RAZON SOCIAL',           //ingreso_traspasos
-                        's4' => 'Nº DE LA FACTURA',
-                        's5' => 'Nº DE DUI',   //egreso_inicial_por_rendir
-                        's6' => "Nº DE\nAUTORIZACION",     //egreso_operacion
-                        's7' => "IMPORTE TOTAL DE LA COMPRA\nA",   //egresos_contra_rendicion
-                        's8' => "IMPORTE NO SUJETO A CREDITO FISCAL\nB",       //egresos_rendidos
-                        's9' => "SUBTOTAL\nC = A - B",      //egreso_traspaso
-                        's10' => "DESCUENTOS BONIFICACIONES Y REBAJAS OBTENIDAS\n D",      //egreso_traspaso
-                        's11' => "IMPORTE BASE PARA CREDITO FISCAL\nE = C-D",      //egreso_traspaso
-                        's12' => "CREDITO FISCAL\nF = E*13%",      //egreso_traspaso
-                        's13' => 'CODIGO DE CONTROL',
-						's14' => 'TIPO DE COMPRA');
-                         
-        $this-> MultiRow($RowArray,false,1);
+		if($this->datos_periodo['gestion']<2017) {
 
-		
+			$RowArray = array(
+					's0' => 'Nº',
+					's1' => 'FECHA DE LA FACTURA O DUI',    //ingreso_inicial
+					's2' => "NIT\nPROVEEDOR",        //ingreso_colectas
+					's3' => 'NOMBRE O RAZON SOCIAL',           //ingreso_traspasos
+					's4' => 'Nº DE LA FACTURA',
+					's5' => 'Nº DE DUI',   //egreso_inicial_por_rendir
+					's6' => "Nº DE\nAUTORIZACION",     //egreso_operacion
+					's7' => "IMPORTE TOTAL DE LA COMPRA\nA",   //egresos_contra_rendicion
+					's8' => "IMPORTE NO SUJETO A CREDITO FISCAL\nB",       //egresos_rendidos
+					's9' => "SUBTOTAL\nC = A - B",      //egreso_traspaso
+					's10' => "DESCUENTOS BONIFICACIONES Y REBAJAS OBTENIDAS\n D",      //egreso_traspaso
+					's11' => "IMPORTE BASE PARA CREDITO FISCAL\nE = C-D",      //egreso_traspaso
+					's12' => "CREDITO FISCAL\nF = E*13%",      //egreso_traspaso
+					's13' => 'CODIGO DE CONTROL',
+					's14' => 'TIPO DE COMPRA');
+		}else{
+			$RowArray = array(
+					's0' => 'Nº',
+					's1' => 'FECHA DE LA FACTURA O DUI',    //ingreso_inicial
+					's2' => "NIT\nPROVEEDOR",        //ingreso_colectas
+					's3' => 'NOMBRE O RAZON SOCIAL',           //ingreso_traspasos
+					's4' => 'Nº DE LA FACTURA',
+					's5' => 'Nº DE DUI',   //egreso_inicial_por_rendir
+					's6' => "Nº DE\nAUTORIZACION",     //egreso_operacion
+					's7' => "IMPORTE TOTAL DE LA COMPRA\nA",   //egresos_contra_rendicion
+					's8' => "IMPORTE NO SUJETO A CREDITO FISCAL\nB",       //egresos_rendidos
+					's9' => "SUBTOTAL\nC = A - B",      //egreso_traspaso
+					's10' => "DESCUENTOS BONIFICACIONES Y REBAJAS SUJETAS AL IVA \n D",      //egreso_traspaso
+					's11' => "IMPORTE BASE PARA CREDITO FISCAL\nE = C-D",      //egreso_traspaso
+					's12' => "CREDITO FISCAL\nF = E*13%",      //egreso_traspaso
+					's13' => 'CODIGO DE CONTROL',
+					's14' => 'TIPO DE COMPRA');
+		}
+
+		$this->MultiRow($RowArray, false, 1);
     }
 	
 	function generarCuerpo($detalle){
