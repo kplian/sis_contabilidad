@@ -223,8 +223,8 @@ Phx.vista.CuentaPartida=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+				format: 'd/m/Y', 
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
 				filters:{pfiltro:'cupa.fecha_mod',type:'date'},
@@ -234,9 +234,10 @@ Phx.vista.CuentaPartida=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	
-	onReloadPage:function(m,a,b){
-		
+	onReloadPage:function(m,a,b){		
 		this.maestro=m;
+	},
+	postReloadPage:function(m,a,b){
 		if(this.maestro.sw_transaccional == 'movimiento'){
 			this.store.baseParams={id_cuenta:this.maestro.id_cuenta};
 			this.Cmp.id_partida.store.baseParams = Ext.apply(this.Cmp.id_partida.store.baseParams,   {id_gestion: this.maestro.id_gestion});
@@ -247,9 +248,9 @@ Phx.vista.CuentaPartida=Ext.extend(Phx.gridInterfaz,{
 			this.bloquearMenus();
 			this.store.removeAll();
 		}
-		
-		
 	},
+	
+	
 	loadValoresIniciales:function(){
 		
 		Phx.vista.CuentaPartida.superclass.loadValoresIniciales.call(this);

@@ -64,10 +64,11 @@ BEGIN
                           movimiento,
                           codigo,
                           descripcion::varchar,
-                          id_orden_trabajo_fk
+                          id_orden_trabajo_fk,
+                          desc_otp
                         
 						from conta.vorden_trabajo odt
-				        where  movimiento = ''si'' and tipo in (''estadistica'',''centro'',''pep'',''orden'') and ';
+				        where  movimiento = ''si'' and tipo in (''estadistica'',''centro'',''edt'',''orden'') and ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -92,7 +93,7 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_orden_trabajo)
 					     from conta.vorden_trabajo odt
-				         where  movimiento = ''si'' and tipo in (''estadistica'',''centro'',''pep'',''orden'') and ';
+				         where  movimiento = ''si'' and tipo in (''estadistica'',''centro'',''edt'',''orden'') and ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -101,6 +102,72 @@ BEGIN
 			return v_consulta;
 
 		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_ODTRAM_SEL'
+ 	#DESCRIPCION:	Consulta OT del tipo rama para configurar padres desde la interface de OT
+ 	#AUTOR:		Renso Arteaga Copari KPLIAN
+ 	#FECHA:		31/05/2017
+	***********************************/
+
+	elsif(p_transaccion='CONTA_ODTRAM_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+                          id_orden_trabajo,
+                          estado_reg,
+                          fecha_final,
+                          fecha_inicio,
+                          desc_orden,
+                          motivo_orden,
+                          fecha_reg,
+                          id_usuario_reg,
+                          id_usuario_mod,
+                          fecha_mod,
+                          usr_reg,
+                          usr_mod,
+                          tipo,
+                          movimiento,
+                          codigo,
+                          descripcion::varchar,
+                          id_orden_trabajo_fk
+                        from conta.vorden_trabajo odt
+				        where  movimiento = ''no'' and tipo in (''estadistica'',''centro'',''edt'',''orden'') and ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+            raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_ODTRAM_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		Rensi ARteaga Copari
+ 	#FECHA:		21-02-2013 21:08:55
+	***********************************/
+
+	elsif(p_transaccion='CONTA_ODTRAM_CONT')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(id_orden_trabajo)
+					     from conta.vorden_trabajo odt
+				         where  movimiento = ''no'' and tipo in (''estadistica'',''centro'',''edt'',''orden'') and ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;    
+        
         
      
     /*********************************    

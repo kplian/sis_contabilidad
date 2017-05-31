@@ -57,7 +57,7 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 				fieldLabel: 'Codigo Orden',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 300,
 				maxLength:100
 			},
 			type:'TextField',
@@ -75,7 +75,7 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:400
 			},
 			type:'TextField',
 			filters:{pfiltro:'odt.desc_orden',type:'string'},
@@ -149,14 +149,14 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
        		    lazyRender:true,
        		    mode: 'local',
        		    valueField: 'inicio',    
-       		    store:['centro','pep','orden','estadistica']
+       		    store:['centro','edt','orden','estadistica']
 			},
 			type:'ComboBox',
 			id_grupo:1,
 			filters:{	
 	       		         type: 'list',
 	       				 pfiltro:'odt.tipo',
-	       				 options: ['centro','pep','orden','estadistica']
+	       				 options: ['centro','edt','orden','estadistica']
 	       		 	},
 	        valorInicial:'estadistica',
 			grid:true,
@@ -197,8 +197,6 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 			grid:true,
 			form:true
 		},
-		
-		
 		{
 			config:{
 				name: 'estado_reg',
