@@ -61,8 +61,8 @@ BEGIN
        where bancaper.id_periodo = v_parametros.id_periodo;
 
 
-      IF v_estado_gestion = 'Bloqueado' THEN
-        RAISE EXCEPTION '%','PERIODO BLOQUEADO';
+      IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
       END IF;
 
 

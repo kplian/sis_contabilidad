@@ -112,8 +112,8 @@ BEGIN
        where bancaper.id_periodo = v_parametros.id_periodo;
 
 
-      IF v_estado_gestion = 'Bloqueado' THEN
-        RAISE EXCEPTION '%','PERIODO BLOQUEADO';
+       IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
       END IF;
 
 
@@ -300,9 +300,9 @@ BEGIN
       from conta.tbancarizacion_periodo bancaper
        where bancaper.id_periodo = v_id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+        IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
         ----------------------------
 
 
@@ -411,9 +411,9 @@ BEGIN
         where bancaper.id_periodo = v_rec.id_periodo;
 
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
 
@@ -458,9 +458,9 @@ BEGIN
         where bancaper.id_periodo = v_parametros.id_periodo;
 
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+        IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
 
@@ -561,9 +561,9 @@ BEGIN
           from conta.tbancarizacion_periodo bancaper
           where bancaper.id_periodo = v_rec.po_id_periodo;
 
-          IF v_estado_gestion = 'Bloqueado' THEN
-            RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-          END IF;
+          IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
           --solo va para un registro de un excel despues comentar
@@ -677,9 +677,9 @@ BEGIN
         from conta.tbancarizacion_periodo bancaper
         where bancaper.id_periodo = v_parametros.id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
 
@@ -1277,9 +1277,9 @@ and (
         from conta.tbancarizacion_periodo bancaper
         where bancaper.id_periodo = v_parametros.id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
         SELECT * INTO v_banca from conta.tbanca_compra_venta
@@ -1334,9 +1334,9 @@ and (
         from conta.tbancarizacion_periodo bancaper
         where bancaper.id_periodo = v_parametros.id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
         
         SELECT
@@ -1853,9 +1853,9 @@ and (
         from conta.tbancarizacion_periodo bancaper
         where bancaper.id_periodo = v_banca.id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
 
