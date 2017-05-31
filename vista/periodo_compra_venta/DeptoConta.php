@@ -27,7 +27,13 @@ Phx.vista.DeptoConta = {
           title:'Periodos Compra Venta', 
           height:'50%',
           cls:'PeriodoCompraVenta'
-   }],
+   },{
+            url:'../../../sis_contabilidad/vista/bancarizacion_periodo/BancarizacionPeriodo.php',
+            title:'Periodos Bancarizacion Compra',
+            height:'50%',
+            cls:'BancarizacionPeriodo'
+    },
+    ],
    bedit:false,
    bnew:false,
    bdel:false,

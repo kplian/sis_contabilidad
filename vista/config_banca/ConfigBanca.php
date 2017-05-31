@@ -19,12 +19,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.init();
                 this.load({params: {start: 0, limit: this.tam_pag}})
 
-                this.addButton('Abrir/Cerrar Gestion', {
+               /* this.addButton('Abrir/Cerrar Gestion', {
                     argument: {imprimir: 'Abrir/Cerrar Gestion'},
-                    text: '<i class="fa fa-file-text-o fa-2x"></i> Abrir/Cerrar Gestion', /*iconCls:'' ,*/
+                    text: '<i class="fa fa-file-text-o fa-2x"></i> Abrir/Cerrar Gestion', /!*iconCls:'' ,*!/
                     disabled: false,
                     handler: this.abrirCerrarGestion
-                });
+                });*/
 
 
             },

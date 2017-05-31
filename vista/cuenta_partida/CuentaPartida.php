@@ -236,22 +236,24 @@ Phx.vista.CuentaPartida=Ext.extend(Phx.gridInterfaz,{
 	
 	onReloadPage:function(m,a,b){
 		
-		console.log('variable a sobrecargar .....',m,a,b)
 		this.maestro=m;
-		this.store.baseParams={id_cuenta:this.maestro.id_cuenta};
-		this.Cmp.id_partida.store.baseParams = Ext.apply(this.Cmp.id_partida.store.baseParams,   {id_gestion: this.maestro.id_gestion});
-		this.Cmp.id_partida.modificado = true;
-		this.load({params:{start:0, limit:50}})
+		if(this.maestro.sw_transaccional == 'movimiento'){
+			this.store.baseParams={id_cuenta:this.maestro.id_cuenta};
+			this.Cmp.id_partida.store.baseParams = Ext.apply(this.Cmp.id_partida.store.baseParams,   {id_gestion: this.maestro.id_gestion});
+			this.Cmp.id_partida.modificado = true;
+			this.load({params:{start:0, limit:50}})
+		}
+		else{
+			this.bloquearMenus();
+			this.store.removeAll();
+		}
+		
 		
 	},
 	loadValoresIniciales:function(){
 		
-		
 		Phx.vista.CuentaPartida.superclass.loadValoresIniciales.call(this);
 		this.getComponente('id_cuenta').setValue(this.maestro.id_cuenta);
-		
-		
-		
 				
 	},
 	

@@ -97,7 +97,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 	        
 			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 			
-			
+
 			//Instancia la clase de pdf
 		    if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
 			
@@ -254,29 +254,46 @@ class ACTDocCompraVentaForm extends ACTbase{
 		/******************************
 		 *  IMPRIME CABECERA PARA CSV
 		 *****************************/
-		 
 		if($this->objParam->getParametro('formato_reporte') !='txt')
 		{
 			
 			if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
-			 	
-					fwrite ($file,  "-".$separador.
-				 	                'N#'.$separador.
-			                        'FECHA DE LA FACTURA O DUI'.$separador.
-			                        'NIT PROVEEDOR'.$separador.
-			                        'NOMBRE O RAZON SOCIAL'.$separador.
-			                        'N# de LA FACTURA.'.$separador.
-									'N# de DUI'.$separador.
-			                        'N# de AUTORIZACION'.$separador.
-			                        "IMPORTE TOTAL DE LA COMPRA A".$separador.
-			                        "IMPORTE NO SUJETO A CREDITO FISCAL B".$separador.
-									"SUBTOTAL C = A - B".$separador.
-									"DESCUENTOS BONOS Y REBAJAS  D".$separador.
-									"IMPORTE SUJETO a CREDITO FISCAL E = C-D".$separador.
-									"CREDITO FISCAL F = E*13%".$separador.
-									'CODIGO DE CONTROL'.$separador.
-			                        'TIPO DE COMPRA'."\r\n");
-									
+
+					if($dataPeriodoArray['gestion']<2017) {
+						fwrite($file, "-" . $separador .
+								'N#' . $separador .
+								'FECHA DE LA FACTURA O DUI' . $separador .
+								'NIT PROVEEDOR' . $separador .
+								'NOMBRE O RAZON SOCIAL' . $separador .
+								'N# de LA FACTURA.' . $separador .
+								'N# de DUI' . $separador .
+								'N# de AUTORIZACION' . $separador .
+								"IMPORTE TOTAL DE LA COMPRA A" . $separador .
+								"IMPORTE NO SUJETO A CREDITO FISCAL B" . $separador .
+								"SUBTOTAL C = A - B" . $separador .
+								"DESCUENTOS BONOS Y REBAJAS  D" . $separador .
+								"IMPORTE SUJETO a CREDITO FISCAL E = C-D" . $separador .
+								"CREDITO FISCAL F = E*13%" . $separador .
+								'CODIGO DE CONTROL' . $separador .
+								'TIPO DE COMPRA' . "\r\n");
+					}else{
+						fwrite($file, "-" . $separador .
+								'N#' . $separador .
+								'FECHA DE LA FACTURA O DUI' . $separador .
+								'NIT PROVEEDOR' . $separador .
+								'NOMBRE O RAZON SOCIAL' . $separador .
+								'N# de LA FACTURA.' . $separador .
+								'N# de DUI' . $separador .
+								'N# de AUTORIZACION' . $separador .
+								"IMPORTE TOTAL DE LA COMPRA A" . $separador .
+								"IMPORTE NO SUJETO A CREDITO FISCAL B" . $separador .
+								"SUBTOTAL C = A - B" . $separador .
+								"DESCUENTOS BONOS Y REBAJAS SUJETAS AL IVA D" . $separador .
+								"IMPORTE SUJETO a CREDITO FISCAL E = C-D" . $separador .
+								"CREDITO FISCAL F = E*13%" . $separador .
+								'CODIGO DE CONTROL' . $separador .
+								'TIPO DE COMPRA' . "\r\n");
+					}
 									
 			 }
 			 else{
