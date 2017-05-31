@@ -37,27 +37,41 @@ class ACTOrdenTrabajo extends ACTbase{
 
    function listarOrdenTrabajoAll(){
 		$this->objParam->defecto('ordenacion','id_orden_trabajo');
-
-		$this->objParam->defecto('dir_ordenacion','asc');
-		
-		if($this->objParam->getParametro('filtro_ot')=='listado'){
-			
+		$this->objParam->defecto('dir_ordenacion','asc');		
+		if($this->objParam->getParametro('filtro_ot')=='listado'){			
 			if($this->objParam->getParametro('id_grupo_ots')!=''){
                $this->objParam->addFiltro("''{".$this->objParam->getParametro('id_grupo_ots')."}''::integer[] && odt.id_grupo_ots");    
 			}
-		}
-		
+		}		
 		if($this->objParam->getParametro('fecha_solicitud')!=''){
             $this->objParam->addFiltro("odt.fecha_inicio <=''".$this->objParam->getParametro('fecha_solicitud')."'' and (odt.fecha_final is null or odt.fecha_final >= ''". $this->objParam->getParametro('fecha_solicitud') ."'')");    
-        }
-		
+        }		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODOrdenTrabajo','listarOrdenTrabajoAll');
 		} else{
-			$this->objFunc=$this->create('MODOrdenTrabajo');
-			
+			$this->objFunc=$this->create('MODOrdenTrabajo');			
 			$this->res=$this->objFunc->listarOrdenTrabajoAll($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+    function listarOrdenTrabajoRama(){
+		$this->objParam->defecto('ordenacion','id_orden_trabajo');
+		$this->objParam->defecto('dir_ordenacion','asc');		
+		if($this->objParam->getParametro('filtro_ot')=='listado'){			
+			if($this->objParam->getParametro('id_grupo_ots')!=''){
+               $this->objParam->addFiltro("''{".$this->objParam->getParametro('id_grupo_ots')."}''::integer[] && odt.id_grupo_ots");    
+			}
+		}		
+		if($this->objParam->getParametro('fecha_solicitud')!=''){
+            $this->objParam->addFiltro("odt.fecha_inicio <=''".$this->objParam->getParametro('fecha_solicitud')."'' and (odt.fecha_final is null or odt.fecha_final >= ''". $this->objParam->getParametro('fecha_solicitud') ."'')");    
+        }		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODOrdenTrabajo','listarOrdenTrabajoRama');
+		} else{
+			$this->objFunc=$this->create('MODOrdenTrabajo');			
+			$this->res=$this->objFunc->listarOrdenTrabajoRama($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
