@@ -102,18 +102,17 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
 		{
-   			config:{
-   				sysorigen:'sis_contabilidad',
-       		    name:'id_cuenta',
-   				origen:'CUENTA',
-   				allowBlank:false,
-   				fieldLabel:'Cuenta',
-   				gdisplayField:'desc_cuenta',//mapea al store del grid
-   				gwidth:600,
-   				width: 380,
-   				listWidth: 380,
-   				
-	   			renderer:function (value, p, record){
+			config:{
+				name: 'id_centro_costo',
+				fieldLabel: 'Centro Costo',
+				allowBlank: false,
+				tinit:false,
+				origen:'CENTROCOSTO',
+				gdisplayField: 'desc_centro_costo',
+				width: 380,
+				listWidth: 380,
+				gwidth: 300,
+   				renderer:function (value, p, record){
 	   			    var color = 'green';
 	   			    if(record.data["tipo_reg"] != 'summary'){
 		   			    if(record.data["tipo_partida"] == 'flujo'){
@@ -140,6 +139,25 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	   			    }
 	   			    
 	   			}
+			},
+			type:'ComboRec',
+			filters:{pfiltro:'cc.codigo_cc',type:'string'},
+			id_grupo:1,
+			grid:true,
+			bottom_filter: true,
+			form:true
+		},
+		{
+   			config:{
+   				sysorigen:'sis_contabilidad',
+       		    name:'id_cuenta',
+   				origen:'CUENTA',
+   				allowBlank:false,
+   				fieldLabel:'Cuenta',
+   				gdisplayField:'desc_cuenta',//mapea al store del grid
+   				gwidth:600,
+   				width: 380,
+   				listWidth: 380
        	     },
    			type:'ComboRec',
    			id_grupo:0,
@@ -147,7 +165,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		        pfiltro:'cue.nombre_cuenta#cue.nro_cuenta#cc.codigo_cc#cue.nro_cuenta#cue.nombre_cuenta#aux.codigo_auxiliar#aux.nombre_auxiliar#par.codigo#par.nombre_partida#ot.desc_orden#suo.codigo#suo.nombre#ot.codigo',
 				type:'string'
 			},
-   			grid:true,
+   			grid:false,
    			form:true
 	   	},
 	   	{
@@ -174,25 +192,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    			grid:false,
    			form:true
 	   	},
-		{
-			config:{
-				name: 'id_centro_costo',
-				fieldLabel: 'Centro Costo',
-				allowBlank: false,
-				tinit:false,
-				origen:'CENTROCOSTO',
-				gdisplayField: 'desc_centro_costo',
-				width: 380,
-				listWidth: 380,
-				gwidth: 300
-			},
-			type:'ComboRec',
-			filters:{pfiltro:'cc.codigo_cc',type:'string'},
-			id_grupo:1,
-			grid:true,
-			bottom_filter: true,
-			form:true
-		},
+		
 	   	{
    			config:{
    				sysorigen:'sis_presupuestos',
@@ -825,32 +825,24 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 					if (reg.ROOT.error) {
 						Ext.Msg.alert('Error', 'Validación no realizada: ' + reg.ROOT.error)
-					} else {
-						
+					} else {						
 						//cambia labels
 						this.labeTc1 = reg.ROOT.datos.v_tc1 +' (tc)';
-						this.labeTc2 = reg.ROOT.datos.v_tc2 +' (tc)';
-						
+						this.labeTc2 = reg.ROOT.datos.v_tc2 +' (tc)';						
 						this.setColumnHeader('tipo_cambio', this.labeTc1);
 		                this.setColumnHeader('tipo_cambio_2', this.labeTc2);
-						
 					}
-					
-
 				}, failure: function(a,b,c,d){
 					this.conexionFailure(a,b,c,d)
 				},
 				timeout: this.timeout,
 				scope:this
 				});
-			
-
 		},
 		
 		setLabelsTc: function(){
 			this.Cmp.tipo_cambio.label.update(this.labeTc1);
-			this.Cmp.tipo_cambio_2.label.update(this.labeTc2);
-						
+			this.Cmp.tipo_cambio_2.label.update(this.labeTc2);						
 		},
 		
 		onButtonEdit:function(){
@@ -859,7 +851,6 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	         Phx.vista.IntTransaccion.superclass.onButtonEdit.call(this); 
 	         this.setModificadoCombos();
 	         this.setLabelsTc();
-	       
        },
        
        onButtonNew: function(){
@@ -873,6 +864,4 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
           
        }
 })
-</script>
-		
-		
+</script>	
