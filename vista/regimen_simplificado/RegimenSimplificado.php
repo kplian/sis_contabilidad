@@ -13,6 +13,52 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
+        this.Grupos = [
+            {
+                layout: 'column',
+                border: false,
+                autoHeight : true,
+                defaults: {
+                    border: false,
+                    bodyStyle: 'padding:4px'
+                },
+                items: [
+                    {
+                        xtype: 'fieldset',
+                        columnWidth: 0.5,
+                        defaults: {
+                            anchor: '-20' // leave room for error icon
+                        },
+                        title: 'Datos Cliente',
+                        items: [],
+                        id_grupo: 0,
+                        flex:1,
+                        autoHeight : true,
+                        margins:'2 2 2 2'
+                    },
+
+                    {
+                        xtype: 'fieldset',
+                        columnWidth: 0.5,
+                        title: 'Detalle del Producto ',
+                        items: [],
+                        margins:'2 10 2 2',
+                        id_grupo:1,
+                        autoHeight : true,
+                        flex:1
+                    },
+                    {
+                        xtype: 'fieldset',
+                        columnWidth: 0.5,
+                        title: 'Detalle de bonificado',
+                        items: [],
+                        margins:'2 10 2 2',
+                        id_grupo:2,
+                        autoHeight : true,
+                        flex:1
+                    }
+                ]
+            }];
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.RegimenSimplificado.superclass.constructor.call(this,config);
@@ -42,7 +88,7 @@ Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'rso.codigo_cliente',type:'string'},
-            id_grupo:1,
+            id_grupo:0,
             grid:true,
             form:true
         },
@@ -57,7 +103,7 @@ Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'rso.nit',type:'string'},
-            id_grupo:1,
+            id_grupo:0,
             grid:true,
             form:true
         },
@@ -72,7 +118,7 @@ Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'rso.nombre',type:'string'},
-            id_grupo:1,
+            id_grupo:0,
             grid:true,
             form:true
         },
@@ -162,7 +208,7 @@ Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
             },
             type:'NumberField',
             filters:{pfiltro:'rso.cantidad_bonificacion',type:'numeric'},
-            id_grupo:1,
+            id_grupo:2,
             grid:true,
             form:true
         },
@@ -177,7 +223,7 @@ Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextField',
 				filters:{pfiltro:'rso.cantidad_bonificado',type:'string'},
-				id_grupo:1,
+				id_grupo:2,
 				grid:true,
 				form:true
 		},
@@ -192,7 +238,7 @@ Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'rso.descripcion_bonificado',type:'string'},
-            id_grupo:1,
+            id_grupo:2,
             grid:true,
             form:true
         },
@@ -207,7 +253,7 @@ Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
             },
             type:'NumberField',
             filters:{pfiltro:'rso.importe_bonificado',type:'numeric'},
-            id_grupo:1,
+            id_grupo:2,
             grid:true,
             form:true
         },
@@ -356,8 +402,8 @@ Phx.vista.RegimenSimplificado=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:true,
-    width: '65%',
-    fheight: '85%'
+    fheight: '55%',
+    fwidth: '75%'
 	}
 )
 </script>

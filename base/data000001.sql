@@ -1237,5 +1237,13 @@ select pxp.f_insert_testructura_gui ('OFIOT', 'CROT');
 select pxp.f_insert_tgui ('<i class="fa fa-signal  fa-2x"></i> SISTEMA DE CONTABILIDAD', '', 'CONTA', 'si', 17, '', 1, '', '', 'CONTA');
 /**********************************F-DAT-RAC-CONTA-1-26/05/2017*****************************************/
 
+/**********************************I-DAT-RAC-CONTA-1-01/06/2017*****************************************/  
+
+select pxp.f_insert_tgui ('Balance de Ordenes de Costos', 'Balance de Ordenes de Costos', 'FBAOR', 'si', 5, 'sis_contabilidad/vista/cuenta/FormFiltroBalanceOrdenes.php', 3, '', 'FormFiltroBalanceOrdenes', 'CONTA');
+select pxp.f_insert_testructura_gui ('FBAOR', 'REPCON');
+
+/**********************************F-DAT-RAC-CONTA-1-01/06/2017*****************************************/  
+
+
 
 

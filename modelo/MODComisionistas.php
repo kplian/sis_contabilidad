@@ -24,7 +24,7 @@ class MODComisionistas extends MODbase{
 		$this->captura('capacidad_envace','varchar');
 		$this->captura('nit','varchar');
 		$this->captura('codigo','varchar');
-		$this->captura('cantidad','int4');
+		$this->captura('cantidad_producto_entregado','int4');
 		$this->captura('estado_reg','varchar');
 		$this->captura('porcentaje','numeric');
 		$this->captura('descripcion','varchar');
@@ -44,6 +44,7 @@ class MODComisionistas extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
         $this->captura('nro_contrato','varchar');
+        $this->captura('revisado','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -63,7 +64,7 @@ class MODComisionistas extends MODbase{
 		$this->setParametro('capacidad_envace','capacidad_envace','varchar');
 		$this->setParametro('nit','nit','varchar');
 		$this->setParametro('codigo','codigo','varchar');
-		$this->setParametro('cantidad','cantidad','int4');
+		$this->setParametro('cantidad_producto_entregado','cantidad_producto_entregado','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('porcentaje','porcentaje','numeric');
 		$this->setParametro('descripcion','descripcion','varchar');
@@ -74,6 +75,8 @@ class MODComisionistas extends MODbase{
 		$this->setParametro('fecha_fin','fecha_fin','date');
 		$this->setParametro('fecha_ini','fecha_ini','date');
 		$this->setParametro('precio_unitario','precio_unitario','numeric');
+		$this->setParametro('nro_contrato','nro_contrato','varchar');
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -94,7 +97,7 @@ class MODComisionistas extends MODbase{
 		$this->setParametro('capacidad_envace','capacidad_envace','varchar');
 		$this->setParametro('nit','nit','varchar');
 		$this->setParametro('codigo','codigo','varchar');
-		$this->setParametro('cantidad','cantidad','int4');
+		$this->setParametro('cantidad_producto_entregado','cantidad_producto_entregado','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('porcentaje','porcentaje','numeric');
 		$this->setParametro('descripcion','descripcion','varchar');
@@ -105,6 +108,8 @@ class MODComisionistas extends MODbase{
 		$this->setParametro('fecha_fin','fecha_fin','date');
 		$this->setParametro('fecha_ini','fecha_ini','date');
 		$this->setParametro('precio_unitario','precio_unitario','numeric');
+		$this->setParametro('nro_contrato','nro_contrato','varchar');
+		$this->setParametro('revisado','revisado','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -130,6 +135,23 @@ class MODComisionistas extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function cambiarRevision(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='conta.ft_comisionistas_ime';
+        $this->transaccion='CONTA_REV_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_comisionista','id_comisionista','int8');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 			
 }
 ?>

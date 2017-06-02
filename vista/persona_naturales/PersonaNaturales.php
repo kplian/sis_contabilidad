@@ -13,6 +13,31 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.PersonaNaturales=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
+        this.Grupos = [
+            {
+                layout: 'column',
+                border: false,
+                autoHeight : true,
+                defaults: {
+                    border: false,
+                    bodyStyle: 'padding:4px'
+                },
+                items: [
+                    {
+                        xtype: 'fieldset',
+                        columnWidth: 0.90,
+                        defaults: {
+                            anchor: '-5' // leave room for error icon
+                        },
+                        title: 'Datos Personas Naturales',
+                        items: [],
+                        id_grupo: 1,
+                        flex:1,
+                        autoHeight : true,
+                        margins:'2 2 2 2'
+                    }
+                ]
+            }];
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.PersonaNaturales.superclass.constructor.call(this,config);
@@ -90,7 +115,7 @@ Phx.vista.PersonaNaturales=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:true
-        }
+        },
         {
             config:{
                 name: 'codigo_producto',
@@ -300,7 +325,7 @@ Phx.vista.PersonaNaturales=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'}
 		
 	],
 	sortInfo:{
@@ -308,7 +333,9 @@ Phx.vista.PersonaNaturales=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+    fheight: '65%',
+    fwidth: '55%'
 	}
 )
 </script>

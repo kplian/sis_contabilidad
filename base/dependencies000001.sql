@@ -3492,6 +3492,24 @@ AS
            otp.desc_orden;
 
 
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_cc_ot
+  ADD CONSTRAINT ttipo_cc_ot_fk FOREIGN KEY (id_tipo_cc)
+    REFERENCES param.ttipo_cc(id_tipo_cc)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_cc_ot
+  ADD CONSTRAINT ttipo_cc_ot_fk1 FOREIGN KEY (id_orden_trabajo)
+    REFERENCES conta.torden_trabajo(id_orden_trabajo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;    
+    
 /**********************************F-DEP-RAC-CONTA-0-31/05/2017****************************************/
 
 
