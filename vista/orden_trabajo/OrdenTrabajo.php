@@ -195,7 +195,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
        		    lazyRender:true,
        		    mode: 'local',
        		    valueField: 'inicio',    
-       		    store:['centro','pep','orden','estadistico']
+       		    store:['centro','edt','orden','estadistico']
 			},
 			type:'ComboBox',
 			id_grupo:1,

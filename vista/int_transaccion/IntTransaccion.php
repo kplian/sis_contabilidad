@@ -23,68 +23,52 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		this.init();
 		
 		this.obtenerVariableGlobal('conta_partidas');
-		
-		 this.Cmp.importe_gasto.on('change',function(cmp,value){
+		this.Cmp.importe_gasto.on('change',function(cmp,value){
 			this.Cmp.importe_haber.suspendEvents();
 			this.Cmp.importe_haber.setValue(0);			
-			this.Cmp.importe_haber.resumeEvents();
-			
+			this.Cmp.importe_haber.resumeEvents();			
 			this.Cmp.importe_recurso.suspendEvents();
 			this.Cmp.importe_recurso.setValue(0);			
-			this.Cmp.importe_recurso.resumeEvents();
-			
+			this.Cmp.importe_recurso.resumeEvents();			
 			this.Cmp.importe_debe.suspendEvents();
 			this.Cmp.importe_debe.setValue(value);				
 			this.Cmp.importe_debe.resumeEvents();
-			
-			
 		},this);  
 		
 		this.Cmp.importe_recurso.on('change',
 		    function(cmp,value){
 			    this.Cmp.importe_debe.suspendEvents();
 				this.Cmp.importe_debe.setValue(0);				
-				this.Cmp.importe_debe.resumeEvents();
-				
+				this.Cmp.importe_debe.resumeEvents();				
 				this.Cmp.importe_haber.suspendEvents();
 			    this.Cmp.importe_haber.setValue(value);			
-			    this.Cmp.importe_haber.resumeEvents();
-				
+			    this.Cmp.importe_haber.resumeEvents();				
 				this.Cmp.importe_gasto.suspendEvents();
 				this.Cmp.importe_gasto.setValue(0);				
 				this.Cmp.importe_gasto.resumeEvents();
-				
-				
-			
-		   },this);
+		 },this);
 		   
 		
 		this.Cmp.importe_debe.on('change',function(cmp){
 			this.Cmp.importe_haber.suspendEvents();
 			this.Cmp.importe_haber.setValue(0);			
-			this.Cmp.importe_haber.resumeEvents();
-			
+			this.Cmp.importe_haber.resumeEvents();			
 			this.Cmp.importe_recurso.suspendEvents();
 			this.Cmp.importe_recurso.setValue(0);			
 			this.Cmp.importe_recurso.resumeEvents();
-			
-			
 		},this);
 		
 		this.Cmp.importe_haber.on('change',
 		    function(cmp){
 			    this.Cmp.importe_debe.suspendEvents();
 				this.Cmp.importe_debe.setValue(0);				
-				this.Cmp.importe_debe.resumeEvents();
-				
+				this.Cmp.importe_debe.resumeEvents();				
 				this.Cmp.importe_gasto.suspendEvents();
 				this.Cmp.importe_gasto.setValue(0);				
 				this.Cmp.importe_gasto.resumeEvents();
 		   },this);
 		   
 		   
-		
-		
 		this.addButton('btnBanco',
             {
                 text: 'Detalle Pago',
@@ -95,8 +79,6 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
             }
         );
         
-       
-		
 	},
 		
 	Atributos:[
@@ -138,25 +120,20 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		   			        color = 'red';
 		   			    }
 		   			    
-		   					
 		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo'], record.data['desc_cuenta']);	
-		   					
 		   					if(record.data['desc_auxiliar']){
 			   					retorno = retorno + String.format('<b>Aux.:</b>{0}</br>', record.data['desc_auxiliar']);
 			   				}
-		   					
 		   					if(record.data['desc_partida']){
 			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
 			   				}
-		   					
-			   				if(record.data['desc_orden']){			   					
+		   					if(record.data['desc_orden']){			   					
 			   					retorno = retorno + String.format('<b>Ord.:</b> <font>{0} {1}</font><br>', record.data['codigo_ot'], record.data['desc_orden']);
 			   				}	
 			   				if(record.data['desc_suborden']){
 			   					retorno = retorno + '<b>Sub.:</b> '+record.data['desc_suborden'];
 			   				}
 		   				return String.format('<div class="gridmultiline">{0}</div>',retorno);
-	   			    	
 	   			    }
 	   			    else{
 	   			    	return '<b><p align="right">Total: &nbsp;&nbsp; </p></b>';

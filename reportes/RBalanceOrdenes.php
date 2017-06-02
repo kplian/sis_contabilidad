@@ -13,11 +13,7 @@ class RBalanceOrdenes extends  ReportePDF {
 	var $ancho_sin_totales;
 	var $cantidad_columnas_estaticas;
 	var $codigos;
-	var $total_activo;
-	var $total_pasigo;
-	var $total_patrimonio;
-	var $total_ingreso;
-	var $total_egreso;
+	var $total_ordenes;
 	var $tipo_balance;
 	var $incluir_cierre;
 	
@@ -39,12 +35,8 @@ class RBalanceOrdenes extends  ReportePDF {
 		$this->Image(dirname(__FILE__).'/../../lib'.$_SESSION['_DIR_LOGO'], $this->ancho_hoja, 5, 30, 10);
 		$this->ln(5);
 		$this->SetFont('','BU',12);
-		if($this->tipo_balance == 'resultado'){
-			$this->Cell(0,5,'ESTADO DE RESULTADOS (BS)',0,1,'C');
-		}
-		else{
-			$this->Cell(0,5,'ÁRBOL DE ORDENES DE COSTOS (BS)',0,1,'C');
-		}
+		
+		$this->Cell(0,5,'ÁRBOL DE ORDENES DE COSTOS (BS)',0,1,'C');
 		
 		$this->SetFont('','BU',11);
 		$this->Cell(0,5,'Depto: ('.$this->codigos.')',0,1,'C');
@@ -88,11 +80,7 @@ class RBalanceOrdenes extends  ReportePDF {
 	
 	function generarReporte() {
 		
-		$this->total_activo = 0;
-	    $this->total_pasigo = 0;
-	    $this->total_patrimonio = 0;
-		$this->total_ingreso = 0;
-		$this->total_egreso = 0;		
+		$this->total_ordenes = 0;		
 		//Reporte de unasola columna de monto
 		if($this->nivel == 1 || $this->nivel > 3 ){
 		    $this->generarReporte1C();
@@ -108,80 +96,23 @@ class RBalanceOrdenes extends  ReportePDF {
 		
 		//escribe formula contabla
 		$this->SetFont('times', 'BI', 17);
-		$tactivo = number_format( $this->total_activo , 2 , '.' , ',' );
-		$tpasivo = number_format( $this->total_pasivo , 2 , '.' , ',' );
-		$tpatrimonio = number_format( $this->total_patrimonio , 2 , '.' , ',' );
-		$tingreso = number_format( $this->total_ingreso , 2 , '.' , ',' );
-		$tegreso = number_format( $this->total_egreso , 2 , '.' , ',' );
-		$resultado = $this->total_ingreso - $this->total_egreso;
-		$resultado = number_format( $resultado , 2 , '.' , ',' );
-		 $sw_dif = 0;
-		if($this->tipo_balance == 'general'){
-			$formula = "ACTIVO =  PASIVO + PATRIMONIO";
-			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
-			$formula = "$tactivo =  $tpasivo + $tpatrimonio";
-			if(($this->total_activo +  $this->total_egreso) !=($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso)){
-				$this->SetTextColor(0,100,100,0,false,'');
-			    $sw_dif = 1;
-			}
-			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);	
-		}
-		elseif($this->tipo_balance == 'resultado'){
-			$formula = "RESULTADO =  INGRESOS - EGRESOS";
-			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
-			
-			$formula = "$resultado =  $tingreso - $tegreso";
-			
-			if(($this->total_ingreso - $this->total_egreso) < 0){
-				$this->SetTextColor(0,100,100,0,false,'');
-			  
-			}
-			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);	
-		}
-		else{
-			
-			
-			$formula = "ACTIVO + GASTOS =  PASIVO + PATRIMONIO + INGRESOS";
-			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
-			$formula = "$tactivo  + $tegreso =  $tpasivo + $tpatrimonio + $tingreso";
-			if(($this->total_activo +  $this->total_egreso) != ($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso)){
-				$this->SetTextColor(0,100,100,0,false,'');
-				  $sw_dif = 1;
-			}
-			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
-		}
-		if( $sw_dif == 1){
-			$diferencia = ($this->total_activo +  $this->total_egreso) - ($this->total_pasivo + $this->total_patrimonio + $this->total_ingreso);
-		    if($diferencia < 0){
-		    	$diferencia = $diferencia * (-1);
-		    }
-			$formula = number_format( $diferencia , 2 , '.' , ',' );
-			$this->Write(0, 'Diferencia de: '.$formula, '', 0, 'C', true, 0, false, false, 0);
-		}
+		$total_ordenes = number_format( $this->total_ordenes , 2 , '.' , ',' );
 		
+		$sw_dif = 0;
+		
+			
+			
+		$formula = "TOTAL ORDENES";
+		$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
+		$formula = "$total_ordenes";
+		$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);
 		
 		
 	}
 	function definirTotales($val){
-		if($val ["nivel"] ==1 && $val ["tipo_cuenta"] == 'activo'){
-			$this->total_activo = $val['monto'];
+		if($val ["nivel"] ==1 ){
+			$this->total_ordenes = $this->total_ordenes + $val['monto'];
 		}
-		if($val ["nivel"] == 1 && $val ["tipo_cuenta"] == 'pasivo'){
-			$this->total_pasivo = $val['monto'];
-		}
-		if($val ["nivel"] ==1 && $val ["tipo_cuenta"] == 'patrimonio'){
-			$this->total_patrimonio = $val['monto'];
-		}
-		
-		//calculo total de egreso		
-		if($val ["nivel"] == 1 && $val ["movimiento"] == 'egreso'){
-			$this->total_egreso = $this->total_egreso + $val['monto'];
-		}
-		//calculo ingreso
-		if($val ["nivel"] == 1 && $val ["movimiento"] == 'ingreso'){
-			$this->total_ingreso = $this->total_ingreso + $val['monto'];
-		}
-		
 		
 	}
 	

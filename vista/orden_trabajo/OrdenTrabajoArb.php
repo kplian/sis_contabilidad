@@ -19,10 +19,6 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 		this.init();
 		this.iniciarEventos();
 		
-		
-		
-		
-		
 	},
 	
 	
@@ -326,6 +322,15 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 			} else {
 				return undefined;
 			}
-		}
+		},
+		
+		
+	tabeast:[
+		  {
+    		  url:'../../../sis_contabilidad/vista/tipo_cc_ot/TipoCcOt.php',
+    		  title:'Tipo de Centro', 
+    		  width:'60%',
+    		  cls:'TipoCcOt'
+		  }]
 })
 </script>

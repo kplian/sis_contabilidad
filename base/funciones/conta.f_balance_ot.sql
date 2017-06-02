@@ -128,7 +128,9 @@ BEGIN
                                             
                         
        IF v_incluir_sinmov != 'no' THEN                          
-          v_consulta = v_consulta|| ' WHERE (monto != 0 and monto_mt !=0) and ' ;
+          v_consulta = v_consulta|| ' WHERE (monto != 0 and monto_mt !=0) and nivel <= '||v_parametros.nivel::varchar;
+       ELSE
+          v_consulta =  v_consulta|| ' WHERE  nivel <= '||v_parametros.nivel::Varchar ;
        END IF; 
        
        IF v_parametros.tipo_balance = 'resultado' THEN 
@@ -142,6 +144,8 @@ BEGIN
        FOR v_registros in EXECUTE(v_consulta) LOOP
                    RETURN NEXT v_registros;
        END LOOP;
+       
+     
        
 ELSE
    raise exception  'no se encontro el códidigo  de transacción:  %',p_transaccion;      

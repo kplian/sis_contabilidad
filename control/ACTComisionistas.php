@@ -39,6 +39,12 @@ class ACTComisionistas extends ACTbase{
 		$this->res=$this->objFunc->eliminarComisionistas($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+    function cambiarRevision(){
+        $this->objFunc=$this->create('MODComisionistas');
+        $this->res=$this->objFunc->cambiarRevision($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+
+    }
 			
 }
 

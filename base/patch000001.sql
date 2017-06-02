@@ -3782,4 +3782,20 @@ IS 'column apropia de boa para trabajr con agencias';
 /***********************************F-SCP-RAC-CONTA-0-26/05/2017****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-0-31/05/2017****************************************/
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.ttipo_cc_ot (
+  id_tipo_cc_ot SERIAL NOT NULL,
+  id_tipo_cc INTEGER NOT NULL,
+  id_orden_trabajo INTEGER NOT NULL,
+  PRIMARY KEY(id_tipo_cc_ot)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+
+/***********************************F-SCP-RAC-CONTA-0-31/05/2017****************************************/
 

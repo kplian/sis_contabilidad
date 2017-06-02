@@ -45,7 +45,10 @@ class ACTOrdenTrabajo extends ACTbase{
 		}		
 		if($this->objParam->getParametro('fecha_solicitud')!=''){
             $this->objParam->addFiltro("odt.fecha_inicio <=''".$this->objParam->getParametro('fecha_solicitud')."'' and (odt.fecha_final is null or odt.fecha_final >= ''". $this->objParam->getParametro('fecha_solicitud') ."'')");    
-        }		
+        }	
+		if($this->objParam->getParametro('filtro')=='raiz'){
+            $this->objParam->addFiltro("odt.id_orden_trabajo_fk is  null");    
+        }	
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODOrdenTrabajo','listarOrdenTrabajoAll');
