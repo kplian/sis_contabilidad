@@ -89,7 +89,7 @@ BEGIN
                                           v_incluir_cierre,
                                           v_parametros.tipo_balance);
        
-      raise notice '------------------------------------------------> total %', v_total;
+     
       
       
       
@@ -106,7 +106,9 @@ BEGIN
                         
                         
        IF v_incluir_sinmov != 'no' THEN                          
-          v_consulta = v_consulta|| ' WHERE monto != 0 ' ;
+          v_consulta = v_consulta|| ' WHERE monto != 0 and nivel <= '||v_parametros.nivel::varchar||' ';
+       ELSE
+        v_consulta = v_consulta|| ' WHERE nivel <= '||v_parametros.nivel::varchar||' ' ;
        END IF; 
        
        IF v_parametros.tipo_balance = 'resultado' THEN 
@@ -114,6 +116,9 @@ BEGIN
        ELSE
            v_consulta = v_consulta|| ' order by  nro_cuenta';                  
        END IF;
+       
+        raise notice '------------------------------------------------> total %', v_total;
+         raise notice '------------------------------------------------>  %', v_consulta;
        
        FOR v_registros in EXECUTE(v_consulta) LOOP
                    RETURN NEXT v_registros;
