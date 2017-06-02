@@ -32,6 +32,8 @@ v_tipo		        varchar;
 v_incluir_cierre	varchar;
 v_incluir_sinmov	varchar;
 v_cont_nro_nodo		integer;
+va_id_orden 		integer[];
+v_nro_nodo			integer;
  
 
 BEGIN
@@ -87,21 +89,31 @@ BEGIN
       --llamada recusiva para llenar la tabla
       v_nivel_inicial = 1;
      
+      IF  v_parametros.id_ordenes_trabajos  is not null and v_parametros.id_ordenes_trabajos != '' THEN
+       va_id_orden = string_to_array(v_parametros.id_ordenes_trabajos,',')::integer[]; 
+      END IF;
+     
       
       va_total =  conta.f_balance_ot_recursivo(
-                                          v_parametros.desde, 
-                                          v_parametros.hasta, 
-                                          v_parametros.id_deptos,
-                                          0,--nro de nodo 
-                                          1,--  nivel                                           
-                                          v_parametros.nivel,
-                                          NULL::integer,  --  id_orden_trabajo INICIAL  
-                                          v_tipo,
-                                          v_incluir_cierre,
-                                          v_parametros.tipo_balance);
-      v_total = va_total[1];
-      v_total_mt = va_total[2];
-      v_cont_nro_nodo = va_total[3]; 
+                                                  v_parametros.desde, 
+                                                  v_parametros.hasta, 
+                                                  v_parametros.id_deptos,
+                                                  0,--nro de nodo 
+                                                  1,--  nivel                                           
+                                                  v_parametros.nivel,
+                                                  NULL::integer,  --  id_orden_trabajo INICIAL  
+                                                  v_tipo,
+                                                  v_incluir_cierre,
+                                                  v_parametros.tipo_balance,
+                                                  va_id_orden);
+     
+     
+        
+      
+    
+     v_total = va_total[1];
+     v_total_mt = va_total[2];
+     v_cont_nro_nodo = va_total[3]; 
       
        
       raise notice '------------------------------------------------> total %', v_total;
