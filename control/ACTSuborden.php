@@ -11,17 +11,18 @@ class ACTSuborden extends ACTbase{
 			
 	function listarSuborden(){
 		$this->objParam->defecto('ordenacion','id_suborden');
-
-		$this->objParam->defecto('dir_ordenacion','asc');
+		$this->objParam->defecto('dir_ordenacion','asc');		
 		
-		
+		if($this->objParam->getParametro('id_orden_trabajo')!=''){
+            $this->objParam->addFiltro("suo.id_suborden IN (select id_suborden 
+            							from conta.tsuborden where estado_reg = ''activo'' and id_orden_trabajo = ".$this->objParam->getParametro('id_orden_trabajo') . ") ");    
+        }
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODSuborden','listarSuborden');
 		} else{
-			$this->objFunc=$this->create('MODSuborden');
-			
+			$this->objFunc=$this->create('MODSuborden');			
 			$this->res=$this->objFunc->listarSuborden($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());

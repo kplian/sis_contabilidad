@@ -15,7 +15,7 @@ class ACTAuxiliar extends ACTbase{
 		$this->objParam->defecto('dir_ordenacion','asc');
 		if($this->objParam->getParametro('id_cuenta')!=''){
             $this->objParam->addFiltro("auxcta.id_auxiliar IN (select id_auxiliar 
-            							from conta.tcuenta_auxiliar where id_cuenta = ".$this->objParam->getParametro('id_cuenta') . ") ");    
+            							from conta.tcuenta_auxiliar where estado_reg = ''activo'' and id_cuenta = ".$this->objParam->getParametro('id_cuenta') . ") ");    
         }
 		
 		if($this->objParam->getParametro('corriente')!=''){
@@ -26,8 +26,7 @@ class ACTAuxiliar extends ACTbase{
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODAuxiliar','listarAuxiliar');
 		} else{
-			$this->objFunc=$this->create('MODAuxiliar');
-			
+			$this->objFunc=$this->create('MODAuxiliar');			
 			$this->res=$this->objFunc->listarAuxiliar($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
