@@ -29,7 +29,10 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-    v_where			varchar;
+    v_where				varchar;
+    v_filtro			varchar;
+    v_ordenes			varchar;
+    v_id_tipo_cc		integer;
 			    
 BEGIN
 
@@ -46,6 +49,37 @@ BEGIN
 	if(p_transaccion='CONTA_ODT_SEL')then
      				
     	begin
+        
+            --armar filtro especial de tipos de centros de costo
+            v_filtro = '0 = 0 AND ';
+            
+            IF pxp.f_existe_parametro(p_tabla, 'id_centro_costo') THEN
+            
+                 select 
+                    id_tipo_cc
+                 into 
+                   v_id_tipo_cc
+                 from param.tcentro_costo cc
+                 where cc.id_centro_costo = v_parametros.id_centro_costo;
+                 
+                 IF v_id_tipo_cc is null THEN
+                    raise exception 'No fue parametrizaso un tipo para el centro de costos % ',v_parametros.id_centro_costo;
+                 END IF;
+                  
+                 SELECT 
+                  pxp.list(c.id_orden_trabajo::VARCHAR)
+                 into 
+                   v_ordenes 
+                FROM conta.vot_arb c 
+                inner join conta.ttipo_cc_ot tco on tco.id_orden_trabajo = ANY(c.ids)
+                where c.movimiento = 'si'  and tco.id_tipo_cc = v_id_tipo_cc;
+            
+            
+                 v_filtro = ' id_orden_trabajo in ('||COALESCE(v_ordenes,'0')::Varchar||') AND ';
+                
+            
+            END IF;
+        
     		--Sentencia de la consulta
 			v_consulta:='select
                           id_orden_trabajo,
@@ -68,13 +102,15 @@ BEGIN
                           desc_otp
                         
 						from conta.vorden_trabajo odt
-				        where  movimiento = ''si'' and tipo in (''estadistica'',''centro'',''edt'',''orden'') and ';
+				        where      movimiento = ''si'' 
+                              and tipo in (''estadistica'',''centro'',''edt'',''orden'') 
+                              and '||v_filtro;
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-            raise notice '%',v_consulta;
+            raise notice '>>>>>>>>>>>>  %',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						

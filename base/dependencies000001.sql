@@ -3513,3 +3513,48 @@ ALTER TABLE conta.ttipo_cc_ot
 /**********************************F-DEP-RAC-CONTA-0-31/05/2017****************************************/
 
 
+/**********************************I-DEP-RAC-CONTA-0-05/06/2017****************************************/
+CREATE OR REPLACE VIEW conta.vot_arb(
+    ids,
+    id_orden_trabajo,
+    id_orden_trabajo_fk,
+    desc_orden,
+    codigo,
+    movimiento)
+AS
+WITH RECURSIVE ordenes_costos(
+    ids,
+    id_orden_trabajo,
+    id_orden_trabajo_fk,
+    desc_orden,
+    codigo,
+    movimiento) AS(
+  SELECT ARRAY [ c_1.id_orden_trabajo ] AS "array",
+         c_1.id_orden_trabajo,
+         c_1.id_orden_trabajo_fk,
+         c_1.desc_orden,
+         c_1.codigo,
+         c_1.movimiento
+  FROM conta.torden_trabajo c_1
+  WHERE c_1.id_orden_trabajo_fk IS NULL AND
+        c_1.estado_reg::text = 'activo'::text
+  UNION
+  SELECT pc.ids || c2.id_orden_trabajo,
+         c2.id_orden_trabajo,
+         c2.id_orden_trabajo_fk,
+         c2.desc_orden,
+         c2.codigo,
+         c2.movimiento
+  FROM conta.torden_trabajo c2,
+       ordenes_costos pc
+  WHERE c2.id_orden_trabajo_fk = pc.id_orden_trabajo AND
+        c2.estado_reg::text = 'activo'::text)
+      SELECT c.ids,
+             c.id_orden_trabajo,
+             c.id_orden_trabajo_fk,
+             c.desc_orden,
+             c.codigo,
+             c.movimiento
+      FROM ordenes_costos c;
+      
+/**********************************F-DEP-RAC-CONTA-0-05/06/2017****************************************/

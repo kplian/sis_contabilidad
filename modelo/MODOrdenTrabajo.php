@@ -18,7 +18,8 @@ class MODOrdenTrabajo extends MODbase{
 		$this->procedimiento='conta.f_orden_trabajo_sel';
 		$this->transaccion='CONTA_ODT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
+		
+		$this->setParametro('id_centro_costo','id_centro_costo','int4'); 
 		//Definicion de la lista del resultado del query
 		$this->captura('id_orden_trabajo','int4');
 		$this->captura('estado_reg','varchar');
@@ -39,10 +40,6 @@ class MODOrdenTrabajo extends MODbase{
 		$this->captura('id_orden_trabajo_fk','int4');
 		$this->captura('desc_otp','varchar');
 		
-		
-		
-		
-
 		
 		
 		//Ejecuta la instruccion
