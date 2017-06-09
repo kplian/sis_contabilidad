@@ -86,7 +86,9 @@ BEGIN
                 funcion_comprobante_editado,
                 funcion_comprobante_prevalidado,
                 funcion_comprobante_validado_eliminado,
-                desc_plantilla
+                desc_plantilla,
+            	campo_cbte_relacionado,
+                codigo_tipo_relacion
              
           	) values(
                 v_parametros.codigo,
@@ -125,7 +127,9 @@ BEGIN
                 v_parametros.funcion_comprobante_editado,
                 v_parametros.funcion_comprobante_prevalidado,
                 v_parametros.funcion_comprobante_validado_eliminado,
-                v_parametros.desc_plantilla
+                v_parametros.desc_plantilla,
+            	v_parametros.campo_cbte_relacionado,
+                v_parametros.codigo_tipo_relacion
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -183,7 +187,9 @@ BEGIN
               funcion_comprobante_editado = v_parametros.funcion_comprobante_editado,
               funcion_comprobante_prevalidado = v_parametros.funcion_comprobante_prevalidado,
               funcion_comprobante_validado_eliminado =v_parametros.funcion_comprobante_validado_eliminado,
-              desc_plantilla = v_parametros.desc_plantilla
+              desc_plantilla = v_parametros.desc_plantilla,
+              campo_cbte_relacionado = v_parametros.campo_cbte_relacionado,
+              codigo_tipo_relacion = v_parametros.codigo_tipo_relacion
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta

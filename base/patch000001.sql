@@ -3799,3 +3799,51 @@ WITH (oids = false);
 
 /***********************************F-SCP-RAC-CONTA-0-31/05/2017****************************************/
 
+
+
+/***********************************I-SCP-RAC-CONTA-0-07/06/2017****************************************/
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.tconfig_subtipo_cuenta (
+  id_config_subtipo_cuenta SERIAL NOT NULL,
+  codigo VARCHAR(300),
+  nombre VARCHAR(500) NOT NULL,
+  descripcion VARCHAR,
+  id_config_tipo_cuenta INTEGER,
+  PRIMARY KEY(id_config_subtipo_cuenta)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  ADD COLUMN id_config_subtipo_cuenta INTEGER;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tconfig_tipo_cuenta
+  RENAME COLUMN id_cofig_tipo_cuenta TO id_config_tipo_cuenta;
+  
+  
+/***********************************F-SCP-RAC-CONTA-0-07/06/2017****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-0-08/06/2017****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_cbte_relacionado VARCHAR(350);
+  
+  --------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN codigo_tipo_relacion VARCHAR(350);
+  
+/***********************************F-SCP-RAC-CONTA-0-08/06/2017****************************************/
+

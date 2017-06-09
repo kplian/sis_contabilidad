@@ -279,7 +279,45 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	       		id_grupo:0,
 	       		grid:true,
 	       		form:true
-	       	},
+	     },
+		 {
+			config: {
+				name: 'id_config_subtipo_cuenta',
+				fieldLabel: 'Subtipo',
+				typeAhead: false,
+				forceSelection: false,
+				allowBlank: false,
+				emptyText: 'Tipos...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/ConfigSubtipoCuenta/listarConfigSubtipoCuenta',
+					id: 'id_config_subtipo_cuenta',
+					root: 'datos',
+					sortInfo: {
+						field: 'codigo',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['tipo_cuenta', 'id_config_subtipo_cuenta','nombre','codigo'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: {par_filtro: 'cst.nombre#cst.codigo'}
+				}),
+				valueField: 'id_config_subtipo_cuenta',
+				displayField: 'nombre',
+				gdisplayField: 'desc_csc',
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 20,
+				queryDelay: 200,
+				listWidth:280,
+				minChars: 2,
+				gwidth: 90
+				},
+			type: 'ComboBox',
+			id_grupo: 0,
+			form: true
+		},
 				
 		 {
    			config:{
@@ -410,7 +448,9 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'nro_cuenta', type: 'string'},
 		{name:'id_moneda', type: 'numeric'},
 		{name:'sw_transaccional', type: 'string'},
-		{name:'id_gestion', type: 'numeric'},'desc_moneda','valor_incremento','eeff','sw_control_efectivo'
+		{name:'id_gestion', type: 'numeric'},'desc_moneda',
+		'valor_incremento','eeff','sw_control_efectivo',
+		'id_config_subtipo_cuenta','desc_csc'
 		
 	],
 	cmbGestion: new Ext.form.ComboBox({

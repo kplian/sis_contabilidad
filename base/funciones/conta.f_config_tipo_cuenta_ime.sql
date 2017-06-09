@@ -31,7 +31,7 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_cofig_tipo_cuenta	integer;
+	v_id_config_tipo_cuenta	integer;
 			    
 BEGIN
 
@@ -72,11 +72,11 @@ BEGIN
               v_parametros.incremento,
               string_to_array(v_parametros.eeff,',')::varchar[],
               v_parametros.movimiento							
-			)RETURNING id_cofig_tipo_cuenta into v_id_cofig_tipo_cuenta;
+			)RETURNING id_config_tipo_cuenta into v_id_config_tipo_cuenta;
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Config. Tipo Cuenta almacenado(a) con exito (id_cofig_tipo_cuenta'||v_id_cofig_tipo_cuenta||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_cofig_tipo_cuenta',v_id_cofig_tipo_cuenta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_config_tipo_cuenta',v_id_cnofig_tipo_cuenta::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -102,7 +102,7 @@ BEGIN
               incremento = v_parametros.incremento,
               eeff = string_to_array(v_parametros.eeff,',')::varchar[],
               movimiento = v_parametros.movimiento
-			where id_cofig_tipo_cuenta=v_parametros.id_cofig_tipo_cuenta;
+			where id_config_tipo_cuenta=v_parametros.id_config_tipo_cuenta;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Config. Tipo Cuenta modificado(a)'); 
@@ -125,11 +125,11 @@ BEGIN
 		begin
 			--Sentencia de la eliminacion
 			delete from conta.tconfig_tipo_cuenta
-            where id_cofig_tipo_cuenta=v_parametros.id_cofig_tipo_cuenta;
+            where id_config_tipo_cuenta=v_parametros.id_config_tipo_cuenta;
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Config. Tipo Cuenta eliminado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_cofig_tipo_cuenta',v_parametros.id_cofig_tipo_cuenta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_config_tipo_cuenta',v_parametros.id_config_tipo_cuenta::varchar);
               
             --Devuelve la respuesta
             return v_resp;

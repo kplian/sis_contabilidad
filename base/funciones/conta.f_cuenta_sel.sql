@@ -155,9 +155,12 @@ BEGIN
                         cta.id_gestion,
                         cta.valor_incremento,
                         array_to_string( cta.eeff, '','',''null'')::varchar	 as eeff     ,
-                        cta.sw_control_efectivo               
+                        cta.sw_control_efectivo,
+                        csc.id_config_subtipo_cuenta,
+                        csc.nombre as desc_csc               
                         from conta.tcuenta cta
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
+                        left join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cta.id_config_subtipo_cuenta
                         where  '||v_where|| ' 
                            and cta.id_gestion = '||COALESCE(v_parametros.id_gestion,0)||'
                            and cta.estado_reg = ''activo''

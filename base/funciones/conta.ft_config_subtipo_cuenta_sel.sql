@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.f_config_tipo_cuenta_sel (
+CREATE OR REPLACE FUNCTION conta.ft_config_subtipo_cuenta_sel (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
@@ -10,10 +10,10 @@ RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.f_config_tipo_cuenta_sel
- DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tconfig_tipo_cuenta'
+ FUNCION: 		conta.ft_config_subtipo_cuenta_sel
+ DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tconfig_subtipo_cuenta'
  AUTOR: 		 (admin)
- FECHA:	        26-02-2013 19:19:24
+ FECHA:	        07-06-2017 19:52:43
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
@@ -32,37 +32,41 @@ DECLARE
 			    
 BEGIN
 
-	v_nombre_funcion = 'conta.f_config_tipo_cuenta_sel';
+	v_nombre_funcion = 'conta.ft_config_subtipo_cuenta_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_CTC_SEL'
+ 	#TRANSACCION:  'CONTA_CST_SEL'
  	#DESCRIPCION:	Consulta de datos
  	#AUTOR:		admin	
- 	#FECHA:		26-02-2013 19:19:24
+ 	#FECHA:		07-06-2017 19:52:43
 	***********************************/
 
-	if(p_transaccion='CONTA_CTC_SEL')then
+	if(p_transaccion='CONTA_CST_SEL')then
      				
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-                            ctc.id_config_tipo_cuenta,
-                            ctc.nro_base,
-                            ctc.tipo_cuenta,
-                            ctc.estado_reg,
-                            ctc.id_usuario_reg,
-                            ctc.fecha_reg,
-                            ctc.fecha_mod,
-                            ctc.id_usuario_mod,
+                            cst.id_config_subtipo_cuenta,
+                            cst.estado_reg,
+                            cst.descripcion,
+                            cst.nombre,
+                            cst.id_config_tipo_cuenta,
+                            cst.codigo,
+                            cst.fecha_reg,
+                            cst.usuario_ai,
+                            cst.id_usuario_reg,
+                            cst.id_usuario_ai,
+                            cst.id_usuario_mod,
+                            cst.fecha_mod,
                             usu1.cuenta as usr_reg,
                             usu2.cuenta as usr_mod,
-                            ctc.incremento,
-                            array_to_string( ctc.eeff, '','',''null'')::varchar	 as eeff,
-                            movimiento
-						from conta.tconfig_tipo_cuenta ctc
-						inner join segu.tusuario usu1 on usu1.id_usuario = ctc.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = ctc.id_usuario_mod
+                            ctc.tipo_cuenta,
+                            ctc.nro_base
+						from conta.tconfig_subtipo_cuenta cst
+						inner join segu.tusuario usu1 on usu1.id_usuario = cst.id_usuario_reg
+                        inner join conta.tconfig_tipo_cuenta ctc on ctc.id_config_tipo_cuenta = cst.id_config_tipo_cuenta
+						left join segu.tusuario usu2 on usu2.id_usuario = cst.id_usuario_mod
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -75,21 +79,22 @@ BEGIN
 		end;
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_CTC_CONT'
+ 	#TRANSACCION:  'CONTA_CST_CONT'
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:		admin	
- 	#FECHA:		26-02-2013 19:19:24
+ 	#FECHA:		07-06-2017 19:52:43
 	***********************************/
 
-	elsif(p_transaccion='CONTA_CTC_CONT')then
+	elsif(p_transaccion='CONTA_CST_CONT')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_config_tipo_cuenta)
-					    from conta.tconfig_tipo_cuenta ctc
-					    inner join segu.tusuario usu1 on usu1.id_usuario = ctc.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = ctc.id_usuario_mod
-					    where ';
+			v_consulta:='select count(id_config_subtipo_cuenta)
+					    from conta.tconfig_subtipo_cuenta cst
+						inner join segu.tusuario usu1 on usu1.id_usuario = cst.id_usuario_reg
+                        inner join conta.tconfig_tipo_cuenta ctc on ctc.id_config_tipo_cuenta = cst.id_config_tipo_cuenta
+						left join segu.tusuario usu2 on usu2.id_usuario = cst.id_usuario_mod
+				        where  ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
