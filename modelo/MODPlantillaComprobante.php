@@ -60,6 +60,10 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('funcion_comprobante_prevalidado','text');
 		$this->captura('funcion_comprobante_validado_eliminado','text');
 		$this->captura('desc_plantilla','varchar');
+		$this->captura('campo_cbte_relacionado','varchar');
+		$this->captura('codigo_tipo_relacion','varchar');
+		
+	
 		
 		
         //Ejecuta la instruccion
@@ -114,6 +118,8 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('funcion_comprobante_validado_eliminado','funcion_comprobante_validado_eliminado','text');
 		
 		$this->setParametro('desc_plantilla','desc_plantilla','varchar');
+		$this->setParametro('campo_cbte_relacionado','campo_cbte_relacionado','varchar');
+		$this->setParametro('codigo_tipo_relacion','codigo_tipo_relacion','varchar');
 		
 		
 		
@@ -171,6 +177,8 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('funcion_comprobante_prevalidado','funcion_comprobante_prevalidado','text');
 		$this->setParametro('funcion_comprobante_validado_eliminado','funcion_comprobante_validado_eliminado','text');
 		$this->setParametro('desc_plantilla','desc_plantilla','varchar');
+		$this->setParametro('campo_cbte_relacionado','campo_cbte_relacionado','varchar');
+		$this->setParametro('codigo_tipo_relacion','codigo_tipo_relacion','varchar');
 		
 		
         
@@ -248,6 +256,8 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('campo_fecha_costo_fin','text');
 			$this->captura('funcion_comprobante_editado','text');
 			$this->captura('desc_plantilla','varchar');
+			$this->captura('campo_cbte_relacionado','varchar');
+		    $this->captura('codigo_tipo_relacion','varchar');
 			
 		
 		$this->armarConsulta();	

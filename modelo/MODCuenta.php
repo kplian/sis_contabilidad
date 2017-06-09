@@ -83,6 +83,10 @@ class MODCuenta extends MODbase{
 			 $this->captura('valor_incremento','varchar');
 			 $this->captura('eeff','varchar');
 			 $this->captura('sw_control_efectivo','varchar');
+			 $this->captura('id_config_subtipo_cuenta','int4');
+			 $this->captura('desc_csc','varchar');
+			 
+			
 			 
 		     //Ejecuta la instruccion
 		     $this->armarConsulta();
@@ -111,6 +115,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('eeff','eeff','varchar');
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
+		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
 		
 		
 
@@ -143,6 +148,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('eeff','eeff','varchar');
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
+		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

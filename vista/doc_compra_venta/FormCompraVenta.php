@@ -2235,11 +2235,9 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
         controlMiles:function (value) {
-            return value
-                .replace(/\D/g, "")
-                .replace(/([0-9])([0-9]{2})$/, '$1.$2')
-                .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, "")
-                ;
+            return value    .replace(',', "")
+                            //.replace(/([0-9])([0-9]{2})$/, '$1.$2')
+                            //.replace(/\B(?=(\d{3})+(?!\d)\.?)/g, "");
         }
 
 

@@ -89,6 +89,7 @@ DECLARE
     v_clcbt_desc  				varchar;
     v_gestion_fecha				integer;
     v_gestion_aux				integer;
+    v_id_tipo_relacion_comprobante	integer;
   
 BEGIN
 
@@ -124,7 +125,8 @@ BEGIN
                         'campo_tipo_cambio',
                         'campo_depto_libro',
                         'campo_fecha_costo_ini',
-                        'campo_fecha_costo_fin'];
+                        'campo_fecha_costo_fin',
+                        'campo_cbte_relacionado'];
     
     v_tamano:=array_upper(v_def_campos,1);
     
@@ -158,7 +160,7 @@ BEGIN
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'' into v_tabla;
             
             
-          
+      
    
     ----------------------------------------------------------
     --  OBTIENE LOS VALORES,  THIS   (tipo de dato agrupador)     
@@ -244,7 +246,10 @@ BEGIN
         										v_plantilla.campo_fecha_costo_fin::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla));   
-	end if; 
+	end if;
+    
+ 
+    
     
     
     
@@ -310,6 +315,17 @@ BEGIN
                                                                   hstore(v_this), 
                                                                   hstore(v_tabla))::numeric;
 	end if;
+    
+    
+    --RAC: guardar id_cuenta_bancaria_mov
+    if ( v_plantilla.campo_cbte_relacionado != ''  AND  v_plantilla.campo_cbte_relacionado is not null ) then
+        v_this.columna_cbte_relacionado = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_cbte_relacionado::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla))::Varchar;
+	end if;
+    
+    
 
     v_resp:=v_this;
     
@@ -500,6 +516,26 @@ BEGIN
       raise exception 'Todo comprobante tiene que tener un proceso wf';
     END IF;
     
+    
+    --recupera el tipo de relacion si es que existe
+    IF v_plantilla.codigo_tipo_relacion is not null and  v_plantilla.codigo_tipo_relacion != ''   THEN
+       
+       select 
+          c.id_tipo_relacion_comprobante
+       into
+          v_id_tipo_relacion_comprobante         
+       from conta.ttipo_relacion_comprobante c
+       where upper(c.codigo) = upper(v_plantilla.codigo_tipo_relacion); 
+       
+       IF v_id_tipo_relacion_comprobante is null THEN
+         raise exception 'Revise sus plantilla el codigo de relación cbte % no existe', upper(v_plantilla.codigo_tipo_relacion) ;
+       END IF;
+       
+    END IF;
+    
+    
+    
+    
    INSERT INTO 
       conta.tint_comprobante
     (
@@ -536,7 +572,9 @@ BEGIN
       localidad,
       sw_editable,
       id_proceso_wf,
-      id_estado_wf
+      id_estado_wf,
+      id_int_comprobante_fks,
+      id_tipo_relacion_comprobante
              
     ) 
     VALUES (
@@ -573,7 +611,9 @@ BEGIN
       v_localidad,
       'no',
       v_id_proceso_wf,
-      v_id_estado_wf
+      v_id_estado_wf,
+      (string_to_array(v_this.columna_cbte_relacionado,','))::integer[],
+      v_id_tipo_relacion_comprobante
       
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
