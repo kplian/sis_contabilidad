@@ -3558,3 +3558,129 @@ WITH RECURSIVE ordenes_costos(
       FROM ordenes_costos c;
       
 /**********************************F-DEP-RAC-CONTA-0-05/06/2017****************************************/
+
+
+/**********************************I-DEP-RAC-CONTA-0-09/06/2017****************************************/
+
+CREATE OR REPLACE VIEW conta.ventrega(
+    id_entrega,
+    estado,
+    c31,
+    id_depto_conta,
+    fecha_c31,
+    codigo,
+    nombre_partida,
+    importe_debe_mb,
+    importe_haber_mb,
+    importe_debe_mb_completo,
+    importe_haber_mb_completo,
+    importe_gasto_mb,
+    importe_recurso_mb,
+    factor_reversion,
+    codigo_cc,
+    codigo_categoria,
+    codigo_cg,
+    nombre_cg,
+    beneficiario,
+    glosa1,
+    id_int_comprobante,
+    id_int_comprobante_dev,
+    id_cuenta_bancaria)
+AS
+  SELECT ent.id_entrega,
+         ent.estado,
+         ent.c31,
+         ent.id_depto_conta,
+         ent.fecha_c31,
+         par.codigo,
+         par.nombre_partida,
+         trd.importe_debe_mb,
+         trd.importe_haber_mb,
+         CASE
+           WHEN trd.factor_reversion > 0::numeric THEN trd.importe_debe_mb /(1::
+             numeric - trd.factor_reversion)
+           ELSE trd.importe_debe_mb
+         END AS importe_debe_mb_completo,
+         CASE
+           WHEN trd.factor_reversion > 0::numeric THEN trd.importe_haber_mb /(1
+             ::numeric - trd.factor_reversion)
+           ELSE trd.importe_haber_mb
+         END AS importe_haber_mb_completo,
+         trd.importe_gasto_mb,
+         trd.importe_recurso_mb,
+         trd.factor_reversion,
+         pr.codigo_cc,
+         cp.codigo_categoria,
+         cg.codigo AS codigo_cg,
+         cg.nombre AS nombre_cg,
+         cbt.beneficiario,
+         cbt.glosa1,
+         cbt.id_int_comprobante,
+         trd.id_int_comprobante AS id_int_comprobante_dev,
+         NULL::integer AS id_cuenta_bancaria
+  FROM conta.tentrega ent
+       JOIN conta.tentrega_det ed ON ed.id_entrega = ent.id_entrega
+       JOIN conta.tint_comprobante cbt ON cbt.id_int_comprobante =
+         ed.id_int_comprobante
+       JOIN conta.tint_comprobante c1 ON c1.id_int_comprobante = ANY (
+         cbt.id_int_comprobante_fks)
+       JOIN conta.ttipo_relacion_comprobante tip ON
+         tip.id_tipo_relacion_comprobante = cbt.id_tipo_relacion_comprobante AND
+         (tip.codigo::text = ANY (ARRAY [ 'PAGODEV'::text, 'AJUSTE'::text ]))
+       JOIN conta.tint_transaccion trd ON trd.id_int_comprobante =
+         c1.id_int_comprobante
+       JOIN pre.tpartida par ON par.id_partida = trd.id_partida
+       JOIN pre.vpresupuesto_cc pr ON pr.id_centro_costo = trd.id_centro_costo
+       JOIN pre.vcategoria_programatica cp ON cp.id_categoria_programatica =
+         pr.id_categoria_prog
+       LEFT JOIN pre.tclase_gasto_partida cgp ON cgp.id_partida = par.id_partida
+       LEFT JOIN pre.tclase_gasto cg ON cg.id_clase_gasto = cgp.id_clase_gasto
+  WHERE par.sw_movimiento::text = 'presupuestaria'::text
+  UNION ALL
+  SELECT ent.id_entrega,
+         ent.estado,
+         ent.c31,
+         ent.id_depto_conta,
+         ent.fecha_c31,
+         par.codigo,
+         par.nombre_partida,
+         trp.importe_debe_mb,
+         trp.importe_haber_mb,
+         CASE
+           WHEN trp.factor_reversion > 0::numeric THEN trp.importe_debe_mb /(1::
+             numeric - trp.factor_reversion)
+           ELSE trp.importe_debe_mb
+         END AS importe_debe_mb_completo,
+         CASE
+           WHEN trp.factor_reversion > 0::numeric THEN trp.importe_haber_mb /(1
+             ::numeric - trp.factor_reversion)
+           ELSE trp.importe_haber_mb
+         END AS importe_haber_mb_completo,
+         trp.importe_gasto_mb,
+         trp.importe_recurso_mb,
+         trp.factor_reversion,
+         pr.codigo_cc,
+         cp.codigo_categoria,
+         cg.codigo AS codigo_cg,
+         cg.nombre AS nombre_cg,
+         cbt.beneficiario,
+         cbt.glosa1,
+         cbt.id_int_comprobante,
+         trp.id_int_comprobante AS id_int_comprobante_dev,
+         trp.id_cuenta_bancaria
+  FROM conta.tentrega ent
+       JOIN conta.tentrega_det ed ON ed.id_entrega = ent.id_entrega
+       JOIN conta.tint_comprobante cbt ON cbt.id_int_comprobante =
+         ed.id_int_comprobante
+       JOIN conta.tint_transaccion trp ON trp.id_int_comprobante =
+         cbt.id_int_comprobante
+       JOIN pre.tpartida par ON par.id_partida = trp.id_partida
+       JOIN pre.vpresupuesto_cc pr ON pr.id_centro_costo = trp.id_centro_costo
+       JOIN pre.vcategoria_programatica cp ON cp.id_categoria_programatica =
+         pr.id_categoria_prog
+       LEFT JOIN pre.tclase_gasto_partida cgp ON cgp.id_partida = par.id_partida
+       LEFT JOIN pre.tclase_gasto cg ON cg.id_clase_gasto = cgp.id_clase_gasto
+  WHERE par.sw_movimiento::text = 'presupuestaria'::text;
+  
+/**********************************F-DEP-RAC-CONTA-0-09/06/2017****************************************/
+
