@@ -927,7 +927,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   type:'TextField',
 			   filters:{pfiltro:'dcv.estacion',type:'string'},
 			   id_grupo:0,
-			   grid:true,
+			   grid:false,
 			   form:false
 		   },
 
@@ -944,7 +944,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   type:'TextField',
 			   filters:{pfiltro:'pv.nombre',type:'string'},
 			   id_grupo:0,
-			   grid:true,
+			   grid:false,
 			   form:false
 		   },
 		   {
@@ -960,7 +960,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   type:'TextField',
 			   filters:{pfiltro:'age.codigo_noiata',type:'string'},
 			   id_grupo:0,
-			   grid:true,
+			   grid:false,
 			   form:false
 		   },
 			{
