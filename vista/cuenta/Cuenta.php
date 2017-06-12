@@ -16,7 +16,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		this.initButtons=[this.cmbGestion];
     	//llama al constructor de la clase padre
 		Phx.vista.Cuenta.superclass.constructor.call(this,config);
-		this.loaderTree.baseParams={id_gestion:0};
+		//this.loaderTree.baseParams={id_gestion:0};
 		this.init();
 		this.iniciarEventos();
 		
@@ -122,8 +122,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				inputType:'hidden'
 			},
 			type:'Field',
-			form:true,
-			grid:false
+			form:true
 		},
 		{
 			config:{
@@ -131,6 +130,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				inputType:'hidden'
 			},
 			type:'Field',
+			grid:false,
 			form:true
 		},
 		{
@@ -165,11 +165,12 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				queryDelay: 200,
 				listWidth:280,
 				minChars: 2,
-				gwidth: 90
+				gwidth: 300
 				},
 			type: 'ComboBox',
 			id_grupo: 0,
-			form: true
+			form: true,
+			grid:false
 		},
 		{
 	       		config:{
@@ -212,8 +213,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				name: 'text',
 				fieldLabel: 'Cuenta',
 				allowBlank: false,
-				anchor: '80%',
 				gwidth: 400,
+				width: 400,
 				maxLength:100
 			},
 			type:'TextField',
@@ -254,7 +255,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				fieldLabel: 'Desc Cuenta',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 200,
 				maxLength:500
 			},
 			type:'TextArea',
@@ -316,7 +317,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				},
 			type: 'ComboBox',
 			id_grupo: 0,
-			form: true
+			form: true,
+			grid:true
 		},
 				
 		 {
@@ -434,9 +436,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	id_store:'id_cuenta',
 	
 	textRoot:'Plan de Cuentas',
- id_nodo:'id_cuenta',
- id_nodo_p:'id_cuenta_padre',
-	
+    id_nodo:'id_cuenta',
+    id_nodo_p:'id_cuenta_padre',
 	fields: [
 		{name:'id_cuenta', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
@@ -554,10 +555,13 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		var nodo = this.sm.getSelectedNode(this.cmpTipoCuenta);           
 	        
 	    if(this.cmpTipoCuenta.getValue() =='patrimonio'){
-					this.mostrarComponente(this.cmpTipoCuentaPat);
-				} else{
-					this.ocultarComponente(this.cmpTipoCuentaPat);
-				}
+			this.mostrarComponente(this.cmpTipoCuentaPat);
+		} else{
+			this.ocultarComponente(this.cmpTipoCuentaPat);
+		}
+		
+		this.Cmp.id_config_subtipo_cuenta.store.baseParams.tipo_cuenta = this.cmpTipoCuenta.getValue();
+	    this.Cmp.id_config_subtipo_cuenta.modificado = true;
 		
 		
 		
@@ -581,6 +585,11 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	        	//si no es el nodo raiz
 	        	this.cmpTipoCuenta.disable();
 	        	this.cmpTipoCuenta.setValue(this.getTipoCuentaPadre(nodo));
+	        	
+	    		this.Cmp.id_config_subtipo_cuenta.store.baseParams.tipo_cuenta = this.cmpTipoCuenta.getValue();
+	    		this.Cmp.id_config_subtipo_cuenta.modificado = true;
+	        	
+	        	
 	        	this.Cmp.valor_incremento.setValue(nodo.attributes.valor_incremento);
 	        	this.Cmp.eeff.setValue(nodo.attributes.eeff);
 	        	
@@ -639,6 +648,10 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				this.cmpNombreCuenta.setValue( Ext.util.Format.capitalize(record.data.tipo_cuenta));
 				this.cmpSwTransaccional.setValue('titular');
 				
+				this.Cmp.id_config_subtipo_cuenta.reset();
+	    		this.Cmp.id_config_subtipo_cuenta.store.baseParams.tipo_cuenta = record.data.tipo_cuenta;
+	    		this.Cmp.id_config_subtipo_cuenta.modificado = true;
+				
 			},this);
 			
 			
@@ -660,8 +673,6 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
     		  title:'Partidas', 
     		  width:'60%',
     		  cls:'CuentaPartida'
-		  }
-		  
-		]
+		  }]
 })
 </script>

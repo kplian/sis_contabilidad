@@ -17,6 +17,11 @@ class ACTConfigSubtipoCuenta extends ACTbase{
 		if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
             $this->objParam->addFiltro("cst.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));    
         }
+		
+		if($this->objParam->getParametro('tipo_cuenta')!=''){
+            $this->objParam->addFiltro("ctc.tipo_cuenta = ''".$this->objParam->getParametro('tipo_cuenta')."''");    
+        }
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODConfigSubtipoCuenta','listarConfigSubtipoCuenta');

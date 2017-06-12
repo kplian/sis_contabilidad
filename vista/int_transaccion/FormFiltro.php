@@ -35,7 +35,24 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
         
     },
     
+  
+    
     Atributos:[
+           {
+	   			config:{
+	   				name : 'tipo_filtro',
+	   				fieldLabel : 'Filtros',
+	   				items: [
+		                {boxLabel: 'Gestión', name: 'tipo_filtro', inputValue: 'gestion', checked: true},
+		                {boxLabel: 'Solo fechas', name: 'tipo_filtro', inputValue: 'fechas'}
+		            ],
+		            
+		    
+	   			},
+	   			type : 'RadioGroupField',
+	   			id_grupo : 0,
+	   			form : true
+	   	   },
            {
 	   			config:{
 	   				name : 'id_gestion',
@@ -83,11 +100,86 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 	   			baseParams:{estado:'activo',codigo_subsistema:'CONTA'},
 	   			width: 150
    			},
-   			//type:'TrigguerCombo',
    			type:'ComboRec',
    			id_grupo:0,
    			form:true
          },
+         {
+			config: {
+				name: 'id_config_tipo_cuenta',
+				fieldLabel: 'Tipo Cuenta',
+				typeAhead: false,
+				forceSelection: false,
+				allowBlank: true,
+				emptyText: 'Tipos...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/ConfigTipoCuenta/listarConfigTipoCuenta',
+					id: 'id_config_tipo_cuenta',
+					root: 'datos',
+					sortInfo: {
+						field: 'nro_base',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_config_tipo_cuenta','tipo_cuenta', 'nro_base'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: {par_filtro: 'tipo_cuenta'}
+				}),
+				valueField: 'id_config_tipo_cuenta',
+				displayField: 'tipo_cuenta',
+				gdisplayField: 'tipo_cuenta',
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 20,
+				queryDelay: 200,
+				width: 150,
+				listWidth:280,
+				minChars: 2
+				},
+			type: 'ComboBox',
+			id_grupo: 0,
+			form: true,
+			grid:false
+		 },
+		 {
+			config: {
+					name: 'id_config_subtipo_cuenta',
+					fieldLabel: 'Subtipo',
+					typeAhead: false,
+					forceSelection: false,
+					allowBlank: true,
+					emptyText: 'Tipos...',
+					store: new Ext.data.JsonStore({
+						url: '../../sis_contabilidad/control/ConfigSubtipoCuenta/listarConfigSubtipoCuenta',
+						id: 'id_config_subtipo_cuenta',
+						root: 'datos',
+						sortInfo: {
+							field: 'codigo',
+							direction: 'ASC'
+						},
+						totalProperty: 'total',
+						fields: ['tipo_cuenta', 'id_config_subtipo_cuenta','nombre','codigo'],
+						// turn on remote sorting
+						remoteSort: true,
+						baseParams: {par_filtro: 'cst.nombre#cst.codigo'}
+					}),
+					valueField: 'id_config_subtipo_cuenta',
+					displayField: 'nombre',
+					triggerAction: 'all',
+					lazyRender: true,
+					mode: 'remote',
+					pageSize: 20,
+					width: 150,
+					queryDelay: 200,
+					listWidth:280,
+					minChars: 2
+				},
+			type: 'ComboBox',
+			id_grupo: 0,
+			form: true
+		 },
    	 	 {
    			config:{
    				sysorigen: 'sis_contabilidad',
@@ -128,6 +220,28 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
    			id_grupo:0,
    			form:true
 	   	},
+	   	
+	   	{
+	   		config:{
+	   				name:'id_tipo_cc',
+	   				qtip: 'Tipo de centro de costos, cada tipo solo puede tener un centro por gestión',	   				
+	   				origen:'TIPOCC',
+	   				fieldLabel:'Tipo Centro',
+	   				gdisplayField: 'desc_tcc',
+	   				url:  '../../sis_parametros/control/TipoCc/listarTipoCcAll',
+	   				baseParams: {movimiento:''},	   				
+	   				allowBlank:true,
+	   				width: 150 
+	   				
+	      		},
+   			type:'ComboRec',
+   			id_grupo:0,
+   			filters:{pfiltro:'vcc.codigo_tcc#vcc.descripcion_tcc',type:'string'},
+   		    grid:true,
+   			form:true
+	    },
+	   	
+	   	
 	   	{
             config:{
                 name: 'id_centro_costo',
@@ -234,8 +348,47 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
     		
     	},this);
     	
-    }
+    	this.Cmp.id_config_tipo_cuenta.on('select', function(cmb, rec, ind){
+    		
+    		this.Cmp.id_config_subtipo_cuenta.reset();
+    		this.Cmp.id_config_subtipo_cuenta.store.baseParams.id_config_tipo_cuenta = cmb.getValue();
+    		this.Cmp.id_config_subtipo_cuenta.modificado = true;
+    		
+    	},this);
+    	
+    	
+    	this.Cmp.tipo_filtro.on('change', function(cmp, check){
+    		    
+    		    if(check.getRawValue() !='gestion'){
+    		    	this.Cmp.id_gestion.reset();
+    		    	this.ocultarComponente(this.Cmp.id_gestion);
+    		    	this.ocultarComponente(this.Cmp.id_cuenta);
+    		    	this.ocultarComponente(this.Cmp.id_partida);
+    		    	this.ocultarComponente(this.Cmp.id_centro_costo);
+    		    }
+    		    else{
+    		    	this.mostrarComponente(this.Cmp.id_gestion);
+    		    	this.mostrarComponente(this.Cmp.id_cuenta);
+    		    	this.mostrarComponente(this.Cmp.id_partida);
+    		    	this.mostrarComponente(this.Cmp.id_centro_costo);
+    		    	
+    		    }
+    		    	
+    		    
+    		
+    	}, this);
+    	
+    },
     
+    loadValoresIniciales: function(){
+    	Phx.vista.FormFiltro.superclass.loadValoresIniciales.call(this);
+    	delete this.Cmp.id_config_subtipo_cuenta.store.baseParams.id_config_tipo_cuenta;
+    	this.Cmp.id_config_subtipo_cuenta.modificado = true;
+    	
+    	
+    	
+    	
+    }
     
 })    
 </script>
