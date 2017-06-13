@@ -265,13 +265,15 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
         this.momento = true;
     },
 
+    onButtonEdit : function () {
+        Phx.vista.Auxiliar.superclass.onButtonEdit.call(this);
+        this.momento = false;
+    },
+
     onSubmit: function (o,x, force) {
-        /*if(this.momento == 'edit'){
-            console.log(this.momento);
-            Phx.vista.Reclamo.superclass.onSubmit.call(this, o);
-        }else */
+        
         if(this.momento) {
-            console.log(this.momento);
+
             Ext.Ajax.request({
                 url: '../../sis_contabilidad/control/Auxiliar/validarAuxiliar',
                 params: {
@@ -291,8 +293,9 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
                 timeout: this.timeout,
                 scope: this
             });
+        }else{
+            Phx.vista.Auxiliar.superclass.onSubmit.call(this, o);
         }
-
     }
 
 })
