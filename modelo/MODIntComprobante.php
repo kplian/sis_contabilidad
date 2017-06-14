@@ -572,6 +572,8 @@ class MODIntComprobante extends MODbase{
         $this->setParametro('id_depto_wf','id_depto_wf','int4');		
         $this->setParametro('obs','obs','text');
         $this->setParametro('json_procesos','json_procesos','text');
+		$this->setParametro('validar_doc','validar_doc','boolean');
+		
 		
 
         //Ejecuta la instruccion

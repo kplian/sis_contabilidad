@@ -1249,3 +1249,27 @@ select pxp.f_insert_testructura_gui ('RECBTAX', 'CBTE.1');
 /**********************************F-DAT-RAC-CONTA-1-02/06/2017*****************************************/  
 
 
+
+/**********************************I-DAT-RAC-CONTA-1-13/06/2017*****************************************/  
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES  (E'conta_val_doc_venta', E'no', E'validar que el cbte cuadre con los documentos de venta');
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_val_doc_compra', E'no', E'validar que el cbte cuadre con los documentos de compra');
+  
+  
+/* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_dif_doc_cbte', E'0.6', E'la difenrecia permitida al validar cbtes y documentos  facturas, invoice etc');  
+  
+/**********************************F-DAT-RAC-CONTA-1-13/06/2017*****************************************/  
+
+  
+
+
+
