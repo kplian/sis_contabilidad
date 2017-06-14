@@ -92,12 +92,12 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 													    <td >Haber</td> \
 													  </tr>\
 		   			    	                          <tr>\
-													    <td style='padding: 15px; border-top:  solid #000000; border-right:  solid #000000;'>{0} </td>\
-													    <td style='padding: 15px; border-top:  solid #000000;'>{1}</td> \
+													    <td style='padding: 10px; border-top:  solid #000000; border-right:  solid #000000;'>{0} </td>\
+													    <td style='padding: 10px; border-top:  solid #000000;'>{1}</td> \
 													  </tr>\
 													  <tr>\
-													    <td style='padding: 15px; border-right: solid #000000;'>{2}</td>\
-													    <td style='padding: 15px;' >{3}</td>\
+													    <td style='padding: 10px; border-right: solid #000000;'>{2}</td>\
+													    <td style='padding: 10px;' >{3}</td>\
 													  </tr><table>" ,Ext.util.Format.number(debe,'0,000.00'), 
 													  				 Ext.util.Format.number(haber,'0,000.00'), 
 													  				 Ext.util.Format.number(sum_debe,'0,000.00'),

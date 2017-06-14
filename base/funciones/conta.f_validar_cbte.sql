@@ -7,7 +7,8 @@ CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
   p_id_int_comprobante integer,
   p_igualar varchar = 'no'::character varying,
   p_origen varchar = 'pxp'::character varying,
-  p_fecha_ejecucion date = NULL::date
+  p_fecha_ejecucion date = NULL::date,
+  p_validar_doc boolean = true
 )
 RETURNS varchar AS
 $body$
@@ -31,6 +32,12 @@ $body$
     AUTOR: RAC KPLIAN
     FECHA: 22/12/2016
     DESCRIPCION   validacion de numeracion en cbtes
+    
+  
+    -------------------- Ediciones
+    AUTOR: RAC KPLIAN
+    FECHA: 13/06/2017
+    DESCRIPCION   validacion de documentos asocidos de compra o de venta  
     
     
     
@@ -81,6 +88,7 @@ DECLARE
     v_recurso_mb 					numeric;
     v_gasto_mt						numeric; 
     v_recurso_mt 					numeric;
+    v_resp_val_doc					varchar[];
      
 
 BEGIN
@@ -129,7 +137,17 @@ BEGIN
     inner join param.tperiodo p on p.id_periodo = c.id_periodo
     where id_int_comprobante = p_id_int_comprobante;
     
+    ------------------------------------------------------------------------------------------
+    --  Verifica si los cbte de diario cuadran con los dosc/fact/recibos/invoices registrados
+    -------------------------------------------------------------------------------------------
     
+     v_resp_val_doc =  conta.f_validar_cbte_docs(p_id_int_comprobante, p_validar_doc);
+     
+     IF v_resp_val_doc[1] = 'FALSE' THEN
+       return v_resp_val_doc[2];       
+     END IF;
+    
+   
      --Obtiene el documento para la numeración
     select 
        doc.codigo,
@@ -338,8 +356,6 @@ BEGIN
     
     END IF;
     
-    
-   
     ------------------------------------------------------------------------------------------------
     --  Validacion presupuestaria del comprobante no se ejecuta solo verifica 
     --  si el dinero comprometido o devengado es suficiente para proseguir con la transaccion

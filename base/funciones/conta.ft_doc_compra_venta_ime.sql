@@ -216,6 +216,7 @@ BEGIN
         id_auxiliar,
         id_tipo_doc_compra_venta,
         id_int_comprobante
+
       ) values(
         v_parametros.tipo,
         v_parametros.importe_excento,
@@ -282,20 +283,11 @@ BEGIN
         end if;
       end if;
 
-      if (pxp.f_existe_parametro(p_tabla,'id_agencia_iata')) then
-        if(v_parametros.id_agencia_iata is not null) then
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia')) then
+        if(v_parametros.id_agencia is not null) then
 
           update conta.tdoc_compra_venta
-          set id_agencia_iata = v_parametros.id_agencia_iata
-          where id_doc_compra_venta = v_id_doc_compra_venta;
-        end if;
-      end if;
-
-      if (pxp.f_existe_parametro(p_tabla,'id_agencia_noiata')) then
-        if(v_parametros.id_agencia_noiata is not null) then
-
-          update conta.tdoc_compra_venta
-          set id_agencia_noiata = v_parametros.id_agencia_noiata
+          set id_agencia = v_parametros.id_agencia
           where id_doc_compra_venta = v_id_doc_compra_venta;
         end if;
       end if;
@@ -463,9 +455,7 @@ BEGIN
         id_auxiliar,
         id_tipo_doc_compra_venta,
         id_int_comprobante,
-        estacion,
-        id_punto_venta,
-        id_agencia
+        estacion
       ) values(
         v_parametros.tipo,
         v_parametros.importe_excento,
@@ -505,9 +495,7 @@ BEGIN
         v_parametros.id_auxiliar,
         v_id_tipo_doc_compra_venta,
         v_id_int_comprobante,
-        v_parametros.estacion,
-        v_parametros.id_punto_venta,
-        v_parametros.id_agencia
+        v_parametros.estacion
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -522,6 +510,24 @@ BEGIN
 
           update conta.tdoc_compra_venta
           set id_tipo_doc_compra_venta = v_parametros.id_tipo_compra_venta
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'estacion')) then
+        if(v_parametros.estacion is not null) then
+
+          update conta.tdoc_compra_venta
+          set estacion = v_parametros.estacion
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia')) then
+        if(v_parametros.id_agencia is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_agencia = v_parametros.id_agencia
           where id_doc_compra_venta = v_id_doc_compra_venta;
         end if;
       end if;
@@ -567,20 +573,26 @@ BEGIN
 
       */
 
+      select tipo_informe into v_tipo_informe
+      from param.tplantilla
+      where id_plantilla = v_parametros.id_plantilla;
+
        v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
       -- 13/01/2017
       --TODO RAC, me parece buena idea  que al cerrar el periodo revise que no existan documentos pendientes  antes de cerrar
       -- valida que period de libro de compras y ventas este abierto
-      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-
+      IF v_tipo_informe = 'lcv' THEN
+	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
+      /*
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
       v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-
+	  */
 
       --revisa si el documento no esta marcado como revisado
       select
@@ -701,23 +713,15 @@ BEGIN
         end if;
       end if;
 
-      if (pxp.f_existe_parametro(p_tabla,'id_agencia_iata')) then
-        if(v_parametros.id_agencia_iata is not null) then
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia')) then
+        if(v_parametros.id_agencia is not null) then
 
           update conta.tdoc_compra_venta
-          set id_agencia_iata = v_parametros.id_agencia_iata
+          set id_agencia = v_parametros.id_agencia
           where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
         end if;
       end if;
 
-      if (pxp.f_existe_parametro(p_tabla,'id_agencia_noiata')) then
-        if(v_parametros.id_agencia_noiata is not null) then
-
-          update conta.tdoc_compra_venta
-          set id_agencia_noiata = v_parametros.id_agencia_noiata
-          where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
-        end if;
-      end if;
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta modificado(a)');
       v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
@@ -743,13 +747,22 @@ BEGIN
       -- 13/01/2017
       --TODO RAC, me parece buena idea  que al cerrar el periodo revise que no existan documentos pendientes  antes de cerrar
       -- valida que period de libro de compras y ventas este abierto
-      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+
+      select tipo_informe into v_tipo_informe
+      from param.tplantilla
+      where id_plantilla = v_parametros.id_plantilla;
+
+      IF v_tipo_informe = 'lcv' THEN
+	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
+      /*
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
       v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  */
 
       --revisa si el documento no esta marcado como revisado
       select
@@ -838,9 +851,7 @@ BEGIN
         id_cliente = v_id_cliente,
         id_auxiliar = v_parametros.id_auxiliar,
         id_int_comprobante = v_id_int_comprobante,
-        estacion = v_parametros.estacion,
-        id_punto_venta = v_parametros.id_punto_venta,
-        id_agencia = v_parametros.id_agencia
+        estacion = v_parametros.estacion
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
@@ -849,6 +860,24 @@ BEGIN
           update conta.tdoc_compra_venta
           set id_tipo_doc_compra_venta = v_parametros.id_tipo_compra_venta
           where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'estacion')) then
+        if(v_parametros.estacion is not null) then
+
+          update conta.tdoc_compra_venta
+          set estacion = v_parametros.estacion
+          where id_doc_compra_venta = v_id_doc_compra_venta;
+        end if;
+      end if;
+
+      if (pxp.f_existe_parametro(p_tabla,'id_agencia')) then
+        if(v_parametros.id_agencia is not null) then
+
+          update conta.tdoc_compra_venta
+          set id_agencia = v_parametros.id_agencia
+          where id_doc_compra_venta = v_id_doc_compra_venta;
         end if;
       end if;
 
@@ -928,7 +957,8 @@ BEGIN
         dcv.tabla_origen,
         dcv.id_origen,
         dcv.id_depto_conta,
-        dcv.fecha
+        dcv.fecha,
+        dcv.id_plantilla
       into
         v_registros
       from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
@@ -950,9 +980,14 @@ BEGIN
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_registros.fecha);
 
-      -- valida que period de libro de compras y ventas este abierto
-      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_registros.id_depto_conta, v_rec.po_id_periodo);
+	  select tipo_informe into v_tipo_informe
+      from param.tplantilla
+      where id_plantilla = v_registros.id_plantilla;
 
+      -- valida que period de libro de compras y ventas este abierto
+      IF v_tipo_informe = 'lcv' THEN
+      	 v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_registros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
 
       --validar que no tenga un comprobante asociado

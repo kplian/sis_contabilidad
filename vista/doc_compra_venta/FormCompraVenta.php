@@ -2028,10 +2028,12 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.id_depto_conta.setValue(this.data.id_depto);
             this.Cmp.id_gestion.setValue(this.data.id_gestion);
             this.Cmp.tipo.setValue(this.data.tipoDoc);
-
-            this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
+            
+            
+           
             //load detalle de conceptos
             if(this.regitrarDetalle == 'si'){
+            	this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
                 this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
                 this.mestore.load()
             }

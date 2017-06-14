@@ -329,13 +329,8 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
     onSubmit: function(o) {
     	var me = this;
     	if (me.form.getForm().isValid()) {
-
              var parametros = me.getValForm()
-             
-             console.log('parametros ....', parametros);
-             
-             this.onEnablePanel(this.idContenedor + '-east', parametros)
-                    
+             this.onEnablePanel(this.idContenedor + '-east', parametros)                    
         }
 
     },
@@ -345,14 +340,32 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
     		 Ext.apply(this.Cmp.id_cuenta.store.baseParams,{id_gestion: rec.data.id_gestion})
 			 Ext.apply(this.Cmp.id_partida.store.baseParams,{id_gestion: rec.data.id_gestion})
 			 Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: rec.data.id_gestion})
+			 this.Cmp.id_cuenta.reset();
+			 this.Cmp.id_partida.reset();
+			 this.Cmp.id_centro_costo.reset();
+			 this.Cmp.id_cuenta.modificado = true;
+			 this.Cmp.id_partida.modificado = true;
+			 this.Cmp.id_centro_costo.modificado = true;
     		
     	},this);
     	
     	this.Cmp.id_config_tipo_cuenta.on('select', function(cmb, rec, ind){
     		
     		this.Cmp.id_config_subtipo_cuenta.reset();
-    		this.Cmp.id_config_subtipo_cuenta.store.baseParams.id_config_tipo_cuenta = cmb.getValue();
+    		this.Cmp.id_config_subtipo_cuenta.store.baseParams.id_config_tipo_cuenta =  cmb.getValue();
     		this.Cmp.id_config_subtipo_cuenta.modificado = true;
+    		
+    		this.Cmp.id_cuenta.reset();
+    		this.Cmp.id_cuenta.store.baseParams.tipo_cuenta = rec.data.tipo_cuenta;
+    	    this.Cmp.id_cuenta.modificado = true;
+    		
+    	},this);
+    	
+    	
+    	this.Cmp.id_config_subtipo_cuenta.on('select', function(cmb, rec, ind){
+    		this.Cmp.id_cuenta.reset();
+    		this.Cmp.id_cuenta.store.baseParams.id_config_subtipo_cuenta = cmb.getValue();
+    	    this.Cmp.id_cuenta.modificado = true;
     		
     	},this);
     	
@@ -384,6 +397,10 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
     	Phx.vista.FormFiltro.superclass.loadValoresIniciales.call(this);
     	delete this.Cmp.id_config_subtipo_cuenta.store.baseParams.id_config_tipo_cuenta;
     	this.Cmp.id_config_subtipo_cuenta.modificado = true;
+    	delete this.Cmp.id_cuenta.store.baseParams.id_gestion;
+    	delete this.Cmp.id_cuenta.store.baseParams.tipo_cuenta;
+    	delete this.Cmp.id_cuenta.store.baseParams.id_config_subtipo_cuenta;
+    	this.Cmp.id_cuenta.modificado = true;
     	
     	
     	

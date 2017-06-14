@@ -1301,8 +1301,20 @@ BEGIN
 				v_result = conta.f_validar_cbte( p_id_usuario,
                                              v_parametros._id_usuario_ai,
                                              v_parametros._nombre_usuario_ai,
-                                             v_parametros.id_int_comprobante);
-           
+                                             v_parametros.id_int_comprobante,
+                                             'no',
+                                             'pxp',
+                                              NULL,
+                                              v_parametros.validar_doc);
+                                             
+                                             
+                 IF v_result != 'Comprobante validado' THEN
+                 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado del cuenta documentada id='||v_parametros.id_int_comprobante); 
+          				v_resp = pxp.f_agrega_clave(v_resp,'operacion','falla');
+                        v_resp = pxp.f_agrega_clave(v_resp,'desc_falla',v_result);
+                 END IF;
+                 
+                 
            END IF;
            
              
