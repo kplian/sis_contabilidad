@@ -88,6 +88,7 @@ DECLARE
     v_id_estado_wf_ant				integer;
     v_clcbt_desc					varchar;
     v_id_partida_ejecucion			integer;
+    va_id_int_comprobante_fks		integer[];
    
    
 			    
@@ -1501,7 +1502,7 @@ BEGIN
                raise exception 'No existe un proceso inicial para el proceso macro indicado % (Revise la configuración)',v_codigo_proceso_macro;
               END IF;
               
-              -- preguntar si se quiere clonar el  con el nro de tramite  nro_tramite
+              -- preguntar si se quiere clonar el  con el nro de tramite  
              IF    v_parametros.sw_tramite = 'si'  THEN     
                 	 -- inciar el proceso con un nuevo nro  de  tramite en el sistema de WF
                     SELECT 
@@ -1547,6 +1548,18 @@ BEGIN
                                 v_reg_cbte.id_depto,
                                 'Cbte Clonado',
                                 'CBTE','');
+                                
+                  --asocia el comprobante  
+                  
+                  va_id_int_comprobante_fks[1] = v_parametros.id_int_comprobante;
+                  select 
+                     tr.id_tipo_relacion_comprobante
+                  into
+                     v_id_tipo_relacion_comprobante
+                  from conta.ttipo_relacion_comprobante tr
+                  where tr.codigo = 'AJUSTE';             
+                                
+                                
               END IF;
                
               IF  v_codigo_estado != 'borrador' THEN
@@ -1608,7 +1621,9 @@ BEGIN
                 cbte_reversion,
                 id_proceso_wf,
                 id_estado_wf,
-                forma_cambio
+                forma_cambio,
+                id_int_comprobante_fks,
+                id_tipo_relacion_comprobante
           	) values(
               v_reg_cbte.id_clase_comprobante,  			
               v_reg_cbte.id_subsistema,
@@ -1651,7 +1666,9 @@ BEGIN
 			  'no', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
               v_id_estado_wf,
-              v_reg_cbte.forma_cambio		
+              v_reg_cbte.forma_cambio,
+              va_id_int_comprobante_fks,
+              v_id_tipo_relacion_comprobante		
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
             update wf.tproceso_wf p set
