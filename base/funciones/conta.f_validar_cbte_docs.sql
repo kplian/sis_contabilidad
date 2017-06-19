@@ -42,6 +42,8 @@ v_total_cbte_recurso		numeric;
 v_difenrecia				numeric;
 v_conta_dif_doc_cbte		numeric;
 v_resp_val_doc				varchar[];
+v_conta_val_doc_otros_subcuentas_compras		varchar;
+va_aux 						 VARCHAR[];
 
 
 
@@ -54,6 +56,10 @@ BEGIN
    v_conta_val_doc_venta = pxp.f_get_variable_global('conta_val_doc_venta');
    v_conta_val_doc_compra = pxp.f_get_variable_global('conta_val_doc_compra');   
    v_conta_dif_doc_cbte = pxp.f_get_variable_global('conta_dif_doc_cbte')::numeric;
+   
+   
+   v_conta_val_doc_otros_subcuentas_compras = pxp.f_get_variable_global('conta_val_doc_otros_subcuentas_compras');
+   va_aux = string_to_array(v_conta_val_doc_otros_subcuentas_compras,',');
    
    v_resp_val_doc[1] = 'TRUE';
    
@@ -70,8 +76,9 @@ BEGIN
          v_registros_gasto
      from conta.tint_transaccion t
      inner join conta.tcuenta c on t.id_cuenta = c.id_cuenta
+     inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = c.id_config_subtipo_cuenta
      where      t.id_int_comprobante = p_id_int_comprobante
-           and  lower(c.tipo_cuenta) in('gasto','costo','egreso'); 
+           and  (lower(c.tipo_cuenta) in('gasto','costo','egreso') or upper(csc.nombre) = ANY(va_aux)); 
              
              
   --sumar todas las cuentas de recurso

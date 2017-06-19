@@ -1272,4 +1272,14 @@ VALUES
   
 
 
+/**********************************I-DAT-RAC-CONTA-1-19/06/2017*****************************************/  
 
+
+/* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_val_doc_otros_subcuentas_compras', E'INVERSION,ACTIVO FIJO,ALMACENES,OTROS ACTIVOS', E'Nombre de subcuenta que tienen que incluirse en la validacion de documentos de compras,al vaidar cbte, se las separa por comas');
+  
+/**********************************F-DAT-RAC-CONTA-1-19/06/2017*****************************************/  
+ 

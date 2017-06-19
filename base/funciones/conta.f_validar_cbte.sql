@@ -363,12 +363,13 @@ BEGIN
     
      --solo verifica en cbte que no son de reversion
      
+     -- RAC 19/06/2017
+     -- ESTA VALIDACION ERA NECESARIA EN ENDESIS
+     -- al separar el sistema de presupuesto ya no es necesaria
      
-     
-     IF v_pre_integrar_presupuestos = 'true' and  v_rec_cbte.cbte_reversion ='no'   THEN 
-         
-     	v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
-     END IF;
+    -- IF v_pre_integrar_presupuestos = 'true' and  v_rec_cbte.cbte_reversion ='no'   THEN          
+    --  	v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
+    -- END IF;
      
        
      

@@ -1589,7 +1589,8 @@ header("content-type: text/javascript; charset=UTF-8");
         	
         }
         else{
-	        
+	        resp.argument.wizard.panel.destroy()
+	        this.reload();
 	        
 	        if (resp.argument.id_proceso_wf) {
 					Phx.CP.loadingShow();
