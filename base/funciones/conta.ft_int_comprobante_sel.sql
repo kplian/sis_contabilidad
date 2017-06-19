@@ -328,8 +328,11 @@ BEGIN
                             '||v_id_moneda_base::VARCHAR||'::integer as id_moneda_base,
                             '''||v_codigo_moneda_base::VARCHAR||'''::varchar as codigo_moneda_base,
                             incbte.codigo_depto,
-                            conta.f_recuperar_nro_documento_facturas_comprobante(incbte.id_int_comprobante) as documentos
+                            conta.f_recuperar_nro_documento_facturas_comprobante(incbte.id_int_comprobante) as documentos,
+                            COALESCE(en.c31,'''') as c31
                           from conta.vint_comprobante incbte
+                          left join conta.tentrega_det ed on ed.id_int_comprobante = incbte.id_int_comprobante
+                          left join conta.tentrega en on en.id_entrega = ed.id_entrega
                           
                           where incbte.id_proceso_wf = '||v_parametros.id_proceso_wf;
 			
