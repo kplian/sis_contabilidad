@@ -106,6 +106,27 @@ class MODAuxiliar extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function validarAuxiliar(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='conta.f_auxiliar_ime';
+        $this->transaccion='CONTA_COD_AUX_VAL';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('codigo_auxiliar','codigo_auxiliar','varchar');
+        $this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
+        $this->setParametro('corriente','corriente','varchar');
+
+        $this->captura('v_valid','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 			
 }
 ?>

@@ -24,6 +24,14 @@ class ACTCuenta extends ACTbase{
             $this->objParam->addFiltro("cta.id_gestion = ".$this->objParam->getParametro('id_gestion'));    
         }
 		
+		if($this->objParam->getParametro('tipo_cuenta')!=''){
+            $this->objParam->addFiltro("cta.tipo_cuenta = ''".$this->objParam->getParametro('tipo_cuenta')."''");    
+        }
+		
+		if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+            $this->objParam->addFiltro("cta.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));    
+        }
+		
 		if($this->objParam->getParametro('sw_control_efectivo')!=''){
             $this->objParam->addFiltro("cta.sw_control_efectivo = ''".$this->objParam->getParametro('sw_control_efectivo')."''");    
         }

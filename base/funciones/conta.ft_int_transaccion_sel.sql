@@ -12,7 +12,7 @@ $body$
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_int_transaccion_sel
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tint_transaccion'
- AUTOR: 		 (admin)
+ AUTOR: 		 (RAC)
  FECHA:	        01-09-2013 18:10:12
  COMENTARIOS:	
 ***************************************************************************
@@ -31,8 +31,10 @@ DECLARE
 	v_resp				varchar;
     v_cuentas			varchar;
     v_ordenes			varchar;
+    v_tipo_cc			varchar;
     v_filtro_cuentas	varchar;
     v_filtro_ordenes	varchar;
+    v_filtro_tipo_cc	varchar;
 			    
 BEGIN
 
@@ -172,7 +174,7 @@ BEGIN
 	/*********************************    
  	#TRANSACCION:  'CONTA_INTMAY_SEL'
  	#DESCRIPCION:	listado de transacicones para el mayor
- 	#AUTOR:		admin	
+ 	#AUTOR:		rac	
  	#FECHA:		24-04-2015 18:10:12
 	***********************************/
 
@@ -181,8 +183,11 @@ BEGIN
     	begin
         
             v_cuentas = '0';
+            v_ordenes = '0';
+            v_tipo_cc = '0';
             v_filtro_cuentas = '0=0';
             v_filtro_ordenes = '0=0';
+            v_filtro_tipo_cc = '0=0';
     		
              IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
              
@@ -237,6 +242,32 @@ BEGIN
                
                 
             END IF;
+            
+            
+            IF  pxp.f_existe_parametro(p_tabla,'id_tipo_cc')  THEN
+             
+                  IF v_parametros.id_tipo_cc is not NULL THEN
+                
+                      WITH RECURSIVE tipo_cc_rec (id_tipo_cc, id_tipo_cc_fk) AS (
+                        SELECT tcc.id_tipo_cc, tcc.id_tipo_cc_fk
+                        FROM param.ttipo_cc tcc
+                        WHERE tcc.id_tipo_cc = v_parametros.id_tipo_cc and tcc.estado_reg = 'activo'
+                      UNION ALL
+                        SELECT tcc2.id_tipo_cc, tcc2.id_tipo_cc_fk
+                        FROM tipo_cc_rec lrec 
+                        INNER JOIN param.ttipo_cc tcc2 ON lrec.id_tipo_cc = tcc2.id_tipo_cc_fk
+                        where tcc2.estado_reg = 'activo'
+                      )
+                    SELECT  pxp.list(id_tipo_cc::varchar) 
+                      into 
+                        v_tipo_cc
+                    FROM tipo_cc_rec;
+                    
+                    
+                    
+                    v_filtro_tipo_cc = ' cc.id_tipo_cc in ('||v_tipo_cc||') ';
+                END IF;
+             END IF;
             
            
             
@@ -296,12 +327,17 @@ BEGIN
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                        
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
+                        inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta                        
+                        inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
 						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
 						left join pre.tpartida par on par.id_partida = transa.id_partida
 						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-				        where icbte.estado_reg = ''validado'' and ' || v_filtro_cuentas||' and '||v_filtro_ordenes||' and ';
+				        where icbte.estado_reg = ''validado'' 
+                              and ' ||v_filtro_cuentas||' 
+                              and '||v_filtro_ordenes||' 
+                              and '||v_filtro_tipo_cc||' and';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -322,9 +358,12 @@ BEGIN
 	elsif(p_transaccion='CONTA_INTMAY_CONT')then
 
 		begin
-             v_cuentas = '0';
-             v_filtro_cuentas = '0=0';
-             v_filtro_ordenes = '0=0';
+            v_cuentas = '0';
+            v_ordenes = '0';
+            v_tipo_cc = '0';
+            v_filtro_cuentas = '0=0';
+            v_filtro_ordenes = '0=0';
+            v_filtro_tipo_cc = '0=0';
     		
              IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
              
@@ -352,7 +391,7 @@ BEGIN
                 
             END IF;
             
-             IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajo')  THEN
+            IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajo')  THEN
              
                   IF v_parametros.id_orden_trabajo is not NULL THEN
                 
@@ -373,10 +412,38 @@ BEGIN
                     
                     
                     
-                    v_filtro_ordenes =  ' transa.id_orden_trabajo in ('||v_ordenes||') ';
+                    v_filtro_ordenes = ' transa.id_orden_trabajo in ('||v_ordenes||') ';
                 END IF;
                 
+               
+                
             END IF;
+            
+            
+            IF  pxp.f_existe_parametro(p_tabla,'id_tipo_cc')  THEN
+             
+                  IF v_parametros.id_tipo_cc is not NULL THEN
+                
+                      WITH RECURSIVE tipo_cc_rec (id_tipo_cc, id_tipo_cc_fk) AS (
+                        SELECT tcc.id_tipo_cc, tcc.id_tipo_cc_fk
+                        FROM param.ttipo_cc tcc
+                        WHERE tcc.id_tipo_cc = v_parametros.id_tipo_cc and tcc.estado_reg = 'activo'
+                      UNION ALL
+                        SELECT tcc2.id_tipo_cc, tcc2.id_tipo_cc_fk
+                        FROM tipo_cc_rec lrec 
+                        INNER JOIN param.ttipo_cc tcc2 ON lrec.id_tipo_cc = tcc2.id_tipo_cc_fk
+                        where tcc2.estado_reg = 'activo'
+                      )
+                    SELECT  pxp.list(id_tipo_cc::varchar) 
+                      into 
+                        v_tipo_cc
+                    FROM tipo_cc_rec;
+                    
+                    
+                    
+                    v_filtro_tipo_cc = ' cc.id_tipo_cc in ('||v_tipo_cc||') ';
+                END IF;
+             END IF;
             
             --RAC 16´/05/2017 quite esta suma de la consulta me parece incorecta, pero no estoy 100% seguro
             
@@ -405,14 +472,19 @@ BEGIN
                         inner join param.tdepto dep on dep.id_depto = icbte.id_depto
                         inner join param.tperiodo per on per.id_periodo = icbte.id_periodo
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
-                        
-                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta               
+                       
+                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
+                        inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta                        
+                        inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
 						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
 						left join pre.tpartida par on par.id_partida = transa.id_partida
 						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-				        where icbte.estado_reg = ''validado'' and ' || v_filtro_cuentas||' and '||v_filtro_ordenes||' and ';
+				        where icbte.estado_reg = ''validado'' 
+                              and ' ||v_filtro_cuentas||' 
+                              and '||v_filtro_ordenes||' 
+                              and '||v_filtro_tipo_cc||' and';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

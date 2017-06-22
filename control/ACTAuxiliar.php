@@ -48,7 +48,7 @@ class ACTAuxiliar extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 
-
+    // Realizamos la conexion a la base de datos sql Server  para poder llamar al procedimiento de replicacion.
     function conectar(){
         //var_dump('conectar');exit;
         $conexion = mssql_connect('172.17.45.133', 'Test', 'Boa.2017');
@@ -70,6 +70,12 @@ class ACTAuxiliar extends ACTbase{
         }
 
         mssql_close($conexion);
+    }
+
+    function validarAuxiliar(){
+        $this->objFunc=$this->create('MODAuxiliar');
+        $this->res=$this->objFunc->validarAuxiliar($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
     }
 }
 

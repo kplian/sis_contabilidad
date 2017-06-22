@@ -1494,14 +1494,13 @@ header("content-type: text/javascript; charset=UTF-8");
 	}, 
 	
 	sigEstado:function(){                   
-      	var rec=this.sm.getSelected();
-      	
-      	this.mostrarWizard(rec);
+      	var rec=this.sm.getSelected();      	
+      	this.mostrarWizard(rec, true);
       	
                
      },
      
-    mostrarWizard : function(rec) {
+    mostrarWizard : function(rec, validar_doc) {
      	var configExtra = [],
      		obsValorInicial;
      	   
@@ -1543,6 +1542,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         });        
      },
     onSaveWizard:function(wizard,resp){
+        this.mandarDatosWizard(wizard, resp, true);
+    },
+    mandarDatosWizard:function(wizard,resp, validar_doc){
         Phx.CP.loadingShow();
         Ext.Ajax.request({
             url:'../../sis_contabilidad/control/IntComprobante/siguienteEstado',
@@ -1555,34 +1557,57 @@ header("content-type: text/javascript; charset=UTF-8");
 	                id_depto_wf:        resp.id_depto_wf,
 	                obs:                resp.obs,
 	                instruc_rpc:		resp.instruc_rpc,
-	                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+	                json_procesos:      Ext.util.JSON.encode(resp.procesos),
+	                validar_doc:		validar_doc
 	                
                 },
             success: this.successWizard,
             failure: this.conexionFailure, 
-            argument: { wizard:wizard , id_proceso_wf : resp.id_proceso_wf_act},
+            argument: { wizard:wizard , id_proceso_wf : resp.id_proceso_wf_act, resp : resp},
             timeout: this.timeout,
             scope: this
         });
+        
+        
+        
     },
     successWizard: function(resp){
         Phx.CP.loadingHide();
-        resp.argument.wizard.panel.destroy()
-        this.reload();
+       
+        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+       
+        if(reg.ROOT.datos.operacion == 'falla'){
+        	
+        	reg.ROOT.datos.desc_falla
+        	if(confirm(reg.ROOT.datos.desc_falla+"\n¿Desea continuar de todas formas?")){
+        		this.mandarDatosWizard(resp.argument.wizard, resp.argument.resp, false);
+        	}
+        	else{
+        		resp.argument.wizard.panel.destroy()
+	            this.reload();
+        	}
+        	
+        }
+        else{
+	        resp.argument.wizard.panel.destroy()
+	        this.reload();
+	        
+	        if (resp.argument.id_proceso_wf) {
+					Phx.CP.loadingShow();
+					Ext.Ajax.request({
+						url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
+						params : {
+							'id_proceso_wf' : resp.argument.id_proceso_wf
+						},
+						success : this.successExport,
+						failure : this.conexionFailure,
+						timeout : this.timeout,
+						scope : this
+					});
+				}	
+        }
         
-        if (resp.argument.id_proceso_wf) {
-				Phx.CP.loadingShow();
-				Ext.Ajax.request({
-					url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
-					params : {
-						'id_proceso_wf' : resp.argument.id_proceso_wf
-					},
-					success : this.successExport,
-					failure : this.conexionFailure,
-					timeout : this.timeout,
-					scope : this
-				});
-			}
+        
         
         
     },

@@ -111,6 +111,15 @@ class ACTIntTransaccion extends ACTbase{
 			$this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));	
 		}
 		
+		if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+			$this->objParam->addFiltro("ctc.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));	
+		}
+		
+		if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+			$this->objParam->addFiltro("csc.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));	
+		}
+		
+		
 		if($this->objParam->getParametro('id_depto')!=''){
 			$this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));	
 		}

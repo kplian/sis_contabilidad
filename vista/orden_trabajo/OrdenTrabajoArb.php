@@ -10,20 +10,13 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
-
 	constructor:function(config){
 		this.maestro=config.maestro;		
     	//llama al constructor de la clase padre
-		Phx.vista.OrdenTrabajoArb.superclass.constructor.call(this,config);
-		
+		Phx.vista.OrdenTrabajoArb.superclass.constructor.call(this,config);		
 		this.init();
-		this.iniciarEventos();
-		
+		this.iniciarEventos();		
 	},
-	
-	
-	
-
 			
 	Atributos:[
 		{
@@ -80,9 +73,6 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 			grid:true,
 			form:true
 		},
-		
-		
-		
 		
 		{
 			config:{
@@ -276,7 +266,7 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 	ActSave:'../../sis_contabilidad/control/OrdenTrabajo/insertarOrdenTrabajoArb',
 	ActDel:'../../sis_contabilidad/control/OrdenTrabajo/eliminarOrdenTrabajoArb',
 	ActList:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajoArb',
-	id_store:'id_cuenta',
+	id_store:'id_orden_trabajo',
 	
 	textRoot:'Ordenes de Costo',
     id_nodo:'id_orden_trabajo',
