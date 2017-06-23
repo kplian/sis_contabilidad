@@ -13,6 +13,8 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
     constructor:function(config)
     {   
+    	
+    	console.log('configuracion.... ',config)
     	this.panelResumen = new Ext.Panel({html:''});
     	this.Grupos = [{
 
@@ -29,7 +31,17 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 				    
         Phx.vista.FormFiltro.superclass.constructor.call(this,config);
         this.init(); 
-        this.iniciarEventos();   
+        this.iniciarEventos(); 
+        
+        if(config.detalle){
+			//cargar los valores para el filtro
+			this.loadForm({data: config.detalle});
+			var me = this;
+			setTimeout(function(){
+				me.onSubmit()
+			}, 1500);
+			
+		}  
        
         
         
@@ -227,7 +239,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 	   				qtip: 'Tipo de centro de costos, cada tipo solo puede tener un centro por gestión',	   				
 	   				origen:'TIPOCC',
 	   				fieldLabel:'Tipo Centro',
-	   				gdisplayField: 'desc_tcc',
+	   				gdisplayField: 'desc_tipo_cc',
 	   				url:  '../../sis_parametros/control/TipoCc/listarTipoCcAll',
 	   				baseParams: {movimiento:''},	   				
 	   				allowBlank:true,

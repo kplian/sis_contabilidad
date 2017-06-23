@@ -3847,3 +3847,27 @@ ALTER TABLE conta.tplantilla_comprobante
   
 /***********************************F-SCP-RAC-CONTA-0-08/06/2017****************************************/
 
+
+
+/***********************************I-SCP-RAC-CONTA-0-22/06/2017****************************************/
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.trango (
+  id_rango SERIAL NOT NULL,
+  id_tipo_cc INTEGER NOT NULL,
+  id_periodo INTEGER NOT NULL,
+  debe_mb NUMERIC,
+  haber_mb NUMERIC,
+  debe_mt NUMERIC,
+  haber_mt NUMERIC(1,0),
+  PRIMARY KEY(id_rango)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON TABLE conta.trango
+IS 'esta tabla sirve apra generar el reporte de costos de manera rapida, necesita ser sincornizada para tener lso datos actualizados (los datos de esta tabla son solo para fines de consulta)';
+
+/***********************************F-SCP-RAC-CONTA-0-22/06/2017****************************************/
+

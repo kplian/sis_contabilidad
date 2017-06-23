@@ -109,12 +109,13 @@ Phx.comborec.sis_contabilidad.configini = function (config){
                                     direction: 'ASC'
                             },
                             totalProperty: 'total',
-                            fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden'],
+                            fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden','codigo'],
                             remoteSort: true,
-                            baseParams:Ext.apply({par_filtro:'desc_orden#motivo_orden'}, config.baseParams)
+                            baseParams:Ext.apply({par_filtro:'codigo#desc_orden#motivo_orden'}, config.baseParams)
                 }),
                valueField: 'id_orden_trabajo',
-               displayField: 'desc_orden',
+               tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{codigo}</b></p><p>{desc_orden}</p> </div></tpl>',
+				displayField: 'desc_orden',
                gdisplayField: 'desc_orden',
                hiddenName: 'id_orden_trabajo',
                forceSelection:true,
