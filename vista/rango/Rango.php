@@ -252,8 +252,24 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 	bsave:false,
 	onReloadPage:function(m,a,b){		
 		this.maestro = m;
-		this.store.baseParams = { id_tipo_cc: this.maestro.id_tipo_cc};			
-		this.load({ params: { start: 0, limit: 50}})
+		
+		console.log('this.idContenedorPadre',this.idContenedorPadre)
+		
+		var padre = Phx.CP.getPagina(this.idContenedorPadre);
+		var desde = padre.campo_fecha_desde.getValue(),
+			hasta = padre.campo_fecha_hasta.getValue();
+			
+			console.log('pagina...',padre)
+			
+			
+			
+		this.store.baseParams = {id_tipo_cc: this.maestro.id_tipo_cc}
+		if(desde && hasta){
+		    this.store.baseParams=Ext.apply(this.store.baseParams,{ desde: desde.dateFormat('d/m/Y'), 
+												                        hasta: hasta.dateFormat('d/m/Y')});
+		}
+		    	                     		
+		this.load({ params: { start: 0, limit: 100}});
 		
 	},
 	oncellclick : function(grid, rowIndex, columnIndex, e) {
@@ -284,6 +300,8 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 	    	
 	    }
 		
-	},
+	}
+	
+	
 })
 </script>	

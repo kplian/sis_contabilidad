@@ -12,10 +12,51 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 
 	constructor:function(config){
-		this.maestro=config.maestro;		
-    	//llama al constructor de la clase padre
-		Phx.vista.TipoCcArbRep.superclass.constructor.call(this,config);		
+		this.maestro=config.maestro;
+		//llama al constructor de la clase padre
+		Phx.vista.TipoCcArbRep.superclass.constructor.call(this,config);
+		
+		this.campo_fecha_desde = new Ext.form.DateField({
+	            name: 'desde',
+	            fieldLabel: 'Desde',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				format: 'd/m/Y'
+	    });
+			
+		this.campo_fecha_hasta = new Ext.form.DateField({
+	            name: 'hasta',
+	            fieldLabel: 'Hasta',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				format: 'd/m/Y'
+	    });
+	    
+	   
+	    
+	    
+		this.tbar.addField('Desde:');
+		this.tbar.addField(this.campo_fecha_desde);
+		this.tbar.addField('Hasta:');		
+		this.tbar.addField(this.campo_fecha_hasta);
+		this.campo_fecha_desde.setValue();
+		this.campo_fecha_hasta.setValue();
+		
+		
+		//Botón para Imprimir el Comprobante
+		this.addButton('btnImprimir', {
+				text : 'Sincronizar',
+				iconCls : 'bexecdb',
+				disabled : false,
+				handler : this.sincronizarRangos,
+				tooltip : '<b>Actuliza los valores de costos desde los comrpbantes aprobados  entre los  periodos de fechas seleccioandas</b>'
+			});
+		
+    			
 		this.init();
+		
 		this.iniciarEventos();
 		
 		
@@ -150,16 +191,90 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 	bnew: false,
 	bedit: false,
 	bsave: false,
-	rootVisible: true,
+	rootVisible: false,
 	expanded: false,
 	
+	validarFiltros : function() {		
+		if ( this.campo_fecha_hasta.validate()  && this.campo_fecha_desde.validate()) {			
+			return true;
+		} else {
+			return false;
+		}
+		
+	},
+	onButtonAct : function() {
+		
+			if (!this.validarFiltros()) {
+				alert('Especifique los filtros antes')
+			}
+			else{
+				 this.capturaFiltros();
+			}
+			
+	},
+	capturaFiltros : function(combo, record, index) {
+		
+		
+		  var desde = this.campo_fecha_desde.getValue(),
+		      hasta = this.campo_fecha_hasta.getValue();
+		
+		
+		    if(desde && hasta){
+		    	this.loaderTree.baseParams={ 
+			                         desde: desde.dateFormat('d/m/Y'), 
+			                         hasta: hasta.dateFormat('d/m/Y')};
+		    }
+			
+			                         
+			
+			this.root.reload();
+			
+	},
+	
+	sincronizarRangos: function(){
+		
+		
+		var desde = this.campo_fecha_desde.getValue(),
+		    hasta = this.campo_fecha_hasta.getValue();
+		 if(desde && hasta){
+		 	Phx.CP.loadingShow();
+			Ext.Ajax.request({
+					url:'../../sis_contabilidad/control/Rango/sincronizarRangos',
+					params:{ desde: desde.dateFormat('d/m/Y'), 
+				             hasta: hasta.dateFormat('d/m/Y')},
+					success: this.successRango,
+					failure: this.conexionFailure,
+					timeout: this.timeout,
+					scope: this
+				});
+		 }
+		 else{
+		 	alert('Especifique el rango de fecha que queire sincronizar');
+		 }
+			
+	},
+	
+	successRango: function(){
+		Phx.CP.loadingHide();
+		this.root.reload();
+	},
+	
+	 
 	tabeast:[
 		  {
     		  url:'../../../sis_contabilidad/vista/rango/Rango.php',
     		  title:'Detalle', 
     		  width:'35%',
     		  cls:'Rango'
-	}]
+			},
+			{
+	          url:'../../../sis_contabilidad/vista/rango/RangoTorta.php',
+	          title:'Pie', 
+	          height:'50%',
+	          cls:'RangoTorta'
+         }]
+	
+	
 	
 	
    

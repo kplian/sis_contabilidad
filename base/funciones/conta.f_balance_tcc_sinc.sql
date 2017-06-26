@@ -44,13 +44,13 @@ BEGIN
     
     
     /*********************************   
-     #TRANSACCION:    'CONTA_BALTCC_SEL'
-     #DESCRIPCION:     Listado para el reporte del balance segun tipos de centro de costo
+     #TRANSACCION:    'CONTA_SINCRAN_IME'
+     #DESCRIPCION:    sincroniza la tabla de rango segun el rango de fechas especificado
      #AUTOR:           rensi arteaga copari  kplian
      #FECHA:            20-06-2017
     ***********************************/
 
-	IF(p_transaccion='CONTA_BALOT_SEL')then
+	IF(p_transaccion='CONTA_SINCRAN_IME')then
     
             if pxp.f_existe_parametro(p_tabla,'tipo') then
               v_tipo = v_parametros.tipo;
@@ -71,9 +71,9 @@ BEGIN
             into
              va_id_periodo
             from param.tperiodo per
-            where   p_desde BETWEEN per.fecha_ini and per.fecha_fin 
-                OR p_hasta BETWEEN per.fecha_ini and per.fecha_fin
-                OR per.fecha_fin BETWEEN p_desde and p_hasta;
+            where   v_parametros.desde BETWEEN per.fecha_ini and per.fecha_fin 
+                OR v_parametros.hasta BETWEEN per.fecha_ini and per.fecha_fin
+                OR per.fecha_fin BETWEEN v_parametros.desde and v_parametros.hasta;
             
           
            v_resp =  conta.f_balance_tcc_recursivo_sinc(va_id_periodo,

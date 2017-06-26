@@ -30,6 +30,9 @@ DECLARE
 	v_nombre_funcion   	text;
 	v_resp				varchar;
     v_where				varchar;
+    va_id_periodo		integer[];
+    v_filtro			varchar;
+    v_periodo			varchar;
 			    
 BEGIN
 
@@ -46,6 +49,25 @@ BEGIN
 	if(p_transaccion='CONTA_RAN_SEL')then
      				
     	begin
+        
+             v_filtro = ' 0=0 ';
+              
+             --si tengo fechas obtenemos los periodos correpondinetes
+             if pxp.f_existe_parametro(p_tabla,'desde') and pxp.f_existe_parametro(p_tabla,'hasta') then
+                
+                  select 
+                   pxp.list(per.id_periodo::Varchar)
+                  into
+                   v_periodo
+                  from param.tperiodo per
+                  where   v_parametros.desde BETWEEN per.fecha_ini and per.fecha_fin 
+                      OR v_parametros.hasta BETWEEN per.fecha_ini and per.fecha_fin
+                      OR per.fecha_fin BETWEEN v_parametros.desde and v_parametros.hasta;
+                      
+                  v_filtro = ' ran.id_periodo in ('||COALESCE(v_periodo,'0')||')';
+                    
+            end if;
+        
     		--Sentencia de la consulta
 			v_consulta:='select
 						ran.id_rango,
@@ -75,7 +97,7 @@ BEGIN
                      inner join param.tgestion ges on ges.id_gestion = per.id_gestion
                      inner join segu.tusuario usu1 on usu1.id_usuario = ran.id_usuario_reg
                      left join segu.tusuario usu2 on usu2.id_usuario = ran.id_usuario_mod  
-                where ';
+                where '||v_filtro||' and  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -96,6 +118,24 @@ BEGIN
 	elsif(p_transaccion='CONTA_RAN_CONT')then
 
 		begin
+        
+            v_filtro = ' 0=0 ';
+              
+            --si tengo fechas obtenemos los periodos correpondinetes
+            if pxp.f_existe_parametro(p_tabla,'desde') and pxp.f_existe_parametro(p_tabla,'hasta') then
+                
+                  select 
+                   pxp.list(per.id_periodo::Varchar)
+                  into
+                   v_periodo
+                  from param.tperiodo per
+                  where   v_parametros.desde BETWEEN per.fecha_ini and per.fecha_fin 
+                      OR v_parametros.hasta BETWEEN per.fecha_ini and per.fecha_fin
+                      OR per.fecha_fin BETWEEN v_parametros.desde and v_parametros.hasta;
+                      
+                  v_filtro = ' ran.id_periodo in ('||COALESCE(v_periodo,'0')||')';
+                    
+            end if;
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select  count(ran.id_rango),
                                  sum(ran.debe_mb) as debe_mb,
@@ -108,7 +148,7 @@ BEGIN
                              inner join param.tgestion ges on ges.id_gestion = per.id_gestion
                              inner join segu.tusuario usu1 on usu1.id_usuario = ran.id_usuario_reg
                              left join segu.tusuario usu2 on usu2.id_usuario = ran.id_usuario_mod  
-                        where ';
+                        where '||v_filtro||' and  ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -134,6 +174,26 @@ BEGIN
               else
                 v_where := ' tcc.id_tipo_cc_fk = '||v_parametros.node;
               end if;
+              
+              v_filtro = ' 0=0 ';
+              
+              --si tengo fechas obtenemos los periodos correpondinetes
+              if pxp.f_existe_parametro(p_tabla,'desde') and pxp.f_existe_parametro(p_tabla,'hasta') then
+                
+                  select 
+                   pxp.list(per.id_periodo::Varchar)
+                  into
+                   v_periodo
+                  from param.tperiodo per
+                  where   v_parametros.desde BETWEEN per.fecha_ini and per.fecha_fin 
+                      OR v_parametros.hasta BETWEEN per.fecha_ini and per.fecha_fin
+                      OR per.fecha_fin BETWEEN v_parametros.desde and v_parametros.hasta;
+                      
+                  v_filtro = ' ran.id_periodo in ('||COALESCE(v_periodo,'0')||')';
+                    
+              end if;
+              
+              
               
               v_consulta:='select
                             tcc.id_tipo_cc,
@@ -165,7 +225,7 @@ BEGIN
                           sum(ran.debe_mt) -  sum(ran.haber_mt) as balance_mt	 	 	 	
 						from param.ttipo_cc tcc                        
                         left join conta.trango ran on ran.id_tipo_cc = tcc.id_tipo_cc
-                        where  '||v_where|| ' and tcc.estado_reg = ''activo''
+                        where  '||v_where|| ' and tcc.estado_reg = ''activo'' and '||v_filtro||' 
                         group by
                         
                               tcc.id_tipo_cc,

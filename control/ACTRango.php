@@ -56,7 +56,7 @@ class ACTRango extends ACTbase{
 	}
 						
 	function eliminarRango(){
-			$this->objFunc=$this->create('MODRango');	
+		$this->objFunc=$this->create('MODRango');	
 		$this->res=$this->objFunc->eliminarRango($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
@@ -128,6 +128,13 @@ class ACTRango extends ACTbase{
 
         $this->res->imprimirRespuesta($this->res->generarJson());         
 
+   }
+
+   function sincronizarRangos(){
+     	$this->objFunc=$this->create('MODRango');	
+		$this->res=$this->objFunc->sincronizarRangos($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	
    }
 			
 }

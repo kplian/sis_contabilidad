@@ -22,6 +22,9 @@ class MODRango extends MODbase{
 		$this->capturaCount('haber_mb','numeric');
 		$this->capturaCount('debe_mt','numeric');
 		$this->capturaCount('haber_mt','numeric');
+		
+		$this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_rango','int4');
@@ -130,6 +133,8 @@ class MODRango extends MODbase{
 		    $id_padre = $this->objParam->getParametro('id_padre');
 		    
 		    $this->setParametro('node','node','varchar'); 
+			$this->setParametro('desde','desde','date');
+			$this->setParametro('hasta','hasta','date');
 			  
 		            
 		    //Definicion de la lista del resultado del query
@@ -155,13 +160,6 @@ class MODRango extends MODbase{
 			$this->captura('haber_mt','numeric');
 			$this->captura('balance_mt','numeric');
 			
-			
-			
-			
-			
-			
-			
-
 			 
 		     //Ejecuta la instruccion
 		     $this->armarConsulta();
@@ -169,6 +167,25 @@ class MODRango extends MODbase{
 		    
 		    return $this->respuesta;       
     }
+
+    function sincronizarRangos(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.f_balance_tcc_sinc';
+		$this->transaccion='CONTA_SINCRAN_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 			
 
 
