@@ -31,11 +31,59 @@ Phx.vista.CbteDependencias=Ext.extend(Phx.arbGridInterfaz,{
 		}, 100);
 		
 		
+		this.addButton('btnDocCmpVnt', {
+				text : 'Doc Cmp/Vnt',
+				iconCls : 'brenew',
+				disabled : true,
+				handler : this.loadDocCmpVnt,
+				tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
+		});
+		
+		this.addButton('btnImprimir', {
+				text : 'Imprimir',
+				iconCls : 'bprint',
+				disabled : true,
+				handler : this.imprimirCbte,
+				tooltip : '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
+		});
+		
+		
+		
+		
+		
 		
 		
 		
 	},
 	
+	
+	imprimirCbte : function() {
+			var nodo = this.sm.getSelectedNode(),
+			    data = nodo.attributes;
+				Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
+					params : {
+						'id_proceso_wf' : data.id_proceso_wf
+					},
+					success : this.successExport,
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+	},
+
+	
+		
+	loadDocCmpVnt : function() {
+			var nodo = this.sm.getSelectedNode(),
+			    data = nodo.attributes;
+			    
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCbte.php', 'Documentos del Cbte', {
+				width : '80%',
+				height : '80%'
+			}, data, this.idContenedor, 'DocCompraVentaCbte');
+	},
 	successRep:function(resp){
         Phx.CP.loadingHide();
         var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
@@ -120,7 +168,7 @@ Phx.vista.CbteDependencias=Ext.extend(Phx.arbGridInterfaz,{
     id_nodo_p:'id_int_comprobante_padre',
 	
 	fields: [
-		'id_int_comprobante','id_int_comprobante_padre','glosa1','nombre','nro_cbte'
+		'id_int_comprobante','id_int_comprobante_padre','glosa1','nombre','nro_cbte','id_proceso_wf'
 		
 	],
 	
@@ -150,6 +198,8 @@ Phx.vista.CbteDependencias=Ext.extend(Phx.arbGridInterfaz,{
     preparaMenu:function(n){
         // llamada funcion clase padre
         Phx.vista.CbteDependencias.superclass.preparaMenu.call(this,n);
+        this.getBoton('btnDocCmpVnt').enable();
+         this.getBoton('btnImprimir').enable();
     },
     
     liberaMenu:function(n){
@@ -157,6 +207,8 @@ Phx.vista.CbteDependencias=Ext.extend(Phx.arbGridInterfaz,{
         
         // llamada funcion clase padre
         Phx.vista.CbteDependencias.superclass.liberaMenu.call(this,n);
+        this.getBoton('btnImprimir').disable();
+        this.getBoton('btnDocCmpVnt').disable();
         
     }
     

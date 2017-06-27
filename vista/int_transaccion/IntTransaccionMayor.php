@@ -437,6 +437,14 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				handler : this.imprimirCbte,
 				tooltip : '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
 		});
+		
+		this.addButton('btnDocCmpVnt', {
+				text : 'Doc Cmp/Vnt',
+				iconCls : 'brenew',
+				disabled : true,
+				handler : this.loadDocCmpVnt,
+				tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
+			});
 			
 			
 		this.grid.getTopToolbar().disable();
@@ -534,6 +542,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			this.getBoton('btnChequeoDocumentosWf').enable();
 			this.getBoton('btnImprimir').enable();
 			this.getBoton('chkpresupuesto').enable();
+			this.getBoton('btnDocCmpVnt').enable();
 			
 			return tb;
 		}
@@ -542,6 +551,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			 this.getBoton('btnChequeoDocumentosWf').disable();
 			 this.getBoton('btnImprimir').disable();
 			 this.getBoton('chkpresupuesto').disable();
+			 this.getBoton('btnDocCmpVnt').disable();
 		 }
 			
          return undefined;
@@ -552,6 +562,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			this.getBoton('btnChequeoDocumentosWf').disable();
 			this.getBoton('btnImprimir').disable();
 			this.getBoton('chkpresupuesto').disable();
+			this.getBoton('btnDocCmpVnt').disable();
+			
 			
 	},
 	
@@ -652,8 +664,16 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
                     rec.data,
                     this.idContenedor,
                     'DocumentoWf'
-        )
+           );
     },
+    
+    loadDocCmpVnt : function() {
+			var rec = this.sm.getSelected();
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCbte.php', 'Documentos del Cbte', {
+				width : '80%',
+				height : '80%'
+			}, rec.data, this.idContenedor, 'DocCompraVentaCbte');
+	},
 	
 	ExtraColumExportDet:[{ 
 		   	    label:'Partida',
