@@ -264,14 +264,13 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		  {
     		  url:'../../../sis_contabilidad/vista/rango/Rango.php',
     		  title:'Detalle', 
-    		  width:'35%',
+    		  width:'50%',
     		  cls:'Rango'
 			},
 			{
-	          url:'../../../sis_contabilidad/vista/rango/RangoTorta.php',
+	          url:'../../../sis_contabilidad/vista/rango/RangoTorta2.php',
 	          title:'Pie', 
-	          height:'50%',
-	          cls:'RangoTorta'
+	          cls:'RangoTorta2'
          }]
 	
 	
