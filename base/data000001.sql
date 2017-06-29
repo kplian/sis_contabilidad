@@ -1282,4 +1282,17 @@ VALUES
   (E'conta_val_doc_otros_subcuentas_compras', E'INVERSION,ACTIVO FIJO,ALMACENES,OTROS ACTIVOS', E'Nombre de subcuenta que tienen que incluirse en la validacion de documentos de compras,al vaidar cbte, se las separa por comas');
   
 /**********************************F-DAT-RAC-CONTA-1-19/06/2017*****************************************/  
- 
+ /**********************************I-DAT-MMV-CONTA-1-28/06/2017*****************************************/
+ select pxp.f_insert_tgui ('ResoluciÃ³n 101700000010', 'ResoluciÃ³n 101700000010', 'RESO', 'si', 11, '', 3, '', '', 'CONTA');
+ select pxp.f_insert_tgui ('Comisionistas', 'Comisionistas', 'COMISI', 'si', 1, 'sis_contabilidad/vista/comisionistas/Comisionistas.php', 4, '', 'Comisionistas', 'CONTA');
+ select pxp.f_insert_tgui ('RÃ©gimen Simplificado', 'RÃ©gimen Simplificado', 'SIMPLI', 'si', 2, 'sis_contabilidad/vista/regimen_simplificado/RegimenSimplificado.php', 4, '', 'RegimenSimplificado', 'CONTA');
+ select pxp.f_insert_tgui ('Personas Naturales', 'Personas Naturales', 'PERNAT', 'si', 3, 'sis_contabilidad/vista/persona_naturales/PersonaNaturales.php', 4, '', 'PersonaNaturales', 'CONTA');
+ select pxp.f_insert_tgui ('Anexos Actualizaciones', 'Anexos Actualizaciones', 'ANS', 'si', 4, 'sis_contabilidad/vista/anexos_actualizaciones/AnexosActualizaciones.php', 4, '', 'AnexosActualizaciones', 'CONTA');
+ select pxp.f_insert_tgui ('Periodo ResoluciÃ³n ', 'Periodo ResoluciÃ³n ', 'PRC', 'si', 9, 'sis_contabilidad/vista/periodo_resolucion/DeptoConta.php', 3, '', 'DeptoConta', 'CONTA');
+ select pxp.f_insert_testructura_gui ('RESO', 'CONTA');
+ select pxp.f_insert_testructura_gui ('COMISI', 'RESO');
+ select pxp.f_insert_testructura_gui ('SIMPLI', 'RESO');
+ select pxp.f_insert_testructura_gui ('PERNAT', 'RESO');
+ select pxp.f_insert_testructura_gui ('ANS', 'RESO');
+ select pxp.f_insert_testructura_gui ('PRC', 'CONF');
+ /**********************************F-DAT-MMV-CONTA-1-28/06/2017*****************************************/
