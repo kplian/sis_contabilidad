@@ -70,7 +70,7 @@ Ext.define('Phx.vista.RangoTorta2',{
 				        type: 'bar'
 				    },
 				    title: {
-				        text: "RELACION DE EJECUCION DE TIPOS DE CENTROS"
+				        text: "RELACIÓN DE EJECUCIÓN DE TIPOS DE CENTROS"
 				    },
 				    tooltip: {
 				      pointFormat: '({series.name}) <br>{point.descripcion}: <br><b>{point.y}</b>'
