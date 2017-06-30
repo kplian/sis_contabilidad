@@ -1283,12 +1283,12 @@ VALUES
   
 /**********************************F-DAT-RAC-CONTA-1-19/06/2017*****************************************/  
  /**********************************I-DAT-MMV-CONTA-1-28/06/2017*****************************************/
- select pxp.f_insert_tgui ('ResoluciÃ³n 101700000010', 'ResoluciÃ³n 101700000010', 'RESO', 'si', 11, '', 3, '', '', 'CONTA');
+ select pxp.f_insert_tgui ('Resolución 101700000010', 'Resolución 101700000010', 'RESO', 'si', 11, '', 3, '', '', 'CONTA');
  select pxp.f_insert_tgui ('Comisionistas', 'Comisionistas', 'COMISI', 'si', 1, 'sis_contabilidad/vista/comisionistas/Comisionistas.php', 4, '', 'Comisionistas', 'CONTA');
- select pxp.f_insert_tgui ('RÃ©gimen Simplificado', 'RÃ©gimen Simplificado', 'SIMPLI', 'si', 2, 'sis_contabilidad/vista/regimen_simplificado/RegimenSimplificado.php', 4, '', 'RegimenSimplificado', 'CONTA');
+ select pxp.f_insert_tgui ('Régimen Simplificado', 'RÃ©gimen Simplificado', 'SIMPLI', 'si', 2, 'sis_contabilidad/vista/regimen_simplificado/RegimenSimplificado.php', 4, '', 'RegimenSimplificado', 'CONTA');
  select pxp.f_insert_tgui ('Personas Naturales', 'Personas Naturales', 'PERNAT', 'si', 3, 'sis_contabilidad/vista/persona_naturales/PersonaNaturales.php', 4, '', 'PersonaNaturales', 'CONTA');
  select pxp.f_insert_tgui ('Anexos Actualizaciones', 'Anexos Actualizaciones', 'ANS', 'si', 4, 'sis_contabilidad/vista/anexos_actualizaciones/AnexosActualizaciones.php', 4, '', 'AnexosActualizaciones', 'CONTA');
- select pxp.f_insert_tgui ('Periodo ResoluciÃ³n ', 'Periodo ResoluciÃ³n ', 'PRC', 'si', 9, 'sis_contabilidad/vista/periodo_resolucion/DeptoConta.php', 3, '', 'DeptoConta', 'CONTA');
+ select pxp.f_insert_tgui ('Periodo Resolución ', 'Periodo Resolución ', 'PRC', 'si', 9, 'sis_contabilidad/vista/periodo_resolucion/DeptoConta.php', 3, '', 'DeptoConta', 'CONTA');
  select pxp.f_insert_testructura_gui ('RESO', 'CONTA');
  select pxp.f_insert_testructura_gui ('COMISI', 'RESO');
  select pxp.f_insert_testructura_gui ('SIMPLI', 'RESO');
@@ -1296,3 +1296,12 @@ VALUES
  select pxp.f_insert_testructura_gui ('ANS', 'RESO');
  select pxp.f_insert_testructura_gui ('PRC', 'CONF');
  /**********************************F-DAT-MMV-CONTA-1-28/06/2017*****************************************/
+
+
+
+/**********************************I-DAT-RAC-CONTA-1-29/06/2017*****************************************/
+select pxp.f_insert_tgui ('Análisis de Costos', 'Análisis de Costos', 'ANCOS', 'si', 20, 'sis_contabilidad/vista/rango/TipoCcArbRep.php', 3, '', 'TipoCcArbRep', 'CONTA');
+select pxp.f_insert_testructura_gui ('ANCOS', 'REPCON');
+/**********************************F-DAT-RAC-CONTA-1-29/06/2017*****************************************/
+
+

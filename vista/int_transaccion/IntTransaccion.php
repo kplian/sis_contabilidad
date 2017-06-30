@@ -120,15 +120,15 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		   			        color = 'red';
 		   			    }
 		   			    
-		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo'], record.data['desc_cuenta']);	
+		   				var retorno =  String.format('<b>CC:</b> {0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo'], record.data['desc_cuenta']);	
 		   					if(record.data['desc_auxiliar']){
-			   					retorno = retorno + String.format('<b>Aux.:</b>{0}</br>', record.data['desc_auxiliar']);
+			   					retorno = retorno + String.format('<b>Aux.:</b> {0}</br>', record.data['desc_auxiliar']);
 			   				}
 		   					if(record.data['desc_partida']){
 			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
 			   				}
 		   					if(record.data['desc_orden']){			   					
-			   					retorno = retorno + String.format('<b>Ord.:</b> <font>{0} {1}</font><br>', record.data['codigo_ot'], record.data['desc_orden']);
+			   					retorno = retorno + String.format('<b>Ord.:</b> <font> {0} {1}</font><br>', record.data['codigo_ot'], record.data['desc_orden']);
 			   				}	
 			   				if(record.data['desc_suborden']){
 			   					retorno = retorno + '<b>Sub.:</b> '+record.data['desc_suborden'];

@@ -16,7 +16,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		this.initButtons=[this.cmbGestion];
     	//llama al constructor de la clase padre
 		Phx.vista.Cuenta.superclass.constructor.call(this,config);
-		//this.loaderTree.baseParams={id_gestion:0};
+		this.loaderTree.baseParams={id_gestion:0};
 		this.init();
 		this.iniciarEventos();
 		
@@ -439,6 +439,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
     id_nodo:'id_cuenta',
     id_nodo_p:'id_cuenta_padre',
 	fields: [
+	    
 		{name:'id_cuenta', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
 		{name:'nombre_cuenta', type: 'string'},

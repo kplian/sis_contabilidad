@@ -92,7 +92,7 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 				anchor: '80%',
 				gwidth: 200,
 				maxLength:200/*
-				tpl: function (value,p,record){
+				gtpl: function (value,p,record){
 					console.log(this, arguments)
 						return  String.format('<b>{0}<b> {1} [{2}] MB',this.codigo, this.descripcion, Ext.util.Format.number(this.balance_mb,'0,000.00'));
 				}*/
@@ -124,7 +124,7 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 				fieldLabel: 'Balance MB ?',				
 				gwidth: 159,
        		    galign: 'right',
-       		    tpl: function (){
+       		    gtpl: function (){
 					console.log('....oooo', arguments)
 						return  String.format('<b>{0}<b>',Ext.util.Format.number(this.balance_mb,'0,000.00'));
 				}
@@ -138,7 +138,7 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 				fieldLabel: 'Balance MT ?',				
 				gwidth: 150,
 				galign: 'right',
-       		    tpl: function (){
+       		    gtpl: function (){
 					return  String.format('<b>{0}<b>',Ext.util.Format.number(this.balance_mt,'0,000.00'));
 				}
 			},
