@@ -134,7 +134,7 @@ class MODAnexosActualizaciones extends MODbase{
     function cambiarRevision(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='conta.ft_anexos_actualizaciones_ime';
-        $this->transaccion='CONTA_ANS_CONT';
+        $this->transaccion='CONTA_ANS_IN';
         $this->tipo_procedimiento='IME';
 
         //Define los parametros para la funcion
