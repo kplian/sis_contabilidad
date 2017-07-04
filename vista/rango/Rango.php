@@ -34,11 +34,25 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'detalle',
-				fieldLabel: '',
+				fieldLabel: 'M',
 				gwidth: 25, 
 				renderer:function (value,p,record){  
 					if(record.data.tipo_reg != 'summary'){
-					    return  String.format("<div style='text-align:center'><img title='Revisar detalle' src = '../../../lib/imagenes/connect.png' align='center'/></div>",record.data.periodo,record.data.gestion);
+					    return  String.format("<div style='text-align:center'><img title='Revisar Mayor' src = '../../../lib/imagenes/connect.png' align='center'/></div>");
+				     }
+				}
+			},
+			type:'Field',
+			grid:true
+		},
+		{
+			config:{
+				name: 'orden',
+				fieldLabel: 'O',
+				gwidth: 25, 
+				renderer:function (value,p,record){  
+					if(record.data.tipo_reg != 'summary'){
+					    return  String.format("<div style='text-align:center'><img title='Revisar Ordenes' src = '../../../lib/imagenes/connect.png' align='center'/></div>");
 				     }
 				}
 			},
@@ -296,6 +310,29 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                      },
                     this.idContenedor,
                     'FormFiltro'
+           );
+	    	
+	    }
+	    
+	    if (fieldName == 'orden') {
+	    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/rango/RangoOt.php',
+                    'Mayor',
+                    {
+                        width:'100%',
+                        height:'100%',
+                    },
+                    { maestro:record.data,
+                      detalle: {
+                      	        'tipo_filtro': 'fechas',
+                      	        'fecha_ini': record.data.fecha_ini,
+                      	        'fecha_fin': record.data.fecha_fin,
+                      	        'id_tipo_cc': record.data.id_tipo_cc,
+                      	        'desc_tipo_cc': record.data.desc_tipo_cc
+                      	      }
+                      
+                     },
+                    this.idContenedor,
+                    'RangoOt'
            );
 	    	
 	    }

@@ -35,6 +35,7 @@ DECLARE
     v_filtro_cuentas	varchar;
     v_filtro_ordenes	varchar;
     v_filtro_tipo_cc	varchar;
+    v_filtro			varchar;
 			    
 BEGIN
 
@@ -219,28 +220,30 @@ BEGIN
              
                   IF v_parametros.id_orden_trabajo is not NULL THEN
                 
-                      WITH RECURSIVE orden_rec (id_orden_trabajo, id_orden_trabajo_fk) AS (
-                        SELECT cue.id_orden_trabajo, cue.id_orden_trabajo_fk
-                        FROM conta.torden_trabajo cue
-                        WHERE cue.id_orden_trabajo = v_parametros.id_orden_trabajo and cue.estado_reg = 'activo'
-                      UNION ALL
-                        SELECT cue2.id_orden_trabajo, cue2.id_orden_trabajo_fk
-                        FROM orden_rec lrec 
-                        INNER JOIN conta.torden_trabajo cue2 ON lrec.id_orden_trabajo = cue2.id_orden_trabajo_fk
-                        where cue2.estado_reg = 'activo'
-                      )
-                    SELECT  pxp.list(id_orden_trabajo::varchar) 
-                      into 
-                        v_ordenes
-                    FROM orden_rec;
+            
+                    IF v_parametros.id_orden_trabajo != 0 THEN
+                          WITH RECURSIVE orden_rec (id_orden_trabajo, id_orden_trabajo_fk) AS (
+                            SELECT cue.id_orden_trabajo, cue.id_orden_trabajo_fk
+                            FROM conta.torden_trabajo cue
+                            WHERE cue.id_orden_trabajo = v_parametros.id_orden_trabajo and cue.estado_reg = 'activo'
+                          UNION ALL
+                            SELECT cue2.id_orden_trabajo, cue2.id_orden_trabajo_fk
+                            FROM orden_rec lrec 
+                            INNER JOIN conta.torden_trabajo cue2 ON lrec.id_orden_trabajo = cue2.id_orden_trabajo_fk
+                            where cue2.estado_reg = 'activo'
+                          )
+                        SELECT  pxp.list(id_orden_trabajo::varchar) 
+                          into 
+                            v_ordenes
+                        FROM orden_rec;
+                        
+                        v_filtro_ordenes = ' transa.id_orden_trabajo in ('||v_ordenes||') ';
+                    ELSE
+                        --cuando la orden de trabajo es cero, se requiere msotrar las ordenes de trabajo nulas
+                        v_filtro_ordenes = ' transa.id_orden_trabajo is null ';
                     
-                    
-                    
-                    v_filtro_ordenes = ' transa.id_orden_trabajo in ('||v_ordenes||') ';
+                    END IF;
                 END IF;
-                
-               
-                
             END IF;
             
             
@@ -391,32 +394,34 @@ BEGIN
                 
             END IF;
             
-            IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajo')  THEN
+             IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajo')  THEN
              
                   IF v_parametros.id_orden_trabajo is not NULL THEN
                 
-                      WITH RECURSIVE orden_rec (id_orden_trabajo, id_orden_trabajo_fk) AS (
-                        SELECT cue.id_orden_trabajo, cue.id_orden_trabajo_fk
-                        FROM conta.torden_trabajo cue
-                        WHERE cue.id_orden_trabajo = v_parametros.id_orden_trabajo and cue.estado_reg = 'activo'
-                      UNION ALL
-                        SELECT cue2.id_orden_trabajo, cue2.id_orden_trabajo_fk
-                        FROM orden_rec lrec 
-                        INNER JOIN conta.torden_trabajo cue2 ON lrec.id_orden_trabajo = cue2.id_orden_trabajo_fk
-                        where cue2.estado_reg = 'activo'
-                      )
-                    SELECT  pxp.list(id_orden_trabajo::varchar) 
-                      into 
-                        v_ordenes
-                    FROM orden_rec;
+            
+                    IF v_parametros.id_orden_trabajo != 0 THEN
+                          WITH RECURSIVE orden_rec (id_orden_trabajo, id_orden_trabajo_fk) AS (
+                            SELECT cue.id_orden_trabajo, cue.id_orden_trabajo_fk
+                            FROM conta.torden_trabajo cue
+                            WHERE cue.id_orden_trabajo = v_parametros.id_orden_trabajo and cue.estado_reg = 'activo'
+                          UNION ALL
+                            SELECT cue2.id_orden_trabajo, cue2.id_orden_trabajo_fk
+                            FROM orden_rec lrec 
+                            INNER JOIN conta.torden_trabajo cue2 ON lrec.id_orden_trabajo = cue2.id_orden_trabajo_fk
+                            where cue2.estado_reg = 'activo'
+                          )
+                        SELECT  pxp.list(id_orden_trabajo::varchar) 
+                          into 
+                            v_ordenes
+                        FROM orden_rec;
+                        
+                        v_filtro_ordenes = ' transa.id_orden_trabajo in ('||v_ordenes||') ';
+                    ELSE
+                        --cuando la orden de trabajo es cero, se requiere msotrar las ordenes de trabajo nulas
+                        v_filtro_ordenes = ' transa.id_orden_trabajo is null ';
                     
-                    
-                    
-                    v_filtro_ordenes = ' transa.id_orden_trabajo in ('||v_ordenes||') ';
+                    END IF;
                 END IF;
-                
-               
-                
             END IF;
             
             
@@ -493,8 +498,105 @@ BEGIN
 			--Devuelve la respuesta
 			return v_consulta;
 
-		end;				
-	else
+		end;
+    
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_INTANA_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:10:12
+	***********************************/
+
+	elseif(p_transaccion='CONTA_INTANA_SEL')then
+     				
+    	begin
+        
+             if pxp.f_existe_parametro(p_tabla,'id_periodo') then
+               v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
+             elseif pxp.f_existe_parametro(p_tabla,'fecha_ini') then
+               v_filtro = ' fecha BETWEEN '''||v_parametros.fecha_ini||'''::date and '''||v_parametros.fecha_fin||'''::Date';
+             else
+                v_filtro = ' 0=0 ';
+             end if;
+             
+         
+    		--Sentencia de la consulta
+			v_consulta:='SELECT
+            				id_orden_trabajo, 
+                            sum(importe_debe_mb) as importe_debe_mb,
+                            sum(importe_haber_mb) as importe_haber_mb,
+                            sum(importe_debe_mt) as importe_debe_mt,
+                            sum(importe_haber_mt) as importe_haber_mt,                            
+                            codigo_ot::varchar,
+                            desc_orden::varchar
+
+                          FROM 
+                            conta.vint_transaccion_analisis  v
+                          where    '||v_parametros.id_tipo_cc::varchar||' =ANY(ids) and '||v_filtro|| ' and ';
+                          
+                          
+              --Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+           
+           
+            v_consulta:=v_consulta||'
+                            group by  
+                                id_orden_trabajo,
+                                codigo_ot,
+                                desc_orden ';
+                            
+            
+			--Definicion de la respuesta
+			
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;    
+    
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_INTANA_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:10:12
+	***********************************/
+
+	elsif(p_transaccion='CONTA_INTANA_CONT')then
+
+		begin
+        
+             if pxp.f_existe_parametro(p_tabla,'id_periodo') then
+               v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
+             elseif pxp.f_existe_parametro(p_tabla,'fecha_ini') then
+               v_filtro = ' fecha BETWEEN '''||v_parametros.fecha_ini||'''::date and '''||v_parametros.fecha_fin||'''::Date';
+             else
+                v_filtro = ' 0=0 ';
+             end if;
+             
+             
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='SELECT 
+                            count(id_orden_trabajo) as total,
+                            sum(importe_debe_mb) as importe_debe_mb,
+                            sum(importe_haber_mb) as importe_haber_mb,
+                            sum(importe_debe_mt) as importe_debe_mt,
+                            sum(importe_haber_mt) as importe_haber_mt
+                         FROM 
+                            conta.vint_transaccion_analisis  v
+                          where    '||v_parametros.id_tipo_cc::varchar||' =ANY(ids) and '||v_filtro|| ' and ';
+			
+            --Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+             
+            raise notice '%',v_consulta;
+ 
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;    				
+	
+    else
 					     
 		raise exception 'Transaccion inexistente';
 					         

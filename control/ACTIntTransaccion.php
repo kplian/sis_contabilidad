@@ -195,6 +195,34 @@ class ACTIntTransaccion extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+     function listarIntTransaccionOrden(){
+		$this->objParam->defecto('ordenacion','id_orden_trabajo');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarIntTransaccionOrden');
+		} else{
+			$this->objFunc=$this->create('MODIntTransaccion');
+			
+			$this->res=$this->objFunc->listarIntTransaccionOrden($this->objParam);
+		}
+		//adicionar una fila al resultado con el summario
+		$temp = Array();
+		$temp['importe_debe_mb'] = $this->res->extraData['total_debe'];
+		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
+		$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
+		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
+		$temp['tipo_reg'] = 'summary';
+		$temp['id_orden_trabajo'] = -1;
+		
+		$this->res->total++;
+		
+		$this->res->addLastRecDatos($temp);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 			
 }
 
