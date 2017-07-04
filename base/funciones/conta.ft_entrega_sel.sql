@@ -173,8 +173,7 @@ BEGIN
                             beneficiario::varchar,
                             glosa1::varchar,
                             id_int_comprobante,
-                            id_int_comprobante_dev,
-                            id_cuenta_bancaria
+                            id_int_comprobante_dev
                           FROM
                             conta.ventrega   e
                           WHERE id_entrega = '||v_parametros.id_entrega||'

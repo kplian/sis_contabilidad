@@ -15,7 +15,7 @@ class ACTSuborden extends ACTbase{
 		
 		if($this->objParam->getParametro('id_orden_trabajo')!=''){
             $this->objParam->addFiltro("suo.id_suborden IN (select id_suborden 
-            							from conta.tsuborden where estado_reg = ''activo'' and id_orden_trabajo = ".$this->objParam->getParametro('id_orden_trabajo') . ") ");    
+            							from conta.torden_suborden where estado_reg = ''activo'' and id_orden_trabajo = ".$this->objParam->getParametro('id_orden_trabajo') . ") ");    
         }
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){

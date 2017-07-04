@@ -102,7 +102,7 @@ class ACTArchivoAirbp extends ACTbase{
 									//calcular iva
 									$this->objParam->addParametro('id_doc_compra_venta', $idDocumento);
 									$this->objParam->addParametro('importe_excento', $importeExcento);
-									$this->objParam->addParametro('importe_iva', $totalFactura-$importeExcento * 0.13);
+									$this->objParam->addParametro('importe_iva', ($totalFactura-$importeExcento) * 0.13);
 									$this->objParam->addParametro('importe_pago_liquido', $totalFactura);
 									$this->objParam->addParametro('importe_doc', $totalFactura);
 									$this->objParam->addParametro('importe_neto', $totalFactura);
@@ -215,9 +215,10 @@ class ACTArchivoAirbp extends ACTbase{
 								$importeExcento = $totalFactura + $fila['total_bs'];				//totalExcento para cobija
 								$totalFactura =  $totalFactura + $fila['total_bs'];
 							}
-							else
-								$totalFactura =  $totalFactura + $fila['total_bs'];					//totalFacturas para el resto
-
+							else {
+								$importeExcento = 0;
+								$totalFactura = $totalFactura + $fila['total_bs'];                    //totalFacturas para el resto
+							}
 				}
 				$this->objParam->addParametro('id_doc_compra_venta', $idDocumento);
 				$this->objParam->addParametro('importe_excento', $importeExcento);
@@ -227,10 +228,16 @@ class ACTArchivoAirbp extends ACTbase{
 				$this->objParam->addParametro('importe_neto', $totalFactura);
 				$this->objFunc = $this->create('MODDocCompraVenta');
 				$this->res = $this->objFunc->modificarDocCompraVenta($this->objParam);
+				/*
+				$this->objParam->addParametro('id_doc_compra_venta', $idDocumento);
+				$this->objParam->addParametro('id_int_comprobante', $id_int_comprobante);
+				$this->res = $this->objFunc->agregarCbteDoc($this->objParam);
+				var_dump($this->res); exit;*/
 				//$resultLibroComprasAnt=$Custom->ModificarValorDocumento($idLibroCompras,$id_transaccion,$tipo_documento,$nro_documento,$fecha_documento,$razon_social,$nro_nit,$nro_autorizacion,$codigo_control,$poliza_dui,$formulario,$tipo_retencion,$id_moneda,$importe_credito,$importe_debito,$importe_ice,$importe_it,$importe_iue,$importe_sujeto,$totalFactura,$importeExcento,$estado_documento,$id_comprobante);
 				if ($this->res->getTipo() == 'ERROR') {
 					$error = 'error';
 					$mensaje_completo = "Error al guardar el fila en tabla " . $this->res->getMensajeTec();
+					var_dump($mensaje_completo); exit;
 					break;
 				}
 			}
