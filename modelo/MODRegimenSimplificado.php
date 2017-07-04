@@ -129,7 +129,7 @@ class MODRegimenSimplificado extends MODbase{
     function cambiarRevision(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='conta.ft_regimen_simplificado_ime';
-        $this->transaccion='CONTA_REV_IME';
+        $this->transaccion='CONTA_REVI_IME';
         $this->tipo_procedimiento='IME';
 
         //Define los parametros para la funcion
