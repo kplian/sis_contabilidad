@@ -35,6 +35,7 @@ v_cont_nro_nodo		integer;
 va_id_orden 		integer[];
 v_nro_nodo			integer;
 va_id_periodo		integer[];
+va_id_gestion		integer[];
  
 
 BEGIN
@@ -74,11 +75,21 @@ BEGIN
             where   v_parametros.desde BETWEEN per.fecha_ini and per.fecha_fin 
                 OR v_parametros.hasta BETWEEN per.fecha_ini and per.fecha_fin
                 OR per.fecha_fin BETWEEN v_parametros.desde and v_parametros.hasta;
+                
+                
+             select 
+                 pxp.aggarray (DISTINCT per.id_gestion::varchar)
+               into
+                  va_id_gestion 
+             from param.tperiodo per
+             where per.id_periodo = ANY(va_id_periodo);
+          
             
           
            v_resp =  conta.f_balance_tcc_recursivo_sinc(va_id_periodo,
-                                                       NULL::integer,  --  id_tipo_cc INICIAL  
-                                                       p_id_usuario);
+           												va_id_gestion,
+                                                        NULL::integer,  --  id_tipo_cc INICIAL  
+                                                        p_id_usuario);
          
           
          

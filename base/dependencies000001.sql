@@ -3796,10 +3796,6 @@ UNION ALL
 
 /**********************************I-DEP-RAC-CONTA-0-04/07/2017****************************************/
 
-
-
-
-
 CREATE OR REPLACE VIEW conta.vint_transaccion_analisis(
     importe_debe_mb,
     importe_haber_mb,
@@ -3816,7 +3812,10 @@ CREATE OR REPLACE VIEW conta.vint_transaccion_analisis(
     id_cuenta,
     id_auxiliar,
     fecha,
-    id_periodo)
+    id_periodo,
+    sw_movimiento,
+    descripcion_partida,
+    id_partida)
 AS
   SELECT "int".importe_debe_mb,
          "int".importe_haber_mb,
@@ -3834,7 +3833,10 @@ AS
          "int".id_cuenta,
          "int".id_auxiliar,
          cbt.fecha,
-         cbt.id_periodo
+         cbt.id_periodo,
+         par.sw_movimiento,
+         par.nombre_partida AS descripcion_partida,
+         par.id_partida
   FROM conta.tint_transaccion "int"
        JOIN conta.tint_comprobante cbt ON cbt.id_int_comprobante =
          "int".id_int_comprobante
@@ -3843,8 +3845,6 @@ AS
        LEFT JOIN conta.torden_trabajo ot ON "int".id_orden_trabajo =
          ot.id_orden_trabajo
        LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida;
-
-
 /**********************************F-DEP-RAC-CONTA-0-04/07/2017****************************************/
 
 

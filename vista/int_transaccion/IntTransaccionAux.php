@@ -25,8 +25,8 @@ Phx.vista.IntTransaccionAux = {
     preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
-		Phx.vista.IntTransaccionAux.superclass.preparaMenu.call(this);
 		this.getBoton('btnBanco').disable();
+		Phx.vista.IntTransaccionAux.superclass.preparaMenu.call(this);
 	},
 	
 	liberaMenu: function() {

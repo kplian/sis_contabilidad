@@ -334,6 +334,45 @@ class MODIntTransaccion extends MODbase{
 		return $this->respuesta;
 	}
 
+    function listarIntTransaccionPartida(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_transaccion_sel';
+		$this->transaccion='CONTA_INTPAR_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+		$this->setParametro('id_periodo','id_periodo','int4');
+		$this->setParametro('fecha_ini','fecha_ini','date');
+		$this->setParametro('fecha_fin','fecha_fin','date');
+		
+		//captura parametros adicionales para el count
+		$this->capturaCount('total_debe','numeric');
+		$this->capturaCount('total_haber','numeric');
+		$this->capturaCount('total_debe_mt','numeric');
+		$this->capturaCount('total_haber_mt','numeric');
+			
+		//Definicion de la lista del resultado del query
+		$this->captura('id_partida','int4');
+		$this->captura('importe_debe_mb','numeric');	
+		$this->captura('importe_haber_mb','numeric');
+		$this->captura('importe_debe_mt','numeric');	
+		$this->captura('importe_haber_mt','numeric');
+		$this->captura('codigo_partida','varchar');
+		$this->captura('sw_movimiento','varchar');
+		$this->captura('descripcion_partida','varchar');
+		
+		
+		
+		 
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 
 
 			

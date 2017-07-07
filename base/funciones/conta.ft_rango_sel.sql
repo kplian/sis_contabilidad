@@ -42,7 +42,7 @@ BEGIN
 	/*********************************    
  	#TRANSACCION:  'CONTA_RAN_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		rac	
  	#FECHA:		22-06-2017 21:30:05
 	***********************************/
 
@@ -90,7 +90,13 @@ BEGIN
                         ges.gestion,
                         per.fecha_ini,
                         per.fecha_fin,
-                        tcc.codigo as desc_tipo_cc
+                        tcc.codigo as desc_tipo_cc,
+                        ran.memoria,
+  						ran.formulado,
+  						ran.comprometido,
+  						ran.ejecutado,
+                        (ran.debe_mb - ran.haber_mb) as balance_mb,
+                        ges.id_gestion
                 from conta.trango ran
                      inner join param.ttipo_cc tcc on tcc.id_tipo_cc = ran.id_tipo_cc
                      inner join param.tperiodo per on per.id_periodo = ran.id_periodo
@@ -111,7 +117,7 @@ BEGIN
 	/*********************************    
  	#TRANSACCION:  'CONTA_RAN_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		rac	
  	#FECHA:		22-06-2017 21:30:05
 	***********************************/
 
@@ -141,7 +147,12 @@ BEGIN
                                  sum(ran.debe_mb) as debe_mb,
                                  sum(ran.haber_mb) as haber_mb,
                                  sum(ran.debe_mt) as debe_mt,
-                                 sum(ran.haber_mt) as haber_mt
+                                 sum(ran.haber_mt) as haber_mt,
+                                 sum(memoria) as memoria,
+                                 sum(formulado) as formulado,
+                                 sum(comprometido) as comprometido,
+                                 sum(ejecutado) as ejecutado,
+                                 sum(ran.debe_mb -  ran.haber_mb) as balance_mb
 					    from conta.trango ran
                              inner join param.ttipo_cc tcc on tcc.id_tipo_cc = ran.id_tipo_cc
                              inner join param.tperiodo per on per.id_periodo = ran.id_periodo
@@ -222,7 +233,11 @@ BEGIN
                           sum(ran.debe_mb) -  sum(ran.haber_mb) as balance_mb,
                           sum(ran.debe_mt) as debe_mt,
                           sum(ran.haber_mt) as haber_mt ,
-                          sum(ran.debe_mt) -  sum(ran.haber_mt) as balance_mt	 	 	 	
+                          sum(ran.debe_mt) -  sum(ran.haber_mt) as balance_mt,
+                          sum(memoria) as memoria,
+  						  sum(formulado) as formulado,
+  						  sum(comprometido) as comprometido,
+  						  sum(ejecutado) as ejecutado	 	 	 	
 						from param.ttipo_cc tcc                        
                         left join conta.trango ran on ran.id_tipo_cc = tcc.id_tipo_cc
                         where  '||v_where|| ' and tcc.estado_reg = ''activo'' and '||v_filtro||' 

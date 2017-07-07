@@ -121,7 +121,7 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		{
 			config:{
 				name: 'balance_mb',
-				fieldLabel: 'Balance MB ?',				
+				fieldLabel: 'Balance MB',				
 				gwidth: 159,
        		    galign: 'right',
        		    gtpl: function (){
@@ -135,11 +135,63 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		{
 			config:{
 				name: 'balance_mt',
-				fieldLabel: 'Balance MT ?',				
+				fieldLabel: 'Balance MT',				
 				gwidth: 150,
 				galign: 'right',
        		    gtpl: function (){
 					return  String.format('<b>{0}<b>',Ext.util.Format.number(this.balance_mt,'0,000.00'));
+				}
+			},
+			type:'Field',
+			grid:true
+		},
+		{
+			config:{
+				name: 'memoria',
+				fieldLabel: 'Memoria MB',				
+				gwidth: 150,
+				galign: 'right',
+       		    gtpl: function (){
+					return  String.format('<b>{0}<b>',Ext.util.Format.number(this.memoria,'0,000.00'));
+				}
+			},
+			type:'Field',
+			grid:true
+		},
+		{
+			config:{
+				name: 'formulado',
+				fieldLabel: 'Formulado MB',				
+				gwidth: 150,
+				galign: 'right',
+       		    gtpl: function (){
+					return  String.format('<b>{0}<b>',Ext.util.Format.number(this.formulado,'0,000.00'));
+				}
+			},
+			type:'Field',
+			grid:true
+		},
+		{
+			config:{
+				name: 'comprometido',
+				fieldLabel: 'Comprometido MB',				
+				gwidth: 150,
+				galign: 'right',
+       		    gtpl: function (){
+					return  String.format('<b>{0}<b>',Ext.util.Format.number(this.comprometido,'0,000.00'));
+				}
+			},
+			type:'Field',
+			grid:true
+		},
+		{
+			config:{
+				name: 'ejecutado',
+				fieldLabel: 'Ejecutado MB',				
+				gwidth: 150,
+				galign: 'right',
+       		    gtpl: function (){
+					return  String.format('<b>{0}<b>',Ext.util.Format.number(this.ejecutado,'0,000.00'));
 				}
 			},
 			type:'Field',
@@ -179,7 +231,8 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'id_ep','debe_mb','haber_mb',
-		'debe_mt','haber_mt','balance_mb','balance_mb'
+		'debe_mt','haber_mt','balance_mb','balance_mb',
+		'memoria','formulado','comprometido','ejecutado'
 		
 	],
 	
@@ -269,7 +322,7 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 			},
 			{
 	          url:'../../../sis_contabilidad/vista/rango/RangoTorta2.php',
-	          title:'Pie', 
+	          title:'Gráficos', 
 	          cls:'RangoTorta2'
          }]
 	

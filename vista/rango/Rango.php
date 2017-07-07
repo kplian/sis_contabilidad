@@ -59,6 +59,20 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			grid:true
 		},
+		{
+			config:{
+				name: 'partida',
+				fieldLabel: 'P',
+				gwidth: 25, 
+				renderer:function (value,p,record){  
+					if(record.data.tipo_reg != 'summary'){
+					    return  String.format("<div style='text-align:center'><img title='Revisar Ordenes' src = '../../../lib/imagenes/connect.png' align='center'/></div>");
+				     }
+				}
+			},
+			type:'Field',
+			grid:true
+		},
 		
 		{
 			config:{
@@ -167,65 +181,112 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false
 		},
-		
 		{
 			config:{
-				name: 'fecha_reg',
-				fieldLabel: 'Fecha creación',
+				name: 'memoria',
+				fieldLabel: 'Memoria MB',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
-				type:'DateField',
-				filters:{pfiltro:'ran.fecha_reg',type:'date'},
+				type:'NumberField',
+				filters:{pfiltro:'ran.memoria',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				form:false
 		},
 		{
 			config:{
-				name: 'usr_reg',
-				fieldLabel: 'Creado por',
+				name: 'formulado',
+				fieldLabel: 'Formulado MB',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:4
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
-				type:'Field',
-				filters:{pfiltro:'usu1.cuenta',type:'string'},
+				type:'NumberField',
+				filters:{pfiltro:'ran.formulado',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				form:false
 		},
 		{
 			config:{
-				name: 'usr_mod',
-				fieldLabel: 'Modificado por',
+				name: 'comprometido',
+				fieldLabel: 'Comprometido MB',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:4
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
-				type:'Field',
-				filters:{pfiltro:'usu2.cuenta',type:'string'},
+				type:'NumberField',
+				filters:{pfiltro:'ran.comprometido',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				form:false
 		},
 		{
 			config:{
-				name: 'fecha_mod',
-				fieldLabel: 'Fecha Modif.',
+				name: 'ejecutado',
+				fieldLabel: 'Ejecutado MB',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
-							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
 			},
-				type:'DateField',
-				filters:{pfiltro:'ran.fecha_mod',type:'date'},
+				type:'NumberField',
+				filters:{pfiltro:'ran.ejecutado',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
+		{
+			config:{
+				name: 'balance_mb',
+				fieldLabel: 'Balance MB',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+			},
+				type:'NumberField',
+				filters:{pfiltro:'ran.balance_mb',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -253,7 +314,9 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'periodo','gestion','tipo_reg','desc_tipo_cc'
+		{name:'usr_mod', type: 'string'},'periodo','gestion','tipo_reg','desc_tipo_cc',
+		'memoria','formulado','comprometido','ejecutado','balance_mb','id_gestion'
+		
 		
 	],
 	sortInfo:{
@@ -304,7 +367,8 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                       	        'desde': record.data.fecha_ini,
                       	        'hasta': record.data.fecha_fin,
                       	        'id_tipo_cc': record.data.id_tipo_cc,
-                      	        'desc_tipo_cc': record.data.desc_tipo_cc
+                      	        'desc_tipo_cc': record.data.desc_tipo_cc,
+                      	        'id_gestion': record.data.id_gestion
                       	      }
                       
                      },
@@ -327,12 +391,38 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                       	        'fecha_ini': record.data.fecha_ini,
                       	        'fecha_fin': record.data.fecha_fin,
                       	        'id_tipo_cc': record.data.id_tipo_cc,
-                      	        'desc_tipo_cc': record.data.desc_tipo_cc
+                      	        'desc_tipo_cc': record.data.desc_tipo_cc,
+                      	        'id_gestion': record.data.id_gestion
                       	      }
                       
                      },
                     this.idContenedor,
                     'RangoOt'
+           );
+	    	
+	    }
+	    
+	    if (fieldName == 'partida') {
+	    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/rango/RangoPartida.php',
+                    'Mayor Partida',
+                    {
+                        width:'100%',
+                        height:'100%',
+                    },
+                    { maestro:record.data,
+                      detalle: {
+                      	        'tipo_filtro': 'fechas',
+                      	        'fecha_ini': record.data.fecha_ini,
+                      	        'fecha_fin': record.data.fecha_fin,
+                      	        'id_tipo_cc': record.data.id_tipo_cc,
+                      	        'desc_tipo_cc': record.data.desc_tipo_cc,
+                      	        'id_gestion': record.data.id_gestion,
+                      	        'gestion': record.data.gestion
+                      	      }
+                      
+                     },
+                    this.idContenedor,
+                    'RangoPartida'
            );
 	    	
 	    }
