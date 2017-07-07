@@ -108,7 +108,8 @@ BEGIN
                             transa.triangulacion,
                             suo.id_suborden,
                             (''(''||suo.codigo||'') ''||suo.nombre)::varchar as desc_suborden,
-                            ot.codigo as codigo_ot
+                            ot.codigo as codigo_ot,
+                            cp.codigo_categoria::varchar
                         from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
@@ -117,7 +118,8 @@ BEGIN
 						left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-                        left join conta.tsuborden suo on suo.id_suborden =  transa.id_suborden 
+                        left join conta.tsuborden suo on suo.id_suborden =  transa.id_suborden
+                        left join pre.vcategoria_programatica cp ON cp.id_categoria_programatica = cc.id_categoria_prog
                         
                         
 				        where ';
@@ -161,6 +163,8 @@ BEGIN
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
                         left join conta.tsuborden suo on suo.id_suborden =  transa.id_suborden
+                        left join pre.vcategoria_programatica cp ON cp.id_categoria_programatica = cc.id_categoria_prog
+                        
                         where  ';
 			
             

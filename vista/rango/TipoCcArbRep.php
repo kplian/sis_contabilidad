@@ -46,13 +46,21 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		
 		
 		//Botón para Imprimir el Comprobante
-		this.addButton('btnImprimir', {
+		this.addButton('btnSincronizar', {
 				text : 'Sincronizar',
 				iconCls : 'bexecdb',
 				disabled : false,
 				handler : this.sincronizarRangos,
 				tooltip : '<b>Actuliza los valores de costos desde los comrpbantes aprobados  entre los  periodos de fechas seleccioandas</b>'
 			});
+			
+		this.addButton('btnSincronizar', {
+				text : 'Reporte',
+				iconCls : 'bprint',
+				disabled : false,
+				handler : this.formularioReporte,
+				tooltip : '<b>Formulario para genererar reporte</b>'
+			});	
 		
     			
 		this.init();
@@ -310,6 +318,15 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 	successRango: function(){
 		Phx.CP.loadingHide();
 		this.root.reload();
+	},
+	
+	formularioReporte: function(){
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/cuenta/FormFiltroBalanceTipoCC.php', 'Formulario de Reporte', {
+				width : '40%',
+				height : '80%'
+			}, {}, this.idContenedor, 'FormFiltroBalanceTipoCC');
+		
+		
 	},
 	
 	 

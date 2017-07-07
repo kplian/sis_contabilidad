@@ -85,6 +85,9 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('id_suborden','int4');
 		$this->captura('desc_suborden','varchar');
 		$this->captura('codigo_ot','varchar');
+		$this->captura('codigo_categoria','varchar');
+		
+		
 		
 		
 		
@@ -360,6 +363,8 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('codigo_partida','varchar');
 		$this->captura('sw_movimiento','varchar');
 		$this->captura('descripcion_partida','varchar');
+		
+		
 		
 		
 		
