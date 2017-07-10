@@ -22,6 +22,12 @@ class MODRango extends MODbase{
 		$this->capturaCount('haber_mb','numeric');
 		$this->capturaCount('debe_mt','numeric');
 		$this->capturaCount('haber_mt','numeric');
+		$this->capturaCount('memoria','numeric');
+		$this->capturaCount('formulado','numeric');
+		$this->capturaCount('comprometido','numeric');
+		$this->capturaCount('ejecutado','numeric');
+		$this->capturaCount('balance_mb','numeric');
+		
 		
 		$this->setParametro('desde','desde','date');
 		$this->setParametro('hasta','hasta','date');
@@ -48,6 +54,13 @@ class MODRango extends MODbase{
 		$this->captura('fecha_ini','date');
 		$this->captura('fecha_fin','date');
 		$this->captura('desc_tipo_cc','varchar');
+		$this->captura('memoria','numeric');
+		$this->captura('formulado','numeric');
+		$this->captura('comprometido','numeric');
+		$this->captura('ejecutado','numeric');
+		$this->captura('balance_mb','numeric');
+		$this->captura('id_gestion','int4');
+		
 		
 		
 		
@@ -159,6 +172,11 @@ class MODRango extends MODbase{
 			$this->captura('debe_mt','numeric');
 			$this->captura('haber_mt','numeric');
 			$this->captura('balance_mt','numeric');
+			
+			$this->captura('memoria','numeric');
+			$this->captura('formulado','numeric');
+			$this->captura('comprometido','numeric');
+			$this->captura('ejecutado','numeric');
 			
 			 
 		     //Ejecuta la instruccion

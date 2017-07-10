@@ -4146,3 +4146,23 @@ CREATE TYPE conta.json_regimen_simplificado AS (
   fecha_documento VARCHAR(255)
 );
 /***********************************F-SCP-MMV-CONTA-1-28/06/2017****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-1-05/07/2017****************************************/
+ALTER TABLE conta.trango
+  ADD COLUMN memoria NUMERIC;  
+--------------- SQL ---------------
+ALTER TABLE conta.trango
+  ADD COLUMN formulado NUMERIC;
+--------------- SQL ---------------
+ALTER TABLE conta.trango
+  ADD COLUMN comprometido NUMERIC;
+
+ALTER TABLE conta.trango
+  ADD COLUMN ejecutado NUMERIC; 
+
+ALTER TABLE conta.trango
+  ADD COLUMN id_partida INTEGER;  
+  
+/***********************************F-SCP-RAC-CONTA-1-05/07/2017****************************************/
+

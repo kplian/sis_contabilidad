@@ -26,7 +26,7 @@ Ext.define('Phx.vista.RangoTorta2',{
 			//root: 'datos',
 			sortInfo: {field: 'id_tipo_cc',direction: 'ASC'},
 			totalProperty: 'total',
-			fields:['id_tipo_cc','codigo','balance_mb'],
+			fields:['id_tipo_cc','codigo','balance_mb','memoria','formulado','comprometido','ejecutado'],
 			remoteSort: true
 		});
 		this.store.load({ params: { node:'id',start: 0, limit: 300}});
@@ -34,7 +34,7 @@ Ext.define('Phx.vista.RangoTorta2',{
 		
 		
 		this.tbar = new Ext.Toolbar({
-				        items:['Tipo: ',this.cmbTipo]
+				        items:['Tipo: ',this.cmbTipo, 'Datos: ',this.cmbOrigen]
 				        });
 		
 		
@@ -70,7 +70,7 @@ Ext.define('Phx.vista.RangoTorta2',{
 				        type: 'bar'
 				    },
 				    title: {
-				        text: "RELACIÓN DE EJECUCIÓN DE TIPOS DE CENTROS"
+				        text: "RELACIÓN POR TIPOS DE CENTROS"
 				    },
 				    tooltip: {
 				      pointFormat: '({series.name}) <br>{point.descripcion}: <br><b>{point.y}</b>'
@@ -95,7 +95,7 @@ Ext.define('Phx.vista.RangoTorta2',{
 				        }
 				    },
 				    series: [{
-				        name: 'Centro de Costo',
+				        name: 'Elemento',
 				        colorByPoint: true,
 				        data: [{}]
 				    }]
@@ -106,6 +106,14 @@ Ext.define('Phx.vista.RangoTorta2',{
 		    
 		    
 		    this.chart.series[0].update({ type: dat.data.field1 });
+		    this.chart.redraw();
+		    
+		},this);
+		
+		this.cmbOrigen.on('select',function(cm,dat,num){
+		    
+		    
+		    this.cambiarOrigen();
 		    this.chart.redraw();
 		    
 		},this);
@@ -144,30 +152,85 @@ Ext.define('Phx.vista.RangoTorta2',{
                     typeAhead: true,
                     triggerAction: 'all',
                     lazyRender: true,
-                    value:'ingreso',
                     mode: 'local',
                     width: 70,
                     store: ['bar','pie','line','column'],
                     value: 'column'
                 }),
+                
+     cmbOrigen: new Ext.form.ComboBox({
+                    name: 'origen',
+                    fieldLabel: 'Datos',
+                    allowBlank: false,
+                    forceSelection : true,
+                    emptyText:'Tipo...',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    value:'ejecutado',
+                    mode: 'local',
+                    width: 150,
+                    store: ['memoria','formulado','comprometido','ejecutado','contabilidad','comparativo']
+                   
+                }), 
+                
+                
+     cambiarOrigen: function(){
+     	this.cargarChart()
+     },                     
 	 
-	 cargarChart: function(r,o,s){
+	 cargarChart: function(){
 	 	
-	 	console.log('datos de regreso ..',r,o,s)
+	 	var resul = [];	
 	 	
-	 	console.log(this.chart)
-	 	console.log(this.chart.series)
-	 	var resul = [];	 	
-	 	r.forEach(function(element) {
-	 		resul.push({
-				    	name: element.data.codigo,
-						descripcion:element.json.descripcion,
-						y: element.data.balance_mb*1.0
-		             });
-	 			
+	 	var aux = this.cmbOrigen.getValue(),origen;
+	 	
+	 	if(aux != 'comparativo'){
+	 		origen =  (aux == 'contabilidad')?'balance_mb':aux;
 	 		
-		    
-		});
+	 		this.store.each(function(element) {
+		 		resul.push({
+					    	name: element.data.codigo,
+							descripcion:element.json.descripcion,
+							y: element.data[origen]*1.0
+			             });
+	 		});
+	 		
+	 		console.log(resul)
+	 		
+	 		
+	 	}
+	 	else{
+	 		resul =[
+			         {
+					    	name: 'Memoria',
+							descripcion:'Según Memoria de Calculo',
+							y: this.maestro.memoria*1.0
+			         },
+			         {
+					    	name: 'Formulado',
+							descripcion:'Presupuesto Formulado',
+							y: this.maestro.formulado*1.0
+			         },
+			         {
+					    	name: 'Comprometido',
+							descripcion:'Presupuesto Comprometido',
+							y: this.maestro.comprometido*1.0
+			         },
+			         {
+					    	name: 'Ejecutado',
+							descripcion:'Presupuesto Ejecutado',
+							y: this.maestro.ejecutado*1.0
+			         },
+			         {
+					    	name: 'Contabilidad',
+							descripcion:'Balance Contable',
+							y: this.maestro.balance_mb*1.0
+			         }];
+	 		
+	 	}
+	 	
+	 	
 		console.log('resultado.....',resul)
 		//this.chart.series[0].remove();
 	 	/*this.chart.series[0].setData({ name: 'Brands',
