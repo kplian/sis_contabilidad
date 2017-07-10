@@ -37,15 +37,21 @@ class RBalanceTipoCC extends  ReportePDF {
 		$this->ln(5);
 		$this->SetFont('','BU',12);
 		
-		$this->Cell(0,5,'ÁRBOL DE ÁNALISIS DE COSTOS',0,1,'C');
+		
+		$this->Cell(0,5,'ÁRBOL DE ÁNALISIS DE CENTROS DE COSTOS',0,1,'C');
 		
 		$this->SetFont('','BU',11);
-		$this->Cell(0,5,'Depto: ('.$this->codigos.')',0,1,'C');
+		if(isset($this->codigos) && $this->codigos !=''){
+			$this->Cell(0,5,'Depto: ('.$this->codigos.')',0,1,'C');
+		}
+		
 		$this->SetFont('','BU',10);		
 		$this->Cell(0,5,'Del '.$this->desde.' al '.$this->hasta,0,1,'C');
 		$this->SetFont('','BU',8);		
 		$this->Cell(0,5,'Incluye Cierres: '.$this->incluir_cierre,0,1,'C');
+			
 		
+		$this->Cell(0,5,'IMPORTES  '. strtoupper($this->objParam->getParametro('importe')) ,0,1,'C');
 		$this->Cell(0,5,'EXPRESADO EN MONEDA '. strtoupper($this->objParam->getParametro('moneda')) ,0,1,'C');
 		
 		
@@ -58,7 +64,7 @@ class RBalanceTipoCC extends  ReportePDF {
 		if($this->nivel == 1 || $this->nivel > 3 ){
 			//Titulos de columnas superiores
 			$this->Cell(160,3.5,'Centros','',0,'C');
-			$this->Cell(40,3.5,'Montos (Bs)','',0,'C');
+			$this->Cell(40,3.5,'Montos','',0,'C');
 			$this->ln();	
 		}
 		//reporte de dos columnas de montos

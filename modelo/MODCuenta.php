@@ -372,6 +372,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar'); 
 		
 		$this->setParametro('incluir_adm','incluir_adm','varchar'); 
+		$this->setParametro('importe','importe','varchar');
+		$this->setParametro('moneda','moneda','varchar');
 		     
 	            
 	    //Definicion de la lista del resultado del query

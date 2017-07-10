@@ -13,14 +13,14 @@ CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
 RETURNS integer AS
 $body$
 /*
-Autor inicial GAYRRINCHA ARTEAGA COPARI (No sabe porner comentarios)
-Fecha 28/06/2013
-Descripcion: nose por que el gayrrincha no puso comentarios
+Autor inicial GAIME RIVERA ROJAS (No sabe porner comentarios)
+Fecha 28/02/2013
+Descripcion: nose por que el guy no puso comentarios
 
 
 Autor:  Rensi Arteaga Copari
 Fecha 21/08/2013
-Descripcion:   Esta funciona inicia la generacion de comprobantes contables,  
+Descripcion:   Esta funcion inicia la generacion de comprobantes contables,  
                apartir de una plantilla predefinida
 
 

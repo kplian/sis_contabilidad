@@ -54,7 +54,7 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 				tooltip : '<b>Actuliza los valores de costos desde los comrpbantes aprobados  entre los  periodos de fechas seleccioandas</b>'
 			});
 			
-		this.addButton('btnSincronizar', {
+		this.addButton('btnReporte', {
 				text : 'Reporte',
 				iconCls : 'bprint',
 				disabled : false,
