@@ -9,10 +9,14 @@ CREATE OR REPLACE FUNCTION conta.f_balance_tcc_recursivo (
   p_nivel_final integer,
   p_id_tipo_cc_fk integer,
   p_tipo varchar,
+  p_id_moneda_base integer,
+  p_id_moneda_tri integer,
   p_incluir_cierre varchar = 'no'::character varying,
   p_tipo_balance varchar = 'general'::character varying,
   p_id_tipo_ccs integer [] = NULL::integer[],
-  p_incluir_adm varchar = 'si'::character varying
+  p_incluir_adm varchar = 'si'::character varying,
+  p_importe varchar = 'contable'::character varying,
+  p_moneda varchar = 'base'::character varying
 )
 RETURNS numeric [] AS
 $body$
@@ -46,6 +50,10 @@ v_suma_mt_debe				numeric;
 v_suma_haber				numeric;
 v_suma_mt_haber				numeric;
 v_registros_aux				record;
+v_id_moneda_tri				integer;
+v_id_moneda_base			integer;
+v_memoria					numeric;
+v_reg_pe					record;
  
 
 BEGIN
@@ -57,7 +65,9 @@ BEGIN
     v_suma_debe = 0;
     v_suma_mt_debe = 0;
     v_suma_haber = 0;
-     v_suma_mt_haber = 0;
+    v_suma_mt_haber = 0;
+    v_mayor = 0;
+    v_mayor_mt = 0;
     
     v_sw_force = FALSE;
     va_tipo = string_to_array(p_tipo,',');
@@ -68,6 +78,7 @@ BEGIN
     
     -- incremetmaos el nivel
     v_nivel = p_nivel_ini +1;
+    
                 
     -- FOR listado de cuenta basicas de la gestion 
     FOR  v_registros in (
@@ -95,24 +106,79 @@ BEGIN
                              
                  IF  v_registros.movimiento = 'si' THEN
                  
-                     va_mayor = conta.f_mayor_tipo_cc(v_registros.id_tipo_cc, 
-                     									p_desde, 
-                                                        p_hasta, 
-                                                        p_id_deptos, 
-                                                        p_incluir_cierre,
-                                                        'todos',
-                                                        'todos',
-                                                        'defecto_cuenta',
-                                                        'balance',
-                                                         NULL,
-                                                         p_incluir_adm);
-                                 
-                     v_mayor = va_mayor[1];
-                     v_mayor_mt = va_mayor[2];
-                     v_mayor_debe = va_mayor[5];
-                     v_mayor_mt_debe = va_mayor[6];
-                     v_mayor_haber = va_mayor[9];
-                     v_mayor_mt_haber = va_mayor[10];
+                    IF p_importe  = 'contabilidad' THEN
+                         va_mayor = conta.f_mayor_tipo_cc(v_registros.id_tipo_cc, 
+                                                            p_desde, 
+                                                            p_hasta, 
+                                                            p_id_deptos, 
+                                                            p_incluir_cierre,
+                                                            'todos',
+                                                            'todos',
+                                                            'defecto_cuenta',
+                                                            'balance',
+                                                             NULL,
+                                                             p_incluir_adm);
+                                     
+                         v_mayor = va_mayor[1];
+                         v_mayor_mt = va_mayor[2];
+                         v_mayor_debe = va_mayor[5];
+                         v_mayor_mt_debe = va_mayor[6];
+                         v_mayor_haber = va_mayor[9];
+                         v_mayor_mt_haber = va_mayor[10];
+                     
+                     ELSEIF  p_importe  = 'memoria' THEN
+                              
+                            v_mayor =  pre.f_balance_memoria(v_registros.id_tipo_cc, 
+                               								 NULL,
+                                                             p_desde, 
+                                                             p_hasta);
+                               
+                          IF p_moneda != 'base' THEN
+                              v_mayor_mt = param.f_convertir_moneda( p_id_moneda_base, 
+                                                                    p_id_moneda_tri,   --por defecto moenda base
+                                                                    v_mayor, 
+                                                                    now()::Date, 
+                                                                    'O',-- tipo oficial, venta, compra 
+                                                                     NULL);--defecto dos decimales
+                          END IF;
+                          
+                          --raise exception 'resultado %',v_mayor;
+                     ELSE
+                          
+                          SELECT 
+                             * 
+                          into
+                             v_reg_pe 
+                          FROM pre.f_balance_presupuesto(v_registros.id_tipo_cc, 
+                          								 NULL,
+                                                         p_desde, 
+                                                         p_hasta,
+                                                         p_importe);
+                                                         
+                                                         
+                          IF  p_importe  = 'formulado' THEN
+                              v_mayor = COALESCE(v_reg_pe.ps_formulado,0);
+                          ELSEIF  p_importe  = 'ejecutado' THEN
+                             v_mayor = COALESCE(v_reg_pe.ps_ejecutado,0);
+                          ELSE
+                             v_mayor = COALESCE(v_reg_pe.ps_comprometido,0);
+                          END IF; 
+                          
+                          IF p_moneda != 'base' THEN
+                                                                   
+                            v_mayor_mt = param.f_convertir_moneda( p_id_moneda_base, 
+                                                                    p_id_moneda_tri,   --por defecto moenda base
+                                                                    v_mayor, 
+                                                                    now()::Date, 
+                                                                    'O',-- tipo oficial, venta, compra 
+                                                                     NULL);--defecto dos decimales 
+                              
+                                                 
+                         END IF;             
+                         
+                     
+                     
+                     END IF;
                                     
                  ELSE
                              
@@ -125,10 +191,14 @@ BEGIN
                                                p_nivel_final, 
                                                v_registros.id_tipo_cc,
                                                p_tipo,
+                                               p_id_moneda_base,
+                                               p_id_moneda_tri,
                                                p_incluir_cierre,
                                                p_tipo_balance,
                                                NULL,
-                                               p_incluir_adm);
+                                               p_incluir_adm,
+                                               p_importe,
+                                               p_moneda);
                                                            
                      v_mayor = va_mayor[2];
                      v_mayor_mt = va_mayor[3];
@@ -174,8 +244,7 @@ BEGIN
                                              
                -- incrementamos suma
                 v_suma = v_suma + COALESCE(v_mayor,0);
-                v_suma_mt = v_suma_mt + COALESCE(v_mayor_mt,0);
-                            
+                v_suma_mt = v_suma_mt + COALESCE(v_mayor_mt,0);                            
                 v_suma_debe = v_suma_debe + COALESCE(v_mayor_debe,0);
                 v_suma_mt_debe = v_suma_mt_debe + COALESCE(v_mayor_mt_debe,0);
                 v_suma_haber = v_suma_haber + COALESCE(v_mayor_haber,0);
