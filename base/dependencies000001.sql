@@ -3794,30 +3794,9 @@ UNION ALL
 
 
 
-/**********************************I-DEP-RAC-CONTA-0-04/07/2017****************************************/
+/**********************************I-DEP-RAC-CONTA-0-10/07/2017****************************************/
 
-CREATE OR REPLACE VIEW conta.vint_transaccion_analisis(
-    importe_debe_mb,
-    importe_haber_mb,
-    importe_debe_mt,
-    importe_haber_mt,
-    id_orden_trabajo,
-    codigo_ot,
-    desc_orden,
-    id_tipo_cc,
-    ids,
-    id_int_comprobante,
-    codigo_partida,
-    id_int_transaccion,
-    id_cuenta,
-    id_auxiliar,
-    fecha,
-    id_periodo,
-    sw_movimiento,
-    descripcion_partida,
-    id_partida)
-AS
-  SELECT "int".importe_debe_mb,
+ SELECT "int".importe_debe_mb,
          "int".importe_haber_mb,
          "int".importe_debe_mt,
          "int".importe_haber_mt,
@@ -3844,8 +3823,9 @@ AS
        JOIN param.vtipo_cc_raiz tcc ON tcc.id_tipo_cc = cc.id_tipo_cc
        LEFT JOIN conta.torden_trabajo ot ON "int".id_orden_trabajo =
          ot.id_orden_trabajo
-       LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida;
-/**********************************F-DEP-RAC-CONTA-0-04/07/2017****************************************/
+       LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida
+  WHERE cbt.estado_reg::text = 'validado'::text;
+/**********************************F-DEP-RAC-CONTA-0-10/07/2017****************************************/
 
 
 
