@@ -271,9 +271,8 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
     },
 
     onSubmit: function (o,x, force) {
-        
-        if(this.momento) {
 
+        if(this.momento) {
             Ext.Ajax.request({
                 url: '../../sis_contabilidad/control/Auxiliar/validarAuxiliar',
                 params: {

@@ -70,6 +70,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 	   				name : 'id_gestion',
 	   				origen : 'GESTION',
 	   				fieldLabel : 'Gestion',
+	   				gdisplayField: 'desc_gestion',
 	   				allowBlank : false,
 	   				width: 150
 	   			},
@@ -212,6 +213,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
        		    name: 'id_auxiliar',
    				origen: 'AUXILIAR',
    				allowBlank: true,
+   				gdisplayField: 'desc_cuenta',
    				fieldLabel: 'Auxiliar',
    				width: 150
        	     },
@@ -224,6 +226,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
    				sysorigen: 'sis_presupuestos',
        		    name: 'id_partida',
    				origen: 'PARTIDA',
+   				gdisplayField: 'desc_partida',
    				allowBlank: true,
    				fieldLabel: 'Partida',
    				width: 150

@@ -111,6 +111,7 @@ BEGIN
                   IF  v_registros.origen = 'balance' and v_registros.destino = 'reporte' THEN
                         
                         --	2.1.1)  recuperamos los datos de la cuenta 
+                        v_reg_cuenta = NULL;
                         select
                           cue.id_cuenta,
                           cue.nro_cuenta,
@@ -120,6 +121,10 @@ BEGIN
                           v_reg_cuenta
                         from conta.tcuenta cue
                         where cue.id_gestion = p_id_gestion and cue.nro_cuenta = v_registros.codigo_cuenta ;
+                        
+                        IF v_reg_cuenta  is null THEN
+                           raise exception 'revise su configuración, no tenemos una cuenta con el código = %',v_registros.codigo_cuenta;
+                        END IF;
                         
                         --raise exception '%, %', v_registros.codigo_cuenta, p_id_gestion;
                 		--   2.1.2)  calculamos el balance de la cuenta para las fechas indicadas

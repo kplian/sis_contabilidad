@@ -113,6 +113,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				width: 380,
 				listWidth: 380,
 				gwidth:600,
+				tipo_pres:"gasto,administrativo,recurso,ingreso_egreso",
    				renderer:function (value, p, record){
 	   			    var color = 'green';
 	   			    if(record.data["tipo_reg"] != 'summary'){
@@ -632,9 +633,49 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg',
 		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque',
 		'importe_debe_mt',	'importe_haber_mt','importe_gasto_mt','importe_recurso_mt',
-		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot'
+		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2','codigo_categoria','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot'
 		
 	],
+	
+	pdfOrientacion: 'L',
+	title2:'Transacciones del Comprobante',
+	
+	ExtraColumExportDet:[{ 
+		   	    label:'Partida',
+				name:'desc_partida',
+				width:'200',
+				type:'string',
+				gdisplayField:'desc_partida',
+				value:'desc_partida'
+			},
+			{ 
+		   	    label:'Cuenta',
+				name:'desc_cuenta',
+				width:'200',
+				type:'string',
+				gdisplayField:'desc_cuenta',
+				value:'desc_cuenta'
+			},
+			{ 
+		   	    label:'Orden',
+				name:'codigo_ot',
+				width:'200',
+				type:'string',
+				gdisplayField:'codigo_ot',
+				value:'codigo_ot'
+			},
+			{ 
+		   	    label:'Categoria',
+				name:'codigo_categoria',
+				width:'200',
+				type:'string',
+				gdisplayField:'codigo_categoria',
+				value:'codigo_categoria'
+			},
+			
+			
+			
+			],
 	
 	loadBanco:function() {
             var rec=this.sm.getSelected();
@@ -867,6 +908,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
           this.Cmp.tipo_cambio_2.setValue(this.maestro.tipo_cambio_2);
           this.setLabelsTc();
           
-       }
+       },
+       
 })
 </script>	

@@ -1305,3 +1305,12 @@ select pxp.f_insert_testructura_gui ('ANCOS', 'REPCON');
 /**********************************F-DAT-RAC-CONTA-1-29/06/2017*****************************************/
 
 
+
+
+/***********************************I-DAT-RAC-CONTA-0-03/07/2017*****************************************/
+
+select pxp.f_insert_tgui ('Balance por Tipos de Centros ', 'Balance por Tipos de Centros ', 'BATCC', 'si', 12, 'sis_contabilidad/vista/cuenta/FormFiltroBalanceTipoCC.php', 3, '', 'FormFiltroBalanceTipoCC', 'CONTA');
+select pxp.f_insert_testructura_gui ('BATCC', 'REPCON');
+
+/***********************************F-DAT-RAC-CONTA-0-03/07/2017*****************************************/
+
