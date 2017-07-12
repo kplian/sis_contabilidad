@@ -1022,9 +1022,7 @@ and (
               v_retencion_cuota =
               (v_record_plan_pago_pxp.importe_total * v_porciento_en_relacion_a_monto_total_plan_pago) / 100;
 
-              --obtenemos el porcentaje correspondiente de multa
-              v_multa_porcentaje = (v_record_plan_pago_pxp.otros_descuentos * 100) / v_record_plan_pago_pxp.monto_pago;
-              v_multa_cuota = (v_record_plan_pago_pxp.importe_total * v_multa_porcentaje) / 100;
+
 
               --obtenemos el porcentaje correspondiente para el intercambio de servicios
               v_intercambio_de_servicio_porcentaje = (v_record_plan_pago_pxp.descuento_inter_serv * 100) /
@@ -1043,6 +1041,21 @@ and (
 
 
               --v_monto_pagado_para_acumular = v_monto_pagado;
+
+
+              --sacamos la multa mas
+            v_multa_cuota = 0;
+
+               --obtenemos el porcentaje correspondiente de MULTAS
+               IF v_record_plan_pago_pxp.otros_descuentos > 0 THEN
+                 v_multa_porcentaje = (v_record_plan_pago_pxp.otros_descuentos * 100) / v_record_plan_pago_pxp.monto_pago;
+                 v_multa_cuota = (v_record_plan_pago_pxp.importe_total * v_multa_porcentaje) / 100;
+
+                 v_monto_pagado = v_monto_pagado - v_multa_cuota;
+
+               END IF;
+
+
 
               IF (v_record_plan_pago_pxp.id_documento = 245471)
               THEN
@@ -1338,7 +1351,7 @@ and (
         RAISE EXCEPTION '%','PERIODO CERRADO';
       END IF;
 
-        
+
         SELECT
           per.fecha_ini,
           per.fecha_fin,
