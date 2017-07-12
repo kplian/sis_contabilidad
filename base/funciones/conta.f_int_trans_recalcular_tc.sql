@@ -46,6 +46,7 @@ BEGIN
       ic.origen,
       ic.tipo_cambio,
       ic.tipo_cambio_2,
+      ic.tipo_cambio_3,
       ic.id_moneda,
       ic.fecha,
       ic.sw_tipo_cambio
@@ -55,7 +56,7 @@ BEGIN
    inner join param.tperiodo per on per.id_periodo = ic.id_periodo
    where ic.id_int_comprobante = p_id_int_comprobante;
    
-   IF v_registros_cbte.tipo_cambio is null or  v_registros_cbte.tipo_cambio_2 is null THEN
+   IF v_registros_cbte.tipo_cambio is null or  v_registros_cbte.tipo_cambio_2 is null or  v_registros_cbte.tipo_cambio_3 is null THEN
       raise exception 'no se definio un tipo de cambio para el comprobante';
    END IF;
    
@@ -71,7 +72,8 @@ BEGIN
              
                 update conta.tint_transaccion it set
                  tipo_cambio = v_registros_cbte.tipo_cambio,
-                 tipo_cambio_2 = v_registros_cbte.tipo_cambio_2
+                 tipo_cambio_2 = v_registros_cbte.tipo_cambio_2,
+                 tipo_cambio_3 = v_registros_cbte.tipo_cambio_3
                 where id_int_transaccion = v_registros.id_int_transaccion;
              
              end if;

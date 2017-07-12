@@ -4166,3 +4166,75 @@ ALTER TABLE conta.trango
   
 /***********************************F-SCP-RAC-CONTA-1-05/07/2017****************************************/
 
+
+/***********************************I-SCP-RAC-CONTA-1-11/07/2017****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tconfig_cambiaria
+  ADD COLUMN ope_3 VARCHAR DEFAULT '{MB}->{MA}' NOT NULL;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN tipo_cambio_3 NUMERIC;
+
+COMMENT ON COLUMN conta.tint_transaccion.tipo_cambio_3
+IS 'tipo de cambio para la segtercera unda operación';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_moneda_act INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_moneda_act
+IS 'identifica la moneda de actualizacion';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN tipo_cambio_3 NUMERIC;
+
+COMMENT ON COLUMN conta.tint_comprobante.tipo_cambio_3
+IS 'tipo de cambio para la tercera operacion'; 
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_moneda_act INTEGER;
+
+COMMENT ON COLUMN conta.tint_comprobante.id_moneda_act
+IS 'identifica la moneda de actualizacion'; 
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_debe_ma NUMERIC;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_haber_ma NUMERIC;
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_gasto_ma NUMERIC;
+      
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN importe_recurso_ma NUMERIC;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_rel_devengado
+  ADD COLUMN monto_pago_ma NUMERIC;
+    
+  
+/***********************************F-SCP-RAC-CONTA-1-11/07/2017****************************************/
+
+

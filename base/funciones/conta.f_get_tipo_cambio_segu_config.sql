@@ -9,8 +9,10 @@ CREATE OR REPLACE FUNCTION conta.f_get_tipo_cambio_segu_config (
   out po_id_config_cambiaria integer,
   out po_valor_tc1 numeric,
   out po_valor_tc2 numeric,
+  out po_valor_tc3 numeric,
   out po_tc1 varchar,
-  out po_tc2 varchar
+  out po_tc2 varchar,
+  out po_tc3 varchar
 )
 RETURNS record AS
 $body$
@@ -24,9 +26,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:	Se agrega una tercera moenda para configuracion cambiara de moneda de actualizacion
+ AUTOR:		    RAC	(KPLIAN)
+ FECHA:		    11/07/2017
 ***************************************************************************/
 
 DECLARE
@@ -38,12 +40,15 @@ v_nombre_funcion		varchar;
 v_resp					varchar;
 v_id_moneda_base        integer;
 v_id_moneda_tri			integer;
+v_id_moneda_act			integer;
 
 v_m  					record;
 v_mb  					record;
 v_mt  					record;
+v_ma  					record;
 va_tc1 					varchar[];
 va_tc2 					varchar[];
+va_tc3 					varchar[];
     
 
 
@@ -83,6 +88,7 @@ BEGIN
             
             v_id_moneda_base = param.f_get_moneda_base();
             v_id_moneda_tri  = param.f_get_moneda_triangulacion();
+            v_id_moneda_act  = param.f_get_moneda_actualizacion();
             
             select 
              *
@@ -105,15 +111,30 @@ BEGIN
             from param.tmoneda m 
             where m.id_moneda = v_id_moneda_tri; 
             
+            select 
+             *
+            into
+             v_ma
+            from param.tmoneda m 
+            where m.id_moneda = v_id_moneda_act;
+            
             
             po_tc1 = replace(v_registros_cc.ope_1, '{M}',v_m.codigo);
             po_tc1 = replace(po_tc1, '{MB}',v_mb.codigo);
             po_tc1 = replace(po_tc1, '{MT}',v_mt.codigo);
+            po_tc1 = replace(po_tc1, '{MA}',v_ma.codigo);
             
             
             po_tc2 = replace(v_registros_cc.ope_2, '{M}',v_m.codigo);
             po_tc2 = replace(po_tc2, '{MB}',v_mb.codigo);
             po_tc2 = replace(po_tc2, '{MT}',v_mt.codigo);
+            po_tc2 = replace(po_tc2, '{MA}',v_ma.codigo);
+            
+            
+            po_tc3 = replace(v_registros_cc.ope_3, '{M}',v_m.codigo);
+            po_tc3 = replace(po_tc3, '{MB}',v_mb.codigo);
+            po_tc3 = replace(po_tc3, '{MT}',v_mt.codigo);
+            po_tc3 = replace(po_tc3, '{MA}',v_ma.codigo);
             
         ----------------------------------------------
         -- obtener tipos de cambio del dia si existen
@@ -123,17 +144,21 @@ BEGIN
             
                 -- desarmar cadenas de conversion
                  va_tc1 = regexp_split_to_array(po_tc1, '->');
-                 va_tc2 = regexp_split_to_array(po_tc2, '->');
+                 va_tc2 = regexp_split_to_array(po_tc2, '->');                 
+                 va_tc3 = regexp_split_to_array(po_tc3, '->');
               
                 -- calcula tipo de cambio 1 para la fecha
                  if p_localidad != 'internacional' then
-                    po_valor_tc1 = conta.f_determinar_tipo_cambio(va_tc1[1], va_tc1[2],  p_fecha, p_forma_cambio);
+                    po_valor_tc1 = conta.f_determinar_tipo_cambio(va_tc1[1], va_tc1[2], p_fecha, p_forma_cambio);
                  else
                     po_valor_tc1 = NULL; --el tipo de cambio 1 ya viene con el cbte
                  end if;
                 -- calcula tipo de cambio 2 para la fecha
                 
-                 po_valor_tc2 = conta.f_determinar_tipo_cambio(va_tc2[1], va_tc2[2],  p_fecha, p_forma_cambio);
+                 po_valor_tc2 = conta.f_determinar_tipo_cambio(va_tc2[1], va_tc2[2], p_fecha, p_forma_cambio);  
+                 --calcula el tipo de cambio 3 para la fecha
+                                
+                 po_valor_tc3 = conta.f_determinar_tipo_cambio(va_tc3[1], va_tc3[2], p_fecha, p_forma_cambio);
                 
             END IF;
             

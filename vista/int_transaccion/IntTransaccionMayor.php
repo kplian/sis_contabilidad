@@ -489,12 +489,18 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		{ name:'importe_gasto_mt', type: 'numeric'},
 		{ name:'importe_recurso_mt', type: 'numeric'},
 		
+		{ name:'importe_debe_ma', type: 'numeric'},
+		{ name:'importe_haber_ma', type: 'numeric'},
+		{ name:'importe_gasto_ma', type: 'numeric'},
+		{ name:'importe_recurso_ma', type: 'numeric'},
+		
 		{ name:'desc_cuenta', type: 'string'},
 		{ name:'desc_auxiliar', type: 'string'},
 		{ name:'desc_partida', type: 'string'},
 		{ name:'desc_centro_costo', type: 'string'},
 		'tipo_partida','id_orden_trabajo','desc_orden',
-		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1','id_proceso_wf','id_estado_wf','id_suborden','desc_suborden',
+		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1',
+		'id_proceso_wf','id_estado_wf','id_suborden','desc_suborden',
 		
 	],
 	

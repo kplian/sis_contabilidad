@@ -87,6 +87,11 @@ class MODIntComprobante extends MODbase{
 		$this->captura('periodo','int4');
 		$this->captura('forma_cambio','varchar');
 		
+		$this->captura('ope_3','varchar');
+		$this->captura('tipo_cambio_3','numeric');
+		$this->captura('id_moneda_act','int4');
+		
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -170,6 +175,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_gestion','int4');
 		$this->captura('periodo','int4');
 		$this->captura('forma_cambio','varchar');
+		
 		
 		
 		
