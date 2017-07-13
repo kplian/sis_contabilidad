@@ -112,6 +112,7 @@ BEGIN
          tipo_cambio_2 = v_registros_config.po_valor_tc2,
          tipo_cambio_3 = v_registros_config.po_valor_tc3,
          id_moneda_tri = v_id_moneda_tri,
+         id_moneda_act = v_id_moneda_act,
          id_config_cambiaria = v_registros_config.po_id_config_cambiaria
        where cbt.id_int_comprobante = p_id_int_comprobante;
       
