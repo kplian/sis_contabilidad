@@ -779,12 +779,13 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	loadValoresIniciales:function(){
 		Phx.vista.IntTransaccion.superclass.loadValoresIniciales.call(this);
 		this.Cmp.id_int_comprobante.setValue(this.maestro.id_int_comprobante);	
-		this.Cmp.id_centro_costo.store.baseParams.id_depto = this.maestro.id_depto;		
+			
 	},
 	onReloadPage:function(m){
 		this.maestro=m;						
 		this.store.baseParams={id_int_comprobante:this.maestro.id_int_comprobante, id_moneda:this.maestro.id_moneda};
 		this.load({params:{start:0, limit:this.tam_pag}});
+		this.Cmp.id_centro_costo.store.baseParams.id_depto = this.maestro.id_depto;	
 		
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var fecha=new Date(this.maestro.fecha);

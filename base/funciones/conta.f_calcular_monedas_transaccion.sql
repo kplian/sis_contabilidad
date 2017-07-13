@@ -82,13 +82,17 @@ BEGIN
         cc.ope_3,
         c.localidad,
         c.fecha,
-        c.sw_editable
+        c.sw_editable,
+        c.cbte_aitb
        into 
         v_registros
        from conta.tint_transaccion it 
        inner join conta.tint_comprobante c on c.id_int_comprobante = it.id_int_comprobante
        inner join conta.tconfig_cambiaria cc on cc.id_config_cambiaria = c.id_config_cambiaria
        where it.id_int_transaccion = p_id_int_transaccion;
+       
+       
+       
        
       
        
@@ -313,6 +317,40 @@ BEGIN
                 
              END LOOP;
            END IF;
+     ELSE
+     
+       --si es un comprobante de AITB
+       IF  v_registros.cbte_aitb  ='si' THEN
+       
+         ---  si es un comrpobane de aitb solo tendra importe en moenda base
+         --   y no es encesario actulizar ninguno otra moneda  ni de triangulacion ni de actualizacion
+       
+       
+       ELSE
+         
+          --las transacciones que son actualizacion y no son de cbte de aitb
+          --son trasacciones que igual el cbte,  para que se mantega equilibrado en moneda baso o moneda de triagulacion
+          
+          
+       
+         -- si no es un comprobant ede AITB
+         -- registramos moneda de actualizacion en funcion a la moneda base
+         v_valor_debe_ma =   param.f_convertir_moneda (v_id_moneda_base, v_id_moneda_act,   v_registros.importe_debe_mb,  v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_3, 'no');
+         v_valor_haber_ma =  param.f_convertir_moneda (v_id_moneda_base, v_id_moneda_act,    v_registros.importe_haber_mb, v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_3, 'no');
+         v_valor_gasto_ma =   param.f_convertir_moneda (v_id_moneda_base, v_id_moneda_act,    v_registros.importe_gasto_mb,  v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_3, 'no');
+         v_valor_recurso_ma =  param.f_convertir_moneda (v_id_moneda_base, v_id_moneda_act,    v_registros.importe_recurso_mb, v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_3, 'no');
+         
+         update conta.tint_transaccion t set
+                importe_debe_ma = v_valor_debe_ma,
+                importe_haber_ma = v_valor_haber_ma,
+                importe_gasto_ma = v_valor_gasto_ma,
+                importe_recurso_ma = v_valor_recurso_ma
+         where id_int_transaccion = p_id_int_transaccion;
+       
+       
+       END IF;
+     
+     
      END IF; -- IF actualizacion
          
 

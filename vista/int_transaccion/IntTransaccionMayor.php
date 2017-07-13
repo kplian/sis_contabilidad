@@ -304,6 +304,55 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			},
 			
 			{
+				config: {
+					name: 'importe_debe_ma',
+					fieldLabel: 'Debe MA',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'transa.importe_debe_ma',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
+			{
+				config: {
+					name: 'importe_haber_ma',
+					fieldLabel: 'Haber MA',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'transa.importe_haber_ma',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
+			
+			{
 				config:{
 					name: 'glosa',
 					fieldLabel: 'Glosa',

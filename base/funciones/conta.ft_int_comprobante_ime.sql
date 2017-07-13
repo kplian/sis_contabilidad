@@ -505,6 +505,8 @@ BEGIN
               v_tc_1 = v_reg_cbte.tipo_cambio;
               v_tc_2 = v_reg_cbte.tipo_cambio_2;
               v_tc_3 = v_reg_cbte.tipo_cambio_3;
+              
+              
             
             ELSE
             
@@ -515,8 +517,11 @@ BEGIN
               v_tc_1 = v_parametros.tipo_cambio;
               v_tc_2 = v_parametros.tipo_cambio_2;
               v_tc_3 = v_parametros.tipo_cambio_3;
+              
             
             END IF;
+            
+           
             
 			------------------------------
 			--Sentencia de la modificacion
@@ -558,7 +563,7 @@ BEGIN
 			where id_int_comprobante = v_parametros.id_int_comprobante;
             
             
-            
+          
             
             -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones 
             IF    v_parametros.tipo_cambio != v_reg_cbte.tipo_cambio 
