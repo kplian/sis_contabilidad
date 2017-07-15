@@ -14,12 +14,74 @@ Phx.vista.BancarizacionPeriodo=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
+        this.initButtons=[this.cmbGestion_bancarizacion];
     	//llama al constructor de la clase padre
 		Phx.vista.BancarizacionPeriodo.superclass.constructor.call(this,config);
+
+        this.bloquearOrdenamientoGrid();
+        this.cmbGestion_bancarizacion.on('select', function(){
+            if(this.validarFiltros()){
+                this.capturaFiltros();
+            }
+        },this);
+
 		this.init();
+
+        this.addButton('btnCerrarPeriodo', {
+            text : 'Cerrar',
+            iconCls : 'block',
+            disabled : true,
+            handler : this.onCerrarPeriodo,
+            tooltip : '<b>Cerrar</b> Cerrar el periodo , nadie puede insertar ni modificar documentos'
+        });
+
+
+
+        this.addButton('btnAbrirPeriodo', {
+            text : 'Abrir',
+            iconCls : 'bunlock',
+            disabled : true,
+            handler : this.onAbrirPeriodo,
+            tooltip : '<b>Abrir</b>Abrir periodo para permitir registros de documentos'
+        });
+
+        this.bloquearMenus();
+
 		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
-			
+
+
+    cmbGestion_bancarizacion: new Ext.form.ComboBox({
+        fieldLabel: 'Gestion',
+        allowBlank: false,
+        emptyText:'Gestion...',
+        blankText: 'Año',
+        store:new Ext.data.JsonStore(
+            {
+                url: '../../sis_parametros/control/Gestion/listarGestion',
+                id: 'id_gestion',
+                root: 'datos',
+                sortInfo:{
+                    field: 'gestion',
+                    direction: 'ASC'
+                },
+                totalProperty: 'total',
+                fields: ['id_gestion','gestion'],
+                // turn on remote sorting
+                remoteSort: true,
+                baseParams:{par_filtro:'gestion'}
+            }),
+        valueField: 'id_gestion',
+        triggerAction: 'all',
+        displayField: 'gestion',
+        hiddenName: 'id_gestion',
+        mode:'remote',
+        pageSize:50,
+        queryDelay:500,
+        listWidth:'280',
+        width:80
+    }),
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -226,6 +288,61 @@ Phx.vista.BancarizacionPeriodo=Ext.extend(Phx.gridInterfaz,{
 	bdel:false,
 	bsave:false,
 	bnew:false,
+	bedit:false,
+
+
+    onCerrarPeriodo: function(){this.cerrarAbrirPeriodo('cerrado');},
+    onAbrirPeriodo: function(){this.cerrarAbrirPeriodo('abierto')},
+
+
+    cerrarAbrirPeriodo: function(estado){
+        var rec = this.sm.getSelected();
+        if(rec){
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url : '../../sis_contabilidad/control/BancarizacionPeriodo/insertarBancarizacionPeriodo',
+                params : {
+                    id_bancarizacion_periodo : rec.data.id_bancarizacion_periodo,
+                    id_periodo : rec.data.id_periodo,
+                    estado : estado,
+                },
+                success : function(resp){
+                    Phx.CP.loadingHide();
+                    var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    if (reg.ROOT.error) {
+                        Ext.Msg.alert('Error','no se pudo proceder: '+reg.ROOT.error)
+                    } else {
+                        this.reload();
+                        Ext.Msg.alert('Mensaje','Proceso ejecutado con éxito')
+                    }
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope:this
+            });
+        }
+    },
+
+
+
+    validarFiltros:function(){
+        if(this.cmbGestion_bancarizacion.isValid()){
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    },
+
+    capturaFiltros:function(combo, record, index){
+        //this.desbloquearOrdenamientoGrid();
+        this.store.baseParams.id_gestion=this.cmbGestion_bancarizacion.getValue();
+        this.load();
+
+
+    },
+
 
     preparaMenu: function (tb) {
         // llamada funcion clace padre
@@ -238,7 +355,7 @@ Phx.vista.BancarizacionPeriodo=Ext.extend(Phx.gridInterfaz,{
     onReloadPage: function (m) {
         this.maestro = m;
         console.log(this.maestro);
-        this.store.baseParams = {id_gestion: this.maestro.id_gestion};
+        this.store.baseParams = {id_depto: this.maestro.id_depto,id_gestion:this.cmbGestion_bancarizacion.getValue()};
         this.load({params: {start: 0, limit: 50}})
     },
 

@@ -10,24 +10,13 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
-
 	constructor:function(config){
 		this.maestro=config.maestro;		
     	//llama al constructor de la clase padre
-		Phx.vista.OrdenTrabajoArb.superclass.constructor.call(this,config);
-		
+		Phx.vista.OrdenTrabajoArb.superclass.constructor.call(this,config);		
 		this.init();
-		this.iniciarEventos();
-		
-		
-		
-		
-		
+		this.iniciarEventos();		
 	},
-	
-	
-	
-
 			
 	Atributos:[
 		{
@@ -57,7 +46,7 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 				fieldLabel: 'Codigo Orden',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 300,
 				maxLength:100
 			},
 			type:'TextField',
@@ -75,7 +64,7 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:400
 			},
 			type:'TextField',
 			filters:{pfiltro:'odt.desc_orden',type:'string'},
@@ -84,9 +73,6 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 			grid:true,
 			form:true
 		},
-		
-		
-		
 		
 		{
 			config:{
@@ -149,14 +135,14 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
        		    lazyRender:true,
        		    mode: 'local',
        		    valueField: 'inicio',    
-       		    store:['centro','pep','orden','estadistica']
+       		    store:['centro','edt','orden','estadistica']
 			},
 			type:'ComboBox',
 			id_grupo:1,
 			filters:{	
 	       		         type: 'list',
 	       				 pfiltro:'odt.tipo',
-	       				 options: ['centro','pep','orden','estadistica']
+	       				 options: ['centro','edt','orden','estadistica']
 	       		 	},
 	        valorInicial:'estadistica',
 			grid:true,
@@ -197,8 +183,6 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 			grid:true,
 			form:true
 		},
-		
-		
 		{
 			config:{
 				name: 'estado_reg',
@@ -282,7 +266,7 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 	ActSave:'../../sis_contabilidad/control/OrdenTrabajo/insertarOrdenTrabajoArb',
 	ActDel:'../../sis_contabilidad/control/OrdenTrabajo/eliminarOrdenTrabajoArb',
 	ActList:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajoArb',
-	id_store:'id_cuenta',
+	id_store:'id_orden_trabajo',
 	
 	textRoot:'Ordenes de Costo',
     id_nodo:'id_orden_trabajo',
@@ -328,6 +312,15 @@ Phx.vista.OrdenTrabajoArb=Ext.extend(Phx.arbGridInterfaz,{
 			} else {
 				return undefined;
 			}
-		}
+		},
+		
+		
+	tabeast:[
+		  {
+    		  url:'../../../sis_contabilidad/vista/tipo_cc_ot/TipoCcOt.php',
+    		  title:'Tipo de Centro', 
+    		  width:'60%',
+    		  cls:'TipoCcOt'
+		  }]
 })
 </script>

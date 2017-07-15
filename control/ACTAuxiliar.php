@@ -15,7 +15,7 @@ class ACTAuxiliar extends ACTbase{
 		$this->objParam->defecto('dir_ordenacion','asc');
 		if($this->objParam->getParametro('id_cuenta')!=''){
             $this->objParam->addFiltro("auxcta.id_auxiliar IN (select id_auxiliar 
-            							from conta.tcuenta_auxiliar where id_cuenta = ".$this->objParam->getParametro('id_cuenta') . ") ");    
+            							from conta.tcuenta_auxiliar where estado_reg = ''activo'' and id_cuenta = ".$this->objParam->getParametro('id_cuenta') . ") ");    
         }
 		
 		if($this->objParam->getParametro('corriente')!=''){
@@ -26,8 +26,7 @@ class ACTAuxiliar extends ACTbase{
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODAuxiliar','listarAuxiliar');
 		} else{
-			$this->objFunc=$this->create('MODAuxiliar');
-			
+			$this->objFunc=$this->create('MODAuxiliar');			
 			$this->res=$this->objFunc->listarAuxiliar($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
@@ -49,7 +48,7 @@ class ACTAuxiliar extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 
-
+    // Realizamos la conexion a la base de datos sql Server  para poder llamar al procedimiento de replicacion.
     function conectar(){
         //var_dump('conectar');exit;
         $conexion = mssql_connect('172.17.45.133', 'Test', 'Boa.2017');
@@ -71,6 +70,12 @@ class ACTAuxiliar extends ACTbase{
         }
 
         mssql_close($conexion);
+    }
+
+    function validarAuxiliar(){
+        $this->objFunc=$this->create('MODAuxiliar');
+        $this->res=$this->objFunc->validarAuxiliar($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
     }
 }
 

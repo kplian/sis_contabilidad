@@ -28,6 +28,7 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
             tooltip: '<b>Permite replicar un auxiliar recien registrado en la BD Ingresos</b>',
             scope:this
         });
+        this.momento = undefined;
 	},
 
 	Atributos:[
@@ -257,10 +258,46 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 			timeout:this.timeout,
 			scope:this
 		});
-	}
+	},
 
-	}
-)
+    onButtonNew : function () {
+        Phx.vista.Auxiliar.superclass.onButtonNew.call(this);
+        this.momento = true;
+    },
+
+    onButtonEdit : function () {
+        Phx.vista.Auxiliar.superclass.onButtonEdit.call(this);
+        this.momento = false;
+    },
+
+    onSubmit: function (o,x, force) {
+
+        if(this.momento) {
+            Ext.Ajax.request({
+                url: '../../sis_contabilidad/control/Auxiliar/validarAuxiliar',
+                params: {
+                    codigo_auxiliar: this.Cmp.codigo_auxiliar.getValue(),
+                    nombre_auxiliar: this.Cmp.nombre_auxiliar.getValue(),
+                    corriente: this.Cmp.corriente.getValue()
+                },
+                success: function (resp) {
+                    var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
+                    if (reg.ROOT.datos.v_valid == 'true')
+                        Ext.Msg.alert('Alerta','Estimado usuario la Cuenta Auxiliar con codigo (<b>'+ this.Cmp.codigo_auxiliar.getValue()+'</b>)-nombre <b>'+ this.Cmp.nombre_auxiliar.getValue()+'</b> que intenta crear, ya se encuentra registrado en el sistema ERP. Por esta razon no es posible crearlo.');
+                    else
+                        Phx.vista.Auxiliar.superclass.onSubmit.call(this, o);
+
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        }else{
+            Phx.vista.Auxiliar.superclass.onSubmit.call(this, o);
+        }
+    }
+
+})
 </script>
 		
 		

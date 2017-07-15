@@ -2,8 +2,25 @@
 <table width="100%" cellpadding="5px"  rules="cols" border="1">
 <tbody>	
 		<tr>
-			<td width="60%"><b>Beneficiario:</b>&nbsp;&nbsp;&nbsp;&nbsp;  <?php  echo $this->cabecera[0]['beneficiario']; ?></td>
+			<td width="60%" ><b>Beneficiario:</b>&nbsp;&nbsp;&nbsp;&nbsp;  <?php  echo $this->cabecera[0]['beneficiario']; ?></td>
+			<?php  
+			   if($this->cabecera[0]['c31'] !=''){ 
+			?>
+			  <td width="40%">
+			  	<table width="100%" cellpadding="0px"  rules="cols" border="0">
+			  	<tr><td width="100%"><b>Nro Trámite:</b>&nbsp;&nbsp;&nbsp;&nbsp;  <?php  echo $this->cabecera[0]['nro_tramite']; ?></td></tr>
+			    <tr><td width="100%"><b>Cbte Rel.:</b>&nbsp;&nbsp;&nbsp;&nbsp;  <?php  echo $this->cabecera[0]['c31']; ?></td></tr>
+			    </table>
+			  </td>
+			<?php
+               } 
+			   else{
+			?>
 			<td width="40%"><b>Nro Trámite:</b>&nbsp;&nbsp;&nbsp;&nbsp;  <?php  echo $this->cabecera[0]['nro_tramite']; ?></td>
+			<?php
+			    }
+			?>
+			
 		</tr>
 		
 		<tr>

@@ -308,6 +308,69 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'campo_cbte_relacionado',
+				qtip: 'Solo para relaciones  ejm:  identificar devegando del pago, ajustes, reversiones, etc',
+				fieldLabel: 'Campo ID Cbte relacionado',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:200
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpb.campo_cbte_relacionado',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		}, 
+		{
+			config : {
+				name : 'codigo_tipo_relacion',
+				fieldLabel : 'Tipo Rel.',
+				qtip : 'Tipo de relacion entre comprobantes (ID cbte relacionado)',
+				allowBlank : true,
+				emptyText : 'Elija una opción...',
+				store : new Ext.data.JsonStore({
+					url : '../../sis_contabilidad/control/TipoRelacionComprobante/listarTipoRelacionComprobante',
+					id : 'id_tipo_relacion_comprobante',
+					root : 'datos',
+					sortInfo : {
+						field : 'id_tipo_relacion_comprobante',
+						direction : 'ASC'
+					},
+					totalProperty : 'total',
+					fields : ['id_tipo_relacion_comprobante', 'codigo', 'nombre'],
+					remoteSort : true,
+					baseParams : {
+						par_filtro : 'tiprelco.nombre#tiprelco.codigo'
+					}
+				}),
+				valueField : 'codigo',
+				displayField : 'codigo',
+				gdisplayField : 'codigo_tipo_relacion',
+				hiddenName : 'codigo',
+				typeAhead : false,
+				triggerAction : 'all',
+				lazyRender : true,
+				mode : 'remote',
+				pageSize : 15,
+				queryDelay : 1000,
+				width : 250,
+				anchor : '100%',
+				gwidth : 150,
+				minChars : 2
+			},
+			type : 'ComboBox',
+			id_grupo : 1,
+			filters : {
+				pfiltro : 'cmpb.codigo_tipo_relacion',
+				type : 'string'
+			},
+			grid : true,
+			form : true
+		},
+		
+		{
+			config:{
 				name: 'campo_moneda',
 				fieldLabel: 'Campo Moneda',
 				allowBlank: false,
@@ -693,7 +756,8 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 	    'campo_fecha_costo_ini',
 	    'campo_fecha_costo_fin',
 	    'funcion_comprobante_editado','funcion_comprobante_prevalidado',
-	    'funcion_comprobante_validado_eliminado','desc_plantilla'
+	    'funcion_comprobante_validado_eliminado','desc_plantilla',
+	    'campo_cbte_relacionado','codigo_tipo_relacion'
         
 		
 	],

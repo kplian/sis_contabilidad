@@ -18,7 +18,8 @@ class MODOrdenTrabajo extends MODbase{
 		$this->procedimiento='conta.f_orden_trabajo_sel';
 		$this->transaccion='CONTA_ODT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
+		
+		$this->setParametro('id_centro_costo','id_centro_costo','int4'); 
 		//Definicion de la lista del resultado del query
 		$this->captura('id_orden_trabajo','int4');
 		$this->captura('estado_reg','varchar');
@@ -37,9 +38,8 @@ class MODOrdenTrabajo extends MODbase{
 		$this->captura('codigo','varchar');
 		$this->captura('descripcion','varchar');
 		$this->captura('id_orden_trabajo_fk','int4');
+		$this->captura('desc_otp','varchar');
 		
-		
-
 		
 		
 		//Ejecuta la instruccion
@@ -84,6 +84,38 @@ function listarOrdenTrabajoAll(){
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+
+    function listarOrdenTrabajoRama(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.f_orden_trabajo_sel';
+		$this->transaccion='CONTA_ODTRAM_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_orden_trabajo','int4');
+		$this->captura('estado_reg','varchar');
+		$this->captura('fecha_final','date');
+		$this->captura('fecha_inicio','date');
+		$this->captura('desc_orden','varchar');
+		$this->captura('motivo_orden','varchar');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		$this->captura('tipo','varchar');
+		$this->captura('movimiento','varchar');
+		$this->captura('codigo','varchar');
+		$this->captura('descripcion','varchar');
+		$this->captura('id_orden_trabajo_fk','int4');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 
 
    function listarOrdenTrabajoArb(){
@@ -139,7 +171,8 @@ function listarOrdenTrabajoAll(){
 		$this->setParametro('motivo_orden','motivo_orden','varchar');
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('movimiento','movimiento','varchar');
-		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('codigo','codigo','varchar');		
+		$this->setParametro('id_orden_trabajo_fk','id_orden_trabajo_fk','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -165,6 +198,7 @@ function listarOrdenTrabajoAll(){
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('movimiento','movimiento','varchar');
 		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('id_orden_trabajo_fk','id_orden_trabajo_fk','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

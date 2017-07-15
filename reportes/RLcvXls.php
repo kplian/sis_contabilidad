@@ -44,6 +44,8 @@ class RLcvXls
         $this->docexcel->getActiveSheet()->setTitle('Libro Compras');
         $this->docexcel->setActiveSheetIndex(0);
 
+        $datos = $this->objParam->getParametro('datos');
+
         $styleTitulos1 = array(
             'font'  => array(
                 'bold'  => true,
@@ -136,7 +138,11 @@ class RLcvXls
         $this->docexcel->getActiveSheet()->setCellValue('I5','IMPORTE NO SUJETO A CREDITO FISCAL B');
 
         $this->docexcel->getActiveSheet()->setCellValue('J5','SUBTOTAL C = A - B');
-        $this->docexcel->getActiveSheet()->setCellValue('K5','DESCUENTOS BONIFICACION ES Y REBAJAS OBTENIDAS D');
+        if($datos[0]['gestion']<2017) {
+            $this->docexcel->getActiveSheet()->setCellValue('K5', 'DESCUENTOS BONIFICACION ES Y REBAJAS OBTENIDAS D');
+        }else{
+            $this->docexcel->getActiveSheet()->setCellValue('K5', 'DESCUENTOS BONIFICACION ES Y REBAJAS SUJETAS AL IVA D');
+        }
         $this->docexcel->getActiveSheet()->setCellValue('L5','MPORTE BASE PARA CREDITO FISCAL E = C-D');
         $this->docexcel->getActiveSheet()->setCellValue('M5','CREDITO FISCAL F = E*13%');
         $this->docexcel->getActiveSheet()->setCellValue('N5','CODIGO DE CONTROL');

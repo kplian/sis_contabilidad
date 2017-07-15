@@ -47,7 +47,7 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-                            ctc.id_cofig_tipo_cuenta,
+                            ctc.id_config_tipo_cuenta,
                             ctc.nro_base,
                             ctc.tipo_cuenta,
                             ctc.estado_reg,
@@ -85,7 +85,7 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_cofig_tipo_cuenta)
+			v_consulta:='select count(id_config_tipo_cuenta)
 					    from conta.tconfig_tipo_cuenta ctc
 					    inner join segu.tusuario usu1 on usu1.id_usuario = ctc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ctc.id_usuario_mod

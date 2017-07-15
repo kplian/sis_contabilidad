@@ -57,7 +57,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			   			    }
 			   			    
 			   					
-			   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Ptda.:</b> <font color="{1}">{2}</font><br><b>Cta.:</b>{3}<br><b>Aux.:</b>{4}',record.data['desc_centro_costo'],color, record.data['desc_partida'],
+			   				var retorno =  String.format('<b>CC:</b> {0}, <br><b>Ptda.:</b> <font color="{1}">{2}</font><br><b>Cta.:</b>{3}<br><b>Aux.:</b>{4}',record.data['desc_centro_costo'],color, record.data['desc_partida'],
 			   					                   record.data['desc_cuenta'],record.data['desc_auxiliar']);	
 			   					
 				   				
@@ -92,12 +92,12 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 													    <td >Haber</td> \
 													  </tr>\
 		   			    	                          <tr>\
-													    <td style='padding: 15px; border-top:  solid #000000; border-right:  solid #000000;'>{0} </td>\
-													    <td style='padding: 15px; border-top:  solid #000000;'>{1}</td> \
+													    <td style='padding: 10px; border-top:  solid #000000; border-right:  solid #000000;'>{0} </td>\
+													    <td style='padding: 10px; border-top:  solid #000000;'>{1}</td> \
 													  </tr>\
 													  <tr>\
-													    <td style='padding: 15px; border-right: solid #000000;'>{2}</td>\
-													    <td style='padding: 15px;' >{3}</td>\
+													    <td style='padding: 10px; border-right: solid #000000;'>{2}</td>\
+													    <td style='padding: 10px;' >{3}</td>\
 													  </tr><table>" ,Ext.util.Format.number(debe,'0,000.00'), 
 													  				 Ext.util.Format.number(haber,'0,000.00'), 
 													  				 Ext.util.Format.number(sum_debe,'0,000.00'),
@@ -437,6 +437,14 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				handler : this.imprimirCbte,
 				tooltip : '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
 		});
+		
+		this.addButton('btnDocCmpVnt', {
+				text : 'Doc Cmp/Vnt',
+				iconCls : 'brenew',
+				disabled : true,
+				handler : this.loadDocCmpVnt,
+				tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
+			});
 			
 			
 		this.grid.getTopToolbar().disable();
@@ -534,6 +542,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			this.getBoton('btnChequeoDocumentosWf').enable();
 			this.getBoton('btnImprimir').enable();
 			this.getBoton('chkpresupuesto').enable();
+			this.getBoton('btnDocCmpVnt').enable();
 			
 			return tb;
 		}
@@ -542,6 +551,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			 this.getBoton('btnChequeoDocumentosWf').disable();
 			 this.getBoton('btnImprimir').disable();
 			 this.getBoton('chkpresupuesto').disable();
+			 this.getBoton('btnDocCmpVnt').disable();
 		 }
 			
          return undefined;
@@ -552,6 +562,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			this.getBoton('btnChequeoDocumentosWf').disable();
 			this.getBoton('btnImprimir').disable();
 			this.getBoton('chkpresupuesto').disable();
+			this.getBoton('btnDocCmpVnt').disable();
+			
 			
 	},
 	
@@ -652,8 +664,16 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
                     rec.data,
                     this.idContenedor,
                     'DocumentoWf'
-        )
+           );
     },
+    
+    loadDocCmpVnt : function() {
+			var rec = this.sm.getSelected();
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCbte.php', 'Documentos del Cbte', {
+				width : '80%',
+				height : '80%'
+			}, rec.data, this.idContenedor, 'DocCompraVentaCbte');
+	},
 	
 	ExtraColumExportDet:[{ 
 		   	    label:'Partida',

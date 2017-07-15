@@ -122,8 +122,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				inputType:'hidden'
 			},
 			type:'Field',
-			form:true,
-			grid:false
+			form:true
 		},
 		{
 			config:{
@@ -131,6 +130,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				inputType:'hidden'
 			},
 			type:'Field',
+			grid:false,
 			form:true
 		},
 		{
@@ -165,11 +165,12 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				queryDelay: 200,
 				listWidth:280,
 				minChars: 2,
-				gwidth: 90
+				gwidth: 300
 				},
 			type: 'ComboBox',
 			id_grupo: 0,
-			form: true
+			form: true,
+			grid:false
 		},
 		{
 	       		config:{
@@ -212,8 +213,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				name: 'text',
 				fieldLabel: 'Cuenta',
 				allowBlank: false,
-				anchor: '80%',
 				gwidth: 400,
+				width: 400,
 				maxLength:100
 			},
 			type:'TextField',
@@ -254,7 +255,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				fieldLabel: 'Desc Cuenta',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 200,
 				maxLength:500
 			},
 			type:'TextArea',
@@ -279,7 +280,46 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	       		id_grupo:0,
 	       		grid:true,
 	       		form:true
-	       	},
+	     },
+		 {
+			config: {
+				name: 'id_config_subtipo_cuenta',
+				fieldLabel: 'Subtipo',
+				typeAhead: false,
+				forceSelection: false,
+				allowBlank: false,
+				emptyText: 'Tipos...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_contabilidad/control/ConfigSubtipoCuenta/listarConfigSubtipoCuenta',
+					id: 'id_config_subtipo_cuenta',
+					root: 'datos',
+					sortInfo: {
+						field: 'codigo',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['tipo_cuenta', 'id_config_subtipo_cuenta','nombre','codigo'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: {par_filtro: 'cst.nombre#cst.codigo'}
+				}),
+				valueField: 'id_config_subtipo_cuenta',
+				displayField: 'nombre',
+				gdisplayField: 'desc_csc',
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 20,
+				queryDelay: 200,
+				listWidth:280,
+				minChars: 2,
+				gwidth: 90
+				},
+			type: 'ComboBox',
+			id_grupo: 0,
+			form: true,
+			grid:true
+		},
 				
 		 {
    			config:{
@@ -396,10 +436,10 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	id_store:'id_cuenta',
 	
 	textRoot:'Plan de Cuentas',
- id_nodo:'id_cuenta',
- id_nodo_p:'id_cuenta_padre',
-	
+    id_nodo:'id_cuenta',
+    id_nodo_p:'id_cuenta_padre',
 	fields: [
+	    
 		{name:'id_cuenta', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
 		{name:'nombre_cuenta', type: 'string'},
@@ -410,7 +450,9 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'nro_cuenta', type: 'string'},
 		{name:'id_moneda', type: 'numeric'},
 		{name:'sw_transaccional', type: 'string'},
-		{name:'id_gestion', type: 'numeric'},'desc_moneda','valor_incremento','eeff','sw_control_efectivo'
+		{name:'id_gestion', type: 'numeric'},'desc_moneda',
+		'valor_incremento','eeff','sw_control_efectivo',
+		'id_config_subtipo_cuenta','desc_csc'
 		
 	],
 	cmbGestion: new Ext.form.ComboBox({
@@ -514,10 +556,13 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		var nodo = this.sm.getSelectedNode(this.cmpTipoCuenta);           
 	        
 	    if(this.cmpTipoCuenta.getValue() =='patrimonio'){
-					this.mostrarComponente(this.cmpTipoCuentaPat);
-				} else{
-					this.ocultarComponente(this.cmpTipoCuentaPat);
-				}
+			this.mostrarComponente(this.cmpTipoCuentaPat);
+		} else{
+			this.ocultarComponente(this.cmpTipoCuentaPat);
+		}
+		
+		this.Cmp.id_config_subtipo_cuenta.store.baseParams.tipo_cuenta = this.cmpTipoCuenta.getValue();
+	    this.Cmp.id_config_subtipo_cuenta.modificado = true;
 		
 		
 		
@@ -541,6 +586,11 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	        	//si no es el nodo raiz
 	        	this.cmpTipoCuenta.disable();
 	        	this.cmpTipoCuenta.setValue(this.getTipoCuentaPadre(nodo));
+	        	
+	    		this.Cmp.id_config_subtipo_cuenta.store.baseParams.tipo_cuenta = this.cmpTipoCuenta.getValue();
+	    		this.Cmp.id_config_subtipo_cuenta.modificado = true;
+	        	
+	        	
 	        	this.Cmp.valor_incremento.setValue(nodo.attributes.valor_incremento);
 	        	this.Cmp.eeff.setValue(nodo.attributes.eeff);
 	        	
@@ -599,6 +649,10 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				this.cmpNombreCuenta.setValue( Ext.util.Format.capitalize(record.data.tipo_cuenta));
 				this.cmpSwTransaccional.setValue('titular');
 				
+				this.Cmp.id_config_subtipo_cuenta.reset();
+	    		this.Cmp.id_config_subtipo_cuenta.store.baseParams.tipo_cuenta = record.data.tipo_cuenta;
+	    		this.Cmp.id_config_subtipo_cuenta.modificado = true;
+				
 			},this);
 			
 			
@@ -612,14 +666,14 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 			},this);
 		},
 		
+		
+		
 		tabeast:[
 		  {
     		  url:'../../../sis_contabilidad/vista/cuenta_partida/CuentaPartida.php',
     		  title:'Partidas', 
     		  width:'60%',
     		  cls:'CuentaPartida'
-		  }
-		  
-		]
+		  }]
 })
 </script>

@@ -139,8 +139,6 @@ BEGIN
                     raise exception 'Combinacion de momentos no contemplada';  
              END IF;
              
-             
-           
            
             --listado de las transacciones con partidas presupuestaria
             FOR v_registros in (
@@ -195,8 +193,10 @@ BEGIN
                                 --  o (compromentemos y ejecutamos) 
                                 --  o (compromentemos, ejecutamos y pagamos)     
                                 
-                                -- si tiene partida ejecucionde comprometido y nose correponde con la gestion
+                                -- si tiene partida ejecucion de comprometido y nose corresponde con la gestion
                                 --  lo ponemos en null para que comprometa
+                                
+                                --  es para devegar planes de pago que quedaron pendientes de una  gestion anterior
                                 
                                 IF v_registros.id_partida_ejecucion is not NULL THEN 
                                 
@@ -230,7 +230,8 @@ BEGIN
                                 END IF; --IF comprometido 
                                 
                                 
-                                
+                                  
+           
                                 
                                 -- solo procesamos si es una partida presupuestaria y no de flujo
                                 IF v_registros.sw_movimiento = 'presupuestaria' THEN
@@ -245,7 +246,7 @@ BEGIN
                                                 END IF; 
                                          END IF;
                                          
-                                         
+                                       
                                          
                                          IF v_registros.tipo = 'gasto'  THEN
                                              -- importe debe ejecucion
@@ -254,25 +255,28 @@ BEGIN
                                                  v_monto_cmp_mb = v_importe_gasto_mb;                                                                                           
                                              END IF;
                                              --importe haber es reversion, multiplicar por -1
-                                             IF v_importe_recurso > 0 or v_importe_recurso_mb > 0THEN
+                                             IF v_importe_recurso > 0 or v_importe_recurso_mb > 0 THEN
                                                  v_monto_cmp  = v_importe_recurso * (-1);
                                                  v_monto_cmp_mb = v_importe_recurso_mb * (-1);
                                              END IF;
                                             
                                          ELSE
-                                             IF v_importe_recurso > 0 or v_importe_recurso_mb THEN
+                                             IF v_importe_recurso > 0 or v_importe_recurso_mb > 0 THEN
                                                v_monto_cmp  = v_importe_recurso;
                                                v_monto_cmp_mb = v_importe_recurso_mb;                                           
                                              END IF;
+                                             
                                              --importe debe es reversion, multiplicar por -1
-                                             IF v_importe_gasto > 0 or v_importe_gasto_mb THEN
+                                             
+                                             IF v_importe_gasto > 0 or v_importe_gasto_mb > 0 THEN
                                                  v_monto_cmp  = v_importe_gasto * (-1);
-                                                 v_monto_cmp_mb = v_importe_gasto_mb(-1);                                              
+                                                 v_monto_cmp_mb = v_importe_gasto_mb * (-1);                                              
                                              END IF;
                                          END IF;
-                                         
+                                           
                                        -- raise exception 'entra.. % --  %',v_monto_cmp, v_monto_cmp_mb;
                                 
+           
                               
                                         -- llamamos a la funcion de ejecucion
                                         v_resp_ges = pre.f_gestionar_presupuesto_v2(

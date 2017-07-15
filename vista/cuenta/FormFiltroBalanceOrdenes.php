@@ -124,7 +124,7 @@ Phx.vista.FormFiltroBalanceOrdenes=Ext.extend(Phx.frmInterfaz,{
 	      {
    			config:{
 			
-			 name: 'id_orden_trabajos',
+			 name: 'id_ordenes_trabajos',
              fieldLabel: 'Orden de Costo',
              allowBlank: true,
 			 tip:'Puede escoger uan rama especifica para reportar',
@@ -149,7 +149,7 @@ Phx.vista.FormFiltroBalanceOrdenes=Ext.extend(Phx.frmInterfaz,{
                valueField: 'id_orden_trabajo',
                displayField: 'desc_orden',
                gdisplayField: 'desc_orden',
-               hiddenName: 'id_orden_trabajo',
+               hiddenName: 'id_ordenes_trabajos',
                forceSelection:true,
                typeAhead: false,
                triggerAction: 'all',
@@ -181,7 +181,7 @@ Phx.vista.FormFiltroBalanceOrdenes=Ext.extend(Phx.frmInterfaz,{
        		    mode: 'local',
        		    valueField: 'inicio',
        		    enableMultiSelect:true ,   
-       		    store:['centro','pep','orden','estadistica']
+       		    store:['centro','edt','orden','estadistica']
 			},
 			type:'AwesomeCombo',
 			id_grupo:1,		

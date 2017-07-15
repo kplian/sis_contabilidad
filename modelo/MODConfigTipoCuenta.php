@@ -20,7 +20,7 @@ class MODConfigTipoCuenta extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
 		//Definicion de la lista del resultado del query
-		$this->captura('id_cofig_tipo_cuenta','int4');
+		$this->captura('id_config_tipo_cuenta','int4');
 		$this->captura('nro_base','int4');
 		$this->captura('tipo_cuenta','varchar');
 		$this->captura('estado_reg','varchar');
@@ -72,7 +72,7 @@ class MODConfigTipoCuenta extends MODbase{
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_cofig_tipo_cuenta','id_cofig_tipo_cuenta','int4');
+		$this->setParametro('id_config_tipo_cuenta','id_config_tipo_cuenta','int4');
 		$this->setParametro('nro_base','nro_base','int4');
 		$this->setParametro('tipo_cuenta','tipo_cuenta','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
@@ -96,7 +96,7 @@ class MODConfigTipoCuenta extends MODbase{
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_cofig_tipo_cuenta','id_cofig_tipo_cuenta','int4');
+		$this->setParametro('id_config_tipo_cuenta','id_config_tipo_cuenta','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

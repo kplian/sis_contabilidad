@@ -28,10 +28,13 @@ DECLARE
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
 	v_id_requerimiento     	integer;
-	v_resp		            varchar;
+	v_resp		              varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_auxiliar	integer;
+	v_id_auxiliar	          integer;
+	--variables para control de codigo y nombre de auxiliar duplicado
+  v_contador				      integer;
+	v_valid					        varchar;
 			    
 BEGIN
 
@@ -131,6 +134,32 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
+		end;
+	/*********************************
+ 	#TRANSACCION:  'CONTA_COD_AUX_VAL'
+ 	#DESCRIPCION:	Control para que no se repita el codigo auxiliar y nombre auxiliar
+ 	#AUTOR:		Franklin Espinoza
+ 	#FECHA:		13-06-2017 10:44:52
+	***********************************/
+
+	elsif(p_transaccion='CONTA_COD_AUX_VAL')then
+
+		begin
+			select count(taux.id_auxiliar)
+            INTO v_contador
+            from conta.tauxiliar taux
+            where taux.codigo_auxiliar % trim(both ' ' from v_parametros.codigo_auxiliar)::integer AND taux.nombre_auxiliar = trim(both ' ' from v_parametros.nombre_auxiliar) ;
+
+            IF(v_contador>=1)THEN
+        		v_valid = 'true';
+            ELSE
+            	v_valid = 'false';
+			END IF;
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Existe el Reclamo');
+            v_resp = pxp.f_agrega_clave(v_resp,'v_valid',v_valid);
+            --Devuelve la respuesta
+            return v_resp;
 		end;
          
 	else

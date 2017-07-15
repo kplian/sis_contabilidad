@@ -83,6 +83,10 @@ class MODCuenta extends MODbase{
 			 $this->captura('valor_incremento','varchar');
 			 $this->captura('eeff','varchar');
 			 $this->captura('sw_control_efectivo','varchar');
+			 $this->captura('id_config_subtipo_cuenta','int4');
+			 $this->captura('desc_csc','varchar');
+			 
+			
 			 
 		     //Ejecuta la instruccion
 		     $this->armarConsulta();
@@ -111,6 +115,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('eeff','eeff','varchar');
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
+		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
 		
 		
 
@@ -143,6 +148,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('eeff','eeff','varchar');
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
+		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -346,6 +352,58 @@ class MODCuenta extends MODbase{
 	    
 	    return $this->respuesta;       
  }
+
+  function listarBalanceTipoCC(){
+	    //Definicion de variables para ejecucion del procedimientp
+	    $this->procedimiento='conta.f_balance_tcc';
+	    $this-> setCount(false);
+		$this->setTipoRetorno('record');
+	    $this->transaccion='CONTA_BALTCC_SEL';
+	    $this->tipo_procedimiento='SEL';//tipo de transaccion
+	    
+	    $this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('nivel','nivel','integer');
+		$this->setParametro('id_deptos','id_deptos','varchar');
+		$this->setParametro('id_tipo_ccs','id_tipo_ccs','varchar'); 		
+		$this->setParametro('tipo','tipo','varchar'); 
+		$this->setParametro('incluir_cierre','incluir_cierre','varchar');  
+		$this->setParametro('tipo_balance','tipo_balance','varchar'); 
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar'); 
+		
+		$this->setParametro('incluir_adm','incluir_adm','varchar'); 
+		$this->setParametro('importe','importe','varchar');
+		$this->setParametro('moneda','moneda','varchar');
+		     
+	            
+	    //Definicion de la lista del resultado del query
+	     $this->captura('id_tipo_cc','int4');     
+		 $this->captura('codigo','varchar');
+		 $this->captura('descripcion','varchar');
+		 $this->captura('id_tipo_cc_fk','int4');
+		 $this->captura('monto','numeric');
+		 $this->captura('monto_mt','numeric');
+		 $this->captura('monto_debe','numeric');
+		 $this->captura('monto_mt_debe','numeric');
+		 $this->captura('monto_haber','numeric');
+		 $this->captura('monto_mt_haber','numeric');
+		 $this->captura('nivel','int4');
+		 $this->captura('tipo','varchar');
+		 $this->captura('movimiento','varchar');
+		 
+		
+          
+		  
+		 
+		//Ejecuta la instruccion
+	    $this->armarConsulta();
+		//echo $this->getConsulta();
+		//exit;
+	    $this->ejecutarConsulta();
+	    
+	    return $this->respuesta;       
+ }
+
 
 			
 }

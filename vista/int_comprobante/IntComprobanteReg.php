@@ -161,11 +161,18 @@ Phx.vista.IntComprobanteReg = {
 		        else{
 		        	 this.getBoton('btnSwEditble').setDisabled(true);
 		        }
+
+				if(rec.data.momento =='presupuestario'){
+					this.getBoton('btnDocCmpVnt').enable();
+				}else{
+					this.getBoton('btnDocCmpVnt').disable();
+				}
+
 		        this.getBoton('sig_estado').enable();            
 				this.getBoton('btnImprimir').enable();
 				this.getBoton('btnRelDev').enable();
 				this.getBoton('btnIgualarCbte').enable();
-				this.getBoton('btnDocCmpVnt').enable();
+				//this.getBoton('btnDocCmpVnt').enable();
 				this.getBoton('chkpresupuesto').enable();				
 				this.getBoton('btnChequeoDocumentosWf').enable();
                 this.getBoton('diagrama_gantt').enable();

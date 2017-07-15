@@ -125,7 +125,9 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['campo_fecha_costo_ini'])?'NULL':"'".$row['campo_fecha_costo_ini']."'") ."," .							 
 							 (is_null($row['campo_fecha_costo_fin'])?'NULL':"'".$row['campo_fecha_costo_fin']."'")."," .
 							 (is_null($row['funcion_comprobante_editado'])?'NULL':"'".$row['funcion_comprobante_editado']."'")."," .
-							 (is_null($row['desc_plantilla'])?'NULL':"'".$row['desc_plantilla']."'").");\r\n");				
+							 (is_null($row['desc_plantilla'])?'NULL':"'".$row['desc_plantilla']."'")."," .
+							 (is_null($row['campo_cbte_relacionado'])?'NULL':"'".$row['campo_cbte_relacionado']."'")."," .
+							 (is_null($row['codigo_tipo_relacion'])?'NULL':"'".$row['codigo_tipo_relacion']."'").");\r\n");					
 							 
 							 	
 				}

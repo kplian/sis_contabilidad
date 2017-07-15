@@ -61,7 +61,6 @@ BEGIN
                raise exception 'ya existe otra orden con el código %',v_parametros.codigo;      
             END IF;
         	
-        	
             --Sentencia de la insercion
         	insert into conta.torden_trabajo(
                 estado_reg,
@@ -75,7 +74,8 @@ BEGIN
                 fecha_mod,
                 codigo,
                 tipo,
-                movimiento
+                movimiento,
+                id_orden_trabajo_fk
           	) values(
                 'activo',
                 v_parametros.fecha_final,
@@ -88,7 +88,8 @@ BEGIN
                 null,
                 upper(v_parametros.codigo),
                 v_parametros.tipo,
-                v_parametros.movimiento
+                v_parametros.movimiento,
+                v_parametros.id_orden_trabajo_fk
 							
 			)RETURNING id_orden_trabajo into v_id_orden_trabajo;
 			
@@ -145,10 +146,11 @@ BEGIN
               fecha_mod = now(),
               codigo =  upper(v_parametros.codigo),
               tipo = v_parametros.tipo,
-              movimiento = v_parametros.movimiento
+              movimiento = v_parametros.movimiento,
+              id_orden_trabajo_fk = v_parametros.id_orden_trabajo_fk
            where id_orden_trabajo=v_parametros.id_orden_trabajo;
             
-            if (pxp.f_get_variable_global('sincronizar') = 'true') then
+           /* if (pxp.f_get_variable_global('sincronizar') = 'true') then
                 	                
                     select * FROM dblink(migra.f_obtener_cadena_conexion(), 
                         'SELECT * 
@@ -161,7 +163,7 @@ BEGIN
                                 ')',TRUE)AS t1(resp varchar)
                                 into v_resp; 
                    
-            end if;
+            end if;*/
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ordenes de Trabajo modificado(a)'); 

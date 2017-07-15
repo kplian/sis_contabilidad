@@ -122,7 +122,7 @@ Phx.vista.IntComprobanteLd = {
 			var rec = this.sm.getSelected();
 			this.getBoton('btnImprimir').enable();
 			this.getBoton('btnRelDev').enable();
-			this.getBoton('btnDocCmpVnt').enable();
+			//this.getBoton('btnDocCmpVnt').enable();
 			this.getBoton('chkpresupuesto').enable();
 			this.getBoton('btnVolcar').enable();
 			this.getBoton('btnClonar').enable();
@@ -130,7 +130,13 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
             this.getBoton('btnObs').enable();
-            this.getBoton('btnWizard').enable()  
+            this.getBoton('btnWizard').enable()
+			
+			if(rec.data.momento =='presupuestario'){
+				this.getBoton('btnDocCmpVnt').enable();
+			}else{
+				this.getBoton('btnDocCmpVnt').disable();
+			}
             
 			
 			return tb;

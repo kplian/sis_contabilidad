@@ -28,7 +28,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			config : {
 				labelSeparator : '',
 				inputType : 'hidden',
-				name : 'id_cofig_tipo_cuenta'
+				name : 'id_config_tipo_cuenta'
 			},
 			type : 'Field',
 			form : true
@@ -250,9 +250,9 @@ header("content-type: text/javascript; charset=UTF-8");
 		ActSave : '../../sis_contabilidad/control/ConfigTipoCuenta/insertarConfigTipoCuenta',
 		ActDel : '../../sis_contabilidad/control/ConfigTipoCuenta/eliminarConfigTipoCuenta',
 		ActList : '../../sis_contabilidad/control/ConfigTipoCuenta/listarConfigTipoCuenta',
-		id_store : 'id_cofig_tipo_cuenta',
+		id_store : 'id_config_tipo_cuenta',
 		fields : [{
-			name : 'id_cofig_tipo_cuenta',
+			name : 'id_config_tipo_cuenta',
 			type : 'numeric'
 		}, {
 			name : 'nro_base',
@@ -285,9 +285,17 @@ header("content-type: text/javascript; charset=UTF-8");
 			type : 'string'
 		}, 'incremento','eeff','movimiento'],
 		sortInfo : {
-			field : 'id_cofig_tipo_cuenta',
+			field : 'id_config_tipo_cuenta',
 			direction : 'ASC'
 		},
+		tabeast:[
+		  {
+    		  url:'../../../sis_contabilidad/vista/config_subtipo_cuenta/ConfigSubtipoCuenta.php',
+    		  title:'Subtipos', 
+    		  width:'60%',
+    		  cls:'ConfigSubtipoCuenta'
+		  }		  
+		],
 		bdel : true,
 		bsave : true
 	})

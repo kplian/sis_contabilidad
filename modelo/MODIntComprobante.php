@@ -423,7 +423,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('codigo_moneda_base','varchar');		
 		$this->captura('codigo_depto','varchar');
 		$this->captura('documentos','varchar');
-		//$this->captura('nro_tramite','varchar');
+		$this->captura('c31','varchar');
 		
 		
 		//Ejecuta la instruccion
@@ -547,6 +547,8 @@ class MODIntComprobante extends MODbase{
 		    $this->captura('volcado','varchar');
 		    $this->captura('cbte_reversion','varchar');
 			$this->captura('tipo_nodo','varchar');
+			$this->captura('id_proceso_wf','int4');
+			
 			
 			
 		    //Ejecuta la instruccion
@@ -572,6 +574,8 @@ class MODIntComprobante extends MODbase{
         $this->setParametro('id_depto_wf','id_depto_wf','int4');		
         $this->setParametro('obs','obs','text');
         $this->setParametro('json_procesos','json_procesos','text');
+		$this->setParametro('validar_doc','validar_doc','boolean');
+		
 		
 
         //Ejecuta la instruccion

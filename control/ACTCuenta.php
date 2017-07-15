@@ -12,6 +12,9 @@ require_once(dirname(__FILE__).'/../reportes/RResultados.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../reportes/RResultadosXls.php');
 require_once(dirname(__FILE__).'/../reportes/RBalanceOrdenes.php');
+require_once(dirname(__FILE__).'/../reportes/RBalanceTipoCC.php');
+require_once(dirname(__FILE__).'/../reportes/RBalanceTipoCcXls.php');
+
 
 class ACTCuenta extends ACTbase{    
 			
@@ -22,6 +25,14 @@ class ACTCuenta extends ACTbase{
 		
 		if($this->objParam->getParametro('id_gestion')!=''){
             $this->objParam->addFiltro("cta.id_gestion = ".$this->objParam->getParametro('id_gestion'));    
+        }
+		
+		if($this->objParam->getParametro('tipo_cuenta')!=''){
+            $this->objParam->addFiltro("cta.tipo_cuenta = ''".$this->objParam->getParametro('tipo_cuenta')."''");    
+        }
+		
+		if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+            $this->objParam->addFiltro("cta.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));    
         }
 		
 		if($this->objParam->getParametro('sw_control_efectivo')!=''){
@@ -395,6 +406,112 @@ class ACTCuenta extends ACTbase{
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		
    }
+
+   function recuperarDatosBalanceTipoCC(){
+    	
+		$this->objFunc = $this->create('MODCuenta');
+		$cbteHeader = $this->objFunc->listarBalanceTipoCC($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){				
+			return $cbteHeader->getDatos();
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}              
+		
+    }
+
+
+   function reporteBalanceTipoCC(){
+		if($this->objParam->getParametro('formato') == 'pdf' ){	
+			$nombreArchivo = uniqid(md5(session_id()).'TipoCC') . '.pdf'; 
+			$dataSource = $this->recuperarDatosBalanceTipoCC();	
+			
+			//parametros basicos
+			$tamano = 'LETTER';
+			$orientacion = 'P';
+			$titulo = 'Árbol de Análitico de Costos';
+			
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);        
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			//Instancia la clase de pdf
+			
+			$reporte = new RBalanceTipoCC($this->objParam);
+			$reporte->datosHeader($dataSource, $this->objParam->getParametro('nivel'), $this->objParam->getParametro('desde'),$this->objParam->getParametro('hasta'),  $this->objParam->getParametro('codigos'), $this->objParam->getParametro('tipo_balance'), $this->objParam->getParametro('incluir_cierre'));
+			//$this->objReporteFormato->renderDatos($this->res2->datos);
+			
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		 }
+		else{
+			//genera reprote en excel ....
+			$this->reporteBalanceTipoCcXls();
+		}
+	}
+
+   function reporteBalanceTipoCcXls()	{
+		
+		
+		$dataSource = $this->recuperarDatosBalanceTipoCC();
+		
+		
+		
+		//TODO recueprar configuracion ....
+		
+		$config = 'carta_horizontal';
+		$titulo = 'Árbol de Ánalisis de Costos';
+		$nombreArchivo=uniqid(md5(session_id()));
+		
+		//obtener tamaño y orientacion
+		if ($config == 'carta_vertical') {
+			$tamano = 'LETTER';
+			$orientacion = 'P';
+		} else if ($config == 'carta_horizontal') {
+			$tamano = 'LETTER';
+			$orientacion = 'L';
+		} else if ($config == 'oficio_vertical') {
+			$tamano = 'LEGAL';
+			$orientacion = 'P';
+		} else {
+			$tamano = 'LEGAL';
+			$orientacion = 'L';
+		}
+		
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);		
+		$this->objParam->addParametro('titulo_archivo',$titulo);
+		$this->objParam->addParametro('test',$titulo);
+		
+		
+		
+			
+		$nombreArchivo.='.xls';
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		//$this->objParam->addParametro('config',$this->res->datos[0]);
+		$this->objParam->addParametro('datos',$dataSource);
+		
+		//Instancia la clase de excel
+		$this->objReporteFormato=new RBalanceTipoCcXls($this->objParam);
+		$this->objReporteFormato->imprimeDatos();
+		
+		$this->objReporteFormato->generarReporte();		
+		
+		
+		//Retorna nombre del archivo
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+				
+	}
+  
 
    
 			
