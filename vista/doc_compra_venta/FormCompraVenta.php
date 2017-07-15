@@ -1875,14 +1875,14 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
             //calculo iva cf
-            if(this.Cmp.porc_iva_cf.getValue() >= 0 || this.Cmp.porc_iva_df.getValue() > 0){
+            if(this.Cmp.porc_iva_cf.getValue() > 0 || this.Cmp.porc_iva_df.getValue() > 0){
 
                 var excento = 0.00;
 
                 if(this.Cmp.importe_excento.getValue() > 0){
                     excento = this.Cmp.importe_excento.getValue();
                 }
-                if(this.Cmp.porc_iva_cf.getValue() >= 0){
+                if(this.Cmp.porc_iva_cf.getValue() > 0){
 
                     this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
                 }
@@ -1890,6 +1890,10 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
                 }
             }
+            else{
+            	 this.Cmp.importe_iva.setValue(0);
+			}
+            
             if(this.mostrarFormaPago){
                 if(this.Cmp.importe_retgar.getValue() > 0 || this.Cmp.importe_anticipo.getValue() > 0 ||  this.Cmp.importe_pendiente.getValue() > 0){
                     this.Cmp.id_auxiliar.allowBlank = false;
