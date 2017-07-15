@@ -3685,7 +3685,7 @@ AS
 /**********************************F-DEP-RAC-CONTA-0-09/06/2017****************************************/
 
 /**********************************I-DEP-GSS-CONTA-0-04/07/2017****************************************/
-
+DROP VIEW conta.ventrega;
 CREATE OR REPLACE VIEW conta.ventrega (
     id_entrega,
     estado,
