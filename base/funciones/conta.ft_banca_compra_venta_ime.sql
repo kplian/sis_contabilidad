@@ -1158,6 +1158,16 @@ and (
               IF (v_record_plan_pago_pxp.importe_total != v_record_plan_pago_pxp.descuento_inter_serv)
               THEN
 
+                IF v_record_plan_pago_pxp.nro_autorizacion is null or v_record_plan_pago_pxp.nro_autorizacion = '' THEN
+                  v_record_plan_pago_pxp.nro_autorizacion = 0;
+                END IF;
+
+
+                IF v_record_plan_pago_pxp.nro_nit is null or v_record_plan_pago_pxp.nro_nit = '' THEN
+                  v_record_plan_pago_pxp.nro_nit = 0;
+                END IF;
+
+
 
                 --Sentencia de la insercion
                 INSERT INTO conta.tbanca_compra_venta (
@@ -1720,6 +1730,16 @@ and (
               IF (v_record_plan_pago_pxp.importe_total != v_record_plan_pago_pxp.descuento_inter_serv)
               THEN
 
+
+
+                IF v_record_plan_pago_pxp.nro_autorizacion is null or v_record_plan_pago_pxp.nro_autorizacion = '' THEN
+                  v_record_plan_pago_pxp.nro_autorizacion = 0;
+                END IF;
+
+
+                IF v_record_plan_pago_pxp.nro_nit is null or v_record_plan_pago_pxp.nro_nit = '' THEN
+                  v_record_plan_pago_pxp.nro_nit = 0;
+                END IF;
 
                 --Sentencia de la insercion
                 INSERT INTO conta.tbanca_compra_venta (

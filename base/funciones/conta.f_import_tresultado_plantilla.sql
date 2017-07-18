@@ -14,7 +14,8 @@ CREATE OR REPLACE FUNCTION conta.f_import_tresultado_plantilla (
   p_codigo_clase_comprobante varchar,
   p_id_resultado_plantilla_hijo varchar,
   p_relacion_unica varchar = 'no'::character varying,
-  p_codigo_tipo_relacion_comprobante varchar = ''::character varying
+  p_codigo_tipo_relacion_comprobante varchar = ''::character varying,
+  p_nombre_func varchar = NULL::character varying
 )
 RETURNS varchar AS
 $body$
@@ -60,7 +61,8 @@ BEGIN
                                 id_clase_comprobante,
                                 glosa,
                                 relacion_unica,
-                                id_tipo_relacion_comprobante
+                                id_tipo_relacion_comprobante,
+                                nombre_func
                           ) values(
                                  p_codigo,
                                 'activo',
@@ -75,7 +77,8 @@ BEGIN
                                  v_id_clase_comprobante,
                                  p_glosa,
                                  p_relacion_unica,
-                                 v_id_tipo_relacion_comprobante);
+                                 v_id_tipo_relacion_comprobante,
+                                 p_nombre_func);
              
         else            
             

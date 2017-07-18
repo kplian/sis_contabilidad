@@ -4234,7 +4234,24 @@ ALTER TABLE conta.tint_transaccion
 ALTER TABLE conta.tint_rel_devengado
   ADD COLUMN monto_pago_ma NUMERIC;
     
-  
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  ADD COLUMN tipo_act VARCHAR(15) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tcuenta.tipo_act
+IS 'no, conta, activos,  defien si la cuetna contable  se actualiza, i actuaiza define si viene el calculo en el sistema de contabilidad o en el sistema de activos fijos';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN nombre_func VARCHAR;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.nombre_func
+IS 'si es null la logica de la plantilla sale de resutlado detalle,  si se define, esta función debe contener lalogica para generar el cbte'; 
+
+
 /***********************************F-SCP-RAC-CONTA-1-11/07/2017****************************************/
 
 

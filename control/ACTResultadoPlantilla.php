@@ -111,7 +111,8 @@ class ACTResultadoPlantilla extends ACTbase{
 							 (is_null($row['glosa'])?'NULL':"'".$row['glosa']."'") ."," .
 							 (is_null($row['codigo_clase_comprobante'])?'NULL':"'".$row['codigo_clase_comprobante']."'") ."," .	
 							 (is_null($row['relacion_unica'])?'NULL':"'".$row['relacion_unica']."'") ."," .								 
-							 (is_null($row['codigo_tipo_relacion_comprobante'])?'NULL':"'".$row['codigo_tipo_relacion_comprobante']."'").");\r\n");			
+							 (is_null($row['codigo_tipo_relacion_comprobante'])?'NULL':"'".$row['codigo_tipo_relacion_comprobante']."'") ."," .	
+							 (is_null($row['nombre_func'])?'NULL':"'".$row['nombre_func']."'").");\r\n");			
 							 	
 				
 			 } else if ($row['tipo_reg'] == 'detalle') {
