@@ -1314,3 +1314,18 @@ select pxp.f_insert_testructura_gui ('BATCC', 'REPCON');
 
 /***********************************F-DAT-RAC-CONTA-0-03/07/2017*****************************************/
 
+
+/***********************************I-DAT-RAC-CONTA-0-20/07/2017*****************************************/
+/* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 4) */
+
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "partida_tipo", "partida_rubro", "id_tabla_relacion_contable")
+VALUES 
+  (1, NULL, E'2017-07-20 15:14:51.622', NULL, E'activo', NULL, NULL, E'Ajuste AITB al debe', E'AJT_AITB_DEBE', E'no', E'si', E'no', E'flujo_presupuestaria', E'recurso_gasto', NULL),
+  (1, NULL, E'2017-07-20 15:15:23.220', NULL, E'activo', NULL, NULL, E'Ajuste AITB  al haber', E'AJT_AITB_HABER', E'no', E'si', E'no', E'flujo_presupuestaria', E'recurso_gasto', NULL),
+  (1, NULL, E'2017-07-20 15:32:34.246', NULL, E'activo', NULL, NULL, E'Gasto por AITB', E'GASTO_AITB', E'no', E'si', E'no', E'flujo', E'gasto', NULL),
+  (1, NULL, E'2017-07-20 15:33:03.064', NULL, E'activo', NULL, NULL, E'Recurso AITB', E'RECURSO_AITB', E'no', E'si', E'no', E'flujo', E'recurso', NULL);
+
+/***********************************F-DAT-RAC-CONTA-0-20/07/2017*****************************************/
+
+
+

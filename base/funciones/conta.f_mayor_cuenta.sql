@@ -90,6 +90,15 @@ BEGIN
      
      va_cbte_cierre[1] = 'no';
      
+     
+     v_resp_final[1] = 0;
+     v_resp_final[2] = 0;
+     v_resp_final[3] = 0;
+     v_resp_final[4] = 0;
+     v_resp_final[5] = 0;
+     v_resp_final[6] = 0; 
+     
+     
      if p_incluir_cierre = 'todos' then
         va_cbte_cierre[2] = 'balance';
         va_cbte_cierre[3] = 'resultado';
@@ -159,18 +168,18 @@ BEGIN
      
           -- sumar el debe y el haber para la cuenta
           select 
-             sum(t.importe_debe_mb),
-             sum(t.importe_haber_mb),
-             sum(t.importe_debe_mt),
-             sum(t.importe_haber_mt),
-             sum(t.importe_gasto_mb),
-             sum(t.importe_recurso_mb),
-             sum(t.importe_gasto_mt),
-             sum(t.importe_recurso_mt),
-             sum(t.importe_debe_ma),
-             sum(t.importe_haber_ma),
-             sum(t.importe_gasto_ma),
-             sum(t.importe_recurso_ma)
+             sum(COALESCE(t.importe_debe_mb,0)),
+             sum(COALESCE(t.importe_haber_mb,0)),
+             sum(COALESCE(t.importe_debe_mt,0)),
+             sum(COALESCE(t.importe_haber_mt,0)),
+             sum(COALESCE(t.importe_gasto_mb,0)),
+             sum(COALESCE(t.importe_recurso_mb,0)),
+             sum(COALESCE(t.importe_gasto_mt,0)),
+             sum(COALESCE(t.importe_recurso_mt,0)),
+             sum(COALESCE(t.importe_debe_ma,0)),
+             sum(COALESCE(t.importe_haber_ma,0)),
+             sum(COALESCE(t.importe_gasto_ma,0)),
+             sum(COALESCE(t.importe_recurso_ma,0))
           into
              v_sum_debe,
              v_sum_haber,
@@ -195,7 +204,7 @@ BEGIN
               c.cbte_aitb = ANY(va_cbte_aitb) AND
               (
                 CASE  WHEN p_id_int_comprobante_ori is NULL  THEN
-              				c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin 
+              				c.fecha::date BETWEEN  p_fecha_ini  and p_fecha_fin 
                       ELSE
                             c.id_int_comprobante = p_id_int_comprobante_ori
                       END
@@ -352,12 +361,7 @@ BEGIN
          
      END IF;     
           
-     v_resp_final[1] = 0;
-     v_resp_final[2] = 0;
-     v_resp_final[3] = 0;
-     v_resp_final[4] = 0;
-     v_resp_final[5] = 0;
-     v_resp_final[6] = 0;      
+          
      
      return v_resp_final;
      
