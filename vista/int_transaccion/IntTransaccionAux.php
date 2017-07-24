@@ -65,7 +65,7 @@ Phx.vista.IntTransaccionAux = {
 	},
 	
 	onButtonEdit:function(){
-		 
+
 	         this.swButton = 'EDIT';
 	         var rec = this.sm.getSelected().data;
 	         Phx.vista.IntTransaccionAux.superclass.onButtonEdit.call(this); 

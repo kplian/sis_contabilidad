@@ -21,6 +21,28 @@ $body$
 Autor: RCM
 Fecha: 18/11/2013
 Descripcion: Funcion para la eliminacion de int comprobante
+
+EJEMPO
+v_resp_aux  					numeric[];
+v_resp_aux = conta.f_mayor_cuenta(v_registros.id_cuenta, 
+               									 p_fecha_ini, 
+                                                 p_fecha_fin, 
+                                                 p_id_deptos, 
+                                                 p_incluir_cierre,
+                                                 p_incluir_apertura,
+                                                 p_incluir_aitb, 
+                                                 p_signo_balance, 
+                                                 p_tipo_saldo,
+                                                 p_id_int_comprobante_ori,
+                                                 p_id_ot,
+                                                 p_id_centro_costo);
+
+
+
+
+
+
+
 */
 
 DECLARE
@@ -36,14 +58,14 @@ DECLARE
     v_resp_final  					numeric[];
     v_resp_aux  					numeric[];
     v_resp_mayor   					numeric;
-   
     v_sum_debe						numeric;
     v_sum_haber						numeric;
-    
     v_resp_mayor_mt   				numeric;
-   
+    v_resp_mayor_ma   				numeric;
     v_sum_debe_mt					numeric;
     v_sum_haber_mt					numeric;
+    v_sum_debe_ma					numeric;
+    v_sum_haber_ma					numeric;
     
     
     va_id_deptos					integer[];
@@ -55,15 +77,27 @@ DECLARE
     v_sum_recurso					numeric;
     v_sum_gasto_mt					numeric;
     v_sum_recurso_mt				numeric;
+    v_sum_gasto_ma					numeric;
+    v_sum_recurso_ma				numeric;
     
     v_resp_mayor_partida				numeric;
     v_resp_mayor_partida_mt				numeric;
+    v_resp_mayor_partida_ma				numeric;
  
 BEGIN
   	 v_nombre_funcion:='conta.f_mayor_cuenta';
      
      
      va_cbte_cierre[1] = 'no';
+     
+     
+     v_resp_final[1] = 0;
+     v_resp_final[2] = 0;
+     v_resp_final[3] = 0;
+     v_resp_final[4] = 0;
+     v_resp_final[5] = 0;
+     v_resp_final[6] = 0; 
+     
      
      if p_incluir_cierre = 'todos' then
         va_cbte_cierre[2] = 'balance';
@@ -105,6 +139,7 @@ BEGIN
      --iniciamos acumulador en cero
      v_resp_mayor = 0;
      v_resp_mayor_mt = 0;
+     v_resp_mayor_ma = 0;
      
      va_id_deptos = string_to_array(p_id_deptos,',')::INTEGER[];
      
@@ -115,7 +150,7 @@ BEGIN
       c.valor_incremento,
       c.sw_transaccional,
       ctc.incremento,
-      ctc.id_cofig_tipo_cuenta
+      ctc.id_config_tipo_cuenta
      into
       v_registros
      from 
@@ -124,8 +159,8 @@ BEGIN
      where c.id_cuenta = p_id_cuenta;
      
      -- verificamos la cuenta
-     IF   v_registros.id_cofig_tipo_cuenta is NULL THEN
-        raise exception 'La cuenta con el id: % no tiene un tipo cuenta asociado',  p_id_cuenta;
+     IF   v_registros.id_config_tipo_cuenta is NULL  THEN
+        raise exception 'La cuenta con el (id: %) no tiene un tipo cuenta asociado',  p_id_cuenta;
      END IF;
      
      -- es una cuenta de movimiento
@@ -133,14 +168,18 @@ BEGIN
      
           -- sumar el debe y el haber para la cuenta
           select 
-             sum(t.importe_debe_mb),
-             sum(t.importe_haber_mb),
-             sum(t.importe_debe_mt),
-             sum(t.importe_haber_mt),
-             sum(t.importe_gasto_mb),
-             sum(t.importe_recurso_mb),
-             sum(t.importe_gasto_mt),
-             sum(t.importe_recurso_mt)
+             sum(COALESCE(t.importe_debe_mb,0)),
+             sum(COALESCE(t.importe_haber_mb,0)),
+             sum(COALESCE(t.importe_debe_mt,0)),
+             sum(COALESCE(t.importe_haber_mt,0)),
+             sum(COALESCE(t.importe_gasto_mb,0)),
+             sum(COALESCE(t.importe_recurso_mb,0)),
+             sum(COALESCE(t.importe_gasto_mt,0)),
+             sum(COALESCE(t.importe_recurso_mt,0)),
+             sum(COALESCE(t.importe_debe_ma,0)),
+             sum(COALESCE(t.importe_haber_ma,0)),
+             sum(COALESCE(t.importe_gasto_ma,0)),
+             sum(COALESCE(t.importe_recurso_ma,0))
           into
              v_sum_debe,
              v_sum_haber,
@@ -149,7 +188,11 @@ BEGIN
              v_sum_gasto,
              v_sum_recurso,
              v_sum_gasto_mt,
-             v_sum_recurso_mt
+             v_sum_recurso_mt,
+             v_sum_debe_ma,
+             v_sum_haber_ma,
+             v_sum_gasto_ma,
+             v_sum_recurso_ma
           from conta.tint_transaccion t
           inner join conta.tint_comprobante c on t.id_int_comprobante = c.id_int_comprobante
           where 
@@ -161,7 +204,7 @@ BEGIN
               c.cbte_aitb = ANY(va_cbte_aitb) AND
               (
                 CASE  WHEN p_id_int_comprobante_ori is NULL  THEN
-              				c.fecha BETWEEN  p_fecha_ini  and p_fecha_fin 
+              				c.fecha::date BETWEEN  p_fecha_ini  and p_fecha_fin 
                       ELSE
                             c.id_int_comprobante = p_id_int_comprobante_ori
                       END
@@ -195,33 +238,41 @@ BEGIN
                     IF  v_registros.incremento = 'debe'   THEN
                        v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
                        v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0);
+                       v_resp_mayor_ma = COALESCE(v_sum_debe_ma,0) - COALESCE(v_sum_haber_ma,0);
                        
                        v_resp_mayor_partida = COALESCE(v_sum_gasto,0) - COALESCE(v_sum_recurso,0);
                        v_resp_mayor_partida_mt = COALESCE(v_sum_gasto_mt,0) - COALESCE(v_sum_recurso_mt,0);
+                       v_resp_mayor_partida_ma = COALESCE(v_sum_gasto_ma,0) - COALESCE(v_sum_recurso_ma,0);
                     ELSE
                     --si el incremento de haber 
                        v_resp_mayor = COALESCE(v_sum_haber,0) - COALESCE(v_sum_debe,0); 
-                       v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0) - COALESCE(v_sum_debe_mt,0); 
+                       v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0) - COALESCE(v_sum_debe_mt,0);
+                       v_resp_mayor_ma = COALESCE(v_sum_haber_ma,0) - COALESCE(v_sum_debe_ma,0);  
                        
                        v_resp_mayor_partida = COALESCE(v_sum_recurso,0) - COALESCE(v_sum_gasto,0); 
                        v_resp_mayor_partida_mt = COALESCE(v_sum_recurso_mt,0) - COALESCE(v_sum_gasto_mt,0); 
+                       v_resp_mayor_partida_ma = COALESCE(v_sum_recurso_ma,0) - COALESCE(v_sum_gasto_ma,0);
                     END IF;  
                    
               
                 ELSIF   p_signo_balance = 'deudor' THEN
                   --forzar saldo deudor
                   v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
-                  v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0); 
+                  v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0);
+                  v_resp_mayor_ma = COALESCE(v_sum_debe_ma,0) - COALESCE(v_sum_haber_ma,0);  
                   
                   v_resp_mayor_partida = COALESCE(v_sum_gasto,0) - COALESCE(v_sum_recurso,0);
-                  v_resp_mayor_partida_mt = COALESCE(v_sum_gasto_mt,0) - COALESCE(v_sum_recurso_mt,0);    
+                  v_resp_mayor_partida_mt = COALESCE(v_sum_gasto_mt,0) - COALESCE(v_sum_recurso_mt,0); 
+                  v_resp_mayor_partida_ma = COALESCE(v_sum_gasto_ma,0) - COALESCE(v_sum_recurso_ma,0);    
                 ELSE
                   --forzar saldo acredor 
                   v_resp_mayor = COALESCE(v_sum_haber,0) - COALESCE(v_sum_debe,0);
                   v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0) - COALESCE(v_sum_debe_mt,0);
+                  v_resp_mayor_ma = COALESCE(v_sum_haber_ma,0) - COALESCE(v_sum_debe_ma,0);
                   
                   v_resp_mayor_partida = COALESCE(v_sum_recurso,0) - COALESCE(v_sum_gasto,0);
                   v_resp_mayor_partida_mt = COALESCE(v_sum_recurso_mt,0) - COALESCE(v_sum_gasto_mt,0);
+                  v_resp_mayor_partida_ma = COALESCE(v_sum_recurso_ma,0) - COALESCE(v_sum_gasto_ma,0);
                 END IF;
                 
                
@@ -230,15 +281,22 @@ BEGIN
           ELSEIF  p_tipo_saldo = 'deudor' THEN
                 v_resp_mayor = COALESCE(v_sum_debe,0);
                 v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0);
+                v_resp_mayor_ma = COALESCE(v_sum_debe_ma,0);
                 
                 v_resp_mayor_partida = COALESCE(v_sum_gasto,0);
                 v_resp_mayor_partida_mt = COALESCE(v_sum_gasto_mt,0);
+                v_resp_mayor_partida_ma = COALESCE(v_sum_gasto_ma,0);
+                
           ELSEIF  p_tipo_saldo = 'acreedor' THEN
+               
                v_resp_mayor = COALESCE(v_sum_haber,0);
                v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0);
+               v_resp_mayor_ma = COALESCE(v_sum_haber_ma,0);
                
                v_resp_mayor_partida = COALESCE(v_sum_recurso,0);
                v_resp_mayor_partida_mt = COALESCE(v_sum_recurso_mt,0);
+               v_resp_mayor_partida_ma = COALESCE(v_sum_recurso_ma,0);
+               
           END IF; 
           -- retornamos el resultado 
           v_resp_final[1] = v_resp_mayor;
@@ -246,6 +304,9 @@ BEGIN
           
           v_resp_final[3] = v_resp_mayor_partida;
           v_resp_final[4] = v_resp_mayor_partida_mt;
+          
+          v_resp_final[5] = v_resp_mayor_ma;
+          v_resp_final[6] = v_resp_mayor_partida_ma;
           
           
           raise notice '##################  RESULTADO BASICO %, %',v_resp_mayor,p_id_cuenta;
@@ -282,21 +343,25 @@ BEGIN
                v_resp_mayor_partida = v_resp_mayor_partida + v_resp_aux[3];               
                v_resp_mayor_partida_mt= v_resp_mayor_partida_mt + v_resp_aux[4];
                
+               v_resp_mayor_ma = v_resp_mayor_ma + v_resp_aux[5];
+               v_resp_mayor_partida_ma= v_resp_mayor_partida_ma + v_resp_aux[6];   
+               
+               
          END LOOP;
          
          v_resp_final[1] = v_resp_mayor;
          v_resp_final[2] = v_resp_mayor_mt;
          v_resp_final[3] = v_resp_mayor_partida;
          v_resp_final[4] = v_resp_mayor_partida_mt;
+         
+         v_resp_final[5] = v_resp_mayor_ma;
+         v_resp_final[6] = v_resp_mayor_partida_ma;
         
          return v_resp_final;
          
      END IF;     
           
-     v_resp_final[1] = 0;
-     v_resp_final[2] = 0;
-     v_resp_final[3] = 0;
-     v_resp_final[4] = 0;     
+          
      
      return v_resp_final;
      

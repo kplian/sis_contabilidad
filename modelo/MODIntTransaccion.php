@@ -28,6 +28,8 @@ class MODIntTransaccion extends MODbase{
 		$this->capturaCount('total_haber_mb','numeric');
 		$this->capturaCount('total_debe_mt','numeric');
 		$this->capturaCount('total_haber_mt','numeric');
+		$this->capturaCount('total_debe_ma','numeric');
+		$this->capturaCount('total_haber_ma','numeric');
 		$this->capturaCount('total_gasto','numeric');
 		$this->capturaCount('total_recurso','numeric');
 		
@@ -60,6 +62,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('importe_haber','numeric');
 		$this->captura('importe_gasto','numeric');
 		$this->captura('importe_recurso','numeric');
+		
 		$this->captura('importe_debe_mb','numeric');	
 		$this->captura('importe_haber_mb','numeric');
 		$this->captura('importe_gasto_mb','numeric');
@@ -75,10 +78,19 @@ class MODIntTransaccion extends MODbase{
         $this->captura('importe_haber_mt','numeric');
         $this->captura('importe_gasto_mt','numeric');
         $this->captura('importe_recurso_mt','numeric');
+		
+		$this->captura('importe_debe_ma','numeric');	
+		$this->captura('importe_haber_ma','numeric');
+		$this->captura('importe_gasto_ma','numeric');
+		$this->captura('importe_recurso_ma','numeric');
+		
         $this->captura('id_moneda_tri','INTEGER');
+        $this->captura('id_moneda_act','INTEGER');
         $this->captura('id_moneda','INTEGER');
+		
         $this->captura('tipo_cambio','numeric');
         $this->captura('tipo_cambio_2','numeric');
+        $this->captura('tipo_cambio_3','numeric');
 		
 		$this->captura('actualizacion','varchar');
 		$this->captura('triangulacion','varchar');
@@ -117,19 +129,23 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('glosa','glosa','varchar');
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		
 		$this->setParametro('importe_debe','importe_debe','numeric');
 		$this->setParametro('importe_haber','importe_haber','numeric');
 		$this->setParametro('importe_gasto','importe_gasto','numeric');
 		$this->setParametro('importe_recurso','importe_recurso','numeric');
+		
 		$this->setParametro('importe_debe_mb','importe_debe','numeric');
 		$this->setParametro('importe_haber_mb','importe_haber','numeric');
 		$this->setParametro('importe_gasto_mb','importe_gasto','numeric');
 		$this->setParametro('importe_recurso_mb','importe_recurso','numeric');
 		
-		$this->setParametro('id_moneda_tri','id_moneda_tri','INTEGER');
+		$this->setParametro('id_moneda_tri','id_moneda_tri','INTEGER');		
+		$this->setParametro('id_moneda_act','id_moneda_act','INTEGER');
         $this->setParametro('id_moneda','id_moneda','INTEGER');
         $this->setParametro('tipo_cambio','tipo_cambio','numeric');
         $this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
+        $this->setParametro('tipo_cambio_3','tipo_cambio_3','numeric');
 		$this->setParametro('id_suborden','id_suborden','int4');
 		
 
@@ -159,19 +175,23 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('glosa','glosa','text');
 		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		
 		$this->setParametro('importe_debe','importe_debe','numeric');
 		$this->setParametro('importe_haber','importe_haber','numeric');
 		$this->setParametro('importe_gasto','importe_gasto','numeric');
 		$this->setParametro('importe_recurso','importe_recurso','numeric');
+		
 		$this->setParametro('importe_debe_mb','importe_debe','numeric');
 		$this->setParametro('importe_haber_mb','importe_haber','numeric');
 		$this->setParametro('importe_gasto_mb','importe_gasto','numeric');
 		$this->setParametro('importe_recurso_mb','importe_recurso','numeric');
 		
 		$this->setParametro('id_moneda_tri','id_moneda_tri','INTEGER');
+		$this->setParametro('id_moneda_act','id_moneda_act','INTEGER');
         $this->setParametro('id_moneda','id_moneda','INTEGER');
         $this->setParametro('tipo_cambio','tipo_cambio','numeric');
         $this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
+		$this->setParametro('tipo_cambio_3','tipo_cambio_3','numeric');
 		$this->setParametro('id_suborden','id_suborden','int4');
 		
 		
@@ -243,6 +263,9 @@ class MODIntTransaccion extends MODbase{
 		$this->capturaCount('total_haber','numeric');
 		$this->capturaCount('total_debe_mt','numeric');
 		$this->capturaCount('total_haber_mt','numeric');
+		$this->capturaCount('total_debe_ma','numeric');
+		$this->capturaCount('total_haber_ma','numeric');
+		
 		
 				
 		//Definicion de la lista del resultado del query
@@ -272,6 +295,11 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('importe_haber_mt','numeric');
 		$this->captura('importe_gasto_mt','numeric');
 		$this->captura('importe_recurso_mt','numeric');
+		
+		$this->captura('importe_debe_ma','numeric');	
+		$this->captura('importe_haber_ma','numeric');
+		$this->captura('importe_gasto_ma','numeric');
+		$this->captura('importe_recurso_ma','numeric');
 		
 		$this->captura('desc_partida','text');
 		$this->captura('desc_centro_costo','text');
@@ -317,6 +345,8 @@ class MODIntTransaccion extends MODbase{
 		$this->capturaCount('total_haber','numeric');
 		$this->capturaCount('total_debe_mt','numeric');
 		$this->capturaCount('total_haber_mt','numeric');
+		$this->capturaCount('total_debe_ma','numeric');
+		$this->capturaCount('total_haber_ma','numeric');
 			
 		//Definicion de la lista del resultado del query
 		$this->captura('id_orden_trabajo','int4');
@@ -324,6 +354,8 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('importe_haber_mb','numeric');
 		$this->captura('importe_debe_mt','numeric');	
 		$this->captura('importe_haber_mt','numeric');
+		$this->captura('importe_debe_ma','numeric');	
+		$this->captura('importe_haber_ma','numeric');
 		$this->captura('codigo_ot','varchar');
 		$this->captura('desc_orden','varchar');
 		
@@ -353,6 +385,8 @@ class MODIntTransaccion extends MODbase{
 		$this->capturaCount('total_haber','numeric');
 		$this->capturaCount('total_debe_mt','numeric');
 		$this->capturaCount('total_haber_mt','numeric');
+		$this->capturaCount('total_debe_ma','numeric');
+		$this->capturaCount('total_haber_ma','numeric');
 			
 		//Definicion de la lista del resultado del query
 		$this->captura('id_partida','int4');
@@ -360,15 +394,13 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('importe_haber_mb','numeric');
 		$this->captura('importe_debe_mt','numeric');	
 		$this->captura('importe_haber_mt','numeric');
+		$this->captura('importe_debe_ma','numeric');	
+		$this->captura('importe_haber_ma','numeric');
 		$this->captura('codigo_partida','varchar');
 		$this->captura('sw_movimiento','varchar');
 		$this->captura('descripcion_partida','varchar');
 		
 		
-		
-		
-		
-		 
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

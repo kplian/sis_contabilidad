@@ -68,8 +68,10 @@ BEGIN
              select
                cbt.id_moneda,
                cbt.id_moneda_tri,
+               cbt.id_moneda_act,
                cbt.tipo_cambio,
                cbt.tipo_cambio_2,
+               cbt.tipo_cambio_3,
                cbt.fecha
              into
                v_registros
@@ -88,7 +90,9 @@ BEGIN
             
             --si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
             -- para que no actulice automaricamente las transacciones si es modificada
-            IF  v_registros.tipo_cambio !=  v_parametros.tipo_cambio or v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 THEN
+            IF      v_registros.tipo_cambio !=  v_parametros.tipo_cambio 
+                 or v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 
+                 or v_registros.tipo_cambio_3 !=  v_parametros.tipo_cambio_3 THEN
               
               update conta.tint_comprobante set
                 sw_tipo_cambio = 'si'
@@ -133,8 +137,10 @@ BEGIN
                 id_orden_trabajo,
                 tipo_cambio,
                 tipo_cambio_2,
+                tipo_cambio_3,
                 id_moneda,
                 id_moneda_tri,
+                id_moneda_act,
                 id_suborden
                 
           	) values(
@@ -157,8 +163,10 @@ BEGIN
                 v_parametros.id_orden_trabajo,
                 v_parametros.tipo_cambio,
                 v_parametros.tipo_cambio_2,
+                v_parametros.tipo_cambio_3,
                 v_registros.id_moneda,
                 v_registros.id_moneda_tri,
+                v_registros.id_moneda_act,
                 v_parametros.id_suborden
 			)RETURNING id_int_transaccion into v_id_int_transaccion;
             
@@ -199,7 +207,9 @@ BEGIN
                cbt.tipo_cambio,
                cbt.fecha,
                cbt.id_moneda_tri,
+               cbt.id_moneda_act,
                cbt.tipo_cambio_2,
+               cbt.tipo_cambio_3,
                cbt.id_moneda
              into
                v_registros
@@ -208,7 +218,9 @@ BEGIN
              
             -- si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
             -- para que no actulice automaricamente las transacciones si es modificada
-            IF  v_registros.tipo_cambio !=  v_parametros.tipo_cambio or v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 THEN
+            IF      v_registros.tipo_cambio !=  v_parametros.tipo_cambio 
+                or  v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 
+                or  v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_3 THEN
               
               update conta.tint_comprobante set
                 sw_tipo_cambio = 'si'
@@ -274,6 +286,7 @@ BEGIN
               fecha_mod = now(),
               tipo_cambio = v_parametros.tipo_cambio,
               tipo_cambio_2 = v_parametros.tipo_cambio_2,
+              tipo_cambio_3 = v_parametros.tipo_cambio_3,
               importe_debe = v_parametros.importe_debe,
               importe_haber = v_parametros.importe_haber,
               importe_gasto = v_monto_gasto,
@@ -282,7 +295,7 @@ BEGIN
              
 			where id_int_transaccion = v_parametros.id_int_transaccion;
             
-            
+           
              -- calcular moneda base y triangulacion
             
             PERFORM  conta.f_calcular_monedas_transaccion(v_parametros.id_int_transaccion);

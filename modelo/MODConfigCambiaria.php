@@ -36,6 +36,7 @@ class MODConfigCambiaria extends MODbase{
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('ope_3','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -59,6 +60,8 @@ class MODConfigCambiaria extends MODbase{
 		$this->setParametro('ope_2','ope_2','varchar');
 		$this->setParametro('ope_1','ope_1','varchar');
 		$this->setParametro('obs','obs','varchar');
+		$this->setParametro('ope_3','ope_3','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -83,6 +86,8 @@ class MODConfigCambiaria extends MODbase{
 		$this->setParametro('ope_2','ope_2','varchar');
 		$this->setParametro('ope_1','ope_1','varchar');
 		$this->setParametro('obs','obs','varchar');
+		$this->setParametro('ope_3','ope_3','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

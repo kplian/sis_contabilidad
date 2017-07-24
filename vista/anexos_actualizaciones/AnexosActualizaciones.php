@@ -17,7 +17,7 @@ Phx.vista.AnexosActualizaciones=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.AnexosActualizaciones.superclass.constructor.call(this,config);
-        this.grid.addListener('cellclick', this.oncellclick,this);
+       // this.grid.addListener('cellclick', this.oncellclick,this);
         this.bloquearOrdenamientoGrid();
         this.cmbGestion.on('select', function(combo, record, index){
             this.tmpGestion = record.data.gestion;

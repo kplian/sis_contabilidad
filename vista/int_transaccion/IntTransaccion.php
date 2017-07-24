@@ -459,6 +459,55 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		},
 		
 		{
+			config: {
+				name: 'importe_debe_ma',
+				fieldLabel: 'Debe MA',
+				allowBlank: true,
+				width: 380,
+				gwidth: 100,
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_debe_ma', type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			form: false
+		},
+		{
+			config: {
+				name: 'importe_haber_ma',
+				fieldLabel: 'Haber MA',
+				allowBlank: true,
+				width: 380,
+				gwidth: 100,
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_haber_ma',type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			form: false
+		},
+		
+		{
 			config : {
 				name : 'tipo_cambio',
 				fieldLabel : 'TC 1',
@@ -491,6 +540,25 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			type : 'NumberField',
 			filters : {
 				pfiltro : 'incbte.tipo_cambio_2',
+				type : 'numeric'
+			},
+			id_grupo : 2,
+			grid : true,
+			form : true
+		}, {
+			config : {
+				name : 'tipo_cambio_3',
+				fieldLabel : 'TC 3',
+				allowBlank : false,
+				width: 380,
+				galign: 'right ',
+				gwidth : 70,
+				maxLength : 20,
+				decimalPrecision : 6
+			},
+			type : 'NumberField',
+			filters : {
+				pfiltro : 'incbte.tipo_cambio_3',
 				type : 'numeric'
 			},
 			id_grupo : 2,
@@ -633,7 +701,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg',
 		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque',
 		'importe_debe_mt',	'importe_haber_mt','importe_gasto_mt','importe_recurso_mt',
-		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2','codigo_categoria','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot'
+		'importe_debe_ma',	'importe_haber_ma','importe_gasto_ma','importe_recurso_ma',
+		'id_moneda_tri','id_moneda_act','id_moneda', 'tipo_cambio','tipo_cambio_2','tipo_cambio_3','codigo_categoria','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot'
 		
 	],
 	
@@ -709,13 +778,17 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	bsave: false,
 	loadValoresIniciales:function(){
 		Phx.vista.IntTransaccion.superclass.loadValoresIniciales.call(this);
-		this.Cmp.id_int_comprobante.setValue(this.maestro.id_int_comprobante);		
+
+		this.Cmp.id_int_comprobante.setValue(this.maestro.id_int_comprobante);	
+			
+
 	},
 	onReloadPage:function(m){
 		this.maestro=m;						
 		this.store.baseParams={id_int_comprobante:this.maestro.id_int_comprobante, id_moneda:this.maestro.id_moneda};
 		this.Cmp.id_centro_costo.store.baseParams.id_depto = this.maestro.id_depto;	
 		this.load({params:{start:0, limit:this.tam_pag}});
+		this.Cmp.id_centro_costo.store.baseParams.id_depto = this.maestro.id_depto;	
 		
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var fecha=new Date(this.maestro.fecha);
@@ -735,6 +808,15 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		 else{
 		 	this.mostrarColumnaByName('importe_debe_mb');
 		 	this.mostrarColumnaByName('importe_haber_mb');
+		 }
+		 
+		 if(this.maestro.id_moneda_act == this.maestro.id_moneda  ||this.maestro.id_moneda_act == this.maestro.id_moneda_tri){
+		 	this.ocultarColumnaByName('importe_debe_ma');
+		 	this.ocultarColumnaByName('importe_haber_ma');
+		 }
+		 else{
+		 	this.mostrarColumnaByName('importe_debe_ma');
+		 	this.mostrarColumnaByName('importe_haber_ma');
 		 }
 		 
 		 this.getConfigCambiaria();
@@ -874,9 +956,11 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 					} else {						
 						//cambia labels
 						this.labeTc1 = reg.ROOT.datos.v_tc1 +' (tc)';
-						this.labeTc2 = reg.ROOT.datos.v_tc2 +' (tc)';						
+						this.labeTc2 = reg.ROOT.datos.v_tc2 +' (tc)';
+						this.labeTc3 = reg.ROOT.datos.v_tc3 +' (tc)';						
 						this.setColumnHeader('tipo_cambio', this.labeTc1);
 		                this.setColumnHeader('tipo_cambio_2', this.labeTc2);
+		                this.setColumnHeader('tipo_cambio_3', this.labeTc3);
 					}
 				}, failure: function(a,b,c,d){
 					this.conexionFailure(a,b,c,d)
@@ -888,7 +972,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		
 		setLabelsTc: function(){
 			this.Cmp.tipo_cambio.label.update(this.labeTc1);
-			this.Cmp.tipo_cambio_2.label.update(this.labeTc2);						
+			this.Cmp.tipo_cambio_2.label.update(this.labeTc2);
+			this.Cmp.tipo_cambio_3.label.update(this.labeTc3);							
 		},
 		
 		onButtonEdit:function(){
@@ -906,6 +991,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
           this.setModificadoCombos()
           this.Cmp.tipo_cambio.setValue(this.maestro.tipo_cambio);
           this.Cmp.tipo_cambio_2.setValue(this.maestro.tipo_cambio_2);
+          this.Cmp.tipo_cambio_3.setValue(this.maestro.tipo_cambio_3);
           this.setLabelsTc();
           
        },

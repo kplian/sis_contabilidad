@@ -257,6 +257,25 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
+		{
+			config:{
+				name: 'nombre_func',
+				fieldLabel: 'Función',
+				qtip: 'Nombre de la función que ejecuta la lógica, si no tiene ninguna se ejecuta segun la configuración del detalle',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 100,
+				maxLength:1500
+			},
+			type:'TextArea',
+			filters: { pfiltro:'resplan.nombre_func', type:'string' },
+			id_grupo: 0,
+			grid: true,
+			form: true
+		},
+		
+		
+		
 		
 		{
 			config : {
@@ -475,7 +494,8 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
         'desc_clase_comprobante',
         'relacion_unica',
         'id_tipo_relacion_comprobante',
-        'desc_tipo_relacion_comprobante'
+        'desc_tipo_relacion_comprobante',
+        'nombre_func'
 		
 	],
 	sortInfo:{

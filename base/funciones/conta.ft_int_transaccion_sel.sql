@@ -100,10 +100,19 @@ BEGIN
                             transa.importe_haber_mt,
                             transa.importe_gasto_mt,
                             transa.importe_recurso_mt,
+                            
+                            transa.importe_debe_ma,	
+                            transa.importe_haber_ma,
+                            transa.importe_gasto_ma,
+                            transa.importe_recurso_ma,
+                            
+                            
                             transa.id_moneda_tri,
+                            transa.id_moneda_act,
                             transa.id_moneda,
                             transa.tipo_cambio,
                             transa.tipo_cambio_2,
+                            transa.tipo_cambio_3,
                             transa.actualizacion,
                             transa.triangulacion,
                             suo.id_suborden,
@@ -152,6 +161,8 @@ BEGIN
                           sum(transa.importe_haber_mb) as total_haber_mb,
                           sum(transa.importe_debe_mt) as total_debe_mt,
                           sum(transa.importe_haber_mt) as total_haber_mt,
+                          sum(transa.importe_debe_ma) as total_debe_ma,
+                          sum(transa.importe_haber_ma) as total_haber_ma,
                           sum(transa.importe_gasto) as total_gasto,
                           sum(transa.importe_recurso) as total_recurso
 					     from conta.tint_transaccion transa
@@ -305,6 +316,11 @@ BEGIN
                         COALESCE(transa.importe_haber_mt,0) as importe_haber_mt, 
                        	COALESCE(transa.importe_gasto_mt,0) as importe_gasto_mt,
 						COALESCE(transa.importe_recurso_mt,0) as importe_recurso_mt,
+                        
+                        COALESCE(transa.importe_debe_ma,0) as importe_debe_ma,
+                        COALESCE(transa.importe_haber_ma,0) as importe_haber_ma, 
+                       	COALESCE(transa.importe_gasto_ma,0) as importe_gasto_ma,
+						COALESCE(transa.importe_recurso_ma,0) as importe_recurso_ma,
 						
                         CASE par.sw_movimiento
                         	WHEN ''flujo'' THEN
@@ -474,7 +490,9 @@ BEGIN
                         sum(COALESCE(transa.importe_debe_mb,0)) as total_debe,
                         sum(COALESCE(transa.importe_haber_mb,0)) as total_haber,
                         sum(COALESCE(transa.importe_debe_mt,0)) as total_debe_mt,
-                        sum(COALESCE(transa.importe_haber_mt,0)) as total_haber_mt
+                        sum(COALESCE(transa.importe_haber_mt,0)) as total_haber_mt,
+                        sum(COALESCE(transa.importe_debe_ma,0)) as total_debe_ma,
+                        sum(COALESCE(transa.importe_haber_ma,0)) as total_haber_ma
                         
 					    from conta.tint_transaccion transa
                         inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
@@ -530,7 +548,9 @@ BEGIN
                             sum(importe_debe_mb) as importe_debe_mb,
                             sum(importe_haber_mb) as importe_haber_mb,
                             sum(importe_debe_mt) as importe_debe_mt,
-                            sum(importe_haber_mt) as importe_haber_mt,                            
+                            sum(importe_haber_mt) as importe_haber_mt, 
+                            sum(importe_debe_ma) as importe_debe_ma,
+                            sum(importe_haber_ma) as importe_haber_ma,                            
                             codigo_ot::varchar,
                             desc_orden::varchar
 
@@ -585,7 +605,9 @@ BEGIN
                                                       sum(importe_debe_mb) as importe_debe_mb,
                                                       sum(importe_haber_mb) as importe_haber_mb,
                                                       sum(importe_debe_mt) as importe_debe_mt,
-                                                      sum(importe_haber_mt) as importe_haber_mt
+                                                      sum(importe_haber_mt) as importe_haber_mt,
+                                                      sum(importe_debe_ma) as importe_debe_ma,
+                                                      sum(importe_haber_ma) as importe_haber_ma
                                                    FROM 
                                                       conta.vint_transaccion_analisis  v
                                                    where    '||v_parametros.id_tipo_cc::varchar||' =ANY(ids) and '||v_filtro|| ' and ';   
@@ -602,7 +624,9 @@ BEGIN
                                                    sum(importe_debe_mb) as importe_debe_mb,
                                                    sum(importe_haber_mb) as importe_haber_mb,
                                                    sum(importe_debe_mt) as importe_debe_mt,
-                                                   sum(importe_haber_mt) as importe_haber_mt
+                                                   sum(importe_haber_mt) as importe_haber_mt,
+                                                   sum(importe_debe_ma) as importe_debe_ma,
+                                                   sum(importe_haber_ma) as importe_haber_ma
                                             FROM parcial';                      
              
             raise notice '%',v_consulta;
@@ -638,7 +662,9 @@ BEGIN
                             sum(importe_debe_mb) as importe_debe_mb,
                             sum(importe_haber_mb) as importe_haber_mb,
                             sum(importe_debe_mt) as importe_debe_mt,
-                            sum(importe_haber_mt) as importe_haber_mt,                            
+                            sum(importe_haber_mt) as importe_haber_mt,
+                            sum(importe_debe_ma) as importe_debe_ma,
+                            sum(importe_haber_ma) as importe_haber_ma,                            
                             codigo_partida::varchar,
                             sw_movimiento::varchar,
                             descripcion_partida::varchar
@@ -663,6 +689,7 @@ BEGIN
 			--Definicion de la respuesta
 			
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            
             raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
@@ -695,7 +722,9 @@ BEGIN
                                                       sum(importe_debe_mb) as importe_debe_mb,
                                                       sum(importe_haber_mb) as importe_haber_mb,
                                                       sum(importe_debe_mt) as importe_debe_mt,
-                                                      sum(importe_haber_mt) as importe_haber_mt
+                                                      sum(importe_haber_mt) as importe_haber_mt,
+                                                      sum(importe_debe_ma) as importe_debe_ma,
+                                                      sum(importe_haber_ma) as importe_haber_ma
                                                    FROM 
                                                       conta.vint_transaccion_analisis  v
                                                    where    '||v_parametros.id_tipo_cc::varchar||' =ANY(ids) and '||v_filtro|| ' and ';   
@@ -713,7 +742,9 @@ BEGIN
                                                    sum(importe_debe_mb) as importe_debe_mb,
                                                    sum(importe_haber_mb) as importe_haber_mb,
                                                    sum(importe_debe_mt) as importe_debe_mt,
-                                                   sum(importe_haber_mt) as importe_haber_mt
+                                                   sum(importe_haber_mt) as importe_haber_mt,
+                                                   sum(importe_debe_ma) as importe_debe_ma,
+                                                   sum(importe_haber_ma) as importe_haber_ma
                                             FROM parcial';  
              
              

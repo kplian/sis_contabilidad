@@ -423,7 +423,42 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
        			id_grupo:0,
        			grid:true,
        			form:true
+       	},
+   	    {
+       			config:{
+       				name:'tipo_act',
+       				fieldLabel:'Tipo Actualización',
+       				qtip:'define si la cuenta realiza actualización AITB, y el origen, sistema de contabilidad o activos fijos',
+       				allowBlank:true,
+       				emptyText:'Roles...',
+       				store: new Ext.data.ArrayStore({
+                        fields: ['variable', 'valor'],
+                        data : [ ['no', 'No actualiza'],
+                                 ['conta', 'Sistema de Contabilidad'],
+                                 ['activos', 'Sistema de Activos FIjos'],
+                               ]
+                        }),
+       				valueField: 'variable',
+				    displayField: 'valor',
+       				forceSelection:true,
+       				typeAhead: true,
+           			triggerAction: 'all',
+           			lazyRender:true,
+       				mode:'local',
+       				pageSize:10,
+       				queryDelay:1000,
+       				width:250,
+       				minChars:2,
+	       			enableMultiSelect:true
+       			},
+       			type:'ComboBox',
+       			id_grupo:0,
+       			grid:true,
+       			form:true
        	}
+       	
+       	
+       	
    	      
 		
 		
@@ -452,7 +487,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'sw_transaccional', type: 'string'},
 		{name:'id_gestion', type: 'numeric'},'desc_moneda',
 		'valor_incremento','eeff','sw_control_efectivo',
-		'id_config_subtipo_cuenta','desc_csc'
+		'id_config_subtipo_cuenta','desc_csc','tipo_act'
 		
 	],
 	cmbGestion: new Ext.form.ComboBox({
