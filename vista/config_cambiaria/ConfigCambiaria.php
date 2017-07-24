@@ -22,7 +22,7 @@ Phx.vista.ConfigCambiaria=Ext.extend(Phx.gridInterfaz,{
 	},
 	
 	arrayStore :{
-                	'TODOS':['{M}->{MT}','{MB}->{MT}','{MT}->{MB}'],
+                	'TODOS':['{M}->{MT}','{MB}->{MT}','{MT}->{MB}','{MB}->{MA}'],
                 	'{M}->{MB}':['{M}->{MT}','{MB}->{MT}'],
                 	'{M}->{MT}':['{MT}->{MB}']
        },
@@ -81,7 +81,7 @@ Phx.vista.ConfigCambiaria=Ext.extend(Phx.gridInterfaz,{
             type:'ComboBox',
             id_grupo:1,
             filters:{type: 'list',
-                     pfiltro:'cnfc.habilitado',
+                     pfiltro:'cnfc.ope_1',
                      options: ['{M}->{MB}','{M}->{MT}']
                     },
             grid:true,
@@ -105,12 +105,39 @@ Phx.vista.ConfigCambiaria=Ext.extend(Phx.gridInterfaz,{
             type: 'ComboBox',
             id_grupo:1,
             filters: { type: 'list',
-                       pfiltro:'cnfc.habilitado',
+                       pfiltro:'cnfc.ope_2',
                        options: ['{M}->{MB}','{M}->{MT}']
                     },
             grid:true,
             form:true
        },
+       
+       {
+            config:{
+                name: 'ope_3',
+				qtip: 'La operación 3 aplica el tipo de cambio 3',
+				fieldLabel:'Ope 3',
+                allowBlank: false,
+                anchor: '80%',
+                emptyText:'operación 3...',                   
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['{M}->{MA}','{MB}->{MA}','{MT}->{MA}']
+            },
+            type: 'ComboBox',
+            id_grupo:1,
+            filters: { type: 'list',
+                       pfiltro:'cnfc.ope_3',
+                       options: ['{M}->{MA}','{MB}->{MA}','{MT}->{MA}']
+                    },
+            grid:true,
+            form:true
+       },
+       
+       
+       
        
        {
 			config:{
@@ -297,7 +324,7 @@ Phx.vista.ConfigCambiaria=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'ope_3'
 		
 	],
 	sortInfo:{

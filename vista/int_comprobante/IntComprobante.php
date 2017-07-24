@@ -634,9 +634,6 @@ header("content-type: text/javascript; charset=UTF-8");
 			grid : true,
 			form : true
 		}, 
-		
-		
-		
 		{
 			config : {
 				name : 'tipo_cambio_2',
@@ -656,7 +653,29 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 2,
 			grid : true,
 			form : true
-		}, {
+		}, 
+		{
+			config : {
+				name : 'tipo_cambio_3',
+				fieldLabel : '(TC)',
+				allowBlank : false,
+				readOnly : true,
+				anchor : '80%',
+				gwidth : 70,
+				maxLength : 20,
+				decimalPrecision : 6
+			},
+			type : 'NumberField',
+			filters : {
+				pfiltro : 'incbte.tipo_cambio_3',
+				type : 'numeric'
+			},
+			id_grupo : 2,
+			grid : true,
+			form : true
+		},
+		
+		{
 			config : {
 				name : 'nro_tramite',
 				gwidth : 150,
@@ -1168,8 +1187,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		}, 'momento_comprometido', 'momento_ejecutado', 'id_moneda_base','id_proceso_wf','id_estado_wf',
 		'cbte_cierre', 'cbte_apertura', 'cbte_aitb', 'momento_pagado', 'manual', 
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
-		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 
-		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 
+		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 'tipo_cambio_3', 'id_moneda_act',
+		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 'ope_3',
 		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio'],
 
 		rowExpander : new Ext.ux.grid.RowExpander({

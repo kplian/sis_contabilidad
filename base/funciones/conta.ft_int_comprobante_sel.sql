@@ -141,7 +141,12 @@ BEGIN
                               incbte.c31,
                               incbte.id_gestion,
                               incbte.periodo,
-                              incbte.forma_cambio
+                              incbte.forma_cambio,
+                              incbte.ope_3,
+                              incbte.tipo_cambio_3,
+                              incbte.id_moneda_act
+                              
+                              
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
@@ -603,7 +608,9 @@ BEGIN
                               incbte.fecha_costo_ini,
                               incbte.fecha_costo_fin,
                               incbte.tipo_cambio_2,
+                              incbte.tipo_cambio_3,
                               incbte.id_moneda_tri,
+                              incbte.id_moneda_act,
                               incbte.sw_tipo_cambio,
                               incbte.id_config_cambiaria,
                               incbte.ope_1,

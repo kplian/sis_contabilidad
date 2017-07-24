@@ -1285,8 +1285,22 @@ fheight: '80%',
 				grid:true,
 				form:true
 		},
-		
-		
+
+        {
+            config:{
+                name: 'multa_cuota',
+                fieldLabel: 'Multa Cuota',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:255
+            },
+            type:'TextField',
+
+            id_grupo:0,
+            grid:true,
+            form:true
+        },
 		{
 			config: {
 				name: 'id_cuenta_bancaria',
@@ -1733,7 +1747,7 @@ fheight: '80%',
 		  'numero_cuota',
             			'tramite_cuota','id_proceso_wf'	,'resolucion',
             			'tipo_monto','rotulo_comercial','estado_libro',
-            			'periodo_servicio','lista_negra','tipo_bancarizacion'
+            			'periodo_servicio','lista_negra','tipo_bancarizacion','multa_cuota'
 	],
 	sortInfo:{
 		field: 'id_banca_compra_venta',

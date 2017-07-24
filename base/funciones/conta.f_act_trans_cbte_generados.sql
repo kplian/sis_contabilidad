@@ -31,6 +31,7 @@ v_resp					varchar;
 
 v_id_moneda_base		integer;
 v_id_moneda_tri			integer;
+v_id_moneda_act			integer;
 v_registros_cbte		record;
 v_registros_config		record;
 v_registros				record;
@@ -39,6 +40,7 @@ v_tipo_cambio 			numeric;
 v_total_monto_pago		numeric;
 v_tipo_cambio_rel_1 	numeric;
 v_tipo_cambio_rel_2		numeric;
+v_tipo_cambio_rel_3		numeric;
 v_glosa_tran 			varchar;
 v_sw_tipo_cambio 		varchar;
 v_parcial 				numeric;
@@ -68,8 +70,10 @@ BEGIN
            po_id_config_cambiaria ,
            po_valor_tc1 ,
            po_valor_tc2 ,
+           po_valor_tc3 ,
            po_tc1 ,
-           po_tc2 
+           po_tc2 ,
+           po_tc3 
          into
           v_registros_config
          FROM conta.f_get_tipo_cambio_segu_config(v_registros_cbte.id_moneda, 
@@ -80,6 +84,7 @@ BEGIN
     
         v_id_moneda_base = param.f_get_moneda_base();
         v_id_moneda_tri  = param.f_get_moneda_triangulacion();
+        v_id_moneda_act  = param.f_get_moneda_actualizacion();
      
    
        v_tipo_cambio = v_registros_cbte.tipo_cambio;
@@ -97,11 +102,17 @@ BEGIN
          raise exception 'no tenemos tipo de cambio % para la fecha % en la estación %',v_registros_config.po_tc2 , v_registros_cbte.fecha, p_estacion;
        END IF;
        
+       IF  v_registros_config.po_valor_tc3 is NULL THEN
+         raise exception 'no tenemos tipo de cambio % para la fecha % en la estación %',v_registros_config.po_tc3 , v_registros_cbte.fecha, p_estacion;
+       END IF;
+       
        
        update conta.tint_comprobante cbt set
          tipo_cambio = v_tipo_cambio,
          tipo_cambio_2 = v_registros_config.po_valor_tc2,
+         tipo_cambio_3 = v_registros_config.po_valor_tc3,
          id_moneda_tri = v_id_moneda_tri,
+         id_moneda_act = v_id_moneda_act,
          id_config_cambiaria = v_registros_config.po_id_config_cambiaria
        where cbt.id_int_comprobante = p_id_int_comprobante;
       
@@ -129,6 +140,7 @@ BEGIN
          v_total_monto_pago = 0;
          v_tipo_cambio_rel_1 = 0;
          v_tipo_cambio_rel_2 = 0;
+         v_tipo_cambio_rel_3 = 0;
          v_glosa_tran = '';
         
          v_sw_tipo_cambio = 'no';                          
@@ -138,15 +150,17 @@ BEGIN
                   v_glosa_tran = 'TC: ';
                   FOR v_registros_rel in (
                                               select 
-                                                 it.tipo_cambio,
+                                                  it.tipo_cambio,
                                                   it.tipo_cambio_2,
+                                                  it.tipo_cambio_3,
                                                   r.monto_pago,
                                                   cb.id_int_comprobante,
                                                   cb.nro_cbte
                                              from conta.tint_rel_devengado r 
                                              inner join conta.tint_transaccion it on it.id_int_transaccion = r.id_int_transaccion_dev and it.estado_reg = 'activo'
                                              inner join conta.tint_comprobante cb on cb.id_int_comprobante = it.id_int_comprobante
-                                             where r.id_int_transaccion_pag = v_registros.id_int_transaccion and r.estado_reg = 'activo' ) LOOP
+                                             where      r.id_int_transaccion_pag = v_registros.id_int_transaccion 
+                                                    and r.estado_reg = 'activo' ) LOOP
                   
                   
                    
@@ -157,8 +171,13 @@ BEGIN
                    v_parcial = (v_registros_rel.monto_pago/v_total_monto_pago)*v_registros_rel.tipo_cambio_2;
                    v_tipo_cambio_rel_2 = v_tipo_cambio_rel_2 + v_parcial;	
                    
+                   
+                   v_parcial = (v_registros_rel.monto_pago/v_total_monto_pago)*v_registros_rel.tipo_cambio_3;
+                   v_tipo_cambio_rel_3 = v_tipo_cambio_rel_3 + v_parcial;
+                   
                    v_glosa_tran =  v_glosa_tran|| '('||v_registros_rel.nro_cbte||'  '||v_registros_config.po_tc1 ||':'||v_registros_rel.tipo_cambio::varchar;
-                   v_glosa_tran =  v_glosa_tran||' '||v_registros_config.po_tc2 ||':'||v_registros_rel.tipo_cambio::varchar||')';
+                   v_glosa_tran =  v_glosa_tran||' , '||v_registros_config.po_tc2 ||':'||v_registros_rel.tipo_cambio_2::varchar||', ';
+                   v_glosa_tran =  v_glosa_tran||' '||v_registros_config.po_tc3 ||':'||v_registros_rel.tipo_cambio_3::varchar||')';
                      
                   END  LOOP;
                 
@@ -170,6 +189,7 @@ BEGIN
                   -- si no toma los valores de tipos de la cabecera
                   v_tipo_cambio_rel_1 = v_tipo_cambio;
                   v_tipo_cambio_rel_2 = v_registros_config.po_valor_tc2;
+                  v_tipo_cambio_rel_3 = v_registros_config.po_valor_tc3;
                 
             
             END IF;
@@ -181,7 +201,9 @@ BEGIN
            update conta.tint_transaccion t set
              tipo_cambio =   v_tipo_cambio_rel_1,
              tipo_cambio_2 = v_tipo_cambio_rel_2,
+             tipo_cambio_3 = v_tipo_cambio_rel_3,
              id_moneda_tri = v_id_moneda_tri,
+             id_moneda_act = v_id_moneda_act,
              id_moneda =  v_registros_cbte.id_moneda::integer,
              glosa = trim(glosa ||' '||v_glosa_tran),
              importe_debe = COALESCE(importe_debe,0),

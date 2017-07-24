@@ -45,6 +45,7 @@ class MODCuenta extends MODbase{
         $this->captura('desc_moneda','varchar');
         $this->captura('gestion','int4');
 		$this->captura('sw_control_efectivo','varchar');
+		$this->captura('tipo_act','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -85,7 +86,7 @@ class MODCuenta extends MODbase{
 			 $this->captura('sw_control_efectivo','varchar');
 			 $this->captura('id_config_subtipo_cuenta','int4');
 			 $this->captura('desc_csc','varchar');
-			 
+			 $this->captura('tipo_act','varchar');
 			
 			 
 		     //Ejecuta la instruccion
@@ -116,6 +117,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
 		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
+		$this->setParametro('tipo_act','tipo_act','varchar');
 		
 		
 
@@ -149,6 +151,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
 		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
+		$this->setParametro('tipo_act','tipo_act','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

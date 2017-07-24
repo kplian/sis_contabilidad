@@ -404,7 +404,7 @@ BEGIN
             
             
          
-         --recuepra el centor de costo para el departamento
+         --recuepra el centro de costo para el departamento
          
           SELECT 
             ps_id_centro_costo 
@@ -414,114 +414,136 @@ BEGIN
                                                    v_id_gestion_cbte,  
                                                    v_parametros.id_depto,--p_id_depto_conta 
                                                    NULL);  --id_dento_costo
-         -- 4) listar trasaccion con destino comprobante 
+         
+         
+         
+         -- 4) si no tenemos un fucion para detemrinar la logica
+              -- listar trasaccion con destino comprobante 
             
+         IF v_registros_plantilla.nombre_func is null or v_registros_plantilla.nombre_func = '' THEN
+             
+             FOR v_registros in (
+                                    SELECT                                   
+                                        *
+                                    FROM temp_balancef 
+                                    where destino != 'reporte' and visible = 'si'
+                                        order by orden_cbte asc, codigo_cuenta asc
+                                        ) LOOP
+                  
+             
+              IF v_registros.monto != 0 THEN
+                        -- recupera partida si existe
+                        SELECT
+                         par.id_partida
+                        into 
+                         v_id_partida
+                        FROM pre.tpartida par 
+                        WHERE    par.id_gestion = v_id_gestion_cbte 
+                             and par.codigo = v_registros.codigo_partida;
+                        
+                         -- TODO recupera relacion contable
+                        
+                        
+                        -- si la gestion del comprobante y las de los datos es distinta, 
+                        --convertir las cuentas la gestion del comprobante
+                        IF v_id_gestion_cbte != v_id_gestion THEN
+                           select 
+                            ci.id_cuenta_dos
+                           into
+                            v_id_cuenta
+                           from conta.tcuenta_ids ci
+                           where ci.id_cuenta_uno = v_registros.id_cuenta;
+                        ELSE
+                          v_id_cuenta = v_registros.id_cuenta;
+                        END IF;
+                        
+                        -- define los monto
+                         IF v_registros.monto > 0 THEN
+                            if v_registros.destino = 'debe' then
+                               v_monto_debe = v_registros.monto;
+                               v_monto_haber = 0;
+                               v_monto_gasto = v_registros.monto_partida;
+                               v_monto_recurso = 0;
+                            else
+                               v_monto_debe = 0;
+                               v_monto_haber = v_registros.monto;
+                               v_monto_gasto = 0;
+                               v_monto_recurso = v_registros.monto_partida;
+                            end if;
+                         ELSE
+                             if v_registros.destino = 'haber' then
+                               v_monto_debe = v_registros.monto*(-1);
+                               v_monto_haber = 0;
+                               v_monto_gasto = v_registros.monto_partida*(-1);
+                               v_monto_recurso = 0;
+                            else
+                               v_monto_debe = 0;
+                               v_monto_haber = v_registros.monto*(-1);
+                               v_monto_gasto = 0;
+                               v_monto_recurso = v_registros.monto_partida*(-1);
+                            end if;
+                         
+                         END IF;
+                      -----------------------------
+                      --REGISTRO DE LA TRANSACCIÓN
+                      -----------------------------
+                      insert into conta.tint_transaccion(
+                          id_partida,
+                          id_centro_costo,
+                          estado_reg,
+                          id_cuenta,
+                          glosa,
+                          id_int_comprobante,
+                          id_auxiliar,
+                          importe_debe,
+                          importe_haber,
+                          importe_gasto,
+                          importe_recurso,
+                          importe_debe_mb,
+                          importe_haber_mb,
+                          importe_gasto_mb,
+                          importe_recurso_mb,
+                          id_usuario_reg,
+                          fecha_reg
+                      ) values(
+                          v_id_partida,
+                          v_id_centro_costo_depto,
+                          'activo',
+                          v_id_cuenta,
+                          v_registros.nombre_variable,  --glosa
+                          v_id_int_comprobante,
+                          v_registros.id_auxiliar,
+                          v_monto_debe,
+                          v_monto_haber,
+                          v_monto_gasto,
+                          v_monto_recurso,
+                          v_monto_debe,
+                          v_monto_haber,
+                          v_monto_gasto,
+                          v_monto_recurso,
+                          p_id_usuario,
+                          now()
+                      );
+                END IF;
+             END LOOP;
+      else
+         -- si tiene una funcion de logica la ejecutamos
          
-         FOR v_registros in (
-                                SELECT                                   
-                                    *
-                                FROM temp_balancef 
-                                where destino != 'reporte' and visible = 'si'
-                                    order by orden_cbte asc, codigo_cuenta asc
-                                    ) LOOP
-              
-         
-          IF v_registros.monto != 0 THEN
-                    -- recupera partida si existe
-                    SELECT
-                     par.id_partida
-                    into 
-                     v_id_partida
-                    FROM pre.tpartida par 
-                    WHERE    par.id_gestion = v_id_gestion_cbte 
-                         and par.codigo = v_registros.codigo_partida;
-                    
-                     -- TODO recupera relacion contable
+          EXECUTE ( 'select ' ||v_registros_plantilla.nombre_func  ||
+                    '('||p_id_usuario::varchar||',
+                    '||v_id_int_comprobante::varchar||',
+                    '||v_id_gestion_cbte::varchar||',
+                    '''|| v_desde::varchar||'''::Date, '''|| v_hasta::varchar||'''::Date,
+                    '|| v_str_id_deptos::varchar||')');
                     
                     
-                    -- si la gestion del comprobante y las de los datos es distinta, 
-                    --convertir las cuentas la gestion del comprobante
-                    IF v_id_gestion_cbte != v_id_gestion THEN
-                       select 
-                        ci.id_cuenta_dos
-                       into
-                        v_id_cuenta
-                       from conta.tcuenta_ids ci
-                       where ci.id_cuenta_uno = v_registros.id_cuenta;
-                    ELSE
-                      v_id_cuenta = v_registros.id_cuenta;
-                    END IF;
-                    
-                    -- define los monto
-                     IF v_registros.monto > 0 THEN
-                        if v_registros.destino = 'debe' then
-                           v_monto_debe = v_registros.monto;
-                           v_monto_haber = 0;
-                           v_monto_gasto = v_registros.monto_partida;
-                           v_monto_recurso = 0;
-                        else
-                           v_monto_debe = 0;
-                           v_monto_haber = v_registros.monto;
-                           v_monto_gasto = 0;
-                           v_monto_recurso = v_registros.monto_partida;
-                        end if;
-                     ELSE
-                         if v_registros.destino = 'haber' then
-                           v_monto_debe = v_registros.monto*(-1);
-                           v_monto_haber = 0;
-                           v_monto_gasto = v_registros.monto_partida*(-1);
-                           v_monto_recurso = 0;
-                        else
-                           v_monto_debe = 0;
-                           v_monto_haber = v_registros.monto*(-1);
-                           v_monto_gasto = 0;
-                           v_monto_recurso = v_registros.monto_partida*(-1);
-                        end if;
-                     
-                     END IF;
-                  -----------------------------
-                  --REGISTRO DE LA TRANSACCIÓN
-                  -----------------------------
-                  insert into conta.tint_transaccion(
-                      id_partida,
-                      id_centro_costo,
-                      estado_reg,
-                      id_cuenta,
-                      glosa,
-                      id_int_comprobante,
-                      id_auxiliar,
-                      importe_debe,
-                      importe_haber,
-                      importe_gasto,
-                      importe_recurso,
-                      importe_debe_mb,
-                      importe_haber_mb,
-                      importe_gasto_mb,
-                      importe_recurso_mb,
-                      id_usuario_reg,
-                      fecha_reg
-                  ) values(
-                      v_id_partida,
-                      v_id_centro_costo_depto,
-                      'activo',
-                      v_id_cuenta,
-                      v_registros.nombre_variable,  --glosa
-                      v_id_int_comprobante,
-                      v_registros.id_auxiliar,
-                      v_monto_debe,
-                      v_monto_haber,
-                      v_monto_gasto,
-                      v_monto_recurso,
-                      v_monto_debe,
-                      v_monto_haber,
-                      v_monto_gasto,
-                      v_monto_recurso,
-                      p_id_usuario,
-                      now()
-                  );
-            END IF;
-         END LOOP;
-         
+               
+             
+      
+    
+    
+      
+      END IF;   
          
       ----------------------------------------------------------------
       -- definir tipos de cambio 

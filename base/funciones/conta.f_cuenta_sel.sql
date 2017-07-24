@@ -72,31 +72,32 @@ BEGIN
         
     		--Sentencia de la consulta
 			v_consulta:='SELECT 
-                        cta.id_cuenta,
-                        cta.id_usuario_reg,
-                        cta.id_usuario_mod,
-                        cta.fecha_reg,
-                        cta.fecha_mod,
-                        cta.estado_reg,
-                       
-                        cta.id_empresa,
-                        cta.id_parametro,
-                        cta.id_cuenta_padre,
-                        cta.nro_cuenta,
-                        cta.id_gestion,
-                        cta.id_moneda,
-                        cta.nombre_cuenta,
-                        cta.desc_cuenta,
-                        cta.nivel_cuenta,
-                        cta.tipo_cuenta,
-                        cta.sw_transaccional,
-                        cta.sw_auxiliar,
-                        cta.tipo_cuenta_pat,
-                        usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        mon.codigo as desc_moneda,
-                        ges.gestion,
-                        cta.sw_control_efectivo
+                            cta.id_cuenta,
+                            cta.id_usuario_reg,
+                            cta.id_usuario_mod,
+                            cta.fecha_reg,
+                            cta.fecha_mod,
+                            cta.estado_reg,
+                           
+                            cta.id_empresa,
+                            cta.id_parametro,
+                            cta.id_cuenta_padre,
+                            cta.nro_cuenta,
+                            cta.id_gestion,
+                            cta.id_moneda,
+                            cta.nombre_cuenta,
+                            cta.desc_cuenta,
+                            cta.nivel_cuenta,
+                            cta.tipo_cuenta,
+                            cta.sw_transaccional,
+                            cta.sw_auxiliar,
+                            cta.tipo_cuenta_pat,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            mon.codigo as desc_moneda,
+                            ges.gestion,
+                            cta.sw_control_efectivo,
+                            cta.tipo_act
                         from conta.tcuenta cta
 						inner join segu.tusuario usu1 on usu1.id_usuario = cta.id_usuario_reg
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
@@ -132,32 +133,33 @@ BEGIN
        
             --Sentencia de la consulta
             v_consulta:='select
-                        cta.id_cuenta,
-                        cta.id_cuenta_padre,
-                        cta.nombre_cuenta,
-                          case
-                          when (cta.id_cuenta_padre is null )then
-                               ''raiz''::varchar
-                          
-                          when (cta.sw_transaccional=''titular'' )then
-                               ''hijo''::varchar
-                          when (cta.sw_transaccional=''movimiento'' )then
-                               ''hoja''::varchar
-                          END as tipo_nodo,
-                        cta.nro_cuenta,
-                        cta.desc_cuenta,
-                        cta.id_moneda,
-                        mon.codigo as desc_moneda,
-                        cta.tipo_cuenta,
-                        cta.sw_auxiliar,
-                        cta.tipo_cuenta_pat,
-                        cta.sw_transaccional,
-                        cta.id_gestion,
-                        cta.valor_incremento,
-                        array_to_string( cta.eeff, '','',''null'')::varchar	 as eeff     ,
-                        cta.sw_control_efectivo,
-                        csc.id_config_subtipo_cuenta,
-                        csc.nombre as desc_csc               
+                            cta.id_cuenta,
+                            cta.id_cuenta_padre,
+                            cta.nombre_cuenta,
+                              case
+                              when (cta.id_cuenta_padre is null )then
+                                   ''raiz''::varchar
+                              
+                              when (cta.sw_transaccional=''titular'' )then
+                                   ''hijo''::varchar
+                              when (cta.sw_transaccional=''movimiento'' )then
+                                   ''hoja''::varchar
+                              END as tipo_nodo,
+                            cta.nro_cuenta,
+                            cta.desc_cuenta,
+                            cta.id_moneda,
+                            mon.codigo as desc_moneda,
+                            cta.tipo_cuenta,
+                            cta.sw_auxiliar,
+                            cta.tipo_cuenta_pat,
+                            cta.sw_transaccional,
+                            cta.id_gestion,
+                            cta.valor_incremento,
+                            array_to_string( cta.eeff, '','',''null'')::varchar	 as eeff     ,
+                            cta.sw_control_efectivo,
+                            csc.id_config_subtipo_cuenta,
+                            csc.nombre as desc_csc,
+                            cta.tipo_act               
                         from conta.tcuenta cta
                         left join param.tmoneda mon on mon.id_moneda = cta.id_moneda
                         left join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cta.id_config_subtipo_cuenta
