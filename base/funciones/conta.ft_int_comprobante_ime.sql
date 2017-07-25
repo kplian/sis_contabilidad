@@ -49,6 +49,7 @@ DECLARE
     v_id_moneda_tri					integer;
     v_tc_1							numeric;
     v_tc_2							numeric;
+    v_tc_3 							numeric;
     v_id_int_comprobante_bk			integer;
     v_ges_1							record;
     v_ges_2							record;
@@ -89,6 +90,7 @@ DECLARE
     v_clcbt_desc					varchar;
     v_id_partida_ejecucion			integer;
     va_id_int_comprobante_fks		integer[];
+    v_id_moneda_act					integer;
    
    
 			    
@@ -132,9 +134,10 @@ BEGIN
             
             
             v_id_moneda_tri  = param.f_get_moneda_triangulacion();
+            v_id_moneda_act  = param.f_get_moneda_actualizacion();
             
             --validacion de tipos de cambios
-            IF v_parametros.tipo_cambio is NULL or  v_parametros.tipo_cambio_2 is NULL THEN
+            IF v_parametros.tipo_cambio is NULL or  v_parametros.tipo_cambio_2 is NULL or  v_parametros.tipo_cambio_3 is NULL THEN
               raise exception 'no se definieron los tipos de cambio';
             END IF;
             
@@ -318,7 +321,9 @@ BEGIN
                 nro_tramite,
                 id_proceso_wf,
                 id_estado_wf,
-                forma_cambio
+                forma_cambio,
+                id_moneda_act,
+                tipo_cambio_3
           	) values(
                 v_parametros.id_clase_comprobante,  			
                 v_id_subsistema,
@@ -360,7 +365,9 @@ BEGIN
                 v_num_tramite,
                 v_id_proceso_wf,
                 v_id_estado_wf,
-                v_parametros.forma_cambio
+                v_parametros.forma_cambio,
+                v_id_moneda_act,
+                v_parametros.tipo_cambio_3
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
@@ -497,17 +504,24 @@ BEGIN
             
               v_tc_1 = v_reg_cbte.tipo_cambio;
               v_tc_2 = v_reg_cbte.tipo_cambio_2;
+              v_tc_3 = v_reg_cbte.tipo_cambio_3;
+              
+              
             
             ELSE
             
-              IF v_parametros.tipo_cambio is  NULL or v_parametros.tipo_cambio_2 is  NULL  THEN
+              IF v_parametros.tipo_cambio is  NULL or v_parametros.tipo_cambio_2 is  NULL  or v_parametros.tipo_cambio_3 is  NULL THEN
                 raise exception 'No se definieron los tipos de cambio para cbte';
               END IF;
               
               v_tc_1 = v_parametros.tipo_cambio;
               v_tc_2 = v_parametros.tipo_cambio_2;
+              v_tc_3 = v_parametros.tipo_cambio_3;
+              
             
             END IF;
+            
+           
             
 			------------------------------
 			--Sentencia de la modificacion
@@ -544,17 +558,22 @@ BEGIN
                 fecha_costo_ini = v_parametros.fecha_costo_ini,
                 fecha_costo_fin = v_parametros.fecha_costo_fin,
                 tipo_cambio_2 = v_tc_2,
+                tipo_cambio_3 = v_tc_3,
                 forma_cambio = v_parametros.forma_cambio
 			where id_int_comprobante = v_parametros.id_int_comprobante;
             
             
-            
+          
             
             -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones 
-            IF v_parametros.tipo_cambio != v_reg_cbte.tipo_cambio or v_parametros.tipo_cambio_2 != v_reg_cbte.tipo_cambio_2 THEN
+            IF    v_parametros.tipo_cambio != v_reg_cbte.tipo_cambio 
+               or v_parametros.tipo_cambio_2 != v_reg_cbte.tipo_cambio_2 
+               or v_parametros.tipo_cambio_3 != v_reg_cbte.tipo_cambio_3 THEN
+               
               IF  not conta.f_int_trans_recalcular_tc(v_parametros.id_int_comprobante) THEN
                 raise exception 'Error al reprocesar el tipo de cambio';
               END IF;
+              
             END IF;
             
             -- procesar las trasaaciones (con diversos propositos, ejm validar  cuentas bancarias)
@@ -876,7 +895,9 @@ BEGIN
                 cbte_reversion,
                 id_proceso_wf,
                 id_estado_wf,
-                forma_cambio
+                forma_cambio,
+                tipo_cambio_3,
+                id_moneda_act
           	) values(
               v_reg_cbte.id_clase_comprobante,  			
               v_reg_cbte.id_subsistema,
@@ -921,7 +942,9 @@ BEGIN
 			  'si', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
               v_id_estado_wf,
-              v_reg_cbte.forma_cambio		
+              v_reg_cbte.forma_cambio,
+              v_reg_cbte.tipo_cambio_3,
+              v_reg_cbte.id_moneda_act		
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
            update wf.tproceso_wf p set
@@ -969,9 +992,10 @@ BEGIN
                         id_orden_trabajo,
                         tipo_cambio,
                         tipo_cambio_2,
+                        tipo_cambio_3,
                         id_moneda,
                         id_moneda_tri,
-                        
+                        id_moneda_act,
                         importe_debe_mb,
                         importe_haber_mb,
                         importe_recurso_mb,
@@ -1008,9 +1032,10 @@ BEGIN
                         v_registros.id_orden_trabajo,
                         v_registros.tipo_cambio,
                         v_registros.tipo_cambio_2,
+                        v_registros.tipo_cambio_3,
                         v_registros.id_moneda,
                         v_registros.id_moneda_tri,
-                        
+                        v_registros.id_moneda_act,
                         v_registros.importe_haber_mb,--  insercion volcada de estos registros
                         v_registros.importe_debe_mb,
                         v_registros.importe_gasto_mb,--  insercion volcada de estos registros
@@ -1613,8 +1638,10 @@ BEGIN
                 fecha_costo_fin,
                 id_config_cambiaria,
                 tipo_cambio_2,
+                tipo_cambio_3,
                 localidad,
                 id_moneda_tri,
+                id_moneda_act,
                 nro_tramite,
                 sw_editable,
                 sw_tipo_cambio,
@@ -1658,8 +1685,10 @@ BEGIN
               v_reg_cbte.fecha_costo_fin,
               v_reg_cbte.id_config_cambiaria,
               v_reg_cbte.tipo_cambio_2,
+              v_reg_cbte.tipo_cambio_3,
               v_reg_cbte.localidad,
               v_reg_cbte.id_moneda_tri,
+              v_reg_cbte.id_moneda_act,
               v_num_tramite,
               'si',  -- sw_editable 
               'no', -- sw_tipo_cambio   
@@ -1709,9 +1738,10 @@ BEGIN
                         id_orden_trabajo,
                         tipo_cambio,
                         tipo_cambio_2,
+                        tipo_cambio_3,
                         id_moneda,
                         id_moneda_tri,
-                        
+                        id_moneda_act,
                         importe_debe_mb,
                         importe_haber_mb,
                         importe_recurso_mb,
@@ -1748,8 +1778,10 @@ BEGIN
                         v_registros.id_orden_trabajo,
                         v_registros.tipo_cambio,
                         v_registros.tipo_cambio_2,
+                        v_registros.tipo_cambio_3,
                         v_registros.id_moneda,
                         v_registros.id_moneda_tri,
+                        v_registros.id_moneda_act,
                         v_registros.importe_debe_mb,
                         v_registros.importe_haber_mb,  
                         v_registros.importe_recurso_mb,   

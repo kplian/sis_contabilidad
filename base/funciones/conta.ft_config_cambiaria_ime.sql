@@ -77,7 +77,8 @@ BEGIN
               usuario_ai,
               id_usuario_ai,
               fecha_mod,
-              id_usuario_mod
+              id_usuario_mod,
+              ope_3
           	) values(
               now(),
               v_parametros.origen,
@@ -91,7 +92,8 @@ BEGIN
               v_parametros._nombre_usuario_ai,
               v_parametros._id_usuario_ai,
               null,
-              null
+              null,
+              v_parametros.ope_3
 							
 			
 			
@@ -131,6 +133,7 @@ BEGIN
               habilitado = v_parametros.habilitado,
               ope_2 = v_parametros.ope_2,
               ope_1 = v_parametros.ope_1,
+              ope_3 = v_parametros.ope_3,
               obs = v_parametros.obs,
               fecha_mod = now(),
               id_usuario_mod = p_id_usuario,
@@ -203,8 +206,10 @@ BEGIN
                po_id_config_cambiaria ,
                po_valor_tc1 ,
                po_valor_tc2 ,
+               po_valor_tc3 ,
                po_tc1 ,
-               po_tc2 
+               po_tc2  ,
+               po_tc3
              into
               v_registros_cc
              FROM conta.f_get_tipo_cambio_segu_config(v_parametros.id_moneda, v_parametros.fecha,v_parametros.localidad,v_parametros.sw_valores, v_forma_cambio);
@@ -214,8 +219,10 @@ BEGIN
             v_resp = pxp.f_agrega_clave(v_resp,'id_config_cambiaria',v_registros_cc.po_id_config_cambiaria::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'v_valor_tc1',v_registros_cc.po_valor_tc1::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'v_valor_tc2',v_registros_cc.po_valor_tc2::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_valor_tc3',v_registros_cc.po_valor_tc3::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'v_tc1',v_registros_cc.po_tc1::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'v_tc2',v_registros_cc.po_tc2::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_tc3',v_registros_cc.po_tc3::varchar);
               
             --Devuelve la respuesta
             return v_resp;

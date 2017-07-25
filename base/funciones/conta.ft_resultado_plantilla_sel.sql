@@ -71,7 +71,8 @@ BEGIN
                             cc.descripcion as desc_clase_comprobante,
                             resplan.id_tipo_relacion_comprobante,
                             resplan.relacion_unica,
-                            resplan.nombre as desc_tipo_relacion_comprobante
+                            resplan.nombre as desc_tipo_relacion_comprobante,
+                            resplan.nombre_func
 						
                         from conta.tresultado_plantilla resplan
                         inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
@@ -153,7 +154,8 @@ BEGIN
                             cc.codigo as codigo_clase_comprobante,
                             resplan.id_tipo_relacion_comprobante,
                             resplan.relacion_unica,
-                            resplan.codigo as codigo_tipo_relacion_comprobante
+                            resplan.codigo as codigo_tipo_relacion_comprobante,
+                            resplan.nombre_func
                       from conta.tresultado_plantilla resplan
                       inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg
                       left join conta.ttipo_relacion_comprobante trc on trc.id_tipo_relacion_comprobante = resplan.id_tipo_relacion_comprobante

@@ -68,7 +68,9 @@ class ACTIntTransaccion extends ACTbase{
 			$temp['importe_debe_mb'] = $this->res->extraData['total_debe_mb'];
 			$temp['importe_haber_mb'] = $this->res->extraData['total_haber_mb'];
 			$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
-			$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
+			$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];			
+			$temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
+			$temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
 			$temp['importe_gasto'] = $this->res->extraData['total_gasto'];
 			$temp['importe_recurso'] = $this->res->extraData['total_recurso'];
 			$temp['glosa'] = 'Sumas iguales';
@@ -176,7 +178,9 @@ class ACTIntTransaccion extends ACTbase{
 		$temp['importe_debe_mb'] = $this->res->extraData['total_debe'];
 		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
 		$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
-		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
+		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];		
+		$temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
+		$temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_int_transaccion'] = 0;
 		
@@ -215,6 +219,8 @@ class ACTIntTransaccion extends ACTbase{
 		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
 		$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
 		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
+		$temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
+		$temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_orden_trabajo'] = -1;
 		
@@ -243,6 +249,9 @@ class ACTIntTransaccion extends ACTbase{
 		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
 		$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
 		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
+		$temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
+		$temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
+		$temp['tipo_reg'] = 'summary';
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_partida'] = -1;
 		

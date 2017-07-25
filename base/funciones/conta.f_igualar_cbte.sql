@@ -17,9 +17,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:	  SE agregan las moneda de actualizacion
+ AUTOR:			  RAC KPLIAN
+ FECHA:		      13/07/2017
 ***************************************************************************/
 
 DECLARE
@@ -71,6 +71,15 @@ DECLARE
      v_monto_recurso_mb				numeric;
      v_monto_gasto					numeric;
      v_monto_recurso				numeric;
+     
+     v_monto_debe_ma				numeric;
+     v_monto_haber_ma				numeric;
+     v_monto_gasto_ma				numeric;
+     v_monto_recurso_ma				numeric;
+     
+     v_id_moneda_base						integer;
+     v_id_moneda_tri						integer;
+     v_id_moneda_act						integer;
 
  
 
@@ -98,6 +107,12 @@ BEGIN
                 raise exception 'Solo puede igualar cbtes en borrador';
               END IF;
             END IF;  
+            
+            v_id_moneda_base = param.f_get_moneda_base();
+            v_id_moneda_tri  = param.f_get_moneda_triangulacion();
+            v_id_moneda_act  = param.f_get_moneda_actualizacion();
+            
+            
                 -- sumar las transacciones en todas las monedas
              select 
                    sum(tra.importe_debe), 
@@ -322,8 +337,9 @@ BEGIN
                                                                        v_registros.id_depto, 
                                                                        NULL);  --id_dento_costo 
                                  
-                                
-                                
+                               
+                             
+                                                  
                                 -- insertar transaccion para igual moneda de transaccion
                                  
                                 insert into conta.tint_transaccion(
@@ -343,8 +359,10 @@ BEGIN
                                     fecha_reg,
                                     tipo_cambio,
                                     tipo_cambio_2,
+                                    tipo_cambio_3,
                                     id_moneda,
-                                    id_moneda_tri
+                                    id_moneda_tri,
+                                    id_moneda_act
                                     
                                 ) values(
                                     v_registros_rel.ps_id_partida,
@@ -364,8 +382,10 @@ BEGIN
                                     now(),
                                     v_registros.tipo_cambio,
                                     v_registros.tipo_cambio_2,
+                                    v_registros.tipo_cambio_3,
                                     v_registros.id_moneda,
-                                    v_registros.id_moneda_tri
+                                    v_registros.id_moneda_tri,
+                                    v_registros.id_moneda_act
                                 )RETURNING id_int_transaccion into v_id_int_transaccion;
                                 
                                   -- calcular moneda base y triangulacion
@@ -428,7 +448,16 @@ BEGIN
                                                              v_registros.id_gestion,  
                                                              v_registros.id_depto, 
                                                              NULL);  --id_dento_costo 
-           
+                                                             
+                                                             
+                                                             
+            --calculamos moenda de AITB
+            
+            v_monto_debe_ma =   param.f_convertir_moneda (v_id_moneda_base, v_id_moneda_act,   v_monto_debe_mb,  v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_3, 'no');
+            v_monto_haber_ma =  param.f_convertir_moneda (v_id_moneda_base, v_id_moneda_act,    v_monto_haber_mb, v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_3, 'no');
+            v_monto_gasto_ma =   param.f_convertir_moneda (v_id_moneda_base, v_id_moneda_act,    v_monto_gasto_mb,  v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_3, 'no');
+            v_monto_recurso_ma =  param.f_convertir_moneda (v_id_moneda_base, v_id_moneda_act,    v_monto_recurso_mb, v_registros.fecha, 'CUS',50, v_registros.tipo_cambio_3, 'no');
+         
             
              
    
@@ -457,12 +486,21 @@ BEGIN
                         importe_gasto_mt,
                         importe_recurso_mt,
                         
+                        
+                        importe_debe_ma,
+                        importe_haber_ma,
+                        importe_gasto_ma,
+                        importe_recurso_ma,
+                        
+                        
                         id_usuario_reg,
                         fecha_reg,
                         tipo_cambio,
                         tipo_cambio_2,
+                        tipo_cambio_3,
                         id_moneda,
                         id_moneda_tri,
+                        id_moneda_act,
                         actualizacion
                         
                     ) values(
@@ -489,13 +527,21 @@ BEGIN
                         v_monto_haber_mt,
                         v_monto_gasto_mt,
                         v_monto_recurso_mt,
+                        
+                        
+                        v_monto_debe_ma,
+                        v_monto_haber_ma,
+                        v_monto_gasto_ma,
+                        v_monto_recurso_ma,
                        
                         p_id_usuario,
                         now(),
                         0,
-                        0,
+                        0,  --tipo de cambio 2
+                        v_registros.tipo_cambio_3,  --tipo de cambio 3
                         v_registros.id_moneda,
                         v_registros.id_moneda_tri,
+                        v_registros.id_moneda_act,
                         'si' --actulizacion
                     )RETURNING id_int_transaccion into v_id_int_transaccion;   
             

@@ -581,7 +581,7 @@ BEGIN
 
       -- 13/01/2017
       --TODO RAC, me parece buena idea  que al cerrar el periodo revise que no existan documentos pendientes  antes de cerrar
-      -- valida que period de libro de compras y ventas este abierto
+      -- valida que period de libro de compras y ventas este abierto para la nueva fecha
       IF v_tipo_informe = 'lcv' THEN
 	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
 	  END IF;
@@ -599,11 +599,17 @@ BEGIN
         dcv.revisado,
         dcv.id_int_comprobante,
         dcv.id_origen,
-        dcv.tabla_origen
+        dcv.tabla_origen,
+        dcv.fecha
       into
         v_registros
       from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
 
+	  v_rec = param.f_get_periodo_gestion(v_registros.fecha);
+	  -- valida que period de libro de compras y ventas este abierto para la antigua fecha
+      IF v_tipo_informe = 'lcv' THEN
+	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
       IF  v_registros.revisado = 'si' THEN
         IF v_estado_rendicion NOT IN ('vbrendicion','revision') or v_estado_rendicion IS NULL THEN
@@ -746,7 +752,7 @@ BEGIN
 
       -- 13/01/2017
       --TODO RAC, me parece buena idea  que al cerrar el periodo revise que no existan documentos pendientes  antes de cerrar
-      -- valida que period de libro de compras y ventas este abierto
+      -- valida que period de libro de compras y ventas este abierto para la nueva fecha
 
       select tipo_informe into v_tipo_informe
       from param.tplantilla
@@ -769,7 +775,8 @@ BEGIN
         dcv.revisado,
         dcv.id_int_comprobante,
         dcv.id_origen,
-        dcv.tabla_origen
+        dcv.tabla_origen,
+        dcv.fecha
       into
         v_registros
       from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
@@ -779,6 +786,12 @@ BEGIN
           raise exception 'los documentos revisados no pueden modificarse';
         END IF;
       END IF;
+
+      v_rec = param.f_get_periodo_gestion(v_registros.fecha);
+	  -- valida que period de libro de compras y ventas este abierto para la antigua fecha
+      IF v_tipo_informe = 'lcv' THEN
+	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+	  END IF;
 
       IF v_parametros.tipo = 'compra' THEN
         -- chequear si el proveedor esta registrado
