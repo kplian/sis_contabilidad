@@ -598,11 +598,11 @@ AS
 
 /***********************************I-DEP-RAC-CONTA-0-11/12/2014*****************************************/
 --------------- SQL ---------------
-
+/*  RAC 14/07/"017 este triguer esta en desuso
 CREATE TRIGGER f_trig_insert_int_trans_val
   AFTER INSERT OR UPDATE 
   ON conta.tint_transaccion FOR EACH ROW 
-  EXECUTE PROCEDURE conta.f_insert_int_trans_val();
+  EXECUTE PROCEDURE conta.f_insert_int_trans_val();*/
 
 
 CREATE TRIGGER f_trig_insert_trans_val
@@ -3847,5 +3847,85 @@ AS
        LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida;
 /**********************************F-DEP-RAC-CONTA-0-04/07/2017****************************************/
 
+
+
+/**********************************I-DEP-RAC-CONTA-0-19/07/2017****************************************/
+
+
+
+--------------- SQL ---------------
+
+CREATE OR REPLACE VIEW conta.vint_transaccion_analisis(
+    importe_debe_mb,
+    importe_haber_mb,
+    importe_debe_mt,
+    importe_haber_mt,
+    id_orden_trabajo,
+    codigo_ot,
+    desc_orden,
+    id_tipo_cc,
+    ids,
+    id_int_comprobante,
+    codigo_partida,
+    id_int_transaccion,
+    id_cuenta,
+    id_auxiliar,
+    fecha,
+    id_periodo,
+    sw_movimiento,
+    descripcion_partida,
+    id_partida)
+AS
+  SELECT "int".importe_debe_mb,
+         "int".importe_haber_mb,
+         "int".importe_debe_mt,
+         "int".importe_haber_mt,
+         COALESCE(ot.id_orden_trabajo, 0) AS id_orden_trabajo,
+         COALESCE(ot.codigo, 'S/O'::character varying) AS codigo_ot,
+         COALESCE(ot.desc_orden, 'No tiene una orden asignada'::character
+           varying) AS desc_orden,
+         tcc.id_tipo_cc,
+         tcc.ids,
+         cbt.id_int_comprobante,
+         par.codigo AS codigo_partida,
+         "int".id_int_transaccion,
+         "int".id_cuenta,
+         "int".id_auxiliar,
+         cbt.fecha,
+         cbt.id_periodo,
+         par.sw_movimiento,
+         par.nombre_partida AS descripcion_partida,
+         par.id_partida
+  FROM conta.tint_transaccion "int"
+       JOIN conta.tint_comprobante cbt ON cbt.id_int_comprobante =
+         "int".id_int_comprobante
+       JOIN param.tcentro_costo cc ON cc.id_centro_costo = "int".id_centro_costo
+       JOIN param.vtipo_cc_raiz tcc ON tcc.id_tipo_cc = cc.id_tipo_cc
+       LEFT JOIN conta.torden_trabajo ot ON "int".id_orden_trabajo =
+         ot.id_orden_trabajo
+       LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida
+ WHERE cbt.estado_reg = 'validado';
+
+
+
+/**********************************F-DEP-RAC-CONTA-0-19/07/2017****************************************/
+
+
+
+/**********************************I-DEP-RAC-CONTA-0-21/07/2017****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta_auxiliar
+  ADD CONSTRAINT tcuenta_auxiliar_fk FOREIGN KEY (id_auxiliar)
+    REFERENCES conta.tauxiliar(id_auxiliar)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+/**********************************F-DEP-RAC-CONTA-0-21/07/2017****************************************/
 
 
