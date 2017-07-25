@@ -148,7 +148,9 @@ BEGIN
 			select count(taux.id_auxiliar)
             INTO v_contador
             from conta.tauxiliar taux
-            where taux.codigo_auxiliar % trim(both ' ' from v_parametros.codigo_auxiliar) AND taux.nombre_auxiliar = trim(both ' ' from v_parametros.nombre_auxiliar) ;
+            where    taux.codigo_auxiliar = trim(both ' ' from v_parametros.codigo_auxiliar) 
+            
+                 AND taux.nombre_auxiliar = trim(both ' ' from v_parametros.nombre_auxiliar) ;
 
             IF(v_contador>=1)THEN
         		v_valid = 'true';

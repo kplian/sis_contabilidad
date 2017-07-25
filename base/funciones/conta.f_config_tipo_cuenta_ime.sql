@@ -76,7 +76,7 @@ BEGIN
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Config. Tipo Cuenta almacenado(a) con exito (id_cofig_tipo_cuenta'||v_id_cofig_tipo_cuenta||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_config_tipo_cuenta',v_id_cnofig_tipo_cuenta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_config_tipo_cuenta',v_id_config_tipo_cuenta::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -106,7 +106,7 @@ BEGIN
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Config. Tipo Cuenta modificado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_cofig_tipo_cuenta',v_parametros.id_cofig_tipo_cuenta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_cofig_tipo_cuenta',v_parametros.id_config_tipo_cuenta::varchar);
                
             --Devuelve la respuesta
             return v_resp;
