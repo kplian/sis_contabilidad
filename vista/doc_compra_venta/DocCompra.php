@@ -14,7 +14,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.DocCompra = {
     
 	require: '../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVenta.php',
-    ActList:'../../sis_contabilidad/control/DocCompraVenta/listarDocCompraCajero',
+    ActList:'../../sis_contabilidad/control/DocCompraVenta/listarDocCompraVenta',
 	requireclase: 'Phx.vista.DocCompraVenta',
 	title: 'Libro de Compras',
 	nombreVista: 'DocCompra',

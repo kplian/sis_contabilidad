@@ -1,7 +1,14 @@
+CREATE OR REPLACE FUNCTION conta.f_revisa_periodo_compra_venta (
+  p_id_usuario integer,
+  p_id_depto_conta integer,
+  p_id_periodo integer
+)
+RETURNS boolean AS
+$body$
 /*
 	Autor: Rensi Arteaga Copari (KPLIAN)
     Fecha: 25/08/2015
-    Descripción: Revisa si el periodo del libro de compra ventas  se encuentra abierto y si el usuario tiene permido para
+    Descripción: Revisa si el periodo del libro de compra ventas  se encuentra abierto y si el usuario tiene permido para 
     insertar o modificar documentos para la fecha y departametno indicados
 */
 
@@ -76,13 +83,20 @@ BEGIN
 
 
 
-EXCEPTION
 
+EXCEPTION
+				
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-
+				        
 END;
+$body$
+LANGUAGE 'plpgsql'
+STABLE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;

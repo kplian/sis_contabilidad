@@ -100,6 +100,7 @@ BEGIN
                                    
                                    
                                        va_mayor = conta.f_mayor_periodo_tipo_cc(v_registros.id_tipo_cc, pa_id_periodo[v_ind]);
+                                       raise notice '>> %',va_mayor;
                                      
                                        v_mayor = va_mayor[1];
                                        v_mayor_mt = va_mayor[2];

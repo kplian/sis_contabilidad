@@ -80,8 +80,8 @@ BEGIN
      into
       v_registros
      from 
-     conta.torden_trabajo c
-     where c.id_orden_trabajo = p_id_tipo_cc;
+     param.ttipo_cc c
+     where c.id_tipo_cc = p_id_tipo_cc;
      
     
      

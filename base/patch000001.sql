@@ -4255,3 +4255,16 @@ IS 'si es null la logica de la plantilla sale de resutlado detalle,  si se defin
 /***********************************F-SCP-RAC-CONTA-1-11/07/2017****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-1-25/07/2017****************************************/
+
+
+
+ALTER TABLE conta.trango
+  ALTER COLUMN haber_mt TYPE NUMERIC;
+
+
+/***********************************F-SCP-RAC-CONTA-1-25/07/2017****************************************/
+  
+  
+  
+  

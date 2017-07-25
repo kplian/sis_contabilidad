@@ -598,11 +598,11 @@ AS
 
 /***********************************I-DEP-RAC-CONTA-0-11/12/2014*****************************************/
 --------------- SQL ---------------
-
+/*  RAC 14/07/"017 este triguer esta en desuso
 CREATE TRIGGER f_trig_insert_int_trans_val
   AFTER INSERT OR UPDATE 
   ON conta.tint_transaccion FOR EACH ROW 
-  EXECUTE PROCEDURE conta.f_insert_int_trans_val();
+  EXECUTE PROCEDURE conta.f_insert_int_trans_val();*/
 
 
 CREATE TRIGGER f_trig_insert_trans_val
@@ -3685,7 +3685,7 @@ AS
 /**********************************F-DEP-RAC-CONTA-0-09/06/2017****************************************/
 
 /**********************************I-DEP-GSS-CONTA-0-04/07/2017****************************************/
-
+DROP VIEW conta.ventrega;
 CREATE OR REPLACE VIEW conta.ventrega (
     id_entrega,
     estado,
@@ -3932,7 +3932,12 @@ UNION ALL
 /**********************************F-DEP-RAC-CONTA-0-11/07/2017****************************************/
 
 
-/**********************************I-DEP-RAC-CONTA-0-13/07/2017****************************************/
+
+/**********************************I-DEP-RAC-CONTA-0-19/07/2017****************************************/
+
+
+
+DROP VIEW conta.vint_transaccion_analisis;
 
 CREATE OR REPLACE VIEW conta.vint_transaccion_analisis
 AS
@@ -3966,8 +3971,30 @@ AS
        LEFT JOIN conta.torden_trabajo ot ON "int".id_orden_trabajo =
          ot.id_orden_trabajo
        LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida
-  WHERE cbt.estado_reg::text = 'validado'::text;
+ WHERE cbt.estado_reg = 'validado';
+ 
+   
 
 
-/**********************************F-DEP-RAC-CONTA-0-13/07/2017****************************************/
+
+/**********************************F-DEP-RAC-CONTA-0-19/07/2017****************************************/
+
+
+
+/**********************************I-DEP-RAC-CONTA-0-21/07/2017****************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta_auxiliar
+  ADD CONSTRAINT tcuenta_auxiliar_fk FOREIGN KEY (id_auxiliar)
+    REFERENCES conta.tauxiliar(id_auxiliar)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+/**********************************F-DEP-RAC-CONTA-0-21/07/2017****************************************/
+
 
