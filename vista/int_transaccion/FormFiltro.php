@@ -34,6 +34,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
         this.iniciarEventos(); 
         
         if(config.detalle){
+        	
 			//cargar los valores para el filtro
 			this.loadForm({data: config.detalle});
 			var me = this;
@@ -180,6 +181,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 					}),
 					valueField: 'id_config_subtipo_cuenta',
 					displayField: 'nombre',
+					gdisplayField: 'desc_csc',
 					triggerAction: 'all',
 					lazyRender: true,
 					mode: 'remote',
@@ -213,7 +215,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
        		    name: 'id_auxiliar',
    				origen: 'AUXILIAR',
    				allowBlank: true,
-   				gdisplayField: 'desc_cuenta',
+   				gdisplayField: 'desc_auxiliar',
    				fieldLabel: 'Auxiliar',
    				width: 150
        	     },

@@ -28,7 +28,7 @@ class RBalanceTipoCC extends  ReportePDF {
 		$this->incluir_cierre = $incluir_cierre;
 		$this->tipo_balance = $tipo_balance;
 		//$this->SetMargins(5, 22.5, 5);
-		$this->SetMargins(5,45);
+		$this->SetMargins(5,50);
 	}
 	
 	function Header() {

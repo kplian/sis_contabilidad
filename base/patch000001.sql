@@ -4266,5 +4266,99 @@ ALTER TABLE conta.trango
 /***********************************F-SCP-RAC-CONTA-1-25/07/2017****************************************/
   
   
+
+
+/***********************************I-SCP-RAC-CONTA-1-26/07/2017****************************************/
   
+--------------- SQL ---------------
+
+CREATE TABLE conta.ttipo_estado_cuenta (
+  id_tipo_estado_cuenta SERIAL NOT NULL,
+  nombre VARCHAR NOT NULL,
+  codigo VARCHAR(50) NOT NULL UNIQUE,
+  tabla VARCHAR(300),
+  columna_id_tabla VARCHAR(100),
+  columna_codigo_aux VARCHAR(100),
+  PRIMARY KEY(id_tipo_estado_cuenta)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.ttipo_estado_cuenta.tabla
+IS 'tabla para consulta de columnas';
+
+COMMENT ON COLUMN conta.ttipo_estado_cuenta.columna_id_tabla
+IS 'nombre de la columnas primari key de la tabla especificada';
+
+COMMENT ON COLUMN conta.ttipo_estado_cuenta.colunas_codigo_aux
+IS 'nombre de la columnas codigo auxuliar, (que nos permite unir los datos de tabla con auxiliares contables)';  
+  
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.ttipo_estado_columna (
+  id_tipo_estado_columna SERIAL NOT NULL,
+  codigo VARCHAR(100) NOT NULL UNIQUE,
+  nombre VARCHAR NOT NULL,
+  origen VARCHAR(40) DEFAULT 'contabilidad' NOT NULL,
+  id_config_subtipo_cuenta INTEGER,
+  nombre_funcion VARCHAR,
+  link_int_det VARCHAR,
+  PRIMARY KEY(id_tipo_estado_columna)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+COMMENT ON COLUMN conta.ttipo_estado_columna.origen
+IS 'origen de calculo de la columas, contabilidad o funcion';
+
+COMMENT ON COLUMN conta.ttipo_estado_columna.id_config_subtipo_cuenta
+IS 'si el origen es contabilidad debe especifica el id_subtipo_Cuenta para realizar el mayor';
+
+COMMENT ON COLUMN conta.ttipo_estado_columna.nombre_funcion
+IS 'si el origen es funcion, aca va el nombre de la funcion que realizara el calculo de columna';
+
+COMMENT ON COLUMN conta.ttipo_estado_columna.link_int_det
+IS 'ur de la interface que mostra el detalle de la composicion del calculo(para la columnas de origen funcion),... para origen contabilidad mostrara la interface de mayor contable';
+
+
+--------------- SQL ---------------
+ALTER TABLE conta.ttipo_estado_columna
+  ADD COLUMN id_tipo_estado_cuenta INTEGER NOT NULL;
+  
+-------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_estado_columna
+  ADD COLUMN prioridad NUMERIC DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN conta.ttipo_estado_columna.prioridad
+IS 'Prioridad con la que se muestra la columna en los resultados';
+
+/***********************************F-SCP-RAC-CONTA-1-26/07/2017****************************************/
+  
+  
+  
+/***********************************I-SCP-RAC-CONTA-1-29/07/2017****************************************/
+ 
+ALTER TABLE conta.ttipo_estado_columna
+  ADD COLUMN descripcion VARCHAR;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_estado_columna
+  ADD COLUMN clase VARCHAR(300);
+
+COMMENT ON COLUMN conta.ttipo_estado_columna.clase
+IS 'nombre de la clase que se ejecuta para msotrar el detalle';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_estado_columna
+  ADD COLUMN parametros_det VARCHAR DEFAULT '{}' NOT NULL;
+
+COMMENT ON COLUMN conta.ttipo_estado_columna.parametros_det
+IS 'JSON con los parametros que se mandan al a la interface de datalle';
+
+   
+/***********************************F-SCP-RAC-CONTA-1-29/07/2017****************************************/
   

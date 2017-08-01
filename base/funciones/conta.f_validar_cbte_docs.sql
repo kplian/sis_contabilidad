@@ -124,7 +124,8 @@ BEGIN
                                      
                    if  v_difenrecia > v_conta_dif_doc_cbte or v_difenrecia < (v_conta_dif_doc_cbte*-1) THEN                 
                         v_resp_val_doc[1] = 'FALSE';
-                        v_resp_val_doc[2] = format('El monto  total de   documentos %s (DOC: %s IVA: %s DESC: %s )  no cuadra con los gastos del comprobante %s, diferencia de (%s)', v_total_doc::varchar,  COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_gasto::varchar, (v_total_cbte_gasto - v_total_doc)::varchar);
+                        --v_resp_val_doc[2] = format('El monto  total de   documentos %s (DOC: %s IVA: %s DESC: %s )  no cuadra con los gastos del comprobante %s, diferencia de (%s)', v_total_doc::varchar,  COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_gasto::varchar, (v_total_cbte_gasto - v_total_doc)::varchar);
+                        v_resp_val_doc[2] = format('FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura, Recibo, Invoice, etc.). El monto total de los documentos registrados es: %s (DOC: %s, IVA: %s, DESC: %s ) y no cuadra con los gastos del comprobante %s, existe una diferencia de: (%s).', v_total_doc::varchar,  COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_gasto::varchar, (v_total_cbte_gasto - v_total_doc)::varchar);
                         
                         return v_resp_val_doc;
                    end if;
@@ -138,7 +139,8 @@ BEGIN
                   v_difenrecia = v_total_cbte_recurso - v_total_doc;                  
                   if  v_difenrecia > v_conta_dif_doc_cbte or v_difenrecia < (v_conta_dif_doc_cbte*-1) THEN 
                      v_resp_val_doc[1] = 'FALSE';
-                     v_resp_val_doc[2] = format('(Ventas) El monto total de   documentos %s (DOC: %s IVA: %s DESC: %s )  no cuadra con los recursos del comprobante %s, diferencia de (%s)', v_total_doc::varchar, COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_recurso::varchar,(v_total_cbte_recurso - v_total_doc)::varchar);
+                    -- v_resp_val_doc[2] = format('(Ventas) El monto total de   documentos %s (DOC: %s IVA: %s DESC: %s )  no cuadra con los recursos del comprobante %s, diferencia de (%s)', v_total_doc::varchar, COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_recurso::varchar,(v_total_cbte_recurso - v_total_doc)::varchar);
+                     v_resp_val_doc[2] = format('FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura, Recibo, Invoice, etc.). El monto total de los documentos registrados es: %s (DOC: %s, IVA: %s, DESC: %s ) y no cuadra con los recursos del comprobante %s, existe una diferencia de (%s).', v_total_doc::varchar, COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_recurso::varchar,(v_total_cbte_recurso - v_total_doc)::varchar);
                      return v_resp_val_doc;
                   end if;
                   
@@ -155,7 +157,7 @@ BEGIN
    
    END IF;
     
-     
+     raise exception 'llega';
    
   return v_resp_val_doc;
 

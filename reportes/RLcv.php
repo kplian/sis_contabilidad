@@ -35,7 +35,7 @@ class RLcv extends  ReportePDF {
 		$this->datos_entidad = $entidad;
 		$this->datos_periodo = $periodo;
 		$this->subtotal = 0;
-		$this->SetMargins(7, 55, 5);
+		$this->SetMargins(7, 59, 5);
 	}
 	
 	function Header() {
@@ -250,7 +250,6 @@ class RLcv extends  ReportePDF {
 		$fill = 0;
 		
 		$this->total = count($detalle);
-		
 		$this->s1 = 0;
 		$this->s2 = 0;
 		$this->s3 = 0;
@@ -258,18 +257,13 @@ class RLcv extends  ReportePDF {
 		$this->s5 = 0;
 		$this->s6 = 0;
         //$this->Cell(20, $height,'NIT:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-		foreach ($detalle as $val) {
-			
+		foreach ($detalle as $val) {			
 			$this->imprimirLinea($val,$count,$fill);
 			$fill = !$fill;
 			$count = $count + 1;
 			$this->total = $this->total -1;
 			$this->revisarfinPagina();
-			
 		}
-		
-		
-		
 	}	
 	
 	function imprimirLinea($val,$count,$fill){
@@ -278,13 +272,10 @@ class RLcv extends  ReportePDF {
         $this->SetTextColor(0);
         $this->SetFont('','',6);
 			
-			
-			
 		$conf_par_tablewidths=array(7,15,15,55,14,12,21,18,15,17,17,17,16,20,10);
         $conf_par_tablealigns=array('C','C','R','L','R','R','R','R','R','R','R','R','R','L','C');
         $conf_par_tablenumbers=array(0,0,0,0,0,0,0,2,2,2,2,2,2,0,0);
 		$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');
-		
 		$this->tablewidths=$conf_par_tablewidths;
         $this->tablealigns=$conf_par_tablealigns;
         $this->tablenumbers=$conf_par_tablenumbers;
@@ -298,21 +289,21 @@ class RLcv extends  ReportePDF {
 		$RowArray = array(
             			's0'  => $count,
                         's1' => $newDate,
-                        's2' => $val['nit'],
-                        's3' => $val['razon_social'],
-                        's4' => $val['nro_documento'],
-						's5' => $val['nro_dui'],
-                        's6' => $val['nro_autorizacion'],
+                        's2' => trim($val['nit']),
+                        's3' => trim($val['razon_social']),
+                        's4' => trim($val['nro_documento']),
+						's5' => trim($val['nro_dui']),
+                        's6' => trim($val['nro_autorizacion']),
                         's7' => $val['importe_doc'],
                         's8' => $val['total_excento'] ,
 						's9' => $val['subtotal'],
 						's10' => $val['importe_descuento'],
 						's11' => $val['sujeto_cf'],
 						's12' => $val['importe_iva'],
-						's13' => $val['codigo_control'],
-                        's14' => $val['tipo_doc']);
+						's13' => trim($val['codigo_control']),
+                        's14' => trim($val['tipo_doc']));
 						
-		$this-> MultiRow($RowArray,$fill,1);
+		$this-> MultiRow($RowArray,$fill,0);
 			
 	}
 
