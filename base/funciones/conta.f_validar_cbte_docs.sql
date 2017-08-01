@@ -43,11 +43,10 @@ v_difenrecia				numeric;
 v_conta_dif_doc_cbte		numeric;
 v_resp_val_doc				varchar[];
 v_conta_val_doc_otros_subcuentas_compras		varchar;
-va_aux 						 VARCHAR[];
+va_aux 						 					VARCHAR[];
+v_conta_lista_blanca_cbte_docs					varchar;
 
 
-
- 
 
 BEGIN
 
@@ -56,12 +55,26 @@ BEGIN
    v_conta_val_doc_venta = pxp.f_get_variable_global('conta_val_doc_venta');
    v_conta_val_doc_compra = pxp.f_get_variable_global('conta_val_doc_compra');   
    v_conta_dif_doc_cbte = pxp.f_get_variable_global('conta_dif_doc_cbte')::numeric;
-   
-   
+   v_conta_lista_blanca_cbte_docs = pxp.f_get_variable_global('conta_lista_blanca_cbte_docs'); 
    v_conta_val_doc_otros_subcuentas_compras = pxp.f_get_variable_global('conta_val_doc_otros_subcuentas_compras');
    va_aux = string_to_array(v_conta_val_doc_otros_subcuentas_compras,',');
    
+  
+   
+   
    v_resp_val_doc[1] = 'TRUE';
+   
+   
+   IF exists (
+               select 1
+               from conta.tint_comprobante c
+               left join conta.tplantilla_comprobante pc on pc.id_plantilla_comprobante = c.id_plantilla_comprobante
+               where c.id_int_comprobante = p_id_int_comprobante
+                     and  pc.codigo =ANY(string_to_array(v_conta_lista_blanca_cbte_docs,',')) )THEN
+       p_validar = FALSE;
+       
+   END IF;
+   
    
   
    
@@ -91,16 +104,16 @@ BEGIN
      inner join conta.tcuenta c on t.id_cuenta = c.id_cuenta
      where      t.id_int_comprobante = p_id_int_comprobante
            and  lower(c.tipo_cuenta)  in('recurso','ingreso','venta'); 
+           
+           
+           
+   --revisar que si el comprobante esta en la lista blanca        
    
    
    --solo valida para los cbte de diario
    IF v_registros_recurso is not null  or v_registros_gasto is not null THEN
    
-       
-             
-             
-      
-        --sumamos el monto de documento y el via de todas los asociados
+       --sumamos el monto de documento y el via de todas los asociados
         
         select
            sum(dcv.importe_doc) as importe_doc,
@@ -157,7 +170,7 @@ BEGIN
    
    END IF;
     
-     raise exception 'llega';
+     --raise exception 'llega';
    
   return v_resp_val_doc;
 
