@@ -4290,8 +4290,8 @@ IS 'tabla para consulta de columnas';
 COMMENT ON COLUMN conta.ttipo_estado_cuenta.columna_id_tabla
 IS 'nombre de la columnas primari key de la tabla especificada';
 
-COMMENT ON COLUMN conta.ttipo_estado_cuenta.colunas_codigo_aux
-IS 'nombre de la columnas codigo auxuliar, (que nos permite unir los datos de tabla con auxiliares contables)';  
+COMMENT ON COLUMN conta.ttipo_estado_cuenta.columna_codigo_aux
+IS 'nombre de la columnas codigo auxuliar, (que nos permite unir los datos de tabla con auxiliares contables)'; 
   
 
 --------------- SQL ---------------
