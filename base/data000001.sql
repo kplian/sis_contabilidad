@@ -1328,4 +1328,21 @@ VALUES
 /***********************************F-DAT-RAC-CONTA-0-20/07/2017*****************************************/
 
 
+/***********************************I-DAT-RAC-CONTA-0-01/08/2017*****************************************/
+
+select pxp.f_insert_tgui ('Tipo de Estado de Cuentas', 'Configuración de tipos de estados de cuentas', 'CFTEC', 'si', 21, 'sis_contabilidad/vista/tipo_estado_cuenta/TipoEstadoCuenta.php', 3, '', 'TipoEstadoCuenta', 'CONTA');
+select pxp.f_insert_testructura_gui ('CFTEC', 'CONF');
+select pxp.f_insert_tgui ('Estado de Cuentas', 'Estado de Cuentas', 'ESTCUNT', 'si', 20, 'sis_contabilidad/vista/tipo_estado_cuenta/FormFiltroEstadoCuenta.php', 3, '', 'FormFiltroEstadoCuenta', 'CONTA');
+select pxp.f_insert_testructura_gui ('ESTCUNT', 'REPCON');
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_lista_blanca_cbte_docs', E'RENDICIONFONDO,RENCAJA', E'Lista de codigos de plnatillas de cbte, que se saltara la validacion de documentos de compra /venta');
+
+
+/***********************************F-DAT-RAC-CONTA-0-01/08/2017*****************************************/
+
+
+
 

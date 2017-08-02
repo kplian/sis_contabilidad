@@ -171,13 +171,13 @@ Ext.define('Phx.vista.RangoTorta2',{
                     mode: 'local',
                     width: 150,
                     store: ['memoria','formulado','comprometido','ejecutado','contabilidad','comparativo']
-                   
-                }), 
+
+                }),
                 
                 
      cambiarOrigen: function(){
      	this.cargarChart()
-     },                     
+     },
 	 
 	 cargarChart: function(){
 	 	
