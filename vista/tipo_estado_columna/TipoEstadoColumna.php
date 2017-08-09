@@ -6,7 +6,6 @@
 *@date 26-07-2017 21:49:56
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -400,14 +399,14 @@ Phx.vista.TipoEstadoColumna=Ext.extend(Phx.gridInterfaz,{
 					this.ocultarComponente(this.Cmp.link_int_det);
 					this.ocultarComponente(this.Cmp.nombre_funcion);
 					this.ocultarComponente(this.Cmp.nombre_clase);
-					this.ocultarComponente(this.Cmp.prametros_det);
+					this.ocultarComponente(this.Cmp.parametros_det);
 					
 			} else{
 					this.ocultarComponente(this.Cmp.id_config_subtipo_cuenta);
 					this.mostrarComponente(this.Cmp.link_int_det);
 					this.mostrarComponente(this.Cmp.nombre_funcion);
 					this.mostrarComponente(this.Cmp.nombre_clase);
-					this.mostrarComponente(this.Cmp.prametros_det);
+					this.mostrarComponente(this.Cmp.parametros_det);
 			} 
 				
 				
@@ -422,13 +421,13 @@ Phx.vista.TipoEstadoColumna=Ext.extend(Phx.gridInterfaz,{
 					this.ocultarComponente(this.Cmp.link_int_det);
 					this.ocultarComponente(this.Cmp.nombre_funcion);
 					this.ocultarComponente(this.Cmp.nombre_clase);
-					this.ocultarComponente(this.Cmp.prametros_det);
+					this.ocultarComponente(this.Cmp.parametros_det);
 		} else{
 					this.ocultarComponente(this.Cmp.id_config_subtipo_cuenta);
 					this.mostrarComponente(this.Cmp.link_int_det);
 					this.mostrarComponente(this.Cmp.nombre_funcion);
 					this.mostrarComponente(this.Cmp.nombre_clase);
-					this.mostrarComponente(this.Cmp.prametros_det);
+					this.mostrarComponente(this.Cmp.parametros_det);
 		}    
 	},
 	
@@ -437,9 +436,9 @@ Phx.vista.TipoEstadoColumna=Ext.extend(Phx.gridInterfaz,{
 		this.ocultarComponente(this.Cmp.nombre_funcion);
 		this.ocultarComponente(this.Cmp.id_config_subtipo_cuenta);
 		this.ocultarComponente(this.Cmp.nombre_clase);
-		this.ocultarComponente(this.Cmp.prametros_det);
+		this.ocultarComponente(this.Cmp.parametros_det);
 		
-    	this.cmpNroCuenta.disable();
+    	
 		Phx.vista.TipoEstadoColumna.superclass.onButtonNew.call(this);
 	      
     },
