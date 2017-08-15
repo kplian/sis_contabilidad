@@ -276,8 +276,7 @@ BEGIN
                 END IF;
                 
                
-                -- raise exception 'bal %, %, %,--- % ,%', v_resp_mayor, p_signo_balance, p_tipo_saldo,  COALESCE(v_sum_debe,0),  COALESCE(v_sum_debe,0);
-         
+                
           ELSEIF  p_tipo_saldo = 'deudor' THEN
                 v_resp_mayor = COALESCE(v_sum_debe,0);
                 v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0);
@@ -308,9 +307,6 @@ BEGIN
           v_resp_final[5] = v_resp_mayor_ma;
           v_resp_final[6] = v_resp_mayor_partida_ma;
           
-          
-          raise notice '##################  RESULTADO BASICO %, %',v_resp_mayor,p_id_cuenta;
-        
           return v_resp_final;  
           
           
