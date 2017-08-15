@@ -402,7 +402,7 @@ BEGIN
 			------------------
         	-- VALIDACIONES
         	------------------
-        	select 
+            select 
               id_subsistema
               into 
              v_id_subsistema_conta
@@ -425,16 +425,19 @@ BEGIN
             END IF;
             
             --SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
-        	IF  pxp.f_existe_parametro(p_tabla,'id_subsistema') THEN
-        		
-                 IF v_parametros.id_subsistema is not NULL THEN
-               	     v_id_subsistema = v_parametros.id_subsistema;
-        	     else
+        	
+        	
+            --RAC, 15/08/2017
+            --  este cambio trabjo problema al editar comprobante de planillas (integrascion con libro de bancos, lo cbte de planillas no generan cheques,  OJO ANALIZAR)
+            --  parece logico no cambiar el sistema donde se origina el cbte
+            -- sin embargo no me acerudo por que se hizo, probablemente es por alguna validacion que solo se aplica al sistema contable
+           
+             IF v_reg_cbte.id_subsistema is not NULL THEN
+               	     v_id_subsistema = v_reg_cbte.id_subsistema;
+             else
                     v_id_subsistema = v_id_subsistema_conta;
-                 end if;
-        	ELSE
-                v_id_subsistema = v_id_subsistema_conta;
-            end if;
+             end if;
+        	
         	
         	--PERIODO
         	--Obtiene el periodo a partir de la fecha
