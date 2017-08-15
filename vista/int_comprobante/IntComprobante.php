@@ -912,6 +912,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				type : 'date'
 			},
 			id_grupo : 3,
+			egrid : true,
 			grid : true,
 			form : true
 		}, {
@@ -932,6 +933,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				type : 'date'
 			},
 			id_grupo : 3,
+			egrid : true,
 			grid : true,
 			form : true
 		}, {
