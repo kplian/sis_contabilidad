@@ -632,6 +632,27 @@ class MODIntComprobante extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+			
+	function modificarFechasCostosCbte(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_UPDFECOS_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('fecha_costo_ini','fecha_costo_ini','date');
+		$this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>
