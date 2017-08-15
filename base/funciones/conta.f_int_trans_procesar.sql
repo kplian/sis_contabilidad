@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_int_trans_procesar (
   p_id_int_comprobante integer
 )
@@ -39,12 +41,14 @@ BEGIN
       ic.id_clase_comprobante,
       cc.codigo,
       ic.nro_tramite ,
-      ic.id_subsistema
+      ic.id_subsistema,
+      sis.codigo as codigo_sistema
    into
       v_registros_cbte
    from conta.tint_comprobante ic 
    inner join param.tperiodo per on per.id_periodo = ic.id_periodo
    inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = ic.id_clase_comprobante
+   inner join segu.tsubsistema sis on sis.id_subsistema = ic.id_subsistema 
    where ic.id_int_comprobante = p_id_int_comprobante;
    
    
@@ -63,11 +67,11 @@ BEGIN
                 
           --si es un cbte de pago
            
-          IF upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON') and v_registros_cbte.id_subsistema != 13  THEN  
+          IF upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON') and v_registros_cbte.codigo_sistema  != 'PLANI'  THEN  
              
              
             
-           -- busca si alguna de las cuentas contables tiene relacion 
+              -- busca si alguna de las cuentas contables tiene relacion 
               -- con una cuenta bancaria
               v_id_cuenta_bancaria = NULL;
                     
@@ -78,11 +82,13 @@ BEGIN
                      v_id_cuenta_bancaria
                   from  conta.trelacion_contable rc
                   inner join conta.ttipo_relacion_contable trc on trc.id_tipo_relacion_contable = rc.id_tipo_relacion_contable
-                  where      trc.codigo_tipo_relacion = 'CUEBANCEGRE' 
+                  where      trc.codigo_tipo_relacion = 'CUEBANCEGRE'  
                          and rc.id_cuenta = v_registros.id_cuenta 
                          and rc.id_gestion = v_registros_cbte.id_gestion
                          and rc.id_auxiliar = v_registros.id_auxiliar
                   offset 0 limit 1;
+                  
+                
               END IF;
                  
                  

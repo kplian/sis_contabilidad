@@ -89,6 +89,7 @@ DECLARE
     v_gasto_mt						numeric; 
     v_recurso_mt 					numeric;
     v_resp_val_doc					varchar[];
+    v_tes_integrar_lb_pagado		varchar;
      
 
 BEGIN
@@ -128,13 +129,15 @@ BEGIN
         c.id_clase_comprobante,
         c.fecha,
         c.id_periodo,
-        cc.id_documento   --documento con que se genera la numeracion
-        
+        cc.id_documento,   --documento con que se genera la numeracion
+        cc.codigo as codigo_cbte,
+        sis.codigo as codigo_sistema
 	  into 
         v_rec_cbte
     from conta.tint_comprobante c
     inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = c.id_clase_comprobante
     inner join param.tperiodo p on p.id_periodo = c.id_periodo
+    inner join segu.tsubsistema sis on sis.id_subsistema = c.id_subsistema
     where id_int_comprobante = p_id_int_comprobante;
     
     ------------------------------------------------------------------------------------------
@@ -639,13 +642,13 @@ BEGIN
           
          --------------------------------------------------
          -- Validaciones sobre el cbte y sus transacciones
+         --  INTEGRAR CON libro de Bancos comprobantes de pago
          ----------------------------------------------------
          IF not conta.f_int_trans_validar(p_id_usuario,p_id_int_comprobante) THEN
               raise exception 'error al realizar validaciones en el combrobante';
          END IF; 
-            
-            -- raise exception 'pasa .. '; 
-          
+         
+         
          ---------------------------------------------------------------------------------------
          -- SI estamos en una regional internacional y  el comprobante es propio de la estacion
          -- migramos a contabilidad central
