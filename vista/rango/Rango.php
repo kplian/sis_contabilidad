@@ -66,7 +66,21 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 25, 
 				renderer:function (value,p,record){  
 					if(record.data.tipo_reg != 'summary'){
-					    return  String.format("<div style='text-align:center'><img title='Revisar Ordenes' src = '../../../lib/imagenes/connect.png' align='center'/></div>");
+					    return  String.format("<div style='text-align:center'><img title='Revisar Partidas' src = '../../../lib/imagenes/connect.png' align='center'/></div>");
+				     }
+				}
+			},
+			type:'Field',
+			grid:true
+		},
+		{
+			config:{
+				name: 'cuenta',
+				fieldLabel: 'C',
+				gwidth: 25, 
+				renderer:function (value,p,record){  
+					if(record.data.tipo_reg != 'summary'){
+					    return  String.format("<div style='text-align:center'><img title='Revisar Cuentas' src = '../../../lib/imagenes/connect.png' align='center'/></div>");
 				     }
 				}
 			},
@@ -423,6 +437,31 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                      },
                     this.idContenedor,
                     'RangoPartida'
+           );
+	    	
+	    }
+	    
+	    if (fieldName == 'cuenta') {
+	    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/rango/RangoCuenta.php',
+                    'Mayor Partida',
+                    {
+                        width:'100%',
+                        height:'100%',
+                    },
+                    { maestro:record.data,
+                      detalle: {
+                      	        'tipo_filtro': 'fechas',
+                      	        'fecha_ini': record.data.fecha_ini,
+                      	        'fecha_fin': record.data.fecha_fin,
+                      	        'id_tipo_cc': record.data.id_tipo_cc,
+                      	        'desc_tipo_cc': record.data.desc_tipo_cc,
+                      	        'id_gestion': record.data.id_gestion,
+                      	        'gestion': record.data.gestion
+                      	      }
+                      
+                     },
+                    this.idContenedor,
+                    'RangoCuenta'
            );
 	    	
 	    }
