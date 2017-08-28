@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.f_pagos_pendientes_prov (
+CREATE OR REPLACE FUNCTION conta.f_pagos_realizados_prov (
   p_id_auxiliar integer,
   p_id_tabla integer,
   p_tabla varchar,
@@ -69,8 +69,8 @@ BEGIN
            and pp.tipo in ('devengado_pagado', 'devengado_pagado_1c','devengado')
            and op.estado_reg = 'activo'
            and pp.estado_reg = 'activo'
-           and pp.estado not in ('devengado','pagado','anulado','pago_exterior')
-           and COALESCE(pp.fecha_tentativa,op.fecha) BETWEEN  p_desde and p_hasta ; 
+           and pp.estado  in ('devengado','pagado','anulado','pago_exterior')
+           and pp.fecha_tentativa BETWEEN p_desde and p_hasta ; 
    
 
      

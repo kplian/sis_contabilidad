@@ -4346,9 +4346,9 @@ ALTER TABLE conta.ttipo_estado_columna
 --------------- SQL ---------------
 
 ALTER TABLE conta.ttipo_estado_columna
-  ADD COLUMN clase VARCHAR(300);
+  ADD COLUMN nombre_clase VARCHAR(300);
 
-COMMENT ON COLUMN conta.ttipo_estado_columna.clase
+COMMENT ON COLUMN conta.ttipo_estado_columna.nombre_clase
 IS 'nombre de la clase que se ejecuta para msotrar el detalle';
 
 --------------- SQL ---------------
@@ -4358,6 +4358,11 @@ ALTER TABLE conta.ttipo_estado_columna
 
 COMMENT ON COLUMN conta.ttipo_estado_columna.parametros_det
 IS 'JSON con los parametros que se mandan al a la interface de datalle';
+
+
+
+
+
 
    
 /***********************************F-SCP-RAC-CONTA-1-29/07/2017****************************************/
