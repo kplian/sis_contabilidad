@@ -69,7 +69,8 @@ BEGIN
            and pp.tipo in ('devengado_pagado', 'devengado_pagado_1c','devengado')
            and op.estado_reg = 'activo'
            and pp.estado_reg = 'activo'
-           and pp.estado not in ('devengado','pagado','anulado','pago_exterior'); 
+           and pp.estado not in ('devengado','pagado','anulado','pago_exterior')
+           and COALESCE(pp.fecha_tentativa,op.fecha) BETWEEN  p_desde and p_hasta ; 
    
 
      
