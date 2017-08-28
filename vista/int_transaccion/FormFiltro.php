@@ -202,6 +202,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
    				origen: 'CUENTA',
    				allowBlank: true,
    				fieldLabel: 'Cuenta',
+   				gdisplayField: 'desc_cuenta',
    				baseParams: { sw_transaccional: undefined },
    				width: 150
        	     },
