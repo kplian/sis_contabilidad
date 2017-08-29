@@ -1346,3 +1346,15 @@ VALUES
 
 
 
+/***********************************I-DAT-RAC-CONTA-0-29/08/2017*****************************************/
+
+/* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_ajustar_tipo_cambio_cbte_rel', E'no', E'ajustar automaticamente diferencia por tipo de cambio en trasaccion y comprobantes reacionados');
+
+
+/***********************************F-DAT-RAC-CONTA-0-29/08/2017*****************************************/
+
+

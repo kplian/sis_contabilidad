@@ -59,6 +59,11 @@ v_valor_haber_ma		numeric;
 v_valor_gasto_ma		numeric;
 v_valor_recurso_ma		numeric;
 v_monto_pago_mb			numeric;
+v_reg_tc				record;
+v_ajustar_tipo_cambio_cbte_rel		varchar;
+v_sw_tmp 				boolean;
+v_tipo_cambio_2			numeric;
+v_tipo_cambio			numeric;
 
  
 
@@ -83,16 +88,91 @@ BEGIN
         c.localidad,
         c.fecha,
         c.sw_editable,
-        c.cbte_aitb
+        c.cbte_aitb,
+        c.id_int_comprobante_fks,
+        cue.id_cuenta,
+        cue.nro_cuenta,
+        it.tipo_cambio,
+        it.tipo_cambio_2,
+        it.tipo_cambio_3,
+        c.id_moneda
        into 
         v_registros
        from conta.tint_transaccion it 
        inner join conta.tint_comprobante c on c.id_int_comprobante = it.id_int_comprobante
        inner join conta.tconfig_cambiaria cc on cc.id_config_cambiaria = c.id_config_cambiaria
+       inner join conta.tcuenta cue on cue.id_cuenta = it.id_cuenta
        where it.id_int_transaccion = p_id_int_transaccion;
        
-       
-       
+      ---------------------------------- 
+      --   Si el comprobante tiene relacioanes identifica el tipo de cambio original
+      --   para el caso por ejemplo de ventas y devegados donde et tipo de cambio varia 
+      --   RAC 29/08/2017
+      --  
+      ---------------------------------
+      v_sw_tmp = false;
+      
+      v_ajustar_tipo_cambio_cbte_rel = pxp.f_get_variable_global('conta_ajustar_tipo_cambio_cbte_rel');
+      
+      IF v_ajustar_tipo_cambio_cbte_rel = 'si' THEN
+          
+          IF v_registros.id_int_comprobante_fks is not null THEN
+             
+                 --verificamos si el  comprobante relacionado tiene la misma cuenta con otros tipo de cambio   
+                 
+                 select
+                     avg(ito.tipo_cambio)   as tipo_cambio,
+                     avg(ito.tipo_cambio_2)   as tipo_cambio_2,
+                     avg(ito.tipo_cambio_3)   as tipo_cambio_3
+                   into
+                     v_reg_tc 
+                 from conta.tint_transaccion ito
+                 inner join conta.tint_comprobante co on co.id_int_comprobante = ito.id_int_comprobante
+                 inner join conta.tcuenta cue on cue.id_cuenta = ito.id_cuenta
+                 where 
+                     ito.id_int_comprobante = ANY(v_registros.id_int_comprobante_fks)
+                     and ito.estado_reg = 'activo'
+                     and cue.nro_cuenta = v_registros.nro_cuenta
+                     and  co.id_moneda = v_registros.id_moneda;
+             
+                 -- solo si encuentra una trasaccion equivalente en el cbte relacionado recuperamso el tipo de cambio 
+                 -- de la trasaccion original, com peudne ser varias transaccion usamos el promedio aritmetico
+                 IF v_reg_tc is not null THEN
+                 
+                       IF v_reg_tc.tipo_cambio !=   v_registros.tipo_cambio   THEN                 
+                          v_tipo_cambio = v_reg_tc.tipo_cambio;
+                          v_registros.tipo_cambio = v_reg_tc.tipo_cambio; --modificamos el tc del consulta original
+                          v_sw_tmp  =true;
+                       ELSE
+                          v_tipo_cambio =v_registros.tipo_cambio_2;     
+                       END IF;
+                       
+                       IF v_reg_tc.tipo_cambio_2 !=   v_registros.tipo_cambio_2   THEN
+                          v_tipo_cambio_2 =v_reg_tc.tipo_cambio_2;
+                          v_registros.tipo_cambio_2 =v_reg_tc.tipo_cambio_2;  --modificamos el tc del consulta original
+                          v_sw_tmp  =true;
+                       ELSE
+                          v_tipo_cambio_2 =v_registros.tipo_cambio_2; 
+                       END IF;
+                       
+                       update conta.tint_transaccion set
+                          
+                          tipo_cambio = v_tipo_cambio,
+                          tipo_cambio_2 = v_tipo_cambio_2
+                       
+                        where id_int_transaccion = p_id_int_transaccion;
+                       
+                       
+                       IF v_sw_tmp  THEN
+                          update conta.tint_comprobante set
+                            sw_tipo_cambio = 'si'
+                          where id_int_comprobante =  v_registros.id_int_comprobante;
+                       END IF;
+                       
+                  END IF;
+             
+          END IF;
+      END IF; 
        
       
        
