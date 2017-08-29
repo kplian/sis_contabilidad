@@ -286,7 +286,8 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		{name:'recorrido_arbol', type: 'string'},
 		'tabla_codigo_auxiliar',
-        'tabla_id_auxiliar'
+        'tabla_id_auxiliar',
+        {name:'tabla_id_fk', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_tabla_relacion_contable',
