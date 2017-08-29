@@ -91,6 +91,8 @@ DECLARE
     v_id_partida_ejecucion			integer;
     va_id_int_comprobante_fks		integer[];
     v_id_moneda_act					integer;
+    v_id_gestion_cos				integer;
+    v_id_gestion_cbte				integer;
    
    
 			    
@@ -274,8 +276,34 @@ BEGIN
                     END IF;
             
             END IF;
-             
             
+             -------------------------------------------------
+            --  validar fechas de costos de inicio o fin
+            --  a solicitud del area de cosots la fecha incial de costo no puede ser de una gestion menor a la gestion
+            --  de la fecha de comprobante
+            --  RAC 29/08/2017
+            -----------------------------------------------
+            
+            select
+              per.id_gestion
+            into
+              v_id_gestion_cbte
+            from param.tperiodo per
+            where  v_parametros.fecha BETWEEN per.fecha_ini and per.fecha_fin;
+            
+            select
+              per.id_gestion
+            into
+              v_id_gestion_cos
+            from param.tperiodo per
+            where  v_parametros.fecha_costo_ini BETWEEN per.fecha_ini and per.fecha_fin;
+            
+            IF v_id_gestion_cos is not null THEN
+               IF v_id_gestion_cos  <  v_id_gestion_cbte  THEN
+                 raise exception 'La fecha del costo inicial debe ser de la misma gestión que el Cbte ';
+               END IF;
+            END IF;
+             
             
         	-----------------------------
         	--REGISTRO DEL COMPROBANTE
@@ -371,8 +399,6 @@ BEGIN
 							
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
             
-            
-			
             
             update wf.tproceso_wf p set
               descripcion = descripcion||' ('||v_clcbt_desc||'id:'||v_id_int_comprobante::varchar||')'
@@ -530,7 +556,38 @@ BEGIN
                raise exception 'la fecha final no puede ser menor a la fecha inicial';
             END IF;
             
-           
+            -------------------------------------------------
+            --  validar fechas de costos de inicio o fin
+            --  a solicitud del area de cosots la fecha incial de costo no puede ser de una gestion menor a la gestion
+            --  de la fecha de comprobante
+            --  RAC 29/08/2017
+            -----------------------------------------------
+            
+            select
+              per.id_gestion
+            into
+              v_id_gestion_cbte
+            from param.tperiodo per
+            where  v_parametros.fecha BETWEEN per.fecha_ini and per.fecha_fin;
+            
+            select
+              per.id_gestion
+            into
+              v_id_gestion_cos
+            from param.tperiodo per
+            where  v_parametros.fecha_costo_ini BETWEEN per.fecha_ini and per.fecha_fin;
+            
+            IF v_id_gestion_cos is not null THEN
+               IF v_id_gestion_cos  <  v_id_gestion_cbte  THEN
+                 raise exception 'La fecha del costo inicial debe ser de la misma gestión que el Cbte ';
+               END IF;
+            END IF;
+            
+            
+            
+            
+        
+            
             
 			------------------------------
 			--Sentencia de la modificacion
