@@ -754,7 +754,128 @@ BEGIN
 			--Devuelve la respuesta
 			return v_consulta;
 
-		end;         				
+		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_INTCUE_SEL'
+ 	#DESCRIPCION:	consulta de analisis de cuentas por tipo_cc
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:10:12
+	***********************************/
+
+	elseif(p_transaccion='CONTA_INTCUE_SEL')then
+     				
+    	begin
+        
+             if pxp.f_existe_parametro(p_tabla,'id_periodo') then
+               v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
+             elseif pxp.f_existe_parametro(p_tabla,'fecha_ini') then
+               v_filtro = ' fecha BETWEEN '''||v_parametros.fecha_ini||'''::date and '''||v_parametros.fecha_fin||'''::Date';
+             else
+                v_filtro = ' 0=0 ';
+             end if;
+             
+         
+    		--Sentencia de la consulta
+			v_consulta:='SELECT
+            				id_cuenta, 
+                            sum(importe_debe_mb) as importe_debe_mb,
+                            sum(importe_haber_mb) as importe_haber_mb,
+                            sum(importe_debe_mt) as importe_debe_mt,
+                            sum(importe_haber_mt) as importe_haber_mt,
+                            sum(importe_debe_ma) as importe_debe_ma,
+                            sum(importe_haber_ma) as importe_haber_ma,                            
+                            codigo_cuenta::varchar,
+                            tipo_cuenta::varchar,
+                            descripcion_cuenta::varchar
+
+                          FROM 
+                            conta.vint_transaccion_analisis  v
+                          where    '||v_parametros.id_tipo_cc::varchar||' =ANY(ids) and '||v_filtro|| ' and ';
+                          
+                          
+              --Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+           
+           
+            v_consulta:=v_consulta||'
+                            group by  
+                                id_cuenta,
+                                codigo_cuenta,
+                                descripcion_cuenta,
+                                tipo_cuenta ';
+                            
+            
+			--Definicion de la respuesta
+			
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            
+            raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;    
+    
+    /*********************************    
+ 	#TRANSACCION:  'CONTA_INTCUE_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:10:12
+	***********************************/
+
+	elsif(p_transaccion='CONTA_INTCUE_CONT')then
+
+		begin
+        
+             if pxp.f_existe_parametro(p_tabla,'id_periodo') then
+               v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
+             elseif pxp.f_existe_parametro(p_tabla,'fecha_ini') then
+               v_filtro = ' fecha BETWEEN '''||v_parametros.fecha_ini||'''::date and '''||v_parametros.fecha_fin||'''::Date';
+             else
+                v_filtro = ' 0=0 ';
+             end if;
+             
+             
+             v_consulta:='WITH parcial AS (
+                                            SELECT 
+                                                      id_cuenta as id_cuenta,
+                                                      sum(importe_debe_mb) as importe_debe_mb,
+                                                      sum(importe_haber_mb) as importe_haber_mb,
+                                                      sum(importe_debe_mt) as importe_debe_mt,
+                                                      sum(importe_haber_mt) as importe_haber_mt,
+                                                      sum(importe_debe_ma) as importe_debe_ma,
+                                                      sum(importe_haber_ma) as importe_haber_ma
+                                                   FROM 
+                                                      conta.vint_transaccion_analisis  v
+                                                   where    '||v_parametros.id_tipo_cc::varchar||' =ANY(ids) and '||v_filtro|| ' and ';   
+                                             
+             v_consulta:=v_consulta||v_parametros.filtro;                              
+                                             
+             v_consulta:= v_consulta|| 'group by  
+                                                      id_cuenta,
+                                                      codigo_cuenta,
+                                                      descripcion_cuenta,
+                                                      tipo_cuenta  ) 
+                                                                            
+                                             SELECT 
+                                                   count(id_cuenta) as total,
+                                                   sum(importe_debe_mb) as importe_debe_mb,
+                                                   sum(importe_haber_mb) as importe_haber_mb,
+                                                   sum(importe_debe_mt) as importe_debe_mt,
+                                                   sum(importe_haber_mt) as importe_haber_mt,
+                                                   sum(importe_debe_ma) as importe_debe_ma,
+                                                   sum(importe_haber_ma) as importe_haber_ma
+                                            FROM parcial';  
+             
+             
+             
+            raise notice '%',v_consulta;
+ 
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;         
+                 				
 	
     else
 					     

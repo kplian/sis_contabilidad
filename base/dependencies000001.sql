@@ -3998,3 +3998,48 @@ ALTER TABLE conta.tcuenta_auxiliar
 /**********************************F-DEP-RAC-CONTA-0-21/07/2017****************************************/
 
 
+
+/**********************************I-DEP-RAC-CONTA-0-29/08/2017****************************************/
+--------------- SQL ---------------
+
+CREATE OR REPLACE VIEW conta.vint_transaccion_analisis
+AS
+  SELECT "int".importe_debe_mb,
+         "int".importe_haber_mb,
+         "int".importe_debe_mt,
+         "int".importe_haber_mt,
+         "int".importe_debe_ma,
+         "int".importe_haber_ma,
+         COALESCE(ot.id_orden_trabajo, 0) AS id_orden_trabajo,
+         COALESCE(ot.codigo, 'S/O'::character varying) AS codigo_ot,
+         COALESCE(ot.desc_orden, 'No tiene una orden asignada'::character
+           varying) AS desc_orden,
+         tcc.id_tipo_cc,
+         tcc.ids,
+         cbt.id_int_comprobante,
+         COALESCE(par.codigo, 'S/P'::character varying) AS codigo_partida,
+         "int".id_int_transaccion,
+         "int".id_cuenta,
+         "int".id_auxiliar,
+         cbt.fecha,
+         cbt.id_periodo,
+         par.sw_movimiento,
+         COALESCE(par.nombre_partida, 'No tiene una partida asignada'::character
+           (1)::character varying) AS descripcion_partida,
+         COALESCE(par.id_partida, 0) AS id_partida,
+         cue.nro_cuenta AS codigo_cuenta,
+         cue.nombre_cuenta AS descripcion_cuenta,
+         cue.tipo_cuenta
+  FROM conta.tint_transaccion "int"
+       JOIN conta.tint_comprobante cbt ON cbt.id_int_comprobante =
+         "int".id_int_comprobante
+       JOIN param.tcentro_costo cc ON cc.id_centro_costo = "int".id_centro_costo
+       JOIN param.vtipo_cc_raiz tcc ON tcc.id_tipo_cc = cc.id_tipo_cc
+       JOIN conta.tcuenta cue ON cue.id_cuenta = "int".id_cuenta
+       LEFT JOIN conta.torden_trabajo ot ON "int".id_orden_trabajo =
+         ot.id_orden_trabajo
+       LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida
+  WHERE cbt.estado_reg::text = 'validado'::text;
+
+/**********************************F-DEP-RAC-CONTA-0-29/08/2017****************************************/
+
