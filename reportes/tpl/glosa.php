@@ -28,12 +28,13 @@
 			 <?php 
 			  if ($this->cabecera[0]['id_moneda'] != $this->cabecera[0]['id_moneda_base']){
 			 ?>
-		      <td><b>T/C:</b> &nbsp;&nbsp;&nbsp;&nbsp;<?php  echo $this->cabecera[0]['tipo_cambio']; ?><br>
-			  <b>Dctos: </b><?php echo $this->cabecera[0]['documentos']; ?></td>
+		      <td>
+		      	<b>T/C:</b> &nbsp;&nbsp;&nbsp;&nbsp;<?php  if($this->cabecera[0]['sw_tipo_cambio']=='no'){echo $this->cabecera[0]['tipo_cambio'];}else{echo 'Por detalle';} ?><br/>
+			    <b>Dctos:</b><?php echo $this->cabecera[0]['documentos']; ?></td>
 		    <?php
 			 } else {
 			 ?>
-			<td><b>Dctos: </b><?php echo $this->cabecera[0]['documentos']; ?></td>
+			    <td><b>Dctos: </b><?php echo $this->cabecera[0]['documentos']; ?></td>
 			<?php
 			}
 			?>

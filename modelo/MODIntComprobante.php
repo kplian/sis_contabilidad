@@ -434,6 +434,8 @@ class MODIntComprobante extends MODbase{
 		$this->captura('codigo_depto','varchar');
 		$this->captura('documentos','varchar');
 		$this->captura('c31','varchar');
+		$this->captura('sw_tipo_cambio','varchar');
+		
 		
 		
 		//Ejecuta la instruccion
@@ -471,6 +473,7 @@ class MODIntComprobante extends MODbase{
 		
 		$this->captura('sw_movimiento','varchar');
 		$this->captura('tipo_partida','varchar');
+		$this->captura('tipo_cambio','numeric');
 		
 		
 		
