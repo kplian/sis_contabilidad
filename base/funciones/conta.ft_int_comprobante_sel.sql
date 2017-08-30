@@ -334,7 +334,8 @@ BEGIN
                             '''||v_codigo_moneda_base::VARCHAR||'''::varchar as codigo_moneda_base,
                             incbte.codigo_depto,
                             conta.f_recuperar_nro_documento_facturas_comprobante(incbte.id_int_comprobante) as documentos,
-                            COALESCE(en.c31,'''') as c31
+                            COALESCE(en.c31,'''') as c31,
+                            incbte.sw_tipo_cambio
                           from conta.vint_comprobante incbte
                           left join conta.tentrega_det ed on ed.id_int_comprobante = incbte.id_int_comprobante
                           left join conta.tentrega en on en.id_entrega = ed.id_entrega
@@ -375,7 +376,8 @@ BEGIN
                                 importe_debe_mb,
                                 importe_haber_mb,
                                 sw_movimiento,
-                                tipo_partida
+                                tipo_partida,
+                                tipo_cambio
                                 FROM ((select
                                                   CASE 
                                                     WHEN  (sum(tra.importe_debe) > 0 or sum(tra.importe_debe_mb) >0) then  1 
@@ -398,7 +400,8 @@ BEGIN
                                                   sum(tra.importe_debe_mb) as importe_debe_mb,
                                                   sum(tra.importe_haber_mb) as importe_haber_mb,
                                                   par.sw_movimiento,
-                                                  par.tipo as tipo_partida
+                                                  par.tipo as tipo_partida,
+                                                  tra.tipo_cambio
                                                 from conta.tint_transaccion tra
                                                 inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
                                                 inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
@@ -419,7 +422,8 @@ BEGIN
                                                   ot.desc_orden,
                                                   tra.glosa,
                                                   par.sw_movimiento,
-                                                  par.tipo
+                                                  par.tipo,
+                                                  tra.tipo_cambio
                                           )
                                           
                                                   

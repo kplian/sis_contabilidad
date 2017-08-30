@@ -21,6 +21,9 @@
 	   		<?php } ?>	
 	   		<?php if  ($val['glosa']!=''){ ?>	
 	   		    <br/><?php  echo trim($val['glosa']); ?>
+	   		<?php } ?>
+	   		<?php if  ($this->cabecera[0]['sw_tipo_cambio']=='si'){ ?>	
+	   		   <br/><b>Tipo Cambio.:</b> <?php  echo number_format($val['tipo_cambio'], 2, '.', ','); ?>
 	   		<?php } ?>	</div>
 			</td>
 			
