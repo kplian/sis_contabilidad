@@ -36,6 +36,10 @@ class MODTablaRelacionContable extends MODbase{
 		$this->captura('tabla_codigo_auxiliar','varchar');
 		$this->captura('tabla_id_auxiliar','varchar');
 		
+		$this->captura('tabla_codigo_aplicacion','varchar');
+		
+		
+		
 		  
 		
 		//Ejecuta la instruccion
@@ -61,6 +65,7 @@ class MODTablaRelacionContable extends MODbase{
 		$this->setParametro('recorrido_arbol','recorrido_arbol','varchar');
 		$this->setParametro('tabla_codigo_auxiliar','tabla_codigo_auxiliar','varchar');
 		$this->setParametro('tabla_id_auxiliar','tabla_id_auxiliar','varchar');
+		$this->setParametro('tabla_codigo_aplicacion','tabla_codigo_aplicacion','varchar');
 		
 		
             
@@ -88,7 +93,8 @@ class MODTablaRelacionContable extends MODbase{
 		$this->setParametro('tabla_id_fk','tabla_id_fk','varchar');
 		$this->setParametro('recorrido_arbol','recorrido_arbol','varchar');
 		$this->setParametro('tabla_codigo_auxiliar','tabla_codigo_auxiliar','varchar');
-        $this->setParametro('tabla_id_auxiliar','tabla_id_auxiliar','varchar');
+        $this->setParametro('tabla_id_auxiliar','tabla_id_auxiliar','varchar');		
+		$this->setParametro('tabla_codigo_aplicacion','tabla_codigo_aplicacion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

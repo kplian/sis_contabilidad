@@ -47,6 +47,11 @@ class ACTIntComprobante extends ACTbase{
 		if($this->objParam->getParametro('momento')!= ''){
 			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
 		}
+
+		//RCM 01/09/2017
+		if($this->objParam->getParametro('id_int_comprobante')!= ''){
+			$this->objParam->addFiltro("incbte.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));    
+		}
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);

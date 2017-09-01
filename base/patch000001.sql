@@ -4366,4 +4366,94 @@ IS 'JSON con los parametros que se mandan al a la interface de datalle';
 
    
 /***********************************F-SCP-RAC-CONTA-1-29/07/2017****************************************/
+
+
+
+
+   
+/***********************************I-SCP-RAC-CONTA-1-01/09/2017****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttabla_relacion_contable
+  ADD COLUMN tabla_codigo_aplicacion VARCHAR(100);
+
+COMMENT ON COLUMN conta.ttabla_relacion_contable.tabla_codigo_aplicacion
+IS 'define la columna en la tabla que se usara para determianr la aplicacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD COLUMN tiene_aplicacion VARCHAR(10) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.ttipo_relacion_contable.tiene_aplicacion
+IS 'indica si aplica o no un concepto de aplicacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD COLUMN tiene_moneda VARCHAR(6) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.ttipo_relacion_contable.tiene_moneda
+IS 'si considera o no la moneda del cbte para definir la relacion contable';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD COLUMN tiene_tipo_centro VARCHAR(10) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.ttipo_relacion_contable.tiene_tipo_centro
+IS 'si considera el tipo de centro de costo si es inversion o gasto';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttipo_relacion_contable
+  ADD COLUMN codigo_aplicacion_catalogo VARCHAR(300);
+
+COMMENT ON COLUMN conta.ttipo_relacion_contable.codigo_aplicacion_catalogo
+IS 'si tiene aplicacion es encesario definir el codigo de tipo catalogo para la configuracion de relaciones contable';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.trelacion_contable
+  ADD COLUMN id_moneda INTEGER;
+
+COMMENT ON COLUMN conta.trelacion_contable.id_moneda
+IS 'identifica la moenda para la relacion contable';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.trelacion_contable
+  ADD COLUMN id_tipo_presupuesto INTEGER;
+
+COMMENT ON COLUMN conta.trelacion_contable.id_tipo_presupuesto
+IS 'identifica el tipod e presupuesto, se aplica si fue configurado el tiene_tipo_centro en el tipo de relacion contable';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.trelacion_contable
+  ADD COLUMN codigo_aplicacion VARCHAR(200);
+
+COMMENT ON COLUMN conta.trelacion_contable.codigo_aplicacion
+IS 'se llena con el catalogo configurado en el tipo de relacion contable,  es el valor de la aplicacion';
+
+
+--------------- SQL ---------------
+
+COMMENT ON TABLE conta.trelacion_contable
+IS 'esta tabla permite configurar cuenta partida y  auxioar para diferentes conceptos, 
+centralizando la parametrizacion en un unico lugar y facilitar la generacion de comprobantes';
+
+
+   
+/***********************************F-SCP-RAC-CONTA-1-01/09/2017****************************************/
+
   
