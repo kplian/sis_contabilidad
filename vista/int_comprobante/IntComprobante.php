@@ -56,12 +56,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				tooltip : '<b>Relación con el devengado</b><br/>Solo para comprobantes de pago presupuestario'
 			});
 			
-			this.addButton('chkpresupuesto',{text:'Chk Presupuesto',
-				iconCls: 'blist',
-				disabled: true,
-				handler: this.checkPresupuesto,
-				tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>'
-			});
+			this.addBotonesPresupuesto()
+			
 			
 			this.addBotonesGantt();
 	        this.addButton('btnChequeoDocumentosWf',
@@ -1409,30 +1405,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				height : '80%'
 			}, rec.data, this.idContenedor, 'IntRelDevengado');
 		},
-	   checkPresupuesto:function(){                   
-			  var rec=this.sm.getSelected();
-			  var configExtra = [];
-			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
-										'Estado del Presupuesto',
-										{
-											modal:true,
-											width:700,
-											height:450
-										}, {
-											data:{
-											   nro_tramite: rec.data.nro_tramite								  
-											}}, this.idContenedor,'ChkPresupuesto',
-										{
-											config:[{
-													  event:'onclose',
-													  delegate: this.onCloseChk												  
-													}],
-											
-											scope:this
-										 });
-			   
-	 },
-	 
+	  
 	 addBotonesGantt: function() {
         this.menuAdqGantt = new Ext.Toolbar.SplitButton({
             id: 'b-diagrama_gantt-' + this.idContenedor,
@@ -1636,6 +1609,70 @@ header("content-type: text/javascript; charset=UTF-8");
         
         
     },
+    addBotonesPresupuesto: function() {
+    	
+        this.menuPre = new Ext.Toolbar.SplitButton({
+            id: 'b-chkpresupuesto-' + this.idContenedor,
+            text: 'Presupuestos.',
+            grupo:[0,1,2],
+            disabled: true,
+            iconCls : 'blist',
+            handler:this.checkPresupuesto,
+            scope: this,
+            menu:{
+            items: [{
+                id:'btn-chkpresupuesto-' + this.idContenedor,
+                text: 'Revisar Presupuesto Comprometido/Ejecutado',
+                tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>',
+                handler:this.checkPresupuesto,               
+                scope: this
+            }, {
+                id:'b-btnRepOC-' + this.idContenedor,
+                text: 'Verificar presupuesto disponible (Formulado)',
+                tooltip: '<b>Reporte de Pre-orden de Compra</b>',
+                handler:this.checkVerPresupuesto,
+                scope: this
+            }
+        ]}});
+		this.tbar.add(this.menuPre);
+    },
+    
+     checkPresupuesto:function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
+										'Estado del Presupuesto',
+										{
+											modal:true,
+											width:700,
+											height:450
+										}, {
+											data:{
+											   nro_tramite: rec.data.nro_tramite								  
+											}}, this.idContenedor,'ChkPresupuesto');
+			   
+	 },
+	 
+	  checkVerPresupuesto:function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/ChkPresupuestoCbte.php',
+										'Verificación de disponibilidad del Presupuesto',
+										{
+											modal: true,
+											width: 700,
+											height: 450
+										}, {
+											data:{
+											   nro_tramite: rec.data.nro_tramite,
+											   id_int_comprobante: rec.data.id_int_comprobante								  
+											}}, this.idContenedor,'ChkPresupuestoCbte');
+			   
+	 },
+	 
+	 
+    
+    
 
 	onButtonAIRBP : function() {
 		var rec=this.sm.getSelected();
