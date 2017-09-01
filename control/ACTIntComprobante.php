@@ -67,6 +67,8 @@ class ACTIntComprobante extends ACTbase{
 	}
 
 
+
+
    function listarIntComprobanteWF(){
 		$this->objParam->defecto('ordenacion','id_int_comprobante');
 		$this->objParam->defecto('dir_ordenacion','asc');
@@ -583,6 +585,25 @@ class ACTIntComprobante extends ACTbase{
 		$this->res=$this->objFunc->modificarFechasCostosCbte($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+   
+   
+
+   function listarVerPresCbte(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarVerPresCbte');
+		} else{
+			$this->objFunc=$this->create('MODIntComprobante');
+			
+			$this->res=$this->objFunc->listarVerPresCbte($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+   
    
    
 		

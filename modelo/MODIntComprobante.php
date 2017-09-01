@@ -6,7 +6,6 @@
 *@date 29-08-2013 00:28:30
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
-
 class MODIntComprobante extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -656,6 +655,48 @@ class MODIntComprobante extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function listarVerPresCbte(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.f_verificar_presu_cbte_sel';
+		$this->transaccion='CONTA_VERPRES_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this-> setCount(false);
+        $this->setTipoRetorno('record');
+
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+				
+		//Definicion de la lista del resultado del query
+		
+		$this->captura('id_ver','bigint');
+		$this->captura('control_partida','VARCHAR');
+		$this->captura('id_par','int4');
+		$this->captura('id_agrupador','INTEGER');
+		$this->captura('importe_debe','NUMERIC');
+		$this->captura('importe_haber','NUMERIC');
+		$this->captura('movimiento','VARCHAR');
+		$this->captura('id_presupuesto','INTEGER');
+		$this->captura('tipo_cambio','NUMERIC');
+		$this->captura('monto_mb','NUMERIC');
+		$this->captura('verificacion','VARCHAR');
+		$this->captura('saldo','NUMERIC');		
+		$this->captura('codigo_partida','VARCHAR');
+		$this->captura('nombre_partida','VARCHAR');
+		$this->captura('desc_tipo_presupuesto','VARCHAR');
+		$this->captura('descripcion','VARCHAR');
+		
+ 
+		
+	
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		//echo $this->getConsulta();exit;
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 			
 }
 ?>
