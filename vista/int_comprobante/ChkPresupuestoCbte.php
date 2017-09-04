@@ -140,7 +140,7 @@ Phx.vista.ChkPresupuestoCbte=Ext.extend(Phx.gridInterfaz,{
 	
 
 	sortInfo:{
-		field: 'id_presup_partida',
+		field: 'id_ver',
 		direction: 'ASC'
 	},
 	bdel: false,
