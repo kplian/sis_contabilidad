@@ -20,7 +20,10 @@ class MODAuxiliar extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		
 		
-		$this->setParametro('id_cuenta','id_cuenta','int4');		
+		$this->setParametro('id_cuenta','id_cuenta','int4');	
+		$this->setParametro('id_centro_costo','id_centro_costo','int4');
+		
+		
 		//Definicion de la lista del resultado del query
 		$this->captura('id_auxiliar','int4');
 		$this->captura('id_empresa','int4');

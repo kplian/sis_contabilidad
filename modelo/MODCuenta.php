@@ -19,7 +19,11 @@ class MODCuenta extends MODbase{
 		$this->transaccion='CONTA_CTA_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
-		$this->setParametro('filtro_ges','filtro_ges','varchar'); 
+		$this->setParametro('filtro_ges','filtro_ges','varchar');
+		$this->setParametro('id_centro_costo','id_centro_costo','int4');
+		$this->setParametro('id_gestion','id_gestion','int4');
+		
+		 
 		//Definicion de la lista del resultado del query
 		$this->captura('id_cuenta','int4');
 		$this->captura('id_usuario_reg','int4');
@@ -344,9 +348,7 @@ class MODCuenta extends MODbase{
 		 $this->captura('tipo','varchar');
 		 $this->captura('movimiento','varchar');
 		 
-		
-          
-		  
+ 
 		 
 		//Ejecuta la instruccion
 	    $this->armarConsulta();
@@ -395,10 +397,7 @@ class MODCuenta extends MODbase{
 		 $this->captura('tipo','varchar');
 		 $this->captura('movimiento','varchar');
 		 
-		
-          
-		  
-		 
+
 		//Ejecuta la instruccion
 	    $this->armarConsulta();
 		//echo $this->getConsulta();
