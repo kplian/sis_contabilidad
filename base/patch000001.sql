@@ -4359,11 +4359,26 @@ ALTER TABLE conta.ttipo_estado_columna
 COMMENT ON COLUMN conta.ttipo_estado_columna.parametros_det
 IS 'JSON con los parametros que se mandan al a la interface de datalle';
 
-
-
-
-
-
-   
+ 
 /***********************************F-SCP-RAC-CONTA-1-29/07/2017****************************************/
   
+  
+/***********************************I-SCP-RAC-CONTA-1-08/09/2017****************************************/
+  
+ 
+CREATE TABLE conta.ttipo_cc_cuenta (
+  id_tipo_cc_cuenta SERIAL NOT NULL,
+  id_tipo_cc INTEGER,
+  nro_cuenta VARCHAR,
+  id_auxiliar INTEGER,
+  obs VARCHAR,
+  PRIMARY KEY(id_tipo_cc_cuenta)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+
+  
+/***********************************F-SCP-RAC-CONTA-1-08/09/2017****************************************/
+  
+ 

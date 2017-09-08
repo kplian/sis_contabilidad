@@ -1358,3 +1358,10 @@ VALUES
 /***********************************F-DAT-RAC-CONTA-0-29/08/2017*****************************************/
 
 
+/***********************************I-DAT-RAC-CONTA-0-08/09/2017*****************************************/
+
+select pxp.f_insert_tgui ('Cuentas por Tipo de Centro', 'Cuentas por Tipo de Centro', 'TCCUAX', 'si', 5, 'sis_contabilidad/vista/tipo_cc_cuenta/TipoCcConf.php', 3, '', 'TipoCcConf', 'CONTA');
+select pxp.f_insert_testructura_gui ('TCCUAX', 'CNOM');
+
+/***********************************F-DAT-RAC-CONTA-0-08/09/2017*****************************************/
+
