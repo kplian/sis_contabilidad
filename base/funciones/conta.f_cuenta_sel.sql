@@ -33,6 +33,8 @@ DECLARE
     v_gestion			varchar;
     v_id_gestion		integer;
     v_add_filtro		varchar;
+    v_filtor_tipo_cc		varchar;
+    v_id_cuenta_permitidas		varchar;
 			    
 BEGIN
 
@@ -69,6 +71,33 @@ BEGIN
             IF  v_id_gestion is not null THEN
               v_add_filtro = ' cta.id_gestion = '||v_id_gestion::varchar|| '  and ';
             END IF;
+            
+            v_filtor_tipo_cc = pxp.f_get_variable_global('conta_filtrar_cuenta_por_tipo_cc_interface_junior');
+            
+          
+            
+            IF v_filtor_tipo_cc = 'si'  and   pxp.f_existe_parametro(p_tabla, 'id_centro_costo') THEN
+            
+            
+                 IF  pxp.f_existe_parametro(p_tabla, 'id_gestion') THEN
+                      v_id_gestion = v_parametros.id_gestion;
+                 END IF;
+                 
+                 
+                 select 
+                   pxp.list(cue.id_cuenta::varchar)
+                 into
+                    v_id_cuenta_permitidas
+                 from conta.ttipo_cc_cuenta tccc  
+                 inner join conta.tcuenta cue on cue.nro_cuenta = tccc.nro_cuenta and cue.id_gestion = v_id_gestion and cue.estado_reg = 'activo'
+                 inner join param.tcentro_costo cc on tccc.id_tipo_cc = cc.id_tipo_cc                 
+                 where cc.id_centro_costo = v_parametros.id_centro_costo;
+                 
+                 v_add_filtro=v_add_filtro||'  cta.id_cuenta in ('|| COALESCE(v_id_cuenta_permitidas,'0') ||')  and '; 
+               
+            END IF;
+            
+           
         
     		--Sentencia de la consulta
 			v_consulta:='SELECT 
@@ -108,7 +137,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+            raise notice '-%-',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -205,6 +234,32 @@ BEGIN
               v_add_filtro = ' cta.id_gestion = '||v_id_gestion::varchar|| '  and ';
             END IF;
             
+            v_filtor_tipo_cc = pxp.f_get_variable_global('conta_filtrar_cuenta_por_tipo_cc_interface_junior');
+            
+          
+            
+            IF v_filtor_tipo_cc = 'si'  and   pxp.f_existe_parametro(p_tabla, 'id_centro_costo') THEN
+            
+            
+                 IF  pxp.f_existe_parametro(p_tabla, 'id_gestion') THEN
+                      v_id_gestion = v_parametros.id_gestion;
+                 END IF;
+                 
+                 
+                 select 
+                   pxp.list(cue.id_cuenta::varchar)
+                 into
+                    v_id_cuenta_permitidas
+                 from conta.ttipo_cc_cuenta tccc  
+                 inner join conta.tcuenta cue on cue.nro_cuenta = tccc.nro_cuenta and cue.id_gestion = v_id_gestion and cue.estado_reg = 'activo'
+                 inner join param.tcentro_costo cc on tccc.id_tipo_cc = cc.id_tipo_cc                 
+                 where cc.id_centro_costo = v_parametros.id_centro_costo;
+                 
+                 v_add_filtro=v_add_filtro||'  cta.id_cuenta in ('|| COALESCE(v_id_cuenta_permitidas,'0') ||')  and '; 
+               
+            END IF;
+            
+            
             
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_cuenta)
@@ -264,8 +319,9 @@ BEGIN
             --Devuelve la respuesta
             return v_consulta;
                        
-        end;   
-    				
+        end; 
+        
+			
 	else
 					     
 		raise exception 'Transaccion inexistente';

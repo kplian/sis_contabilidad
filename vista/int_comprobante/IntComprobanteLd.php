@@ -27,13 +27,7 @@ Phx.vista.IntComprobanteLd = {
 	    this.addBotonesVolcar();
 		this.addBotonesClonar();
 		
-		this.addButton('chkdep',{	text:'Dependencias',
-				iconCls: 'blist',
-				disabled: true,
-				handler: this.checkDependencias,
-				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
-			});
-			
+		
 		this.addButton('btnWizard', {
 					text : 'Plantilla',
 					iconCls : 'bgear',
@@ -157,20 +151,7 @@ Phx.vista.IntComprobanteLd = {
            
 			
 	},
-	checkDependencias: function(){                   
-			  var rec=this.sm.getSelected();
-			  var configExtra = [];
-			  this.objChkPres = Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/CbteDependencias.php',
-										'Dependencias',
-										{
-											modal:true,
-											width: '80%',
-											height: '80%'
-										}, 
-										  rec.data, 
-										  this.idContenedor,
-										 'CbteDependencias');			   
-	},
+	
 	addBotonesClonar: function() {
         this.menuClonar = new Ext.Toolbar.SplitButton({
             id: 'b-btnClonar-' + this.idContenedor,
