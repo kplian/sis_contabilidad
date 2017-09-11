@@ -29,13 +29,16 @@ Phx.vista.IntTransaccionLd = {
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
 		Phx.vista.IntTransaccionLd.superclass.preparaMenu.call(this);
-		this.getBoton('btnBanco').disable();
+		if(this.getBoton('btnBanco')){
+			this.getBoton('btnBanco').disable();
+		}		
 	},
 	
 	liberaMenu: function() {
 		var tb = Phx.vista.IntTransaccionLd.superclass.liberaMenu.call(this);
-		this.getBoton('btnBanco').setDisabled(true);
-		
+		if(this.getBoton('btnBanco')){
+			this.getBoton('btnBanco').setDisabled(true);
+		}		
 	}
 	
 };

@@ -819,7 +819,11 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		 	this.mostrarColumnaByName('importe_haber_ma');
 		 }
 		 
+		 console.log('mostrarColumnaByName')
+		 
 		 this.getConfigCambiaria();
+		 
+		 console.log('getConfigCambiaria')
 		 
 		 
 	},
@@ -836,9 +840,13 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			
 		}
 		else{
+			if (tb && this.bedit) {
 			 this.getBoton('edit').disable();
-			 this.getBoton('del').disable();
-			 this.getBoton('btnBanco').disable();
+			}
+			if (tb && this.bdel) {
+				 this.getBoton('del').disable();
+			}
+			this.getBoton('btnBanco').disable();
 		}
 		
 		if(rec.data.actualizacion == 'si'){
@@ -848,11 +856,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		
 		
 		if(this.maestro.sw_editable == 'no'){
-			this.getBoton('edit').disable();
-			this.getBoton('edit').disable();
-			this.getBoton('del').disable();
+			if (tb && this.bedit) {
+               this.getBoton('edit').disable();
+            }
+            if (tb && this.bdel) {
+            	this.getBoton('del').disable();
+            }
+			if (tb && this.bnew) {
+			    this.getBoton('new').disable();
+			}
 			this.getBoton('btnBanco').disable();
-			this.getBoton('new').disable();
 		}
 		
 		
@@ -864,7 +877,10 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		this.getBoton('btnBanco').setDisabled(true);
 		
 		if(this.maestro.sw_editable == 'no'){
-			this.getBoton('new').disable();
+			if (tb && this.bnew) {
+               this.getBoton('new').disable();
+            }
+			
 		}
 	},
 	
@@ -938,6 +954,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 
 			var localidad = this.maestro.localidad;
 			
+			
 			Phx.CP.loadingShow();
 				Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/ConfigCambiaria/getConfigCambiaria',
@@ -949,6 +966,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 					forma_cambio: 'Oficial'
 				}, success: function(resp) {
 					
+					
+					
 					Phx.CP.loadingHide();
 					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 					if (reg.ROOT.error) {
@@ -957,10 +976,12 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 						//cambia labels
 						this.labeTc1 = reg.ROOT.datos.v_tc1 +' (tc)';
 						this.labeTc2 = reg.ROOT.datos.v_tc2 +' (tc)';
-						this.labeTc3 = reg.ROOT.datos.v_tc3 +' (tc)';						
+						this.labeTc3 = reg.ROOT.datos.v_tc3 +' (tc)';	
+											
 						this.setColumnHeader('tipo_cambio', this.labeTc1);
 		                this.setColumnHeader('tipo_cambio_2', this.labeTc2);
 		                this.setColumnHeader('tipo_cambio_3', this.labeTc3);
+		               
 					}
 				}, failure: function(a,b,c,d){
 					this.conexionFailure(a,b,c,d)

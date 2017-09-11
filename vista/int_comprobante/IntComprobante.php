@@ -47,6 +47,14 @@ header("content-type: text/javascript; charset=UTF-8");
 						tooltip: 'Subir archivo facturas AIRBP'
 					}
 			);
+			
+			this.addButton('chkdep',{	text:'Dependencias',
+				iconCls: 'blist',
+				disabled: true,
+				handler: this.checkDependencias,
+				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
+			});
+			
 
 			this.addButton('btnRelDev', {
 				text : 'Rel Dev',
@@ -1672,7 +1680,20 @@ header("content-type: text/javascript; charset=UTF-8");
 			   
 	 },
 	 
-	 
+	 checkDependencias: function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/CbteDependencias.php',
+										'Dependencias',
+										{
+											modal:true,
+											width: '80%',
+											height: '80%'
+										}, 
+										  rec.data, 
+										  this.idContenedor,
+										 'CbteDependencias');			   
+	},
     
     
 
