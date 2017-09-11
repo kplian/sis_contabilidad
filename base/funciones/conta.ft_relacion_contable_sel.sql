@@ -47,36 +47,45 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						relcon.id_relacion_contable,
-						relcon.estado_reg,
-						relcon.id_tipo_relacion_contable,
-						relcon.id_cuenta,
-						relcon.id_partida,
-						relcon.id_gestion,
-						relcon.id_auxiliar,
-						relcon.id_centro_costo,
-						relcon.fecha_reg,
-						relcon.id_usuario_reg,
-						relcon.fecha_mod,
-						relcon.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-						relcon.id_tabla,
-						ges.gestion,
-						tiprelco.nombre_tipo_relacion,
-						cu.nro_cuenta,
-						cu.nombre_cuenta,
-						au.codigo_auxiliar,
-						au.nombre_auxiliar,
-						par.codigo,
-						par.nombre_partida,
-						tiprelco.tiene_centro_costo,
-						tiprelco.tiene_partida,
-						tiprelco.tiene_auxiliar,
-                        cc.codigo_cc,
-                        relcon.defecto,
-                        tiprelco.partida_tipo,
-                        tiprelco.partida_rubro
+                            relcon.id_relacion_contable,
+                            relcon.estado_reg,
+                            relcon.id_tipo_relacion_contable,
+                            relcon.id_cuenta,
+                            relcon.id_partida,
+                            relcon.id_gestion,
+                            relcon.id_auxiliar,
+                            relcon.id_centro_costo,
+                            relcon.fecha_reg,
+                            relcon.id_usuario_reg,
+                            relcon.fecha_mod,
+                            relcon.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            relcon.id_tabla,
+                            ges.gestion,
+                            tiprelco.nombre_tipo_relacion,
+                            cu.nro_cuenta,
+                            cu.nombre_cuenta,
+                            au.codigo_auxiliar,
+                            au.nombre_auxiliar,
+                            par.codigo,
+                            par.nombre_partida,
+                            tiprelco.tiene_centro_costo,
+                            tiprelco.tiene_partida,
+                            tiprelco.tiene_auxiliar,
+                            cc.codigo_cc,
+                            relcon.defecto,
+                            tiprelco.partida_tipo,
+                            tiprelco.partida_rubro,
+                            tiprelco.tiene_moneda,
+                            tiprelco.tiene_tipo_centro,
+                            tiprelco.tiene_aplicacion,
+                            tiprelco.codigo_aplicacion_catalogo,
+                            tp.nombre as desc_tipo_presupuesto,
+                            relcon.codigo_aplicacion,
+                            mon.moneda,
+                            relcon.id_tipo_presupuesto,
+                            relcon.id_moneda
 						from conta.trelacion_contable relcon
 						inner join conta.ttipo_relacion_contable tiprelco
 							on tiprelco.id_tipo_relacion_contable = relcon.id_tipo_relacion_contable
@@ -94,6 +103,8 @@ BEGIN
 							on par.id_partida = relcon.id_partida
 						inner join segu.tusuario usu1 on usu1.id_usuario = relcon.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = relcon.id_usuario_mod
+                        left join pre.ttipo_presupuesto tp on tp.id_tipo_presupuesto = relcon.id_tipo_presupuesto
+                        left join param.tmoneda mon on mon.id_moneda = relcon.id_moneda
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -134,6 +145,8 @@ BEGIN
 							on par.id_partida = relcon.id_partida
 						inner join segu.tusuario usu1 on usu1.id_usuario = relcon.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = relcon.id_usuario_mod
+                        left join pre.ttipo_presupuesto tp on tp.id_tipo_presupuesto = relcon.id_tipo_presupuesto
+                        left join param.tmoneda mon on mon.id_moneda = relcon.id_moneda
 				        where ';
 			
 			--Definicion de la respuesta		    
