@@ -42,6 +42,11 @@ Phx.vista.IntTransaccionAux = {
 		 	  this.Cmp.id_orden_trabajo.modificado = true;		 	  
 		 	  this.Cmp.id_partida.store.baseParams.id_centro_costo = rec.data.id_centro_costo;
 		 	  this.Cmp.id_partida.modificado = true;
+		 	  this.Cmp.id_cuenta.store.baseParams.id_centro_costo = rec.data.id_centro_costo;
+		 	  this.Cmp.id_cuenta.modificado = true;
+		 	  this.Cmp.id_auxiliar.store.baseParams.id_centro_costo = rec.data.id_centro_costo;
+		 	  this.Cmp.id_auxiliar.modificado = true;
+		 	  
 		 	  
 		 }, this);
 		 
