@@ -60,7 +60,7 @@ class MODRelacionContable extends MODbase{
         $this->captura('desc_tipo_presupuesto','varchar');
 		
 		$this->captura('codigo_aplicacion','varchar');
-		$this->captura('moenda','varchar');
+		$this->captura('moneda','varchar');
 		$this->captura('id_tipo_presupuesto','int4');
 		$this->captura('id_moneda','int4');
 		

@@ -15,6 +15,13 @@ Phx.vista.TipoRelacionContableGeneral = {
 	requireclase:'Phx.vista.TipoRelacionContable',
 	title:'Tipo Relacion Contable',
 	constructor:function(config){
+		
+        this.Atributos[this.getIndAtributo('codigo_aplicacion_catalogo')].grid=false;         
+        this.Atributos[this.getIndAtributo('codigo_aplicacion_catalogo')].form=false; 
+		this.Atributos[this.getIndAtributo('tiene_aplicacion')].grid=false;        
+        this.Atributos[this.getIndAtributo('tiene_aplicacion')].form=false; 
+        
+         
 		//llama al constructor de la clase padre
 		Phx.vista.TipoRelacionContableGeneral.superclass.constructor.call(this,config);
 		this.store.baseParams={es_general:'si'};

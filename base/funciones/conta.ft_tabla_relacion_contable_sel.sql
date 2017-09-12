@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.ft_tipo_relacion_contable_sel (
+CREATE OR REPLACE FUNCTION conta.ft_tabla_relacion_contable_sel (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
@@ -10,14 +10,13 @@ RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.ft_tipo_relacion_contable_sel
- DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.ttipo_relacion_contable'
+ FUNCION: 		conta.ft_tabla_relacion_contable_sel
+ DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.ttabla_relacion_contable'
  AUTOR: 		 (admin)
- FECHA:	        16-05-2013 21:51:43
+ FECHA:	        16-05-2013 21:05:26
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
  DESCRIPCION:	
  AUTOR:			
  FECHA:		
@@ -32,48 +31,40 @@ DECLARE
 			    
 BEGIN
 
-	v_nombre_funcion = 'conta.ft_tipo_relacion_contable_sel';
+	v_nombre_funcion = 'conta.ft_tabla_relacion_contable_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_TIPRELCO_SEL'
+ 	#TRANSACCION:  'CONTA_TABRECON_SEL'
  	#DESCRIPCION:	Consulta de datos
  	#AUTOR:		admin	
- 	#FECHA:		16-05-2013 21:51:43
+ 	#FECHA:		16-05-2013 21:05:26
 	***********************************/
 
-	if(p_transaccion='CONTA_TIPRELCO_SEL')then
+	if(p_transaccion='CONTA_TABRECON_SEL')then
      				
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-                            tiprelco.id_tipo_relacion_contable,
-                            tiprelco.estado_reg,
-                            tiprelco.nombre_tipo_relacion,
-                            tiprelco.tiene_centro_costo,
-                            tiprelco.codigo_tipo_relacion,
-                            tiprelco.id_tabla_relacion_contable,
-                            tiprelco.fecha_reg,
-                            tiprelco.id_usuario_reg,
-                            tiprelco.fecha_mod,
-                            tiprelco.id_usuario_mod,
-                            usu1.cuenta as usr_reg,
-                            usu2.cuenta as usr_mod,
-                            tiprelco.tiene_partida,
-                            tiprelco.tiene_auxiliar,
-                            tiprelco.partida_tipo,
-                            tiprelco.partida_rubro,
-                            
-                            tiprelco.tiene_aplicacion,
-                            tiprelco.tiene_moneda,
-                            tiprelco.tiene_tipo_centro,
-                            tiprelco.codigo_aplicacion_catalogo
-						
-                        from conta.ttipo_relacion_contable tiprelco
-						left join conta.ttabla_relacion_contable tabrelco
-							on tabrelco.id_tabla_relacion_contable = tiprelco.id_tabla_relacion_contable
-						inner join segu.tusuario usu1 on usu1.id_usuario = tiprelco.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = tiprelco.id_usuario_mod
+						tabrecon.id_tabla_relacion_contable,
+						tabrecon.estado_reg,
+						tabrecon.tabla,
+						tabrecon.esquema,
+                        tabrecon.tabla_id,
+						tabrecon.fecha_reg,
+						tabrecon.id_usuario_reg,
+						tabrecon.fecha_mod,
+						tabrecon.id_usuario_mod,
+						usu1.cuenta as usr_reg,
+						usu2.cuenta as usr_mod,
+						tabrecon.tabla_id_fk,
+						tabrecon.recorrido_arbol,
+                        tabrecon.tabla_codigo_auxiliar,
+                        tabrecon.tabla_id_auxiliar,
+                        tabrecon.tabla_codigo_aplicacion
+						from conta.ttabla_relacion_contable tabrecon
+						inner join segu.tusuario usu1 on usu1.id_usuario = tabrecon.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = tabrecon.id_usuario_mod
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -86,22 +77,20 @@ BEGIN
 		end;
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_TIPRELCO_CONT'
+ 	#TRANSACCION:  'CONTA_TABRECON_CONT'
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:		admin	
- 	#FECHA:		16-05-2013 21:51:43
+ 	#FECHA:		16-05-2013 21:05:26
 	***********************************/
 
-	elsif(p_transaccion='CONTA_TIPRELCO_CONT')then
+	elsif(p_transaccion='CONTA_TABRECON_CONT')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_tipo_relacion_contable)
-					    from conta.ttipo_relacion_contable tiprelco
-					    left join conta.ttabla_relacion_contable tabrelco
-							on tabrelco.id_tabla_relacion_contable = tiprelco.id_tabla_relacion_contable
-					    inner join segu.tusuario usu1 on usu1.id_usuario = tiprelco.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = tiprelco.id_usuario_mod
+			v_consulta:='select count(id_tabla_relacion_contable)
+					    from conta.ttabla_relacion_contable tabrecon
+					    inner join segu.tusuario usu1 on usu1.id_usuario = tabrecon.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = tabrecon.id_usuario_mod
 					    where ';
 			
 			--Definicion de la respuesta		    
