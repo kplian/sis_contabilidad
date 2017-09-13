@@ -36,6 +36,7 @@ DECLARE
     v_codigo_pla			varchar;
     v_registros				record;
     v_id_int_comprobante     integer;
+    v_nro_tramite			varchar;
 			    
 BEGIN
 
@@ -164,9 +165,17 @@ BEGIN
            FOR v_registros in ( SELECT  
                                    agd.id_doc_compra_venta
                                 FROM conta.tagrupador_doc agd where agd.id_agrupador =   v_parametros.id_agrupador) LOOP
+                                
+                select
+                  c.nro_tramite
+                into
+                  v_nro_tramite
+                from conta.tint_comprobante c
+                where c.id_int_comprobante = v_id_int_comprobante;                
             
                 UPDATE  conta.tdoc_compra_venta  SET 
-                  id_int_comprobante = v_id_int_comprobante
+                  id_int_comprobante = v_id_int_comprobante,
+                  nro_tramite = v_nro_tramite
                 WHERE  id_doc_compra_venta = v_registros.id_doc_compra_venta; 
            END LOOP;
            

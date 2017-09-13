@@ -4382,3 +4382,19 @@ WITH (oids = false);
 /***********************************F-SCP-RAC-CONTA-1-08/09/2017****************************************/
   
  
+ 
+ 
+/***********************************I-SCP-RAC-CONTA-1-13/09/2017****************************************/
+  
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN nro_tramite VARCHAR;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.nro_tramite
+IS 'identifica el nro de tramite donde fue generada la factura';
+
+
+/***********************************F-SCP-RAC-CONTA-1-13/09/2017****************************************/
+ 
+
+
