@@ -36,6 +36,11 @@ class MODTipoRelacionContable extends MODbase{
 		$this->captura('tiene_auxiliar','varchar');
 		$this->captura('partida_tipo','varchar');
 		$this->captura('partida_rubro','varchar');
+		$this->captura('tiene_aplicacion','varchar');
+		$this->captura('tiene_moneda','varchar');
+		$this->captura('tiene_tipo_centro','varchar');
+		$this->captura('codigo_aplicacion_catalogo','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -61,6 +66,11 @@ class MODTipoRelacionContable extends MODbase{
 		$this->setParametro('tiene_auxiliar','tiene_auxiliar','varchar');
 		$this->setParametro('partida_tipo','partida_tipo','varchar');
 		$this->setParametro('partida_rubro','partida_rubro','varchar');
+		$this->setParametro('tiene_aplicacion','tiene_aplicacion','varchar');
+		$this->setParametro('tiene_moneda','tiene_moneda','varchar');
+		$this->setParametro('tiene_tipo_centro','tiene_tipo_centro','varchar');
+		$this->setParametro('codigo_aplicacion_catalogo','codigo_aplicacion_catalogo','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -87,6 +97,10 @@ class MODTipoRelacionContable extends MODbase{
 		$this->setParametro('tiene_auxiliar','tiene_auxiliar','varchar');
 		$this->setParametro('partida_tipo','partida_tipo','varchar');
 		$this->setParametro('partida_rubro','partida_rubro','varchar');
+		$this->setParametro('tiene_aplicacion','tiene_aplicacion','varchar');
+		$this->setParametro('tiene_moneda','tiene_moneda','varchar');
+		$this->setParametro('tiene_tipo_centro','tiene_tipo_centro','varchar');
+		$this->setParametro('codigo_aplicacion_catalogo','codigo_aplicacion_catalogo','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

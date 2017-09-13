@@ -167,6 +167,115 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 	   			grid:true,
 	   			form:true
 	   	},	
+	   	
+	   		{
+			config : {
+				name : 'id_moneda',
+				origen : 'MONEDA',
+				allowBlank : false,
+				fieldLabel : 'Moneda',
+				gdisplayField : 'moneda', //mapea al store del grid
+				gwidth : 100,
+				anchor: '80%',
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['moneda']);
+				}
+			},
+			type : 'ComboRec',
+			id_grupo : 2,
+			filters : {
+				pfiltro : 'mon.moneda',
+				type : 'string'
+			},
+			grid : true,
+			form : true
+		}, 
+		
+	   	
+	   	{
+			config:{
+				name: 'id_tipo_presupuesto',
+				fieldLabel: 'Tipo Presupuesto',
+				allowBlank: false,
+				emptyText : '...',
+				store : new Ext.data.JsonStore({
+					url:'../../sis_presupuestos/control/TipoPresupuesto/listarTipoPresupuesto',
+					id : 'codigo',
+					root: 'datos',
+					sortInfo:{
+						field: 'codigo',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['codigo','nombre','movimiento','id_tipo_presupuesto'],
+					remoteSort: true,
+					baseParams:{par_filtro:'nombre'}
+				}),
+				valueField: 'id_tipo_presupuesto',
+				displayField: 'nombre',
+				gdisplayField: 'desc_tipo_presupuesto',
+				hiddenName: 'id_tipo_presupuesto',
+				forceSelection:true,
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender:true,
+				mode:'remote',
+				pageSize:10,
+				queryDelay:1000,
+				anchor: '80%',
+				listWidth: 280,
+				gwidth: 150,
+				minChars:2,
+				renderer:function(value, p, record){return String.format('{0}', record.data['desc_tipo_presupuesto']);}
+			},
+			type:'ComboBox',
+			bottom_filter: true,
+			filters:{pfiltro:'tp.nombre',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config : {
+						name:'codigo_aplicacion',
+						qtip:'Aplicación para filtro prioritario, primero busca uan relación contable especifica para la aplicación definida si no la encuentra busca un relación contable sin aplicación',
+						fieldLabel : 'Aplicación:',
+						resizable:true,
+						allowBlank:true,
+		   				emptyText:'Seleccione un catálogo...',
+		   				store: new Ext.data.JsonStore({
+							url: '../../sis_parametros/control/Catalogo/listarCatalogoCombo',
+							id: 'id_catalogo',
+							root: 'datos',
+							sortInfo:{
+								field: 'orden',
+								direction: 'ASC'
+							},
+							totalProperty: 'total',
+							fields: ['id_catalogo','codigo','descripcion'],
+							// turn on remote sorting
+							remoteSort: true,
+							baseParams: {par_filtro:'descripcion',catalogo_tipo:''}
+						}),
+	       			    enableMultiSelect:false,    				
+						valueField: 'codigo',
+		   				displayField: 'descripcion',
+		   				gdisplayField: 'codigo_aplicacion',
+		   				forceSelection:true,
+		   				typeAhead: false,
+		       			triggerAction: 'all',
+		       			lazyRender:true,
+		   				mode:'remote',
+		   				pageSize:10,
+		   				queryDelay:1000,
+		   				anchor: '80%',
+		   				minChars:2
+		    },
+			type : 'ComboBox',
+			form : true,
+			grid: true
+		 },
+	   	
 		
 		{
 			config:{
@@ -282,7 +391,11 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombre_partida', type: 'string'},
 		{name:'defecto', type: 'string'},
 		{name:'partida_tipo', type: 'string'},
-		{name:'partida_rubro', type: 'string'}
+		{name:'partida_rubro', type: 'string'},		
+		'tiene_moneda','tiene_tipo_centro','tiene_aplicacion',
+		'codigo_aplicacion_catalogo','desc_tipo_presupuesto','codigo_aplicacion','moneda','id_tipo_presupuesto','id_moneda'
+		
+		
 	],
 	sortInfo:{
 		field: 'id_relacion_contable',
