@@ -140,7 +140,25 @@ Phx.vista.RelacionContableTabla = {
             
         }, this);
         
-        this.Cmp.id_centro_costo.on('select', function (c,r,i) {           
+        
+        this.Cmp.id_centro_costo.on('change', function (c,newValue, oldValue) { 
+        	
+        	console.log('newValue...',newValue, 'oldValue', oldValue)
+        	
+        	if(newValue){
+        		this.Cmp.id_tipo_presupuesto.reset();
+        	    this.Cmp.id_tipo_presupuesto.disable()
+        	}
+        	else{
+        		this.Cmp.id_tipo_presupuesto.reset();
+        	    this.Cmp.id_tipo_presupuesto.enable()
+        	}
+        	
+         }, this);	
+        
+        this.Cmp.id_centro_costo.on('select', function (c,r,i) { 
+        	
+        	
             //if (this.filtro_partida == 'no') {
 	          //  this.Cmp.id_partida.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
 	            //this.Cmp.id_partida.modificado = true;
@@ -260,7 +278,7 @@ Phx.vista.RelacionContableTabla = {
 			if (r.data.tiene_tipo_centro == 'si') {
 				this.tiene_tipo_centro = 'si';
 				this.mostrarComponente(this.Cmp.id_tipo_presupuesto);
-				this.setAllowBlank(this.Cmp.id_tipo_presupuesto, false);
+				this.setAllowBlank(this.Cmp.id_tipo_presupuesto, true);
 				this.Cmp.id_tipo_presupuesto.enable();
 				
 				
@@ -277,7 +295,7 @@ Phx.vista.RelacionContableTabla = {
 				this.tiene_aplicacion = 'si';
 				this.Cmp.codigo_aplicacion.reset();
 				this.mostrarComponente(this.Cmp.codigo_aplicacion);
-				this.setAllowBlank(this.Cmp.codigo_aplicacion, false);
+				this.setAllowBlank(this.Cmp.codigo_aplicacion, true);
 				this.Cmp.codigo_aplicacion.enable();
 				this.Cmp.codigo_aplicacion.store.baseParams.catalogo_tipo = r.data.codigo_aplicacion_catalogo ;
 				this.Cmp.codigo_aplicacion.modificado = true;
@@ -376,7 +394,7 @@ Phx.vista.RelacionContableTabla = {
 		//moneda
 		if (selected.tiene_moneda == 'si') {			
 			this.mostrarComponente(this.Cmp.id_moneda);
-			this.setAllowBlank(this.Cmp.id_moneda, true);
+			this.setAllowBlank(this.Cmp.id_moneda, false);
 			this.tiene_moneda = 'si';
 		} else {
 			this.Cmp.id_moneda.reset();
