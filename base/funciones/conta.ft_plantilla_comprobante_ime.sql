@@ -1,6 +1,6 @@
---------------- SQL ---------------
+-------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime (
+CREATE OR REPLACE FUNCTION conta.ft_plantilla_comprobante_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
@@ -10,14 +10,13 @@ RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.ft_relacion_contable_ime
- DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.trelacion_contable'
- AUTOR: 		 (rac - kplian)
- FECHA:	        16-05-2013 21:52:14
+ FUNCION: 		conta.ft_plantilla_comprobante_ime
+ DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_comprobante'
+ AUTOR: 		 (admin)
+ FECHA:	        10-06-2013 14:40:00
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
  DESCRIPCION:	
  AUTOR:			
  FECHA:		
@@ -31,165 +30,101 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_relacion_contable	integer;
-    
-    v_tipo_rel  record;
-    v_defecto varchar;
-    v_resp_rep			varchar;
-    v_id_deptos_lbs			varchar;
+	v_id_plantilla_comprobante	integer;
 			    
 BEGIN
 
-    v_nombre_funcion = 'conta.ft_relacion_contable_ime';
+    v_nombre_funcion = 'conta.ft_plantilla_comprobante_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_RELCON_INS'
+ 	#TRANSACCION:  'CONTA_CMPB_INS'
  	#DESCRIPCION:	Insercion de registros
  	#AUTOR:		admin	
- 	#FECHA:		16-05-2013 21:52:14
+ 	#FECHA:		10-06-2013 14:40:00
 	***********************************/
 
-	if(p_transaccion='CONTA_RELCON_INS')then
+	if(p_transaccion='CONTA_CMPB_INS')then
 					
         begin
-        	--raise exception 'Desabilitado por unos instantes...';
-            -- sies una relacion contable unica buscamos que para la misma tabla no exista otrao
-            select 
-              * 
-            into 
-              v_tipo_rel 
-            from conta.ttipo_relacion_contable trc 
-            where trc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable;
-            
-            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
-            
-               v_defecto =  v_parametros.defecto;
-        
-            ELSE
-            
-               v_defecto = 'no';
-            
-            
-            END IF;
-            
-            --si_unico solo permite un centro de costo para el id_tabla
-	    IF v_tipo_rel.tiene_centro_costo IN ('si-unico') THEN
-            
-            
-               IF  EXISTS(select  1 
-                   from conta.trelacion_contable  rc 
-                   where rc.id_gestion = v_parametros.id_gestion 
-                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
-                     and rc.id_centro_costo is not null
-                     and rc.estado_reg = 'activo'  
-                     and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null )  ) THEN
-                     
-                     raise exception 'En relaciones contables si-unico solo se permite una configuracion con un solo centro de costo';
-                     
-               END IF;   
-            
-            END IF;
-            --si_general permite  centro de costo para el id_tabla
-            IF (v_tipo_rel.tiene_centro_costo IN ('si-general') and v_defecto = 'no' )THEN
-            
-            
-               IF  EXISTS(select  1 
-                   from conta.trelacion_contable  rc 
-                   where rc.id_gestion = v_parametros.id_gestion 
-                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
-                     and rc.id_centro_costo = v_parametros.id_centro_costo
-                     and rc.estado_reg = 'activo'
-                     and rc.defecto = 'no'
-                     and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null )  ) THEN
-                     
-                     raise exception 'Ya existe una relacion contable para este elemento';
-                     
-               END IF;   
-            
-            END IF;
-            
-            IF v_tipo_rel.tiene_centro_costo = 'no' THEN            
-            
-               IF  EXISTS(select  1 
-                   from conta.trelacion_contable  rc 
-                   where rc.id_gestion = v_parametros.id_gestion 
-                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
-                     and rc.id_tabla = v_parametros.id_tabla) THEN                     
-                     raise exception 'Ya existe una relacion contable para este registro';                     
-               END IF;   
-            
-            END IF;
-            
-            
-            IF  v_defecto = 'si'   THEN
-             --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
-               v_parametros.id_tabla = NULL;
-               
-             --validamos que solo exista un parametro por defecto activo para la gestion 
-             
-             
-                IF   exists (select 1 
-                             from conta.trelacion_contable rc 
-                             where rc.defecto='si'  
-                               and rc.id_tabla is NULL 
-                               and (rc.id_centro_costo = v_parametros.id_centro_costo or rc.id_centro_costo is NULL)
-                               and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
-                               and rc.id_gestion = v_parametros.id_gestion
-                               and rc.estado_reg='activo')     THEN
-                
-                   
-                      raise exception 'Ya existe un valor po defecto para este tipo de relacion contable'; 
-                    
-                END IF;  
-               
-            
-            END IF;
-            
-        
         	--Sentencia de la insercion
-        	insert into conta.trelacion_contable(
-			estado_reg,
-			id_tipo_relacion_contable,
-			id_cuenta,
-			id_partida,
-			id_gestion,
-			id_auxiliar,
-			id_centro_costo,
-			fecha_reg,
-			id_usuario_reg,
-			fecha_mod,
-			id_usuario_mod,
-			id_tabla,
-            defecto,
-            codigo_aplicacion,
-            id_tipo_presupuesto,
-            id_moneda
-            
-            
+        	insert into conta.tplantilla_comprobante(
+                codigo,
+                funcion_comprobante_eliminado,
+                id_tabla,
+                campo_subsistema,
+                campo_descripcion,
+                funcion_comprobante_validado,
+                campo_fecha,
+                estado_reg,
+                campo_acreedor,
+                campo_depto,
+                momento_presupuestario,
+                campo_fk_comprobante,
+                tabla_origen,
+                clase_comprobante,
+                campo_moneda,
+                id_usuario_reg,
+                fecha_reg,
+                id_usuario_mod,
+                fecha_mod,
+                campo_gestion_relacion	,
+                otros_campos, 
+                momento_comprometido,
+                momento_ejecutado,
+                momento_pagado,
+                campo_id_cuenta_bancaria,
+                campo_id_cuenta_bancaria_mov,
+                campo_nro_cheque,
+                campo_nro_cuenta_bancaria_trans,
+                campo_nro_tramite,
+                campo_tipo_cambio,
+                campo_depto_libro,
+                campo_fecha_costo_ini,
+                campo_fecha_costo_fin,
+                funcion_comprobante_editado
+             
           	) values(
-			'activo',
-			v_parametros.id_tipo_relacion_contable,
-			v_parametros.id_cuenta,
-			v_parametros.id_partida,
-			v_parametros.id_gestion,
-			v_parametros.id_auxiliar,
-			v_parametros.id_centro_costo,
-			now(),
-			p_id_usuario,
-			null,
-			null,
-			v_parametros.id_tabla,
-            v_defecto,
-            v_parametros.codigo_aplicacion,
-            v_parametros.id_tipo_presupuesto,
-            v_parametros.id_moneda
+                v_parametros.codigo,
+                v_parametros.funcion_comprobante_eliminado,
+                v_parametros.id_tabla,
+                v_parametros.campo_subsistema,
+                v_parametros.campo_descripcion,
+                v_parametros.funcion_comprobante_validado,
+                v_parametros.campo_fecha,
+                'activo',
+                v_parametros.campo_acreedor,
+                v_parametros.campo_depto,
+                v_parametros.momento_presupuestario,
+                v_parametros.campo_fk_comprobante,
+                v_parametros.tabla_origen,
+                v_parametros.clase_comprobante,
+                v_parametros.campo_moneda,
+                p_id_usuario,
+                now(),
+                null,
+                null,
+                v_parametros.campo_gestion_relacion,
+                v_parametros.otros_campos ,
+                v_parametros.momento_comprometido,
+                v_parametros.momento_ejecutado,
+                v_parametros.momento_pagado,
+                v_parametros.campo_id_cuenta_bancaria,
+                v_parametros.campo_id_cuenta_bancaria_mov,
+                v_parametros.campo_nro_cheque,
+                v_parametros.campo_nro_cuenta_bancaria_trans,
+                v_parametros.campo_nro_tramite,
+                v_parametros.campo_tipo_cambio,
+                v_parametros.campo_depto_libro,
+                v_parametros.campo_fecha_costo_ini,
+                v_parametros.campo_fecha_costo_fin,
+                v_parametros.funcion_comprobante_editado
 							
-			)RETURNING id_relacion_contable into v_id_relacion_contable;
+			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Relación Contable almacenado(a) con exito (id_relacion_contable'||v_id_relacion_contable||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_relacion_contable',v_id_relacion_contable::varchar);
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante almacenado(a) con exito (id_plantilla_comprobante'||v_id_plantilla_comprobante||')'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla_comprobante',v_id_plantilla_comprobante::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -197,99 +132,53 @@ BEGIN
 		end;
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_RELCON_MOD'
+ 	#TRANSACCION:  'CONTA_CMPB_MOD'
  	#DESCRIPCION:	Modificacion de registros
  	#AUTOR:		admin	
- 	#FECHA:		16-05-2013 21:52:14
+ 	#FECHA:		10-06-2013 14:40:00
 	***********************************/
 
-	elsif(p_transaccion='CONTA_RELCON_MOD')then
+	elsif(p_transaccion='CONTA_CMPB_MOD')then
 
 		begin
-        
-        -- sies una relacion contable unica buscamos que para la misma tabla no exista otrao
-            select 
-              * 
-            into 
-              v_tipo_rel 
-            from conta.ttipo_relacion_contable trc 
-            where trc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable;
-           
-            IF v_tipo_rel.tiene_centro_costo = 'si-unico' THEN
-            
-            
-               IF  EXISTS(select  1 
-                   from conta.trelacion_contable  rc 
-                   where rc.id_gestion = v_parametros.id_gestion 
-                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
-                     and rc.estado_reg = 'activo'  
-                     and (rc.id_tabla = v_parametros.id_tabla or rc.id_tabla  is null ) 
-                     and id_relacion_contable!=v_parametros.id_relacion_contable ) THEN
-                     
-                     raise exception 'Ya existe una relacion contable paes este elemento';
-                     
-               END IF;   
-            
-            END IF;
-            
-            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
-            
-               v_defecto =  v_parametros.defecto;
-        
-            ELSE
-            
-               v_defecto = 'no';
-            
-            
-            END IF;
-            
-            
-            IF  v_defecto = 'si'   THEN
-             --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
-               v_parametros.id_tabla = NULL;
-               
-             --validamos que solo exista un parametro por defecto activo para la gestion 
-             
-             
-                IF   exists (select 1 
-                             from conta.trelacion_contable rc 
-                             where rc.defecto='si'  
-                               and rc.id_tabla is NULL 
-                                and (rc.id_centro_costo = v_parametros.id_centro_costo or rc.id_centro_costo is NULL)
-                               and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
-                               and rc.id_gestion = v_parametros.id_gestion
-                               and rc.estado_reg='activo'
-                               and rc.id_relacion_contable != v_parametros.id_relacion_contable)     THEN
-                
-                   
-                      raise exception 'Ya existe un valor por defecto para este tipo de relacion contable'; 
-                    
-                END IF;  
-               
-            
-            END IF;
-        
-        
 			--Sentencia de la modificacion
-			update conta.trelacion_contable set
-			id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable,
-			id_cuenta = v_parametros.id_cuenta,
-			id_partida = v_parametros.id_partida,
-			id_gestion = v_parametros.id_gestion,
-			id_auxiliar = v_parametros.id_auxiliar,
-			id_centro_costo = v_parametros.id_centro_costo,
-			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario,
-			id_tabla = v_parametros.id_tabla,
-            defecto = v_defecto,
-            codigo_aplicacion= v_parametros.codigo_aplicacion,
-            id_tipo_presupuesto= v_parametros.id_tipo_presupuesto,
-            id_moneda= v_parametros.id_moneda
-			where id_relacion_contable=v_parametros.id_relacion_contable;
+			update conta.tplantilla_comprobante set
+              codigo=v_parametros.codigo,
+              funcion_comprobante_eliminado = v_parametros.funcion_comprobante_eliminado,
+              id_tabla = v_parametros.id_tabla,
+              campo_subsistema = v_parametros.campo_subsistema,
+              campo_descripcion = v_parametros.campo_descripcion,
+              funcion_comprobante_validado = v_parametros.funcion_comprobante_validado,
+              campo_fecha = v_parametros.campo_fecha,
+              campo_acreedor = v_parametros.campo_acreedor,
+              campo_depto = v_parametros.campo_depto,
+              momento_presupuestario = v_parametros.momento_presupuestario,
+              campo_fk_comprobante = v_parametros.campo_fk_comprobante,
+              tabla_origen = v_parametros.tabla_origen,
+              clase_comprobante = v_parametros.clase_comprobante,
+              campo_moneda = v_parametros.campo_moneda,
+              id_usuario_mod = p_id_usuario,
+              fecha_mod = now(),
+              campo_gestion_relacion=v_parametros.campo_gestion_relacion,
+              otros_campos=v_parametros.otros_campos,
+              momento_comprometido=v_parametros.momento_comprometido,
+              momento_ejecutado=v_parametros.momento_ejecutado,
+              momento_pagado=v_parametros.momento_pagado,
+              campo_id_cuenta_bancaria=v_parametros.campo_id_cuenta_bancaria,
+              campo_id_cuenta_bancaria_mov=v_parametros.campo_id_cuenta_bancaria_mov,
+              campo_nro_cheque = v_parametros.campo_nro_cheque,
+              campo_nro_cuenta_bancaria_trans= v_parametros.campo_nro_cuenta_bancaria_trans,
+              campo_nro_tramite= v_parametros.campo_nro_tramite,
+              campo_tipo_cambio = v_parametros.campo_tipo_cambio,
+              campo_depto_libro = v_parametros.campo_depto_libro,
+              campo_fecha_costo_ini = v_parametros.campo_fecha_costo_ini,
+              campo_fecha_costo_fin = v_parametros.campo_fecha_costo_fin,
+              funcion_comprobante_editado = v_parametros.funcion_comprobante_editado
+			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Relación Contable modificado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_relacion_contable',v_parametros.id_relacion_contable::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla_comprobante',v_parametros.id_plantilla_comprobante::varchar);
                
             --Devuelve la respuesta
             return v_resp;
@@ -297,87 +186,27 @@ BEGIN
 		end;
 
 	/*********************************    
- 	#TRANSACCION:  'CONTA_RELCON_ELI'
+ 	#TRANSACCION:  'CONTA_CMPB_ELI'
  	#DESCRIPCION:	Eliminacion de registros
  	#AUTOR:		admin	
- 	#FECHA:		16-05-2013 21:52:14
+ 	#FECHA:		10-06-2013 14:40:00
 	***********************************/
 
-	elsif(p_transaccion='CONTA_RELCON_ELI')then
+	elsif(p_transaccion='CONTA_CMPB_ELI')then
 
 		begin
 			--Sentencia de la eliminacion
-			delete from conta.trelacion_contable
-            where id_relacion_contable=v_parametros.id_relacion_contable;
+			delete from conta.tplantilla_comprobante
+            where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Relación Contable eliminado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_relacion_contable',v_parametros.id_relacion_contable::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla_comprobante',v_parametros.id_plantilla_comprobante::varchar);
               
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-		
-	/*********************************    
- 	#TRANSACCION:  'CONTA_REPRELCON_REP'
- 	#DESCRIPCION:	Replicación de parametrización de Relaciones Contables
- 	#AUTOR:			RCM	
- 	#FECHA:			10/12/2013
-	***********************************/
-
-	elsif(p_transaccion='CONTA_REPRELCON_REP')then
-
-		begin
-			--Llamada a la función de replicación
-			v_resp_rep = conta.f_replicar_relacion_contable_cambio_gestion(v_parametros.id_relacion_contable, p_id_usuario);
-            
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Replicacion realizada'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'observaciones',v_resp_rep); 
-              
-            --Devuelve la respuesta
-            return v_resp;
-
-		end;
-   
-    /*********************************    
- 	#TRANSACCION:  'CONTA_GDLB_IME'
- 	#DESCRIPCION:	recupera los departamentos de libro de bancos relacionados al departamento de contabilidad
- 	#AUTOR:		admin	
- 	#FECHA:		16-05-2013 21:52:14
-	***********************************/
-
-	elsif(p_transaccion='CONTA_GDLB_IME')then
-
-		begin
-			
-            select
-             pxp.list(dd.id_depto_origen::varchar)
-            into
-             v_id_deptos_lbs
-            
-            from param.tdepto_depto dd
-            inner join param.tdepto d on d.id_depto = dd.id_depto_origen
-            inner join segu.tsubsistema s on s.id_subsistema = d.id_subsistema and s.codigo = 'TES'
-            where  dd.id_depto_destino = v_parametros.id_depto_conta and  d.modulo = 'LB';
-        
-        
-               
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','relacion depto lb - conta)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_depto_conta',v_parametros.id_depto_conta::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'id_deptos_lbs',v_id_deptos_lbs::varchar);
-            
-            
-              
-            --Devuelve la respuesta
-            return v_resp;
-
-		end;
-
- 
-    
          
 	else
      
@@ -400,4 +229,4 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
-COST 100;
+COST 100

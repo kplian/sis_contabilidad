@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime (
+CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime ( 
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
