@@ -237,11 +237,9 @@ class MODIntTransaccion extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-
 
 
    function listarIntTransaccionMayor(){
@@ -316,10 +314,6 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_estado_wf','int4');
 		 
-		
-		
-		
-		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -399,8 +393,6 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('codigo_partida','varchar');
 		$this->captura('sw_movimiento','varchar');
 		$this->captura('descripcion_partida','varchar');
-		
-		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

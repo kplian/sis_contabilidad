@@ -46,13 +46,13 @@ BEGIN
       ic.id_clase_comprobante,
       cc.codigo,
       ic.id_depto,
-      sis.codigo as subsistema
+      pla.codigo as codigo_plantilla
    into
       v_registros_cbte
    from conta.tint_comprobante ic
    inner join param.tperiodo per on per.id_periodo = ic.id_periodo
    inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = ic.id_clase_comprobante
-   inner join segu.tsubsistema sis on sis.id_subsistema=ic.id_subsistema
+   left join conta.tplantilla_comprobante pla on pla.id_plantilla_comprobante=ic.id_plantilla_comprobante
    where ic.id_int_comprobante = p_id_int_comprobante;
 
 
@@ -96,7 +96,7 @@ BEGIN
 
                                v_valor = param.f_get_depto_param( v_registros_cbte.id_depto, 'ENTREGA');
 
-                               IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_cbte.subsistema='CD') THEN
+                               IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_cbte.codigo_plantilla in ('SOLFONDAV', 'REPOCAJA')) THEN
                                     -- si alguna transaccion tiene banco habilitado para pago
                                     IF  not tes.f_integracion_libro_bancos(p_id_usuario,p_id_int_comprobante) THEN
 									  --raise exception 'error al registrar transacción en libro de bancos, comprobante %', p_id_int_comprobante;
