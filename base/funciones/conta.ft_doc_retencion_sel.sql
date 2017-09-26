@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_retencion_sel (
   p_administrador integer,
   p_id_usuario integer,

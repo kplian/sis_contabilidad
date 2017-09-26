@@ -1,4 +1,4 @@
-<?php 
+<?php
 // Extend the TCPDF class to create custom MultiRow
 class RRetencion extends ReportePDF {
 	var $datos_titulo;
@@ -17,7 +17,7 @@ class RRetencion extends ReportePDF {
 	var $t1;
 	var $t2;
 	var $t3;
-	var $t4; 
+	var $t4;
 	var $t5;
 	var $t6;
 	var $total;
@@ -43,6 +43,7 @@ class RRetencion extends ReportePDF {
 			$this->SetMargins(20, 51, 35);	
 		}
 	}
+	
 	//
 	function Header() {
 		$white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
@@ -112,7 +113,7 @@ class RRetencion extends ReportePDF {
 		}
 		else{
 			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-			$this->Cell($width_c1, $height, 'Año:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$this->Cell($width_c1, $height, 'AÃ±o:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 			$this->SetFont('', '');
 			$this->Cell($width_c2, $height, $this->datos_periodo['gestion'], 0, 0, 'L', false, '', 0, false, 'T', 'C');
 			////////////////////////////////////////////
@@ -124,7 +125,7 @@ class RRetencion extends ReportePDF {
 		$this->Ln();
 		/////////////////////////////////////////////
 		$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-		$this->Cell($width_c1, $height, 'Nombre o Razón Social:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		$this->Cell($width_c1, $height, 'Nombre o RazÃ³n Social:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 		$this->SetFont('', '');
 		$this->SetFillColor(192,192,192, true);
 		$this->Cell($width_c2, $height, $this->datos_entidad['nombre'].' ('.$this->datos_entidad['direccion_matriz'].')', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -154,7 +155,7 @@ class RRetencion extends ReportePDF {
 		$this->Ln(2);
 		$cur_y = $this->GetY();
 		$this->Cell($ancho, 0, '', '', 0, 'L');
-		$pagenumtxt = 'Página'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
+		$pagenumtxt = 'PÃ¡gina'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
 		$this->Cell($ancho, 0, $pagenumtxt, '', 0, 'C');
 		$this->Cell($ancho, 0, '', '', 0, 'R');
 		$this->Ln();
@@ -501,9 +502,9 @@ class RRetencion extends ReportePDF {
 									's8' => $this->s5,
 									's9' => $this->s6,
 									's10' => $this->s7,
-									's11' => $this->s8,
-									's12' => $this->s9,
-									's13' => $this->s10,
+									's11' => '',
+									's12' => '',
+									's13' => ''
 								);
 				break;
 			case 'rcrb':
@@ -579,12 +580,12 @@ class RRetencion extends ReportePDF {
 							't3' => '', 
 							'espacio' => 'TOTAL: ',
 							't4' => $this->t1,
-							't5' => $this->t2,
-							't6' => $this->t3,
-							't7' => $this->t4,
-							't8' => $this->t5,
-							't9' => $this->t6,
-							't10' => $this->t7,
+							't5' => '',
+							't6' => '',
+							't7' => '',
+							't8' => '',
+							't9' => '',
+							't10' => '',
 							't11' => $this->t8,
 							't12' => $this->t9,
 							't13' => $this->t10
@@ -596,8 +597,8 @@ class RRetencion extends ReportePDF {
 									't3' => '', 
 									'espacio' => 'TOTAL: ',
 									't4' => $this->t1,
-									't5' => $this->t2,
-									't6' => $this->t3,
+									't5' => '',
+									't6' => '',
 									't7' => $this->t8,
 									't8' => $this->t9,
 									't9' => $this->t10
@@ -609,8 +610,8 @@ class RRetencion extends ReportePDF {
 									't3' => '', 
 									'espacio' => 'TOTAL: ',
 									't4' => $this->t1,
-									't5' => $this->t4,
-									't6' => $this->t5,
+									't5' => '',
+									't6' => '',
 									't7' => $this->t8,
 									't8' => $this->t9,
 									't9' => $this->t10
@@ -622,8 +623,8 @@ class RRetencion extends ReportePDF {
 									't3' => '', 
 									'espacio' => 'TOTAL: ',
 									't4' => $this->t1,
-									't5' => $this->t6,
-									't6' => $this->t7,
+									't5' => '',
+									't6' => '',
 									't7' => $this->t8,
 									't8' => $this->t9,
 									't9' => $this->t10

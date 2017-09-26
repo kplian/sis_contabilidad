@@ -4047,7 +4047,6 @@ AS
 /**********************************I-DEP-MANU-CONTA-0-25/09/2017****************************************/
 select pxp.f_insert_testructura_gui ('REPRET', 'REPCON');
 
-
 CREATE OR REPLACE VIEW conta.vretencion(
     id_doc_compra_venta,
     obs,

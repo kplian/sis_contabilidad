@@ -53,8 +53,7 @@ class MODDocRetencion extends MODbase{
 		$this->captura('it_bienes','NUMERIC');
 		$this->captura('it_servicios','NUMERIC');
 		$this->captura('it_alquileres','NUMERIC');
-		
-		//$this->captura('it_total','NUMERIC');
+				
 		$this->captura('iue_iva','NUMERIC');
 		
 		$this->captura('iue_iva_total','NUMERIC');

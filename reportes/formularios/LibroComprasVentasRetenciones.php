@@ -43,8 +43,7 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 		}, this);
 	},
 	//pregunta
-	successSave :function(resp){
-		console.log("manu");
+	successSave :function(resp){		
 		Phx.CP.loadingHide();
 		var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 		if(reg.ROOT.error) {
@@ -150,7 +149,7 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 					fields: ['ID', 'valor'],
-					data :	[['periodo','AÃ±o y Mes'],	
+					data :	[['periodo','Año y Mes'],	
 							['fechas','Rango de Fechas']]				
 				}),
 				valueField:'ID',

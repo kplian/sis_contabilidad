@@ -10,6 +10,7 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 require_once(dirname(__FILE__).'/../reportes/RRetencion.php');
 require_once(dirname(__FILE__).'/../reportes/RetXls.php');
+
 class ACTDocRetencionForm extends ACTbase{
 	//
 	function recuperarDatosRet(){	
