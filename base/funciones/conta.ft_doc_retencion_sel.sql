@@ -41,7 +41,7 @@ DECLARE
     var_6  				VARCHAR;
     v_ini  				VARCHAR;
     v_fin  				VARCHAR;
-BEGIN
+BEGIN 
 
 	v_nombre_funcion = 'conta.ft_doc_retencion_sel';
     v_parametros = pxp.f_get_record(p_tabla);
