@@ -95,7 +95,7 @@ BEGIN
                                 ret.id_periodo::INTEGER AS id_periodo,
                                 ret.id_gestion::INTEGER AS id_gestion,
                                 ret.periodo::INTEGER AS periodo,
-                                ret.gestion::INTEGER AS gestion,
+                                ret.gestion::INTEGER AS gestion, 
                                 ret.id_usuario_reg::VARCHAR AS id_usuario_reg,
                                 MAX(CASE WHEN c.descripcion LIKE '''|| var_1 ||''' THEN c.importe_presupuesto ::NUMERIC END) AS a,
                                 MAX(CASE WHEN c.descripcion LIKE '''|| var_2 ||''' THEN c.importe_presupuesto ::NUMERIC END) AS b,
@@ -146,3 +146,4 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+ 

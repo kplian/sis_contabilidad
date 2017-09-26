@@ -23,7 +23,7 @@ class RRetencion extends ReportePDF {
 	var $total;
 	var $datos_entidad;
 	var $datos_periodo;	
-	//desde control 
+	//desde control   
 	function datosHeader ($detalle, $totales,$entidad, $periodo) {		
 		$tipo =$this->objParam->getParametro('tipo_ret');
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;

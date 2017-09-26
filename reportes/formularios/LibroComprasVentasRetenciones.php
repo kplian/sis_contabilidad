@@ -160,7 +160,7 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 			id_grupo:1,
 			form:true
 		},		
-		{
+		{  
 			config:{
 				name:'id_gestion',
 				fieldLabel:'GestiÃ³n',

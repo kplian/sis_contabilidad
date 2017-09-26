@@ -1,5 +1,5 @@
 <?php
-
+ 
 class RetXls
 {
 	private $docexcel;
