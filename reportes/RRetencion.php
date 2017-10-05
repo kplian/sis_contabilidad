@@ -23,7 +23,7 @@ class RRetencion extends ReportePDF {
 	var $total;
 	var $datos_entidad;
 	var $datos_periodo;	
-	//desde control 
+	//MARGENES
 	function datosHeader ($detalle, $totales,$entidad, $periodo) {		
 		$tipo =$this->objParam->getParametro('tipo_ret');
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
@@ -35,12 +35,12 @@ class RRetencion extends ReportePDF {
 		if($tipo=='todo'){
 			$this->SetHeaderMargin(13);		
 			$this->SetAutoPageBreak(TRUE, 10);	
-			$this->SetMargins(20, 55, 10);
+			$this->SetMargins(13, 55, 10);
 		}else{						
 			$this->SetHeaderMargin(9);			
 			$this->SetAutoPageBreak(TRUE, 10);
 			//(left,bottom,right,TOP) 
-			$this->SetMargins(20, 51, 35);	
+			$this->SetMargins(12, 51, 35);	
 		}
 	}
 	//
@@ -148,7 +148,7 @@ class RRetencion extends ReportePDF {
 		$this->setY(-15);
 		$ormargins = $this->getOriginalMargins();
 		$this->SetTextColor(0, 0, 0);
-		$line_width = 0.85 / $this->getScaleFactor();
+		$line_width = 0.85 / $this->getScaleFactor();	
 		$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
 		$ancho = round(($this->getPageWidth() - $ormargins['left'] - $ormargins['right']) / 3);
 		$this->Ln(2);
@@ -178,25 +178,26 @@ class RRetencion extends ReportePDF {
 	} 
 	//
 	function cab(){
-		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,16);
-		$conf_par_tablealigns=array('C','C','C','C','C','R','L','R','L','R','L','C','C','C');
-		$conf_tableborders=array('LTR','TR','TR','TR','TR','T','TR','T','TR','T','TR','TR','TR','TR');
-		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15,16);
+		$conf_par_tablealigns=array('C','C','C','C','C','C','R','L','R','L','R','L','C','C','C');
+		$conf_tableborders=array('LTR','TR','TR','TR','TR','TR','T','TR','T','TR','T','TR','TR','TR','TR');
+		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 		$RowArray = array(
 						's0' => '',
 						's1' => '',
 						's2' => '',
 						's3' => '',
 						's4' => '',
-						's5' => 'BI',
-						's6' => 'ENES',
-						's7' => 'SERV',
-						's8' => 'ICIOS',
-						's9' => 'ALQU',
-						's10' => 'ILERES',
-						's11' => 'IMPORTE ',
-						's12' => '',
-						's13' => ''
+						's5' => '',
+						's6' => 'BI',
+						's7' => 'ENES',
+						's8' => 'SERV',
+						's9' => 'ICIOS',
+						's10' => 'ALQU',
+						's11' => 'ILERES',
+						's12' => 'IMPORTE ',
+						's13' => '',
+						's14' => ''
 					);
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
@@ -207,26 +208,27 @@ class RRetencion extends ReportePDF {
 	}
 	//
 	function generarCabecera(){
-		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,16);
-		$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C');
-		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0);
+		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,16);
+		$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C');
+		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0);
 		$conf_tableborders=array();
 		$conf_tabletextcolor=array();	
 		$nombre =$this->objParam->getParametro('tipo_ret');
 		switch ($nombre) {
 			case 'rcrb':
 				$m='IUE';
-				$RowArray = array(
+				$RowArray = array(								
 								's0' => 'Nº',
 								's1' => 'FECHA DE LA FACTURA O DUI',
 								's2' => 'CONCEPTO',
-								's3' => 'Nro DE DOCUMENTO',
-								's4' => 'IMPORTE TOTAL',
-								's5' => 'IT',
-								's6' => $m,
-								's7' => 'IMPORTE DESCUENTO DE LEY',
-								's8' => 'DESCUENTOS',
-								's9' => 'LIQUIDO'
+								's3' => 'TIPO',
+								's4' => 'Nro DE DOCUMENTO',
+								's5' => 'IMPORTE TOTAL',
+								's6' => 'IT',
+								's7' => $m,
+								's8' => 'IMPORTE DESCUENTO DE LEY',
+								's9' => 'DESCUENTOS',
+								's10' => 'LIQUIDO'
 							);
 				break;
 			case 'rcrs':
@@ -235,13 +237,14 @@ class RRetencion extends ReportePDF {
 								's0' => 'Nº',
 								's1' => 'FECHA DE LA FACTURA O DUI',
 								's2' => 'CONCEPTO',
-								's3' => 'Nro DE DOCUMENTO',
-								's4' => 'IMPORTE TOTAL',
-								's5' => 'IT',
-								's6' => $m,
-								's7' => 'IMPORTE DESCUENTO DE LEY',
-								's8' => 'DESCUENTOS',
-								's9' => 'LIQUIDO'
+								's3' => 'TIPO',
+								's4' => 'Nro DE DOCUMENTO',
+								's5' => 'IMPORTE TOTAL',
+								's6' => 'IT',
+								's7' => $m,
+								's8' => 'IMPORTE DESCUENTO DE LEY',
+								's9' => 'DESCUENTOS',
+								's10' => 'LIQUIDO'
 							);
 				break;
 			case 'rcra':
@@ -250,36 +253,38 @@ class RRetencion extends ReportePDF {
 								's0' => 'Nº',
 								's1' => 'FECHA DE LA FACTURA O DUI',
 								's2' => 'CONCEPTO',
-								's3' => 'Nro DE DOCUMENTO',
-								's4' => 'IMPORTE TOTAL',
-								's5' => 'IT',
-								's6' => $m,
-								's7' => 'IMPORTE DESCUENTO DE LEY',
-								's8' => 'DESCUENTOS',
-								's9' => 'LIQUIDO'
+								's3' => 'TIPO',
+								's4' => 'Nro DE DOCUMENTO',
+								's5' => 'IMPORTE TOTAL',
+								's6' => 'IT',
+								's7' => $m,
+								's8' => 'IMPORTE DESCUENTO DE LEY',
+								's9' => 'DESCUENTOS',
+								's10' => 'LIQUIDO'
 							);
 				break;
 			case 'todo':
 				$m='-';
-				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,16);
-				$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C');
-				$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-				$conf_tableborders=array('LBR','BR','BR','BR','BR','BTR','BTR','BTR','BTR','BTR','BTR','BR','BR','BR');
+				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15,16);
+				$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C','C');
+				$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+				$conf_tableborders=array('LBR','BR','BR','BR','BR','BR','BTR','BTR','BTR','BTR','BTR','BTR','BR','BR','BR');
 				$RowArray = array(
 								's0' => 'Nº',
 								's1' => 'FECHA DE LA FACTURA O DUI',
 								's2' => 'CONCEPTO',
-								's3' => 'Nro DE DOCUMENTO',
-								's4' => 'IMPORTE',
-								's5' => 'IT',
-								's6' => 'IUE',
-								's7' => 'IT',
-								's8' => 'IUE',
-								's9' => 'IT',
-								's10' => 'RC-IVA',
-								's11' => 'DESCUENTO DE LEY',
-								's12' => 'DESCUENTOS',
-								's13' => 'LIQUIDO'
+								's3' => 'TIPO',
+								's4' => 'Nro DE DOCUMENTO',
+								's5' => 'IMPORTE',
+								's6' => 'IT',
+								's7' => 'IUE',
+								's8' => 'IT',
+								's9' => 'IUE',
+								's10' => 'IT',
+								's11' => 'RC-IVA',
+								's12' => 'DESCUENTO DE LEY',
+								's13' => 'DESCUENTOS',
+								's14' => 'LIQUIDO'
 							);
 				break;	
 			default:				
@@ -298,45 +303,47 @@ class RRetencion extends ReportePDF {
 		$this->SetFillColor(224, 235, 255);
 		$this->SetTextColor(0);
 		$this->SetFont('','',6);				
-		$newDate = date("d/m/Y", strtotime( $val['fecha']));
+		$newDate = date("d/m/Y", strtotime($val['fecha']));
 		$nombre =$this->objParam->getParametro('tipo_ret');		
 		if($nombre=='todo'){
-			$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,16);
-			$conf_par_tablealigns=array('C','C','C','C','R','R','R','R','R','R','R','R','R','R');
-			$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-			$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');		
+			$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15,16);
+			$conf_par_tablealigns=array('C','C','C','C','C','R','R','R','R','R','R','R','R','R','R');
+			$conf_par_tablenumbers=array(0,0,0,0,0,2,2,2,2,2,2,2,2,2,2);
+			$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');		
 			$RowArray = array(  's0' => $count,
 								's1' => $newDate,
 								's2' => trim($val['obs']),
 								's3' => trim($val['plantilla']),
-								's4' => $val['importe_doc'],
-								's5' => $val['it_bienes'],
-								's6' => $val['iue_bienes'],
-								's7' => $val['it_servicios'],
-								's8' => $val['iue_servicios'],		
-								's9' => $val['it_alquileres'],
-								's10' => $val['rc_iva_alquileres'],
-								's11' => $val['importe_descuento_ley'],
-								's12' => $val['descuento'],
-								's13' => $val['liquido']			
+								's4'=> trim($val['nro_documento']),
+								's5' => $val['importe_doc'],
+								's6' => $val['it_bienes'],
+								's7' => $val['iue_bienes'],
+								's8' => $val['it_servicios'],
+								's9' => $val['iue_servicios'],		
+								's10' => $val['it_alquileres'],
+								's11' => $val['rc_iva_alquileres'],
+								's12' => $val['importe_descuento_ley'],
+								's13' => $val['descuento'],
+								's14' => $val['liquido']			
 							);
 		}else{
-			$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,16);
-			$conf_par_tablealigns=array('C','C','C','C','R','R','R','R','R','R');
-			$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0);
-			$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');											
-			switch ($nombre) {
+			$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,16);
+			$conf_par_tablealigns=array('C','C','C','C','C','R','R','R','R','R','R');
+			$conf_par_tablenumbers=array(0,0,0,0,0,2,2,2,2,2,2);
+			$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');											
+			switch ($nombre) {				
 				case 'rcrb':
 					$RowArray = array(  's0' => $count,
 										's1' => $newDate,
 										's2' => trim($val['obs']),
 										's3' => trim($val['plantilla']),
-										's4' => $val['importe_doc'],		
-										's5' => $val['it_bienes'],
-										's6' => $val['iue_bienes'],
-										's7' => $val['importe_descuento_ley'],
-										's8' => $val['descuento'],
-										's9' => $val['liquido']			
+										's4' => trim($val['nro_documento']),
+										's5' => $val['importe_doc'],		
+										's6' => $val['it_bienes'],
+										's7' => $val['iue_bienes'],
+										's8' => $val['importe_descuento_ley'],
+										's9' => $val['descuento'],
+										's10' => $val['liquido']			
 									);
 					break;
 				case 'rcrs':
@@ -344,12 +351,13 @@ class RRetencion extends ReportePDF {
 										's1' => $newDate,
 										's2' => trim($val['obs']),
 										's3' => trim($val['plantilla']),
-										's4' => $val['importe_doc'],		
-										's5' => $val['it_servicios'],
-										's6' => $val['iue_servicios'],
-										's7' => $val['importe_descuento_ley'],
-										's8' => $val['descuento'],
-										's9' => $val['liquido']			
+										's4' => trim($val['nro_documento']),
+										's5' => $val['importe_doc'],		
+										's6' => $val['it_servicios'],
+										's7' => $val['iue_servicios'],
+										's8' => $val['importe_descuento_ley'],
+										's9' => $val['descuento'],
+										's10' => $val['liquido']			
 									);
 					break;
 				case 'rcra':
@@ -357,12 +365,13 @@ class RRetencion extends ReportePDF {
 										's1' => $newDate,
 										's2' => trim($val['obs']),
 										's3' => trim($val['plantilla']),
-										's4' => $val['importe_doc'],		
-										's5' => $val['it_alquileres'],
-										's6' => $val['rc_iva_alquileres'],
-										's7' => $val['importe_descuento_ley'],
-										's8' => $val['descuento'],
-										's9' => $val['liquido']			
+										's4' => trim($val['nro_documento']),
+										's5' => $val['importe_doc'],		
+										's6' => $val['it_alquileres'],
+										's7' => $val['rc_iva_alquileres'],
+										's8' => $val['importe_descuento_ley'],
+										's9' => $val['descuento'],
+										's10' => $val['liquido']			
 									);
 					break;
 				default:					
@@ -412,7 +421,7 @@ class RRetencion extends ReportePDF {
 		$startY = $this->GetY();
 		$x=0;
 		if($this->objParam->getParametro('tipo_ret')=='todo'){
-			$this->getNumLines($row['cell1data'], 80);
+			$this->getNumLines($row['cell1data'], 105);
 			$x=190;	
 		}else{
 			$this->getNumLines($row['cell1data'], 80);
@@ -479,70 +488,74 @@ class RRetencion extends ReportePDF {
 	//revisarfinPagina pie
 	function cerrarCuadro(){
 		//si noes inicio termina el cuardro anterior
-		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15);
-		$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R');		
-		$this->tablenumbers=array(0,0,0,0,0,0,0,0,0,0);
-		$this->tableborders=array('T','T','T','T','LRTB','LRTB','LRTB','LRTB','LRTB','TR');
+		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15);
+		$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R','R');				
+		$this->tablenumbers=array(0,0,0,0,0,2,2,2,2,2,2);
+		$this->tableborders=array('T','T','T','T','T','LRTB','LRTB','LRTB','LRTB','LRTB','TR');
 		$nombre =$this->objParam->getParametro('tipo_ret');		
 		switch ($nombre) {
 			case 'todo':
-				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15);
-				$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R','R','R','R','R');		
-				$this->tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0);
-				$this->tableborders=array('T','T','T','T','LRTB','LRTB','LRTB','LRTB','LRTB', 'LRTB','LRTB','LRTB','TR');
+				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15);
+				$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R','R','R','R','R','R');		
+				$this->tablenumbers=array(0,0,0,0,0,2,2,2,2,2,2,2,2,2,2);
+				$this->tableborders=array('T','T','T','T','LT','LRTB','LRTB','LRTB','LRTB','LRTB', 'LRTB','LRTB','LRTB','TR');
 				$RowArray = array(  's1' => '',
 									's2' => '',
 									's3' => '', 
+									's4' => '',
 									'espacio' => 'Subtotal',
-									's4' => $this->s1,
-									's5' => $this->s2,
-									's6' => $this->s3,
-									's7' => $this->s4,
-									's8' => $this->s5,
-									's9' => $this->s6,
-									's10' => $this->s7,
-									's11' => $this->s8,
-									's12' => $this->s9,
-									's13' => $this->s10,
+									's5' => $this->s1,
+									's6' => $this->s2,
+									's7' => $this->s3,
+									's8' => $this->s4,
+									's9' => $this->s5,
+									's10' => $this->s6,
+									's11' => $this->s7,
+									's12' => $this->s8,
+									's13' => $this->s9,
+									's14' => $this->s10,
 								);
 				break;
 			case 'rcrb':
 				$RowArray = array(  's1' => '',
 									's2' => '',
 									's3' => '', 
+									's4' => '', 
 									'espacio' => 'Subtotal',
-									's4' => $this->s1,
-									's5' => $this->s2,
-									's6' => $this->s3,
-									's7' => $this->s8,
-									's8' => $this->s9,
-									's9' => $this->s10
+									's5' => $this->s1,
+									's6' => $this->s2,
+									's7' => $this->s3,
+									's8' => $this->s8,
+									's9' => $this->s9,
+									's10' => $this->s10
 								);
 				break;
 			case 'rcrs':
 				$RowArray = array(  's1' => '',
 									's2' => '',
-									's3' => '', 
+									's3' => '',
+									's4' => '',
 									'espacio' => 'Subtotal',
-									's4' => $this->s1,
-									's5' => $this->s4,
-									's6' => $this->s5,
-									's7' => $this->s8,
-									's8' => $this->s9,
-									's9' => $this->s10
+									's5' => $this->s1,
+									's6' => $this->s4,
+									's7' => $this->s5,
+									's8' => $this->s8,
+									's9' => $this->s9,
+									's10' => $this->s10
 								);
 				break;
 			case 'rcra':
 				$RowArray = array(  's1' => '',
 									's2' => '',
 									's3' => '', 
+									's4' => '', 
 									'espacio' => 'Subtotal',
-									's4' => $this->s1,
-									's5' => $this->s6,
-									's6' => $this->s7,
-									's7' => $this->s8,
-									's8' => $this->s9,
-									's9' => $this->s10
+									's5' => $this->s1,
+									's6' => $this->s6,
+									's7' => $this->s7,
+									's8' => $this->s8,
+									's9' => $this->s9,
+									's10' => $this->s10
 								);
 				break;
 			default:				
@@ -562,71 +575,75 @@ class RRetencion extends ReportePDF {
 	//revisarfinPagina pie
 	function cerrarCuadroTotal(){
 		//si noes inicio termina el cuardro anterior
-		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15);
-		$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R');		
-		$this->tablenumbers=array(0,0,0,0,0,0,0,0,0,0);
-		$this->tableborders=array('','','','','LRTB','LRTB','LRTB','LRTB','LRTB','TRB');
+		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15);
+		$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R','R');		
+		$this->tablenumbers=array(0,0,0,0,0,2,2,2,2,2,2);
+		$this->tableborders=array('','','','','','LRTB','LRTB','LRTB','LRTB','LRTB','TRB');
 		$nombre =$this->objParam->getParametro('tipo_ret');		
 		switch ($nombre) {
 			case 'todo':
-				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15);
-				$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R','R','R','R','R');		
-				$this->tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0);
-				$this->tableborders=array('','','','','LRTB','LRTB','LRTB','LRTB','LRTB', 'LRTB','LRTB','LRTB','TRB');				
+				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15);
+				$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R','R','R','R','R','R');		
+				$this->tablenumbers=array(0,0,0,0,0,2,2,2,2,2,2,2,2,2,2);
+				$this->tableborders=array('','','','','LRTB','LRTB','LRTB','LRTB','LRTB', 'LRTB','LRTB','LRTB','LRTB','TRB');				
 				$RowArray = array( 
 							't1' => '',
 							't2' => '',
 							't3' => '', 
+							't4' => '', 
 							'espacio' => 'TOTAL: ',
-							't4' => $this->t1,
-							't5' => $this->t2,
-							't6' => $this->t3,
-							't7' => $this->t4,
-							't8' => $this->t5,
-							't9' => $this->t6,
-							't10' => $this->t7,
-							't11' => $this->t8,
-							't12' => $this->t9,
-							't13' => $this->t10
+							't5' => $this->t1,
+							't6' => $this->t2,
+							't7' => $this->t3,
+							't8' => $this->t4,
+							't9' => $this->t5,
+							't10' => $this->t6,
+							't11' => $this->t7,
+							't12' => $this->t8,
+							't13' => $this->t9,
+							't14' => $this->t10
 						);
 				break;
 			case 'rcrb':
 				$RowArray = array(  't1' => '',
 									't2' => '',
-									't3' => '', 
+									't3' => '',
+									't4' => '', 
 									'espacio' => 'TOTAL: ',
-									't4' => $this->t1,
-									't5' => $this->t2,
-									't6' => $this->t3,
-									't7' => $this->t8,
-									't8' => $this->t9,
-									't9' => $this->t10
+									't5' => $this->t1,
+									't6' => $this->t2,
+									't7' => $this->t3,
+									't8' => $this->t8,
+									't9' => $this->t9,
+									't10' => $this->t10
 								);
 				break;
 			case 'rcrs':
 				$RowArray = array(  't1' => '',
 									't2' => '',
-									't3' => '', 
+									't3' => '',
+									't4' => '', 
 									'espacio' => 'TOTAL: ',
-									't4' => $this->t1,
-									't5' => $this->t4,
-									't6' => $this->t5,
-									't7' => $this->t8,
-									't8' => $this->t9,
-									't9' => $this->t10
+									't5' => $this->t1,
+									't6' => $this->t4,
+									't7' => $this->t5,
+									't8' => $this->t8,
+									't9' => $this->t9,
+									't10' => $this->t10
 								);
 				break;
 			case 'rcra':				
 				$RowArray = array(  't1' => '',
 									't2' => '',
-									't3' => '', 
+									't3' => '',
+									't4' => '',
 									'espacio' => 'TOTAL: ',
-									't4' => $this->t1,
-									't5' => $this->t6,
-									't6' => $this->t7,
-									't7' => $this->t8,
-									't8' => $this->t9,
-									't9' => $this->t10
+									't5' => $this->t1,
+									't6' => $this->t6,
+									't7' => $this->t7,
+									't8' => $this->t8,
+									't9' => $this->t9,
+									't10' => $this->t10
 								);
 				break;
 			default:

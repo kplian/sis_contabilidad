@@ -41,19 +41,19 @@ DECLARE
     var_6  				VARCHAR;
     v_ini  				VARCHAR;
     v_fin  				VARCHAR;
-BEGIN 
+BEGIN
 
 	v_nombre_funcion = 'conta.ft_doc_retencion_sel';
     v_parametros = pxp.f_get_record(p_tabla);
     
     /*********************************
-    #TRANSACCION:  'CONTA_REPRET_FRM_SEL'
+    #TRANSACCION:  'CONTA_REPRET_FRM'
     #DESCRIPCION:	listado para reporte de retenciones
     #AUTOR:		admin
     #FECHA:		18-08-2015 15:57:09
     ***********************************/
 
-	IF(p_transaccion='CONTA_REPRET_FRM_SEL')THEN
+	IF(p_transaccion='CONTA_REPRET_FRM')THEN
     	BEGIN
 			v_sincronizar = pxp.f_get_variable_global('sincronizar');
            	SELECT gestion into v_gestion
@@ -249,7 +249,7 @@ BEGIN
                                       ret.desc_plantilla
 							ORDER BY ret.id_plantilla';
 			--Devuelve la respuesta   
---            raise exception '-> %',v_consulta; 
+			--raise exception '-> %',v_consulta; 
 			RETURN v_consulta;        	
 		END;
     ELSE
