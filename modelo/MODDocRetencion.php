@@ -10,22 +10,22 @@ class MODDocRetencion extends MODbase{
 	//
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
-	}
+	}	
 	//
 	function listarRetForm(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_doc_retencion_sel';
-		$this->transaccion='CONTA_REPRET_FRM_SEL';
+		$this->transaccion='CONTA_REPRET_FRM';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);	
 		
 		$this->setParametro('filtro_sql','filtro_sql','VARCHAR');
-		$this->setParametro('id_periodo','id_periodo','INTEGER');
+		$this->setParametro('id_periodo','id_periodo','int4');
 		$this->setParametro('tipo_ret','tipo_ret','VARCHAR');
 		$this->setParametro('fecha_ini','fecha_ini','DATE');
 		$this->setParametro('fecha_fin','fecha_fin','DATE');
-		$this->setParametro('id_gestion','id_gestion','INTEGER');
- 
+		$this->setParametro('id_gestion','id_gestion','int4');
+
 		$this->captura('id_doc_compra_venta','BIGINT');
 		$this->captura('tipo','VARCHAR');
 		$this->captura('fecha','DATE');

@@ -61,7 +61,16 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 		}
 		else{
 			window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
-		}
+		}			
+		/*this.Cmp.id_entidad.reset();
+		this.Cmp.tipo_ret.reset();
+		this.Cmp.filtro_sql.reset();
+		this.Cmp.id_gestion.reset();
+		this.Cmp.id_periodo.reset();
+		this.Cmp.fecha_ini.reset();
+		this.Cmp.fecha_fin.reset();
+		this.Cmp.id_usuario.reset();
+		this.Cmp.formato_reporte.reset();*/				
 	},	
 	//
 	Atributos : 
@@ -163,9 +172,9 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 		{  
 			config:{
 				name:'id_gestion',
-				fieldLabel:'GestiÃ³n',
-				allowBlank:true,
-				emptyText:'GestiÃ³n...',
+				fieldLabel:'Gestion',
+				allowBlank:false,
+				emptyText:'Gestion...',
 				store: new Ext.data.JsonStore({
 					url: '../../sis_parametros/control/Gestion/listarGestion',
 					id: 'id_gestion',
@@ -202,7 +211,7 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 			config:{
 				name:'id_periodo',
 				fieldLabel:'Periodo',
-				allowBlank:true,
+				allowBlank:false,
 				emptyText:'Periodo...',
 				store: new Ext.data.JsonStore({
 					url: '../../sis_parametros/control/Periodo/listarPeriodo',
@@ -240,7 +249,7 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 			config:{
 				name: 'fecha_ini',
 				fieldLabel: 'Fecha Inicio',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				format: 'd/m/Y', 
@@ -258,7 +267,7 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 			config:{
 				name: 'fecha_fin',
 				fieldLabel: 'Fecha Fin',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				format: 'd/m/Y', 
