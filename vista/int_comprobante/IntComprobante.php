@@ -1579,11 +1579,9 @@ header("content-type: text/javascript; charset=UTF-8");
        
         var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 
-		var patron = /^FA*/;
-       
         if(reg.ROOT.datos.operacion == 'falla'){
 
-			if(patron.test(rec.data.nro_tramite)==false) {
+			
 				reg.ROOT.datos.desc_falla
 				if (confirm(reg.ROOT.datos.desc_falla + "\n¿Desea continuar de todas formas?")) {
 					this.mandarDatosWizard(resp.argument.wizard, resp.argument.resp, false);
@@ -1592,7 +1590,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					resp.argument.wizard.panel.destroy()
 					this.reload();
 				}
-			}
+			
         }
         else{
 	        resp.argument.wizard.panel.destroy()
