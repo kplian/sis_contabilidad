@@ -817,7 +817,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	addLibroMayor : function (){
 		Phx.CP.loadingShow();		
 		Ext.Ajax.request({
-			url:'../../sis_contabilidad/control/IntTransaccion/impReporte',
+			url:'../../sis_contabilidad/control/IntTransaccion/impReporteMayor',
 			params:
 			{	
 				'desde':ini,

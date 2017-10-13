@@ -334,9 +334,18 @@ class ACTIntTransaccion extends ACTbase{
 		if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
 			$this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");	
 		}		
-		$this->objFunc=$this->create('MODIntTransaccion');
-		$this->res=$this->objFunc->listarIntTransaccionMayor($this->objParam);
-		//adicionar una fila al resultado con el summario
+		$this->objFunc=$this->create('MODIntTransaccion');		
+		//$this->res=$this->objFunc->listarIntTransaccionRepMayor($this->objParam);
+		$cbteHeader = $this->objFunc->listarIntTransaccionRepMayor($this->objParam);
+		//var_dump('che manu->',$cbteHeader);
+		if($cbteHeader->getTipo() == 'EXITO'){							
+			return $cbteHeader;
+		}
+		else{
+			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}
+		/*
 		$temp = Array();
 		$temp['importe_debe_mb'] = $this->res->extraData['total_debe'];
 		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
@@ -345,16 +354,14 @@ class ACTIntTransaccion extends ACTbase{
 		$temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
 		$temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
 		$temp['tipo_reg'] = 'summary';
-		$temp['id_int_transaccion'] = 0;
-		
+		$temp['id_int_transaccion'] = 0;		
 		$this->res->total++;		
 		$this->res->addLastRecDatos($temp);
-		//var_dump($this->res);
-		$this->res->imprimirRespuesta($this->res->generarJson());
+		*/
+		//$this->res->imprimirRespuesta($this->res->generarJson());
 	}	
-
 	//mp
-	function impReporte() {		
+	function impReporteMayor() {		
 		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf';
 		$orientacion = 'P';		
 		$dataSource = $this->listarIntTransaccionMayorReporte();		
