@@ -333,15 +333,7 @@ class ACTIntTransaccion extends ACTbase{
 		}		
 		if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
 			$this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");	
-		}
-		/*
-		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
-			$this->objReporte = new Reporte($this->objParam,$this);
-			$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarIntTransaccionMayor');
-		} else{
-			$this->objFunc=$this->create('MODIntTransaccion');			
-			$this->res=$this->objFunc->listarIntTransaccionMayor($this->objParam);
-		}*/
+		}		
 		$this->objFunc=$this->create('MODIntTransaccion');
 		$this->res=$this->objFunc->listarIntTransaccionMayor($this->objParam);
 		//adicionar una fila al resultado con el summario
@@ -357,8 +349,30 @@ class ACTIntTransaccion extends ACTbase{
 		
 		$this->res->total++;		
 		$this->res->addLastRecDatos($temp);
+		var_dump($this->res);
 		$this->res->imprimirRespuesta($this->res->generarJson());
-	}		
+	}	
+
+	//mp
+	function impReporte() {		
+		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf';
+		$orientacion = 'P';		
+		$dataSource = $this->listarIntTransaccionMayorReporte();		
+		$tamano = 'LETTER';
+		$titulo = 'Consolidado';
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);		
+		$this->objParam->addParametro('titulo_archivo',$titulo);	
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		$reporte = new RTransaccionMayor($this->objParam);  
+		$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData);		
+		$reporte->generarReporte();
+		$reporte->output($reporte->url_archivo,'F');
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());	
+	}	
 }
 
 ?>

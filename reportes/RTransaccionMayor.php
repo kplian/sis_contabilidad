@@ -24,14 +24,14 @@ class RTransaccionMayor extends ReportePDF {
 	var $datos_entidad;
 	var $datos_periodo;
 	
-	function datosHeader ($detalle,$resultado,$tpoestado,$auxiliar) {
+	function datosHeader ($detalle,$resultado) {
 		$this->SetHeaderMargin(20);
 		$this->SetAutoPageBreak(TRUE, 10);
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
 		$this->datos_titulo = $resultado;
-		$this->datos_tpoestado = $tpoestado;
-		$this->datos_auxiliar = $auxiliar;
+		//$this->datos_tpoestado = $tpoestado;
+		//$this->datos_auxiliar = $auxiliar;
 		$this->subtotal = 0;
 		$this->SetMargins(20, 59, 5);
 	}

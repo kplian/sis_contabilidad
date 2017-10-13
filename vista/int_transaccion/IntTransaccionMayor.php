@@ -11,6 +11,22 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 var ini=null;
 var fin=null;
+var id_auxiliar=null;
+var id_centro_costo;
+var id_config_subtipo_cuenta=null;
+var id_config_tipo_cuenta=null;
+var id_cuenta=null;
+var id_depto=null;
+var id_gestion=null;
+var id_orden_trabajo=null;
+var id_partida=null;
+var id_suborden=null;
+var id_tipo_cc=null;
+var nro_tramite=null;
+var tipo_filtro=null;
+
+
+
 Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
     title:'Mayor',
 	constructor:function(config){		
@@ -753,7 +769,20 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	//mpmpmp
 	postReloadPage:function(data){
 		ini=data.desde;
-		fin=data.hasta;		
+		fin=data.hasta;			
+		id_auxiliar=data.id_auxiliar;
+		id_centro_costo=data.id_centro_costo;
+		id_config_subtipo_cuenta=data.id_config_subtipo_cuenta;
+		id_config_tipo_cuenta=data.id_config_tipo_cuenta;
+		id_cuenta=data.id_cuenta;
+		id_depto=data.id_depto;
+		id_gestion=data.id_gestion;
+		id_orden_trabajo=data.id_orden_trabajo;
+		id_partida=data.id_partida;
+		id_suborden=data.id_suborden;
+		id_tipo_cc=data.id_tipo_cc;
+		nro_tramite=data.nro_tramite;
+		tipo_filtro=data.tipo_filtro;	
 	},
 	//mpmpppmpmp
 	addBotonesLibroMayor: function() {
@@ -761,7 +790,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			id: 'b-libro_mayor-' + this.idContenedor,
 			text: 'Libro Mayor',
 			disabled: false,
-			grupo:[0,1,2],
+			grupo:[0,1],
 			iconCls : 'bprint',
 			//handler:this.listaRetencionGarantias,
 			scope: this,
@@ -788,11 +817,24 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	addLibroMayor : function (){
 		Phx.CP.loadingShow();		
 		Ext.Ajax.request({
-			url:'../../sis_contabilidad/control/IntTransaccion/listarIntTransaccionMayorReporte',
+			url:'../../sis_contabilidad/control/IntTransaccion/impReporte',
 			params:
 			{	
-				'desde ':ini,
-				'hasta':fin
+				'desde':ini,
+				'hasta':fin,
+				'id_auxiliar':id_auxiliar,
+				'id_centro_costo':id_centro_costo,
+				'id_config_subtipo_cuenta':id_config_subtipo_cuenta,
+				'id_config_tipo_cuenta':id_config_tipo_cuenta,
+				'id_cuenta':id_cuenta,
+				'id_depto':id_depto,
+				'id_gestion':id_gestion,
+				'id_orden_trabajo':id_orden_trabajo,
+				'id_partida':id_partida,
+				'id_suborden':id_suborden,
+				'id_tipo_cc':id_tipo_cc,
+				'nro_tramite':nro_tramite,
+				'tipo_filtro':tipo_filtro
 			},
 			success: this.successExport,		
 			failure: this.conexionFailure,
