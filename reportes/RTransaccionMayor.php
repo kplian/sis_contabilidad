@@ -167,7 +167,7 @@ class RTransaccionMayor extends ReportePDF {
 		$this->tabletextcolor=$conf_tabletextcolor;
 		$this->calcularMontos($val);		
 		$this-> MultiRow($RowArray,$fill,0);
-	}
+	} 
 	//desde generarcuerpo
 	function revisarfinPagina(){
 		$dimensions = $this->getPageDimensions();

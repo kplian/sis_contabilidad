@@ -241,7 +241,6 @@ class MODIntTransaccion extends MODbase{
 		return $this->respuesta;
 	}
 
-
    function listarIntTransaccionMayor(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_int_transaccion_sel';

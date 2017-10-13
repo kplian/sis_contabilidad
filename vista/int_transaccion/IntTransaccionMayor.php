@@ -9,6 +9,8 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
+var ini=null;
+var fin=null;
 Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
     title:'Mayor',
 	constructor:function(config){		
@@ -495,6 +497,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
 			});
 			
+		//mp/mp
+		this.addBotonesLibroMayor();
 			
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
@@ -738,16 +742,65 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				gdisplayField:'desc_partida',
 				value:'desc_partida'
 			},
-			{ 
-		   	    label:'Cbte',
+			{	
+				label:'Cbte',
 				name:'nro_cbte',
 				width:'100',
 				type:'string',
 				gdisplayField:'nro_cbte',
 				value:'nro_cbte'
 			}],
-	
-	
+	//mpmpmp
+	postReloadPage:function(data){
+		ini=data.desde;
+		fin=data.hasta;		
+	},
+	//mpmpppmpmp
+	addBotonesLibroMayor: function() {
+		this.menuLibroMayor = new Ext.Toolbar.SplitButton({
+			id: 'b-libro_mayor-' + this.idContenedor,
+			text: 'Libro Mayor',
+			disabled: false,
+			grupo:[0,1,2],
+			iconCls : 'bprint',
+			//handler:this.listaRetencionGarantias,
+			scope: this,
+			menu:{
+				items: [{
+					id:'b-ins-mayor-pdf-' + this.idContenedor,
+					text: 'PDF',
+					tooltip: '<b>Imprimir reporte en formato pdf</b>',
+					handler:this.addLibroMayor,
+					scope: this
+				},
+				{
+					id:'b-ins-mayor-xls-' + this.idContenedor,
+					text: 'EXCEL',
+					tooltip: '<b>Imprimir reporte en formato xls</b>',
+					handler:this.addLibroMayor,
+					scope: this
+				}
+			]}
+		});
+		this.tbar.add(this.menuLibroMayor);
+	},
+	//
+	addLibroMayor : function (){
+		Phx.CP.loadingShow();		
+		Ext.Ajax.request({
+			url:'../../sis_contabilidad/control/IntTransaccion/listarIntTransaccionMayorReporte',
+			params:
+			{	
+				'desde ':ini,
+				'hasta':fin
+			},
+			success: this.successExport,		
+			failure: this.conexionFailure,
+			timeout:this.timeout,
+			scope:this
+		});
+    },
+    //
     bnew : false,
     bedit: false,
     bdel:  false

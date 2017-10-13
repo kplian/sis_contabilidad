@@ -6,6 +6,7 @@
 *@date 01-09-2013 18:10:12
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
+require_once(dirname(__FILE__).'/../reportes/RTransaccionMayor.php');
 
 class ACTIntTransaccion extends ACTbase{    
 			
@@ -290,7 +291,74 @@ class ACTIntTransaccion extends ACTbase{
 		$this->res->addLastRecDatos($temp);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+	//
+	function listarIntTransaccionMayorReporte(){
+		$this->objParam->defecto('ordenacion','id_int_transaccion');
+		$this->objParam->defecto('dir_ordenacion','asc');		
+		if($this->objParam->getParametro('id_int_comprobante')!=''){
+			$this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));	
+		}
+		if($this->objParam->getParametro('id_gestion')!=''){
+			$this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));	
+		}		
+		if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+			$this->objParam->addFiltro("ctc.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));	
+		}		
+		if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+			$this->objParam->addFiltro("csc.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));	
+		}
+		if($this->objParam->getParametro('id_depto')!=''){
+			$this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));	
+		}	
+		if($this->objParam->getParametro('id_partida')!=''){
+			$this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));	
+		}		
+		if($this->objParam->getParametro('id_suborden')!=''){
+			$this->objParam->addFiltro("transa.id_subordeno = ".$this->objParam->getParametro('id_suborden'));	
+		}
+		if($this->objParam->getParametro('id_auxiliar')!=''){
+			$this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));	
+		}		
+		if($this->objParam->getParametro('id_centro_costo')!=''){
+			$this->objParam->addFiltro("transa.id_centro_costo = ".$this->objParam->getParametro('id_centro_costo'));	
+		}		
+		if($this->objParam->getParametro('nro_tramite')!=''){
+			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");	
+		}
+		if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+			$this->objParam->addFiltro("(icbte.fecha::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");	
+		}		
+		if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')==''){
+			$this->objParam->addFiltro("(icbte.fecha::date  >= ''%".$this->objParam->getParametro('desde')."%''::date)");	
+		}		
+		if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
+			$this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");	
+		}
+		/*
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarIntTransaccionMayor');
+		} else{
+			$this->objFunc=$this->create('MODIntTransaccion');			
+			$this->res=$this->objFunc->listarIntTransaccionMayor($this->objParam);
+		}*/
+		$this->objFunc=$this->create('MODIntTransaccion');
+		$this->res=$this->objFunc->listarIntTransaccionMayor($this->objParam);
+		//adicionar una fila al resultado con el summario
+		$temp = Array();
+		$temp['importe_debe_mb'] = $this->res->extraData['total_debe'];
+		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
+		$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
+		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];		
+		$temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
+		$temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
+		$temp['tipo_reg'] = 'summary';
+		$temp['id_int_transaccion'] = 0;
+		
+		$this->res->total++;		
+		$this->res->addLastRecDatos($temp);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}		
 }
 
 ?>
