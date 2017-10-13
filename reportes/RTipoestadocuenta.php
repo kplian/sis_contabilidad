@@ -91,9 +91,9 @@ class RTipoestadocuenta extends  ReportePDF {
 	}
 	//	
 	function generarCabecera(){
-		$conf_par_tablewidths=array(7,80,15,15,15);
-		$conf_par_tablealigns=array('C','C','C','C','C');
-		$conf_par_tablenumbers=array(0,0,0,0,0);
+		$conf_par_tablewidths=array(7,50,80,15,15,15);
+		$conf_par_tablealigns=array('C','C','C','C','C','C');
+		$conf_par_tablenumbers=array(0,0,0,0,0,0);
 		$conf_tableborders=array();
 		$conf_tabletextcolor=array();		
 		$this->tablewidths=$conf_par_tablewidths;
@@ -103,9 +103,10 @@ class RTipoestadocuenta extends  ReportePDF {
 		$this->tabletextcolor=$conf_tabletextcolor;
 		$RowArray = array(
 				's0' => 'Nº',
-				's1' => 'NOMBRE ',
-				's2' => 'MONTO MB',
-				's3' => 'MONTO MT'
+				's1' => 'NOMBRE',
+				's2' => 'DESCRIPCION',
+				's3' => 'MONTO MB',
+				's4' => 'MONTO MT'
 				);
 		$this->MultiRow($RowArray, false, 1);
 	}
@@ -149,14 +150,15 @@ class RTipoestadocuenta extends  ReportePDF {
 		$this->SetTextColor(0);
 		$this->SetFont('','',6);				
 			
-		$conf_par_tablewidths=array(7,80,15,15,15);
-		$conf_par_tablealigns=array('C','C','C','C','C');
-		$conf_par_tablenumbers=array(0,0,0,0,0);
-		$conf_tableborders=array('LR','LR','LR','LR','LR');		
+		$conf_par_tablewidths=array(7,50,80,15,15,15);
+		$conf_par_tablealigns=array('C','L','L','C','C','C');
+		$conf_par_tablenumbers=array(0,0,0,0,0,0);
+		$conf_tableborders=array('LR','LR','LR','LR','LR','LR');		
 		$RowArray = array(  's0' => $count,
 							's1' => trim($val['nombre']),
-							's2' => $val['monto_mb'],
-							's3' => $val['monto_mt']			
+							's2' => trim($val['descripcion']),
+							's3' => $val['monto_mb'],
+							's4' => $val['monto_mt']			
 						);				
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
@@ -213,14 +215,15 @@ class RTipoestadocuenta extends  ReportePDF {
 	//revisarfinPagina pie
 	function cerrarCuadro(){
 		//si noes inicio termina el cuardro anterior
-		$conf_par_tablewidths=array(7,80,15,15,15);				
-		$this->tablealigns=array('R','R','R','R','R');		
-		$this->tablenumbers=array(0,0,0,0,0);
-		$this->tableborders=array('T','T','LRTB','LRTB','LRTB');						
-		$RowArray = array(  's1' => '', 
+		$conf_par_tablewidths=array(7,50,80,15,15,15);				
+		$this->tablealigns=array('R','R','R','R','R','R');		
+		$this->tablenumbers=array(0,0,0,0,0,0);
+		$this->tableborders=array('T','T','T','LRTB','LRTB','LRTB');						
+		$RowArray = array(  's1' => '',
+							's2' => '',
 							'espacio' => 'Subtotal',
-							's2' => $this->s1,
-							's3' => $this->s2
+							's3' => $this->s1,
+							's4' => $this->s2
 						);		
 		$this-> MultiRow($RowArray,false,1);
 		$this->s1 = 0;
@@ -229,16 +232,17 @@ class RTipoestadocuenta extends  ReportePDF {
 	}
 	//revisarfinPagina pie
 	function cerrarCuadroTotal(){
-		$conf_par_tablewidths=array(7,80,15,15,15);	
-		$this->tablealigns=array('R','R','R','R','R');		
-		$this->tablenumbers=array(0,0,0,0,0);
-		$this->tableborders=array('','','LRTB','LRTB','TRB');	
+		$conf_par_tablewidths=array(7,50,80,15,15,15);	
+		$this->tablealigns=array('R','R','R','R','R','R');		
+		$this->tablenumbers=array(0,0,0,0,0,0);
+		$this->tableborders=array('','','','LRTB','LRTB','TRB');	
 							
 		$RowArray = array( 
 					't1' => '',
+					't2' => '',
 					'espacio' => 'TOTAL: ',
-					't2' => $this->t1,
-					't3' => $this->t2
+					't3' => $this->t1,
+					't4' => $this->t2
 				);
 		$this-> MultiRow($RowArray,false,1);
 	}
