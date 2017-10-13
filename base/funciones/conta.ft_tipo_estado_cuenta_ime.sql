@@ -32,6 +32,7 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_tipo_estado_cuenta	integer;
+    v_registros				record;
 			    
 BEGIN
 
@@ -120,6 +121,33 @@ BEGIN
             return v_resp;
             
 		end;
+       --------------   
+      
+     /*********************************    
+ 	#TRANSACCION:  'CONTA_TEC_GET'
+ 	#DESCRIPCION:	Recupera los datos de la tipo estado de cuenta 
+ 	#AUTOR:		manu	
+ 	#FECHA:		10-10-2017 16:03:19
+	***********************************/
+
+	elsif(p_transaccion='CONTA_TEC_GET')then
+		begin
+			--Sentencia de la    eliminacion		
+            select b.nombre,b.codigo,b.id_tipo_estado_cuenta,b.tabla
+            into v_registros
+            from conta.ttipo_estado_cuenta b               
+            where b.estado_reg='activo' and b.id_tipo_estado_cuenta= v_parametros.id_tipo_estado_cuenta;
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Dato recuperada(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'nombre',v_registros.nombre::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'codigo',v_registros.codigo::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado_cuenta',v_registros.id_tipo_estado_cuenta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'tabla',v_registros.tabla::varchar);                        
+            --Devuelve la respuesta
+            return v_resp;
+		end; 
+    
+    ---------------------  
 
 	/*********************************    
  	#TRANSACCION:  'CONTA_TEC_ELI'
@@ -143,7 +171,7 @@ BEGIN
             return v_resp;
 
 		end;
-         
+      
 	else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;
