@@ -349,7 +349,7 @@ class ACTIntTransaccion extends ACTbase{
 		
 		$this->res->total++;		
 		$this->res->addLastRecDatos($temp);
-		var_dump($this->res);
+		//var_dump($this->res);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}	
 
