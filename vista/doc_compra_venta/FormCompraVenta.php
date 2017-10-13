@@ -1173,7 +1173,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         anchor: '80%',
                         gwidth: 100,
                         maxLength :16,
-                        minLength:16,
+                        minLength:9,
                         listeners:{
                             'change': function(field, newValue, oldValue){
 
