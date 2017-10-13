@@ -456,12 +456,12 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
 		$this->setParametro('tipo_filtro','tipo_filtro','varchar');
 		//captura parametros adicionales para el count
-		$this->capturaCount('total_debe','numeric');
+	/*	$this->capturaCount('total_debe','numeric');
 		$this->capturaCount('total_haber','numeric');
 		$this->capturaCount('total_debe_mt','numeric');
 		$this->capturaCount('total_haber_mt','numeric');
 		$this->capturaCount('total_debe_ma','numeric');
-		$this->capturaCount('total_haber_ma','numeric');	
+		$this->capturaCount('total_haber_ma','numeric');	*/
 		//Definicion de la lista del resultado del query
 		$this->captura('id_int_transaccion','int4');
 		$this->captura('id_partida','int4');

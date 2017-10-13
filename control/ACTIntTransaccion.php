@@ -6,9 +6,10 @@
 *@date 01-09-2013 18:10:12
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
-require_once(dirname(__FILE__).'/../reportes/RTransaccionMayor.php');
 
-class ACTIntTransaccion extends ACTbase{    
+require_once(dirname(__FILE__).'/../reportes/RLibroMayorXls.php');
+
+class ACTIntTransaccion extends ACTbase{
 			
 	function listarIntTransaccion(){
 		$this->objParam->defecto('ordenacion','orden');
@@ -293,8 +294,7 @@ class ACTIntTransaccion extends ACTbase{
 	}
 	//
 	function listarIntTransaccionMayorReporte(){
-		$this->objParam->defecto('ordenacion','id_int_transaccion');
-		$this->objParam->defecto('dir_ordenacion','asc');		
+	
 		if($this->objParam->getParametro('id_int_comprobante')!=''){
 			$this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));	
 		}
@@ -333,48 +333,38 @@ class ACTIntTransaccion extends ACTbase{
 		}		
 		if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
 			$this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");	
-		}		
+		}
+				
 		$this->objFunc=$this->create('MODIntTransaccion');		
-		//$this->res=$this->objFunc->listarIntTransaccionRepMayor($this->objParam);
 		$cbteHeader = $this->objFunc->listarIntTransaccionRepMayor($this->objParam);
-		
-		if($cbteHeader->getTipo() == 'EXITO'){
-			var_dump('verdad manu->',$cbteHeader);								
+				
+		if($cbteHeader->getTipo() == 'EXITO'){										
 			return $cbteHeader;			
 		}
 		else{
-			var_dump('falso manu->',$cbteHeader);
 			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
 			exit;
-		}
-		/*
-		$temp = Array();
-		$temp['importe_debe_mb'] = $this->res->extraData['total_debe'];
-		$temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
-		$temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
-		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];		
-		$temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
-		$temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
-		$temp['tipo_reg'] = 'summary';
-		$temp['id_int_transaccion'] = 0;		
-		$this->res->total++;		
-		$this->res->addLastRecDatos($temp);
-		*/
-		//$this->res->imprimirRespuesta($this->res->generarJson());
+		}		
 	}	
 	//mp
 	function impReporteMayor() {		
-		$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf';
+		//$nombreArchivo = uniqid(md5(session_id()).'LibroMayor').'.pdf';	
+		$nombreArchivo=uniqid(md5(session_id()).'LibroMayor');
+		$nombreArchivo.='.xls';
+					
+		$dataSource = $this->listarIntTransaccionMayorReporte();
+		$dataEntidad = "";
+		$dataPeriodo = "";	
 		$orientacion = 'P';		
-		$dataSource = $this->listarIntTransaccionMayorReporte();		
 		$tamano = 'LETTER';
 		$titulo = 'Consolidado';
 		$this->objParam->addParametro('orientacion',$orientacion);
 		$this->objParam->addParametro('tamano',$tamano);		
 		$this->objParam->addParametro('titulo_archivo',$titulo);	
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
-		$reporte = new RTransaccionMayor($this->objParam);  
-		$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData);		
+		//var_dump($this->objParam);
+		$reporte = new RLibroMayorXls($this->objParam);  
+		$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
 		$reporte->generarReporte();
 		$reporte->output($reporte->url_archivo,'F');
 		$this->mensajeExito=new Mensaje();
