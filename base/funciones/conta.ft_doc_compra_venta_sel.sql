@@ -377,7 +377,8 @@ BEGIN
                            DISTINCT(dcv.nit)::bigint,
                            dcv.razon_social
                           from conta.tdoc_compra_venta dcv
-                        where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                        where dcv.nit != '''' and pla.tipo_informe = ''lcv'' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
 
 
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
