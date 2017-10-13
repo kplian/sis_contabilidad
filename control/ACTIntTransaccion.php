@@ -337,7 +337,7 @@ class ACTIntTransaccion extends ACTbase{
 		$this->objFunc=$this->create('MODIntTransaccion');		
 		//$this->res=$this->objFunc->listarIntTransaccionRepMayor($this->objParam);
 		$cbteHeader = $this->objFunc->listarIntTransaccionRepMayor($this->objParam);
-		//var_dump('che manu->',$cbteHeader);
+		var_dump('che manu->',$cbteHeader);
 		if($cbteHeader->getTipo() == 'EXITO'){							
 			return $cbteHeader;
 		}
