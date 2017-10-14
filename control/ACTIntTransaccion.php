@@ -6,8 +6,7 @@
 *@date 01-09-2013 18:10:12
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
-
-require_once(dirname(__FILE__).'/../reportes/RLibroMayorXls.php');
+require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
 
 class ACTIntTransaccion extends ACTbase{
 			
@@ -348,10 +347,7 @@ class ACTIntTransaccion extends ACTbase{
 	}	
 	//mp
 	function impReporteMayor() {		
-		//$nombreArchivo = uniqid(md5(session_id()).'LibroMayor').'.pdf';	
-		$nombreArchivo=uniqid(md5(session_id()).'LibroMayor');
-		$nombreArchivo.='.xls';
-					
+		$nombreArchivo = uniqid(md5(session_id()).'LibroMayor').'.pdf';			
 		$dataSource = $this->listarIntTransaccionMayorReporte();
 		$dataEntidad = "";
 		$dataPeriodo = "";	
@@ -362,8 +358,8 @@ class ACTIntTransaccion extends ACTbase{
 		$this->objParam->addParametro('tamano',$tamano);		
 		$this->objParam->addParametro('titulo_archivo',$titulo);	
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
-		//var_dump($this->objParam);
-		$reporte = new RLibroMayorXls($this->objParam);  
+		
+		$reporte = new RTransaccionmayor($this->objParam);  
 		$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
 		$reporte->generarReporte();
 		$reporte->output($reporte->url_archivo,'F');
@@ -371,6 +367,7 @@ class ACTIntTransaccion extends ACTbase{
 		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());	
+		
 	}	
 }
 

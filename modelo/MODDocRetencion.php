@@ -46,6 +46,7 @@ class MODDocRetencion extends MODbase{
 		
 		$this->captura('importe_descuento_ley','NUMERIC');
 		$this->captura('obs','VARCHAR');
+		$this->captura('nro_tramite','VARCHAR');
 		$this->captura('plantilla','VARCHAR');
 		
 		$this->captura('it','NUMERIC');

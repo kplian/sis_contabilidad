@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_retencion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -59,7 +61,7 @@ BEGIN
            	SELECT gestion into v_gestion
            	FROM param.tgestion
            	WHERE id_gestion=v_parametros.id_gestion;
-
+			--si existiria otra vista x añadir
            	IF v_gestion < 2017  THEN
             	v_tabla_origen = 'conta.vretencion';
             ELSE
@@ -113,6 +115,7 @@ BEGIN
                                 ret.importe_doc::NUMERIC, 
                                 ret.importe_descuento_ley::NUMERIC,   
                                 ret.obs::VARCHAR,
+                                ret.nro_tramite::VARCHAR,
                                 CASE
                                     WHEN ret.desc_plantilla=''Recibo con Retenciones Servicios''  THEN ''Servicios''::VARCHAR
                                     WHEN ret.desc_plantilla=''Recibo con Retenciones Bienes''  THEN ''Bienes''::VARCHAR    
@@ -219,8 +222,7 @@ BEGIN
                                         MAX(CASE WHEN (c.descripcion LIKE '''||var_6||''' AND c.codigo_tipo_relacion LIKE '''||var_6||''') THEN ret.desc_plantilla::VARCHAR END)       
                                     ELSE
                                         0::VARCHAR
-                                END AS alquileres
-                               
+                                END AS alquileres                               
                                 
                             FROM '||v_tabla_origen||' ret, param.tplantilla p
                             JOIN conta.tplantilla_calculo c ON p.id_plantilla = c.id_plantilla
@@ -246,6 +248,7 @@ BEGIN
                                       ret.importe_doc,                       
                                       ret.importe_descuento_ley,
                                       ret.obs,
+                                      ret.nro_tramite,
                                       ret.desc_plantilla
 							ORDER BY ret.id_plantilla';
 			--Devuelve la respuesta   

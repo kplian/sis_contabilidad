@@ -112,7 +112,7 @@ class RTransaccionmayor extends ReportePDF {
 		$this->MultiRow($RowArray, false, 1);
 	}
 	//
-	/*function generarReporte() {
+	function generarReporte() {
 		$this->setFontSubsetting(false);
 		$this->AddPage();
 		$sw = false;
@@ -120,11 +120,9 @@ class RTransaccionmayor extends ReportePDF {
 		$this->generarCuerpo($this->datos_detalle);
 		if($this->s1 != 0){
 			$this->SetFont('','B',6);
-			$this->cerrarCuadro();	
-			$this->cerrarCuadroTotal();
 		}
 		$this->Ln(4);
-	}*/
+	}
 	//		
 	function generarCuerpo($detalle){
 		$count = 1;
@@ -156,9 +154,7 @@ class RTransaccionmayor extends ReportePDF {
 		$conf_par_tablenumbers=array(0,0,0,0,0);
 		$conf_tableborders=array('LR','LR','LR','LR','LR');		
 		$RowArray = array(  's0' => $count,
-							's1' => trim($val['nombre']),
-							's2' => $val['monto_mb'],
-							's3' => $val['monto_mt']			
+							's1' => trim($val['desc_partida'])			
 						);				
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
@@ -177,8 +173,8 @@ class RTransaccionmayor extends ReportePDF {
 		$this->getNumLines($row['cell1data'], 80);
 
 		if ($startY > 190) {
-			$this->cerrarCuadro();
-			$this->cerrarCuadroTotal();
+			//$this->cerrarCuadro();
+			//$this->cerrarCuadroTotal();
 			if($this->total!= 0){
 				$this->AddPage();
 			}
@@ -205,15 +201,15 @@ class RTransaccionmayor extends ReportePDF {
 	}
 	//
 	//imprimirLinea suma filas
-	function calcularMontos($val){			
+	/*function calcularMontos($val){			
 		$this->s1 = $this->s1 + $val['monto_mb'];
 		$this->s2 = $this->s2 + $val['monto_mt'];
 					
 		$this->t1 = $this->t1 + $val['monto_mb'];
 		$this->t2 = $this->t2 + $val['monto_mt'];
-	}	
+	}	*/
 	//revisarfinPagina pie
-	function cerrarCuadro(){
+	/*function cerrarCuadro(){
 		//si noes inicio termina el cuardro anterior
 		$conf_par_tablewidths=array(7,80,15,15,15);				
 		$this->tablealigns=array('R','R','R','R','R');		
@@ -228,9 +224,9 @@ class RTransaccionmayor extends ReportePDF {
 		$this->s1 = 0;
 		$this->s2 = 0;
 		$this->s3 = 0;
-	}
+	}*/
 	//revisarfinPagina pie
-	function cerrarCuadroTotal(){
+	/*function cerrarCuadroTotal(){
 		$conf_par_tablewidths=array(7,80,15,15,15);	
 		$this->tablealigns=array('R','R','R','R','R');		
 		$this->tablenumbers=array(0,0,0,0,0);
@@ -243,6 +239,6 @@ class RTransaccionmayor extends ReportePDF {
 					't3' => $this->t2
 				);
 		$this-> MultiRow($RowArray,false,1);
-	}
+	}*/
 }
 ?>
