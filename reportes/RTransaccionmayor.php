@@ -149,16 +149,19 @@ class RTransaccionmayor extends ReportePDF {
 		$this->SetTextColor(0);
 		$this->SetFont('','',6);				
 			
-		$conf_par_tablewidths=array(7,80,15,15,15);
-		$conf_par_tablealigns=array('C','C','C','C','C');
-		$conf_par_tablenumbers=array(0,0,2,2,2);
-		$conf_tableborders=array('LR','LR','LR','LR','LR');		
+		$conf_par_tablewidths=array(7,80,15,15,15,15,15,15,15,15);
+		$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C');
+		$conf_par_tablenumbers=array(0,0,0,2,2,2,2,2,2);
+		$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR');		
 		$RowArray = array(  's0' => $count,
 							's1' => trim($val['desc_partida']),
 							's2' => trim($val['glosa']),
-							's3' => trim($val['importe_debe']),
-							's4' => trim($val['importe_haber']),
-							's5' => trim($val['importe_gasto_mb'])			
+							's3' => trim($val['importe_debe_mb']),
+							's4' => trim($val['importe_haber_mb']),
+							's5' => trim($val['importe_debe_mt']),
+							's6' => trim($val['importe_haber_mt']),
+							's7' => trim($val['importe_debe_ma']),
+							's8' => trim($val['importe_haber_ma'])			
 						);				
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
