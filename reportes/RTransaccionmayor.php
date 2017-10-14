@@ -154,7 +154,11 @@ class RTransaccionmayor extends ReportePDF {
 		$conf_par_tablenumbers=array(0,0,0,0,0);
 		$conf_tableborders=array('LR','LR','LR','LR','LR');		
 		$RowArray = array(  's0' => $count,
-							's1' => trim($val['desc_partida'])			
+							's1' => trim($val['desc_partida']),
+							's2' => trim($val['glosa']),
+							's3' => trim($val['importe_debe']),
+							's4' => trim($val['importe_haber']),
+							's5' => trim($val['importe_gasto_mb'])			
 						);				
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
