@@ -161,7 +161,7 @@ class RTransaccionmayor extends ReportePDF {
 		$this->tablenumbers=$conf_par_tablenumbers;
 		$this->tableborders=$conf_tableborders;
 		$this->tabletextcolor=$conf_tabletextcolor;
-		$this->calcularMontos($val);		
+		//$this->calcularMontos($val);		
 		$this-> MultiRow($RowArray,$fill,0);
 	} 
 	//desde generarcuerpo
