@@ -151,7 +151,7 @@ class RTransaccionmayor extends ReportePDF {
 			
 		$conf_par_tablewidths=array(7,80,15,15,15);
 		$conf_par_tablealigns=array('C','C','C','C','C');
-		$conf_par_tablenumbers=array(0,0,0,0,0);
+		$conf_par_tablenumbers=array(0,0,2,2,2);
 		$conf_tableborders=array('LR','LR','LR','LR','LR');		
 		$RowArray = array(  's0' => $count,
 							's1' => trim($val['desc_partida']),
