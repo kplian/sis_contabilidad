@@ -205,6 +205,27 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	            grid:false,
 	            form:true
 	        },
+	        {
+				config:{
+					name: 'glosa',
+					fieldLabel: 'Glosa',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 300,
+					maxLength:1000,
+					renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+                          metaData.css = 'multilineColumn'; 
+                          return String.format('{0} <br> {1}', record.data['glosa1'], value);
+                     }
+				},
+				type:'TextArea',
+				filters:{pfiltro:'transa.glosa',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:true
+			},
+			
+	        
 			{
 				config: {
 					name: 'importe_debe_mb',
@@ -352,21 +373,6 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				form: true
 			},
 			
-			{
-				config:{
-					name: 'glosa',
-					fieldLabel: 'Glosa',
-					allowBlank: true,
-					anchor: '80%',
-					gwidth: 300,
-					maxLength:1000
-				},
-				type:'TextArea',
-				filters:{pfiltro:'transa.glosa',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:true
-			},
 			
 			
 			{
@@ -559,14 +565,12 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	            '<br>',	    
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Cbte:&nbsp;&nbsp;</b> {nro_cbte} - {nombre_corto}</p>',	            
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Trámite:&nbsp;&nbsp;</b> {nro_tramite} &nbsp; {fecha:date("d/m/Y")}</p>',
-	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa Comprobante :&nbsp;&nbsp;</b> <p>{glosa1}</p></p>',
-	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa Trasacción:&nbsp;&nbsp;</b> {glosa}</p>',
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>',
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>'
 	        )
     }),
     
-    arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','estado_reg','fecha_reg','glosa'],
+    arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','estado_reg','fecha_reg'],
 
     sortInfo:{
 		field: 'id_int_transaccion',
