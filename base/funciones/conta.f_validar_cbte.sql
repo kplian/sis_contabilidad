@@ -19,6 +19,7 @@ $body$
  
   ***************************************************************************************************   
     
+
     HISTORIAL DE MODIFICACIONES:
    	
  ISSUE            FECHA:		      AUTOR                 DESCRIPCION
@@ -28,8 +29,9 @@ $body$
  #0       		20/11/2016        RAC KPLIAN        Se invirte la migraicon de cbte PXP -> ENDESIS
  #0       		22/12/2016        RAC KPLIAN        validacion de numeracion en cbtes
  #0       		13/06/2017        RAC KPLIAN        validacion de documentos asocidos de compra o de venta 
- 
+ #13			    18/10/2017		    RAC KPLIAN		    Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados  
   
+
 */
 DECLARE
 
@@ -127,6 +129,8 @@ BEGIN
     inner join param.tperiodo p on p.id_periodo = c.id_periodo
     inner join segu.tsubsistema sis on sis.id_subsistema = c.id_subsistema
     where id_int_comprobante = p_id_int_comprobante;
+    
+    
     
     ------------------------------------------------------------------------------------------
     --  Verifica si los cbte de diario cuadran con los dosc/fact/recibos/invoices registrados
@@ -652,6 +656,15 @@ BEGIN
              v_resp_int_endesis =  migra.f_migrar_cbte_endesis(p_id_int_comprobante, v_nombre_conexion, 'si');
          
          END IF;
+         
+         
+         ------------------------------------------------------------------------
+         --  #13  actualiza nro de tramite en documentos de compra venta relacionados
+         -------------------------------------------------------------------------
+         
+           update conta.tdoc_compra_venta d set
+                nro_tramite =  v_rec_cbte.nro_tramite
+           where d.id_int_comprobante = p_id_int_comprobante;
          
          
           

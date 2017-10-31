@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -10,15 +12,16 @@ $body$
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_doc_compra_venta_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
- AUTOR: 		 (admin)
+ AUTOR: 		RAC KPLIAN
  FECHA:	        18-08-2015 15:57:09
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:
- AUTOR:
- FECHA:
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0				 18-08-2015        RAC KPLIAN 		Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
+ #14, BOA		 18/10/2017		   RAC KPLIAN		Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados en las trasacciones CONTA_DCV_INS y CONTA_ADDCBTE_IME
+  
 ***************************************************************************/
 
 DECLARE
@@ -47,6 +50,7 @@ DECLARE
   v_nit						integer;
   v_id_moneda				integer;
   v_nomeda					varchar;
+  v_nro_tramite				varchar;
 
 
 BEGIN
@@ -126,7 +130,15 @@ BEGIN
 
 
       if (pxp.f_existe_parametro(p_tabla,'id_int_comprobante')) then
-          v_id_int_comprobante = v_parametros.id_int_comprobante;
+          v_id_int_comprobante = v_parametros.id_int_comprobante;          
+          --#14,  se recupera el nro_tramite del comprobante si es que existe
+          select
+             c.nro_tramite
+          into
+             v_nro_tramite
+          from conta.tint_comprobante c
+          where c.id_int_comprobante = v_id_int_comprobante;
+          
       end if;
 
 
@@ -215,7 +227,8 @@ BEGIN
         id_cliente,
         id_auxiliar,
         id_tipo_doc_compra_venta,
-        id_int_comprobante
+        id_int_comprobante,
+        nro_tramite
 
       ) values(
         v_parametros.tipo,
@@ -255,7 +268,8 @@ BEGIN
         v_id_cliente,
         v_parametros.id_auxiliar,
         v_id_tipo_doc_compra_venta,
-        v_id_int_comprobante
+        v_id_int_comprobante,
+        v_nro_tramite
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -1140,7 +1154,7 @@ BEGIN
   /*********************************
  #TRANSACCION:  'CONTA_ADDCBTE_IME'
  #DESCRIPCION:	adiciona un documento al comprobante
- #AUTOR:		admin
+ #AUTOR:		RAC
  #FECHA:		25-09-2015 15:57:09
 ***********************************/
 
@@ -1157,9 +1171,19 @@ BEGIN
 
         raise exception 'El documento no existe o ya tiene un cbte relacionado';
       END IF;
+      
+      --#14, recupera nro de tramite del cbte
+      
+      select
+         cbte.nro_tramite
+      into
+        v_nro_tramite
+      from conta.tint_comprobante cbte
+      where cbte.id_int_comprobante = v_parametros.id_int_comprobante;
 
-      update conta.tdoc_compra_venta  set
-        id_int_comprobante =  v_parametros.id_int_comprobante
+      update conta.tdoc_compra_venta d  set
+        id_int_comprobante =  v_parametros.id_int_comprobante,
+        nro_tramite =   v_nro_tramite
       where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
 
 

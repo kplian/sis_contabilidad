@@ -265,7 +265,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 				anchor: '80%',
 				gwidth: 100,
 				maxLength :16,
-				minLength:16
+				minLength:9
 			},
 				type:'TextField',
 				filters:{pfiltro:'dcv.nro_dui',type:'string'},

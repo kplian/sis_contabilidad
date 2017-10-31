@@ -1,5 +1,5 @@
 --------------- SQL ---------------
--- test
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -227,7 +227,7 @@ BEGIN
                             dcv.id_moneda,
                             mon.codigo as desc_moneda,
                             dcv.id_int_comprobante,
-                            ic.nro_tramite,
+                            dcv.nro_tramite,
                             COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
                             COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
                             COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
@@ -377,7 +377,8 @@ BEGIN
                            DISTINCT(dcv.nit)::bigint,
                            dcv.razon_social
                           from conta.tdoc_compra_venta dcv
-                        where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                        where dcv.nit != '''' and pla.tipo_informe = ''lcv'' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
 
 
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;

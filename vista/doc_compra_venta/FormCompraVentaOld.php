@@ -1152,7 +1152,7 @@ Phx.vista.FormCompraVenta=Ext.extend(Phx.frmInterfaz,{
 					anchor: '80%',
 					gwidth: 100,
 					maxLength :16,
-					minLength:16,
+					minLength:9,
 	                listeners:{
 				          'change': function(field, newValue, oldValue){
 				          			 
