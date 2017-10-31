@@ -512,8 +512,25 @@ class ACTCuenta extends ACTbase{
 				
 	}
   
+	function listarCuentaTCC(){
+		$this->objParam->defecto('ordenacion','id_cuenta');
+		$this->objParam->defecto('dir_ordenacion','asc');
 
-   
+		if($this->objParam->getParametro('id_tipo_cc')!=''){
+            $this->objParam->addFiltro("cc.id_tipo_cc = ".$this->objParam->getParametro('id_tipo_cc'));
+        }
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODCuenta','listarCuentaTCC');
+		} 
+		else{
+			$this->objFunc=$this->create('MODCuenta');
+			$this->res=$this->objFunc->listarCuentaTCC($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+  	 
 			
 }
 

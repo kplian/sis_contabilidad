@@ -311,8 +311,8 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('fecha','date');
 		$this->captura('glosa1','varchar');
 		$this->captura('id_proceso_wf','int4');
-		$this->captura('id_estado_wf','int4');
-		 
+		$this->captura('id_estado_wf','int4');		 
+		$this->captura('cbte_relacional','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -509,6 +509,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('glosa1','varchar');
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_estado_wf','int4');
+		$this->captura('cbte_relacional','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

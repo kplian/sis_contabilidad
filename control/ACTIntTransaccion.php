@@ -7,6 +7,7 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
+require_once(dirname(__FILE__).'/../reportes/RMayorXls.php');
 
 class ACTIntTransaccion extends ACTbase{
 			
@@ -292,8 +293,7 @@ class ACTIntTransaccion extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	//
-	function listarIntTransaccionMayorReporte(){
-	
+	function listarIntTransaccionMayorReporte(){		
 		if($this->objParam->getParametro('id_int_comprobante')!=''){
 			$this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));	
 		}
@@ -335,8 +335,7 @@ class ACTIntTransaccion extends ACTbase{
 		}
 				
 		$this->objFunc=$this->create('MODIntTransaccion');		
-		$cbteHeader = $this->objFunc->listarIntTransaccionRepMayor($this->objParam);
-				
+		$cbteHeader = $this->objFunc->listarIntTransaccionRepMayor($this->objParam);			
 		if($cbteHeader->getTipo() == 'EXITO'){										
 			return $cbteHeader;			
 		}
@@ -346,28 +345,49 @@ class ACTIntTransaccion extends ACTbase{
 		}		
 	}	
 	//mp
-	function impReporteMayor() {		
-		$nombreArchivo = uniqid(md5(session_id()).'LibroMayor').'.pdf';			
-		$dataSource = $this->listarIntTransaccionMayorReporte();
-		$dataEntidad = "";
-		$dataPeriodo = "";	
-		$orientacion = 'P';		
-		$tamano = 'LETTER';
-		$titulo = 'Consolidado';
-		$this->objParam->addParametro('orientacion',$orientacion);
-		$this->objParam->addParametro('tamano',$tamano);		
-		$this->objParam->addParametro('titulo_archivo',$titulo);	
-		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
-		
-		$reporte = new RTransaccionmayor($this->objParam);  
-		$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
-		$reporte->generarReporte();
-		$reporte->output($reporte->url_archivo,'F');
-		$this->mensajeExito=new Mensaje();
-		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
-		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
-		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());	
-		
+	function impReporteMayor() {
+		//var_dump($this->objParam->getParametro('fec'));
+		if($this->objParam->getParametro('tipo_formato')=='pdf') {
+			$nombreArchivo = uniqid(md5(session_id()).'LibroMayor').'.pdf';			
+			$dataSource = $this->listarIntTransaccionMayorReporte();
+			$dataEntidad = "";
+			$dataPeriodo = "";	
+			$orientacion = 'P';		
+			$tamano = 'LETTER';
+			$titulo = 'Consolidado';
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);	
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$reporte = new RTransaccionmayor($this->objParam);  
+			$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
+		}
+		if($this->objParam->getParametro('tipo_formato')=='xls') {			
+			$this->objFun=$this->create('MODIntTransaccion');	
+			$this->res = $this->objFun->listarIntTransaccionRepMayor();
+			if($this->res->getTipo()=='ERROR'){
+				$this->res->imprimirRespuesta($this->res->generarJson());
+				exit;
+			}
+			$titulo ='Ret';
+			$nombreArchivo=uniqid(md5(session_id()).$titulo);
+			$nombreArchivo.='.xls';
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$this->objParam->addParametro('datos',$this->res->datos);			
+			$this->objReporteFormato=new RMayorXls($this->objParam);
+			$this->objReporteFormato->generarDatos();
+			$this->objReporteFormato->generarReporte();
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		}					
 	}	
 }
 

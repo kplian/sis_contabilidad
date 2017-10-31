@@ -320,6 +320,68 @@ BEGIN
             return v_consulta;
                        
         end; 
+
+    /*********************************    
+    #TRANSACCION:  'CONTA_CTATCC_SEL'
+    #DESCRIPCION:   Listado de cuentas contables por TCC
+    #AUTOR:         RCM
+    #FECHA:         30/10/2017
+    ***********************************/
+
+    elsif(p_transaccion='CONTA_CTATCC_SEL')then
+                    
+        begin
+        
+            --Sentencia de la consulta
+            v_consulta = 'select
+                        distinct cue.nro_cuenta, cue.nombre_cuenta
+                        from conta.tint_transaccion tra
+                        inner join conta.tcuenta cue
+                        on cue.id_cuenta = tra.id_cuenta
+                        inner join param.tcentro_costo cc
+                        on cc.id_centro_costo = tra.id_centro_costo
+                        inner join param.ttipo_cc tcc
+                        on tcc.id_tipo_cc = cc.id_tipo_cc
+                        where ';
+            
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+            --Devuelve la respuesta
+            return v_consulta;
+                        
+        end;
+
+    /*********************************    
+    #TRANSACCION:  'CONTA_CTATCC_CONT'
+    #DESCRIPCION:   Conteo de registros
+    #AUTOR:         RCM
+    #FECHA:         30/10/2017
+    ***********************************/
+
+    elsif(p_transaccion='CONTA_CTATCC_CONT')then
+
+        begin
+
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='select count(distinct cue.nro_cuenta)
+                        from conta.tint_transaccion tra
+                        inner join conta.tcuenta cue
+                        on cue.id_cuenta = tra.id_cuenta
+                        inner join param.tcentro_costo cc
+                        on cc.id_centro_costo = tra.id_centro_costo
+                        inner join param.ttipo_cc tcc
+                        on tcc.id_tipo_cc = cc.id_tipo_cc
+                        where ';
+            
+            --Definicion de la respuesta            
+            v_consulta:=v_consulta||v_parametros.filtro;
+
+            --Devuelve la respuesta
+            return v_consulta;
+
+        end;
         
 			
 	else

@@ -96,7 +96,7 @@ class ACTDocRetencionForm extends ACTbase{
 			$this->objReporteFormato->generarDatos();
 			$this->objReporteFormato->generarReporte();
 			$this->mensajeExito=new Mensaje();
-			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generO con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		}

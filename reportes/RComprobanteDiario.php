@@ -1,6 +1,6 @@
 <?php
 // Extend the TCPDF class to create custom MultiRow
-class RTransaccionmayor extends ReportePDF {
+class RComprobanteDiario extends ReportePDF {
 	var $datos_titulo;
 	var $datos_detalle;
 	var $ancho_hoja;
@@ -32,48 +32,65 @@ class RTransaccionmayor extends ReportePDF {
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
 		$this->datos_titulo = $resultado;
-		$this->SetMargins(10, 15, 5,10);
+		//$this->datos_tpoestado = $tpoestado;
+		//$this->datos_auxiliar = $auxiliar;
+		$this->subtotal = 0;
+		$this->SetMargins(20, 15, 5,10);
 	}
-	//
-	function getDataSource(){
-		return  $this->datos_detalle;		
-	}
-	//
+	
 	function Header() {		
 	}
 	//	
 	function generarCabecera(){
-		$conf_par_tablewidths=array(7,50,80,20,20,20);
-		$conf_par_tablenumbers=array(0,0,0,0,0,0);
-		$conf_par_tablealigns=array('C','C','C','C','C','C');
+		$conf_par_tablewidths=array(7,40,15,30,15,7,7,7,7,7,7,7,7,7);
+		$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C');
+		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+		$conf_tableborders=array();
 		$conf_tabletextcolor=array();
+		
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
 		$this->tablenumbers=$conf_par_tablenumbers;
 		$this->tableborders=$conf_tableborders;
 		$this->tabletextcolor=$conf_tabletextcolor;
-		$valor=$a;
-		$var = $this->objParam->getParametro('tipo_moneda');//MT MA MB
-		$RowArray = array(
-							's0' => 'Nº',
-							's1' => 'DESCRIPCION',
-							's2' => 'GLOSA',
-							's3' => 'DEBE'."\r\n".$var,
-							's4' => 'HABER'."\r\n".$var,
-							's5' => 'DEUDOR ACREEDOR'
-						);
+
+		$RowArray = array
+		(
+			's0' => 'Nº',				
+			's1' => 'Nro DE COMPROBANTE',
+			's2' => 'FECHA',
+			's3' => 'TIPO DE COMPROBANTE',
+			's4' => 'COMPROMETIDO',
+			's5' => 'EJECUTADO',
+			's6' => 'PAGADO',
+			's7' => 'MONEDA',
+			's8' => 'CAMBIO',
+			's9' => 'TC',
+			's10' => 'TC',
+			's11' => 'TC',
+			's12' => 'TRAMITE',
+			's13' => 'BENEFICIARIO'				
+		);
 		$this->MultiRow($RowArray, false, 1);
 	}
 	//
 	function generarReporte() {
 		$this->setFontSubsetting(false);
 		$this->AddPage();
+		$sw = false;
+		$concepto = '';		
 		$this->generarCuerpo($this->datos_detalle);
+		if($this->s1 != 0){
+			$this->SetFont('','B',6);
+			$this->cerrarCuadro();	
+			$this->cerrarCuadroTotal();
+		}
 	}
 	//		
 	function generarCuerpo($detalle){		
 		//function
 		$this->cab();
+		//
 		$count = 1;
 		$sw = 0;
 		$ult_region = '';
@@ -84,127 +101,124 @@ class RTransaccionmayor extends ReportePDF {
 		$this->s3 = 0;
 		$this->s4 = 0;
 		$this->s5 = 0;
-		$this->imprimirLinea($val,$count,$fill);
+		foreach ($detalle as $val) {			
+			$this->imprimirLinea($val,$count,$fill);
+			$fill = !$fill;
+			$count = $count + 1;
+			$this->total = $this->total -1;
+			$this->revisarfinPagina();
+		}
 	}
 	//desde 
 	function imprimirLinea($val,$count,$fill){
 		$this->SetFillColor(224, 235, 255);
 		$this->SetTextColor(0);
 		$this->SetFont('','',6);
-		$acreedor=0;
-		foreach ($this->getDataSource() as $datarow) {
-			
-			switch ($this->objParam->getParametro('tipo_moneda')) {
-				case 'MA':
-					$debe=$datarow['importe_debe_ma'];
-					$haber=$datarow['importe_haber_ma'];		
-					break;
-				case 'MT':			
-					$debe=$datarow['importe_debe_mt'];
-					$haber=$datarow['importe_haber_mt'];
-					break;
-				case 'MB':
-					$debe=$datarow['importe_debe_mb'];
-					$haber=$datarow['importe_haber_mb'];			
-					break;		
-				default:			
-					break;
-			}
-					
-			$cc= (int)($this->objParam->getParametro('cc') === 'true');		
-			$partida = (int)($this->objParam->getParametro('partida')=== 'true');
-			$auxiliar = (int)($this->objParam->getParametro('auxiliar')=== 'true');
-			$ordenes = (int)($this->objParam->getParametro('ordenes')=== 'true');
-			$tramite = (int)($this->objParam->getParametro('tramite')=== 'true');
-			$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
-			$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
-			$fec = (int)($this->objParam->getParametro('fec')=== 'true');	
-			
-			$aux='';		
-			if($cc == 1){
-				$aux=$aux.'CC:'.trim($datarow['desc_centro_costo'])."\r\n";			
-			}else{			
-				$aux=$aux.'';
-			}
-			if($partida == 1){
-				$aux=$aux.'Ptda:'.trim($datarow['desc_partida'])."\r\n";
-			}else{
-				$aux=$aux.'';
-			}
-			if($auxiliar == 1){
-				$aux=$aux.'Aux:'.trim($datarow['desc_auxiliar'])."\r\n";
-			}else{
-				$aux=$aux.'';
-			}
-			if($ordenes == 1){
-				$aux=$aux.'Ptda:'.trim($datarow['desc_partida'])."\r\n";
-			}else{
-				$aux=$aux.'';
-			}
-			if($tramite == 1){
-				$aux=$aux.'Tramite:'.strval($datarow['nro_tramite'])."\r\n";
-			}else{
-				$aux=$aux.'';
-			}
-			if($crel == 1 ){
-				$aux=$aux.'Cbte Relacional:'.$datarow['cbte_relacional']."\r\n";
-			}else{
-				$aux=$aux.'';
-			}		
-			if($nro_comprobante == 1){
-				$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";
-			}else{
-				$aux=$aux.'';
-			}	
-			if($fec == 1){
-				$arr = explode('-', $datarow['fecha']);
-				$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-				$aux=$aux.'Fecha:'.$newDate."\r\n";
-			}else{
-				$aux=$aux.'';
-			}	
-			$this->tablealigns=array('C','L','L','R','R','R');
-			$this->tablenumbers=array(0,0,0,2,2,2);
-			$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
-			$this->tabletextcolor=array();			
-			$RowArray = array(
-				's0'  => $i+1,
-				's1' => $aux,
-				's2' => trim($datarow['glosa1'])."\r\n".trim($datarow['glosa']),
-				's3' => $debe,
-				's4' => $haber,
-				's5' => $acreedor+($debe-$haber)	
-			);
-			$fill = !$fill;
-			$acreedor=$debe+$haber;	
-			$this->total = $this->total -1;
-			$i++;		
-			$this-> MultiRow($RowArray,$fill,0);			
-			$this->revisarfinPagina($datarow);
-			
-		}			
-		$this->cerrarCuadro();
-		$this->cerrarCuadroTotal();			
+
+		$conf_par_tablewidths=array(7,50,80,20,20);
+		$conf_par_tablealigns=array('C','L','L','R','R');		
+		$conf_par_tablenumbers=array(0,0,0,2,2);
+		$conf_tableborders=array('LR','LR','LR','LR','LR');		
+		/*
+		switch ($this->objParam->getParametro('tipo_moneda')) {
+			case 'MA':
+				$debe=$val['importe_debe_ma'];
+				$haber=$val['importe_haber_ma'];		
+				break;
+			case 'MT':			
+				$debe=$val['importe_debe_mt'];
+				$haber=$val['importe_haber_mt'];
+				break;
+			case 'MB':
+				$debe=$val['importe_debe_mb'];
+				$haber=$val['importe_haber_mb'];			
+				break;		
+			default:			
+				break;
+		}
+				
+		$cc= (int)($this->objParam->getParametro('cc') === 'true');		
+		$partida = (int)($this->objParam->getParametro('partida')=== 'true');
+		$auxiliar = (int)($this->objParam->getParametro('auxiliar')=== 'true');
+		$ordenes = (int)($this->objParam->getParametro('ordenes')=== 'true');
+		$tramite = (int)($this->objParam->getParametro('tramite')=== 'true');
+		$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
+		$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
+		$fec = (int)($this->objParam->getParametro('fec')=== 'true');	
+		
+		$aux='';		
+		if($cc == 1){
+			$aux=$aux.'CC:'.trim($val['desc_centro_costo'])."\r\n";			
+		}else{			
+			$aux=$aux.'';
+		}
+		if($partida == 1){
+			$aux=$aux.'Ptda:'.trim($val['desc_partida'])."\r\n";
+		}else{
+			$aux=$aux.'';
+		}
+		if($auxiliar == 1){
+			$aux=$aux.'Aux:'.trim($val['desc_auxiliar'])."\r\n";
+		}else{
+			$aux=$aux.'';
+		}
+		if($ordenes == 1){
+			$aux=$aux.'Ptda:'.trim($val['desc_partida'])."\r\n";
+		}else{
+			$aux=$aux.'';
+		}
+		if($tramite == 1){
+			$aux=$aux.'Tramite:'.strval($val['nro_tramite'])."\r\n";
+		}else{
+			$aux=$aux.'';
+		}
+		if($crel == 1 ){
+			$aux=$aux.'Cbte Relacional:'.$val['cbte_relacional']."\r\n";
+		}else{
+			$aux=$aux.'';
+		}		
+		if($nro_comprobante == 1){
+			$aux=$aux.'Nro Cbte.:'.trim($val['nro_cbte'])."\r\n";
+		}else{
+			$aux=$aux.'';
+		}	
+		if($fec == 1){
+			$arr = explode('-', $val['fecha']);
+			$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
+			$aux=$aux.'Fecha:'.$newDate."\r\n";
+		}else{
+			$aux=$aux.'';
+		}	*/		
+		//			
+		/*
+		$RowArray = array(  's0' => $count,
+							's1' => $val['nro_cbte']
+						);
+		*/									
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
 		$this->tablenumbers=$conf_par_tablenumbers;
 		$this->tableborders=$conf_tableborders;
 		$this->tabletextcolor=$conf_tabletextcolor;
+		//$this->calcularMontos($val);		
+		$this-> MultiRow($RowArray,$fill,0);
 	} 
 	//desde generarcuerpo
-	function revisarfinPagina($a){
+	function revisarfinPagina(){
 		$dimensions = $this->getPageDimensions();
 		$hasBorder = false;
 		$startY = $this->GetY();
+		$x=0;
 		$this->getNumLines($row['cell1data'], 90);
-		$this->calcularMontos($a);			
-		if ($startY > 250) {			
-			$this->cerrarCuadro();
-			$this->cerrarCuadroTotal();		
+
+		if ($startY > 230) {
+			//$this->cerrarCuadro();
+			//$this->cerrarCuadroTotal();
 			if($this->total!= 0){
 				$this->AddPage();
 				$this->generarCabecera();
-			}				
+			}
+			
 		}
 	}
 	//
@@ -244,8 +258,7 @@ class RTransaccionmayor extends ReportePDF {
 				break;		
 			default:			
 				break;
-		}		
-		$this->s3=$this->s1-$this->s2;
+		}
 		
 		switch ($this->objParam->getParametro('tipo_moneda')) {
 			case 'MA':
@@ -262,50 +275,42 @@ class RTransaccionmayor extends ReportePDF {
 				break;		
 			default:			
 				break;
-		}
-		$this->t3=$this->t1-$this->t2;			
+		}			
 	}	
 	//revisarfinPagina pie
 	function cerrarCuadro(){
 		//si noes inicio termina el cuardro anterior
-		$conf_par_tablewidths=array(7,80,15,15,15,15);				
-		$this->tablealigns=array('R','R','R','R','R','R');		
-		$this->tablenumbers=array(0,0,0,2,2,2);
-		$this->tableborders=array('T','T','T','LRTB','LRTB','LRTB');						
+		$conf_par_tablewidths=array(7,80,15,15,15);				
+		$this->tablealigns=array('R','R','R','R','R');		
+		$this->tablenumbers=array(0,0,0,2,2);
+		$this->tableborders=array('T','T','T','LRTB','LRTB');						
 		$RowArray = array(  's1' => '',
 							's2' => '', 
 							'espacio' => 'Subtotal',
 							's3' => $this->s1,
-							's4' => $this->s2,
-							's5' => $this->s3
+							's4' => $this->s2
 						);		
 		$this-> MultiRow($RowArray,false,1);
 		$this->s1 = 0;
 		$this->s2 = 0;
 		$this->s3 = 0;
 		$this->s4 = 0;
-		$this->s5 = 0;
 	}
 	//revisarfinPagina pie
 	function cerrarCuadroTotal(){
-		$conf_par_tablewidths=array(7,80,15,15,15,15);				
-		$this->tablealigns=array('R','R','R','R','R','R');		
-		$this->tablenumbers=array(0,0,0,2,2,2);
-		$this->tableborders=array('','','','LRTB','LRTB','LRTB');									
+		$conf_par_tablewidths=array(7,80,15,15,15);				
+		$this->tablealigns=array('R','R','R','R','R');		
+		$this->tablenumbers=array(0,0,0,2,2);
+		$this->tableborders=array('','','','LRTB','LRTB');		
+							
 		$RowArray = array( 
 					't1' => '',
 					't2' => '',
 					'espacio' => 'TOTAL: ',
 					't3' => $this->t1,
-					't4' => $this->t2,
-					't5' => $this->t3
+					't4' => $this->t2
 				);
 		$this-> MultiRow($RowArray,false,1);
-		$this->t1 = 0;
-		$this->t2 = 0;
-		$this->t3 = 0;
-		$this->t4 = 0;
-		$this->t5 = 0;
 	}
 	
 	function cab() {
@@ -315,7 +320,7 @@ class RTransaccionmayor extends ReportePDF {
 		$this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 10,5,40,20);
 		$this->ln(5);
 		$this->SetFont('','B',12);		
-		$this->Cell(0,5,"LIBRO MAYOR",0,1,'C');					
+		$this->Cell(0,5,"LIBRO DIARIO",0,1,'C');					
 		$this->Ln(3);
 		
 		$height = 5;
@@ -323,7 +328,7 @@ class RTransaccionmayor extends ReportePDF {
 		$esp_width = 10;
 		$width_c1= 30;
 		$width_c2= 50;			
-		
+		/*
 		if($this->objParam->getParametro('desde')!=null){
 			$desde = $this->objParam->getParametro('desde');
 			$cant++;	
@@ -544,7 +549,7 @@ class RTransaccionmayor extends ReportePDF {
 			$this->SetFillColor(192,192,192, true);			
 			$this->Cell($width_c2, $height, $nro_tram, 0, 1, 'L', true, '', 0, false, 'T', 'C');
 			$this->Ln();		
-		}
+		}*/
 		
 		$this->Ln(4);
 		$this->SetFont('','B',6);

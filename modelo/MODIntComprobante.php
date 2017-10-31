@@ -696,7 +696,114 @@ class MODIntComprobante extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	//
+	function listarRepIntComprobanteDiario(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_comprobante_sel';
+		$this->transaccion='CONTA_REPINCBTE_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);	
+		//
+		$this->setParametro('nombreVista','nombreVista','varchar');				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_int_comprobante','int4');
+		$this->captura('id_clase_comprobante','int4');		
+		$this->captura('id_subsistema','int4');
+		$this->captura('id_depto','int4');
+		$this->captura('id_moneda','int4');
+		$this->captura('id_periodo','int4');
+		$this->captura('id_funcionario_firma1','int4');
+		$this->captura('id_funcionario_firma2','int4');
+		$this->captura('id_funcionario_firma3','int4');
+		$this->captura('tipo_cambio','numeric');
+		$this->captura('beneficiario','varchar');
+		$this->captura('nro_cbte','varchar');
+		$this->captura('estado_reg','varchar');
+		$this->captura('glosa1','varchar');
+		$this->captura('fecha','date');
+		$this->captura('glosa2','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('momento','varchar');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		$this->captura('desc_clase_comprobante','varchar');
+		$this->captura('desc_subsistema','varchar');
+		$this->captura('desc_depto','text');
+		$this->captura('desc_moneda','text');
+		$this->captura('desc_firma1','text');
+		$this->captura('desc_firma2','text');
+		$this->captura('desc_firma3','text');
+		$this->captura('momento_comprometido','varchar');
+		$this->captura('momento_ejecutado','varchar');
+		$this->captura('momento_pagado','varchar');
+		$this->captura('manual','varchar');
+		$this->captura('id_int_comprobante_fks','text');
+		$this->captura('id_tipo_relacion_comprobante','int');
+		$this->captura('desc_tipo_relacion_comprobante','varchar');
+		$this->captura('id_moneda_base','int4');
+		$this->captura('desc_moneda_base','text');		
+		$this->captura('cbte_cierre','varchar');
+		$this->captura('cbte_apertura','varchar');
+		$this->captura('cbte_aitb','varchar');		
+		$this->captura('fecha_costo_ini','date');
+        $this->captura('fecha_costo_fin','date');		
+		$this->captura('tipo_cambio_2','numeric');
+        $this->captura('id_moneda_tri','int4');
+        $this->captura('sw_tipo_cambio','varchar');
+        $this->captura('id_config_cambiaria','int4');
+        $this->captura('ope_1','varchar');
+        $this->captura('ope_2','varchar');
+        $this->captura('desc_moneda_tri','text');		
+		$this->captura('origen','varchar');
+		$this->captura('localidad','varchar');		
+		$this->captura('sw_editable','varchar');
+		$this->captura('cbte_reversion','varchar');
+		$this->captura('volcado','varchar');		
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_estado_wf','int4');		
+		$this->captura('fecha_c31','date');
+		$this->captura('c31','varchar');
+		$this->captura('id_gestion','int4');
+		$this->captura('periodo','int4');
+		$this->captura('forma_cambio','varchar');		
+		$this->captura('ope_3','varchar');
+		$this->captura('tipo_cambio_3','numeric');
+		$this->captura('id_moneda_act','int4');
+		
+		$this->captura('id_partida','int4');
+		$this->captura('nombre_partida','varchar');
+		$this->captura('codigo','varchar');
 
+		$this->armarConsulta();
+		//echo $this->getConsulta();exit;
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarIntComprobanteTCCCuenta(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_comprobante_sel';
+		$this->transaccion='CONTA_CBTENCUE_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_int_comprobante','int4');
+		$this->captura('fecha','date');
+		$this->captura('glosa1','varchar');
+		$this->captura('nro_tramite','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>
