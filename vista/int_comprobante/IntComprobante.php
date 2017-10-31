@@ -9,7 +9,10 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-	Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
+var id_depto=null;
+var id_gestion=null;
+
+Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		fheight : '90%',
 		fwidth : '90%',
 		nombreVista : 'IntComprobante',
@@ -126,8 +129,9 @@ header("content-type: text/javascript; charset=UTF-8");
 			
 			
 			
-
+			
 			this.iniciarEventos();
+			this.addBotonesLibroDiario();
 		},
 
 		capturaFiltros : function(combo, record, index) {
@@ -1269,6 +1273,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				allowBlank: false,
 				blankText:'... ?',
 				emptyText:'Gestion...',
+				name:'id_gestion',
 				store:new Ext.data.JsonStore(
 				{
 					url: '../../sis_parametros/control/Gestion/listarGestion',
@@ -1716,7 +1721,92 @@ header("content-type: text/javascript; charset=UTF-8");
 			width:450,
 			height:200
 		},rec.data,this.idContenedor,'FormArchivoAIRBP')
-	}
+	},
+	//
+	postReloadPage:function(data){	
+		console.log('---->'+data);			
+		//id_depto=data.id_depto;
+		//id_gestion=data.id_gestion;
+	},
+	//
+	addBotonesLibroDiario: function() {
+		this.menuLibroDiario = new Ext.Toolbar.SplitButton({
+			id: 'b-libro_diario-' + this.idContenedor,
+			text: 'Libro Diario',
+			disabled: false,
+			grupo:[0,1],
+			iconCls : 'bprint',
+			handler:this.formfiltroDiario,
+			scope: this,
+			menu:{
+				items: [{
+					id:'b-ins-diario-pdf-' + this.idContenedor,
+					text: 'Filtrar',
+					tooltip: '<b>Filtro de parametros a visualizar</b>',
+					handler:this.formfiltroDiario,
+					scope: this
+				}
+			]}
+		});
+		this.tbar.add(this.menuLibroDiario);
+	},
+	//
+	formfiltroDiario:function(){	
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/FormFiltroDiario.php',
+			'Formulario',
+			{
+				modal:true,
+				width:400,
+				height:400
+			}, 
+			{
+			}, 
+			this.idContenedor,'FormFiltroDiario',
+			{
+				config:[{
+					event:'beforesave',
+					delegate: this.addLibroDiario,
+				}],
+				scope:this
+			}
+		)
+	},	
+	//
+	addLibroDiario : function (wizard,resp){		
+		var dpto=this.cmbDepto.getRawValue();
+		var gest=this.cmbGestion.getRawValue();		
+		var id_dpto=this.cmbDepto.getValue();
+		var id_gestion=this.cmbGestion.getValue();		
+		var nombreVista=this.nombreVista;
+		Phx.CP.loadingShow();		
+		Ext.Ajax.request({
+			url:'../../sis_contabilidad/control/IntComprobante/impReporteDiario',
+			params:
+			{	
+				'gestion':gest,
+				'depto':dpto,
+				'id_gestion':id_gestion,
+				'id_dpto':id_dpto,
+				'nombreVista':nombreVista,
+				//
+				'tipo_moneda':resp.tipo_moneda,
+				'cc':resp.cc,
+				'partida':resp.partida,
+				'auxiliar':resp.auxiliar,
+				'ordenes':resp.ordenes,
+				'tramite':resp.nro_tramite,
+				'nro_comprobante':resp.nro_comprobante,
+				'tipo_formato':resp.tipo_formato,
+				'relacional':resp.relacional,
+				'fecIni':resp.fecIni,
+				'fecFin':resp.fecFin				
+			},
+			success: this.successExport,		
+			failure: this.conexionFailure,
+			timeout:this.timeout,
+			scope:this
+		});
+    }
 })
 </script>
 

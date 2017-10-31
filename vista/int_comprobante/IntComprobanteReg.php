@@ -21,6 +21,7 @@ Phx.vista.IntComprobanteReg = {
 	
 	
 	constructor: function(config) {
+		console.log('aaaaa',config);
 		    var me = this;
 		    me.bMedios = [];
             me.addButtonCustom(config.idContenedor, 'sig_estado', { text: 'Aprobar', iconCls: 'badelante', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>' });

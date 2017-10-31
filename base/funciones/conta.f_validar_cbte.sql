@@ -16,18 +16,22 @@ $body$
 	Autor: RCM
     Fecha: 05-09-2013
     Descripción: Función que se encarga de verificar la integridad del comprobante para posteriormente validarlo.
+ 
+  ***************************************************************************************************   
     
-   HISTORIAL DE MODIFICACIONES:
 
- ISSUE            FECHA:		      AUTOR               DESCRIPCION
- 0                2015             RAC                 Ejecucion presupeustaria, Integracion con ENDESIS -> PXP
- 0				 20/11/2016        RAC KPLIAN          Se invirte la migraicon de cbte PXP -> ENDESIS
- 0               22/12/2016        RAC KPLIAN          validacion de numeracion en cbtes
- 0               13/06/2017 	   RAC KPLIAN          validacion de documentos asocidos de compra o de venta 
- #13			 18/10/2017		   RAC KPLIAN		   Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados 
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		05-09-2013        RCM KPLIAN        Función que se encarga de verificar la integridad del comprobante para posteriormente validarlo
+ #0       		2015              RAC KPLIAN        Ejecucion presupeustaria, Integracion con ENDESIS -> PXP
+ #0       		20/11/2016        RAC KPLIAN        Se invirte la migraicon de cbte PXP -> ENDESIS
+ #0       		22/12/2016        RAC KPLIAN        validacion de numeracion en cbtes
+ #0       		13/06/2017        RAC KPLIAN        validacion de documentos asocidos de compra o de venta 
+ #13			    18/10/2017		    RAC KPLIAN		    Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados  
   
-  
-    
+
 */
 DECLARE
 
@@ -347,28 +351,8 @@ BEGIN
     
     END IF;
     
-    ------------------------------------------------------------------------------------------------
-    --  Validacion presupuestaria del comprobante no se ejecuta solo verifica 
-    --  si el dinero comprometido o devengado es suficiente para proseguir con la transaccion
-    -----------------------------------------------------------------------------------------------
     
-     --solo verifica en cbte que no son de reversion
      
-     -- RAC 19/06/2017
-     -- ESTA VALIDACION ERA NECESARIA EN ENDESIS
-     -- al separar el sistema de presupuesto ya no es necesaria
-     
-    -- IF v_pre_integrar_presupuestos = 'true' and  v_rec_cbte.cbte_reversion ='no'   THEN          
-    --  	v_resp =  conta.f_verificar_presupuesto_cbte(p_id_usuario,p_id_int_comprobante,'no',p_fecha_ejecucion,v_nombre_conexion);
-    -- END IF;
-     
-       
-     
-     
-     
-     
-  
-   
     --6. Numeración del comprobante
     if v_errores = '' then
     	

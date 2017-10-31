@@ -405,7 +405,25 @@ class MODCuenta extends MODbase{
 	    $this->ejecutarConsulta();
 	    
 	    return $this->respuesta;       
- }
+	}
+
+	function listarCuentaTCC(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.f_cuenta_sel';
+		$this->transaccion='CONTA_CTATCC_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+		//Definicion de la lista del resultado del query
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 
 
 			

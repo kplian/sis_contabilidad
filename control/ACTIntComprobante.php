@@ -12,6 +12,10 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/PlantillasHTML.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
 require_once(dirname(__FILE__).'/../reportes/RIntCbte.php');
+
+require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario.php');
+//require_once(dirname(__FILE__).'/../reportes/RDiarioXls.php');
+//
 class ACTIntComprobante extends ACTbase{
 	
 	private $objPlantHtml;
@@ -603,11 +607,113 @@ class ACTIntComprobante extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-   
-   
-   
+	//
+	function listarRepIntComprobante(){
+
+		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    		
+		if($this->objParam->getParametro('id_deptos')!=''){
+			$this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
+		}		
+		if($this->objParam->getParametro('id_gestion')!=''){
+			$this->objParam->addFiltro("incbte.id_gestion in (".$this->objParam->getParametro('id_gestion').")");    
+		}		
+		if($this->objParam->getParametro('id_clase_comprobante')!=''){
+		    $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");    
+		}		
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'  || $this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
+			$this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
+		}
+		else{
+			$this->objParam->addFiltro("incbte.estado_reg in (''borrador'', ''edicion'')");
+		}		
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
+			$this->objParam->addFiltro(" (incbte.c31 = '''' or incbte.c31 is null )" );      
+		}		
+		if($this->objParam->getParametro('momento')!= ''){
+			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
+		}
+		if($this->objParam->getParametro('id_int_comprobante')!= ''){
+			$this->objParam->addFiltro("incbte.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));    
+		}
+
+		$this->objFunc=$this->create('MODIntComprobante');		
+		$cbteHeader = $this->objFunc->listarRepIntComprobanteDiario($this->objParam);			
+		if($cbteHeader->getTipo() == 'EXITO'){										
+			return $cbteHeader;			
+		}
+		else{
+			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}			
+	}
+	//mp
+	function impReporteDiario() {
+		if($this->objParam->getParametro('tipo_formato')=='pdf') {
+			$nombreArchivo = uniqid(md5(session_id()).'LibroDiario').'.pdf';			
+			$dataSource = $this->listarRepIntComprobante();	
+			$dataEntidad = "";
+			$dataPeriodo = "";	
+			$orientacion = 'P';		
+			$tamano = 'LETTER';
+			$titulo = 'Consolidado';
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);	
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$reporte = new RComprobanteDiario($this->objParam);  
+			$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
+		}
+		/*if($this->objParam->getParametro('tipo_formato')=='xls') {			
+			$this->objFun=$this->create('MODIntTransaccion');	
+			$this->res = $this->objFun->listarRepIntComprobante();
+			if($this->res->getTipo()=='ERROR'){
+				$this->res->imprimirRespuesta($this->res->generarJson());
+				exit;
+			}
+			$titulo ='Ret';
+			$nombreArchivo=uniqid(md5(session_id()).$titulo);
+			$nombreArchivo.='.xls';
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$this->objParam->addParametro('datos',$this->res->datos);			
+			$this->objReporteFormato=new RDiarioXls($this->objParam);
+			$this->objReporteFormato->generarDatos();
+			$this->objReporteFormato->generarReporte();
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		}	*/				
+	}
+
+	function listarIntComprobanteTCCCuenta(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
 		
+		if($this->objParam->getParametro('id_tipo_cc')!=''){
+            $this->objParam->addFiltro("cc.id_tipo_cc =".$this->objParam->getParametro('id_tipo_cc'));    
+        }
+
+        if($this->objParam->getParametro('nro_cuenta')!=''){
+            $this->objParam->addFiltro("cue.nro_cuenta = ''".$this->objParam->getParametro('nro_cuenta')."''");
+        }
 		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarIntComprobanteTCCCuenta');
+		} else{
+			$this->objFunc=$this->create('MODIntComprobante');
+			
+			$this->res=$this->objFunc->listarIntComprobanteTCCCuenta($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
 }
 
 ?>

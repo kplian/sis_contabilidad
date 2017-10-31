@@ -9,6 +9,24 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
+var ini=null;
+var fin=null;
+var id_auxiliar=null;
+var id_centro_costo;
+var id_config_subtipo_cuenta=null;
+var id_config_tipo_cuenta=null;
+var id_cuenta=null;
+var id_depto=null;
+var id_gestion=null;
+var id_orden_trabajo=null;
+var id_partida=null;
+var id_suborden=null;
+var id_tipo_cc=null;
+var nro_tramite=null;
+var tipo_filtro=null;
+var fec=null;
+
+
 Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
     title:'Mayor',
 	constructor:function(config){		
@@ -501,6 +519,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
 			});
 			
+		//mp/mp
+		this.addBotonesLibroMayor();
 			
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
@@ -553,6 +573,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		{ name:'desc_auxiliar', type: 'string'},
 		{ name:'desc_partida', type: 'string'},
 		{ name:'desc_centro_costo', type: 'string'},
+		'cbte_relacional',
 		'tipo_partida','id_orden_trabajo','desc_orden',
 		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1',
 		'id_proceso_wf','id_estado_wf','id_suborden','desc_suborden',
@@ -582,6 +603,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.IntTransaccionMayor.superclass.loadValoresIniciales.call(this);
 		this.getComponente('id_int_comprobante').setValue(this.maestro.id_int_comprobante);		
 	},
+		
 	onReloadPage:function(param){
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var me = this;
@@ -742,16 +764,153 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				gdisplayField:'desc_partida',
 				value:'desc_partida'
 			},
-			{ 
-		   	    label:'Cbte',
+			{	
+				label:'Cbte',
 				name:'nro_cbte',
 				width:'100',
 				type:'string',
 				gdisplayField:'nro_cbte',
 				value:'nro_cbte'
 			}],
+	//mpmpmp
+	postReloadPage:function(data){	
+		console.log(data);	
+		ini=data.desde;
+		fin=data.hasta;
+		
+		aux=data.auxiliar;		
+		gest=data.gest;		
+		depto=data.dpto;		
+		
+		config_tipo_cuenta=data.tpocuenta;
+		config_subtipo_cuenta=data.subtpocuenta;
+		cuenta=data.cuenta;
+		partida=data.partida;
+		tipo_cc=data.tcc;				
+		centro_costo=data.cc;							
+		orden_trabajo=data.ot ;				
+		suborden=data.suborden;		
+		nro_tram=data.nro_tram;
+		//
+		tipo_filtro=data.tipo_filtro;			
+		id_auxiliar=data.id_auxiliar;
+		id_centro_costo=data.id_centro_costo;
+		id_config_subtipo_cuenta=data.id_config_subtipo_cuenta;
+		id_config_tipo_cuenta=data.id_config_tipo_cuenta;
+		id_cuenta=data.id_cuenta;
+		id_depto=data.id_depto;
+		id_gestion=data.id_gestion;
+		id_orden_trabajo=data.id_orden_trabajo;
+		id_partida=data.id_partida;
+		id_suborden=data.id_suborden;
+		id_tipo_cc=data.id_tipo_cc;
+		nro_tramite=data.nro_tramite;
+		tipo_filtro=data.tipo_filtro;
+	},
+	//mpmpppmpmp
+	addBotonesLibroMayor: function() {
+		this.menuLibroMayor = new Ext.Toolbar.SplitButton({
+			id: 'b-libro_mayor-' + this.idContenedor,
+			text: 'Libro Mayor',
+			disabled: false,
+			grupo:[0,1],
+			iconCls : 'bprint',
+			handler:this.formfiltro,
+			scope: this,
+			menu:{
+				items: [{
+					id:'b-ins-mayor-pdf-' + this.idContenedor,
+					text: 'Filtrar',
+					tooltip: '<b>Filtro de parametros a visualizar</b>',
+					handler:this.formfiltro,
+					scope: this
+				}
+			]}
+		});
+		this.tbar.add(this.menuLibroMayor);
+	},
+	//
+	formfiltro:function(){	
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/FormFiltroMayor.php',
+			'Formulario',
+			{
+				modal:true,
+				width:400,
+				height:400
+			}, 
+			{
+				//data:rec.data, 
+				//id_depto_lb:this.store.baseParams.desc_auxiliar
+			}, 
+			this.idContenedor,'FormFiltroMayor',
+			{
+				config:[{
+					event:'beforesave',
+					delegate: this.addLibroMayor,
+				}],
+				scope:this
+			}
+		)
+	},	
 	
-	
+	addLibroMayor : function (wizard,resp){
+		//tipo_filtro, fechas
+		console.log(resp.fec);
+		Phx.CP.loadingShow();		
+		Ext.Ajax.request({
+			url:'../../sis_contabilidad/control/IntTransaccion/impReporteMayor',
+			params:
+			{	
+				'desde':ini,
+				'hasta':fin,
+				
+				'id_auxiliar':id_auxiliar,
+				'id_gestion':id_gestion,
+				'id_depto':id_depto,
+				'id_config_tipo_cuenta':id_config_tipo_cuenta,
+				'id_config_subtipo_cuenta':id_config_subtipo_cuenta,
+				'id_cuenta':id_cuenta,
+				'id_partida':id_partida,
+				'id_tipo_cc':id_tipo_cc,				
+				'id_centro_costo':id_centro_costo,																						
+				'id_orden_trabajo':id_orden_trabajo,								
+				'id_suborden':id_suborden,				
+				'nro_tramite':nro_tramite,				
+				//				
+				'aux':aux,
+				'gest':gest,
+				'depto':depto,								
+				'config_tipo_cuenta':config_tipo_cuenta,
+				'config_subtipo_cuenta':config_subtipo_cuenta,
+				'cuenta':cuenta,
+				'partidas':partida,				
+				'tipo_cc':tipo_cc,
+				'centro_costo':centro_costo,
+				'orden_trabajo':orden_trabajo,
+				'suborden':suborden,
+				'nro_tram':nro_tram,								
+				//formato pdf o xls
+				'tipo_filtro':tipo_filtro,			
+				//parametros q se mostraran, si son tickeados						
+				'tipo_moneda':resp.tipo_moneda,
+				'cc':resp.cc,
+				'partida':resp.partida,
+				'auxiliar':resp.auxiliar,
+				'ordenes':resp.ordenes,
+				'tramite':resp.nro_tramite,
+				'nro_comprobante':resp.nro_comprobante,
+				'tipo_formato':resp.tipo_formato,
+				'relacional':resp.relacional,
+				'fec':resp.fec
+			},
+			//argument:{wizard:wizard},
+			success: this.successExport,		
+			failure: this.conexionFailure,
+			timeout:this.timeout,
+			scope:this
+		});
+    },
+    //
     bnew : false,
     bedit: false,
     bdel:  false

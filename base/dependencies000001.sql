@@ -4112,3 +4112,72 @@ AS
   WHERE pla.tipo_informe::text = 'retenciones'::text and
         pc.descuento::text = 'si'::text;
 /**********************************F-DEP-MANU-CONTA-0-25/09/2017****************************************/
+
+
+
+/**********************************I-DEP-MANU-CONTA-0-18/10/2017****************************************/
+CREATE OR REPLACE VIEW conta.vretencion (
+    id_doc_compra_venta,
+    obs,
+    tipo,
+    fecha,
+    nit,
+    razon_social,
+    nro_documento,
+    nro_autorizacion,
+    importe_doc,
+    codigo_control,
+    tipo_doc,
+    id_plantilla,
+    tipo_informe,
+    id_moneda,
+    codigo_moneda,
+    id_periodo,
+    id_gestion,
+    periodo,
+    gestion,
+    id_depto_conta,
+    id_usuario_reg,
+    descripcion,
+    importe_presupuesto,
+    importe,
+    importe_descuento_ley,
+    desc_plantilla,
+    nro_tramite)
+AS
+ SELECT dcv.id_doc_compra_venta,
+    dcv.obs,
+    dcv.tipo,
+    dcv.fecha,
+    dcv.nit,
+    dcv.razon_social,
+    dcv.nro_documento,
+    dcv.nro_autorizacion,
+    dcv.importe_doc,
+    dcv.codigo_control,
+    tdcv.codigo AS tipo_doc,
+    pla.id_plantilla,
+    pla.tipo_informe,
+    dcv.id_moneda,
+    mon.codigo AS codigo_moneda,
+    dcv.id_periodo,
+    per.id_gestion,
+    per.periodo,
+    ges.gestion,
+    dcv.id_depto_conta,
+    dcv.id_usuario_reg,
+    pc.descripcion,
+    pc.importe_presupuesto,
+    pc.importe,
+    dcv.importe_descuento_ley,
+    pla.desc_plantilla, 
+    dcv.nro_tramite 
+   FROM conta.tdoc_compra_venta dcv
+     JOIN param.tplantilla pla ON pla.id_plantilla = dcv.id_plantilla
+     JOIN conta.tplantilla_calculo pc ON dcv.id_plantilla = pc.id_plantilla
+     JOIN param.tperiodo per ON per.id_periodo = dcv.id_periodo
+     JOIN param.tgestion ges ON ges.id_gestion = per.id_gestion
+     JOIN param.tmoneda mon ON mon.id_moneda = dcv.id_moneda
+     JOIN conta.ttipo_doc_compra_venta tdcv ON tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+  WHERE pla.tipo_informe::text = 'retenciones'::text AND pc.descuento::text = 'si'::text;
+/**********************************F-DEP-MANU-CONTA-0-18/10/2017****************************************/

@@ -12,7 +12,7 @@ class MODTipoEstadoCuenta extends MODbase{
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+
 	function listarTipoEstadoCuenta(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_tipo_estado_cuenta_sel';
@@ -159,6 +159,64 @@ class MODTipoEstadoCuenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	//**************//
+	function listarDatos(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_tipo_estado_cuenta_sel';
+		$this->transaccion='CONTA_REP_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);	
+				
+		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		$this->setParametro('id_tipo_estado_cuenta','id_tipo_estado_cuenta','int4');
+		$this->setParametro('desde','desde','DATE');
+		$this->setParametro('hasta','hasta','DATE');
+
+		$this->captura('id_auxiliar','int4');
+        $this->captura('id_tipo_estado_cuenta','int4');
+        $this->captura('id_tipo_estado_columna','int4');
+        $this->captura('id_config_subtipo_cuenta','int4');
+        $this->captura('fecha_ini','date');
+        $this->captura('fecha_fin','date');
+        $this->captura('desc_csc','varchar');
+        $this->captura('codigo','varchar');
+        $this->captura('nombre','varchar');
+        $this->captura('monto_mb','numeric');
+        $this->captura('monto_mt','numeric');
+        $this->captura('prioridad','numeric');
+        $this->captura('nombre_funcion','varchar');
+        $this->captura('link_int_det','varchar');
+        $this->captura('tabla','varchar');
+        $this->captura('id_tabla','int4');
+        $this->captura('origen','varchar');
+        $this->captura('descripcion','varchar');
+		$this->captura('desc_auxiliar','varchar');
+		$this->captura('nombre_clase','varchar');
+		$this->captura('parametros_det','varchar');
+	
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}	
+	//
+	function getTipoEstadoCuenta(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_tipo_estado_cuenta_ime';
+		$this->transaccion='CONTA_TEC_GET';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_tipo_estado_cuenta','id_tipo_estado_cuenta','int4');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}	
 			
 }
 ?>

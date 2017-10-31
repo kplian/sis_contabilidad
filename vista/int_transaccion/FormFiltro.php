@@ -104,19 +104,19 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 				form: true
 		  },
 		  {
-   			config:{
-   				name:'id_depto',
-   				hiddenName: 'id_depto',
-   				url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
-	   			origen:'DEPTO',
-	   			allowBlank:true,
-	   			fieldLabel: 'Depto',
-	   			baseParams:{estado:'activo',codigo_subsistema:'CONTA'},
-	   			width: 150
-   			},
-   			type:'ComboRec',
-   			id_grupo:0,
-   			form:true
+			config:{
+				name:'id_depto',
+				hiddenName: 'id_depto',
+				url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
+				origen:'DEPTO',
+				allowBlank:true,
+				fieldLabel: 'Depto',
+				baseParams:{estado:'activo',codigo_subsistema:'CONTA'},
+				width: 150
+			},
+			type:'ComboRec',
+			id_grupo:0,
+			form:true
          },
          {
 			config: {
@@ -152,7 +152,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 				listWidth:280,
 				minChars: 2
 				},
-			type: 'ComboBox',
+			type: 'ComboBox',	
 			id_grupo: 0,
 			form: true,
 			grid:false
@@ -334,24 +334,53 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 			form: true
 		}
 
-    ],
-    labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
-    east: {
-          url: '../../../sis_contabilidad/vista/int_transaccion/IntTransaccionMayor.php',
-          title: undefined, 
-          width: '70%',
-          cls: 'IntTransaccionMayor'
-         },
-    title: 'Filtro de mayores',
-    // Funcion guardar del formulario
-    onSubmit: function(o) {
-    	var me = this;
-    	if (me.form.getForm().isValid()) {
-             var parametros = me.getValForm()
-             this.onEnablePanel(this.idContenedor + '-east', parametros)                    
+	],
+	labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
+	east: {
+		url: '../../../sis_contabilidad/vista/int_transaccion/IntTransaccionMayor.php',
+		title: undefined, 
+		width: '70%',
+		cls: 'IntTransaccionMayor'
+	},
+	title: 'Filtro de mayores',
+	// Funcion guardar del formulario
+	onSubmit: function(o) {    	
+		var me = this;
+		if (me.form.getForm().isValid()) {		
+			var parametros = me.getValForm();
+			
+			var gest=this.Cmp.id_gestion.lastSelectionText;
+			var dpto=this.Cmp.id_depto.lastSelectionText;
+			var tpocuenta=this.Cmp.id_config_tipo_cuenta.lastSelectionText;
+			var subtpocuenta=this.Cmp.id_config_subtipo_cuenta.lastSelectionText;
+			
+			var cuenta=this.Cmp.id_cuenta.lastSelectionText;
+			var auxiliar=this.Cmp.id_auxiliar.lastSelectionText;
+			var partida=this.Cmp.id_partida.lastSelectionText;
+			var tcc=this.Cmp.id_tipo_cc.lastSelectionText;
+			
+			var cc=this.Cmp.id_centro_costo.lastSelectionText;
+			var ot=this.Cmp.id_orden_trabajo.lastSelectionText;
+			var suborden=this.Cmp.id_suborden.lastSelectionText;
+			var nro_tram=this.Cmp.nro_tramite.lastSelectionText;		
+					
+			this.onEnablePanel(this.idContenedor + '-east', 
+				Ext.apply(parametros,{	'gest': gest,
+										'dpto': dpto,
+										'tpocuenta': tpocuenta,
+										'subtpocuenta': subtpocuenta,
+										'cuenta': cuenta,
+										'auxiliar': auxiliar,
+										'partida': partida,
+										'tcc' : tcc,										
+										'cc' : cc,
+										'ot' : ot,
+										'suborden' : suborden,
+										'nro_tram' : nro_tram
+									 }));
         }
-
     },
+	//
     iniciarEventos:function(){
     	this.Cmp.id_gestion.on('select', function(cmb, rec, ind){
     		

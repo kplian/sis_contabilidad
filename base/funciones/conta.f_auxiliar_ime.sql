@@ -28,13 +28,14 @@ DECLARE
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
 	v_id_requerimiento     	integer;
-	v_resp		              varchar;
+	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_auxiliar	          integer;
+	v_id_auxiliar	        integer;
 	--variables para control de codigo y nombre de auxiliar duplicado
-  v_contador				      integer;
-	v_valid					        varchar;
+    v_contador				integer;
+	v_valid					varchar;
+    v_registros				record;
 			    
 BEGIN
 
@@ -163,6 +164,33 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 		end;
+        
+        
+     /*********************************    
+    #TRANSACCION:  'CONTA_COD_AUX_GET'
+    #DESCRIPCION:   Recupera los datos de la auxiliar 
+    #AUTOR:     manu    
+    #FECHA:     10-10-2017 16:03:19
+    ***********************************/
+
+    elsif(p_transaccion='CONTA_COD_AUX_GET')then
+        begin
+            --Sentencia de la eliminacion           
+            select a.id_auxiliar,a.id_empresa,a.nombre_auxiliar,a.codigo_auxiliar,a.corriente 
+            into v_registros                 
+            from conta.tauxiliar a                  
+            where a.estado_reg='activo' and a.id_auxiliar= v_parametros.id_auxiliar;
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Empresa recuperada(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_auxiliar',v_registros.id_auxiliar::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_empresa',v_registros.id_empresa::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'nombre_auxiliar',v_registros.nombre_auxiliar::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'codigo_auxiliar',v_registros.codigo_auxiliar::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'corriente',v_registros.corriente::varchar);                        
+            --Devuelve la respuesta
+            return v_resp;
+        end;      
+ 
          
 	else
      

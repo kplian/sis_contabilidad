@@ -73,7 +73,7 @@ class ACTDocRetencionForm extends ACTbase{
 			$reporte->generarReporte();
 			$reporte->output($reporte->url_archivo,'F');
 			$this->mensajeExito=new Mensaje();
-			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generÃ³ con Ã©xito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con exito el reporte: '.$nombreArchivo,'control');
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		}
@@ -91,12 +91,12 @@ class ACTDocRetencionForm extends ACTbase{
 			$nombreArchivo=uniqid(md5(session_id()).$titulo);
 			$nombreArchivo.='.xls';
 			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
-			$this->objParam->addParametro('datos',$this->res->datos);
+			$this->objParam->addParametro('datos',$this->res->datos);			
 			$this->objReporteFormato=new RetXls($this->objParam);
 			$this->objReporteFormato->generarDatos();
 			$this->objReporteFormato->generarReporte();
 			$this->mensajeExito=new Mensaje();
-			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generÃ³ con Ã©xito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		}

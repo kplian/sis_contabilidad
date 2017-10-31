@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime ( 
+CREATE OR REPLACE FUNCTION conta.ft_relacion_contable_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
@@ -142,16 +142,37 @@ BEGIN
                 END IF;
              END IF;
             
-             IF v_tipo_rel.tiene_centro_costo = 'no' THEN            
+             --RAC 27/10/2017, se considera moneda en la validacion 
+             IF v_tipo_rel.tiene_centro_costo = 'no' THEN  
+             
+                 IF v_tipo_rel.tiene_moneda = 'no'  THEN
+                 
+                       IF  EXISTS(select  1 
+                                     from conta.trelacion_contable  rc 
+                                     where rc.id_gestion = v_parametros.id_gestion 
+                                       and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
+                                       and rc.id_tabla = v_parametros.id_tabla) THEN                     
+                             raise exception 'Ya existe una relacion contable para este registro';                     
+                       END IF;   
             
-               IF  EXISTS(select  1 
-                   from conta.trelacion_contable  rc 
-                   where rc.id_gestion = v_parametros.id_gestion 
-                     and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
-                     and rc.id_tabla = v_parametros.id_tabla) THEN                     
-                     raise exception 'Ya existe una relacion contable para este registro';                     
-               END IF;   
+                 
+                 ELSE
+                 
+                     IF  EXISTS(
+                                     select  1 
+                                     from conta.trelacion_contable  rc 
+                                     where rc.id_gestion = v_parametros.id_gestion 
+                                       and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
+                                       and rc.id_tabla = v_parametros.id_tabla
+                                       and rc.id_moneda = v_parametros.id_moneda) THEN                     
+                             raise exception 'Ya existe una relacion contable para este registro y moneda';                     
+                       END IF;   
             
+                 
+                 END IF;
+                       
+            
+                      
              END IF;
             
             -- RAC 07/09/2017, ...ahora peuden exitir mas de un valor por defecto por gestion en diferentes combianciones

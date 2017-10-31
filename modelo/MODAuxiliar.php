@@ -130,6 +130,21 @@ class MODAuxiliar extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+	//
+	function getAuxiliar(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.f_auxiliar_ime';
+		$this->transaccion='CONTA_COD_AUX_GET';
+		$this->tipo_procedimiento='IME';	
+		//Define los parametros para la funcion
+		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>
