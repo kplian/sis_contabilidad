@@ -1646,13 +1646,13 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
             items: [{
                 id:'btn-chkpresupuesto-' + this.idContenedor,
                 text: 'Revisar Presupuesto Comprometido/Ejecutado',
-                tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>',
+                tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para este  tramite</p>',
                 handler:this.checkPresupuesto,               
                 scope: this
             }, {
                 id:'b-btnRepOC-' + this.idContenedor,
                 text: 'Verificar presupuesto disponible (Formulado)',
-                tooltip: '<b>Reporte de Pre-orden de Compra</b>',
+                tooltip: '<b>Verificar presupuesto disponible (Formulado)</b>',
                 handler:this.checkVerPresupuesto,
                 scope: this
             }

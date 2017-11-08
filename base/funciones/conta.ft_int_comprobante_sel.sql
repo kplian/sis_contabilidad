@@ -1,5 +1,9 @@
 --------------- SQL ---------------
 
+
+
+
+
 CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -802,7 +806,71 @@ BEGIN
 			return v_consulta;
 
 		end;
+
+    /*********************************    
+    #TRANSACCION:  'CONTA_CBTENCUE_SEL'
+    #DESCRIPCION:   Listado de comprobantes por cuenta contable y Tipo CC
+    #AUTOR:         RCM
+    #FECHA:         31/10/2017
+    ***********************************/
+    elsif(p_transaccion='CONTA_CBTENCUE_SEL') then
+                    
+        begin
         
+            --Sentencia de la consulta
+            v_consulta := 'select
+                        com.id_int_comprobante, com.fecha, com.nro_tramite, com.glosa1
+                        from conta.tint_transaccion tra
+                        inner join conta.tint_comprobante com
+                        on com.id_int_comprobante = tra.id_int_comprobante
+                        inner join conta.tcuenta cue
+                        on cue.id_cuenta = tra.id_cuenta
+                        inner join param.tcentro_costo cc
+                        on cc.id_centro_costo = tra.id_centro_costo
+                        inner join param.ttipo_cc tcc
+                        on tcc.id_tipo_cc = cc.id_tipo_cc
+                        where ';
+
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+            --Devuelve la respuesta
+            return v_consulta;
+
+        end;
+
+    /*********************************    
+    #TRANSACCION:  'CONTA_CBTENCUE_CONT'
+    #DESCRIPCION:   Conteo de registros del Listado de comprobantes por cuenta contable y Tipo CC
+    #AUTOR:         RCM
+    #FECHA:         31/10/2017
+    ***********************************/
+
+    elsif(p_transaccion='CONTA_CBTENCUE_CONT')then
+
+        begin
+            
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='select count(1) as total
+                        from conta.tint_transaccion tra
+                        inner join conta.tint_comprobante com
+                        on com.id_int_comprobante = tra.id_int_comprobante
+                        inner join conta.tcuenta cue
+                        on cue.id_cuenta = tra.id_cuenta
+                        inner join param.tcentro_costo cc
+                        on cc.id_centro_costo = tra.id_centro_costo
+                        inner join param.ttipo_cc tcc
+                        on tcc.id_tipo_cc = cc.id_tipo_cc
+                        where ';
+            
+            --Definicion de la respuesta            
+            v_consulta:=v_consulta||v_parametros.filtro;
+
+            --Devuelve la respuesta
+            return v_consulta;
+
+        end;
 					
 	else
 					     

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_regimen_simplificado_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -191,12 +193,12 @@ BEGIN
 
 		end;
     /*********************************
- 	#TRANSACCION:  'CONTA_REV_IME'
+ 	#TRANSACCION:  'CONTA_CTREV_IME'
  	#DESCRIPCION:	Control revision
  	#AUTOR:		MMV
  	#FECHA:		14-06-2017
 	***********************************/
-	elsif (p_transaccion='CONTA_REV_IME')then
+	elsif (p_transaccion='CONTA_CTREV_IME')then
 
         begin
 

@@ -1,5 +1,3 @@
--------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_comprobante_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -82,7 +80,12 @@ BEGIN
                 campo_depto_libro,
                 campo_fecha_costo_ini,
                 campo_fecha_costo_fin,
-                funcion_comprobante_editado
+                funcion_comprobante_editado,
+                funcion_comprobante_prevalidado,
+                funcion_comprobante_validado_eliminado,
+                desc_plantilla,
+            	campo_cbte_relacionado,
+                codigo_tipo_relacion
              
           	) values(
                 v_parametros.codigo,
@@ -118,7 +121,12 @@ BEGIN
                 v_parametros.campo_depto_libro,
                 v_parametros.campo_fecha_costo_ini,
                 v_parametros.campo_fecha_costo_fin,
-                v_parametros.funcion_comprobante_editado
+                v_parametros.funcion_comprobante_editado,
+                v_parametros.funcion_comprobante_prevalidado,
+                v_parametros.funcion_comprobante_validado_eliminado,
+                v_parametros.desc_plantilla,
+            	v_parametros.campo_cbte_relacionado,
+                v_parametros.codigo_tipo_relacion
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -173,7 +181,12 @@ BEGIN
               campo_depto_libro = v_parametros.campo_depto_libro,
               campo_fecha_costo_ini = v_parametros.campo_fecha_costo_ini,
               campo_fecha_costo_fin = v_parametros.campo_fecha_costo_fin,
-              funcion_comprobante_editado = v_parametros.funcion_comprobante_editado
+              funcion_comprobante_editado = v_parametros.funcion_comprobante_editado,
+              funcion_comprobante_prevalidado = v_parametros.funcion_comprobante_prevalidado,
+              funcion_comprobante_validado_eliminado =v_parametros.funcion_comprobante_validado_eliminado,
+              desc_plantilla = v_parametros.desc_plantilla,
+              campo_cbte_relacionado = v_parametros.campo_cbte_relacionado,
+              codigo_tipo_relacion = v_parametros.codigo_tipo_relacion
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta
@@ -229,4 +242,4 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
-COST 100
+COST 100;

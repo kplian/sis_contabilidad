@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_anexos_actualizaciones_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -201,12 +203,12 @@ BEGIN
 
 		end;
     /*********************************
- 	#TRANSACCION:  'CONTA_ANS_CONT'
+ 	#TRANSACCION:  'CONTA_ANSXX_CONT'
  	#DESCRIPCION:	Control revision
  	#AUTOR:		MMV
  	#FECHA:		14-06-2017
 	***********************************/
-	elsif (p_transaccion='CONTA_ANS_CONT')then
+	elsif (p_transaccion='CONTA_ANSXX_CONT')then
 
         begin
 
