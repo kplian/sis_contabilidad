@@ -346,7 +346,6 @@ class ACTIntTransaccion extends ACTbase{
 	}	
 	//mp
 	function impReporteMayor() {
-		//var_dump($this->objParam->getParametro('fec'));
 		if($this->objParam->getParametro('tipo_formato')=='pdf') {
 			$nombreArchivo = uniqid(md5(session_id()).'LibroMayor').'.pdf';			
 			$dataSource = $this->listarIntTransaccionMayorReporte();

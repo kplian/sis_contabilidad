@@ -855,7 +855,6 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	
 	addLibroMayor : function (wizard,resp){
 		//tipo_filtro, fechas
-		console.log(resp.fec);
 		Phx.CP.loadingShow();		
 		Ext.Ajax.request({
 			url:'../../sis_contabilidad/control/IntTransaccion/impReporteMayor',
@@ -901,7 +900,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				'nro_comprobante':resp.nro_comprobante,
 				'tipo_formato':resp.tipo_formato,
 				'relacional':resp.relacional,
-				'fec':resp.fec
+				'fec':resp.fec,
+				'cuenta':resp.cuenta
 			},
 			//argument:{wizard:wizard},
 			success: this.successExport,		

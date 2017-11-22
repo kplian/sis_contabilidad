@@ -13,7 +13,7 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 		
 	layout:'fit',
 	maxCount:0,
-	constructor:function(config){   
+	constructor:function(config){
 		Phx.vista.FormFiltroMayor.superclass.constructor.call(this,config);
 		this.init(); 
 		this.iniciarEventos();		
@@ -129,6 +129,17 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 			},
 			type:'Checkbox',
 			form:true,		
+		},{
+			config:{
+				name: 'cuenta',
+				fieldLabel: 'Cuenta contable',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 50,
+				checked:true		
+			},
+			type:'Checkbox',
+			form:true,		
 		},
 		{
 			config:{
@@ -178,7 +189,8 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 			nro_comprobante:this.Cmp.nro_comprobante.getValue(),
 			tipo_formato:this.Cmp.tipo_formato.getValue(),
 			
-			fec:this.Cmp.fec.getValue()
+			fec:this.Cmp.fec.getValue(),
+			cuenta:this.Cmp.cuenta.getValue()
 		}
 		return resp;
 	}

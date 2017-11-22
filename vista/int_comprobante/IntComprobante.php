@@ -11,6 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 var id_depto=null;
 var id_gestion=null;
+var tipo_filtro=null;
 
 Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		fheight : '90%',
@@ -1727,6 +1728,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		console.log('---->'+data);			
 		//id_depto=data.id_depto;
 		//id_gestion=data.id_gestion;
+		tipo_filtro=data.tipo_filtro;	
 	},
 	//
 	addBotonesLibroDiario: function() {
@@ -1777,7 +1779,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		var gest=this.cmbGestion.getRawValue();		
 		var id_dpto=this.cmbDepto.getValue();
 		var id_gestion=this.cmbGestion.getValue();		
-		var nombreVista=this.nombreVista;
+		var nombreVista=this.nombreVista;		
 		Phx.CP.loadingShow();		
 		Ext.Ajax.request({
 			url:'../../sis_contabilidad/control/IntComprobante/impReporteDiario',
@@ -1788,18 +1790,19 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				'id_gestion':id_gestion,
 				'id_dpto':id_dpto,
 				'nombreVista':nombreVista,
-				//
+				//tipo de formato pdf o xls
+				'tipo_filtro':tipo_filtro,
+				//parametros q se mostraran, si son tickeados
 				'tipo_moneda':resp.tipo_moneda,
-				'cc':resp.cc,
+				'beneficiario':resp.beneficiario,
 				'partida':resp.partida,
-				'auxiliar':resp.auxiliar,
-				'ordenes':resp.ordenes,
-				'tramite':resp.nro_tramite,
+				'fecha':resp.fecha,
 				'nro_comprobante':resp.nro_comprobante,
+				'nro_tramite':resp.nro_tramite,
+				'desc_tipo_relacion_comprobante':resp.desc_tipo_relacion_comprobante,
 				'tipo_formato':resp.tipo_formato,
-				'relacional':resp.relacional,
 				'fecIni':resp.fecIni,
-				'fecFin':resp.fecFin				
+				'fecFin':resp.fecFin			
 			},
 			success: this.successExport,		
 			failure: this.conexionFailure,

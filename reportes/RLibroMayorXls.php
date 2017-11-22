@@ -51,7 +51,7 @@ class RLibroMayorXls {
 		
 		
 	    $this->SetFont('','B',12);		
-		$this->Cell(0,5,"LIBRO DE COMPRAS ESTANDAR",0,1,'C');		
+		$this->Cell(0,5,"LIBRO MAYOR",0,1,'C');		
 		//$this->Ln();
 		$this->SetFont('','B',7);
 		$this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');		
@@ -80,7 +80,7 @@ class RLibroMayorXls {
 	        $this->Cell($width_c2, $height, $fecha_ini, 0, 0, 'L', true, '', 0, false, 'T', 'C');
 	        
 	        $this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-	        $this->Cell(20, $height,'Haste:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+	        $this->Cell(20, $height,'Hasta:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->SetFont('', '');
 	        $this->SetFillColor(192,192,192, true);
 	        $this->Cell(50, $height, $fecha_fin, 0, 0, 'L', true, '', 0, false, 'T', 'C');

@@ -48,8 +48,8 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 			form:true
 		},{
 			config:{
-				name: 'cc',
-				fieldLabel: 'Centro Costo',
+				name: 'beneficiario',
+				fieldLabel: 'Beneficiario',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,				
@@ -68,18 +68,8 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 			form:true	
 		},{
 			config:{
-				name: 'auxiliar',
-				fieldLabel: 'Auxiliar',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 50,				
-			},
-			type:'Checkbox',		
-			form:true	
-		},{
-			config:{
-				name: 'ordenes',
-				fieldLabel: 'Ordenes',
+				name: 'fecha',
+				fieldLabel: 'Fecha',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,				
@@ -99,8 +89,8 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 			form:true	
 		},{
 			config:{
-				name: 'relacional',
-				fieldLabel: 'Comprobante Relacional',
+				name: 'nro_tramite',
+				fieldLabel: 'Nro Tramite',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,			
@@ -109,8 +99,8 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 			form:true	
 		},{
 			config:{
-				name: 'nro_tramite',
-				fieldLabel: 'Nro de Tramite',
+				name: 'desc_tipo_relacion_comprobante',
+				fieldLabel: 'Tipo de Relacion de Comprobante',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,
@@ -121,7 +111,7 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 		},{
 			config:{
 				name: 'fecIni',
-				fieldLabel: 'Fecha Inicio',
+				fieldLabel: 'Fecha Inicial',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,
@@ -156,7 +146,7 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 					fields: ['variable', 'valor'],
 					data : [ 
 								['pdf','PDF'],
-								//['xls',' EXCEL']
+								['xls',' EXCEL']
 							]
 				}),
 				valueField: 'variable',
@@ -178,14 +168,13 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 	
 	getValues:function(){		
 		var resp = {			
-			tipo_moneda:this.Cmp.tipo_moneda.getValue(),
-			cc:this.Cmp.cc.getValue(),
-			partida:this.Cmp.partida.getValue(),
-			auxiliar:this.Cmp.auxiliar.getValue(),
-			ordenes:this.Cmp.ordenes.getValue(),
-			relacional:this.Cmp.relacional.getValue(),
-			nro_tramite:this.Cmp.nro_tramite.getValue(),
-			nro_comprobante:this.Cmp.nro_comprobante.getValue(),
+			tipo_moneda:this.Cmp.tipo_moneda.getValue(),				
+			beneficiario:this.Cmp.beneficiario.getValue(),
+			partida:this.Cmp.partida.getValue(),						
+			fecha:this.Cmp.fecha.getValue(),
+			nro_comprobante:this.Cmp.nro_comprobante.getValue(),					
+			nro_tramite:this.Cmp.nro_tramite.getValue(),			
+			desc_tipo_relacion_comprobante:this.Cmp.desc_tipo_relacion_comprobante.getValue(),			
 			tipo_formato:this.Cmp.tipo_formato.getValue(),			
 			fecIni:this.Cmp.fecIni.getValue(),
 			fecFin:this.Cmp.fecFin.getValue()		

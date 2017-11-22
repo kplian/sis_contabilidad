@@ -23,7 +23,7 @@ class RMayorXls
 			->setDescription('Reporte "'.$this->objParam->getParametro('titulo_archivo').'", generado por el framework PXP')
 			->setKeywords("office 2007 openxml php")
 			->setCategory("Report File");
-        $this->equivalencias=array( 0=>'A',1=>'B',2=>'C',3=>'D',4=>'E',5=>'F',6=>'G',7=>'H',8=>'I',
+		$this->equivalencias=array( 0=>'A',1=>'B',2=>'C',3=>'D',4=>'E',5=>'F',6=>'G',7=>'H',8=>'I',
 			9=>'J',10=>'K',11=>'L',12=>'M',13=>'N',14=>'O',15=>'P',16=>'Q',17=>'R',
 			18=>'S',19=>'T',20=>'U',21=>'V',22=>'W',23=>'X',24=>'Y',25=>'Z',
 			26=>'AA',27=>'AB',28=>'AC',29=>'AD',30=>'AE',31=>'AF',32=>'AG',33=>'AH',
@@ -35,12 +35,14 @@ class RMayorXls
 			68=>'BQ',69=>'BR',70=>'BS',71=>'BT',72=>'BU',73=>'BV',74=>'BW',75=>'BX',
 			76=>'BY',77=>'BZ');
 	}
+	//
 	function imprimeCabecera() {
 		$this->docexcel->createSheet();
-		$this->docexcel->getActiveSheet()->setTitle('Libro Compras');
+		$this->docexcel->getActiveSheet()->setTitle('Libro Mayor');
 		$this->docexcel->setActiveSheetIndex(0);
+		
 		$datos = $this->objParam->getParametro('datos');
-		$ar = array();
+		$var = array();
 		$contador=0;
 		$styleTitulos1 = array(
 			'font'  => array(
@@ -99,67 +101,81 @@ class RMayorXls
 		$tramite = (int)($this->objParam->getParametro('tramite')=== 'true');
 		$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 		$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
-		$fec = (int)($this->objParam->getParametro('fec')=== 'true');						
+		$fec = (int)($this->objParam->getParametro('fec')=== 'true');	
+		$cuenta = (int)($this->objParam->getParametro('cuenta')=== 'true');						
 		
 		$aux='';		
 		if($cc == 1){
+			array_push($var,'CENTRO COSTO');
 			$contador++;						
 		}
 		if($partida == 1){
+			array_push($var,'PARTIDA');
 			$contador++;						
 		}
 		if($auxiliar == 1){
+			array_push($var,'AUXILIAR');
 			$contador++;						
 		}
 		if($ordenes == 1){
+			array_push($var,'ORDENES');
 			$contador++;
 		}
 		if($tramite == 1){
+			array_push($var,'TRAMITE');
 			$contador++;
 		}
 		if($crel == 1 ){
+			array_push($var,'RELACIONAL');
 			$contador++;
 		}		
 		if($nro_comprobante == 1){
+			array_push($var,'NRO COMPROBANTE');
 			$contador++;
 		}	
-		if($fec == 1){						
+		if($fec == 1){
+			array_push($var,'FECHA');						
 			$contador++;
 		}	
+		if($cuenta == 1){
+			array_push($var,'CUENTA CONTABLE');						
+			$contador++;
+		}
+		$this->docexcel->getActiveSheet()->setCellValue('A5','No.');
 		//titulos
 		$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'LIBRO DE MAYOR' );
-		$this->docexcel->getActiveSheet()->getStyle('A2:E2')->applyFromArray($styleTitulos1);
-		$this->docexcel->getActiveSheet()->mergeCells('A2:E2');
-		
-		$this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(70);
-		$this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(70);
-		$this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
-		$this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(30);
-		
-		$this->docexcel->getActiveSheet()->getStyle('A5:O5')->getAlignment()->setWrapText(true);
-		$this->docexcel->getActiveSheet()->getStyle('A5:O5')->applyFromArray($styleTitulos2);
+		$this->docexcel->getActiveSheet()->getStyle('A2:'.$this->equivalencias[$contador].'2')->applyFromArray($styleTitulos1);
+		$this->docexcel->getActiveSheet()->mergeCells('A2:'.$this->equivalencias[$contador].'2');
+				
+		$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+4].'5')->getAlignment()->setWrapText(true);
+		$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+4].'5')->applyFromArray($styleTitulos2);
 		//*************************************Cabecera*****************************************	
+		for ($i=1; $i <= $contador; $i++) {
+			$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$i].'5',$var[$i-1]);
+			$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$i].'')->setWidth(40); 			
+		}
+		$contador+=3;
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador-1].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+1].'')->setWidth(15);
+		
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$i].'')->setWidth(40);
+		$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-2].'5','GLOSA');
 		switch ($this->objParam->getParametro('tipo_moneda')) {
-			case 'MA':
-				$this->docexcel->getActiveSheet()->setCellValue('A5','Nº');
-				$this->docexcel->getActiveSheet()->setCellValue('B5','DESCRIPCION');
-				$this->docexcel->getActiveSheet()->setCellValue('C5','GLOSA');
-				$this->docexcel->getActiveSheet()->setCellValue('D5','DEBE'.' '.'MA');
-				$this->docexcel->getActiveSheet()->setCellValue('E5','HABER'.' '.'MA');	
+			case 'MA':				
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-1].'5','DEBE'.' '.'MA');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador].'5','HABER'.' '.'MA');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+1].'5','SALDO'.' '.'MA');				
 				break;
 			case 'MT':			
-				$this->docexcel->getActiveSheet()->setCellValue('A5','Nº');
-				$this->docexcel->getActiveSheet()->setCellValue('B5','DESCRIPCION');
-				$this->docexcel->getActiveSheet()->setCellValue('C5','GLOSA');
-				$this->docexcel->getActiveSheet()->setCellValue('D5','DEBE'.' '.'MT');
-				$this->docexcel->getActiveSheet()->setCellValue('E5','HABER'.' '.'MT');	
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-1].'5','DEBE'.' '.'MT');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador].'5','HABER'.' '.'MT');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+1].'5','SALDO'.' '.'MT');				
 				break;
 			case 'MB':
-				$this->docexcel->getActiveSheet()->setCellValue('A5','Nº');
-				$this->docexcel->getActiveSheet()->setCellValue('B5','DESCRIPCION');
-				$this->docexcel->getActiveSheet()->setCellValue('C5','GLOSA');
-				$this->docexcel->getActiveSheet()->setCellValue('D5','DEBE'.' '.'MB');
-				$this->docexcel->getActiveSheet()->setCellValue('E5','HABER'.' '.'MB');			
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-1].'5','DEBE'.' '.'MB');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador].'5','HABER'.' '.'MB');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+1].'5','SALDO'.' '.'MB');			
 				break;		
 			default:			
 				break;
@@ -181,6 +197,7 @@ class RMayorXls
 		$contador=0;
 		$k=1;
 		$t=0;
+		$acreedor=0;
 		$ar = array();
 		//
 		switch ($this->objParam->getParametro('tipo_moneda')) {
@@ -193,52 +210,57 @@ class RMayorXls
 					$tramite = (int)($this->objParam->getParametro('tramite')=== 'true');
 					$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
-					$fec = (int)($this->objParam->getParametro('fec')=== 'true');						
+					$fec = (int)($this->objParam->getParametro('fec')=== 'true');
+					$cuenta = (int)($this->objParam->getParametro('cuenta')=== 'true');						
 					
 					$aux='';		
 					if($cc == 1){
-						array_push($ar,'CC:'.trim($value['desc_centro_costo']));$contador++;						
+						array_push($ar,trim($value['desc_centro_costo']));$contador++;						
 					}
 					if($partida == 1){
-						array_push($ar,'Ptda:'.trim($value['desc_partida']));$contador++;						
+						array_push($ar,trim($value['desc_partida']));$contador++;						
 					}
 					if($auxiliar == 1){
-						array_push($ar,'Aux:'.trim($value['desc_auxiliar']));$contador++;						
+						array_push($ar,trim($value['desc_auxiliar']));$contador++;						
 					}
 					if($ordenes == 1){
-						array_push($ar,'Ptda:'.trim($value['desc_partida']));$contador++;
+						array_push($ar,trim($value['desc_partida']));$contador++;
 					}
 					if($tramite == 1){
-						array_push($ar,'Tramite:'.strval($value['nro_tramite']));$contador++;
+						array_push($ar,strval($value['nro_tramite']));$contador++;
 					}
 					if($crel == 1 ){
-						array_push($ar,'Cbte Relacional:'.$value['cbte_relacional']);$contador++;
+						array_push($ar,$value['cbte_relacional']);$contador++;
 					}		
 					if($nro_comprobante == 1){
-						array_push($ar,'Nro Cbte.:'.trim($value['nro_cbte']));$contador++;
+						array_push($ar,trim($value['nro_cbte']));$contador++;
 					}	
 					if($fec == 1){						
 						$arr = explode('-', $value['fecha']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-						$aux=$aux.'Fecha:'.$newDate."\r\n";
-						array_push($ar,'Fecha:'.$newDate);$contador++;
+						$aux=$aux.$newDate."\r\n";
+						array_push($ar,$newDate);$contador++;
 					}
+					if($cuenta == 1){
+						array_push($ar,trim($value['desc_cuenta']));$contador++;
+					}
+					
 					if($k==1){
 						$max=$contador;
 					}
 					$k=2;
-					$v=0;
-					//$this->docexcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(60);					
+					$v=0;				
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
 					for ($i=$t; $i < $max+$t ; $i++) { 						
 						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($v+1, $fila, $ar[$i]);
 						$v++;				
 					}	
 					$t=$t+$max;					
-						
+					$acreedor = ($value['importe_debe_ma']-$value['importe_haber_ma']) + $acreedor;		
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa1'])."\r\n".trim($value['glosa']));
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, $value['importe_debe_ma']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, $value['importe_haber_ma']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4, $fila, $acreedor);
 					$fila++;
 					$this->numero++;
 				}		
@@ -252,35 +274,39 @@ class RMayorXls
 					$tramite = (int)($this->objParam->getParametro('tramite')=== 'true');
 					$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
-					$fec = (int)($this->objParam->getParametro('fec')=== 'true');						
+					$fec = (int)($this->objParam->getParametro('fec')=== 'true');
+					$fec = (int)($this->objParam->getParametro('cuenta')=== 'true');							
 					
 					$aux='';		
 					if($cc == 1){
-						array_push($ar,'CC:'.trim($value['desc_centro_costo']));$contador++;						
+						array_push($ar,trim($value['desc_centro_costo']));$contador++;						
 					}
 					if($partida == 1){
-						array_push($ar,'Ptda:'.trim($value['desc_partida']));$contador++;						
+						array_push($ar,trim($value['desc_partida']));$contador++;						
 					}
 					if($auxiliar == 1){
-						array_push($ar,'Aux:'.trim($value['desc_auxiliar']));$contador++;						
+						array_push($ar,trim($value['desc_auxiliar']));$contador++;						
 					}
 					if($ordenes == 1){
-						array_push($ar,'Ptda:'.trim($value['desc_partida']));$contador++;
+						array_push($ar,trim($value['desc_partida']));$contador++;
 					}
 					if($tramite == 1){
-						array_push($ar,'Tramite:'.strval($value['nro_tramite']));$contador++;
+						array_push($ar,strval($value['nro_tramite']));$contador++;
 					}
 					if($crel == 1 ){
-						array_push($ar,'Cbte Relacional:'.$value['cbte_relacional']);$contador++;
+						array_push($ar,$value['cbte_relacional']);$contador++;
 					}		
 					if($nro_comprobante == 1){
-						array_push($ar,'Nro Cbte.:'.trim($value['nro_cbte']));$contador++;
+						array_push($ar,trim($value['nro_cbte']));$contador++;
 					}	
 					if($fec == 1){						
 						$arr = explode('-', $value['fecha']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-						$aux=$aux.'Fecha:'.$newDate."\r\n";
-						array_push($ar,'Fecha:'.$newDate);$contador++;
+						$aux=$aux.$newDate."\r\n";
+						array_push($ar,$newDate);$contador++;
+					}
+					if($cuenta == 1){
+						array_push($ar,trim($value['desc_cuenta']));$contador++;
 					}
 					if($k==1){
 						$max=$contador;
@@ -294,10 +320,11 @@ class RMayorXls
 						$v++;				
 					}	
 					$t=$t+$max;					
-						
+					$acreedor = ($value['importe_debe_mt']-$value['importe_haber_mt']) + $acreedor;		
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa1'])."\r\n".trim($value['glosa']));
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, $value['importe_debe_mt']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, $value['importe_haber_mt']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4, $fila, $acreedor);
 					$fila++;
 					$this->numero++;
 				}	
@@ -311,52 +338,58 @@ class RMayorXls
 					$tramite = (int)($this->objParam->getParametro('tramite')=== 'true');
 					$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
-					$fec = (int)($this->objParam->getParametro('fec')=== 'true');						
+					$fec = (int)($this->objParam->getParametro('fec')=== 'true');
+					$cuenta = (int)($this->objParam->getParametro('cuenta')=== 'true');						
 					
 					$aux='';		
 					if($cc == 1){
-						array_push($ar,'CC:'.trim($value['desc_centro_costo']));$contador++;						
+						array_push($ar,trim($value['desc_centro_costo']));$contador++;						
 					}
 					if($partida == 1){
-						array_push($ar,'Ptda:'.trim($value['desc_partida']));$contador++;						
+						array_push($ar,trim($value['desc_partida']));$contador++;						
 					}
 					if($auxiliar == 1){
-						array_push($ar,'Aux:'.trim($value['desc_auxiliar']));$contador++;						
+						array_push($ar,trim($value['desc_auxiliar']));$contador++;						
 					}
 					if($ordenes == 1){
-						array_push($ar,'Ptda:'.trim($value['desc_partida']));$contador++;
+						array_push($ar,trim($value['desc_partida']));$contador++;
 					}
 					if($tramite == 1){
-						array_push($ar,'Tramite:'.strval($value['nro_tramite']));$contador++;
+						array_push($ar,strval($value['nro_tramite']));$contador++;
 					}
 					if($crel == 1 ){
-						array_push($ar,'Cbte Relacional:'.$value['cbte_relacional']);$contador++;
+						array_push($ar,$value['cbte_relacional']);$contador++;
 					}		
 					if($nro_comprobante == 1){
-						array_push($ar,'Nro Cbte.:'.trim($value['nro_cbte']));$contador++;
+						array_push($ar,trim($value['nro_cbte']));$contador++;
 					}	
 					if($fec == 1){						
 						$arr = explode('-', $value['fecha']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-						$aux=$aux.'Fecha:'.$newDate."\r\n";
-						array_push($ar,'Fecha:'.$newDate);$contador++;
+						$aux=$aux.$newDate."\r\n";
+						array_push($ar,$newDate);$contador++;
+					}
+					if($cuenta == 1){
+						array_push($ar,trim($value['desc_cuenta']));$contador++;
 					}
 					if($k==1){
 						$max=$contador;
 					}
 					$k=2;
-					$v=0;
-					//$this->docexcel->getActiveSheet()->getRowDimension($fila)->setRowHeight(60);					
+					$v=0;				
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
 					for ($i=$t; $i < $max+$t ; $i++) { 						
 						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($v+1, $fila, $ar[$i]);
 						$v++;				
 					}	
 					$t=$t+$max;					
-						
+					
+					$acreedor = ($value['importe_debe_mb']-$value['importe_haber_mb']) + $acreedor;		
+												
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa1'])."\r\n".trim($value['glosa']));
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, $value['importe_debe_mb']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, $value['importe_haber_mb']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4, $fila, $acreedor);
 					$fila++;
 					$this->numero++;
 				}			
@@ -369,11 +402,7 @@ class RMayorXls
 		$this->objWriter = PHPExcel_IOFactory::createWriter($this->docexcel, 'Excel5');
 		$this->objWriter->save($this->url_archivo);
 		$this->imprimeCabecera(0);
-	}
-	
-	function datos(){
-		
-	}
+	}	
 
 }
 ?>

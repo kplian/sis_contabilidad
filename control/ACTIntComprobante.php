@@ -14,7 +14,7 @@ require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
 require_once(dirname(__FILE__).'/../reportes/RIntCbte.php');
 
 require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario.php');
-//require_once(dirname(__FILE__).'/../reportes/RDiarioXls.php');
+require_once(dirname(__FILE__).'/../reportes/RComprobanteDiarioXls.php');
 //
 class ACTIntComprobante extends ACTbase{
 	
@@ -669,26 +669,26 @@ class ACTIntComprobante extends ACTbase{
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
 		}
-		/*if($this->objParam->getParametro('tipo_formato')=='xls') {			
-			$this->objFun=$this->create('MODIntTransaccion');	
-			$this->res = $this->objFun->listarRepIntComprobante();
+		if($this->objParam->getParametro('tipo_formato')=='xls') {			
+			$this->objFun=$this->create('MODIntComprobante');	
+			$this->res = $this->objFun->listarRepIntComprobanteDiario();
 			if($this->res->getTipo()=='ERROR'){
 				$this->res->imprimirRespuesta($this->res->generarJson());
 				exit;
 			}
-			$titulo ='Ret';
+			$titulo ='Diario';
 			$nombreArchivo=uniqid(md5(session_id()).$titulo);
 			$nombreArchivo.='.xls';
 			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 			$this->objParam->addParametro('datos',$this->res->datos);			
-			$this->objReporteFormato=new RDiarioXls($this->objParam);
+			$this->objReporteFormato=new RComprobanteDiarioXls($this->objParam);
 			$this->objReporteFormato->generarDatos();
 			$this->objReporteFormato->generarReporte();
 			$this->mensajeExito=new Mensaje();
 			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
-		}	*/				
+		}				
 	}
 
 	function listarIntComprobanteTCCCuenta(){

@@ -25,6 +25,8 @@ class RTransaccionmayor extends ReportePDF {
 	var $datos_periodo;
 	var $cant;
 	var $valor;
+	var $signo="";
+	var $a="";
 	
 	function datosHeader ($detalle,$resultado,$tpoestado,$auxiliar) {
 		$this->SetHeaderMargin(10);
@@ -60,7 +62,7 @@ class RTransaccionmayor extends ReportePDF {
 							's2' => 'GLOSA',
 							's3' => 'DEBE'."\r\n".$var,
 							's4' => 'HABER'."\r\n".$var,
-							's5' => 'DEUDOR ACREEDOR'
+							's5' => 'SALDO'
 						);
 		$this->MultiRow($RowArray, false, 1);
 	}
@@ -119,8 +121,14 @@ class RTransaccionmayor extends ReportePDF {
 			$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 			$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 			$fec = (int)($this->objParam->getParametro('fec')=== 'true');	
+			$cuenta = (int)($this->objParam->getParametro('cuenta')=== 'true');	
 			
-			$aux='';		
+			$aux='';	
+			if($cuenta == 1){
+				$aux=$aux.'Cta. Contable:'.trim($datarow['desc_cuenta'])."\r\n";
+			}else{
+				$aux=$aux.'';
+			}	
 			if($cc == 1){
 				$aux=$aux.'CC:'.trim($datarow['desc_centro_costo'])."\r\n";			
 			}else{			
@@ -155,7 +163,9 @@ class RTransaccionmayor extends ReportePDF {
 				$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";
 			}else{
 				$aux=$aux.'';
-			}	
+			}			
+				
+			
 			if($fec == 1){
 				$arr = explode('-', $datarow['fecha']);
 				$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
@@ -163,8 +173,17 @@ class RTransaccionmayor extends ReportePDF {
 			}else{
 				$aux=$aux.'';
 			}	
-			$this->tablealigns=array('C','L','L','R','R','R');
-			$this->tablenumbers=array(0,0,0,2,2,2);
+			
+			$acreedor = ($debe-$haber) + $acreedor;						
+			
+			if($acreedor<0){
+				$this->tablenumbers=array(0,0,0,2,2,0);
+				$acreedor=$acreedor*-1;
+				$acreedor= '('.($acreedor).')';
+			}else{
+				$this->tablenumbers=array(0,0,0,2,2,2);
+			}			
+			$this->tablealigns=array('C','L','L','R','R','R');			
 			$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
 			$this->tabletextcolor=array();			
 			$RowArray = array(
@@ -173,11 +192,13 @@ class RTransaccionmayor extends ReportePDF {
 				's2' => trim($datarow['glosa1'])."\r\n".trim($datarow['glosa']),
 				's3' => $debe,
 				's4' => $haber,
-				's5' => $acreedor+($debe-$haber)	
+				's5' => $acreedor
 			);
-			$fill = !$fill;
-			$acreedor=$debe+$haber;	
+			
+			$fill = !$fill;			
+			//$acreedor=$debe+$haber;			
 			$this->total = $this->total -1;
+			
 			$i++;		
 			$this-> MultiRow($RowArray,$fill,0);			
 			$this->revisarfinPagina($datarow);
@@ -322,7 +343,7 @@ class RTransaccionmayor extends ReportePDF {
 		$width1 = 5;
 		$esp_width = 10;
 		$width_c1= 30;
-		$width_c2= 50;			
+		$width_c2= 70;			
 		
 		if($this->objParam->getParametro('desde')!=null){
 			$desde = $this->objParam->getParametro('desde');
@@ -385,9 +406,9 @@ class RTransaccionmayor extends ReportePDF {
 		if($this->objParam->getParametro('gest')!=null){			
 			$gest=$this->objParam->getParametro('gest');
 			$this->SetFont('', 'B',6);
-			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-			$this->SetFont('', '',6);
+			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');			
 			$this->Cell($width_c1, $height, 'Gestion:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$this->SetFont('', '',6);
 			$this->SetFillColor(192,192,192, true);			
 			$this->Cell($width_c2, $height, $gest, 0, 1, 'L', true, '', 0, false, 'T', 'C');
 			$this->Ln();		
