@@ -774,7 +774,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			}],
 	//mpmpmp
 	postReloadPage:function(data){	
-		console.log(data);	
+		console.log("->",data.nro_tramite);	
 		ini=data.desde;
 		fin=data.hasta;
 		
@@ -790,7 +790,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		centro_costo=data.cc;							
 		orden_trabajo=data.ot ;				
 		suborden=data.suborden;		
-		nro_tram=data.nro_tram;
+		nro_tram=data.nro_tramite;
 		//
 		tipo_filtro=data.tipo_filtro;			
 		id_auxiliar=data.id_auxiliar;
@@ -901,7 +901,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				'tipo_formato':resp.tipo_formato,
 				'relacional':resp.relacional,
 				'fec':resp.fec,
-				'cuenta':resp.cuenta
+				'cuenta_t':resp.cuenta_t
 			},
 			//argument:{wizard:wizard},
 			success: this.successExport,		

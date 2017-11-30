@@ -720,6 +720,12 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_depto','int4');
 		$this->captura('id_gestion','int4');
 		
+		$this->captura('glosa','varchar');
+		
+		$this->captura('nombre_partida','varchar');
+		$this->captura('desc_cuenta','varchar');
+		$this->captura('desc_centro_costo','varchar');
+		
 		$this->captura('importe_debe_mb','numeric');
 		$this->captura('importe_haber_mb','numeric');
 		$this->captura('importe_gasto_mb','numeric');

@@ -326,7 +326,6 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				fieldLabel : 'Fecha',
 				allowBlank : false,
 				anchor : '80%',
-				maxValue : new Date(),
 				gwidth : 100,
 				format : 'd/m/Y',
 				renderer : function(value, p, record) {
@@ -1802,7 +1801,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				'desc_tipo_relacion_comprobante':resp.desc_tipo_relacion_comprobante,
 				'tipo_formato':resp.tipo_formato,
 				'fecIni':resp.fecIni,
-				'fecFin':resp.fecFin			
+				'fecFin':resp.fecFin,
+				'cc':resp.cc			
 			},
 			success: this.successExport,		
 			failure: this.conexionFailure,

@@ -1,6 +1,6 @@
 <?php
 // Extend the TCPDF class to create custom MultiRow
-class RComprobanteDiario extends ReportePDF {
+class RComprobanteDiario_cuad extends ReportePDF {
 	var $datos_titulo;
 	var $datos_detalle;
 	var $ancho_hoja;
@@ -94,11 +94,8 @@ class RComprobanteDiario extends ReportePDF {
 		$acreedor=0;
 		$y=0;
 		$sw=0;
-		$f2='';
-		$f1='';
-		$f='';
-		$g='';
-		foreach ($this->getDataSource() as $datarow) {
+		$a=0;
+		foreach ($this->getDataSource() as $datarow) {					
 			switch ($this->objParam->getParametro('tipo_moneda')) {
 				case 'MA':
 					$debe=$datarow['importe_debe_ma'];
@@ -114,7 +111,8 @@ class RComprobanteDiario extends ReportePDF {
 					break;		
 				default:			
 					break;
-			}
+			}				
+			//			
 			$beneficiario = (int)($this->objParam->getParametro('beneficiario') === 'true');
 			$partida = (int)($this->objParam->getParametro('partida') === 'true');			
 			$fecha = (int)($this->objParam->getParametro('fecha')=== 'true');
@@ -124,26 +122,78 @@ class RComprobanteDiario extends ReportePDF {
 			$fecIni = (int)($this->objParam->getParametro('fecIni')=== 'true');
 			$fecFin = (int)($this->objParam->getParametro('fecFin')=== 'true');	
 			$cc = (int)($this->objParam->getParametro('cc')=== 'true');	
-									
+
 			$aux='';
-			if($y==0){
-				$cab=trim($datarow['nro_cbte']);
-				$y++;
-			}
-			if(trim($datarow['nro_cbte'])==$cab){
-				if($sw==0){
-					$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";
-					//
-					if($nro_tramite == 1){
-						$aux=$aux.'Nro Tramite:'.trim($datarow['nro_tramite'])."\r\n";
+				//
+				if($y==0){
+					$cab=trim($datarow['nro_cbte']);
+					$y++;
+				}	
+				
+				if(trim($datarow['nro_cbte'])==$cab){
+					if($sw==0){
+						$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";
+						//					
+						if($fecha == 1){
+							$arr = explode('-', $datarow['fecha']);
+							$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
+							$aux=$aux.'Fecha:'.$newDate."\r\n";
+						}else{
+							$aux=$aux.'';
+						}
+						if($cc == 1){
+							$aux=$aux.'Centro de Costo:'.trim($datarow['desc_centro_costo'])."\r\n";			
+						}else{			
+							$aux=$aux.'';
+						}	
+						if($nro_tramite == 1){
+							$aux=$aux.'Nro Tramite:'.trim($datarow['nro_tramite'])."\r\n";
+						}else{
+							$aux=$aux.'';
+						}		
+						if($beneficiario == 1){
+							$aux=$aux.'Beneficiario:'.trim($datarow['beneficiario'])."\r\n";			
+						}else{			
+							$aux=$aux.'';
+						}
+						if($partida == 1){
+							$aux=$aux.'Fecha:'.trim($datarow['partida'])."\r\n";
+						}else{
+							$aux=$aux.'';
+						}										
+						if($desc_tipo_relacion_comprobante == 1){
+							$aux=$aux.'Tpo. Relacion Cbte.:'.trim(strval($datarow['desc_tipo_relacion_comprobante']))."\r\n";
+						}else{
+							$aux=$aux.'';
+						}	
+						$a=0;	
+						$sw=1;		
+					}else{
+						$a=1;
+						$aux=$aux.''."\r\n";					
+					}				
+					
+				}else{
+					$cab=trim($datarow['nro_cbte']);
+					$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";				
+					//						
+					if($fecha == 1){
+						$arr = explode('-', $datarow['fecha']);
+						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
+						$aux=$aux.'Fecha:'.$newDate."\r\n";
 					}else{
 						$aux=$aux.'';
-					}	
+					}
 					if($cc == 1){
 						$aux=$aux.'Centro de Costo:'.trim($datarow['desc_centro_costo'])."\r\n";			
 					}else{			
 						$aux=$aux.'';
 					}	
+					if($nro_tramite == 1){
+						$aux=$aux.'Nro Tramite:'.trim($datarow['nro_tramite'])."\r\n";
+					}else{
+						$aux=$aux.'';
+					}		
 					if($beneficiario == 1){
 						$aux=$aux.'Beneficiario:'.trim($datarow['beneficiario'])."\r\n";			
 					}else{			
@@ -153,155 +203,96 @@ class RComprobanteDiario extends ReportePDF {
 						$aux=$aux.'Fecha:'.trim($datarow['partida'])."\r\n";
 					}else{
 						$aux=$aux.'';
-					}
-					if($fecha == 1){
-						$arr = explode('-', $datarow['fecha']);
-						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-						$aux=$aux.'Fecha:'.$newDate."\r\n";
-					}else{
-						$aux=$aux.'';
-					}						
+					}										
 					if($desc_tipo_relacion_comprobante == 1){
-						$aux=$aux.'Tpo. Relacion Cbte.:'.strval($datarow['desc_tipo_relacion_comprobante'])."\r\n";
+						$aux=$aux.'Tpo. Relacion Cbte.:'.trim(strval($datarow['desc_tipo_relacion_comprobante']))."\r\n";
 					}else{
 						$aux=$aux.'';
 					}	
-					$sw=1;		
-				}else{
-					$aux=$aux.''."\r\n";					
-				}								
-			}else{
-				$cab=trim($datarow['nro_cbte']);
-				$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";					
-				if($nro_tramite == 1){
-					$aux=$aux.'Nro Tramite:'.trim($datarow['nro_tramite'])."\r\n";
-				}else{
-					$aux=$aux.'';
-				}
-				if($cc == 1){
-					$aux=$aux.'Centro de Costo:'.trim($datarow['cc'])."\r\n";			
-				}else{			
-					$aux=$aux.'';
+					$a=0;											
 				}			
-				if($beneficiario == 1){
-					$aux=$aux.'Beneficiario:'.trim($datarow['beneficiario'])."\r\n";			
-				}else{			
-					$aux=$aux.'';
+						
+				if($haber>$debe){
+					$m= "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".trim($datarow['desc_cuenta'])."\r\n".trim($datarow['glosa']);
+				}else{
+					$m= trim($datarow['desc_cuenta'])."\r\n".trim($datarow['glosa']);
 				}
-				if($partida == 1){
-					$aux=$aux.'Fecha:'.trim($datarow['partida'])."\r\n";
-				}else{
-					$aux=$aux.'';
+				$arr = explode('-', $datarow['fecha']);
+				$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
+				
+				$f = ($this->objParam->getParametro('fecIni'));
+				$g = ($this->objParam->getParametro('fecFin'));			
+				$f1 = date("d-m-Y", strtotime($f));	
+				$f2 = date("d-m-Y", strtotime($g));							
+				//
+				$this->tablealigns=array('C','L','L','L','R','R');
+				$this->tablenumbers=array(0,0,0,0,2,2);
+				$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
+				$this->tabletextcolor=array();	
+				//
+				if($debe==0 and $haber==0){
 				}
-				if($fecha == 1){
-					$arr = explode('-', $datarow['fecha']);
-					$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-					$aux=$aux.'Fecha:'.$newDate."\r\n";
-				}else{
-					$aux=$aux.'';
-				}						
-				if($desc_tipo_relacion_comprobante == 1){
-					$aux=$aux.'Tpo. Relacion Cbte.:'.strval($datarow['desc_tipo_relacion_comprobante'])."\r\n";
-				}else{
-					$aux=$aux.'';
-				}			
-			}	
-			if($haber>$debe){
-				$m= "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".trim($datarow['desc_cuenta'])."\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".trim($datarow['glosa']);
-			}else{
-				$m= trim($datarow['desc_cuenta'])."\r\n".trim($datarow['glosa']);
-			}
-			$arr = explode('-', $datarow['fecha']);
-			$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];	
-			
-			$f = ($this->objParam->getParametro('fecIni'));
-			$g = ($this->objParam->getParametro('fecFin'));			
-			$f1 = date("d-m-Y", strtotime($f));	
-			$f2 = date("d-m-Y", strtotime($g));	
-			
-			$this->tablealigns=array('C','L','L','L','R','R');
-			$this->tablenumbers=array(0,0,0,0,2,2);
-			$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
-			$this->tabletextcolor=array();
-			if($debe==0 and $haber==0){
-			}
-			else{
-				if($f!=''){
-					if($g!=''){
-						$time1 = strtotime($f1);
-						$time2 = strtotime($f2);
-						$time3 = strtotime($newDate);
-						if ($time1 < $time3 AND $time2 > $time3){			
-							$RowArray = array(
-								's0'  => $i+1,
-								's1'  => $newDate,
-								's2' => $aux,
-								's3' => $m, 
-								's4' => $debe,
-								's5' => $haber
-							);			
-							$fill = !$fill;					
-							$this->total = $this->total -1;
-							$i++;	
-							$this-> MultiRow($RowArray,$fill,1);			
-							$this->revisarfinPagina($datarow);	
-						}
-					}else{
-						$time1 = strtotime($f1);
-						$time2 = strtotime($newDate);
-						if ($time1 < $time2){			
-							$RowArray = array(
-								's0'  => $i+1,
-								's1'  => $newDate,
-								's2' => $aux,
-								's3' => $m, 
-								's4' => $debe,
-								's5' => $haber
-							);			
-							$fill = !$fill;					
-							$this->total = $this->total -1;
-							$i++;	
-							$this-> MultiRow($RowArray,$fill,1);			
-							$this->revisarfinPagina($datarow);	
+				else{
+					if($f!=''){
+						if($g!=''){
+							$time1 = strtotime($f1);
+							$time2 = strtotime($f2);
+							$time3 = strtotime($newDate);
+							if ($time1 < $time3 AND $time2 > $time3){			
+								if($a==0){
+									$this->SetFont('','B',8);
+									$this->tablealigns=array('L','L','R','L','L','L');
+									$this->tablenumbers=array(0,0,0,0,0,0);
+									$this->tableborders=array('LTB','TB','TB','TB','TB','TBR');
+									$RowArray = array(
+										's0' => '',
+										's1' => '',
+										's2' => '-------------'.$newDate,
+										's3' => trim($datarow['nro_cbte']).'-------------',
+										's4' => '',
+										's5' => ''
+									);
+									$this-> MultiRow($RowArray,$fill,1);
+									
+									$this->SetTextColor(0);
+									$this->SetFont('','',6);
+									$this->tablealigns=array('C','L','L','L','R','R');
+									$this->tablenumbers=array(0,0,0,0,2,2);
+									$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
+									$this->tabletextcolor=array();							
+									$RowArray = array(
+										's0' => $i+1,
+										's1' => $newDate,
+										's2' => $aux,
+										's3' => trim($m),
+										's4' => $debe,
+										's5' => $haber
+									);	
+									$this-> MultiRow($RowArray,$fill,1);	
+								}else{
+									$RowArray = array(
+										's0' => $i+1,
+										's1' => $newDate,
+										's2' => $aux,	
+										's3' => trim($m), 
+										's4' => $debe,
+										's5' => $haber
+									);	
+									$this-> MultiRow($RowArray,$fill,1);
+								}
+								$fill = !$fill;					
+								$this->total = $this->total -1;							
+								$i++;					
+								$this->revisarfinPagina($datarow);	
+							}
 						}
 					}
-				}else{
-					if($g!=''){
-						$time1 = strtotime($f2);
-						$time2 = strtotime($newDate);
-						if ($time1 > $time2){				
-							$RowArray = array(
-								's0'  => $i+1,
-								's1'  => $newDate,
-								's2' => $aux,
-								's3' => $m, 
-								's4' => $debe,
-								's5' => $haber
-							);			
-							$fill = !$fill;					
-							$this->total = $this->total -1;
-							$i++;	
-							$this-> MultiRow($RowArray,$fill,1);			
-							$this->revisarfinPagina($datarow);	
-						}
-					}else{			
-						$RowArray = array(
-							's0'  => $i+1,
-							's1'  => $newDate,
-							's2' => $aux,
-							's3' => $m, 
-							's4' => $debe,
-							's5' => $haber
-						);			
-						$fill = !$fill;					
-						$this->total = $this->total -1;
-						$i++;	
-						$this-> MultiRow($RowArray,$fill,1);			
-						$this->revisarfinPagina($datarow);						
-					}
 				}
-			}									
-		}	
+				//	
+			}		
+			//
+					
+					
 		$this->cerrarCuadro();
 		$this->cerrarCuadroTotal();					
 		$this->tablewidths=$conf_par_tablewidths;
@@ -317,7 +308,7 @@ class RComprobanteDiario extends ReportePDF {
 		$startY = $this->GetY();
 		$this->getNumLines($row['cell1data'], 90);
 		$this->calcularMontos($a);			
-		if ($startY > 237) {			
+		if ($startY > 234) {			
 			$this->cerrarCuadro();
 			$this->cerrarCuadroTotal();		
 			if($this->total!= 0){
@@ -342,7 +333,7 @@ class RComprobanteDiario extends ReportePDF {
 				$this->s2 = $this->s2 + $val['importe_haber_mb'];			
 				break;		
 			default:			
-				break;
+				break;	
 		}		
 		
 		switch ($this->objParam->getParametro('tipo_moneda')) {
@@ -359,7 +350,7 @@ class RComprobanteDiario extends ReportePDF {
 				$this->t2 = $this->t2 + $val['importe_haber_mb'];			
 				break;		
 			default:			
-				break;
+				break;	
 		}	
 	}	
 	//revisarfinPagina pie
@@ -425,7 +416,7 @@ class RComprobanteDiario extends ReportePDF {
 		$this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 10,5,40,20);
 		$this->ln(5);
 		$this->SetFont('','B',12);		
-		$this->Cell(0,5,"LIBRO DIARIO",0,1,'C');					
+		$this->Cell(0,5,"LIBRO DIARIO 2",0,1,'C');					
 		$this->Ln(3);
 		
 		$height = 2;

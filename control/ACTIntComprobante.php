@@ -14,6 +14,7 @@ require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
 require_once(dirname(__FILE__).'/../reportes/RIntCbte.php');
 
 require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario.php');
+require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario_cuad.php');
 require_once(dirname(__FILE__).'/../reportes/RComprobanteDiarioXls.php');
 //
 class ACTIntComprobante extends ACTbase{
@@ -661,6 +662,27 @@ class ACTIntComprobante extends ACTbase{
 			$this->objParam->addParametro('titulo_archivo',$titulo);	
 			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 			$reporte = new RComprobanteDiario($this->objParam);  
+			$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
+		}
+		if($this->objParam->getParametro('tipo_formato')=='pdf_c') {
+			$nombreArchivo = uniqid(md5(session_id()).'LibroDiario').'.pdf';			
+			$dataSource = $this->listarRepIntComprobante();	
+			$dataEntidad = "";
+			$dataPeriodo = "";	
+			$orientacion = 'P';		
+			$tamano = 'LETTER';
+			$titulo = 'Consolidado';
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);	
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$reporte = new RComprobanteDiario_cuad($this->objParam);  
 			$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
 			$reporte->generarReporte();
 			$reporte->output($reporte->url_archivo,'F');

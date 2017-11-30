@@ -1378,8 +1378,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
    formTitulo: 'Registro de Documento Compra',
    abrirFormulario: function(tipo, record){
    	       var me = this;
-   	       console.log(' me.regitrarDetalle', me.regitrarDetalle)
-	       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVenta.php',
+   	       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVenta.php',
 	                                me.formTitulo,
 	                                {
 	                                    modal:true,

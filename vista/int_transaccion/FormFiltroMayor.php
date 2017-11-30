@@ -23,33 +23,40 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 	Atributos:[
 		{
 			config:{
-				name:'tipo_moneda',
-				fieldLabel:'Tipo de Moneda',
-				allowBlank:false,
-				emptyText:'Tipo...',
-				typeAhead: true,
-				triggerAction: 'all',
-				lazyRender:true,
-				mode: 'local',
-				valueField: 'tipo_moneda',
-				gwidth: 100,
-				store:new Ext.data.ArrayStore({
-					fields: ['variable', 'valor'],
-					data : [ 
-								['MB','Moneda Base'],
-								['MT','Moneda Triangulacion'],
-								['MA','Moneda Actualizacion'],
-							]
-				}),
-				valueField: 'variable',
-				displayField: 'valor'
+				name: 'nro_comprobante',
+				fieldLabel: 'Nro de Comprobante',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 50,				
 			},
-			type:'ComboBox',
-			form:true
+			type:'Checkbox',			
+			form:true	
 		},{
 			config:{
-				name: 'cc',
-				fieldLabel: 'Centro Costo',
+				name: 'nro_tramite',
+				fieldLabel: 'Nro de Tramite',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 50,
+				checked:true		
+			},
+			type:'Checkbox',
+			form:true,		
+		},{
+			config:{
+				name: 'cuenta',
+				fieldLabel: 'Cuenta contable',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 50,
+				checked:true		
+			},
+			type:'Checkbox',
+			form:true,		
+		},{
+			config:{
+				name: 'partida',
+				fieldLabel: 'Partida',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,				
@@ -58,8 +65,8 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 			form:true	
 		},{
 			config:{
-				name: 'partida',
-				fieldLabel: 'Partida',
+				name: 'cc',
+				fieldLabel: 'Centro Costo',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,				
@@ -86,17 +93,6 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 			},
 			type:'Checkbox',			
 			form:true	
-		},
-		{
-			config:{
-				name: 'nro_comprobante',
-				fieldLabel: 'Nro de Comprobante',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 50,				
-			},
-			type:'Checkbox',			
-			form:true	
 		},{
 			config:{
 				name: 'relacional',
@@ -109,44 +105,52 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 			form:true	
 		},{
 			config:{
-				name: 'nro_tramite',
-				fieldLabel: 'Nro de Tramite',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 50,
-				checked:true		
-			},
-			type:'Checkbox',
-			form:true,		
-		},{
-			config:{
 				name: 'fec',
 				fieldLabel: 'Fecha',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,
-				checked:true		
+				checked:true,
+				hidden:true		
 			},
 			type:'Checkbox',
 			form:true,		
 		},{
 			config:{
-				name: 'cuenta',
-				fieldLabel: 'Cuenta contable',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 50,
-				checked:true		
+				name:'tipo_moneda',
+				fieldLabel:'Tipo de Moneda',
+				allowBlank:false,
+				emptyText:'Tipo de moneda...',
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender:true,
+				mode: 'local',
+				valueField: 'tipo_moneda',
+				gwidth: 100,
+				store:new Ext.data.ArrayStore({
+					fields: ['variable', 'valor'],
+					data : [ 
+								['MB','Moneda Base'],
+								['MT','Moneda Triangulacion'],
+								['MA','Moneda Actualizacion']
+							]
+				}),
+				valueField: 'variable',
+				displayField: 'valor',
+				listeners: {
+					'afterrender': function(combo){			  
+						combo.setValue('MB');
+					}
+				}
 			},
-			type:'Checkbox',
-			form:true,		
-		},
-		{
+			type:'ComboBox',
+			form:true
+		},{
 			config:{
 				name:'tipo_formato',
 				fieldLabel:'Tipo de Reporte',
 				allowBlank:false,
-				emptyText:'Tipo...',
+				emptyText:'Tipo de reporte...',
 				typeAhead: true,
 				triggerAction: 'all',
 				lazyRender:true,
@@ -157,11 +161,16 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 					fields: ['variable', 'valor'],
 					data : [ 
 								['pdf','PDF'],
-								['xls',' EXCEL']
+								['xls','EXCEL']
 							]
 				}),
 				valueField: 'variable',
-				displayField: 'valor'
+				displayField: 'valor',
+				listeners: {
+					'afterrender': function(combo){			  
+						combo.setValue('pdf');
+					}
+				}
 			},
 			type:'ComboBox',
 			form:true
@@ -190,7 +199,7 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 			tipo_formato:this.Cmp.tipo_formato.getValue(),
 			
 			fec:this.Cmp.fec.getValue(),
-			cuenta:this.Cmp.cuenta.getValue()
+			cuenta_t:this.Cmp.cuenta.getValue()
 		}
 		return resp;
 	}

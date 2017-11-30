@@ -2023,6 +2023,8 @@ header("content-type: text/javascript; charset=UTF-8");
             if(this.data.datosOriginales){
                 this.loadForm(this.data.datosOriginales);
             }
+            
+            console.log('datosOriginales', this.data.datosOriginales)
 
 
             this.esconderImportes();
