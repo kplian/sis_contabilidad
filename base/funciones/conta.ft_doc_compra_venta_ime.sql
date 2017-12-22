@@ -47,10 +47,11 @@ DECLARE
   v_id_int_comprobante		integer;
   v_tipo_informe			varchar;
   v_razon_social			varchar;
-  v_nit						integer;
+  v_nit						varchar;
   v_id_moneda				integer;
   v_nomeda					varchar;
   v_nro_tramite				varchar;
+  v_reg_periodo				record;
 
 
 BEGIN
@@ -1206,26 +1207,47 @@ BEGIN
   elsif(p_transaccion='CONTA_RAZONXNIT_GET')then
 
     begin
-    --raise EXCEPTION 'esta llegando  %',v_parametros.nit;
-    select
-        DISTINCT(dcv.nit)::bigint,
-        dcv.razon_social,
-        m.id_moneda,
-        m.moneda
-        into
-        v_nit,
-        v_razon_social,
-        v_id_moneda,
-        v_nomeda
-        from conta.tdoc_compra_venta dcv
-        inner join param.tmoneda m on m.id_moneda = dcv.id_moneda
-		where dcv.nit != '' and dcv.nit like ''||COALESCE(v_parametros.nit,'-')||'%';
-      --Definicion de la respuesta
-      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transaccion Exitosa');
-      v_resp = pxp.f_agrega_clave(v_resp,'razon_social',v_razon_social::varchar);
-      v_resp = pxp.f_agrega_clave(v_resp,'id_nomeda',v_id_moneda::varchar);
-      v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_nomeda::varchar);
-      --Devuelve la respuesta
+    
+        --obtener gestion en funcion de la fecha
+        
+        select 
+           per.id_gestion,
+           per.id_periodo,
+           per.periodo
+         into
+           v_reg_periodo
+        from  param.tperiodo per
+        where  v_parametros.fecha BETWEEN per.fecha_ini and per.fecha_fin
+               and per.estado_reg = 'activo';
+           
+        IF v_reg_periodo is null THEN
+           raise exception  'No se encontro periodo para la fecha %',v_parametros.fecha; 
+        END IF;    
+            
+        
+        --raise EXCEPTION 'esta llegando  %',v_parametros.nit;
+        select
+            DISTINCT(dcv.nit),
+            dcv.razon_social,
+            m.id_moneda,
+            m.moneda
+            into
+            v_nit,
+            v_razon_social,
+            v_id_moneda,
+            v_nomeda
+            from conta.tdoc_compra_venta dcv
+            inner join param.tmoneda m on m.id_moneda = dcv.id_moneda
+            where dcv.nit != '' and dcv.nit like ''||COALESCE(v_parametros.nit,'-')||'%';
+          --Definicion de la respuesta
+          v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transaccion Exitosa');
+          v_resp = pxp.f_agrega_clave(v_resp,'razon_social',v_razon_social::varchar);
+          v_resp = pxp.f_agrega_clave(v_resp,'id_nomeda',v_id_moneda::varchar);
+          v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_nomeda::varchar);
+          v_resp = pxp.f_agrega_clave(v_resp,'id_gestion',v_reg_periodo.id_gestion::varchar);
+          v_resp = pxp.f_agrega_clave(v_resp,'id_periodo',v_reg_periodo.id_periodo::varchar);
+          v_resp = pxp.f_agrega_clave(v_resp,'periodo',v_reg_periodo.periodo::varchar);
+          --Devuelve la respuesta
       return v_resp;
 
     end;

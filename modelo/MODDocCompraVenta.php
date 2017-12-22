@@ -358,6 +358,7 @@ class MODDocCompraVenta extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('nit','nit','varchar');
+		$this->setParametro('fecha','fecha','date');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

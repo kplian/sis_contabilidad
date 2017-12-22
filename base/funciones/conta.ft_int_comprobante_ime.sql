@@ -442,7 +442,7 @@ BEGIN
              v_reg_cbte
             from conta.tint_comprobante ic where ic.id_int_comprobante = v_parametros.id_int_comprobante;
             
-            IF v_reg_cbte.estado_reg != 'borrador' THEN
+            IF v_reg_cbte.estado_reg not in ( 'borrador','vbcbte') THEN
                raise exception 'solo puede editar comprobantes en borrador';
             END IF;
             

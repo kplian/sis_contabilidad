@@ -350,11 +350,6 @@ class RTransaccionmayor extends ReportePDF {
 					't5' => $this->t3
 				);
 		$this-> MultiRow($RowArray,false,1);
-		$this->t1 = 0;
-		$this->t2 = 0;
-		$this->t3 = 0;
-		$this->t4 = 0;
-		$this->t5 = 0;
 	}
 	
 	function cab() {

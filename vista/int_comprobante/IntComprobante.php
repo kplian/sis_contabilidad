@@ -1771,7 +1771,80 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				scope:this
 			}
 		)
-	},	
+	} ,
+	
+	getConfigCambiaria : function(sw_valores) {
+
+			var localidad = 'nacional';
+			
+			if (this.swButton == 'EDIT') {
+				var rec = this.sm.getSelected();
+				localidad = rec.data.localidad;
+				
+			}
+
+			//Verifica que la fecha y la moneda hayan sido elegidos
+			if (this.Cmp.fecha.getValue() && this.Cmp.id_moneda.getValue() && this.Cmp.forma_cambio.getValue()) {
+				Phx.CP.loadingShow();
+				var forma_cambio = this.Cmp.forma_cambio.getValue();
+				if(forma_cambio=='convenido'){
+					this.Cmp.tipo_cambio.setReadOnly(false);
+					this.Cmp.tipo_cambio_2.setReadOnly(false);
+				}
+				else{
+					this.Cmp.tipo_cambio.setReadOnly(true);
+					this.Cmp.tipo_cambio_2.setReadOnly(true);
+				}
+				this.Cmp.tipo_cambio_3.setReadOnly(true);
+				
+				
+				Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/ConfigCambiaria/getConfigCambiaria',
+				params:{
+					fecha: this.Cmp.fecha.getValue(),
+					id_moneda: this.Cmp.id_moneda.getValue(),
+					localidad: localidad,
+					sw_valores: sw_valores,
+					forma_cambio: forma_cambio
+				}, success: function(resp) {
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					if (reg.ROOT.error) {
+						this.Cmp.tipo_cambio.reset();
+						this.Cmp.tipo_cambio_2.reset();
+						this.Cmp.tipo_cambio_3.reset();
+						Ext.Msg.alert('Error', 'Validación no realizada: ' + reg.ROOT.error)
+					} else {
+						
+						//cambia labels
+						
+						this.Cmp.tipo_cambio.label.update(reg.ROOT.datos.v_tc1 +' (tc)');
+						this.Cmp.tipo_cambio_2.label.update(reg.ROOT.datos.v_tc2 +' (tc)');
+						this.Cmp.tipo_cambio_3.label.update(reg.ROOT.datos.v_tc3 +' (tc)');
+						if (sw_valores == 'si'){
+						    //poner valores por defecto
+						 	this.Cmp.tipo_cambio.setValue(reg.ROOT.datos.v_valor_tc1);
+						    this.Cmp.tipo_cambio_2.setValue(reg.ROOT.datos.v_valor_tc2);
+						    this.Cmp.tipo_cambio_3.setValue(reg.ROOT.datos.v_valor_tc3);
+						}
+						
+					   
+					   this.Cmp.id_config_cambiaria.setValue(reg.ROOT.datos.id_config_cambiaria);
+					}
+					
+
+				}, failure: function(a,b,c,d){
+					this.Cmp.tipo_cambio.reset();
+					this.Cmp.tipo_cambio_2.reset();
+					this.Cmp.tipo_cambio_3.reset();
+					this.conexionFailure(a,b,c,d)
+				},
+				timeout: this.timeout,
+				scope:this
+				});
+			}
+
+		},	
 	//
 	addLibroDiario : function (wizard,resp){		
 		var dpto=this.cmbDepto.getRawValue();
@@ -1809,7 +1882,58 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			timeout:this.timeout,
 			scope:this
 		});
-    }
+   },
+    
+    igualarCbte: function() {
+			   
+			    var rec = this.sm.getSelected().data;
+			    Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/IntComprobante/igualarComprobante',
+					params : {
+						id_int_comprobante : rec.id_int_comprobante
+					},
+					success : function(resp) {
+						Phx.CP.loadingHide();
+						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+						if (reg.ROOT.error) {
+							Ext.Msg.alert('Error', 'No se pudo igualar el cbte: ' + reg.ROOT.error)
+						} else {
+							this.reload();
+						}
+					},
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			
+
+		},
+		
+		
+	    swEditable: function() {
+			   
+			    var rec = this.sm.getSelected().data;
+			    Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/IntComprobante/swEditable',
+					params : {
+						id_int_comprobante : rec.id_int_comprobante
+					},
+					success : function(resp) {
+						Phx.CP.loadingHide();
+						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+						if (reg.ROOT.error) {
+							Ext.Msg.alert('Error', 'Al  cambiar el modo de edición: ' + reg.ROOT.error)
+						} else {
+							this.reload();
+						}
+					},
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+	  }
 })
 </script>
 

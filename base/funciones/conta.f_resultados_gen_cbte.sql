@@ -378,7 +378,8 @@ BEGIN
               id_proceso_wf,
               id_estado_wf,
               id_int_comprobante_fks,
-              id_tipo_relacion_comprobante
+              id_tipo_relacion_comprobante,
+              manual
           	) 
             values(
               v_registros_plantilla.id_clase_comprobante,			
@@ -399,7 +400,8 @@ BEGIN
               v_id_proceso_wf,
               v_id_estado_wf,
               v_id_int_comprobante_fk,
-              v_id_tipo_relacion_comprobante
+              v_id_tipo_relacion_comprobante,
+              'si'
 		   )RETURNING id_int_comprobante into v_id_int_comprobante;
             
             

@@ -126,7 +126,8 @@ BEGIN
                         'campo_depto_libro',
                         'campo_fecha_costo_ini',
                         'campo_fecha_costo_fin',
-                        'campo_cbte_relacionado'];
+                        'campo_cbte_relacionado',
+                        'clase_comprobante'];   --19/12/2017  adciona clase de comprobante
     
     v_tamano:=array_upper(v_def_campos,1);
     
@@ -325,8 +326,13 @@ BEGIN
                                                                   hstore(v_tabla))::Varchar;
 	end if;
     
-    
-
+    --RAC 19/12/2017:  la case del comprobante,    tiene que salir de al configuracion de tabla 
+     if ( v_plantilla.clase_comprobante != ''  AND  v_plantilla.clase_comprobante is not null ) then
+          v_this.columna_clase_comprobante = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.clase_comprobante::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla))::Varchar;
+     end if;
     v_resp:=v_this;
     
     -- RAC 23/23/2016 
@@ -363,15 +369,14 @@ BEGIN
          where sub.estado_reg = 'activo' 
             and sub.codigo =  v_this.columna_subsistema;
             
-          IF v_id_subsistema is null THEN
-          
-               raise exception 'No existe un subsistema con el codigo %',v_this.columna_subsistema;   
-          
-          END IF;  
-    
-    --  obtener id clase comprobante
-    
+         IF v_id_subsistema is null THEN          
+               raise exception 'No existe un subsistema con el codigo %',v_this.columna_subsistema;
+         END IF; 
   
+         IF v_this.columna_clase_comprobante is null  OR v_this.columna_clase_comprobante ='' THEN
+            raise exception 'No fue definida una codigo apra la clase de cbte';
+         END IF;
+       
     
          Select  
            cl.id_clase_comprobante ,
@@ -381,15 +386,11 @@ BEGIN
            v_clcbt_desc
          from  conta.tclase_comprobante cl 
          where cl.estado_reg = 'activo' 
-            and cl.codigo =  v_plantilla.clase_comprobante::varchar;
+            and cl.codigo =  v_this.columna_clase_comprobante::varchar;-- v_plantilla.clase_comprobante::varchar;
             
-          IF v_id_clase_comprobante is null THEN
-          
-               raise exception 'No existe un comprobante de la clase codigo : %',v_plantilla.clase_comprobante;   
-          
-          END IF;
-    
-    
+         IF v_id_clase_comprobante is null THEN
+          raise exception 'No existe un comprobante de la clase codigo : %',v_this.columna_clase_comprobante;   
+         END IF;
     
     
     --calcular el tipo de cambio segun fecha y moneda del comprobante

@@ -285,14 +285,160 @@ class RComprobanteDiario_cuad extends ReportePDF {
 								$i++;					
 								$this->revisarfinPagina($datarow);	
 							}
+						}else{
+							$time1 = strtotime($f1);
+							$time2 = strtotime($newDate);
+							if ($time1 < $time2){			
+								if($a==0){
+									$this->SetFont('','B',8);
+									$this->tablealigns=array('L','L','R','L','L','L');
+									$this->tablenumbers=array(0,0,0,0,0,0);
+									$this->tableborders=array('LTB','TB','TB','TB','TB','TBR');
+									$RowArray = array(
+										's0' => '',
+										's1' => '',
+										's2' => '-------------'.$newDate,
+										's3' => trim($datarow['nro_cbte']).'-------------',
+										's4' => '',
+										's5' => ''
+									);
+									$this-> MultiRow($RowArray,$fill,1);
+									
+									$this->SetTextColor(0);
+									$this->SetFont('','',6);
+									$this->tablealigns=array('C','L','L','L','R','R');
+									$this->tablenumbers=array(0,0,0,0,2,2);
+									$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
+									$this->tabletextcolor=array();							
+									$RowArray = array(
+										's0' => $i+1,
+										's1' => $newDate,
+										's2' => $aux,
+										's3' => trim($m),
+										's4' => $debe,
+										's5' => $haber
+									);	
+									$this-> MultiRow($RowArray,$fill,1);	
+								}else{
+									$RowArray = array(
+										's0' => $i+1,
+										's1' => $newDate,
+										's2' => $aux,	
+										's3' => trim($m), 
+										's4' => $debe,
+										's5' => $haber
+									);	
+									$this-> MultiRow($RowArray,$fill,1);
+								}
+								$fill = !$fill;					
+								$this->total = $this->total -1;							
+								$i++;					
+								$this->revisarfinPagina($datarow);	
+							}
 						}
-					}
+					}else{
+						if($g!=''){
+							$time1 = strtotime($f2);
+							$time2 = strtotime($newDate);
+							if ($time1 > $time2){				
+								if($a==0){
+									$this->SetFont('','B',8);
+									$this->tablealigns=array('L','L','R','L','L','L');
+									$this->tablenumbers=array(0,0,0,0,0,0);
+									$this->tableborders=array('LTB','TB','TB','TB','TB','TBR');
+									$RowArray = array(
+										's0' => '',
+										's1' => '',
+										's2' => '-------------'.$newDate,
+										's3' => trim($datarow['nro_cbte']).'-------------',
+										's4' => '',
+										's5' => ''
+									);
+									$this-> MultiRow($RowArray,$fill,1);
+									
+									$this->SetTextColor(0);
+									$this->SetFont('','',6);
+									$this->tablealigns=array('C','L','L','L','R','R');
+									$this->tablenumbers=array(0,0,0,0,2,2);
+									$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
+									$this->tabletextcolor=array();							
+									$RowArray = array(
+										's0' => $i+1,
+										's1' => $newDate,
+										's2' => $aux,
+										's3' => trim($m),
+										's4' => $debe,
+										's5' => $haber
+									);	
+									$this-> MultiRow($RowArray,$fill,1);	
+								}else{
+									$RowArray = array(
+										's0' => $i+1,
+										's1' => $newDate,
+										's2' => $aux,	
+										's3' => trim($m), 
+										's4' => $debe,
+										's5' => $haber
+									);	
+									$this-> MultiRow($RowArray,$fill,1);
+								}
+								$fill = !$fill;					
+								$this->total = $this->total -1;							
+								$i++;					
+								$this->revisarfinPagina($datarow);		
+							}
+						}else{			
+							if($a==0){
+								$this->SetFont('','B',8);
+								$this->tablealigns=array('L','L','R','L','L','L');
+								$this->tablenumbers=array(0,0,0,0,0,0);
+								$this->tableborders=array('LTB','TB','TB','TB','TB','TBR');
+								$RowArray = array(
+									's0' => '',
+									's1' => '',
+									's2' => '-------------'.$newDate,
+									's3' => trim($datarow['nro_cbte']).'-------------',
+									's4' => '',
+									's5' => ''
+								);
+								$this-> MultiRow($RowArray,$fill,1);
+								
+								$this->SetTextColor(0);
+								$this->SetFont('','',6);
+								$this->tablealigns=array('C','L','L','L','R','R');
+								$this->tablenumbers=array(0,0,0,0,2,2);
+								$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
+								$this->tabletextcolor=array();							
+								$RowArray = array(
+									's0' => $i+1,
+									's1' => $newDate,
+									's2' => $aux,
+									's3' => trim($m),
+									's4' => $debe,
+									's5' => $haber
+								);	
+								$this-> MultiRow($RowArray,$fill,1);	
+							}else{
+								$RowArray = array(
+									's0' => $i+1,
+									's1' => $newDate,
+									's2' => $aux,	
+									's3' => trim($m), 
+									's4' => $debe,
+									's5' => $haber
+								);	
+								$this-> MultiRow($RowArray,$fill,1);
+							}
+							$fill = !$fill;					
+							$this->total = $this->total -1;							
+							$i++;					
+							$this->revisarfinPagina($datarow);							
+						}
+					}	
 				}
 				//	
 			}		
-			//
-					
-					
+		//								
 		$this->cerrarCuadro();
 		$this->cerrarCuadroTotal();					
 		$this->tablewidths=$conf_par_tablewidths;
