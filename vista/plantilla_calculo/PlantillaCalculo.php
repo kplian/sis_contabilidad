@@ -240,6 +240,59 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
+                name: 'usar_cc_original',
+                fieldLabel: 'Usar CC Original',
+                qtip: 'permite configurar si usar el centro de costo original , en caso contrario permite usar el adminsitrativo',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{   pfiltro:'usar_cc_original',
+                        type: 'list',
+                         options: ['si','no']  
+                    },
+            valorInicial: 'no',        
+            grid:true,
+            egrid: true,
+            form:true
+       },
+       {
+            config:{
+                name: 'imputar_excento',
+                fieldLabel: 'Imputar Excento',
+                qtip: 'si es prioridad 1 no se suma el excento, si es prioriad 2 e monto es el excento',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{   pfiltro:'imputar_excento',
+                        type: 'list',
+                         options: ['si','no']  
+                    },
+            valorInicial: 'no',        
+            grid:true,
+            egrid: true,
+            form:true
+       },
+        
+        
+        
+        {
+            config:{
                 name: 'estado_reg',
                 fieldLabel: 'Estado Reg.',
                 allowBlank: true,
@@ -339,7 +392,8 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         {name:'usr_reg', type: 'string'},
         {name:'usr_mod', type: 'string'},
         {name:'importe_presupuesto', type: 'numeric'},
-        {name:'descuento', type: 'string'}
+        {name:'descuento', type: 'string'},        
+        'usar_cc_original', 'imputar_excento'
         
     ],
     sortInfo:{

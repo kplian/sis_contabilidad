@@ -35,9 +35,31 @@ Phx.vista.DocVenta= {
         Phx.vista.DocVenta.superclass.capturaFiltros.call(this,combo, record, index);
     },
     
-	
-   
-	
+    obtenerVariableGlobal: function(){
+		//Verifica que la fecha y la moneda hayan sido elegidos
+		Phx.CP.loadingShow();
+		Ext.Ajax.request({
+				url:'../../sis_seguridad/control/Subsistema/obtenerVariableGlobal',
+				params:{
+					codigo: 'conta_libro_ventas_detallado'  
+				},
+				success: function(resp){
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error','Error a recuperar la variable global')
+					} else {
+						if(reg.ROOT.datos.valor == 'no'){
+							this.regitrarDetalle = 'no';
+						}
+					}
+				},
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope:this
+			});
+	}
 	
 };
 </script>

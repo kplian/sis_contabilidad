@@ -1330,10 +1330,10 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			}),		
 			
 		south : {
-			url : '../../../sis_contabilidad/vista/int_transaccion/IntTransaccion.php',
+			url : '../../../sis_contabilidad/vista/int_transaccion/IntTransaccionAux.php',
 			title : 'Transacciones',
 			height : '50%', //altura de la ventana hijo
-			cls : 'IntTransaccion'
+			cls : 'IntTransaccionAux'
 		},
 		
 

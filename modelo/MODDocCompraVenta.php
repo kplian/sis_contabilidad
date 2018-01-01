@@ -35,6 +35,8 @@ class MODDocCompraVenta extends MODbase{
 		$this->capturaCount('total_importe_aux_neto','numeric');
 		
 		
+		$this->setParametro('nombre_vista','nombre_vista','varchar');
+		
 		
 				
 		//Definicion de la lista del resultado del query
@@ -93,6 +95,9 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('id_tipo_doc_compra_venta','integer');
 		$this->captura('desc_tipo_doc_compra_venta','varchar');		
 		$this->captura('importe_aux_neto','numeric');
+		$this->captura('id_funcionario','integer');		
+		$this->captura('desc_funcionario2','varchar');
+		
 
 		
 

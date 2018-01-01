@@ -4483,5 +4483,33 @@ IS 'identifica el nro de tramite donde fue generada la factura';
 /***********************************F-SCP-RAC-CONTA-1-13/09/2017****************************************/
  
 
+/***********************************I-SCP-RAC-CONTA-1-05/01/2018****************************************/
+  
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN sw_pgs VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+--------------- SQL ---------------
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.sw_pgs
+IS 'indetifica si es una factura registrada por pago simple valores, no,  reg, proc';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_funcionario INTEGER; 
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_funcionario
+IS 'registor auxiliar de apsajes, util para compra de boletos aereos donde es necesario indicar quien esta viajando';
+
+
+
+/***********************************F-SCP-RAC-CONTA-1-05/01/2018****************************************/
+  
+
+
 
 

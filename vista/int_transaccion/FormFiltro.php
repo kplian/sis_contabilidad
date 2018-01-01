@@ -303,7 +303,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
             id_grupo: 0,
             form: true
         },
-         {
+        {
             config:{
                     name:'id_suborden',
                     fieldLabel: 'Suborden',

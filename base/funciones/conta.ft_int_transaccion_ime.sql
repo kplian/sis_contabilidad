@@ -236,7 +236,7 @@ BEGIN
 			        	inner join conta.tint_comprobante cbte
 			        	on cbte.id_int_comprobante = tra.id_int_comprobante
 			        	where tra.id_int_transaccion = v_parametros.id_int_transaccion
-        				and cbte.estado_reg = 'borrador'  and cbte.sw_editable = 'si') then
+        				and cbte.estado_reg in ('borrador', 'vbcbte')  and cbte.sw_editable = 'si') then
         		raise exception 'Modificación no realizada: el comprobante no está en estado Borrador o no es editable';
         	end if;
             

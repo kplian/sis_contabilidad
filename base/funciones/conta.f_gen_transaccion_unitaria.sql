@@ -17,6 +17,17 @@ Fecha 27/08/2013
 Descripcion:    
    Esta funcion evalua un detalle de trasaccion especifico e inserta 
    las trasacciones generadas en int_trasaccion
+   
+
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		27/08/2013       Rensi Arteaga Copari      Esta funcion evalua un detalle de trasaccion especifico e inserta 
+                                                           las trasacciones generadas en int_trasaccion
+ 
+ #0        		17/11/2017        Rensi Arteaga Copari      
+   
 
 
 

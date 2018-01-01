@@ -55,6 +55,8 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
         }
 		
+		
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODDocCompraVenta','listarDocCompraVenta');
@@ -63,6 +65,8 @@ class ACTDocCompraVenta extends ACTbase{
 			$this->res=$this->objFunc->listarDocCompraVenta($this->objParam);
 		}
 		
+		
+	
 		$temp = Array();
 			$temp['importe_ice'] = $this->res->extraData['total_importe_ice'];
 			$temp['importe_excento'] = $this->res->extraData['total_importe_excento'];

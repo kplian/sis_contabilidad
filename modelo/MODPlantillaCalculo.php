@@ -36,7 +36,11 @@ class MODPlantillaCalculo extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('importe_presupuesto','numeric');
-		$this->captura('descuento','varchar');
+		$this->captura('descuento','varchar');		
+		$this->captura('usar_cc_original','varchar');
+		$this->captura('imputar_excento','varchar');
+		
+
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -62,8 +66,11 @@ class MODPlantillaCalculo extends MODbase{
 		$this->setParametro('descripcion','descripcion','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('importe_presupuesto','importe_presupuesto','numeric');
-		$this->setParametro('descuento','descuento','varchar');
-
+		$this->setParametro('descuento','descuento','varchar');		
+		$this->setParametro('usar_cc_original','usar_cc_original','varchar');		
+		$this->setParametro('imputar_excento','imputar_excento','varchar');
+		
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -90,6 +97,10 @@ class MODPlantillaCalculo extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('importe_presupuesto','importe_presupuesto','numeric');
 		$this->setParametro('descuento','descuento','varchar');
+		
+		$this->setParametro('usar_cc_original','usar_cc_original','varchar');		
+		$this->setParametro('imputar_excento','imputar_excento','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -222,6 +233,9 @@ class MODPlantillaCalculo extends MODbase{
 			$this->captura('importe_presupuesto','numeric');
 			$this->captura('descuento','varchar');	
 			$this->captura('desc_plantilla','varchar');
+			$this->captura('usar_cc_original','varchar');
+		    $this->captura('imputar_excento','varchar');
+		
 			
 			$this->armarConsulta();
 			$consulta=$this->getConsulta();			

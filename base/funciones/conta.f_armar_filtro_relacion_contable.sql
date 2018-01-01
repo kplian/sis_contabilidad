@@ -44,8 +44,6 @@ BEGIN
 
   	  v_nombre_funcion = 'conta.f_armar_filtro_relacion_contable';
       
-     
-      
        if p_tiene_centro_costo = 'no' then
           
               if p_tiene_aplicacion = 'si' and p_sw_ca  then

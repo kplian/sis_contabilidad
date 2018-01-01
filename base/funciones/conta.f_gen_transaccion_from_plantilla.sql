@@ -210,7 +210,10 @@ BEGIN
                                      FROM conta.f_get_config_relacion_contable('CCDEPCON', -- relacion contable que almacena los centros de costo por departamento
                                                                          (p_super->'columna_gestion')::integer,  
                                                                          (p_super->'columna_depto')::integer,--p_id_depto_conta 
-                                                                         NULL);  --id_dento_costo
+                                                                         NULL, --centrode costo
+                                                                         NULL, -- mensaje de error
+                                                                         (p_super->'columna_moneda')::integer);  --id_moneda
+                                  
                                                                              
                                      v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
                                 
@@ -226,7 +229,9 @@ BEGIN
                                      FROM conta.f_get_config_relacion_contable((p_reg_det_plantilla->'tipo_relacion_contable_cc')::varchar, -- relacion contable que almacena los centros de costo por departamento
                                                                          (p_super->'columna_gestion')::integer,  
                                                                          (v_this_hstore->'campo_relacion_contable_cc')::integer, 
-                                                                         NULL);  --id_dento_costo
+                                                                         NULL, --centrode costo
+                                                                         NULL, -- mensaje de error
+                                                                         (p_super->'columna_moneda')::integer);  --id_moneda
                                                                              
                                      v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
                                 
@@ -255,7 +260,9 @@ BEGIN
                                  FROM conta.f_get_config_relacion_contable((p_reg_det_plantilla->'tipo_relacion_contable')::varchar, 
                                                                           (p_super->'columna_gestion')::integer, 
                                                                           (v_this_hstore->'campo_relacion_contable')::integer, 
-                                                                          (v_this_hstore->'campo_centro_costo')::integer);
+                                                                          (v_this_hstore->'campo_centro_costo')::integer,
+                                                                           NULL, -- mensaje de error
+                                                                           (p_super->'columna_moneda')::integer);  --id_moneda
                                                                               
                                 -- utiliza la relacion contable solo si no remplaza los valores de los campos del detalle de plantilla 
                                 
@@ -338,7 +345,7 @@ BEGIN
                       v_record_int_tran.nombre_cheque_trans = (v_this_hstore->'campo_nombre_cheque_trans')::varchar;
                       v_record_int_tran.forma_pago = (v_this_hstore->'campo_forma_pago')::varchar;
                       
-                     raise notice '>>>>>>>>>>>>>>>>>>   glosa %',(v_this_hstore->'campo_concepto_transaccion');
+                    -- raise notice '>>>>>>>>>>>>>>>>>>   glosa %',(v_this_hstore->'campo_concepto_transaccion');
                       
                       /****************************************************************
                       --Proceso el monto y lo ubica en el debe o haber, gasto o recurso
@@ -611,7 +618,7 @@ BEGIN
                                         
                                         END IF;
                                         
-                                        raise notice  ' >>> actualiza transaccion .. %,%',(p_reg_det_plantilla->'func_act_transaccion'),(v_this_hstore->'campo_id_tabla_detalle');
+                                        --raise notice  ' >>> actualiza transaccion .. %,%',(p_reg_det_plantilla->'func_act_transaccion'),(v_this_hstore->'campo_id_tabla_detalle');
                                
                                         
                                         EXECUTE ( 'select ' || (p_reg_det_plantilla->'func_act_transaccion')  ||'('||v_resp_doc[1]::varchar||' ,'||(v_this_hstore->'campo_id_tabla_detalle') ||' )');

@@ -788,10 +788,10 @@ BEGIN
           from conta.tint_comprobante set            
           where id_int_comprobante = v_parametros.id_int_comprobante;  
           
-          
-          IF  v_reg_cbte.estado_reg != 'borrador'  THEN
+          IF  v_reg_cbte.estado_reg not in ('borrador', 'vbcbte')  THEN
              raise exception 'El cbte debe estar en borrador para habilitar la edición';
           END IF;
+          
           
           IF  v_reg_cbte.sw_editable = 'si'  THEN
              raise exception 'La edición ya se encuentra habilitada ....';

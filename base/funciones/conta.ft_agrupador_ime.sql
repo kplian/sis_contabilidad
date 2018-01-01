@@ -104,7 +104,7 @@ BEGIN
                    from conta.tdoc_compra_venta dcv 
                    where     dcv.id_depto_conta = v_parametros.id_depto_conta
                         and  dcv.tipo = v_parametros.tipo
-                        and  (dcv.fecha BETWEEN v_parametros.fecha_ini and v_parametros.fecha_fin)
+                        and  (dcv.fecha::Date BETWEEN v_parametros.fecha_ini::Date and v_parametros.fecha_fin::Date)
                         and dcv.id_moneda = v_parametros.id_moneda
                         and dcv.manual = 'si'   --solo documentos registrdos manaulmente
                         and dcv.id_int_comprobante is NULL  --solo documentos que no esten en ningun comprobante
@@ -115,6 +115,8 @@ BEGIN
                                  (v_parametros.incluir_rev = 'no' and dcv.revisado in('si','no'))
                               )
                         ) LOOP
+                        
+                   
             
                    --insertamos documento al grupo
                    INSERT INTO 
@@ -145,7 +147,6 @@ BEGIN
             return v_resp;
 
 		end;
-    
     
     
     else

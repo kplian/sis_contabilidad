@@ -1374,3 +1374,16 @@ VALUES (E'conta_filtrar_cuenta_por_tipo_cc_interface_junior', E'no', E'esta vari
 select pxp.f_insert_tgui ('Reporte Retencion', 'Reporte Retencion', 'REPRET', 'si', 13, 'sis_contabilidad/reportes/formularios/LibroComprasVentasRetenciones.php', 3, '', 'ReporteRetenciones', 'CONTA');
 /***********************************F-DAT-MANU-CONTA-0-25/09/2017*****************************************/                          
 
+
+
+/***********************************I-DAT-RAC-CONTA-0-22/12/2017*****************************************/ 
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_libro_ventas_detallado', E'si', E'Si la interface de libro de ventas permite el registro del detalle de la factura');
+
+/***********************************F-DAT-RAC-CONTA-0-22/12/2017*****************************************/ 
+
+
+
+

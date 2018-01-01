@@ -137,7 +137,7 @@ BEGIN
     
 
      IF p_id_centro_costo is NULL  and v_registros.tiene_centro_costo != 'si-unico' and  v_registros.tiene_centro_costo != 'no'THEN                
-         raise exception 'El tipooo de relacion relacion contable indica que necesita  centro de costo: % (%)',v_registros.nombre_tipo_relacion,p_codigo;              
+         raise exception 'El tipo de relacion contable indica que necesita  centro de costo: % (%)',v_registros.nombre_tipo_relacion,p_codigo;              
      END IF;
     
    
@@ -145,12 +145,14 @@ BEGIN
    --  preguntamos si el tipo de relacion necesita o no necesita tabla de configuracion
    --  RELACIONES CONTABLES GENERALES
    ----------------------------------------------------------------------------------------
+   
+  
 
   
    IF  v_registros.id_tabla_relacion_contable is NULL THEN
        
        --  si no necesita, obtiene el valor para la gestion indica 
-                 
+       
                IF v_registros.tiene_aplicacion = 'si' THEN
                   raise exception 'la relaciones contables generales no aceptan aplicacion (%)',p_codigo;
                END IF;
@@ -183,6 +185,8 @@ BEGIN
                             LIMIT 1  OFFSET 0;
                       
                     END IF;
+                    
+                   
                       
                    --si no encontramos un opcion con moneda buscamos sin moneda
                     IF ps_id_cuenta is null THEN  
@@ -594,7 +598,7 @@ BEGIN
         -----------------------------------------------
         else
         
-             
+                  
 
                   for i in 1..array_upper(va_sql,1) loop
                   
@@ -603,12 +607,7 @@ BEGIN
                       end if;
                   
                       v_sql1 = v_sql || va_sql[i] || ' limit 1 offset 0';
-                      
-                        IF p_codigo = 'CUENPAGPRO' THEN
-                        raise notice '(CONMSULTA)---% , ---%',v_sql1, p_codigo;
-                        --raise exception 'errorllega'; 
-                      END IF;  
-        		  	  
+                             		  	  
                       for v_rec_rel in execute(v_sql1) loop
                           ps_id_cuenta = v_rec_rel.id_cuenta;
                           ps_id_auxiliar = v_rec_rel.id_auxiliar;

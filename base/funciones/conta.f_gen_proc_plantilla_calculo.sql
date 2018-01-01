@@ -23,9 +23,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:	Ajuste par aconsiderar nuevas variables usar_cc_original, imputar_excento
+ AUTOR:	    	RAC	 
+ FECHA:		    05/01/2018
 ***************************************************************************/
 
 DECLARE
@@ -95,7 +95,9 @@ BEGIN
                                   pc.prioridad,
                                   pc.descripcion,
                                   pc.importe_presupuesto,
-                                  plan.sw_monto_excento
+                                  plan.sw_monto_excento,
+                                  pc.imputar_excento,
+                                  pc.usar_cc_original
                           FROM  conta.tplantilla_calculo pc 
                           inner join param.tplantilla plan on plan.id_plantilla = pc.id_plantilla
                           WHERE pc.estado_reg = 'activo' and
@@ -103,7 +105,7 @@ BEGIN
                            order by pc.prioridad ) LOOP
                            
           --confirma  si es necesario el monto excento             
-          IF v_registros.sw_monto_excento = 'no'  and v_sw_calcular_excento THEN
+          IF v_registros.sw_monto_excento = 'no'  and v_sw_calcular_excento THEN  
               v_sw_calcular_excento = FALSE;   
           END IF; 
           
@@ -121,9 +123,6 @@ BEGIN
              --  obtine valor o porcentajes aplicado
                IF v_registros.tipo_importe = 'porcentaje' THEN
                
-               
-               
-               
                    IF v_sw_calcular_excento  THEN
                       
                       
@@ -133,15 +132,28 @@ BEGIN
                         v_porc_importe_presupuesto = v_porc_monto_imponible * v_registros.importe_presupuesto;
                         
                         
-                       --si es una trasaccion primeria (priorida =1 )se suma el porcentaje del monto no imponible
-                       IF v_registros.prioridad = 1 THEN
+                       -- si es una trasaccion primeria (priorida =1 )se suma el porcentaje del monto no imponible
+                       -- FIN RAC 05/01/2017 se agregar  las condiciones para calcular el excento 
+                       -- si imputar_excento, es si,  el importe  lo retira del prioridad 1 y lo imputa a la propiedad 2 que este marcada
+                       
+                       IF v_registros.prioridad = 1  and   v_registros.imputar_excento = 'no' THEN
                              v_porc_importe = v_porc_importe + p_porc_monto_excento_var;
                              v_porc_importe_presupuesto = v_porc_importe_presupuesto + p_porc_monto_excento_var;
                        END IF;
                        
-                     
-                         
-                     
+                       IF v_registros.prioridad = 1  and   v_registros.imputar_excento = 'si' THEN
+                             v_porc_importe = v_porc_importe ;
+                             v_porc_importe_presupuesto = v_porc_importe_presupuesto;
+                       END IF;
+                       
+                       
+                       IF v_registros.prioridad = 2  and   v_registros.imputar_excento = 'si' THEN
+                             v_porc_importe =  p_porc_monto_excento_var;
+                             v_porc_importe_presupuesto =  p_porc_monto_excento_var;
+                       END IF;
+                       
+                       --FIN RAC 05/01/2017
+                       
                       
                    ELSE
                    
@@ -195,8 +207,8 @@ BEGIN
                
                
                -- si no es una trasaccion primaria obtener centro de costo del departamento
-               
-               IF v_registros.prioridad > 1 THEN
+               --RAC 05/01/2018, se considera si para este transaccion requiere el Centro de Costo original
+               IF v_registros.prioridad > 1 and v_registros.usar_cc_original = 'no' THEN --RAC 05/01/2018, se adiciona  usar_cc_original = 'no'
                
                -- obtener centro de consto del depto contable  CCDEPCON
               
@@ -218,11 +230,8 @@ BEGIN
                   v_record_int_tran.id_centro_costo = v_id_centro_costo_depto;
               
                END IF;
+               
                --  aplicar relacion contable si existe
-               
-               
-               
-               
                IF  v_registros.codigo_tipo_relacion != '' and v_registros.codigo_tipo_relacion is not null THEN
                
                   
@@ -254,9 +263,6 @@ BEGIN
                         raise exception 'Revisar la partida para la relacion contable:  % (%)',  v_record_rel_con.ps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;
                       END IF;
                     END IF;
-                    
-                    
-                  
                     
                     
                     --replanza las cuenta, partida y auxiliar obtenidos 

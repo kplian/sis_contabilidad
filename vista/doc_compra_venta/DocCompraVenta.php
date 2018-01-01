@@ -15,12 +15,11 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
     tabEnter: true,
     tipoDoc: 'venta',
     regitrarDetalle: 'si',
+    nombreVista: 'DocCompraVenta',
     constructor:function(config){
 		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
 		var me = this;
-		
-		
-	   this.Atributos = [
+		this.Atributos = [
 			{
 				//configuracion del componente
 				config:{
@@ -129,9 +128,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                	   if(value == 'si'){
 	                	      checked = 'checked';
 	                	   }
-	                	   /*if(record.data.id_int_comprobante){
+	                	   if(record.data.id_int_comprobante){
 	                	      state = 'disabled';
-	                	   }*/
+	                	   }
 	                	   if(record.data.tipo_reg != 'summary'){
 	            	         return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
 	            	       }
@@ -963,6 +962,24 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   grid:false,
 			   form:false
 		   },
+		   {
+			   config:{
+				   name: 'desc_funcionario2',
+				   fieldLabel: 'Funcionario',
+				   allowBlank: true,
+				   anchor: '80%',
+				   gwidth: 100,
+				   maxLength :16,
+				   minLength:16
+			   },
+			   type:'TextField',
+			   filters:{pfiltro:'fun.desc_funcionario2',type:'string'},
+			   id_grupo:0,
+			   grid:true,
+			   form:false
+		   },
+		   
+		   
 			{
 				config:{
 					name: 'estado_reg',
@@ -1175,10 +1192,12 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
+        this.store.baseParams.nombre_vista = this.nombreVista;
         if(this.validarFiltros()){
         	this.store.baseParams.id_gestion = this.cmbGestion.getValue();
 	        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
 	        this.store.baseParams.id_depto = this.cmbDepto.getValue();
+	        
 	        this.load(); 
         }
         
@@ -1352,7 +1371,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
 		'desc_tipo_doc_compra_venta','id_tipo_doc_compra_venta','nro_tramite',
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg',
-		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata'
+		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata','desc_funcionario2','id_funcionario'
 	],
 	sortInfo:{
 		field: 'id_doc_compra_venta',
@@ -1370,7 +1389,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             this.store.baseParams.id_gestion=this.cmbGestion.getValue();
             this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
             this.store.baseParams.id_depto = this.cmbDepto.getValue();
-            
+            this.store.baseParams.nombre_vista = this.nombreVista;
             Phx.vista.DocCompraVenta.superclass.onButtonAct.call(this);
         }
     },
@@ -1578,8 +1597,6 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
         }
         window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
 	}
-    
-   
     
     
 })

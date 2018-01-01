@@ -17,6 +17,7 @@ header("content-type: text/javascript; charset=UTF-8");
         mostrarFormaPago : true,
         mostrarPartidas: false,
         regitrarDetalle: 'si',
+        mostrarFuncionario: false,
         id_moneda_defecto: 0,  // 0 quiere decir todas las monedas
         //layoutType: 'wizard',
         layout: 'fit',
@@ -52,15 +53,17 @@ header("content-type: text/javascript; charset=UTF-8");
             this.buildGrupos();
             //rac, 07/12/2017 si existe plantilla se crea un formulario
             this.buildFormPlantilla()
-
-
             Phx.vista.FormCompraVenta.superclass.constructor.call(this,config);
-
+            
+            if(this.mostrarFuncionario){
+            	 this.mostrarComponente(this.Cmp.id_funcionario);
+            }
+            else{
+            	 this.ocultarComponente(this.Cmp.id_funcionario);
+            }
+            
             this.init();
-
-
             this.iniciarEventos();
-
             if(this.regitrarDetalle == 'si'){
                 this.iniciarEventosDetalle();
             }
@@ -1179,13 +1182,13 @@ header("content-type: text/javascript; charset=UTF-8");
                         allowBlank: false,
                         anchor: '80%',
                         allowDecimals: false,
-                        maxLength:100,
+                        maxLength:100/*,  RAC  29/12/2017 comentado para recibos pueden tener numeros alfanumericos
                         maskRe: /[0-9/-]+/i,
-                        regex: /[0-9/-]+/i
+                        regex: /[0-9/-]+/i*/
 
 
                     },
-                    type:'NumberField',
+                    type:'Field',
                     id_grupo:1,
                     form:true
                 },
@@ -1533,7 +1536,24 @@ header("content-type: text/javascript; charset=UTF-8");
                     type:'NumberField',
                     id_grupo:2,
                     form: true
-                }
+                },
+                
+               
+                {
+		   			config:{
+		       		    name:'id_funcionario',
+		       		    hiddenName: 'id_funcionario',
+		   				origen:'FUNCIONARIO',
+		   				fieldLabel:'Funcionario',
+		   				allowBlank: false,
+		                valueField: 'id_funcionario',
+		   			    gdisplayField: 'desc_funcionario2',
+		   			    baseParams: { fecha: new Date()}
+		       	     },
+		   			type:'ComboRec',
+		   			id_grupo:2,
+		   			form:true
+				}
 
             ];
 
@@ -1962,6 +1982,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarComponente(this.Cmp.estacion);
             this.ocultarComponente(this.Cmp.id_punto_venta);
             this.ocultarComponente(this.Cmp.id_agencia);
+           
+            
+            
         },
         iniciarImportes:function(){
             this.Cmp.importe_excento.setValue(0);

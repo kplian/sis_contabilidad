@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_calculo_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -63,7 +61,9 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
 						placal.importe_presupuesto,
-						placal.descuento	
+						placal.descuento,
+                        placal.usar_cc_original,
+                        placal.imputar_excento	
 						from conta.tplantilla_calculo placal
 						inner join segu.tusuario usu1 on usu1.id_usuario = placal.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = placal.id_usuario_mod
@@ -178,7 +178,9 @@ BEGIN
                             usu2.cuenta as usr_mod,
                             placal.importe_presupuesto,
                             placal.descuento,
-                            plt.desc_plantilla	
+                            plt.desc_plantilla,
+                            placal.usar_cc_original,
+                            placal.imputar_excento		
 						from conta.tplantilla_calculo placal
                         inner join param.tplantilla plt on plt.id_plantilla = placal.id_plantilla
 						inner join segu.tusuario usu1 on usu1.id_usuario = placal.id_usuario_reg

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -9,49 +7,51 @@ CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
 RETURNS varchar AS
 $body$
 /**************************************************************************
- SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.ft_doc_compra_venta_ime
+ SISTEMA:   Sistema de Contabilidad
+ FUNCION:     conta.ft_doc_compra_venta_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
- AUTOR: 		RAC KPLIAN
- FECHA:	        18-08-2015 15:57:09
+ AUTOR:     RAC KPLIAN
+ FECHA:         18-08-2015 15:57:09
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- ISSUE            FECHA:		      AUTOR               DESCRIPCION
- #0				 18-08-2015        RAC KPLIAN 		Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
- #14, BOA		 18/10/2017		   RAC KPLIAN		Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados en las trasacciones CONTA_DCV_INS y CONTA_ADDCBTE_IME
-  
+ ISSUE            FECHA:          AUTOR               DESCRIPCION
+ #0        18-08-2015        RAC KPLIAN     Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
+ #14, BOA    18/10/2017      RAC KPLIAN   Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados en las trasacciones CONTA_DCV_INS y CONTA_ADDCBTE_IME
+ #0   ETR        05/01/2018        RAC PLIAN    Registor opcion de sw_pgs e id_funcionario para pagos simplificados 
 ***************************************************************************/
 
 DECLARE
 
-  v_nro_requerimiento    	integer;
-  v_parametros           	record;
-  v_registros				record;
-  v_id_requerimiento     	integer;
-  v_resp		            varchar;
+  v_nro_requerimiento     integer;
+  v_parametros            record;
+  v_registros       record;
+  v_id_requerimiento      integer;
+  v_resp                varchar;
   v_nombre_funcion        text;
   v_mensaje_error         text;
-  v_id_doc_compra_venta	integer;
-  v_rec					record;
-  v_tmp_resp				boolean;
-  v_importe_ice			numeric;
-  v_revisado				varchar;
-  v_sum_total				numeric;
-  v_id_proveedor			integer;
-  v_id_cliente			integer;
+  v_id_doc_compra_venta integer;
+  v_rec         record;
+  v_tmp_resp        boolean;
+  v_importe_ice     numeric;
+  v_revisado        varchar;
+  v_sum_total       numeric;
+  v_id_proveedor      integer;
+  v_id_cliente      integer;
   v_id_tipo_doc_compra_venta integer;
-  v_codigo_estado			varchar;
-  v_estado_rendicion		varchar;
-  v_id_int_comprobante		integer;
-  v_tipo_informe			varchar;
-  v_razon_social			varchar;
-  v_nit						varchar;
-  v_id_moneda				integer;
-  v_nomeda					varchar;
-  v_nro_tramite				varchar;
-  v_reg_periodo				record;
+  v_codigo_estado     varchar;
+  v_estado_rendicion    varchar;
+  v_id_int_comprobante    integer;
+  v_tipo_informe      varchar;
+  v_razon_social      varchar;
+  v_nit           varchar;
+  v_id_moneda       integer;
+  v_nomeda          varchar;
+  v_nro_tramite       varchar;
+  v_reg_periodo       record;
+  v_id_funcionario      integer;
+  v_sw_pgs          varchar;
 
 
 BEGIN
@@ -61,9 +61,9 @@ BEGIN
 
   /*********************************
    #TRANSACCION:  'CONTA_DCV_INS'
-   #DESCRIPCION:	Insercion de registros
-   #AUTOR:		admin
-   #FECHA:		18-08-2015 15:57:09
+   #DESCRIPCION:  Insercion de registros
+   #AUTOR:    admin
+   #FECHA:    18-08-2015 15:57:09
   ***********************************/
 
   if(p_transaccion='CONTA_DCV_INS')then
@@ -73,7 +73,7 @@ BEGIN
 
 
       --  calcula valores pode defecto para el tipo de doc compra venta
-		IF v_parametros.id_moneda is null THEN
+    IF v_parametros.id_moneda is null THEN
           raise EXCEPTION 'Es necesario indicar la Moneda del documento, revise los datos.';
       END IF;
 
@@ -99,7 +99,7 @@ BEGIN
 
       END IF;
 
-		IF v_parametros.id_moneda is null THEN
+    IF v_parametros.id_moneda is null THEN
           raise EXCEPTION 'Es necesario indicar la Moneda del documento, revise los datos.';
       END IF;
 
@@ -107,14 +107,14 @@ BEGIN
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
-	  select tipo_informe into v_tipo_informe
+    select tipo_informe into v_tipo_informe
       from param.tplantilla
       where id_plantilla = v_parametros.id_plantilla;
 
       IF v_tipo_informe = 'lcv' THEN
-      	  -- valida que periodO de libro de compras y ventas este abierto
-      	  v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-	  END IF;
+          -- valida que periodO de libro de compras y ventas este abierto
+          v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+    END IF;
 
       --TODO
       --validar que no exsita un documento con el mismo nro y misma razon social  ...?
@@ -141,7 +141,20 @@ BEGIN
           where c.id_int_comprobante = v_id_int_comprobante;
           
       end if;
-
+      
+      --RAC 05/01/2018 nuevos para emtros para registro de pagos simplificados 
+      if (pxp.f_existe_parametro(p_tabla,'id_funcionario')) then
+          v_id_funcionario = v_parametros.id_funcionario;
+      end if;
+      
+      
+      if (pxp.f_existe_parametro(p_tabla,'sw_pgs')) then
+          v_sw_pgs = v_parametros.sw_pgs;
+      else
+         v_sw_pgs = 'no';
+      end if;
+      
+      --FIN RAC
 
       --recupera parametrizacion de la plantilla
       select
@@ -229,7 +242,9 @@ BEGIN
         id_auxiliar,
         id_tipo_doc_compra_venta,
         id_int_comprobante,
-        nro_tramite
+        nro_tramite,
+        id_funcionario,
+        sw_pgs
 
       ) values(
         v_parametros.tipo,
@@ -270,7 +285,9 @@ BEGIN
         v_parametros.id_auxiliar,
         v_id_tipo_doc_compra_venta,
         v_id_int_comprobante,
-        v_nro_tramite
+        v_nro_tramite,
+        v_id_funcionario,
+        v_sw_pgs
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -289,7 +306,7 @@ BEGIN
         end if;
       end if;
 
-	  if (pxp.f_existe_parametro(p_tabla,'estacion')) then
+    if (pxp.f_existe_parametro(p_tabla,'estacion')) then
         if(v_parametros.estacion is not null) then
 
           update conta.tdoc_compra_venta
@@ -318,9 +335,9 @@ BEGIN
 
   /*********************************
    #TRANSACCION:  'CONTA_DCVCAJ_INS'
-   #DESCRIPCION:	Insercion de registros
-   #AUTOR:		Gonzalo Sarmiento
-   #FECHA:		09-02-2017
+   #DESCRIPCION:  Insercion de registros
+   #AUTOR:    Gonzalo Sarmiento
+   #FECHA:    09-02-2017
   ***********************************/
 
   elsif(p_transaccion='CONTA_DCVCAJ_INS')then
@@ -359,14 +376,14 @@ BEGIN
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
-	  select tipo_informe into v_tipo_informe
+    select tipo_informe into v_tipo_informe
       from param.tplantilla
       where id_plantilla = v_parametros.id_plantilla;
 
       IF v_tipo_informe = 'lcv' THEN
-      	  -- valida que period de libro de compras y ventas este abierto
-      	  v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-	  END IF;
+          -- valida que period de libro de compras y ventas este abierto
+          v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+    END IF;
 
       --TODO
       --validar que no exsita un documento con el mismo nro y misma razon social  ...?
@@ -558,9 +575,9 @@ BEGIN
 
   /*********************************
    #TRANSACCION:  'CONTA_DCV_MOD'
-   #DESCRIPCION:	Modificacion de registros
-   #AUTOR:		admin
-   #FECHA:		18-08-2015 15:57:09
+   #DESCRIPCION:  Modificacion de registros
+   #AUTOR:    admin
+   #FECHA:    18-08-2015 15:57:09
   ***********************************/
 
   elsif(p_transaccion='CONTA_DCV_MOD')then
@@ -598,8 +615,8 @@ BEGIN
       --TODO RAC, me parece buena idea  que al cerrar el periodo revise que no existan documentos pendientes  antes de cerrar
       -- valida que period de libro de compras y ventas este abierto para la nueva fecha
       IF v_tipo_informe = 'lcv' THEN
-	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-	  END IF;
+        v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+    END IF;
 
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
@@ -607,7 +624,7 @@ BEGIN
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
       v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-	  */
+    */
 
       --revisa si el documento no esta marcado como revisado
       select
@@ -620,11 +637,11 @@ BEGIN
         v_registros
       from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
 
-	  v_rec = param.f_get_periodo_gestion(v_registros.fecha);
-	  -- valida que period de libro de compras y ventas este abierto para la antigua fecha
+    v_rec = param.f_get_periodo_gestion(v_registros.fecha);
+    -- valida que period de libro de compras y ventas este abierto para la antigua fecha
       IF v_tipo_informe = 'lcv' THEN
-	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-	  END IF;
+        v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+    END IF;
 
       IF  v_registros.revisado = 'si' THEN
         IF v_estado_rendicion NOT IN ('vbrendicion','revision') or v_estado_rendicion IS NULL THEN
@@ -681,6 +698,21 @@ BEGIN
         END IF;
 
       END IF;
+      
+      
+      --RAC 05/01/2018 nuevos para emtros para registro de pagos simplificados 
+      if (pxp.f_existe_parametro(p_tabla,'id_funcionario')) then
+          v_id_funcionario = v_parametros.id_funcionario;
+      end if;
+      
+      
+      if (pxp.f_existe_parametro(p_tabla,'sw_pgs')) then
+          v_sw_pgs = v_parametros.sw_pgs;
+      else
+         v_sw_pgs = 'no';
+      end if;
+      
+      --FIN RAC
 
 
       --Sentencia de la modificacion
@@ -713,7 +745,9 @@ BEGIN
         id_proveedor = v_id_proveedor,
         id_cliente = v_id_cliente,
         id_auxiliar = v_parametros.id_auxiliar,
-        id_int_comprobante = v_id_int_comprobante
+        id_int_comprobante = v_id_int_comprobante,
+        id_funcionario = v_id_funcionario,
+        sw_pgs = v_sw_pgs
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
@@ -725,7 +759,7 @@ BEGIN
         end if;
       end if;
 
-	  if (pxp.f_existe_parametro(p_tabla,'estacion')) then
+    if (pxp.f_existe_parametro(p_tabla,'estacion')) then
         if(v_parametros.estacion is not null) then
 
           update conta.tdoc_compra_venta
@@ -754,9 +788,9 @@ BEGIN
 
   /*********************************
    #TRANSACCION:  'CONTA_DCVCAJ_MOD'
-   #DESCRIPCION:	Modificacion de registros
-   #AUTOR:		Gonzalo Sarmiento
-   #FECHA:		09-02-2017
+   #DESCRIPCION:  Modificacion de registros
+   #AUTOR:    Gonzalo Sarmiento
+   #FECHA:    09-02-2017
   ***********************************/
 
   elsif(p_transaccion='CONTA_DCVCAJ_MOD')then
@@ -774,8 +808,8 @@ BEGIN
       where id_plantilla = v_parametros.id_plantilla;
 
       IF v_tipo_informe = 'lcv' THEN
-	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-	  END IF;
+        v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+    END IF;
 
       -- recuepra el periodo de la fecha ...
       --Obtiene el periodo a partir de la fecha
@@ -783,7 +817,7 @@ BEGIN
       v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
 
       v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-	  */
+    */
 
       --revisa si el documento no esta marcado como revisado
       select
@@ -803,10 +837,10 @@ BEGIN
       END IF;
 
       v_rec = param.f_get_periodo_gestion(v_registros.fecha);
-	  -- valida que period de libro de compras y ventas este abierto para la antigua fecha
+    -- valida que period de libro de compras y ventas este abierto para la antigua fecha
       IF v_tipo_informe = 'lcv' THEN
-	      v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
-	  END IF;
+        v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_parametros.id_depto_conta, v_rec.po_id_periodo);
+    END IF;
 
       IF v_parametros.tipo = 'compra' THEN
         -- chequear si el proveedor esta registrado
@@ -920,9 +954,9 @@ BEGIN
 
   /*********************************
    #TRANSACCION:  'CONTA_DCVBASIC_MOD'
-   #DESCRIPCION:	Modificacion basica de documento de compra venta
-   #AUTOR:		admin
-   #FECHA:		18-08-2015 15:57:09
+   #DESCRIPCION:  Modificacion basica de documento de compra venta
+   #AUTOR:    admin
+   #FECHA:    18-08-2015 15:57:09
   ***********************************/
 
   elsif(p_transaccion='CONTA_DCVBASIC_MOD')then
@@ -969,9 +1003,9 @@ BEGIN
 
   /*********************************
  #TRANSACCION:  'CONTA_DCV_ELI'
- #DESCRIPCION:	Eliminacion de registros
- #AUTOR:		admin
- #FECHA:		18-08-2015 15:57:09
+ #DESCRIPCION:  Eliminacion de registros
+ #AUTOR:    admin
+ #FECHA:    18-08-2015 15:57:09
 ***********************************/
 
   elsif(p_transaccion='CONTA_DCV_ELI')then
@@ -1008,14 +1042,14 @@ BEGIN
       --Obtiene el periodo a partir de la fecha
       v_rec = param.f_get_periodo_gestion(v_registros.fecha);
 
-	  select tipo_informe into v_tipo_informe
+    select tipo_informe into v_tipo_informe
       from param.tplantilla
       where id_plantilla = v_registros.id_plantilla;
 
       -- valida que period de libro de compras y ventas este abierto
       IF v_tipo_informe = 'lcv' THEN
-      	 v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_registros.id_depto_conta, v_rec.po_id_periodo);
-	  END IF;
+         v_tmp_resp = conta.f_revisa_periodo_compra_venta(p_id_usuario, v_registros.id_depto_conta, v_rec.po_id_periodo);
+    END IF;
 
 
       --validar que no tenga un comprobante asociado
@@ -1046,9 +1080,9 @@ BEGIN
     end;
   /*********************************
   #TRANSACCION:  'CONTA_CAMREV_IME'
-  #DESCRIPCION:	Cambia el estao de la revisón del documento de compra o venta
-  #AUTOR:		admin
-  #FECHA:		09-09-2015 15:57:09
+  #DESCRIPCION: Cambia el estao de la revisón del documento de compra o venta
+  #AUTOR:   admin
+  #FECHA:   09-09-2015 15:57:09
  ***********************************/
 
   elsif(p_transaccion='CONTA_CAMREV_IME')then
@@ -1088,9 +1122,9 @@ BEGIN
 
   /*********************************
  #TRANSACCION:  'CONTA_CHKDOCSUM_IME'
- #DESCRIPCION:	verifica si el detalle del documento cuadra con el total
- #AUTOR:		admin
- #FECHA:		09-09-2015 15:57:09
+ #DESCRIPCION:  verifica si el detalle del documento cuadra con el total
+ #AUTOR:    admin
+ #FECHA:    09-09-2015 15:57:09
 ***********************************/
 
   elsif(p_transaccion='CONTA_CHKDOCSUM_IME')then
@@ -1128,9 +1162,9 @@ BEGIN
 
   /*********************************
    #TRANSACCION:  'CONTA_QUITCBTE_ELI'
-   #DESCRIPCION:	quita el comprobante del documento
-   #AUTOR:		admin
-   #FECHA:		25-09-2015 15:57:09
+   #DESCRIPCION:  quita el comprobante del documento
+   #AUTOR:    admin
+   #FECHA:    25-09-2015 15:57:09
   ***********************************/
 
   elsif(p_transaccion='CONTA_QUITCBTE_ELI')then
@@ -1154,9 +1188,9 @@ BEGIN
     end;
   /*********************************
  #TRANSACCION:  'CONTA_ADDCBTE_IME'
- #DESCRIPCION:	adiciona un documento al comprobante
- #AUTOR:		RAC
- #FECHA:		25-09-2015 15:57:09
+ #DESCRIPCION:  adiciona un documento al comprobante
+ #AUTOR:    RAC
+ #FECHA:    25-09-2015 15:57:09
 ***********************************/
 
   elsif(p_transaccion='CONTA_ADDCBTE_IME')then
@@ -1199,9 +1233,9 @@ BEGIN
     end;
 /*********************************
  #TRANSACCION:  'CONTA_RAZONXNIT_GET'
- #DESCRIPCION:	recuperar razon social nit
- #AUTOR:		MMV
- #FECHA:		19-04-2017
+ #DESCRIPCION:  recuperar razon social nit
+ #AUTOR:    MMV
+ #FECHA:    19-04-2017
 ***********************************/
 
   elsif(p_transaccion='CONTA_RAZONXNIT_GET')then

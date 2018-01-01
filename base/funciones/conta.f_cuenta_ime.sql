@@ -42,6 +42,7 @@ DECLARE
     v_conta					integer;
     v_id_cuenta_padre_des	integer;
     v_reg_cuenta_ori		record;
+    v_reg_aux				record;
 			    
 BEGIN
 
@@ -406,7 +407,10 @@ BEGIN
                          
                          --obtiene los dastos de la cuenta origen
                          v_reg_cuenta_ori = NULL;
-                         select * into v_reg_cuenta_ori from conta.tcuenta c where c.id_cuenta = v_registros_cuenta.id_cuenta;
+                         select *
+                         into 
+                         v_reg_cuenta_ori 
+                         from conta.tcuenta c where c.id_cuenta = v_registros_cuenta.id_cuenta;
                          --  inserta la cuenta para la nueva gestion
                         
                         INSERT INTO conta.tcuenta
@@ -466,16 +470,39 @@ BEGIN
                           --insertar relacion en tre ambas gestion
                           INSERT INTO conta.tcuenta_ids (id_cuenta_uno,id_cuenta_dos, sw_cambio_gestion ) VALUES ( v_registros_cuenta.id_cuenta,v_id_cuenta, 'gestion');
                           v_conta = v_conta + 1;
+                          
+                          
+                           --revisamos si los  auxiliares asignados para la cuenta si es de movimiento
+                          IF  v_reg_cuenta_ori.sw_transaccional = 'movimiento' THEN
+                          
+                              --recuperamos todos los auxiliares para la cuenta origen
+                              
+                              FOR v_reg_aux in ( select  ca.id_auxiliar 
+                                                 from conta.tcuenta_auxiliar ca 
+                                                 where ca.id_cuenta = v_registros_cuenta.id_cuenta    and ca.estado_reg = 'activo') LOOP
+                              
+                                   --verificamos si e auxilar no fue insertado anteriormente
+                                   IF  not exists (select 1 from conta.tcuenta_auxiliar ca where ca.id_cuenta = v_id_cuenta   and ca.id_auxiliar = v_reg_aux.id_auxiliar) THEN
+                                   
+                                           INSERT INTO    conta.tcuenta_auxiliar
+                                                (
+                                                  id_usuario_reg,
+                                                  fecha_reg,
+                                                  estado_reg,
+                                                  id_auxiliar,
+                                                  id_cuenta
+                                                )
+                                                VALUES (
+                                                  p_id_usuario,
+                                                  now(),
+                                                  'activo',
+                                                  v_reg_aux.id_auxiliar,
+                                                  v_id_cuenta
+                                                );
+                                   END IF;
+                              END LOOP;
+                          END IF;
                   END IF; 
-            
-               
-           
-        
-             --Definicion de la respuesta
-        
-        
-        
-        
            END LOOP;
             
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan de cuentas clonado para la gestion: '||v_registros_ges.gestion::varchar); 

@@ -64,10 +64,10 @@ Phx.vista.IntComprobanteVbFinanzas = {
 	},
     
     south:{
-	  url:'../../../sis_contabilidad/vista/int_transaccion/IntTransaccion.php', 
+	  url:'../../../sis_contabilidad/vista/int_transaccion/IntTransaccionAux.php', 
 	  title:'Transacciones', 
-	  height:'50%',	//altura de la ventana hijo
-	  cls:'IntTransaccion'
+	  height:'50%',	//altura de la ventana hijo 
+	  cls:'IntTransaccionAux'
 	},
 	preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobanteVbFinanzas.superclass.preparaMenu.call(this);
