@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_calculo_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -7,48 +9,48 @@ CREATE OR REPLACE FUNCTION conta.ft_plantilla_calculo_ime (
 RETURNS varchar AS
 $body$
 /**************************************************************************
- SISTEMA:   Sistema de Contabilidad
- FUNCION:     conta.ft_plantilla_calculo_ime
+ SISTEMA:		Sistema de Contabilidad
+ FUNCION: 		conta.ft_plantilla_calculo_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_calculo'
- AUTOR:      (admin)
- FECHA:         28-08-2013 19:01:20
- COMENTARIOS: 
+ AUTOR: 		 (admin)
+ FECHA:	        28-08-2013 19:01:20
+ COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION: 
- AUTOR:     
- FECHA:   
+ DESCRIPCION:	
+ AUTOR:			
+ FECHA:		
 ***************************************************************************/
 
 DECLARE
 
-  v_nro_requerimiento     integer;
-  v_parametros            record;
-  v_id_requerimiento      integer;
-  v_resp                varchar;
-  v_nombre_funcion        text;
-  v_mensaje_error         text;
-  v_id_plantilla_calculo  integer;
+	v_nro_requerimiento    	integer;
+	v_parametros           	record;
+	v_id_requerimiento     	integer;
+	v_resp		            varchar;
+	v_nombre_funcion        text;
+	v_mensaje_error         text;
+	v_id_plantilla_calculo	integer;
     v_registros  record;
-          
+			    
 BEGIN
 
     v_nombre_funcion = 'conta.ft_plantilla_calculo_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-  /*********************************    
-  #TRANSACCION:  'CONTA_PLACAL_INS'
-  #DESCRIPCION: Insercion de registros
-  #AUTOR:   admin 
-  #FECHA:   28-08-2013 19:01:20
-  ***********************************/
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_PLACAL_INS'
+ 	#DESCRIPCION:	Insercion de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		28-08-2013 19:01:20
+	***********************************/
 
-  if(p_transaccion='CONTA_PLACAL_INS')then
-          
+	if(p_transaccion='CONTA_PLACAL_INS')then
+					
         begin
-          --Sentencia de la insercion
-          insert into conta.tplantilla_calculo(
+        	--Sentencia de la insercion
+        	insert into conta.tplantilla_calculo(
                 prioridad,
                 debe_haber,
                 tipo_importe,
@@ -64,8 +66,9 @@ BEGIN
                 importe_presupuesto,
                 descuento,
                 usar_cc_original,
-                imputar_excento
-            ) values(
+                imputar_excento,
+                sw_registro
+          	) values(
                 v_parametros.prioridad,
                 v_parametros.debe_haber,
                 v_parametros.tipo_importe,
@@ -79,32 +82,33 @@ BEGIN
                 null,
                 null,
                 v_parametros.importe_presupuesto,
-                v_parametros.descuento  ,
+                v_parametros.descuento	,
                 v_parametros.usar_cc_original,
-                v_parametros.imputar_excento      
-      )RETURNING id_plantilla_calculo into v_id_plantilla_calculo;
-      
-      --Definicion de la respuesta
-      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla de Cálculo almacenado(a) con exito (id_plantilla_calculo'||v_id_plantilla_calculo||')'); 
+                v_parametros.imputar_excento,
+                v_parametros.sw_registro			
+			)RETURNING id_plantilla_calculo into v_id_plantilla_calculo;
+			
+			--Definicion de la respuesta
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla de Cálculo almacenado(a) con exito (id_plantilla_calculo'||v_id_plantilla_calculo||')'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla_calculo',v_id_plantilla_calculo::varchar);
 
             --Devuelve la respuesta
             return v_resp;
 
-    end;
+		end;
 
-  /*********************************    
-  #TRANSACCION:  'CONTA_PLACAL_MOD'
-  #DESCRIPCION: Modificacion de registros
-  #AUTOR:   admin 
-  #FECHA:   28-08-2013 19:01:20
-  ***********************************/
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_PLACAL_MOD'
+ 	#DESCRIPCION:	Modificacion de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		28-08-2013 19:01:20
+	***********************************/
 
-  elsif(p_transaccion='CONTA_PLACAL_MOD')then
+	elsif(p_transaccion='CONTA_PLACAL_MOD')then
 
-    begin
-      --Sentencia de la modificacion
-      update conta.tplantilla_calculo set
+		begin
+			--Sentencia de la modificacion
+			update conta.tplantilla_calculo set
                 prioridad = v_parametros.prioridad,
                 debe_haber = v_parametros.debe_haber,
                 tipo_importe = v_parametros.tipo_importe,
@@ -117,30 +121,31 @@ BEGIN
                 importe_presupuesto = v_parametros.importe_presupuesto,
                 descuento = v_parametros.descuento,
                 usar_cc_original =  v_parametros.usar_cc_original,
-                imputar_excento  = v_parametros.imputar_excento 
-      where id_plantilla_calculo=v_parametros.id_plantilla_calculo;
+                imputar_excento  = v_parametros.imputar_excento	,
+                sw_registro = v_parametros.sw_registro
+			where id_plantilla_calculo=v_parametros.id_plantilla_calculo;
                
-      --Definicion de la respuesta
+			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla de Cálculo modificado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla_calculo',v_parametros.id_plantilla_calculo::varchar);
                
             --Devuelve la respuesta
             return v_resp;
             
-    end;
+		end;
 
-  /*********************************    
-  #TRANSACCION:  'CONTA_PLACAL_ELI'
-  #DESCRIPCION: Eliminacion de registros
-  #AUTOR:   admin 
-  #FECHA:   28-08-2013 19:01:20
-  ***********************************/
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_PLACAL_ELI'
+ 	#DESCRIPCION:	Eliminacion de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		28-08-2013 19:01:20
+	***********************************/
 
-  elsif(p_transaccion='CONTA_PLACAL_ELI')then
+	elsif(p_transaccion='CONTA_PLACAL_ELI')then
 
-    begin
-      --Sentencia de la eliminacion
-      delete from conta.tplantilla_calculo
+		begin
+			--Sentencia de la eliminacion
+			delete from conta.tplantilla_calculo
             where id_plantilla_calculo=v_parametros.id_plantilla_calculo;
                
             --Definicion de la respuesta
@@ -150,19 +155,19 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-    end;
+		end;
      
     /*********************************    
-  #TRANSACCION:  'CONTA_GETDEC_IME'
-  #DESCRIPCION: Recuperar decuetnos de la plantilla de calculo indicada
-  #AUTOR:   rensi 
-  #FECHA:   28-08-2013 19:01:20
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_GETDEC_IME'
+ 	#DESCRIPCION:	Recuperar decuetnos de la plantilla de calculo indicada
+ 	#AUTOR:		rensi	
+ 	#FECHA:		28-08-2013 19:01:20
+	***********************************/
 
-  elsif(p_transaccion='CONTA_GETDEC_IME')then
+	elsif(p_transaccion='CONTA_GETDEC_IME')then
 
-    begin
-      
+		begin
+			
             -- llamada a la funcion de recuperacion de descuento
              select  
                ps_descuento_porc,
@@ -183,22 +188,22 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-    end;
+		end;
     /*********************************    
-  #TRANSACCION:  'CONTA_GETDETPLA_IME'
-  #DESCRIPCION: Recuperar IVA-CF, IVA-DF, IT, DESCUENTOS, ICE
-  #AUTOR:   rensi 
-  #FECHA:   19-08-2015 19:01:20
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_GETDETPLA_IME'
+ 	#DESCRIPCION:	Recuperar IVA-CF, IVA-DF, IT, DESCUENTOS, ICE
+ 	#AUTOR:		rensi	
+ 	#FECHA:		19-08-2015 19:01:20
+	***********************************/
 
-  elsif(p_transaccion='CONTA_GETDETPLA_IME')then
+	elsif(p_transaccion='CONTA_GETDETPLA_IME')then
 
-    begin
+		begin
         
              --Definicion de la respuesta
              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de decuentos recuperados con exito'); 
              v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla',v_parametros.id_plantilla::varchar);
-      
+			
             -- llamada a la funcion de recuperacion de descuento
              select  
                ps_descuento_porc,
@@ -263,23 +268,23 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-    end;
+		end;
         
-  else
+	else
      
-      raise exception 'Transaccion inexistente: %',p_transaccion;
+    	raise exception 'Transaccion inexistente: %',p_transaccion;
 
-  end if;
+	end if;
 
 EXCEPTION
-        
-  WHEN OTHERS THEN
-    v_resp='';
-    v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-    v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-    v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-    raise exception '%',v_resp;
-                
+				
+	WHEN OTHERS THEN
+		v_resp='';
+		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+		raise exception '%',v_resp;
+				        
 END;
 $body$
 LANGUAGE 'plpgsql'

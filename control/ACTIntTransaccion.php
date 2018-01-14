@@ -8,6 +8,7 @@
 */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
 require_once(dirname(__FILE__).'/../reportes/RMayorXls.php');
+include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
 
 class ACTIntTransaccion extends ACTbase{
 			
@@ -387,7 +388,75 @@ class ACTIntTransaccion extends ACTbase{
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		}					
-	}	
+	}
+
+	function SubirArchivoTran(){
+        $arregloFiles = $this->objParam->getArregloFiles();
+        $ext = pathinfo($arregloFiles['archivo']['name']);
+        $extension = $ext['extension'];
+        $error = 'no';
+        $mensaje_completo = '';
+        
+        if(isset($arregloFiles['archivo']) && is_uploaded_file($arregloFiles['archivo']['tmp_name'])) {
+            if (!in_array($extension, array('xls', 'xlsx', 'XLS', 'XLSX'))) {
+                $mensaje_completo = "La extensión del archivo debe ser XLS o XLSX";
+                $error = 'error_fatal';
+            } else {
+                //procesa Archivo
+                $archivoExcel = new ExcelInput($arregloFiles['archivo']['tmp_name'], 'IMPTRACON');
+                $archivoExcel->recuperarColumnasExcel();
+                $arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
+                foreach ($arrayArchivo as $fila) {					
+                    $this->objParam->addParametro('centro_costo', $fila['centro_costo']);
+                    $this->objParam->addParametro('partida', $fila['partida']);
+                    $this->objParam->addParametro('cuenta', $fila['cuenta']);
+                    $this->objParam->addParametro('auxiliar', $fila['auxiliar']);
+                    $this->objParam->addParametro('orden', $fila['orden']);
+                    $this->objParam->addParametro('suborden', $fila['suborden']);
+                    $this->objParam->addParametro('saldo', $fila['saldo']);
+                    $this->objParam->addParametro('debe', $fila['debe']);
+                    $this->objParam->addParametro('haber', $fila['haber']);
+					$this->objParam->addParametro('glosa', $fila['glosa']);
+
+                    $this->objFunc = $this->create('MODIntTransaccion');
+                    $this->res = $this->objFunc->insertarIntTransaccionXLS($this->objParam);
+
+                    if ($this->res->getTipo() == 'ERROR') {
+                        $error = 'error';
+                        $mensaje_completo = "Error al guardar el fila en tabla " . $this->res->getMensajeTec();
+                        break;
+                    }
+                }
+            }
+        } else {
+            $mensaje_completo = "No se subio el archivo";
+            $error = 'error_fatal';
+        }
+        
+
+        if ($error == 'error_fatal') {
+            $this->mensajeRes=new Mensaje();
+            $this->mensajeRes->setMensaje('ERROR','ACTIntTransaccion.php',$mensaje_completo,
+                $mensaje_completo,'control');
+            //si no es error fatal proceso el archivo
+        }
+
+        if ($error == 'error') {
+            $this->mensajeRes=new Mensaje();
+            $this->mensajeRes->setMensaje('ERROR','ACTIntTransaccion.php','Ocurrieron los siguientes errores : ' . $mensaje_completo,
+                $mensaje_completo,'control');
+
+        } else if ($error == 'no') {
+            $this->mensajeRes=new Mensaje();
+            $this->mensajeRes->setMensaje('EXITO','ACTIntTransaccion.php','El archivo fue ejecutado con éxito',
+                'El archivo fue ejecutado con éxito','control');
+        }
+
+        //devolver respuesta
+        $this->mensajeRes->imprimirRespuesta($this->mensajeRes->generarJson());
+    }
+
+		
 }
 
 ?>

@@ -4506,8 +4506,20 @@ COMMENT ON COLUMN conta.tdoc_compra_venta.id_funcionario
 IS 'registor auxiliar de apsajes, util para compra de boletos aereos donde es necesario indicar quien esta viajando';
 
 
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_calculo
+  ADD COLUMN sw_registro VARCHAR(5) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN conta.tplantilla_calculo.sw_registro
+IS 'Si registra el resultado en una trasaccion,  en caso contrario ,no, sirve como calculo auxiliar porejmplo en polizas de importación';
+
+
+
 
 /***********************************F-SCP-RAC-CONTA-1-05/01/2018****************************************/
+  
+  
   
 
 

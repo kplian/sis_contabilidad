@@ -156,6 +156,35 @@ class MODIntTransaccion extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+	function insertarIntTransaccionXLS(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_transaccion_ime';
+		$this->transaccion='CONTA_TRANSAXLS_INS';
+		$this->tipo_procedimiento='IME';		
+		
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('centro_costo','centro_costo','varchar');
+		$this->setParametro('partida','partida','varchar');
+		$this->setParametro('cuenta','cuenta','varchar');
+		$this->setParametro('auxiliar','auxiliar','varchar');
+		$this->setParametro('orden','orden','varchar');
+		$this->setParametro('suborden','suborden','varchar');
+        $this->setParametro('saldo','saldo','numeric');
+		$this->setParametro('debe','debe','numeric');
+		$this->setParametro('haber','haber','numeric');
+		$this->setParametro('glosa','glosa','varchar');		
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 	function modificarIntTransaccion(){
 		//Definicion de variables para ejecucion del procedimiento

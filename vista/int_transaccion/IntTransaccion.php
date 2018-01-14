@@ -78,8 +78,29 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Detalle del Pago</b><br/>Si la transaccion afecta bancos esta opción permite regitrar datos relacioandos (forma de pago, etc) '
             }
         );
+        this.addButton('btnTransaccionesUpload',
+	            {
+	                text: 'Subir Trans.',	                
+	                iconCls: 'bchecklist',
+	                disabled: true,
+	                handler: this.SubirArchivo,
+	                tooltip: '<b>Subir Transacciones</b><br/>desde Excel (xlsx).'
+	            }
+	        );
         
 	},
+	SubirArchivo : function(rec)
+    {                   
+        
+    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/SubirArchivoTran.php',
+        'Subir Transacciones desde Excel',
+        {
+            modal:true,
+            width:450,
+            height:150
+        },this.maestro,this.idContenedor,'SubirArchivoTran');
+	   
+    },
 		
 	Atributos:[
 		{

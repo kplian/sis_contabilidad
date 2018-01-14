@@ -38,9 +38,8 @@ class MODPlantillaCalculo extends MODbase{
 		$this->captura('importe_presupuesto','numeric');
 		$this->captura('descuento','varchar');		
 		$this->captura('usar_cc_original','varchar');
-		$this->captura('imputar_excento','varchar');
-		
-
+		$this->captura('imputar_excento','varchar');		
+		$this->captura('sw_registro','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -54,8 +53,7 @@ class MODPlantillaCalculo extends MODbase{
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='conta.ft_plantilla_calculo_ime';
 		$this->transaccion='CONTA_PLACAL_INS';
-		$this->tipo_procedimiento='IME';
-				
+		$this->tipo_procedimiento='IME';				
 		//Define los parametros para la funcion
 		$this->setParametro('prioridad','prioridad','int4');
 		$this->setParametro('debe_haber','debe_haber','varchar');
@@ -68,8 +66,8 @@ class MODPlantillaCalculo extends MODbase{
 		$this->setParametro('importe_presupuesto','importe_presupuesto','numeric');
 		$this->setParametro('descuento','descuento','varchar');		
 		$this->setParametro('usar_cc_original','usar_cc_original','varchar');		
-		$this->setParametro('imputar_excento','imputar_excento','varchar');
-		
+		$this->setParametro('imputar_excento','imputar_excento','varchar');		
+		$this->setParametro('sw_registro','sw_registro','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -100,6 +98,7 @@ class MODPlantillaCalculo extends MODbase{
 		
 		$this->setParametro('usar_cc_original','usar_cc_original','varchar');		
 		$this->setParametro('imputar_excento','imputar_excento','varchar');
+		$this->setParametro('sw_registro','sw_registro','varchar');
 		
 
 		//Ejecuta la instruccion

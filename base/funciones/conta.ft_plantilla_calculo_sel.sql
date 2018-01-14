@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_calculo_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -45,25 +47,26 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						placal.id_plantilla_calculo,
-						placal.prioridad,
-						placal.debe_haber,
-						placal.tipo_importe,
-						placal.id_plantilla,
-						placal.codigo_tipo_relacion,
-						placal.importe,
-						placal.descripcion,
-						placal.estado_reg,
-						placal.id_usuario_reg,
-						placal.fecha_reg,
-						placal.fecha_mod,
-						placal.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-						placal.importe_presupuesto,
-						placal.descuento,
-                        placal.usar_cc_original,
-                        placal.imputar_excento	
+                            placal.id_plantilla_calculo,
+                            placal.prioridad,
+                            placal.debe_haber,
+                            placal.tipo_importe,
+                            placal.id_plantilla,
+                            placal.codigo_tipo_relacion,
+                            placal.importe,
+                            placal.descripcion,
+                            placal.estado_reg,
+                            placal.id_usuario_reg,
+                            placal.fecha_reg,
+                            placal.fecha_mod,
+                            placal.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            placal.importe_presupuesto,
+                            placal.descuento,
+                            placal.usar_cc_original,
+                            placal.imputar_excento,
+                            placal.sw_registro
 						from conta.tplantilla_calculo placal
 						inner join segu.tusuario usu1 on usu1.id_usuario = placal.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = placal.id_usuario_mod

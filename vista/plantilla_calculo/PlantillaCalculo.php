@@ -288,10 +288,33 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
             egrid: true,
             form:true
        },
-        
-        
-        
-        {
+       
+       {
+            config:{
+                name: 'sw_registro',
+                fieldLabel: 'Registrar Trasaccion',
+                qtip: 'Si, registra la trasaccion en el cbte si es distinto de cero, en caso cotnrario solo se utiliza como calculo auxiliar',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{   pfiltro:'imputar_excento',
+                        type: 'list',
+                         options: ['si','no']  
+                    },
+            valorInicial: 'no',        
+            grid:true,
+            egrid: true,
+            form:true
+       },       
+       {
             config:{
                 name: 'estado_reg',
                 fieldLabel: 'Estado Reg.',
@@ -393,7 +416,7 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         {name:'usr_mod', type: 'string'},
         {name:'importe_presupuesto', type: 'numeric'},
         {name:'descuento', type: 'string'},        
-        'usar_cc_original', 'imputar_excento'
+        'usar_cc_original', 'imputar_excento','sw_registro'
         
     ],
     sortInfo:{
