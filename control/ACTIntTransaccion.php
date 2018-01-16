@@ -406,24 +406,28 @@ class ACTIntTransaccion extends ACTbase{
                 $archivoExcel = new ExcelInput($arregloFiles['archivo']['tmp_name'], 'IMPTRACON');
                 $archivoExcel->recuperarColumnasExcel();
                 $arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
-                foreach ($arrayArchivo as $fila) {					
+                foreach ($arrayArchivo as $fila) {
+                	//var_dump($fila)	;echo"<br>";				
                     $this->objParam->addParametro('centro_costo', $fila['centro_costo']);
                     $this->objParam->addParametro('partida', $fila['partida']);
                     $this->objParam->addParametro('cuenta', $fila['cuenta']);
                     $this->objParam->addParametro('auxiliar', $fila['auxiliar']);
                     $this->objParam->addParametro('orden', $fila['orden']);
-                    $this->objParam->addParametro('suborden', $fila['suborden']);
-                    $this->objParam->addParametro('saldo', $fila['saldo']);
+                    $this->objParam->addParametro('suborden', $fila['suborden']);                  
                     $this->objParam->addParametro('debe', $fila['debe']);
                     $this->objParam->addParametro('haber', $fila['haber']);
 					$this->objParam->addParametro('glosa', $fila['glosa']);
-
+                    
                     $this->objFunc = $this->create('MODIntTransaccion');
                     $this->res = $this->objFunc->insertarIntTransaccionXLS($this->objParam);
-
+                   
                     if ($this->res->getTipo() == 'ERROR') {
+                    	
+						$this->res->imprimirRespuesta($this->res->generarJson());
+			            exit;
+						
                         $error = 'error';
-                        $mensaje_completo = "Error al guardar el fila en tabla " . $this->res->getMensajeTec();
+                        $mensaje_completo = "Error al guardar el fila en tabla :  " . $this->res->getMensajeTec();
                         break;
                     }
                 }
@@ -433,6 +437,7 @@ class ACTIntTransaccion extends ACTbase{
             $error = 'error_fatal';
         }
         
+		
 
         if ($error == 'error_fatal') {
             $this->mensajeRes=new Mensaje();
