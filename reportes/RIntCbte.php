@@ -39,7 +39,7 @@ class RIntCbte extends  ReportePDF {
 				$this->writeHTML($content, true, false, true, false, '');
 		}
 		else{
-		        $this->SetMargins(15, 42, 5);
+		        $this->SetMargins(15, 46, 5);  //15 46 5
 			    ob_start();
 				include(dirname(__FILE__).'/../reportes/tpl/cabecera.php');
 		        $content = ob_get_clean();
@@ -86,14 +86,15 @@ class RIntCbte extends  ReportePDF {
 		
 		$this->SetFont ('helvetica', '', 5 , '', 'default', true );
 		
-		
+		//$this->Ln(2);
 		foreach($this->detalleCbte as $key=>$val){
 		   	
 		   $sw = 1;	
 		   if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&  $val['importe_debe'] == 0 && $val['importe_haber'] == 0){
 				$sw = 0;	
 		   }
-		   	
+		   
+		   
 		   if ($sw == 1){ 		
 		    	ob_start();
 			    include(dirname(__FILE__).'/../reportes/tpl/transaccion.php');
@@ -103,13 +104,11 @@ class RIntCbte extends  ReportePDF {
 				
 				$this->writeHTML($content, false, false, true, false, '');
 				
-				
+			
 				$this->tot_debe+=$val['importe_debe'];
 				$this->tot_haber+=$val['importe_haber'];
 				$this->tot_debe_mb+=$val['importe_debe_mb'];
 				$this->tot_haber_mb+=$val['importe_haber_mb'];
-				
-				
 				
 		    }	
 			

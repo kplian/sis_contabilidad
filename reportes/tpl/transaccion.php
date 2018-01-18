@@ -1,6 +1,8 @@
 <font size="7"><table width="100%" cellpadding="1px"  rules="cols" border="0">
+
 <tr>
-		    <td width="<?php  echo $with_col; ?>" style="border-left: 1px solid #000;"><div><br>
+
+		    <td width="<?php  echo $with_col; ?>" style="border-left: 1px solid #000; vertical-align: bottom ;"><div><br>
 				<b>CC:</b> <?php  echo  $val['cc']; ?> 
 			<?php if  ($val['codigo_partida']!=''){ 
 				
@@ -28,6 +30,7 @@
 			</td>
 			
 		<?php 
+		
 		  if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base']){
 		 ?>
 			<td width="15%" align="right" style="border-left: 0px solid #000;"><span><?php  if ($val['importe_gasto']>0) {echo  number_format($val['importe_gasto'], 2, '.', ',');}else{echo  number_format($val['importe_recurso'], 2, '.', ',');} ?></span></td>
