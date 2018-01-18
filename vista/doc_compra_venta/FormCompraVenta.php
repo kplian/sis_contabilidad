@@ -1545,7 +1545,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		       		    hiddenName: 'id_funcionario',
 		   				origen:'FUNCIONARIO',
 		   				fieldLabel:'Funcionario',
-		   				allowBlank: false,
+		   				allowBlank: true,
 		                valueField: 'id_funcionario',
 		   			    gdisplayField: 'desc_funcionario2',
 		   			    baseParams: { fecha: new Date()}

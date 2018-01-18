@@ -229,7 +229,9 @@ Phx.vista.RelacionContableTabla = {
 				    			//si se selecciona automaticamente la partida ya no se filtrara por cuenta ni por centro de costo
 				    			this.filtro_partida = 'si';
 				    			//si selecciona automaticamante la partida es necesario aplicar nuevo filtro al centro de costos
-				    			this.Cmp.id_centro_costo.store.setBaseParam('id_partida',r[0].data.id_partida);
+				    			
+				    			//RAC ,17/01/2018,  se comenta el filtro de aprtida sobre el presupeusto para que la parametrizacion sea mas facil
+				    			//this.Cmp.id_centro_costo.store.setBaseParam('id_partida',r[0].data.id_partida);
 				    		}			    			    		
 				    	}, scope : this
 				    });
