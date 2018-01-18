@@ -171,10 +171,9 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('cuenta','cuenta','varchar');
 		$this->setParametro('auxiliar','auxiliar','varchar');
 		$this->setParametro('orden','orden','varchar');
-		$this->setParametro('suborden','suborden','varchar');
-        $this->setParametro('saldo','saldo','numeric');
-		$this->setParametro('debe','debe','numeric');
-		$this->setParametro('haber','haber','numeric');
+		$this->setParametro('suborden','suborden','varchar');        
+		$this->setParametro('debe','debe','varchar');
+		$this->setParametro('haber','haber','varchar');
 		$this->setParametro('glosa','glosa','varchar');		
 		
 
