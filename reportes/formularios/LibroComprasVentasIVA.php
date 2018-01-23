@@ -376,13 +376,13 @@ header("content-type: text/javascript; charset=UTF-8");
 	ActSave:'../../sis_contabilidad/control/DocCompraVentaForm/reporteLCV',
 	
     successSave :function(resp){
+   
        Phx.CP.loadingHide();
        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-        if (reg.ROOT.error) {
+       if (reg.ROOT.error) {
             alert('error al procesar');
             return
        } 
-       
        var nomRep = reg.ROOT.detalle.archivo_generado;
         if(Phx.CP.config_ini.x==1){  			
         	nomRep = Phx.CP.CRIPT.Encriptar(nomRep);
@@ -394,7 +394,6 @@ header("content-type: text/javascript; charset=UTF-8");
         else{
         	window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
         }
-       
 	}
 })
 </script>
