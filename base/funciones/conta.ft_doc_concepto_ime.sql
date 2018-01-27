@@ -38,6 +38,7 @@ DECLARE
     v_id_cuenta  			integer;
     v_id_partida	integer;
     v_id_auxiliar	integer;
+    v_id_gestion	integer;
 			    
 BEGIN
 
@@ -105,7 +106,18 @@ BEGIN
                raise exception 'no se encontro relacion contable ...';
            END IF;
            
-          
+           
+           --RAC 24/01/2018  verificar que el centro de csoto se correponda con la fecha de la cabecera
+           select 
+             id_gestion 
+            into 
+            v_id_gestion 
+           from param.tcentro_costo cc 
+           where cc.id_centro_costo = v_parametros.id_centro_costo;
+           
+           IF  v_registros_doc.id_gestion  !=  v_id_gestion THEN
+             raise exception 'El centro de costo no es de la misma gestión que el documento';
+           END IF;
         
         	--Sentencia de la insercion
         	insert into conta.tdoc_concepto(
@@ -205,7 +217,17 @@ BEGIN
                                                      'No se encontro relación contable para el conceto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
           
         
-        
+              --RAC 24/01/2018  verificar que el centro de csoto se correponda con la fecha de la cabecera
+             select 
+               id_gestion 
+              into 
+               v_id_gestion 
+             from param.tcentro_costo cc 
+             where cc.id_centro_costo = v_parametros.id_centro_costo;
+           
+            IF  v_registros_doc.id_gestion  !=  v_id_gestion THEN
+             raise exception 'El centro de costo no es de la misma gestión que el documento';
+            END IF;
         
 			--Sentencia de la modificacion
 			update conta.tdoc_concepto set
