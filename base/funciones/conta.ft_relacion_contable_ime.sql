@@ -203,6 +203,8 @@ BEGIN
             
             END IF;
             
+         
+            
             
             -- si tiene centro de costo el id_tipo_presupeusto tiene que ser nulo
             IF v_parametros.id_centro_costo is not null AND v_parametros.id_tipo_presupuesto is not null THEN
@@ -275,9 +277,6 @@ BEGIN
 
 		begin
           
-        
-            raise exception 'La edicion de relaciones esta bloqueada';
-        
             -- sies una relacion contable unica buscamos que para la misma tabla no exista otrao
             select 
               * 
@@ -303,42 +302,93 @@ BEGIN
             
             END IF;
             
-            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN
-            
+            IF  pxp.f_existe_parametro(p_tabla, 'defecto') THEN            
                v_defecto =  v_parametros.defecto;
-        
-            ELSE
-            
+            ELSE            
                v_defecto = 'no';
-            
-            
             END IF;
             
             
+            -- RAC 07/09/2017, ...ahora peuden exitir mas de un valor por defecto por gestion en diferentes combianciones
+            -- valor por defecto para un tipo de presupesuto, para una moneda, para una aplicacion
+            
             IF  v_defecto = 'si'   THEN
-             --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
+               --si el valor es marcado como defecto es valido para cualquier atributo de la tabla  
                v_parametros.id_tabla = NULL;
                
-             --validamos que solo exista un parametro por defecto activo para la gestion 
-             
-             
-                IF   exists (select 1 
+                --validamos que solo exista un parametro por defecto activo para la gestion sin extras 
+                 IF   exists (select 1 
                              from conta.trelacion_contable rc 
                              where rc.defecto='si'  
                                and rc.id_tabla is NULL 
-                                and (rc.id_centro_costo = v_parametros.id_centro_costo or rc.id_centro_costo is NULL)
+                               and (rc.id_centro_costo = v_parametros.id_centro_costo or rc.id_centro_costo is NULL)
                                and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable
                                and rc.id_gestion = v_parametros.id_gestion
+                               and codigo_aplicacion is null
+                               and id_tipo_presupuesto is null
+                               and id_moneda is null                               
                                and rc.estado_reg='activo'
-                               and rc.id_relacion_contable != v_parametros.id_relacion_contable)     THEN
-                
-                   
-                      raise exception 'Ya existe un valor por defecto para este tipo de relacion contable'; 
-                    
-                END IF;  
-               
+                               and rc.id_relacion_contable != v_parametros.id_relacion_contable)     THEN                   
+                      raise exception 'Ya existe un valor po defecto para este tipo de relacion contable';                     
+                 END IF;  
+                 
+                 -------------------------------------------------------------------------------------------------------
+                 --con extras podriamos tener un valor podefecto para cada tipo de extra (por moneda, por valor de codigo o por tipo de presupeusto)
+                 --------------------------------------------------------------------------------------------------------
             
             END IF;
+            
+            
+               --RAC 27/10/2017, se considera moneda en la validacion 
+             IF v_tipo_rel.tiene_centro_costo = 'no' THEN  
+             
+                 IF v_tipo_rel.tiene_moneda = 'no'  THEN
+                 
+                       IF  EXISTS(select  1 
+                                     from conta.trelacion_contable  rc 
+                                     where rc.id_gestion = v_parametros.id_gestion 
+                                       and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
+                                       and rc.id_tabla = v_parametros.id_tabla
+                                       and rc.id_relacion_contable != v_parametros.id_relacion_contable
+                                       ) THEN                     
+                             raise exception 'Ya existe una relacion contable para este registro';                     
+                       END IF;   
+            
+                 
+                 ELSE
+                 
+                     IF  EXISTS(
+                                     select  1 
+                                     from conta.trelacion_contable  rc 
+                                     where rc.id_gestion = v_parametros.id_gestion 
+                                       and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
+                                       and rc.id_tabla = v_parametros.id_tabla
+                                       and rc.id_moneda = v_parametros.id_moneda
+                                       and rc.id_relacion_contable != v_parametros.id_relacion_contable
+                                       ) THEN                     
+                             raise exception 'Ya existe una relacion contable para este registro y moneda';                     
+                       END IF;   
+            
+                 
+                 END IF;
+                       
+            
+                      
+             END IF;
+            
+            
+             -- si tiene centro de costo el id_tipo_presupeusto tiene que ser nulo
+            IF v_parametros.id_centro_costo is not null AND v_parametros.id_tipo_presupuesto is not null THEN
+              raise exception 'Si configura un centro de costo , NO tiene que configurar un tipo de presupuesto';
+            END IF;
+            
+            -- si tiene moenda no puede tener id_tipo_presupuesto
+             IF v_parametros.id_moneda is not null AND v_parametros.id_tipo_presupuesto is not null THEN
+              raise exception 'Solo puede configarar moneda o tipo de presupeusto, no ambos';
+            END IF;
+            
+            
+         
         
         
 			--Sentencia de la modificacion

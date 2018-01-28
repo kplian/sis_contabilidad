@@ -25,10 +25,12 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				config:{
 						labelSeparator:'',
 						inputType:'hidden',
-						name: 'id_doc_compra_venta'
+						name: 'id_doc_compra_venta',
+						gwidth: 40,
 				},
 				type:'Field',
-				form:true 
+				form:true ,
+				grid:true
 			},
 			{
 				//configuracion del componente

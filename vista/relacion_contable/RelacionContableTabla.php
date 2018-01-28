@@ -346,6 +346,24 @@ Phx.vista.RelacionContableTabla = {
 	    console.log('compronete....', this.Cmp.codigo_aplicacion)
 	       
 	} ,
+	
+	onButtonEdit : function () {		
+		Phx.vista.RelacionContableTabla.superclass.onButtonEdit.call(this);
+		var selected = this.sm.getSelected().data;	
+		Phx.CP.loadingShow();
+		this.Cmp.id_tipo_relacion_contable.store.load({params:{start:0,limit:this.tam_pag, id_tipo_relacion_contable: this.Cmp.id_tipo_relacion_contable.getValue()}, 
+	       callback : function (r) {
+	       		if (r.length > 0 ) { 
+	    			this.Cmp.id_tipo_relacion_contable.fireEvent('select',this.Cmp.id_tipo_relacion_contable, r[0]);	    			 
+	    		}	    		 
+	    		this.form.getForm().isValid() 
+	    		Phx.CP.loadingHide();  
+	    			    		
+	    	}, scope : this
+	    });
+	    
+	},
+	/*
 	onButtonEdit : function () {
 	   
 		Phx.vista.RelacionContableTabla.superclass.onButtonEdit.call(this);
@@ -467,11 +485,7 @@ Phx.vista.RelacionContableTabla = {
 		this.Cmp.id_moneda.modificado = true;
 		
 		
-		
-		
-		
-		
-	}, 
+	}, */
 	loadValoresIniciales:function()  
     {
     	this.Cmp.defecto.setValue('no');

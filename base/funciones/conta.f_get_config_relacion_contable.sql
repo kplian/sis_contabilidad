@@ -75,6 +75,7 @@ DECLARE
     v_sw_ca					BOOLEAN;
     v_consulta_aplicacion   varchar;
     v_aplicacion   			varchar;
+    v_id_relacion_contable    integer;
 
 BEGIN
 
@@ -88,6 +89,8 @@ BEGIN
      ps_id_auxiliar=NULL;
      ps_id_partida=NULL;
      v_relacion_tabla = FALSE;
+     
+     
     
     
     --1)  recuperamos el tipo de relacion
@@ -147,7 +150,7 @@ BEGIN
    ----------------------------------------------------------------------------------------
    
   
-
+ 
   
    IF  v_registros.id_tabla_relacion_contable is NULL THEN
        
@@ -169,12 +172,14 @@ BEGIN
                             rc.id_cuenta,
                             rc.id_auxiliar,
                             rc.id_partida,
-                            rc.id_centro_costo
+                            rc.id_centro_costo,
+                            rc.id_relacion_contable
                          into
                             ps_id_cuenta,
                             ps_id_auxiliar,
                             ps_id_partida,
-                            ps_id_centro_costo
+                            ps_id_centro_costo,
+                            v_id_relacion_contable
                          from conta.trelacion_contable rc 
                          where  
                             rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
@@ -194,12 +199,14 @@ BEGIN
                           rc.id_cuenta,
                           rc.id_auxiliar,
                           rc.id_partida,
-                          rc.id_centro_costo
+                          rc.id_centro_costo,
+                          rc.id_relacion_contable
                        into
                           ps_id_cuenta,
                           ps_id_auxiliar,
                           ps_id_partida,
-                          ps_id_centro_costo
+                          ps_id_centro_costo,
+                          v_id_relacion_contable
                        from conta.trelacion_contable rc 
                        where  
                           rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
@@ -222,12 +229,14 @@ BEGIN
                                 rc.id_cuenta,
                                 rc.id_auxiliar,
                                 rc.id_partida,
-                                rc.id_centro_costo
+                                rc.id_centro_costo,
+                                rc.id_relacion_contable
                              into
                                 ps_id_cuenta,
                                 ps_id_auxiliar,
                                 ps_id_partida,
-                                ps_id_centro_costo
+                                ps_id_centro_costo,
+                                v_id_relacion_contable
                              from conta.trelacion_contable rc 
                              where  
                                 rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
@@ -244,12 +253,14 @@ BEGIN
                               rc.id_cuenta,
                               rc.id_auxiliar,
                               rc.id_partida,
-                              rc.id_centro_costo
+                              rc.id_centro_costo,
+                              rc.id_relacion_contable
                            into
                               ps_id_cuenta,
                               ps_id_auxiliar,
                               ps_id_partida,
-                              ps_id_centro_costo
+                              ps_id_centro_costo,
+                              v_id_relacion_contable
                         from conta.trelacion_contable rc 
                         where  
                               rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
@@ -278,12 +289,14 @@ BEGIN
                         rc.id_cuenta,
                         rc.id_auxiliar,
                         rc.id_partida,
-                        rc.id_centro_costo
+                        rc.id_centro_costo,
+                        rc.id_relacion_contable
                      into
                         ps_id_cuenta,
                         ps_id_auxiliar,
                         ps_id_partida,
-                        ps_id_centro_costo
+                        ps_id_centro_costo,
+                        v_id_relacion_contable
                      from conta.trelacion_contable rc 
                      where  
                         rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
@@ -316,12 +329,14 @@ BEGIN
                               rc.id_cuenta,
                               rc.id_auxiliar,
                               rc.id_partida,
-                              rc.id_centro_costo
+                              rc.id_centro_costo,
+                              rc.id_relacion_contable
                            into
                               ps_id_cuenta,
                               ps_id_auxiliar,
                               ps_id_partida,
-                              ps_id_centro_costo
+                              ps_id_centro_costo,
+                              v_id_relacion_contable
                            from conta.trelacion_contable rc 
                            where  
                               rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
@@ -346,12 +361,14 @@ BEGIN
                               rc.id_cuenta,
                               rc.id_auxiliar,
                               rc.id_partida,
-                              rc.id_centro_costo
+                              rc.id_centro_costo,
+                              rc.id_relacion_contable
                            into
                               ps_id_cuenta,
                               ps_id_auxiliar,
                               ps_id_partida,
-                              ps_id_centro_costo
+                              ps_id_centro_costo,
+                              v_id_relacion_contable
                            from conta.trelacion_contable rc 
                            where  
                               rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
@@ -374,12 +391,14 @@ BEGIN
                               rc.id_cuenta,
                               rc.id_auxiliar,
                               rc.id_partida,
-                              rc.id_centro_costo
+                              rc.id_centro_costo,
+                              rc.id_relacion_contable
                            into
                               ps_id_cuenta,
                               ps_id_auxiliar,
                               ps_id_partida,
-                              ps_id_centro_costo
+                              ps_id_centro_costo,
+                              v_id_relacion_contable
                            from conta.trelacion_contable rc 
                            where  
                               rc.id_tipo_relacion_contable =  v_registros.id_tipo_relacion_contable
@@ -400,12 +419,14 @@ BEGIN
                         rc.id_cuenta,
                         rc.id_auxiliar,
                         rc.id_partida,
-                        rc.id_centro_costo
+                        rc.id_centro_costo,
+                        rc.id_relacion_contable
                      into
                         ps_id_cuenta,
                         ps_id_auxiliar,
                         ps_id_partida,
-                        ps_id_centro_costo
+                        ps_id_centro_costo,
+                        v_id_relacion_contable
                      from conta.trelacion_contable rc 
                      where  
                         rc.id_tipo_relacion_contable=  v_registros.id_tipo_relacion_contable
@@ -442,6 +463,9 @@ BEGIN
           END IF;
           
             --Obtiene datos de larelación contable de tipo árbol
+            
+           --raise exception 'llega %, % ,% ',p_id_gestion, p_id_tabla, p_id_centro_costo ;
+           
         
           select
             lower(ttab.esquema) || '.' || lower(ttab.tabla) as tabla,
@@ -452,6 +476,7 @@ BEGIN
             ttab.tabla_id_auxiliar,
             trel.tiene_auxiliar,
             trel.codigo_aplicacion_catalogo
+         
           into 
              v_rec
           from conta.ttipo_relacion_contable trel
@@ -488,7 +513,8 @@ BEGIN
                        rc.id_cuenta,
                        rc.id_auxiliar,
                        rc.id_partida,
-                       rc.id_centro_costo
+                       rc.id_centro_costo,
+                       rc.id_relacion_contable
                    from conta.trelacion_contable rc 
                    where rc.id_tipo_relacion_contable = ' || v_registros.id_tipo_relacion_contable || '
                    and rc.id_gestion = ' || p_id_gestion || '
@@ -561,6 +587,7 @@ BEGIN
                                 ps_id_auxiliar = v_rec_rel.id_auxiliar;
                                 ps_id_partida = v_rec_rel.id_partida;
                                 ps_id_centro_costo = v_rec_rel.id_centro_costo;
+                                v_id_relacion_contable = v_rec_rel.id_relacion_contable;
                             end loop;
                             
                             if ps_id_cuenta is not null then
@@ -607,12 +634,15 @@ BEGIN
                       end if;
                   
                       v_sql1 = v_sql || va_sql[i] || ' limit 1 offset 0';
+                      
+                      raise notice 'Consulta .... %',v_sql1; --TODO
                              		  	  
                       for v_rec_rel in execute(v_sql1) loop
                           ps_id_cuenta = v_rec_rel.id_cuenta;
                           ps_id_auxiliar = v_rec_rel.id_auxiliar;
                           ps_id_partida = v_rec_rel.id_partida;
                           ps_id_centro_costo = v_rec_rel.id_centro_costo;
+                          v_id_relacion_contable = v_rec_rel.id_relacion_contable;
                       end loop;
                       
                       if ps_id_cuenta is not null then
@@ -704,6 +734,9 @@ BEGIN
            END IF;
          	
    END IF;
+   
+   ps_nombre_tipo_relacion = ps_nombre_tipo_relacion ||'('|| COALESCE( v_id_relacion_contable::varchar,' DI: N/I ') ||')';
+   
    
 
 return NEXT;

@@ -206,19 +206,20 @@ BEGIN
     	raise exception 'Validación no realizada: el comprobante debe tener al menos dos transacciones';
     end if;
     
-    
-    --se ejecuta funcion de prevalidacion si existe
-    IF v_rec_cbte.id_plantilla_comprobante is not null THEN
-           
-                select 
-                 pc.funcion_comprobante_prevalidado
-                into v_funcion_comprobante_prevalidado 
-                from conta.tplantilla_comprobante pc  
-                where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
-                
-                IF  v_funcion_comprobante_prevalidado is not null and v_funcion_comprobante_prevalidado != '' THEN
-                   EXECUTE ( 'select ' || v_funcion_comprobante_prevalidado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
-                END IF;                    
+    IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte  = '' THEN     --RAC, 25/01/2018  solo corresmos las plantilla si el cbte no tiene asignado un nro 
+          --se ejecuta funcion de prevalidacion si existe
+          IF v_rec_cbte.id_plantilla_comprobante is not null THEN
+                 
+                      select 
+                       pc.funcion_comprobante_prevalidado
+                      into v_funcion_comprobante_prevalidado 
+                      from conta.tplantilla_comprobante pc  
+                      where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+                      
+                      IF  v_funcion_comprobante_prevalidado is not null and v_funcion_comprobante_prevalidado != '' THEN
+                         EXECUTE ( 'select ' || v_funcion_comprobante_prevalidado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+                      END IF;                    
+          END IF;
     END IF;
     
     
@@ -384,7 +385,7 @@ BEGIN
                END IF;
                
                --el comprobante de apertura solo puede ser un comprobante de diaraio
-               IF v_codigo_clase_cbte != 'DIARIO' THEN
+               IF v_codigo_clase_cbte != 'DIARIOCON' THEN
                  raise exception 'El comprobante de paertura solo puede ser del tipo DIARIO (CDIR) no %', v_codigo_clase_cbte;
                END IF;
                
@@ -585,32 +586,35 @@ BEGIN
           
            
          ---------------------------------------------------------------------------------------- 
-         -- si viene de una plantilla de comprobante busca la funcion de validacion configurada
+         -- si tiene de una plantilla de comprobante busca la funcion de validacion configurada
          ----------------------------------------------------------------------------------------
-           
-         IF v_rec_cbte.id_plantilla_comprobante is not null  THEN
-           
-                select 
-                 pc.funcion_comprobante_validado
-                into v_funcion_comprobante_validado 
-                from conta.tplantilla_comprobante pc  
-                where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
-                
-                
-                -- raise exception 'llega % ---', v_funcion_comprobante_validado;
-                
-                -- raise exception 'validar comprobante pxp %',v_funcion_comprobante_validado ;
-              	 IF  v_funcion_comprobante_validado is not null and v_funcion_comprobante_validado != '' THEN
-                    EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
-                end IF;                   
-          ELSE
-                -- si no tenemos plantilla de comprobante revisamos la funcin directamente	          
-                IF v_rec_cbte.funcion_comprobante_validado is not NULL and v_rec_cbte.funcion_comprobante_validado != '' THEN
-                   EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
-                END IF;
-           
-         END IF;
-           
+
+         --  Obtención del número de comprobante, si no tiene un numero asignado
+         IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte  = '' THEN     --RAC, 25/01/2018  solo corresmos las plantilla si el cbte no tiene asignado un nro 
+             IF v_rec_cbte.id_plantilla_comprobante is not null  THEN
+               
+                    select 
+                     pc.funcion_comprobante_validado
+                    into v_funcion_comprobante_validado 
+                    from conta.tplantilla_comprobante pc  
+                    where pc.id_plantilla_comprobante = v_rec_cbte.id_plantilla_comprobante;
+                    
+                    
+                    -- raise exception 'llega % ---', v_funcion_comprobante_validado;
+                    
+                    -- raise exception 'validar comprobante pxp %',v_funcion_comprobante_validado ;
+                     IF  v_funcion_comprobante_validado is not null and v_funcion_comprobante_validado != '' THEN
+                        EXECUTE ( 'select ' || v_funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+                    end IF;                   
+              ELSE
+                    -- si no tenemos plantilla de comprobante revisamos la funcin directamente	          
+                    IF v_rec_cbte.funcion_comprobante_validado is not NULL and v_rec_cbte.funcion_comprobante_validado != '' THEN
+                       EXECUTE ( 'select ' || v_rec_cbte.funcion_comprobante_validado  ||'('||p_id_usuario::varchar||','||COALESCE(p_id_usuario_ai::varchar,'NULL')||','||COALESCE(''''||p_usuario_ai::varchar||'''','NULL')||','|| p_id_int_comprobante::varchar||', '||COALESCE('''' || v_nombre_conexion || '''','NULL')||')');
+                    END IF;
+               
+             END IF;
+          END IF; 
+
          
           
          --------------------------------------------------

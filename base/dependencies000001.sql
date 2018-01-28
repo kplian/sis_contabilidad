@@ -4181,3 +4181,63 @@ AS
      JOIN conta.ttipo_doc_compra_venta tdcv ON tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
   WHERE pla.tipo_informe::text = 'retenciones'::text AND pc.descuento::text = 'si'::text;
 /**********************************F-DEP-MANU-CONTA-0-18/10/2017****************************************/
+
+
+
+/**********************************I-DEP-RAC-CONTA-0-29/01/2018****************************************/
+
+
+--------------- SQL ---------------
+
+CREATE VIEW conta.vdoc_compra_venta_proveedor 
+AS 
+
+SELECT ad.id_agrupador_doc,
+         dcv.id_moneda,
+         dcv.id_int_comprobante,
+         dcv.id_plantilla,
+         dcv.importe_doc,
+         dcv.importe_excento,
+         COALESCE(dcv.importe_excento, 0::numeric) + COALESCE(dcv.importe_ice, 0
+           ::numeric) AS importe_total_excento,
+         dcv.importe_descuento,
+         dcv.importe_descuento_ley,
+         dcv.importe_ice,
+         dcv.importe_it,
+         dcv.importe_iva,
+         dcv.importe_pago_liquido,
+         dcv.nro_documento,
+         dcv.nro_dui,
+         dcv.nro_autorizacion,
+         dcv.razon_social,
+         dcv.revisado,
+         dcv.manual,
+         dcv.obs,
+         dcv.nit,
+         dcv.fecha,
+         dcv.codigo_control,
+         dcv.sw_contabilizar,
+         dcv.tipo,
+         ad.id_agrupador,
+         ad.id_doc_compra_venta,
+         (((dcv.razon_social::text || ' - '::text) || ' ( '::text) ||
+           ' ) Nro Doc: '::text) || COALESCE(dcv.nro_documento)::text AS
+           descripcion,
+         dcv.importe_neto,
+         dcv.importe_anticipo,
+         dcv.importe_pendiente,
+         dcv.importe_retgar,
+         dcv.id_auxiliar,
+         pro.id_proveedor
+  FROM conta.tagrupador_doc ad
+  JOIN conta.tdoc_compra_venta dcv ON ad.id_doc_compra_venta =  dcv.id_doc_compra_venta
+  LEFT  JOIN conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+       left JOIN param.tproveedor pro on pro.codigo = aux.codigo_auxiliar
+ ;
+
+
+/**********************************F-DEP-RAC-CONTA-0-29/01/2018****************************************/
+
+
+
+
