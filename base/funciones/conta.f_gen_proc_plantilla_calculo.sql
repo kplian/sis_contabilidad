@@ -16,7 +16,7 @@ $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.f_gen_proc_plantilla_calculo
- DESCRIPCION:   esta funcion procesa la plantilla de calculo e insertar las transacciones necesarias
+ DESCRIPCION:   esta funcion procesa la plantilla de calculo e insertar las transacciones necesarias  
  AUTOR: 		 RAC KPLIAN
  FECHA:	        04-09-2013 03:51:00
  COMENTARIOS:	
@@ -56,6 +56,7 @@ DECLARE
     v_porc_importe numeric;
     v_porc_importe_presupuesto numeric;
      v_conta_partidas				varchar;
+     v_registros_rest    record;
 			    
 BEGIN
 
@@ -182,8 +183,39 @@ BEGIN
                     --  IF  p_id_plantilla =  25  THEN
                     --      raise exception '% ,  %    ', v_monto_x_aplicar, v_monto_revertir;
                     -- END IF; 
+                    
+                    
+                      IF v_registros.sw_registro = 'si'  THEN
                      
+                           -- si es prorirdad 1 y tiene alguna trasaccion de mauor priodidad del tipo restar
+                           IF v_registros.prioridad  =  1 THEN
+                              
+                                   FOR v_registros_rest in (  
+                                      SELECT  
+                                              pc.tipo_importe,
+                                              sum(pc.importe) as importe,
+                                              sum(pc.importe_presupuesto) as importe_presupuesto
+                                      FROM  conta.tplantilla_calculo pc 
+                                      inner join param.tplantilla plan on plan.id_plantilla = pc.id_plantilla
+                                      WHERE pc.estado_reg = 'activo' and
+                                            pc.id_plantilla = p_id_plantilla 
+                                            and pc.sw_restar = 'si'  
+                                      GROUP BY  pc.tipo_importe) LOOP
+                                      
+                                         IF v_registros_rest.tipo_importe = 'porcentaje' THEN                                           
+                                            v_monto_x_aplicar = v_monto_x_aplicar - (v_monto_x_aplicar* COALESCE(v_registros_rest.importe,0));
+                                            v_monto_x_aplicar_pre = v_monto_x_aplicar_pre - (v_monto_x_aplicar* COALESCE(v_registros_rest.importe_presupuesto,0));
+                                            
+                                         ELSE
+                                            v_monto_x_aplicar = v_monto_x_aplicar - COALESCE(v_registros_rest.importe,0);
+                                            v_monto_x_aplicar_pre = v_monto_x_aplicar_pre - COALESCE(v_registros_rest.importe_presupuesto,0);
+                                         END IF;
+                                      
+                                      END LOOP;
+                           
+                           END IF;
                      
+                     END IF;
                      --  acomoda en el debe o haber 
                      --  acomoda la ejecucion presupuestaria
                      
@@ -254,7 +286,7 @@ BEGIN
                           
                           
                           IF(v_record_rel_con.ps_id_cuenta is NULL) THEN
-                             raise exception 'Revisar la ps_id_cuenta para la relacion contable:  % (%)',  v_record_rel_con.ps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion;
+                             raise exception 'Revisar la ps_id_cuenta para la relacion contable:  % (%) ID(%)',  v_record_rel_con.ps_nombre_tipo_relacion,v_registros.codigo_tipo_relacion, v_record_int_tran.id_centro_costo;
                           END IF;
                           
                           v_conta_partidas = pxp.f_get_variable_global('conta_partidas');

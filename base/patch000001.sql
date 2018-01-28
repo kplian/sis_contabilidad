@@ -4523,5 +4523,50 @@ IS 'Si registra el resultado en una trasaccion,  en caso contrario ,no, sirve co
   
 
 
+/***********************************I-SCP-RAC-CONTA-1-25/01/2018****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_calculo
+  ADD COLUMN sw_restar VARCHAR(8) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tplantilla_calculo.sw_restar
+IS 'Para usar en pasajes con exceto internacionales donde el sabsa debe restar al valor proginal al final de los calculos (difenrete de descontar)';
+
+
+
+/***********************************F-SCP-RAC-CONTA-1-27/01/2018****************************************/
+  
+  
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-25/01/2018****************************************/
+
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN monto_no_ejecutado NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.monto_no_ejecutado
+IS 'monto que no se va aejcutar , en la monada de la trasaccion';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN monto_no_ejecutado_mb NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.monto_no_ejecutado_mb
+IS 'monto a no ejecutar en moneda base';
+
+
+
+
+
+/***********************************F-SCP-RAC-CONTA-1-27/01/2018****************************************/
+
+
+
 
 

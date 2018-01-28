@@ -32,6 +32,7 @@ header("content-type: text/javascript; charset=UTF-8");
         plantillaProrrateo: [], //07/12/2017 , RAc adcionar plantilal de prorrateo
         constructor:function(config)
         {
+            console.log('despues despues')
             this.addEvents('beforesave');
             this.addEvents('successsave');
             if (config.data.mostrarFormaPago === false) {

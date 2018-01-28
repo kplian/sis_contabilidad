@@ -15,6 +15,12 @@ $body$
     Descripción: 
      Nueva funcion para gestion de presupuesto simplicada, toma ventaja de que el presupuesto se ejecuta 
      directamente en pxp y no depende del deblink
+     
+   ISSUE            FECHA:		           AUTOR                 DESCRIPCION
+ #31, ETR       27/12/20178              RAC KPLIAN           que considere los monto noejectuados, registrados por cada transaccion
+ 
+          
+     
 */
 DECLARE
   
@@ -55,6 +61,9 @@ DECLARE
   v_importe_gasto_mb 				numeric;
   v_importe_recurso_mb 				numeric;
   v_reg_par_eje						record;
+  
+ v_monto_cmp_aux 				numeric;
+ v_monto_cmp_mb_aux				numeric;
   
     
 BEGIN
@@ -163,7 +172,9 @@ BEGIN
                                      it.importe_reversion,
                                      it.factor_reversion,
                                      par.codigo as codigo_partida,
-                                     it.actualizacion
+                                     it.actualizacion,
+                                     it.monto_no_ejecutado_mb,
+                                     it.monto_no_ejecutado
                                   from conta.tint_transaccion it
                                   inner join pre.tpartida par on par.id_partida = it.id_partida
                                   inner join pre.tpresupuesto pr on pr.id_centro_costo = 
@@ -191,17 +202,18 @@ BEGIN
                           
                                 -- si solo ejecutamos el presupuesto 
                                 --  o (compromentemos y ejecutamos) 
-                                --  o (compromentemos, ejecutamos y pagamos)     
+                                --  o (compromentemos, ejecutamos y pagamos) 
                                 
+                                    
+                                -----------------------------------------------------------------------------------------
                                 -- si tiene partida ejecucion de comprometido y nose corresponde con la gestion
-                                --  lo ponemos en null para que comprometa
-                                
+                                --  lo ponemos en null para que comprometa                                
                                 --  es para devegar planes de pago que quedaron pendientes de una  gestion anterior
+                                -----------------------------------------------------------------------------------------
                                 
                                 IF v_registros.id_partida_ejecucion is not NULL THEN 
                                 
-                                                                      
-                                   
+                                      
                                    select
                                        par.id_gestion
                                    into
@@ -251,7 +263,7 @@ BEGIN
                                          IF v_registros.tipo = 'gasto'  THEN
                                              -- importe debe ejecucion
                                              IF v_importe_gasto > 0  or v_importe_gasto_mb > 0 THEN
-                                                 v_monto_cmp  = v_importe_gasto;
+                                                 v_monto_cmp  = v_importe_gasto ;
                                                  v_monto_cmp_mb = v_importe_gasto_mb;                                                                                           
                                              END IF;
                                              --importe haber es reversion, multiplicar por -1
@@ -275,7 +287,17 @@ BEGIN
                                          END IF;
                                            
                                        -- raise exception 'entra.. % --  %',v_monto_cmp, v_monto_cmp_mb;
-                                
+                                        IF  v_monto_cmp  > 0 THEN
+                                            --si es ejecucion restamos el monto a no ejecutar
+                                            v_monto_cmp_aux   = 	v_monto_cmp	 - 	v_registros.monto_no_ejecutado;
+                                            v_monto_cmp_mb_aux	 = 	v_monto_cmp_mb - 	v_registros.monto_no_ejecutado_mb;
+                                        ELSEIF v_monto_cmp < 0 THEN
+                                           --si es reversion sumammos el monto a ejecutar
+                                            v_monto_cmp_aux  = 	v_monto_cmp	 + 	v_registros.monto_no_ejecutado;
+                                            v_monto_cmp_mb_aux	 = 	v_monto_cmp_mb + 	v_registros.monto_no_ejecutado_mb;
+                                        ELSE                                           
+                                           raise exception 'monto no contemplado';
+                                        END IF;
            
                               
                                         -- llamamos a la funcion de ejecucion
@@ -285,8 +307,8 @@ BEGIN
                                                                                     v_registros.id_presupuesto, 
                                                                                     v_registros.id_partida, 
                                                                                     v_id_moneda, 
-                                                                                    v_monto_cmp,
-                                                                                    v_monto_cmp_mb, 
+                                                                                    v_monto_cmp_aux,
+                                                                                    v_monto_cmp_mb_aux, 
                                                                                     p_fecha_ejecucion, 
                                                                                     v_momento_presupeustario, 
                                                                                     v_registros.id_partida_ejecucion, 
@@ -361,7 +383,10 @@ BEGIN
                                                         v_monto_cmp_mb = (v_monto_cmp_mb * v_registros.factor_reversion)/(1 - v_registros.factor_reversion);
                                                   END IF;
                                                   
-                                                   -- llamar a la funcion para revertir el comprometido
+                                                  
+                                                   --  considerar ei el monto ejecutado no consumio todo
+                                                  
+                                                   --  llamar a la funcion para revertir el comprometido
                                                  
                                                    v_resp_ges = pre.f_gestionar_presupuesto_v2(
                                                                                             p_id_usuario, 
