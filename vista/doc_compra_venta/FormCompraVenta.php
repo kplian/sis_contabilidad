@@ -1858,8 +1858,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             }
 
-            if(this.tmp_porc_monto_excento_var){
-                alert('ENTRA ...')
+            if(this.tmp_porc_monto_excento_var){               
                 this.Cmp.importe_excento.setValue(this.Cmp.importe_neto.getValue()*this.tmp_porc_monto_excento_var)
             }
 
