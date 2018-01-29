@@ -41,7 +41,9 @@ header("content-type: text/javascript; charset=UTF-8");
             Ext.apply(this,config);
             this.obtenerVariableGlobal(config);
             this.generarAtributos();
-          
+			
+			this.extraSubmitCampo = config.data.extraSubmitCampo;
+			this.extraSubmitValor = config.data.extraSubmitValor;          
 
         },
 
@@ -2418,7 +2420,15 @@ header("content-type: text/javascript; charset=UTF-8");
 		    this.wPlantilla.hide();
         	
         	
-        }
+        },
+        agregarArgsExtraSubmit: function(){
+        	console.log()
+	    	var me = this;
+			//Inicializa el objeto de los argumentos extra
+			this.argumentExtraSubmit={};
+			//Añade los parámetros extra para mandar por submit
+			this.argumentExtraSubmit[me.extraSubmitCampo] = me.extraSubmitValor;
+		}
 
 
 
