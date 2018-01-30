@@ -2375,19 +2375,19 @@ header("content-type: text/javascript; charset=UTF-8");
         	    descConceptoGasto = this.formPlantilla.getForm().findField('id_concepto_ingas').getRawValue(),
                 precioDet = this.formPlantilla.getForm().findField('precio_det').getValue(),
                 descripcion = this.formPlantilla.getForm().findField('descripcion').getValue();
-                
+
                 
            this.plantillaProrrateo.forEach(function callback(element, index, array) {
 		        this.editorDetail.stopEditing();
-		        
+
 		        if(index == (me.plantillaProrrateo.length - 1) ){
-		        	 aux = precioDet - acumulado;
+		        	 aux = (precioDet - acumulado).toFixed(2);
 		        }
 		        else{
 		        	aux = (precioDet * element.factor).toFixed(2);
 		        }
-		        
-		        acumulado = aux + acumulado;
+		         
+		        acumulado = aux*1 + acumulado;
 		        pTot = aux - (aux * this.Cmp.porc_descuento.getValue())
 		        
 		        var e = new this.itemsRecordDet({
