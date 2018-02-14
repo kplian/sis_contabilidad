@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -7,11 +9,11 @@ CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_sel (
 RETURNS varchar AS
 $body$
 /**************************************************************************
- SISTEMA:   Sistema de Contabilidad
- FUNCION:     conta.ft_doc_compra_venta_sel
+ SISTEMA:		Sistema de Contabilidad
+ FUNCION: 		conta.ft_doc_compra_venta_sel
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tdoc_compra_venta'
- AUTOR:      (admin)
- FECHA:         18-08-2015 15:57:09
+ AUTOR: 		 (admin)
+ FECHA:	        18-08-2015 15:57:09
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
@@ -23,36 +25,36 @@ $body$
 
 DECLARE
 
-  v_consulta        varchar;
-  v_parametros      record;
-  v_nombre_funcion    text;
-  v_resp        varchar;
-    v_id_entidad    integer;
-    v_id_deptos     varchar;
-    v_registros     record;
-    v_reg_entidad   record;
-    v_tabla_origen      varchar;
-    v_filtro        varchar;
-    v_tipo        varchar;
-    v_sincronizar   varchar;
-    v_gestion     integer;
-    v_filtro_ext    varchar;
+	v_consulta    		varchar;
+	v_parametros  		record;
+	v_nombre_funcion   	text;
+	v_resp				varchar;
+    v_id_entidad		integer;
+    v_id_deptos			varchar;
+    v_registros 		record;
+    v_reg_entidad		record;
+    v_tabla_origen    	varchar;
+    v_filtro     		varchar;
+    v_tipo   			varchar;
+    v_sincronizar		varchar;
+    v_gestion			integer;
+    v_filtro_ext		varchar;
 
 BEGIN
 
-  v_nombre_funcion = 'conta.ft_doc_compra_venta_sel';
+	v_nombre_funcion = 'conta.ft_doc_compra_venta_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-  /*********************************
-  #TRANSACCION:  'CONTA_DCV_SEL'
-  #DESCRIPCION: Consulta de datos
-  #AUTOR:   admin
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+	/*********************************
+ 	#TRANSACCION:  'CONTA_DCV_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  if(p_transaccion='CONTA_DCV_SEL')then
+	if(p_transaccion='CONTA_DCV_SEL')then
 
-      begin
+    	begin
             
             v_filtro_ext = ' 0 = 0 and ';
             
@@ -67,8 +69,8 @@ BEGIN
                 END IF;
             END IF;
         
-        --Sentencia de la consulta
-      v_consulta:='select
+    		--Sentencia de la consulta
+			v_consulta:='select
                             dcv.id_doc_compra_venta,
                             dcv.revisado,
                             dcv.movil,
@@ -124,7 +126,7 @@ BEGIN
                             fun.id_funcionario,
                             fun.desc_funcionario2::varchar
                             
-            from conta.tdoc_compra_venta dcv
+						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
@@ -134,26 +136,26 @@ BEGIN
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
                           left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
-                where  '||v_filtro_ext;
+				        where  '||v_filtro_ext;
 
-      --Definicion de la respuesta
-      v_consulta:=v_consulta||v_parametros.filtro;
-      v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-      --Devuelve la respuesta
-      return v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;
+		end;
      /*********************************
-  #TRANSACCION:  'CONTA_DCV_CONT'
-  #DESCRIPCION: Conteo de registros
-  #AUTOR:   admin
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_DCV_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  elsif(p_transaccion='CONTA_DCV_CONT')then
+	elsif(p_transaccion='CONTA_DCV_CONT')then
 
-    begin
+		begin
         
             v_filtro_ext = ' 0 = 0 and ';
             
@@ -167,8 +169,8 @@ BEGIN
             END IF;
             
             
-      --Sentencia de la consulta de conteo de registros
-      v_consulta:='select
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select
                               count(dcv.id_doc_compra_venta),
                               COALESCE(sum(dcv.importe_ice),0)::numeric  as total_importe_ice,
                               COALESCE(sum(dcv.importe_excento),0)::numeric  as total_importe_excento,
@@ -183,7 +185,7 @@ BEGIN
                               COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
                               COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
                               COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
-            from conta.tdoc_compra_venta dcv
+						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
@@ -193,29 +195,29 @@ BEGIN
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
                           left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
-                where  '||v_filtro_ext;
+				        where  '||v_filtro_ext;
 
-      --Definicion de la respuesta
-      v_consulta:=v_consulta||v_parametros.filtro;
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
             raise notice '%', v_consulta;
-      --Devuelve la respuesta
-      return v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;   
+		end;   
         
         
     /*********************************
-  #TRANSACCION:  'CONTA_DCVCAJ_SEL'
-  #DESCRIPCION: Consulta de libro de compras que considera agencias , propio de BOA
-  #AUTOR:   Gonzalos, ...  Modificado Rensi
-  #FECHA:   26-05-2017 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_DCVCAJ_SEL'
+ 	#DESCRIPCION:	Consulta de libro de compras que considera agencias , propio de BOA
+ 	#AUTOR:		Gonzalos, ...  Modificado Rensi
+ 	#FECHA:		26-05-2017 15:57:09
+	***********************************/
 
-  elsif(p_transaccion='CONTA_DCVCAJ_SEL')then
+	elsif(p_transaccion='CONTA_DCVCAJ_SEL')then
 
-      begin
-        --Sentencia de la consulta
-      v_consulta:='select
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
                             dcv.id_doc_compra_venta,
                             dcv.revisado,
                             dcv.movil,
@@ -274,7 +276,7 @@ BEGIN
                             dcv.id_agencia,
                             ob.codigo_noiata
 
-            from conta.tdoc_compra_venta dcv
+						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
@@ -284,29 +286,29 @@ BEGIN
                           left join obingresos.tagencia ob on ob.id_agencia = dcv.id_agencia
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
-                where  ';
+				        where  ';
 
-      --Definicion de la respuesta
-      v_consulta:=v_consulta||v_parametros.filtro;
-      v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-      --Devuelve la respuesta
-      return v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;  
+		end;  
         
      /*********************************
-  #TRANSACCION:  'CONTA_DCVCAJ_CONT'
-  #DESCRIPCION: Conteo de registros
-  #AUTOR:   admin
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_DCVCAJ_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  elsif(p_transaccion='CONTA_DCVCAJ_CONT')then
+	elsif(p_transaccion='CONTA_DCVCAJ_CONT')then
 
-    begin
-      --Sentencia de la consulta de conteo de registros
-      v_consulta:='select
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select
                               count(dcv.id_doc_compra_venta),
                               COALESCE(sum(dcv.importe_ice),0)::numeric  as total_importe_ice,
                               COALESCE(sum(dcv.importe_excento),0)::numeric  as total_importe_excento,
@@ -322,7 +324,7 @@ BEGIN
                               COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
                               COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
 
-            from conta.tdoc_compra_venta dcv
+					  from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
@@ -332,28 +334,28 @@ BEGIN
                           left join obingresos.tagencia ob on ob.id_agencia = dcv.id_agencia
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
-                where  ';
+				        where  ';
 
-      --Definicion de la respuesta
-      v_consulta:=v_consulta||v_parametros.filtro;
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
             raise notice '%', v_consulta;
-      --Devuelve la respuesta
-      return v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;        
+		end;        
 
-  /*********************************
-  #TRANSACCION:  'CONTA_DCVNA_SEL'
-  #DESCRIPCION: colulta nit y razon social a parti del nro de autorizacion
-  #AUTOR:   Rensi Arteaga Copari
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+	/*********************************
+ 	#TRANSACCION:  'CONTA_DCVNA_SEL'
+ 	#DESCRIPCION:	colulta nit y razon social a parti del nro de autorizacion
+ 	#AUTOR:		Rensi Arteaga Copari
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  elsif(p_transaccion='CONTA_DCVNA_SEL')then
+	elsif(p_transaccion='CONTA_DCVNA_SEL')then
 
-      begin
-        --Sentencia de la consulta
-      v_consulta:='select
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
                           DISTINCT(dcv.nro_autorizacion)::numeric,
                           dcv.nit,
                           dcv.razon_social
@@ -365,20 +367,20 @@ BEGIN
 
 
 
-      --Devuelve la respuesta
-      return v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;
+		end;
     /*********************************
-  #TRANSACCION:  'CONTA_DCVNA_CONT'
-  #DESCRIPCION: Conteo de registros
-  #AUTOR:   admin
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_DCVNA_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  elsif(p_transaccion='CONTA_DCVNA_CONT')then
+	elsif(p_transaccion='CONTA_DCVNA_CONT')then
 
-    begin
+		begin
 
             v_consulta:='select
                           count(DISTINCT(dcv.nro_autorizacion))
@@ -386,23 +388,23 @@ BEGIN
                         where dcv.nro_autorizacion != '''' and dcv.nro_autorizacion like '''||COALESCE(v_parametros.nro_autorizacion,'-')||'%'' ';
 
 
-      --Devuelve la respuesta
-      return v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;
+		end;
 
     /*********************************
-  #TRANSACCION:  'CONTA_DCVNIT_SEL'
-  #DESCRIPCION: colulta  razon social a partir del nro de nit
-  #AUTOR:   Rensi Arteaga Copari
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_DCVNIT_SEL'
+ 	#DESCRIPCION:	colulta  razon social a partir del nro de nit
+ 	#AUTOR:		Rensi Arteaga Copari
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  elsif(p_transaccion='CONTA_DCVNIT_SEL')then
+	elsif(p_transaccion='CONTA_DCVNIT_SEL')then
 
-      begin
-        --Sentencia de la consulta
-      v_consulta:='select
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
                            DISTINCT(dcv.nit)::bigint,
                            dcv.razon_social
                           from conta.tdoc_compra_venta dcv
@@ -414,20 +416,20 @@ BEGIN
 
 
 
-      --Devuelve la respuesta
-      return v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;
+		end;
     /*********************************
-  #TRANSACCION:  'CONTA_DCVNIT_CONT'
-  #DESCRIPCION: Conteo de registros
-  #AUTOR:   admin
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_DCVNIT_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  elsif(p_transaccion='CONTA_DCVNIT_CONT')then
+	elsif(p_transaccion='CONTA_DCVNIT_CONT')then
 
-    begin
+		begin
 
             v_consulta:='select
                           count(DISTINCT(dcv.nit))
@@ -435,20 +437,20 @@ BEGIN
                         where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%'' ';
 
 
-      --Devuelve la respuesta
-      return v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;
+		end;
     /*********************************
-  #TRANSACCION:  'CONTA_REPLCV_SEL'
-  #DESCRIPCION: listado para reporte de libro de compras y ventas
-  #AUTOR:   admin
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_REPLCV_SEL'
+ 	#DESCRIPCION:	listado para reporte de libro de compras y ventas
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  ELSEIF(p_transaccion='CONTA_REPLCV_SEL')then
+	ELSEIF(p_transaccion='CONTA_REPLCV_SEL')then
 
-      begin
+    	begin
 
 
 
@@ -476,8 +478,8 @@ BEGIN
 
 
 
-        --Sentencia de la consulta
-      v_consulta:='SELECT
+    		--Sentencia de la consulta
+			v_consulta:='SELECT
                               id_doc_compra_venta,
                               tipo,
                               fecha,
@@ -506,7 +508,9 @@ BEGIN
                               subtotal_venta,
                               sujeto_df,
                               importe_ice,
-                              importe_excento
+                              importe_excento,
+                              lcv.nro_cbte,
+                              lcv.tipo_cambio
                         FROM
                           conta.vlcv lcv
                         where      lcv.tipo = '''||v_parametros.tipo||'''
@@ -514,24 +518,24 @@ BEGIN
                                and id_depto_conta in ( '||v_id_deptos||')
                         order by fecha, id_doc_compra_venta';
 
-      raise notice '%', v_consulta;
-      --Devuelve la respuesta
-      return v_consulta;
+			raise notice '%', v_consulta;
+            
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;
+		end;
 
 
     /*********************************
-  #TRANSACCION:  'CONTA_REPLCV_FRM'
-  #DESCRIPCION: listado para reporte de libro de compras y ventas  desde formualrio, incialmente usar datos de endesis
-  #AUTOR:   admin
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_REPLCV_FRM'
+ 	#DESCRIPCION:	listado para reporte de libro de compras y ventas  desde formualrio, incialmente usar datos de endesis
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  ELSEIF(p_transaccion='CONTA_REPLCV_FRM')then
+	ELSEIF(p_transaccion='CONTA_REPLCV_FRM')then
 
-      begin
-
+    	begin
 
            v_sincronizar = pxp.f_get_variable_global('sincronizar');
 
@@ -559,7 +563,7 @@ BEGIN
           END IF;
 
           --Sentencia de la consulta
-      v_consulta:='SELECT id_doc_compra_venta::BIGINT,
+		  v_consulta:='SELECT id_doc_compra_venta::BIGINT,
                                tipo::Varchar,
                                fecha::date,
                                nit::varchar,
@@ -587,29 +591,32 @@ BEGIN
                                subtotal_venta::numeric,
                                sujeto_df::numeric,
                                importe_ice::numeric,
-                               importe_excento::numeric
+                               importe_excento::numeric,
+                               lcv.nro_cbte,
+                               lcv.tipo_cambio
                         FROM '||v_tabla_origen||' lcv
                         where  lcv.tipo = '''||v_tipo||'''
                                and id_moneda = '||param.f_get_moneda_base()||'
-                               and '||v_filtro||'
+                               and '||v_filtro||' and lcv.nro_cbte is not null
                         order by fecha, id_doc_compra_venta';
 
-      raise notice '%', v_consulta;
-      --Devuelve la respuesta
-      return v_consulta;
+			raise notice '%', v_consulta;
+			--Devuelve la respuesta
+            --RAISE EXCEPTION 'Error j %',v_consulta;
+			return v_consulta;
 
-    end;
+		end;
 
     /*********************************
-  #TRANSACCION:  'CONTA_REPLCV_ENDESIS_ERP'
-  #DESCRIPCION: listado consolidado para reporte de libro de compras y ventas  desde formulario, tanto del endesis como del erp
-  #AUTOR:   Gonzalo Sarmiento Sejas
-  #FECHA:   18-08-2015 15:57:09
-  ***********************************/
+ 	#TRANSACCION:  'CONTA_REPLCV_ENDESIS_ERP'
+ 	#DESCRIPCION:	listado consolidado para reporte de libro de compras y ventas  desde formulario, tanto del endesis como del erp
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
-  ELSEIF(p_transaccion='CONTA_REPLCV_ENDERP')then
+	ELSEIF(p_transaccion='CONTA_REPLCV_ENDERP')then
 
-      begin
+    	begin
 
            IF v_parametros.filtro_sql = 'periodo'  THEN
                v_filtro =  ' (lcv.id_periodo = '||v_parametros.id_periodo||')  ';
@@ -618,7 +625,7 @@ BEGIN
            END IF;
 
            IF v_parametros.id_usuario != 0 THEN
-              v_filtro = v_filtro || ' and lcv.id_usuario_reg='||v_parametros.id_usuario||' ';
+           		v_filtro = v_filtro || ' and lcv.id_usuario_reg='||v_parametros.id_usuario||' ';
            END IF;
 
           IF v_parametros.tipo_lcv = 'lcv_compras' or v_parametros.tipo_lcv='endesis_erp' THEN
@@ -628,7 +635,7 @@ BEGIN
           END IF;
 
           --Sentencia de la consulta
-      v_consulta:='SELECT id_doc_compra_venta::BIGINT,
+		  v_consulta:='SELECT id_doc_compra_venta::BIGINT,
                                tipo::Varchar,
                                fecha::date,
                                nit::varchar,
@@ -697,27 +704,27 @@ BEGIN
                                and '||v_filtro||'
                         order by fecha, id_doc_compra_venta';
 
-      raise notice '%', v_consulta;
-      --Devuelve la respuesta
-      return v_consulta;
+			raise notice '%', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
 
-    end;
+		end;
 
 
     else
 
-    raise exception 'Transaccion inexistente';
+		raise exception 'Transaccion inexistente';
 
-  end if;
+	end if;
 
 EXCEPTION
 
-  WHEN OTHERS THEN
-      v_resp='';
-      v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-      v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-      v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-      raise exception '%',v_resp;
+	WHEN OTHERS THEN
+			v_resp='';
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+			raise exception '%',v_resp;
 END;
 $body$
 LANGUAGE 'plpgsql'

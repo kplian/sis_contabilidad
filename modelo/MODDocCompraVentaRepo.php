@@ -6,7 +6,7 @@
 *@date 18-08-2015 15:57:09
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
-class MODDocCompraVenta extends MODbase{
+class MODDocCompraVentaRepo extends MODbase{
 	
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
@@ -97,6 +97,8 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('importe_aux_neto','numeric');
 		$this->captura('id_funcionario','integer');		
 		$this->captura('desc_funcionario2','varchar');
+		$this->captura('tipo_cambio_compra','numeric');
+		
 
 		
 
@@ -1331,8 +1333,10 @@ class MODDocCompraVenta extends MODbase{
 		  $this->captura('importe_ice','NUMERIC');
 		  $this->captura('importe_excento','NUMERIC');
 		  
+		  $this->captura('nro_cbte','VARCHAR');
+		  $this->captura('tipo_cambio','NUMERIC');
 		              
-		
+		  
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -1353,7 +1357,7 @@ class MODDocCompraVenta extends MODbase{
 		  $this->setParametro('filtro_sql','filtro_sql','VARCHAR');
 		  $this->setParametro('id_periodo','id_periodo','INTEGER');
 		  $this->setParametro('tipo_lcv','tipo_lcv','VARCHAR');
-		  $this->setParametro('fecha_ini','fecha_ini','date');
+		 $this->setParametro('fecha_ini','fecha_ini','date');
 		  $this->setParametro('fecha_fin','fecha_fin','date');
 		  $this->setParametro('id_gestion','id_gestion','INTEGER');
 
@@ -1401,8 +1405,8 @@ class MODDocCompraVenta extends MODbase{
 		  $this->captura('importe_ice','NUMERIC');
 		  $this->captura('importe_excento','NUMERIC');
 		  
-		  $this->captura('nro_cbte','VARCHAR');
-		  $this->captura('tipo_cambio','NUMERIC');
+		              
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

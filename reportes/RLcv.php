@@ -188,9 +188,12 @@ class RLcv extends  ReportePDF {
 		
 		
 		//arma cabecera de la tabla  17  - 13   20   -    ;  (15,  14  21,   2,,4,6)
-		$conf_par_tablewidths=array(7,15,15,55,14,12,21,18,15,17,17,17,16,20,10);
+		$conf_par_tablewidths=array(7,15,15,38,14,12,21,15,15,17,17,17,16,18,10,18);
+        $conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C','C','C');
+        $conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+		/*$conf_par_tablewidths=array(7,15,15,55,14,12,21,18,15,17,17,17,16,20,10);
         $conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C','C');
-        $conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+        $conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);*/
         $conf_tableborders=array();
         $conf_tabletextcolor=array();
 		
@@ -217,7 +220,8 @@ class RLcv extends  ReportePDF {
 					's11' => "IMPORTE BASE PARA CREDITO FISCAL\nE = C-D",      //egreso_traspaso
 					's12' => "CREDITO FISCAL\nF = E*13%",      //egreso_traspaso
 					's13' => 'CODIGO DE CONTROL',
-					's14' => 'TIPO DE COMPRA');
+					's14' => 'TIPO DE COMPRA',
+					's15' => '#_CBTE');
 		}else{
 			$RowArray = array(
 					's0' => 'Nº',
@@ -234,7 +238,8 @@ class RLcv extends  ReportePDF {
 					's11' => "IMPORTE BASE PARA CREDITO FISCAL\nE = C-D",      //egreso_traspaso
 					's12' => "CREDITO FISCAL\nF = E*13%",      //egreso_traspaso
 					's13' => 'CODIGO DE CONTROL',
-					's14' => 'TIPO DE COMPRA');
+					's14' => 'TIPO DE COMPRA',
+					's15' => '#_CBTE');
 		}
 
 		$this->MultiRow($RowArray, false, 1);
@@ -270,10 +275,15 @@ class RLcv extends  ReportePDF {
         $this->SetTextColor(0);
         $this->SetFont('','',6);
 			
-		$conf_par_tablewidths=array(7,15,15,55,14,12,21,18,15,17,17,17,16,20,10);
+		/*$conf_par_tablewidths=array(7,15,15,55,14,12,21,18,15,17,17,17,16,20,10);
         $conf_par_tablealigns=array('C','C','R','L','R','R','R','R','R','R','R','R','R','L','C');
         $conf_par_tablenumbers=array(0,0,0,0,0,0,0,2,2,2,2,2,2,0,0);
-		$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');
+		$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');*/
+		$conf_par_tablewidths=array(7,15,15,38,14,12,21,15,15,17,17,17,16,18,10,18);
+        $conf_par_tablealigns=array('C','C','R','L','R','R','R','R','R','R','R','R','R','L','C','C');
+        $conf_par_tablenumbers=array(0,0,0,0,0,0,0,2,2,2,2,2,2,0,0);
+		$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');
+		
 		$this->tablewidths=$conf_par_tablewidths;
         $this->tablealigns=$conf_par_tablealigns;
         $this->tablenumbers=$conf_par_tablenumbers;
@@ -283,24 +293,46 @@ class RLcv extends  ReportePDF {
 		$this->caclularMontos($val);
 		
 		$newDate = date("d/m/Y", strtotime( $val['fecha']));
-		
-		$RowArray = array(
-            			's0'  => $count,
-                        's1' => $newDate,
-                        's2' => trim($val['nit']),
-                        's3' => trim($val['razon_social']),
-                        's4' => trim($val['nro_documento']),
-						's5' => trim($val['nro_dui']),
-                        's6' => trim($val['nro_autorizacion']),
-                        's7' => $val['importe_doc'],
-                        's8' => $val['total_excento'] ,
-						's9' => $val['subtotal'],
-						's10' => $val['importe_descuento'],
-						's11' => $val['sujeto_cf'],
-						's12' => $val['importe_iva'],
-						's13' => trim($val['codigo_control']),
-                        's14' => trim($val['tipo_doc']));
-						
+        if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){
+			$RowArray = array(
+	            			's0'  => $count,
+	                        's1' => $newDate,
+	                        's2' => trim($val['nit']),
+	                        's3' => trim($val['razon_social']),
+	                        's4' => trim($val['nro_documento']),
+							's5' => trim($val['nro_dui']),
+	                        's6' => trim($val['nro_autorizacion']),
+	                        's7' => $val['importe_doc'] * $val['tipo_cambio'],
+	                        's8' => $val['total_excento'] * $val['tipo_cambio'],
+							's9' => $val['subtotal'] * $val['tipo_cambio'],
+							's10' => $val['importe_descuento']* $val['tipo_cambio'],
+							's11' => $val['sujeto_cf']* $val['tipo_cambio'],
+							's12' => $val['importe_iva']* $val['tipo_cambio'],
+							's13' => trim($val['codigo_control']),
+	                        's14' => trim($val['tipo_doc']),
+							's15' => trim($val['nro_cbte'])
+							);
+		}
+		else{
+			$RowArray = array(
+	            			's0'  => $count,
+	                        's1' => $newDate,
+	                        's2' => trim($val['nit']),
+	                        's3' => trim($val['razon_social']),
+	                        's4' => trim($val['nro_documento']),
+							's5' => trim($val['nro_dui']),
+	                        's6' => trim($val['nro_autorizacion']),
+	                        's7' => $val['importe_doc'],
+	                        's8' => $val['total_excento'] ,
+							's9' => $val['subtotal'],
+							's10' => $val['importe_descuento'],
+							's11' => $val['sujeto_cf'],
+							's12' => $val['importe_iva'],
+							's13' => trim($val['codigo_control']),
+	                        's14' => trim($val['tipo_doc']),
+							's15' => trim($val['nro_cbte'])
+							);
+		}
 		$this-> MultiRow($RowArray,$fill,0);
 			
 	}
@@ -348,21 +380,54 @@ class RLcv extends  ReportePDF {
 	
 	function caclularMontos($val){
 		
-		$this->s1 = $this->s1 + $val['importe_doc'];
-		$this->s2 = $this->s2 + $val['total_excento'];
-		$this->s3 = $this->s3 + $val['subtotal'];
-		$this->s4 = $this->s4 + $val['importe_descuento'];
-		$this->s5 = $this->s5 + $val['sujeto_cf'];
-		$this->s6 = $this->s6 + $val['importe_iva'];
 		
+        if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){
 		
-		$this->t1 = $this->t1 + $val['importe_doc'];
-		$this->t2 = $this->t2 + $val['total_excento'];
-		$this->t3 = $this->t3 + $val['subtotal'];
-		$this->t4 = $this->t4 + $val['importe_descuento'];
-		$this->t5 = $this->t5 + $val['sujeto_cf'];
-		$this->t6 = $this->t6 + $val['importe_iva'];
-		
+			/*$this->s1 = $this->s1 + $val['importe_doc'];
+			$this->s2 = $this->s2 + $val['total_excento'];
+			$this->s3 = $this->s3 + $val['subtotal'];
+			$this->s4 = $this->s4 + $val['importe_descuento'];
+			$this->s5 = $this->s5 + $val['sujeto_cf'];
+			$this->s6 = $this->s6 + $val['importe_iva'];
+			
+			
+			$this->t1 = $this->t1 + $val['importe_doc'];
+			$this->t2 = $this->t2 + $val['total_excento'];
+			$this->t3 = $this->t3 + $val['subtotal'];
+			$this->t4 = $this->t4 + $val['importe_descuento'];
+			$this->t5 = $this->t5 + $val['sujeto_cf'];
+			$this->t6 = $this->t6 + $val['importe_iva'];*/
+			$this->s1 = $this->s1 + ($val['importe_doc'] * $val['tipo_cambio']);
+			$this->s2 = $this->s2 + ($val['total_excento'] * $val['tipo_cambio']);
+			$this->s3 = $this->s3 + ($val['subtotal'] * $val['tipo_cambio']);
+			$this->s4 = $this->s4 + ($val['importe_descuento'] * $val['tipo_cambio']);
+			$this->s5 = $this->s5 + ($val['sujeto_cf'] * $val['tipo_cambio']);
+			$this->s6 = $this->s6 + ($val['importe_iva'] * $val['tipo_cambio']);
+			
+			
+			$this->t1 = $this->t1 + ($val['importe_doc']* $val['tipo_cambio']);
+			$this->t2 = $this->t2 + ($val['total_excento']* $val['tipo_cambio']);
+			$this->t3 = $this->t3 + ($val['subtotal']* $val['tipo_cambio']);
+			$this->t4 = $this->t4 + ($val['importe_descuento']* $val['tipo_cambio']);
+			$this->t5 = $this->t5 + ($val['sujeto_cf']* $val['tipo_cambio']);
+			$this->t6 = $this->t6 + ($val['importe_iva']* $val['tipo_cambio']);
+		}
+		else{
+			$this->s1 = $this->s1 + $val['importe_doc'];
+			$this->s2 = $this->s2 + $val['total_excento'];
+			$this->s3 = $this->s3 + $val['subtotal'];
+			$this->s4 = $this->s4 + $val['importe_descuento'];
+			$this->s5 = $this->s5 + $val['sujeto_cf'];
+			$this->s6 = $this->s6 + $val['importe_iva'];
+			
+			
+			$this->t1 = $this->t1 + $val['importe_doc'];
+			$this->t2 = $this->t2 + $val['total_excento'];
+			$this->t3 = $this->t3 + $val['subtotal'];
+			$this->t4 = $this->t4 + $val['importe_descuento'];
+			$this->t5 = $this->t5 + $val['sujeto_cf'];
+			$this->t6 = $this->t6 + $val['importe_iva'];
+		}
 		
 		
 	}
@@ -371,11 +436,14 @@ class RLcv extends  ReportePDF {
 	   
 	   	    //si noes inicio termina el cuardro anterior
 				
-								
-	   	    $this->tablewidths=array(7 +15 +15 +55 +14 +12 +21,18,15,17,17,17,16,20,10);
+	   	    $this->tablewidths=array(7 +15 +15 +55 +14 +8 +8,15,15,17,17,17,16);
 	        $this->tablealigns=array('R','R','R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2,0,0);	
-	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','T','T');
+	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','T','T');				
+	   	    /*$this->tablewidths=array(7 +15 +15 +55 +14 +12 +21,18,15,17,17,17,16,20,10);
+	        $this->tablealigns=array('R','R','R','R','R','R','R','R','R');
+	        $this->tablenumbers=array(0,2,2,2,2,2,2,0,0);	
+	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','T','T');*/
 	        
 	        $RowArray = array( 
 	                    'espacio' => 'Subtotal: ',
@@ -404,11 +472,15 @@ class RLcv extends  ReportePDF {
   	
 	   
 	   	    //si noes inicio termina el cuardro anterior
-									
-			$this->tablewidths=array(7 +15 +15 +55 +14 +12 +21,18,15,17,17,17,16);
+				
+			$this->tablewidths=array(7 +15 +15 +55 +14 +8 +8,15,15,17,17,17,16);
 	        $this->tablealigns=array('R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2);	
-	        $this->tableborders=array('','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
+	        $this->tableborders=array('','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');				
+			/*$this->tablewidths=array(7 +15 +15 +55 +14 +12 +21,18,15,17,17,17,16);
+	        $this->tablealigns=array('R','R','R','R','R','R','R');
+	        $this->tablenumbers=array(0,2,2,2,2,2,2);	
+	        $this->tableborders=array('','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');*/
 	        
 	        $RowArray = array( 
 	                    'espacio' => 'TOTAL: ',

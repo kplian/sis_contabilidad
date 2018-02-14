@@ -1546,13 +1546,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             
     },
     imprimirLCV : function() {
-		
+		        
 				if(this.validarFiltros){
 					    var me = this;
 					    Phx.CP.loadingShow();
 						Ext.Ajax.request({
 							//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
-							url : '../../sis_contabilidad/control/DocCompraVenta/reporteLCV',
+							url : '../../sis_contabilidad/control/DocCompraVentaRepo/reporteLCV',
 							params : {
 								'id_periodo' : me.cmbPeriodo.getValue(),
 								'id_depto' : me.cmbDepto.getValue(),

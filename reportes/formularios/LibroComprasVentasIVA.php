@@ -301,11 +301,27 @@ header("content-type: text/javascript; charset=UTF-8");
 			type:'ComboBox',
 			id_grupo:1,
 			form:true
-		}],
+		},
+        /*{
+            config:{
+                name:'id_moneda',
+                origen:'MONEDA',
+                allowBlank:false,
+                baseParams: {id_moneda_defecto: 0},
+                fieldLabel:'Moneda',
+                gdisplayField:'desc_moneda',
+                gwidth:100,
+                width:180
+            },
+            type:'ComboRec',
+            id_grupo:0,
+            form:true
+        },*/
+		],
 		
 		
-		title : 'Reporte Libro Compras Ventas IVA',		
-		ActSave : '../../sis_contabilidad/control/TsLibroBancos/reporteLibroBancos',
+		//title : 'Reporte Libro Compras Ventas IVA',		
+		//ActSave : '../../sis_contabilidad/control/TsLibroBancos/reporteLibroBancos',
 		
 		topBar : true,
 		botones : false,

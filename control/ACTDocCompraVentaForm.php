@@ -12,14 +12,17 @@ require_once(dirname(__FILE__).'/../reportes/RLcv.php');
 require_once(dirname(__FILE__).'/../reportes/RLcvVentas.php');
 require_once(dirname(__FILE__).'/../reportes/RLcvXls.php');
 
+
+
 class ACTDocCompraVentaForm extends ACTbase{    
 			
 	
 	
 	
 	function recuperarDatosLCV(){    	
-		$this->objFunc = $this->create('MODDocCompraVenta');
+	    $this->objFunc = $this->create('MODDocCompraVenta');
 		$cbteHeader = $this->objFunc->listarRepLCVForm($this->objParam);
+ 
 		if($cbteHeader->getTipo() == 'EXITO'){				
 			return $cbteHeader;
 		}
