@@ -33,9 +33,9 @@ class RRetencion extends ReportePDF {
 		$this->datos_periodo = $periodo;
 		$this->subtotal = 0;
 		if($tipo=='todo'){
-			$this->SetHeaderMargin(13);		
+			$this->SetHeaderMargin(12);		
 			$this->SetAutoPageBreak(TRUE, 10);	
-			$this->SetMargins(13, 55, 10);
+			$this->SetMargins(6, 54, 10);
 		}else{						
 			$this->SetHeaderMargin(9);			
 			$this->SetAutoPageBreak(TRUE, 10);
@@ -73,7 +73,7 @@ class RRetencion extends ReportePDF {
 				$nombre='Recibo con Retenciones de Alquiler';
 				break;
 			case 'todo':				
-				$nombre='Retenciones';
+				$nombre='RETENCIONES';
 				$height = 5;
 		        $width1 = 5;
 				$esp_width = 10;
@@ -178,13 +178,13 @@ class RRetencion extends ReportePDF {
 	} 
 	//
 	function cab(){
-		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15,16);
-		$conf_par_tablealigns=array('C','C','C','C','C','C','R','L','R','L','R','L','C','C','C');
-		$conf_tableborders=array('LTR','TR','TR','TR','TR','TR','T','TR','T','TR','T','TR','TR','TR','TR');
-		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+		$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15,16,16);
+		$conf_par_tablealigns=array('C','C','C','C','C','C','R','L','R','L','R','L','R','L','C','C');
+		$conf_tableborders=array('LTR','TR','TR','TR','TR','TR','T','TR','T','TR','T','TR','TR','TR','TR','TR');
+		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 		$RowArray = array(
 						's0' => '',
-						's1' => '',
+						's1' => 'FECHA',
 						's2' => '',
 						's3' => '',
 						's4' => '',
@@ -195,9 +195,10 @@ class RRetencion extends ReportePDF {
 						's9' => 'ICIOS',
 						's10' => 'ALQU',
 						's11' => 'ILERES',
-						's12' => 'IMPORTE ',
-						's13' => '',
-						's14' => ''
+						's12' => 'DIREC ',
+						's13' => 'TORES',
+						's14' => 'LIQUIDO',
+						's15' => 'NRO'
 					);
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
@@ -219,10 +220,10 @@ class RRetencion extends ReportePDF {
 				$m='IUE';
 				$RowArray = array(								
 								's0' => 'Nº',
-								's1' => 'FECHA DE LA FACTURA O DUI',
-								's2' => 'CONCEPTO',
-								's3' => 'TIPO',
-								's4' => 'Nro DE DOCUMENTO',
+								's1' => 'FECHA DE PAGO',
+								's2' => 'NOMBRE',
+								's3' => 'C.I.',
+								's4' => 'TIPO',
 								's5' => 'IMPORTE TOTAL',
 								's6' => 'IT',
 								's7' => $m,
@@ -235,10 +236,10 @@ class RRetencion extends ReportePDF {
 				$m='IUE';
 				$RowArray = array(
 								's0' => 'Nº',
-								's1' => 'FECHA DE LA FACTURA O DUI',
-								's2' => 'CONCEPTO',
-								's3' => 'TIPO',
-								's4' => 'Nro DE DOCUMENTO',
+								's1' => 'FECHA DE PAGO',
+								's2' => 'NOMBRE',
+								's3' => 'C.I.',
+								's4' => 'TIPO',								
 								's5' => 'IMPORTE TOTAL',
 								's6' => 'IT',
 								's7' => $m,
@@ -251,10 +252,10 @@ class RRetencion extends ReportePDF {
 				$m='RC-IVA';
 				$RowArray = array(
 								's0' => 'Nº',
-								's1' => 'FECHA DE LA FACTURA O DUI',
-								's2' => 'CONCEPTO',
-								's3' => 'TIPO',
-								's4' => 'Nro DE DOCUMENTO',
+								's1' => 'FECHA DE PAGO',
+								's2' => 'NOMBRE',
+								's3' => 'C.I.',
+								's4' => 'TIPO',								
 								's5' => 'IMPORTE TOTAL',
 								's6' => 'IT',
 								's7' => $m,
@@ -265,26 +266,27 @@ class RRetencion extends ReportePDF {
 				break;
 			case 'todo':
 				$m='-';
-				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15,16);
-				$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C','C');
-				$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-				$conf_tableborders=array('LBR','BR','BR','BR','BR','BR','BTR','BTR','BTR','BTR','BTR','BTR','BR','BR','BR');
+				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15,16,16);
+				$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C','C','C');
+				$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+				$conf_tableborders=array('LBR','BR','BR','BR','BR','BR','BTR','BTR','BTR','BTR','BTR','BTR','BR','BR','BR','BR');
 				$RowArray = array(
 								's0' => 'Nº',
-								's1' => 'FECHA DE LA FACTURA O DUI',
-								's2' => 'CONCEPTO',
-								's3' => 'TIPO',
-								's4' => 'Nro DE DOCUMENTO',
-								's5' => 'IMPORTE',
+								's1' => 'DE PAGO',
+								's2' => 'NOMBRE',
+								's3' => 'C.I.',
+								's4' => 'TIPO',								
+								's5' => 'CONVENIDO',
 								's6' => 'IT',
 								's7' => 'IUE',
 								's8' => 'IT',
 								's9' => 'IUE',
 								's10' => 'IT',
 								's11' => 'RC-IVA',
-								's12' => 'DESCUENTO DE LEY',
-								's13' => 'DESCUENTOS',
-								's14' => 'LIQUIDO'
+								's12' => 'IT',
+								's13' => 'RC-IVA',
+								's14' => 'PAGABLE',
+								's15' => 'COMPROBANTE'
 							);
 				break;	
 			default:				
@@ -313,8 +315,8 @@ class RRetencion extends ReportePDF {
 			$RowArray = array(  's0' => $count,
 								's1' => $newDate,
 								's2' => trim($val['obs']),
-								's3' => trim($val['plantilla']),
-								's4'=> trim($val['nro_documento']),
+								's3' => trim($val['nro_documento']),
+								's4'=> trim($val['plantilla']),
 								's5' => $val['importe_doc'],
 								's6' => $val['it_bienes'],
 								's7' => $val['iue_bienes'],
@@ -336,8 +338,8 @@ class RRetencion extends ReportePDF {
 					$RowArray = array(  's0' => $count,
 										's1' => $newDate,
 										's2' => trim($val['obs']),
-										's3' => trim($val['plantilla']),
-										's4' => trim($val['nro_documento']),
+										's3' => trim($val['nro_documento']),
+										's4' => trim($val['plantilla']),
 										's5' => $val['importe_doc'],		
 										's6' => $val['it_bienes'],
 										's7' => $val['iue_bienes'],
@@ -350,8 +352,8 @@ class RRetencion extends ReportePDF {
 					$RowArray = array(  's0' => $count,
 										's1' => $newDate,
 										's2' => trim($val['obs']),
-										's3' => trim($val['plantilla']),
-										's4' => trim($val['nro_documento']),
+										's3' => trim($val['nro_documento']),
+										's4' => trim($val['plantilla']),
 										's5' => $val['importe_doc'],		
 										's6' => $val['it_servicios'],
 										's7' => $val['iue_servicios'],
@@ -364,8 +366,8 @@ class RRetencion extends ReportePDF {
 					$RowArray = array(  's0' => $count,
 										's1' => $newDate,
 										's2' => trim($val['obs']),
-										's3' => trim($val['plantilla']),
-										's4' => trim($val['nro_documento']),
+										's3' => trim($val['nro_documento']),
+										's4' => trim($val['plantilla']),
 										's5' => $val['importe_doc'],		
 										's6' => $val['it_alquileres'],
 										's7' => $val['rc_iva_alquileres'],

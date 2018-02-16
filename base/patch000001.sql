@@ -4569,4 +4569,27 @@ IS 'monto a no ejecutar en moneda base';
 
 
 
+/***********************************I-SCP-RAC-CONTA-1-03/02/2018****************************************/
+
+
+
+
+--------------- SQL ---------------
+
+CREATE TABLE conta.trelacion_contable_tpm (
+  codigo_tipo_presupuesto VARCHAR,
+  codigo_cuenta VARCHAR,
+  migrado VARCHAR DEFAULT 'no' NOT NULL,
+  obs VARCHAR(1)
+) 
+WITH (oids = false);
+
+
+
+/***********************************F-SCP-RAC-CONTA-1-03/02/2018****************************************/
+
+
+
+
+
 

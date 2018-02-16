@@ -37,6 +37,9 @@ DECLARE
     v_defecto varchar;
     v_resp_rep			varchar;
     v_id_deptos_lbs			varchar;
+    v_id_gestion_cuenta   integer;
+    v_id_gestion_cc       integer;
+    v_id_gestion_partida  integer;
 			    
 BEGIN
 
@@ -217,6 +220,61 @@ BEGIN
             END IF;
             
             
+            --valdiar que la gestion de la cuenta, partida y centro de csoto sean las mismas
+            IF v_parametros.id_cuenta is not null THEN
+            
+                    select 
+                      id_gestion 
+                    into 
+                      v_id_gestion_cuenta                  
+                    from conta.tcuenta cu 
+                    where id_cuenta = v_parametros.id_cuenta;
+                   
+                
+                   IF v_parametros.id_gestion != v_id_gestion_cuenta  THEN
+                       raise exception 'La cuenta no es de la misma gestión, verifique la cuenta';
+                   END IF;
+                    
+            
+            END IF;
+            
+             IF v_parametros.id_partida is not null THEN
+            
+                  select 
+                    id_gestion 
+                  into 
+                    v_id_gestion_partida                  
+                  from pre.tpartida pa 
+                  where id_partida = v_parametros.id_partida;
+               
+                 IF v_parametros.id_gestion != v_id_gestion_partida  THEN
+                     raise exception 'La partida no es de la misma gestión, verifique la partida';
+                 END IF;
+                
+            
+            END IF;
+            
+            
+             IF v_parametros.id_centro_costo is not null THEN
+            
+                select 
+                  cc.id_gestion 
+                into 
+                  v_id_gestion_cc               
+                from param.tcentro_costo cc 
+                where id_centro_costo = v_parametros.id_centro_costo;
+            
+            
+               IF v_parametros.id_gestion != v_id_gestion_cc  THEN
+                   raise exception 'El centro de costo no es de la misma gestión, verifique el centro';
+               END IF;
+                
+            
+            END IF;
+            
+            
+            
+            
         
         	--Sentencia de la insercion
         	insert into conta.trelacion_contable(
@@ -386,6 +444,60 @@ BEGIN
              IF v_parametros.id_moneda is not null AND v_parametros.id_tipo_presupuesto is not null THEN
               raise exception 'Solo puede configarar moneda o tipo de presupeusto, no ambos';
             END IF;
+            
+            
+             --valdiar que la gestion de la cuenta, partida y centro de csoto sean las mismas
+            IF v_parametros.id_cuenta is not null THEN
+            
+                    select 
+                      id_gestion 
+                    into 
+                      v_id_gestion_cuenta                  
+                    from conta.tcuenta cu 
+                    where id_cuenta = v_parametros.id_cuenta;
+                   
+                
+                   IF v_parametros.id_gestion != v_id_gestion_cuenta  THEN
+                       raise exception 'La cuenta no es de la misma gestión, verifique la cuenta';
+                   END IF;
+                    
+            
+            END IF;
+            
+             IF v_parametros.id_partida is not null THEN
+            
+                  select 
+                    id_gestion 
+                  into 
+                    v_id_gestion_partida                  
+                  from pre.tpartida pa 
+                  where id_partida = v_parametros.id_partida;
+               
+                 IF v_parametros.id_gestion != v_id_gestion_partida  THEN
+                     raise exception 'La partida no es de la misma gestión, verifique la partida';
+                 END IF;
+                
+            
+            END IF;
+            
+            
+             IF v_parametros.id_centro_costo is not null THEN
+            
+                select 
+                  cc.id_gestion 
+                into 
+                  v_id_gestion_cc               
+                from param.tcentro_costo cc 
+                where id_centro_costo = v_parametros.id_centro_costo;
+            
+            
+               IF v_parametros.id_gestion != v_id_gestion_cc  THEN
+                   raise exception 'El centro de costo no es de la misma gestión, verifique el centro';
+               END IF;
+                
+            
+            END IF;
+            
             
             
          

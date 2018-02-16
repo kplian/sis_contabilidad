@@ -4239,5 +4239,27 @@ SELECT ad.id_agrupador_doc,
 /**********************************F-DEP-RAC-CONTA-0-29/01/2018****************************************/
 
 
+/**********************************I-DEP-RAC-CONTA-0-03/02/2018****************************************/
+
+CREATE TRIGGER tdoc_compra_venta_tr
+  BEFORE UPDATE OR DELETE 
+  ON conta.tdoc_compra_venta
+  
+FOR EACH ROW 
+  EXECUTE PROCEDURE conta.f_trig_doc_compra_venta();
+  
+/**********************************F-DEP-RAC-CONTA-0-03/02/2018****************************************/
+
+/**********************************I-DEP-RCM-CONTA-0-03/02/2018****************************************/  
+ALTER TABLE conta.tdoc_concepto
+  ADD CONSTRAINT fk_tdoc_concepto__id_doc_compra_venta FOREIGN KEY (id_doc_compra_venta)
+    REFERENCES conta.tdoc_compra_venta(id_doc_compra_venta)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+/**********************************F-DEP-RCM-CONTA-0-03/02/2018****************************************/  
+
+
+
 
 

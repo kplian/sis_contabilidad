@@ -26,7 +26,6 @@ var nro_tramite=null;
 var tipo_filtro=null;
 var fec=null;
 
-
 Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
     title:'Mayor',
 	constructor:function(config){		

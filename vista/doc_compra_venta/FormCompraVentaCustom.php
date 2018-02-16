@@ -31,7 +31,6 @@ header("content-type: text/javascript; charset=UTF-8");
         tipo_pres_recurso: 'recurso',
         plantillaProrrateo: [], //07/12/2017 , RAc adcionar plantilal de prorrateo
         constructor:function(config) {
-        	console.log('config',config);
         	this.datos = config;
             this.addEvents('beforesave');
             this.addEvents('successsave');
