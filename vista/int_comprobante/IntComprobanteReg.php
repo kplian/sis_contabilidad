@@ -115,12 +115,12 @@ Phx.vista.IntComprobanteReg = {
 		        else{
 		        	 this.getBoton('btnSwEditble').setDisabled(true);
 		        }
-
-				if(rec.data.momento =='presupuestario'){
+                //comentado temporalmente por las facturas de subsidio
+				//if(rec.data.momento =='presupuestario'){
 					this.getBoton('btnDocCmpVnt').enable();
-				}else{
-					this.getBoton('btnDocCmpVnt').disable();
-				}
+				//}else{
+					//this.getBoton('btnDocCmpVnt').disable();
+				//}
 
 		        this.getBoton('sig_estado').enable();            
 				this.getBoton('btnImprimir').enable();

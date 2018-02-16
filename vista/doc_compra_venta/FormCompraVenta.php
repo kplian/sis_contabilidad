@@ -30,6 +30,7 @@ header("content-type: text/javascript; charset=UTF-8");
         tipo_pres_gasto: 'gasto',
         tipo_pres_recurso: 'recurso',
         plantillaProrrateo: [], //07/12/2017 , RAc adcionar plantilal de prorrateo
+        sw_nro_dui: 'no',
         constructor:function(config)
         {
             this.addEvents('beforesave');
@@ -1699,6 +1700,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.mostrarComponente(this.Cmp.nro_dui);
                     this.Cmp.nro_documento.setValue(0);
                     this.Cmp.nro_documento.setReadOnly(true);
+                    this.sw_nro_dui =  'si';
 
                 }
                 else{
@@ -1917,9 +1919,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
                 this.Cmp.id_auxiliar.validate();
             }
-
-            var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
-            this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+            
+            if( this.sw_nro_dui ==  'si'){
+            	var liquido =  this.Cmp.importe_iva.getValue();
+               this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+            }
+            else{
+            	var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
+                this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+            }
+            
 
 
 

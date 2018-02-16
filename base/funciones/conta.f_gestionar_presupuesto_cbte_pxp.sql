@@ -17,7 +17,8 @@ $body$
      directamente en pxp y no depende del deblink
      
    ISSUE            FECHA:		           AUTOR                 DESCRIPCION
- #31, ETR       27/12/20178              RAC KPLIAN           que considere los monto noejectuados, registrados por cada transaccion
+ #31, ETR       27/12/2017              RAC KPLIAN           que considere los monto noejectuados, registrados por cada transaccion
+ #32, ETR       06/02/2018              RAC KPLIAN           mandar glosa, datos de anticipo, descuento y iva revertido al ejecutar presupesuto
  
           
      
@@ -64,6 +65,11 @@ DECLARE
   
  v_monto_cmp_aux 				numeric;
  v_monto_cmp_mb_aux				numeric;
+ v_glosa						varchar;
+ 
+ v_monto_anticipo		    numeric;
+ v_monto_desc_anticipo		numeric;
+ v_monto_iva_revertido		numeric;
   
     
 BEGIN
@@ -73,6 +79,11 @@ BEGIN
     v_retorno = 'exito';
     v_sw_error = false; --iniciamos sin errores
     v_mensaje_error = '';
+    
+    v_glosa = '';    --#32
+    v_monto_anticipo  = 0;  --#32
+    v_monto_desc_anticipo  = 0; --#32
+    v_monto_iva_revertido  = 0; --#32
     
    
     -- recupera datos del comprobante
@@ -242,9 +253,6 @@ BEGIN
                                 END IF; --IF comprometido 
                                 
                                 
-                                  
-           
-                                
                                 -- solo procesamos si es una partida presupuestaria y no de flujo
                                 IF v_registros.sw_movimiento = 'presupuestaria' THEN
                                        
@@ -298,8 +306,18 @@ BEGIN
                                         ELSE                                           
                                            raise exception 'monto no contemplado';
                                         END IF;
-           
-                              
+                                        
+                                        --#32 monto que no ejecuta presupeusto retencion de antiicpo
+                                        v_monto_desc_anticipo = v_registros.monto_no_ejecutado;                                         
+                                        v_monto_iva_revertido = 0;
+                                        v_monto_anticipo  = 0;  --#32
+                                        IF v_monto_desc_anticipo > 0 THEN
+                                           v_glosa = 'Monto o ejecutor (Ejm Retenciones de anticipo, otros)';
+                                        ELSE
+                                            v_glosa = '';
+                                        END IF;
+                                        
+                                        
                                         -- llamamos a la funcion de ejecucion
                                         v_resp_ges = pre.f_gestionar_presupuesto_v2(
                                                                                     p_id_usuario, 
@@ -318,7 +336,11 @@ BEGIN
                                                                                     p_id_int_comprobante, 
                                                                                     v_registros_comprobante.momento_comprometido, 
                                                                                     v_registros_comprobante.momento_ejecutado, 
-                                                                                    v_registros_comprobante.momento_pagado);
+                                                                                    v_registros_comprobante.momento_pagado,
+                                                                                    v_glosa,
+                                                                                    v_monto_anticipo,
+                                                                                    v_monto_desc_anticipo,
+                                                                                    v_monto_iva_revertido);
                                                             
                                          ------------------------------------
                                          --  ACUMULAR ERRORES
@@ -383,6 +405,12 @@ BEGIN
                                                         v_monto_cmp_mb = (v_monto_cmp_mb * v_registros.factor_reversion)/(1 - v_registros.factor_reversion);
                                                   END IF;
                                                   
+                                                  --#32 monto de presupeusto revertido
+                                                  v_monto_iva_revertido = v_monto_cmp;
+                                                  v_glosa = 'Reversión presupuestaria del comprometido correspondiente al IVA';
+                                                  v_monto_anticipo  = 0;  --#32
+                                                  v_monto_desc_anticipo  = 0; --#32
+                                                  
                                                   
                                                    --  considerar ei el monto ejecutado no consumio todo
                                                   
@@ -405,7 +433,11 @@ BEGIN
                                                                                             p_id_int_comprobante, 
                                                                                             v_registros_comprobante.momento_comprometido, 
                                                                                             v_registros_comprobante.momento_ejecutado, 
-                                                                                            v_registros_comprobante.momento_pagado);
+                                                                                            v_registros_comprobante.momento_pagado,
+                                                                                            v_glosa,
+                                                                                            v_monto_anticipo,
+                                                                                            v_monto_desc_anticipo,
+                                                                                            v_monto_iva_revertido);
                                                                                             
                                                                                             
                                                      --  analizamos respuesta y retornamos error
