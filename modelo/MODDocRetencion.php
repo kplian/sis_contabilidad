@@ -49,6 +49,10 @@ class MODDocRetencion extends MODbase{
 		$this->captura('nro_tramite','VARCHAR');
 		$this->captura('plantilla','VARCHAR');
 		
+		$this->captura('id_int_comprobante','int4');
+		$this->captura('nro_cbte','VARCHAR');
+		
+		
 		$this->captura('it','NUMERIC');
 		
 		$this->captura('it_bienes','NUMERIC');

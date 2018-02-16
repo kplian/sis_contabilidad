@@ -120,7 +120,9 @@ BEGIN
                                     WHEN ret.desc_plantilla=''Recibo con Retenciones Servicios''  THEN ''Servicios''::VARCHAR
                                     WHEN ret.desc_plantilla=''Recibo con Retenciones Bienes''  THEN ''Bienes''::VARCHAR    
                                     WHEN ret.desc_plantilla=''Recibo con Retenciones de Alquiler''  THEN ''Alquileres''::VARCHAR
-                                END AS plantilla,                        
+                                END AS plantilla,                                                                  
+                                ret.id_int_comprobante,
+                                ret.nro_cbte,                        
 								--
                                 MAX(CASE WHEN (c.descripcion LIKE '''||var_1||''' AND c.codigo_tipo_relacion LIKE '''||var_2||''') THEN c.importe_presupuesto::NUMERIC END) AS it,
                                 --MAX(CASE WHEN (c.descripcion LIKE '''||var_1||''' AND c.codigo_tipo_relacion LIKE '''||var_2||''') THEN (c.importe_presupuesto * ret.importe_doc)::NUMERIC END) AS it_total,
@@ -222,8 +224,7 @@ BEGIN
                                         MAX(CASE WHEN (c.descripcion LIKE '''||var_6||''' AND c.codigo_tipo_relacion LIKE '''||var_6||''') THEN ret.desc_plantilla::VARCHAR END)       
                                     ELSE
                                         0::VARCHAR
-                                END AS alquileres                               
-                                
+                                END AS alquileres
                             FROM '||v_tabla_origen||' ret, param.tplantilla p
                             JOIN conta.tplantilla_calculo c ON p.id_plantilla = c.id_plantilla
                             WHERE  '||v_tipo||'
@@ -249,7 +250,9 @@ BEGIN
                                       ret.importe_descuento_ley,
                                       ret.obs,
                                       ret.nro_tramite,
-                                      ret.desc_plantilla
+                                      ret.desc_plantilla,                                                                                                
+                                      ret.id_int_comprobante,
+                                      ret.nro_cbte 
 							ORDER BY ret.id_plantilla';
 			--Devuelve la respuesta   
 			--raise exception '-> %',v_consulta; 
