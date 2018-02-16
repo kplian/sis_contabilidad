@@ -116,7 +116,9 @@ class RBalanceGeneral extends  ReportePDF {
 		$resultado = $this->total_ingreso - $this->total_egreso;
 		$resultado = number_format( $resultado , 2 , '.' , ',' );
 		 $sw_dif = 0;
+
 		 //COMENTADO TEMPORALEMTEN, debe ser configurable desde el formulario
+
 		if($this->tipo_balance == 'general'){
 			$formula = "ACTIVO =  PASIVO + PATRIMONIO";
 			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);

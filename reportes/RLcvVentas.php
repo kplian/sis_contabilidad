@@ -260,25 +260,46 @@ class RLcvVentas extends  ReportePDF {
 		}		
 	}
 	
-	function caclularMontos($val){		
-		$this->s1 = $this->s1 + $val['importe_doc'];
-		$this->s2 = $this->s2 + $val['importe_ice'];
-		$this->s3 = $this->s3 + $val['importe_excento'];
-		$this->s4 = $this->s4 + $val['venta_gravada_cero'];
-		$this->s5 = $this->s5 + $val['subtotal_venta'];
-		$this->s6 = $this->s6 + $val['importe_descuento'];
-		$this->s7 = $this->s7 + $val['sujeto_df'];
-		$this->s8 = $this->s8 + $val['importe_iva'];
+	function caclularMontos($val){
+		if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){		
+			$this->s1 = $this->s1 + $val['importe_doc']*$val['tipo_cambio'];
+			$this->s2 = $this->s2 + $val['importe_ice']*$val['tipo_cambio'];
+			$this->s3 = $this->s3 + $val['importe_excento']*$val['tipo_cambio'];
+			$this->s4 = $this->s4 + $val['venta_gravada_cero']*$val['tipo_cambio'];
+			$this->s5 = $this->s5 + $val['subtotal_venta']*$val['tipo_cambio'];
+			$this->s6 = $this->s6 + $val['importe_descuento']*$val['tipo_cambio'];
+			$this->s7 = $this->s7 + $val['sujeto_df']*$val['tipo_cambio'];
+			$this->s8 = $this->s8 + $val['importe_iva']*$val['tipo_cambio'];
+			
+			$this->t1 = $this->t1 + $val['importe_doc']*$val['tipo_cambio'];
+			$this->t2 = $this->t2 + $val['importe_ice']*$val['tipo_cambio'];
+			$this->t3 = $this->t3 + $val['importe_excento']*$val['tipo_cambio'];
+			$this->t4 = $this->t4 + $val['venta_gravada_cero']*$val['tipo_cambio'];
+			$this->t5 = $this->t5 + $val['subtotal_venta']*$val['tipo_cambio'];
+			$this->t6 = $this->t6 + $val['importe_descuento']*$val['tipo_cambio'];
+			$this->t7 = $this->t7 + $val['sujeto_df']*$val['tipo_cambio'];
+			$this->t8 = $this->t8 + $val['importe_iva']*$val['tipo_cambio'];	
+		}else{
+			$this->s1 = $this->s1 + $val['importe_doc'];
+			$this->s2 = $this->s2 + $val['importe_ice'];
+			$this->s3 = $this->s3 + $val['importe_excento'];
+			$this->s4 = $this->s4 + $val['venta_gravada_cero'];
+			$this->s5 = $this->s5 + $val['subtotal_venta'];
+			$this->s6 = $this->s6 + $val['importe_descuento'];
+			$this->s7 = $this->s7 + $val['sujeto_df'];
+			$this->s8 = $this->s8 + $val['importe_iva'];
+			
+			$this->t1 = $this->t1 + $val['importe_doc'];
+			$this->t2 = $this->t2 + $val['importe_ice'];
+			$this->t3 = $this->t3 + $val['importe_excento'];
+			$this->t4 = $this->t4 + $val['venta_gravada_cero'];
+			$this->t5 = $this->t5 + $val['subtotal_venta'];
+			$this->t6 = $this->t6 + $val['importe_descuento'];
+			$this->t7 = $this->t7 + $val['sujeto_df'];
+			$this->t8 = $this->t8 + $val['importe_iva'];
+		}
 		
 		
-		$this->t1 = $this->t1 + $val['importe_doc'];
-		$this->t2 = $this->t2 + $val['importe_ice'];
-		$this->t3 = $this->t3 + $val['importe_excento'];
-		$this->t4 = $this->t4 + $val['venta_gravada_cero'];
-		$this->t5 = $this->t5 + $val['subtotal_venta'];
-		$this->t6 = $this->t6 + $val['importe_descuento'];
-		$this->t7 = $this->t7 + $val['sujeto_df'];
-		$this->t8 = $this->t8 + $val['importe_iva'];	
 	}
 	
 	function cerrarCuadro(){

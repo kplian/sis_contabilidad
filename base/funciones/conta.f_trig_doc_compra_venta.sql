@@ -1,18 +1,20 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_trig_doc_compra_venta (
 )
 RETURNS trigger AS
 $body$
 DECLARE
-     v_reg_pres_par       record;
-     v_reg_pres_par_new     record;
-     v_reg            record;
-     v_id_partida_new     integer;
-     v_id_partida_old     integer;
-     v_id_presupuesto     integer;
-     v_id_presupuesto_new   integer;
-     v_importe_total_segun_memoria  numeric;
-     v_importe_total_segun_memoria_new  numeric;
-     v_estado varchar;
+     v_reg_pres_par 			record;
+     v_reg_pres_par_new			record;
+     v_reg						record;
+     v_id_partida_new			integer;
+     v_id_partida_old			integer;
+     v_id_presupuesto			integer;
+     v_id_presupuesto_new		integer;
+     v_importe_total_segun_memoria	numeric;
+     v_importe_total_segun_memoria_new	numeric;
+     v_estado	varchar;
 BEGIN
    --     select (current_database()::text)||'_'||NEW.cuenta into g_new_login;
    --   select (current_database()::text)||'_'||OLD.cuenta into g_old_login;
@@ -56,7 +58,7 @@ BEGIN
             END IF;
             
             
-          RETURN NEW;
+       		RETURN NEW;
        
        ELSEIF TG_OP = 'DELETE' THEN
         
@@ -83,7 +85,7 @@ BEGIN
        END IF;   
      
        
-       RETURN NULL;
+       
    
 END;
 $body$
@@ -92,6 +94,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER TABLE conta.tdoc_compra_venta
-  ENABLE TRIGGER tdoc_compra_venta_tr;

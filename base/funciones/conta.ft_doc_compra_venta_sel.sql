@@ -597,7 +597,7 @@ BEGIN
                         FROM '||v_tabla_origen||' lcv
                         where  lcv.tipo = '''||v_tipo||'''
                                and id_moneda = '||param.f_get_moneda_base()||'
-                               and '||v_filtro||' and lcv.nro_cbte is not null
+                               and '||v_filtro||' 
                         order by fecha, id_doc_compra_venta';
 
 			raise notice '%', v_consulta;

@@ -411,7 +411,7 @@ BEGIN
            IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte  = '' THEN
            
                 -- RAC 27/01/2018 , dejamos pasar sin validar fecha apra rebularizar cbtes de enero
-                IF  v_rec_cbte.fecha  > '31/01/2018'THEN 
+                IF  v_rec_cbte.fecha  > '28/02/2018'THEN 
                      --  validamos que la numeracion sea coherente con la fecha y correlativo
                      IF  v_rec_cbte.cbte_apertura = 'no' then
                           IF exists (select

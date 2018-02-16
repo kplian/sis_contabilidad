@@ -608,7 +608,7 @@ BEGIN
                     end loop;
                     
                     
-                    
+
                     if ps_id_cuenta is null then
                         
                         select gestion into v_gestion
@@ -658,13 +658,13 @@ BEGIN
               --si la relacion contable es para encontrat departamentos
               --  no es obigatorio que regreuna cuenta contable
                  IF v_registros.tiene_centro_costo != 'si-unico' THEN
-
+--raise exception 'loading';
                         if ps_id_cuenta is null then
                         
                               select gestion into v_gestion
                               from param.tgestion
                               where id_gestion = p_id_gestion;
-                              raise exception '% (% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) - Centro de costo: %',COALESCE(p_mensaje_error,''), p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0');
+                              raise exception '% (% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) - Centro de costo: % , %, ID %',COALESCE(p_mensaje_error,''), p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0'),v_rec.tabla, p_id_tabla;
                         end if;
                   
                  ELSE
@@ -675,7 +675,7 @@ BEGIN
                            from param.tgestion
                            where id_gestion = p_id_gestion;
                        	 
-                           raise exception '% (% - %) No se encuentra Centro de costo para  la Gestión % (tiene_centro_costo = %) - Centro de costo: %',COALESCE(p_mensaje_error,''),p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0');
+                           raise exception '% (% - %) No se encuentra Centro de costo para  la Gestión % (tiene_centro_costo = %) - Centro de costo: % , % ID % ',COALESCE(p_mensaje_error,''),p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0'),v_rec.tabla,p_id_tabla ;
                         
                         end if;
                  

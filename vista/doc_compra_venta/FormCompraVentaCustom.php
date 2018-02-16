@@ -31,7 +31,9 @@ header("content-type: text/javascript; charset=UTF-8");
         tipo_pres_recurso: 'recurso',
         plantillaProrrateo: [], //07/12/2017 , RAc adcionar plantilal de prorrateo
         constructor:function(config) {
+
         	this.datos = config;
+
             this.addEvents('beforesave');
             this.addEvents('successsave');
             if (config.data.mostrarFormaPago === false) {
@@ -40,9 +42,9 @@ header("content-type: text/javascript; charset=UTF-8");
             Ext.apply(this,config);
             this.obtenerVariableGlobal(config);
             this.generarAtributos();
-			
-			this.extraSubmitCampo = config.data.extraSubmitCampo;
-			this.extraSubmitValor = config.data.extraSubmitValor;          
+            
+            this.extraSubmitCampo = config.data.extraSubmitCampo;
+            this.extraSubmitValor = config.data.extraSubmitValor;          
 
         },
 
@@ -59,10 +61,10 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.FormCompraVentaCustom.superclass.constructor.call(this,config);
             
             if(this.mostrarFuncionario){
-            	 this.mostrarComponente(this.Cmp.id_funcionario);
+                 this.mostrarComponente(this.Cmp.id_funcionario);
             }
             else{
-            	 this.ocultarComponente(this.Cmp.id_funcionario);
+                 this.ocultarComponente(this.Cmp.id_funcionario);
             }
             
             this.init();
@@ -607,19 +609,19 @@ header("content-type: text/javascript; charset=UTF-8");
             
           
             if(me.plantillaProrrateo.length > 0){
-            	this.megrid.getTopToolbar().add({	                   
-	                    text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar desde Plantilla',
-	                    scope: this,
-	                    width: '100',
-	                    handler: function(){
-	                        if(this.evaluaRequistos() === true){
-	                           this.bloqueaRequisitos(true);
-	                           this.wPlantilla.show();
-	                           
-	                        }
-	                   }
-	
-	           }) ;
+                this.megrid.getTopToolbar().add({                      
+                        text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar desde Plantilla',
+                        scope: this,
+                        width: '100',
+                        handler: function(){
+                            if(this.evaluaRequistos() === true){
+                               this.bloqueaRequisitos(true);
+                               this.wPlantilla.show();
+                               
+                            }
+                       }
+    
+               }) ;
             }
             
            
@@ -1541,20 +1543,20 @@ header("content-type: text/javascript; charset=UTF-8");
                 
                
                 {
-		   			config:{
-		       		    name:'id_funcionario',
-		       		    hiddenName: 'id_funcionario',
-		   				origen:'FUNCIONARIO',
-		   				fieldLabel:'Funcionario',
-		   				allowBlank: true,
-		                valueField: 'id_funcionario',
-		   			    gdisplayField: 'desc_funcionario2',
-		   			    baseParams: { fecha: new Date()}
-		       	     },
-		   			type:'ComboRec',
-		   			id_grupo:2,
-		   			form:true
-				}
+                    config:{
+                        name:'id_funcionario',
+                        hiddenName: 'id_funcionario',
+                        origen:'FUNCIONARIO',
+                        fieldLabel:'Funcionario',
+                        allowBlank: true,
+                        valueField: 'id_funcionario',
+                        gdisplayField: 'desc_funcionario2',
+                        baseParams: { fecha: new Date()}
+                     },
+                    type:'ComboRec',
+                    id_grupo:2,
+                    form:true
+                }
 
             ];
 
@@ -1779,43 +1781,43 @@ header("content-type: text/javascript; charset=UTF-8");
 
                          if (this.Cmp[plt[i]]) {
 
-	                             if (plt[i] == 'importe_excento') {
-	                                 var aux = 0;
-	                                 if (this.Cmp[plt[i]].getValue()) {
-	                                     aux = this.Cmp[plt[i]].getValue();
-	                                 }
-	                                 this.Cmp[plt[i]].setValue(res[i] + aux);
-	                             }
-	                             else {
-	                                 this.Cmp[plt[i]].setValue(res[i]);
-	                             }
-	
-	                            if (plt[i]=='nro_documento'){
-	                                 var nro_doc = Math.floor(res[1]);
-	                                 this.getComponente('nro_documento').setValue(nro_doc);
-	                             }
-	                             if(plt[i]=='importe_doc'){
-	                                 var importe = this.controlMiles(res[4]);
-	                                 this.getComponente('importe_doc').setValue(importe);
-	                             }
-	                             if(plt[i]=='fecha'){          	
-	                             	if(this.data.tmpPeriodo){ //si existe un periodo de referencia
-		                             	   var mesPeriodo = this.data.tmpPeriodo > 9 ? this.data.tmpPeriodo : '0' + this.data.tmpPeriodo,
-		                                     fechaInt = this.data.tmpGestion + '-' + mesPeriodo + '-' + '30',
-		                                     mesPer = new Date(fechaInt).getMonth(),
-		                                     mesFactura = res[3].split("/"),
-		                                     fechaFac = mesFactura[2] + '-' + mesFactura[1] + '-' + mesFactura[0],
-		                                     mesFac = new Date(fechaFac).getMonth(),
-		                                     monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Mayo","Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-		                                     literalFactura = monthNames[mesFac],
-		                                     literalPeriodo = monthNames[mesPer];
-		                                     
-		                                 if (mesFactura[1] != mesPeriodo) {
-		                                     this.mensaje_('ALERTA', 'Actualmente se encuentra en el periodo: ' + literalPeriodo + ', la factura corresponde al periodo de: ' + literalFactura, 'ERROR');
-		                                 }	
-	                             	}
-	                             }
-	                            
+                                 if (plt[i] == 'importe_excento') {
+                                     var aux = 0;
+                                     if (this.Cmp[plt[i]].getValue()) {
+                                         aux = this.Cmp[plt[i]].getValue();
+                                     }
+                                     this.Cmp[plt[i]].setValue(res[i] + aux);
+                                 }
+                                 else {
+                                     this.Cmp[plt[i]].setValue(res[i]);
+                                 }
+    
+                                if (plt[i]=='nro_documento'){
+                                     var nro_doc = Math.floor(res[1]);
+                                     this.getComponente('nro_documento').setValue(nro_doc);
+                                 }
+                                 if(plt[i]=='importe_doc'){
+                                     var importe = this.controlMiles(res[4]);
+                                     this.getComponente('importe_doc').setValue(importe);
+                                 }
+                                 if(plt[i]=='fecha'){           
+                                    if(this.data.tmpPeriodo){ //si existe un periodo de referencia
+                                           var mesPeriodo = this.data.tmpPeriodo > 9 ? this.data.tmpPeriodo : '0' + this.data.tmpPeriodo,
+                                             fechaInt = this.data.tmpGestion + '-' + mesPeriodo + '-' + '30',
+                                             mesPer = new Date(fechaInt).getMonth(),
+                                             mesFactura = res[3].split("/"),
+                                             fechaFac = mesFactura[2] + '-' + mesFactura[1] + '-' + mesFactura[0],
+                                             mesFac = new Date(fechaFac).getMonth(),
+                                             monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Mayo","Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                                             literalFactura = monthNames[mesFac],
+                                             literalPeriodo = monthNames[mesPer];
+                                             
+                                         if (mesFactura[1] != mesPeriodo) {
+                                             this.mensaje_('ALERTA', 'Actualmente se encuentra en el periodo: ' + literalPeriodo + ', la factura corresponde al periodo de: ' + literalFactura, 'ERROR');
+                                         }  
+                                    }
+                                 }
+                                
                          }                        
                      } 
                       this.cargarRazonSocialGestionMoneda();  
@@ -1904,8 +1906,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             }
             else{
-            	 this.Cmp.importe_iva.setValue(0);
-			}
+                 this.Cmp.importe_iva.setValue(0);
+            }
             
             if(this.mostrarFormaPago){
                 if(this.Cmp.importe_retgar.getValue() > 0 || this.Cmp.importe_anticipo.getValue() > 0 ||  this.Cmp.importe_pendiente.getValue() > 0){
@@ -2054,7 +2056,7 @@ header("content-type: text/javascript; charset=UTF-8");
            
             //load detalle de conceptos
             if(this.regitrarDetalle == 'si'){
-            	this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
+                this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
                 this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
                 this.mestore.load()
             }
@@ -2065,7 +2067,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         onNew: function(){
-        	console.log('onNew');
+            console.log('onNew');
             this.accionFormulario = 'NEW';
             this.Cmp.nit.modificado = true;
             this.Cmp.nro_autorizacion.modificado = true;
@@ -2078,7 +2080,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             console.log('siii', this.datos.data.id_plantilla)
             Ext.apply(this.Cmp.id_plantilla.store.baseParams, {id_plantilla: this.datos.data.id_plantilla});
-	    	this.Cmp.id_plantilla.modificado=true;
+            this.Cmp.id_plantilla.modificado=true;
 
 
         },
@@ -2270,133 +2272,133 @@ header("content-type: text/javascript; charset=UTF-8");
         
         //RAC 07122017, crea formulario para plantilla de prorrateo
         buildFormPlantilla: function(){
-        	var me = this, 
-        	    bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto', autorizacion: me.autorizacion, autorizacion_nulos: me.autorizacion_nulos }:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
-         	if(me.plantillaProrrateo.length > 0){
-        		 this.formPlantilla = new Ext.form.FormPanel({
-							            baseCls: 'x-plain',
-							            autoDestroy: true,							           
-							            border: false,
-							            layout: 'form',
-							            autoHeight: true,
-							            items: [new Ext.form.ComboBox({
-								                    name: 'id_concepto_ingas',
-								                    msgTarget: 'title',
-								                    fieldLabel: 'Concepto',
-								                    allowBlank: false,
-								                    emptyText : 'Concepto...',
-								                    store : new Ext.data.JsonStore({
-								                        url: me.listadoConcepto,
-								                        id : 'id_concepto_ingas',
-								                        root: 'datos',
-								                        sortInfo:{
-								                            field: 'desc_ingas',
-								                            direction: 'ASC'
-								                        },
-								                        totalProperty: 'total',
-								                        fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
-								                        remoteSort: true,
-								                        baseParams: bpar
-								                    }),
-								                    valueField: 'id_concepto_ingas',
-								                    displayField: 'desc_ingas',
-								                    hiddenName: 'id_concepto_ingas',
-								                    forceSelection: true,
-								                    typeAhead: false,
-								                    triggerAction: 'all',
-								                    listWidth: 500,
-								                    resizable: true,
-								                    lazyRender: true,
-								                    mode: 'remote',
-								                    pageSize: 10,
-								                    queryDelay: 1000,
-								                    minChars: 2,
-								                    qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
-								                    tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
-								                }),
-								                
-								                new Ext.form.NumberField({
-								                    name: 'precio_det',
-								                    msgTarget: 'title',
-								                    currencyChar:' ',
-								                    fieldLabel: 'Prec. Unit.',
-								                    minValue: 0.0001,
-								                    allowBlank: false,
-								                    allowDecimals: true,
-								                    allowNegative:false,
-								                    decimalPrecision:2
-								                }),
-								                
-								                new Ext.form.TextArea({
-								                    name: 'descripcion',
-								                    msgTarget: 'title',
-								                    fieldLabel: 'Descripcion',
-								                    allowBlank: false,
-								                    anchor: '80%',
-								                    maxLength:1200
-								                })
-																               
-								            ]
-							        });
-							        
-									
-									
-									me.wPlantilla = new Ext.Window({
-							            title: 'Plantilla de Prorrateo',
-							            collapsible: true,
-							            maximizable: true,
-							            autoDestroy: true,
-							            width: 380,
-							            height: 170,
-							            layout: 'fit',
-							            plain: true,
-							            bodyStyle: 'padding:5px;',
-							            buttonAlign: 'center',
-							            items: this.formPlantilla,
-							            modal:true,
-							             closeAction: 'hide',
-							            buttons: [{
-							                text: 'Guardar',
-							                handler: this.addPltProc,
-							                scope: this
-							                
-							            },
-							             {
-							                text: 'Cancelar',
-							                handler: function(){ me.wPlantilla.hide() },
-							                scope: this
-							            }]
-							        });
-							        
-						
-        		
-        	}
-        	
+            var me = this, 
+                bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto', autorizacion: me.autorizacion, autorizacion_nulos: me.autorizacion_nulos }:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
+            if(me.plantillaProrrateo.length > 0){
+                 this.formPlantilla = new Ext.form.FormPanel({
+                                        baseCls: 'x-plain',
+                                        autoDestroy: true,                                     
+                                        border: false,
+                                        layout: 'form',
+                                        autoHeight: true,
+                                        items: [new Ext.form.ComboBox({
+                                                    name: 'id_concepto_ingas',
+                                                    msgTarget: 'title',
+                                                    fieldLabel: 'Concepto',
+                                                    allowBlank: false,
+                                                    emptyText : 'Concepto...',
+                                                    store : new Ext.data.JsonStore({
+                                                        url: me.listadoConcepto,
+                                                        id : 'id_concepto_ingas',
+                                                        root: 'datos',
+                                                        sortInfo:{
+                                                            field: 'desc_ingas',
+                                                            direction: 'ASC'
+                                                        },
+                                                        totalProperty: 'total',
+                                                        fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+                                                        remoteSort: true,
+                                                        baseParams: bpar
+                                                    }),
+                                                    valueField: 'id_concepto_ingas',
+                                                    displayField: 'desc_ingas',
+                                                    hiddenName: 'id_concepto_ingas',
+                                                    forceSelection: true,
+                                                    typeAhead: false,
+                                                    triggerAction: 'all',
+                                                    listWidth: 500,
+                                                    resizable: true,
+                                                    lazyRender: true,
+                                                    mode: 'remote',
+                                                    pageSize: 10,
+                                                    queryDelay: 1000,
+                                                    minChars: 2,
+                                                    qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
+                                                    tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
+                                                }),
+                                                
+                                                new Ext.form.NumberField({
+                                                    name: 'precio_det',
+                                                    msgTarget: 'title',
+                                                    currencyChar:' ',
+                                                    fieldLabel: 'Prec. Unit.',
+                                                    minValue: 0.0001,
+                                                    allowBlank: false,
+                                                    allowDecimals: true,
+                                                    allowNegative:false,
+                                                    decimalPrecision:2
+                                                }),
+                                                
+                                                new Ext.form.TextArea({
+                                                    name: 'descripcion',
+                                                    msgTarget: 'title',
+                                                    fieldLabel: 'Descripcion',
+                                                    allowBlank: false,
+                                                    anchor: '80%',
+                                                    maxLength:1200
+                                                })
+                                                                               
+                                            ]
+                                    });
+                                    
+                                    
+                                    
+                                    me.wPlantilla = new Ext.Window({
+                                        title: 'Plantilla de Prorrateo',
+                                        collapsible: true,
+                                        maximizable: true,
+                                        autoDestroy: true,
+                                        width: 380,
+                                        height: 170,
+                                        layout: 'fit',
+                                        plain: true,
+                                        bodyStyle: 'padding:5px;',
+                                        buttonAlign: 'center',
+                                        items: this.formPlantilla,
+                                        modal:true,
+                                         closeAction: 'hide',
+                                        buttons: [{
+                                            text: 'Guardar',
+                                            handler: this.addPltProc,
+                                            scope: this
+                                            
+                                        },
+                                         {
+                                            text: 'Cancelar',
+                                            handler: function(){ me.wPlantilla.hide() },
+                                            scope: this
+                                        }]
+                                    });
+                                    
+                        
+                
+            }
+            
         },
         addPltProc: function(){
-        	var acumulado = 0,
-        	    aux = 0,
-        	    pTot = 0
-        	    idConceptoGasto = this.formPlantilla.getForm().findField('id_concepto_ingas').getValue(),
-        	    descConceptoGasto = this.formPlantilla.getForm().findField('id_concepto_ingas').getRawValue(),
+            var acumulado = 0,
+                aux = 0,
+                pTot = 0
+                idConceptoGasto = this.formPlantilla.getForm().findField('id_concepto_ingas').getValue(),
+                descConceptoGasto = this.formPlantilla.getForm().findField('id_concepto_ingas').getRawValue(),
                 precioDet = this.formPlantilla.getForm().findField('precio_det').getValue(),
                 descripcion = this.formPlantilla.getForm().findField('descripcion').getValue();
                 
                 
            this.plantillaProrrateo.forEach(function callback(element, index, array) {
-		        this.editorDetail.stopEditing();
-		        
-		        if(index == (me.plantillaProrrateo.length - 1) ){
-		        	 aux = precioDet - acumulado;
-		        }
-		        else{
-		        	aux = (precioDet * element.factor).toFixed(2);
-		        }
-		        
-		        acumulado = aux + acumulado;
-		        pTot = aux - (aux * this.Cmp.porc_descuento.getValue())
-		        
-		        var e = new this.itemsRecordDet({
+                this.editorDetail.stopEditing();
+                
+                if(index == (me.plantillaProrrateo.length - 1) ){
+                     aux = precioDet - acumulado;
+                }
+                else{
+                    aux = (precioDet * element.factor).toFixed(2);
+                }
+                
+                acumulado = aux + acumulado;
+                pTot = aux - (aux * this.Cmp.porc_descuento.getValue())
+                
+                var e = new this.itemsRecordDet({
                                 id_concepto_ingas: idConceptoGasto,
                                 desc_concepto_ingas: descConceptoGasto,
                                 cantidad_sol: 1,
@@ -2413,21 +2415,21 @@ header("content-type: text/javascript; charset=UTF-8");
                
                 
                 
-		    }, this);
-		    
-		    this.megrid.getView().refresh();
-		    this.wPlantilla.hide();
-        	
-        	
+            }, this);
+            
+            this.megrid.getView().refresh();
+            this.wPlantilla.hide();
+            
+            
         },
         agregarArgsExtraSubmit: function(){
-        	console.log()
-	    	var me = this;
-			//Inicializa el objeto de los argumentos extra
-			this.argumentExtraSubmit={};
-			//Añade los parámetros extra para mandar por submit
-			this.argumentExtraSubmit[me.extraSubmitCampo] = me.extraSubmitValor;
-		}
+            console.log()
+            var me = this;
+            //Inicializa el objeto de los argumentos extra
+            this.argumentExtraSubmit={};
+            //Añade los parámetros extra para mandar por submit
+            this.argumentExtraSubmit[me.extraSubmitCampo] = me.extraSubmitValor;
+        }
 
 
 
