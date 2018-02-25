@@ -2,7 +2,8 @@
 
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte_docs (
   p_id_int_comprobante integer,
-  p_validar boolean = true
+  p_validar boolean = true,
+  p_forzar_validacion varchar = 'no'::character varying
 )
 RETURNS varchar [] AS
 $body$
@@ -16,9 +17,12 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #86  ETR       24/02/2018        RAC KPLIAN        Validar que el monto IVA y descuentos cuadre al validar el comprobante
+
+ 
 ***************************************************************************/
 
 DECLARE
@@ -45,7 +49,12 @@ v_resp_val_doc				varchar[];
 v_conta_val_doc_otros_subcuentas_compras		varchar;
 va_aux 						 					VARCHAR[];
 v_conta_lista_blanca_cbte_docs					varchar;
-v_registros_doc_dui	record;
+v_registros_doc_dui	         record;
+v_registros_iva_cf	         record; -- #86 +
+v_registros_iva_df	         record; -- #86 +
+v_registros_desc_ley    	 record; -- #86 +
+v_lista_docs           		 varchar;-- #86 +
+v_reg_cbte  				 record; -- #86 +
 
 
 
@@ -60,12 +69,38 @@ BEGIN
    v_conta_val_doc_otros_subcuentas_compras = pxp.f_get_variable_global('conta_val_doc_otros_subcuentas_compras');
    va_aux = string_to_array(v_conta_val_doc_otros_subcuentas_compras,',');
    
-  
+   --#obtenemos el periodo del cbte y la fecha
    
    
    v_resp_val_doc[1] = 'TRUE';
    
+   --#86   considerar casos en los que si se salta la validacio de codumentos, por ejemplo cbte volcados, de reversion
+   IF p_forzar_validacion = 'si' THEN
+      p_validar  =TRUE;
+   END IF;
    
+   select 
+      c.fecha,
+      c.volcado,
+      c.cbte_reversion,
+      c.cbte_apertura,
+      c.cbte_cierre,
+      c.cbte_aitb
+     into
+       v_reg_cbte
+   from conta.tint_comprobante c  
+   where   c.id_int_comprobante =  p_id_int_comprobante;
+   
+   
+   IF v_reg_cbte.cbte_cierre = 'si'   or v_reg_cbte.cbte_apertura = 'si' or  v_reg_cbte.cbte_reversion  = 'si'or v_reg_cbte.cbte_aitb  = 'si' THEN
+      p_validar  =FALSE;  --soltamso la validacion solo apra casos especificamos
+   END IF;
+   
+   
+   
+   -- #86 OJO ANALIZAR ESTOS CASOS .. me aprece que nodeberiamos tener.....
+  
+  /*
    IF exists (
                select 1
                from conta.tint_comprobante c
@@ -74,7 +109,7 @@ BEGIN
                      and  pc.codigo =ANY(string_to_array(v_conta_lista_blanca_cbte_docs,',')) )THEN
        p_validar = FALSE;
        
-   END IF;
+   END IF;*/
    
    
   
@@ -95,7 +130,7 @@ BEGIN
            and  (lower(c.tipo_cuenta) in('gasto','costo','egreso') or upper(csc.nombre) = ANY(va_aux)); 
              
              
-  --sumar todas las cuentas de recurso
+     --sumar todas las cuentas de recurso
      select
          sum(t.importe_debe) as debe,
          sum(t.importe_haber) as haber
@@ -107,23 +142,178 @@ BEGIN
            and  lower(c.tipo_cuenta)  in('recurso','ingreso','venta'); 
            
            
+   -- #86  suma del IVA Credito Fiscal ...  revisar que el plan de cuentas este configurado adecuadamente
+     select
+         sum(t.importe_debe) as debe,
+         sum(t.importe_haber) as haber
+     into
+         v_registros_iva_cf
+     from conta.tint_transaccion t
+     inner join conta.tcuenta c on t.id_cuenta = c.id_cuenta
+     inner join conta.tconfig_subtipo_cuenta s on s.id_config_subtipo_cuenta = c.id_config_subtipo_cuenta
+     where      t.id_int_comprobante = p_id_int_comprobante
+     
+           and  trim(s.nombre)  in('IVA-CF'); 
            
+           
+       
+           
+   -- #86  suma del IVA DEBITO  Fiscal ...  revisar que el plan de cuentas este configurado adecuadamente
+     select
+         sum(t.importe_debe) as debe,
+         sum(t.importe_haber) as haber
+     into
+         v_registros_iva_df
+     from conta.tint_transaccion t
+     inner join conta.tcuenta c on t.id_cuenta = c.id_cuenta
+     inner join conta.tconfig_subtipo_cuenta s on s.id_config_subtipo_cuenta = c.id_config_subtipo_cuenta
+     where      t.id_int_comprobante = p_id_int_comprobante
+     
+           and  trim(s.nombre)  in('IVA-DF');         
+           
+   
+    -- #86   suma de descuentos retenciones de ley    
+     select
+         sum(t.importe_debe) as debe,
+         sum(t.importe_haber) as haber
+     into
+         v_registros_desc_ley
+     from conta.tint_transaccion t
+     inner join conta.tcuenta c on t.id_cuenta = c.id_cuenta
+     inner join conta.tconfig_subtipo_cuenta s on s.id_config_subtipo_cuenta = c.id_config_subtipo_cuenta
+     where      t.id_int_comprobante = p_id_int_comprobante
+     
+           and  trim(s.nombre)  in('DESC-LEY');  
+           
+                  
+     --sumamos el monto de documento y el IVA  de todas los asociados
+        
+      select
+         sum(dcv.importe_doc) as importe_doc,
+         sum(dcv.importe_iva) as importe_iva,
+         sum(dcv.importe_descuento) as importe_descuento,
+         sum(dcv.importe_descuento_ley) as  importe_descuento_ley --#86 ++
+      into
+         v_registros_doc
+      from conta.tdoc_compra_venta dcv
+      where dcv.id_int_comprobante = p_id_int_comprobante;  
+        
+      -- #86  validar la fecha de los documentos facturas y recibos
+       select 
+           pxp.list(dcv.id_doc_compra_venta::varchar)  into v_lista_docs
+       from  conta.tdoc_compra_venta dcv
+       inner join param.tperiodo per on   dcv.fecha BETWEEN per.fecha_ini and per.fecha_fin
+       inner join conta.tint_comprobante c on c.id_int_comprobante = dcv.id_int_comprobante
+       where dcv.id_int_comprobante = p_id_int_comprobante
+             and dcv.estado_reg = 'activo'
+             and per.id_periodo != c.id_periodo;
+      
+      
+        
+    ---------------------------------------------         
+    --#86  VALDIAR FECHAS DE LOS DOCUMENTOS
+    ---------------------------------------------
+    
+   IF  p_validar  THEN
+      IF v_lista_docs is not null THEN
+                   v_resp_val_doc[1] = 'FALSE';
+                   v_resp_val_doc[2] = format('Existen  documentos que no se correponden al perido del comprobante, revise los IDS:  %s', v_lista_docs::varchar);
+                        
+                   IF p_forzar_validacion = 'si' THEN
+                     raise exception '%',v_resp_val_doc[2];
+                   ELSE
+                     return v_resp_val_doc;
+                   END IF;
+        END IF;
+    END IF;       
+    
+    
+   
+           
+     ------------------------------
+     -- #86 VALDIAR EL IVa, CF     
+     -------------------------------
+     
+     IF v_registros_iva_cf is not null   THEN
+     
+           IF v_conta_val_doc_compra = 'si' and p_validar  THEN
+                
+               IF  COALESCE(v_registros_doc.importe_iva,0)  !=  COALESCE(v_registros_iva_cf.debe,0)  THEN  
+                  
+                  
+                  --raise exception '-- % , %'   ,v_registros_doc.importe_iva,v_registros_iva_cf.debe ;            
+               
+                   v_resp_val_doc[1] = 'FALSE';
+                   v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura CON CREDITO FISCAL o algun excento esta mal registrado). IVA cbte: ('||COALESCE(v_registros_iva_cf.debe,0)::varchar||'),  IVA Documentos : ('|| COALESCE(v_registros_doc.importe_iva,0)::varchar||').';
+                     
+                     raise exception '%',v_resp_val_doc[2]::varchar;
+                      
+                   IF p_forzar_validacion = 'si' THEN
+                     raise exception '%',v_resp_val_doc[2]::varchar;
+                   ELSE
+                     return v_resp_val_doc;
+                   END IF;
+                   
+               END IF;
+           END IF;
+     END IF;      
+           
+     ----------------------------
+     -- #86 VALDIAR EL IVA, DF     
+     ----------------------------- 
+     
+       IF v_registros_iva_df is not null  THEN
+     
+           IF v_conta_val_doc_compra = 'si' and p_validar  THEN
+                
+               IF  COALESCE(v_registros_doc.importe_iva,0)  != COALESCE(v_registros_desc_ley.haber,0)   THEN               
+               
+                   v_resp_val_doc[1] = 'FALSE';
+                   v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura CON DEBITO FISCAL o algun excento esta mal registrado). IVA DF cbte: ('|| COALESCE( v_registros_iva_df.haber,0)::varchar||'),  IVA Documentos: ('||COALESCE(v_registros_doc.importe_iva,0)::varchar ||').';
+                        
+                   IF p_forzar_validacion = 'si' THEN
+                     raise exception '%',v_resp_val_doc[2];
+                   ELSE
+                     return v_resp_val_doc;
+                   END IF;
+                   
+               END IF;
+           END IF;
+     END IF;
+     
+     ----------------------------------------
+     -- #86 VALDIAR  DSECUENTOS DE LEY    
+     --------------------------------------
+    
+       IF v_registros_desc_ley is not null  or v_registros_doc.importe_descuento_ley > 0 THEN
+     
+           IF v_conta_val_doc_compra = 'si' and p_validar  THEN
+                
+               IF  COALESCE(v_registros_doc.importe_descuento_ley,0)  != COALESCE(v_registros_desc_ley.haber,0)  THEN               
+               
+                   v_resp_val_doc[1] = 'FALSE';
+                   v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!! (Los descuentos de ley no cuadran). Decuentos CBTE: ('||  COALESCE(v_registros_desc_ley.haber,0)::varchar||'),  Descuentos DOCS ('||  COALESCE(v_registros_doc.importe_descuento_ley,0)::varchar ||').';
+                        
+                   IF p_forzar_validacion = 'si' THEN
+                     raise exception '%',v_resp_val_doc[2];
+                   ELSE
+                     return v_resp_val_doc;
+                   END IF;
+                   
+               END IF;
+           END IF;
+     END IF; 
+     
+     
+     
+     /* --#86      
    --revisar que si el comprobante esta en la lista blanca        
    
    
    --solo valida para los cbte de diario
    IF v_registros_recurso is not null  or v_registros_gasto is not null THEN
    
-       --sumamos el monto de documento y el via de todas los asociados
-        
-        select
-           sum(dcv.importe_doc) as importe_doc,
-           sum(dcv.importe_iva) as importe_iva,
-           sum(dcv.importe_descuento) as importe_descuento
-        into
-           v_registros_doc
-        from conta.tdoc_compra_venta dcv
-        where dcv.id_int_comprobante = p_id_int_comprobante; 
+       
         
         
         --RAC 20/01/2018, si tenemos una IDEA se tiene que restar el monto  (El monto neto de la DUI es solo para afectar el libro de compras)
@@ -167,10 +357,14 @@ BEGIN
                                      
                    if  v_difenrecia > v_conta_dif_doc_cbte or v_difenrecia < (v_conta_dif_doc_cbte*-1) THEN                 
                         v_resp_val_doc[1] = 'FALSE';
-                        --v_resp_val_doc[2] = format('El monto  total de   documentos %s (DOC: %s IVA: %s DESC: %s )  no cuadra con los gastos del comprobante %s, diferencia de (%s)', v_total_doc::varchar,  COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_gasto::varchar, (v_total_cbte_gasto - v_total_doc)::varchar);
                         v_resp_val_doc[2] = format('FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura, Recibo, Invoice, etc.). El monto total de los documentos registrados es: %s (DOC: %s, IVA: %s, DESC: %s ) y no cuadra con los gastos del comprobante (%s), existe una diferencia de: (%s).', v_total_doc::varchar,  COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_gasto::varchar, (v_total_cbte_gasto - v_total_doc)::varchar);
                         
-                        return v_resp_val_doc;
+                      
+                         IF p_forzar_validacion = 'si' THEN
+                           raise exception '%',v_resp_val_doc[2];
+                         ELSE
+                           return v_resp_val_doc;
+                         END IF;
                    end if;
               
               END IF;
@@ -182,9 +376,17 @@ BEGIN
                   v_difenrecia = v_total_cbte_recurso - v_total_doc;                  
                   if  v_difenrecia > v_conta_dif_doc_cbte or v_difenrecia < (v_conta_dif_doc_cbte*-1) THEN 
                      v_resp_val_doc[1] = 'FALSE';
-                    -- v_resp_val_doc[2] = format('(Ventas) El monto total de   documentos %s (DOC: %s IVA: %s DESC: %s )  no cuadra con los recursos del comprobante %s, diferencia de (%s)', v_total_doc::varchar, COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_recurso::varchar,(v_total_cbte_recurso - v_total_doc)::varchar);
+                    
                      v_resp_val_doc[2] = format('FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura, Recibo, Invoice, etc.). El monto total de los documentos registrados es: %s (DOC: %s, IVA: %s, DESC: %s ) y no cuadra con los recursos del comprobante (%s), existe una diferencia de (%s).', v_total_doc::varchar, COALESCE(v_registros_doc.importe_doc,0)::varchar, COALESCE(v_registros_doc.importe_iva,0)::varchar, COALESCE(v_registros_doc.importe_descuento,0)::Varchar, v_total_cbte_recurso::varchar,(v_total_cbte_recurso - v_total_doc)::varchar);
-                     return v_resp_val_doc;
+                     
+                     
+                     IF p_forzar_validacion = 'si' THEN
+                       raise exception '%',v_resp_val_doc[2];
+                     ELSE
+                       return v_resp_val_doc;
+                     END IF;
+                     
+                     
                   end if;
                   
               END IF;
@@ -198,7 +400,8 @@ BEGIN
              
    
    
-   END IF;
+   END IF;*/
+  
     
      --raise exception 'llega';
    
