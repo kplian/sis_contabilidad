@@ -55,6 +55,7 @@ v_registros_iva_df	         record; -- #86 +
 v_registros_desc_ley    	 record; -- #86 +
 v_lista_docs           		 varchar;-- #86 +
 v_reg_cbte  				 record; -- #86 +
+v_error_round                numeric;-- #86 +
 
 
 
@@ -70,6 +71,7 @@ BEGIN
    va_aux = string_to_array(v_conta_val_doc_otros_subcuentas_compras,',');
    
    --#obtenemos el periodo del cbte y la fecha
+   v_error_round = 0.06;-- #86 + error de redondeo apra validacion
    
    
    v_resp_val_doc[1] = 'TRUE';
@@ -238,7 +240,7 @@ BEGIN
      
            IF v_conta_val_doc_compra = 'si' and p_validar  THEN
                 
-               IF  COALESCE(v_registros_doc.importe_iva,0)  !=  COALESCE(v_registros_iva_cf.debe,0)  THEN  
+               IF not conta.f_comparar_numeric(COALESCE(v_registros_doc.importe_iva,0),  COALESCE(v_registros_iva_cf.debe,0) , v_error_round )  THEN  
                   
                   
                   --raise exception '-- % , %'   ,v_registros_doc.importe_iva,v_registros_iva_cf.debe ;            
@@ -266,7 +268,7 @@ BEGIN
      
            IF v_conta_val_doc_compra = 'si' and p_validar  THEN
                 
-               IF  COALESCE(v_registros_doc.importe_iva,0)  != COALESCE(v_registros_desc_ley.haber,0)   THEN               
+               IF not conta.f_comparar_numeric(COALESCE(v_registros_doc.importe_iva,0) , COALESCE(v_registros_iva_df.haber,0) ,v_error_round )     THEN               
                
                    v_resp_val_doc[1] = 'FALSE';
                    v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura CON DEBITO FISCAL o algun excento esta mal registrado). IVA DF cbte: ('|| COALESCE( v_registros_iva_df.haber,0)::varchar||'),  IVA Documentos: ('||COALESCE(v_registros_doc.importe_iva,0)::varchar ||').';
@@ -289,7 +291,7 @@ BEGIN
      
            IF v_conta_val_doc_compra = 'si' and p_validar  THEN
                 
-               IF  COALESCE(v_registros_doc.importe_descuento_ley,0)  != COALESCE(v_registros_desc_ley.haber,0)  THEN               
+               IF  not conta.f_comparar_numeric(COALESCE(v_registros_doc.importe_descuento_ley,0), COALESCE(v_registros_desc_ley.haber,0) , v_error_round )   THEN               
                
                    v_resp_val_doc[1] = 'FALSE';
                    v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!! (Los descuentos de ley no cuadran). Decuentos CBTE: ('||  COALESCE(v_registros_desc_ley.haber,0)::varchar||'),  Descuentos DOCS ('||  COALESCE(v_registros_doc.importe_descuento_ley,0)::varchar ||').';
