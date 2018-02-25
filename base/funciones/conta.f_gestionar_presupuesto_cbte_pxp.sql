@@ -18,7 +18,8 @@ $body$
      
    ISSUE            FECHA:		           AUTOR                 DESCRIPCION
  #31, ETR       27/12/2017              RAC KPLIAN           que considere los monto noejectuados, registrados por cada transaccion
- #32, ETR       06/02/2018              RAC KPLIAN           mandar glosa, datos de anticipo, descuento y iva revertido al ejecutar presupesuto
+ #32, ETR       06/02/2018              RAC KPLIAN           mandar glosa, datos de anticipo, descuento y iva revertido al ejecutar presupesuto 
+ #88, ETR       25/02/2018              RAC KPLIAN           Hscer opcional la reversion del IVA comprometido
  
           
      
@@ -70,6 +71,7 @@ DECLARE
  v_monto_anticipo		    numeric;
  v_monto_desc_anticipo		numeric;
  v_monto_iva_revertido		numeric;
+ v_conta_revertir_iva_comprometido   varchar; --#88 ++
   
     
 BEGIN
@@ -84,6 +86,9 @@ BEGIN
     v_monto_anticipo  = 0;  --#32
     v_monto_desc_anticipo  = 0; --#32
     v_monto_iva_revertido  = 0; --#32
+    
+    
+    v_conta_revertir_iva_comprometido =  pxp.f_get_variable_global('conta_revertir_iva_comprometido');--#88 ++
     
    
     -- recupera datos del comprobante
@@ -383,7 +388,7 @@ BEGIN
                                          --   si existe un factor a revertir y tenememos el id_partida_ejecucion, revertimos
                                          -------------------------------------------------------------------------------------
                                          
-                                         IF  v_registros.factor_reversion > 0 and v_registros.id_partida_ejecucion is not null THEN
+                                         IF  v_registros.factor_reversion > 0 and v_registros.id_partida_ejecucion is not null and v_conta_revertir_iva_comprometido = 'si' THEN --#88 considera variable de configuracion apra revertir IVA
                                          
                                                    /*  regla de 3 para calcular  el monto a revertir en moneda base
                                                     *      200 -> 0.87

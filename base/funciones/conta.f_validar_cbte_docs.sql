@@ -71,7 +71,7 @@ BEGIN
    va_aux = string_to_array(v_conta_val_doc_otros_subcuentas_compras,',');
    
    --#obtenemos el periodo del cbte y la fecha
-   v_error_round = 0.06;-- #86 + error de redondeo apra validacion
+   v_error_round = v_conta_dif_doc_cbte::numeric   ;-- #86 + error de redondeo apra validacion
    
    
    v_resp_val_doc[1] = 'TRUE';
