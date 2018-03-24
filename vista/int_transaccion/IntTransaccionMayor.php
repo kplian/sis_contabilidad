@@ -47,11 +47,14 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			{
 				//configuracion del componente
 				config:{
-						labelSeparator:'',
+					  fieldLabel:'ID Cbte',
+					  	labelSeparator:'',
 						inputType:'hidden',
-						name: 'id_int_comprobante'
+						name: 'id_int_comprobante',
+						gwidth:60,
 				},
 				type:'Field',
+				grid:true,
 				form:true 
 			},
 			{

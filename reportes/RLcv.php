@@ -273,7 +273,7 @@ class RLcv extends  ReportePDF {
 		
 		$this->SetFillColor(224, 235, 255);
         $this->SetTextColor(0);
-        $this->SetFont('','',6);
+        $this->SetFont('','',5.5);
 			
 		/*$conf_par_tablewidths=array(7,15,15,55,14,12,21,18,15,17,17,17,16,20,10);
         $conf_par_tablealigns=array('C','C','R','L','R','R','R','R','R','R','R','R','R','L','C');
@@ -293,12 +293,12 @@ class RLcv extends  ReportePDF {
 		$this->caclularMontos($val);
 		
 		$newDate = date("d/m/Y", strtotime( $val['fecha']));
-        if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){
+        if(trim($val['codigo_moneda'])!='BS' ){
 			$RowArray = array(
 	            			's0'  => $count,
 	                        's1' => $newDate,
 	                        's2' => trim($val['nit']),
-	                        's3' => trim($val['razon_social']),
+	                        's3' => $this->cortar_cadena(trim($val['razon_social']),58),
 	                        's4' => trim($val['nro_documento']),
 							's5' => trim($val['nro_dui']),
 	                        's6' => trim($val['nro_autorizacion']),
@@ -318,7 +318,7 @@ class RLcv extends  ReportePDF {
 	            			's0'  => $count,
 	                        's1' => $newDate,
 	                        's2' => trim($val['nit']),
-	                        's3' => trim($val['razon_social']),
+	                        's3' => $this->cortar_cadena(trim($val['razon_social']),58),
 	                        's4' => trim($val['nro_documento']),
 							's5' => trim($val['nro_dui']),
 	                        's6' => trim($val['nro_autorizacion']),
@@ -375,13 +375,32 @@ class RLcv extends  ReportePDF {
 
 
     }
+	function cortar_cadena($cadena, $longitud) {
+	    // Inicializamos las variables
+	    
+	    $contador = 0;
+	    $texto = '';
+
+	    $arrayTexto = explode(' ', $cadena);
+
+		while($longitud >= strlen($texto) + strlen($arrayTexto[$contador])) {
+			$texto .= ' '.$arrayTexto[$contador];
+			$contador++;
+		}
+	     
+	    if(strlen($cadena)>$longitud){
+	        $texto .= '';
+	    }
+	    return trim($texto);
+	}
 	
 	
 	
 	function caclularMontos($val){
 		
 		
-        if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){
+        if(trim($val['codigo_moneda'])!='BS' ){
+        //if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){
 		
 			/*$this->s1 = $this->s1 + $val['importe_doc'];
 			$this->s2 = $this->s2 + $val['total_excento'];
@@ -444,8 +463,23 @@ class RLcv extends  ReportePDF {
 	        $this->tablealigns=array('R','R','R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2,0,0);	
 	        $this->tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','T','T');*/
-	        
+	        if(trim($val['codigo_moneda'])!='BS' ){
+	        //if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){
+	       
 	        $RowArray = array( 
+	                    'espacio' => 'Subtotal: ',
+	                    's1' => $this->s1 * $val['tipo_cambio'],
+	                    's2' => $this->s2 * $val['tipo_cambio'],
+	                    's3' => $this->s3 * $val['tipo_cambio'],
+	                    's4' => $this->s4 * $val['tipo_cambio'],
+	                    's5' => $this->s5 * $val['tipo_cambio'],
+	                    's6' => $this->s6 * $val['tipo_cambio'],
+	                    's7' => '',
+	                    's8' => ''
+	                  );     
+			}
+			else{
+					        $RowArray = array( 
 	                    'espacio' => 'Subtotal: ',
 	                    's1' => $this->s1,
 	                    's2' => $this->s2,
@@ -455,8 +489,8 @@ class RLcv extends  ReportePDF {
 	                    's6' => $this->s6,
 	                    's7' => '',
 	                    's8' => ''
-	                  );     
-	                     
+	                  ); 
+			}           
 	        $this-> MultiRow($RowArray,false,1);
 			
 			$this->s1 = 0;

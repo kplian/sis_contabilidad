@@ -31,13 +31,13 @@ v_id_gestion=2;
 --fl_id_tipo_presup
 fl_tipo_rc = 1;
 
-fl_id_cuenta_inv =2320;
+fl_id_cuenta_inv =  1936;  --cueta para el tipo de presupesuto  2189
 
-v_i = 9;
+v_i = 24;   --tipo de presupeusto
 
 
 
-   DELETE FROM conta.trelacion_contable    WHERE id_tipo_presupuesto in (9,10,11,12,13,14,15,16,17,18)  ;
+ --  DELETE FROM conta.trelacion_contable    WHERE id_tipo_presupuesto in (9,10,11,12,13,14,15,16,17,18)  ;
   
   
                                              
@@ -52,11 +52,9 @@ retorno ='';
  LOOP
  
       v_id_partida=g_registros.id_partida;
-      v_i = 9;
-      
-       WHILE v_i <=   18 LOOP  
     
-       -- Si id_partida no es null
+      
+    
       
        		--Sentencia de la insercion Cuenta Inversion
         	insert into conta.trelacion_contable(
@@ -79,9 +77,9 @@ retorno ='';
                 
           	) values(
                 'activo',
-                fl_tipo_rc,
-                fl_id_cuenta_inv,
-                v_id_partida,
+                fl_tipo_rc,        --tipo de relacion contable .---la 1 = cuenta para ahcer compras
+                fl_id_cuenta_inv,  --cuenta de inversion que sera insertada
+                v_id_partida,      -- la msima parti da dereferecnia
                 v_id_gestion,
                 NULL,
                 NULL,
@@ -89,20 +87,17 @@ retorno ='';
                 1,
                 null,
                 null,
-                g_registros.id_tabla,
+                g_registros.id_tabla,  --el mismo concepto de gasto de referencia
                 'no',
                 NULL,
-                v_i,
+                v_i,    --id del tipo de presupeuisto 
                 NULL							
 			);
    		
        
-       
-       v_i = v_i + 1;
-     END LOOP;
  END LOOP;           
  
-  
+--raise exception 'TODO BIEN, BORRAR CUANDO SE CORRA EN PRODUCCIÓN';  
 return retorno;
 
   EXCEPTION

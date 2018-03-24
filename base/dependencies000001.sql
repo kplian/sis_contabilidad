@@ -4261,7 +4261,7 @@ ALTER TABLE conta.tdoc_concepto
 
 
 /**********************************I-DEP-MANU-CONTA-0-16/02/2018****************************************/  
-CREATE VIEW conta.vretencion (
+CREATE OR REPLACE VIEW conta.vretencion (
     id_doc_compra_venta,
     obs,
     tipo,

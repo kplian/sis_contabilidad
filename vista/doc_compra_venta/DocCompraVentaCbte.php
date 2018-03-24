@@ -49,7 +49,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 		 {
             config:{
                 name: 'id_doc_compra_venta',
-                fieldLabel: 'Documento',
+                fieldLabel: 'Documento ID',
                 allowBlank: false,
                 emptyText:'Elija una plantilla...',
                 store:new Ext.data.JsonStore(
@@ -72,7 +72,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
                 valueField: 'id_doc_compra_venta',
                 hiddenValue: 'id_doc_compra_venta',
                 displayField: 'desc_plantilla',
-                gdisplayField:'nro_documento',
+                //gdisplayField:'nro_documento',
                 listWidth:'280',
                 forceSelection:true,
                 typeAhead: false,
@@ -81,12 +81,12 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
                 mode:'remote',
                 pageSize:20,
                 queryDelay:500,
-               gwidth: 250,
-                minChars:2
+                gwidth: 100,
+                 minChars:2
             },
             type:'ComboBox',
             id_grupo: 0,
-            grid: false,
+			grid:true,
             bottom_filter: true,
             form: true
         },
@@ -644,7 +644,7 @@ Phx.vista.DocCompraVentaCbte=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	tam_pag: 50,	
-	title: 'Documentos Compra/Venta',
+	title: 'Documentos Compra y Venta',
 	ActSave: '../../sis_contabilidad/control/DocCompraVenta/agregarCbteDoc',
 	ActDel: '../../sis_contabilidad/control/DocCompraVenta/quitarCbteDoc',
 	ActList: '../../sis_contabilidad/control/DocCompraVenta/listarDocCompraVenta',

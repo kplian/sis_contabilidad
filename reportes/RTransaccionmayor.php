@@ -174,11 +174,12 @@ class RTransaccionmayor extends ReportePDF {
 			}else{
 				$aux=$aux.'';
 			}	*/
+							
 			
 			$arr = explode('-', $datarow['fecha']);
-			$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-			
-			$acreedor = ($debe-$haber) + $acreedor;								
+			$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];			
+			$acreedor = ($debe-$haber) + $acreedor;		
+
 			if($acreedor<0){
 				$this->tablenumbers=array(0,0,0,0,2,2,0);
 				$acreedor=$acreedor*-1;
@@ -186,6 +187,9 @@ class RTransaccionmayor extends ReportePDF {
 			}else{
 				$this->tablenumbers=array(0,0,0,0,2,2,2);
 			}			
+			
+			
+			
 			$this->tablealigns=array('C','L','L','L','R','R','R');			
 			$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
 			$this->tabletextcolor=array();			
@@ -208,7 +212,7 @@ class RTransaccionmayor extends ReportePDF {
 			$this->revisarfinPagina($datarow);
 			
 		}			
-		$this->cerrarCuadro();
+		//$this->cerrarCuadro();
 		$this->cerrarCuadroTotal();			
 		$this->tablewidths=$conf_par_tablewidths;
 		$this->tablealigns=$conf_par_tablealigns;
@@ -223,8 +227,8 @@ class RTransaccionmayor extends ReportePDF {
 		$startY = $this->GetY();
 		$this->getNumLines($row['cell1data'], 90);
 		$this->calcularMontos($a);			
-		if ($startY > 250) {			
-			$this->cerrarCuadro();
+		if ($startY > 235) {			
+			//$this->cerrarCuadro();
 			$this->cerrarCuadroTotal();		
 			if($this->total!= 0){
 				$this->AddPage();

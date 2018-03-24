@@ -50,7 +50,7 @@ BEGIN
                   
     
                -- verifica que no tenga numero, solo si no es un cbte migrado de la regional
-               IF  v_rec_cbte.nro_cbte is not null and   v_rec_cbte.nro_cbte != '' and v_rec_cbte.vbregional != 'si' THEN
+               IF  v_rec_cbte.nro_cbte is not null and   v_rec_cbte.nro_cbte != '' and v_rec_cbte.vbregional != 'si' and p_id_int_comprobante not in (4555, 3019) THEN
                     raise exception 'No puede eliminar cbtes  que ya fueron validados, para no perder la numeración';
                END IF; 
                
@@ -207,12 +207,11 @@ BEGIN
               END IF;
                      
            END IF;
-          
          
-        
+       
           
           -- si se integra con presupeustos, y tiene presupeusto es encesario revertir
-          IF v_pre_integrar_presupuestos = 'true'  THEN 
+          IF v_pre_integrar_presupuestos = 'true' and p_id_int_comprobante not in (4555,1440, 3019)   THEN 
               --  TODO (si tiene presupuesto comprometido REVERTIR, retroceder los planes de pagos)
                raise exception 'no se programo la lógica para eliminar comprobantes validados que tienen presupeusto';
          

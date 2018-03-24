@@ -39,6 +39,8 @@ DECLARE
     v_sincronizar		varchar;
     v_gestion			integer;
     v_filtro_ext		varchar;
+    
+    V_filtroLCV         varchar;
 
 BEGIN
 
@@ -124,7 +126,9 @@ BEGIN
                             (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta,
                             (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto,
                             fun.id_funcionario,
-                            fun.desc_funcionario2::varchar
+                            fun.desc_funcionario2::varchar,
+                            ic.fecha as fecha_cbte,
+                            ic.estado_reg as estado_cbte
                             
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
@@ -141,6 +145,10 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			if p_id_usuario = 431 then
+            	raise notice '%',v_consulta;
+            end if;
 
 			--Devuelve la respuesta
 			return v_consulta;
@@ -555,16 +563,35 @@ BEGIN
                v_filtro =  ' (lcv.fecha::Date between '''||v_parametros.fecha_ini||'''::Date  and '''||v_parametros.fecha_fin||'''::date)  ';
            END IF;
 
-
+          --------------------filtro comprobante , nro nit y nro autorizacion para compras y ventas 
+          V_filtroLCV :='';
+          if v_parametros.nro_comprobante !='' then
+              V_filtroLCV :=  ' and  (lcv.nro_cbte like ''%'||v_parametros.nro_comprobante||'%'' or lcv.id_int_comprobante::varchar = '' '||v_parametros.nro_comprobante||' '' '||')'; 
+          end if;
+          if v_parametros.nro_nit !='' then
+              V_filtroLCV := ' and  lcv.nit like ''%'||v_parametros.nro_nit||'%'' '; 
+          end if;
+          if v_parametros.nro_autorizacion !='' then
+              V_filtroLCV := ' and  lcv.nro_autorizacion like ''%'||v_parametros.nro_autorizacion||'%'' '; 
+          end if;
+          ----------------------fin filtro ---------------------------------
           IF v_parametros.tipo_lcv = 'lcv_compras'  THEN
               v_tipo = 'compra';
+              V_filtroLCV := V_filtroLCV ||' order by fecha asc';         
           ELSE
               v_tipo = 'venta';
+              V_filtroLCV := V_filtroLCV ||'order by nro_documento,fecha asc';   
+               
           END IF;
-
+		-- se agrego id_plantilla=2 para el filtro libro de ventas
+          IF v_parametros.datos='contabilizado' then
+             v_filtro :=v_filtro||' and lcv.nro_cbte is not null and  lcv.id_plantilla in (1,2,25,33,27,4,36,42,38,24)';
+          ELSE
+             v_filtro :=v_filtro||' and lcv.nro_cbte is null and  lcv.id_plantilla in (1,2,25,33,27,4,36,42,38,24)';
+          END IF;
           --Sentencia de la consulta
 		  v_consulta:='SELECT id_doc_compra_venta::BIGINT,
-                               tipo::Varchar,
+                               lcv.tipo::Varchar,
                                fecha::date,
                                nit::varchar,
                                razon_social::Varchar,
@@ -593,16 +620,20 @@ BEGIN
                                importe_ice::numeric,
                                importe_excento::numeric,
                                lcv.nro_cbte,
-                               lcv.tipo_cambio
+                               lcv.tipo_cambio, 
+                               lcv.id_int_comprobante,
+                               (SELECT usu1.cuenta FROM segu.tusuario usu1 WHERE usu1.id_usuario=LCV.id_usuario_comprobante) cuenta
                         FROM '||v_tabla_origen||' lcv
+                        join segu.tusuario usu on usu.id_usuario=lcv.id_usuario_reg
                         where  lcv.tipo = '''||v_tipo||'''
-                               and id_moneda = '||param.f_get_moneda_base()||'
-                               and '||v_filtro||' 
-                        order by fecha, id_doc_compra_venta';
-
+                               
+                               and '||v_filtro||V_filtroLCV;
+                        
+                       
 			raise notice '%', v_consulta;
+             --RAISE EXCEPTION 'iii %',v_consulta;
 			--Devuelve la respuesta
-            --RAISE EXCEPTION 'Error j %',v_consulta;
+            --RAISE EXCEPTION 'Error j %',v_filtro||V_filtroLCV;
 			return v_consulta;
 
 		end;
@@ -704,7 +735,8 @@ BEGIN
                                and '||v_filtro||'
                         order by fecha, id_doc_compra_venta';
 
-			raise notice '%', v_consulta;
+			raise notice 'edison = %', v_consulta;
+           
 			--Devuelve la respuesta
 			return v_consulta;
 

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_plantilla_aitb (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -9,35 +11,35 @@ CREATE OR REPLACE FUNCTION conta.f_plantilla_aitb (
 RETURNS void AS
 $body$
 DECLARE
- v_nombre_funcion         text;
- v_resp             varchar;
- v_total_haber          numeric;
- v_total_debe         numeric;
- v_resp_deudor          numeric[];
- v_resp_acreedor          numeric[];
- v_registros          record;
- v_reg_cbte           record;
+ v_nombre_funcion   			text;
+ v_resp							varchar;
+ v_total_haber   				numeric;
+ v_total_debe	 				numeric;
+ v_resp_deudor  				numeric[];
+ v_resp_acreedor  				numeric[];
+ v_registros					record;
+ v_reg_cbte						record;
  v_sw_saldo_acredor               boolean;
- v_sw_actualiza               boolean;
- v_saldo_ma             numeric;
- v_saldo_mb             numeric;
- v_id_moneda_base       integer;
- v_id_moneda_act        integer;
- v_aux_actualizado_mb     numeric;
- v_diferencia         numeric;
- v_total_dif          numeric;
- v_diferencia_positiva      boolean;
- v_importe_haber        numeric;
- v_importe_debe         numeric;
+ v_sw_actualiza              	boolean;
+ v_saldo_ma   					numeric;
+ v_saldo_mb   					numeric;
+ v_id_moneda_base				integer;
+ v_id_moneda_act				integer;
+ v_aux_actualizado_mb			numeric;
+ v_diferencia					numeric;
+ v_total_dif					numeric;
+ v_diferencia_positiva			boolean;
+ v_importe_haber				numeric;
+ v_importe_debe					numeric;
  
- v_ajuste_debe          numeric;
- v_ajuste_haber         numeric;
- v_id_centro_costo_depto    integer;
- v_id_cuenta          integer;
- v_id_partida         integer;
- v_record_rel_con         record;
- v_sw_minimo          boolean; 
- v_record_rel         record;
+ v_ajuste_debe					numeric;
+ v_ajuste_haber					numeric;
+ v_id_centro_costo_depto		integer;
+ v_id_cuenta					integer;
+ v_id_partida					integer;
+ v_record_rel_con 				record;
+ v_sw_minimo					boolean; 
+ v_record_rel					record;
  
   
 BEGIN
@@ -70,10 +72,22 @@ BEGIN
     
     
     v_sw_minimo = false;
+    
+     -- validar que la fecha inicial sea el primer dia del año  
+    IF not exists (select
+                        1
+                    from param.tgestion ges
+                    where ges.id_gestion = p_id_gestion_cbte
+                          and ges.fecha_ini = p_desde ) THEN
+      
+         raise exception 'El calculo AITB siempre debe comenzar desde el primer dia del año';
+                        
+     END IF;
+    
     -- 1) FOR listar todas las cuentas que actualizan desde contabilidad de la gestion
     
     FOR v_registros in (
-              select 
+    					select 
                             c.id_cuenta,
                             c.tipo_act
                         from conta.tcuenta c 
@@ -89,13 +103,14 @@ BEGIN
       
         v_resp_deudor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
                                            p_desde, 
-                           p_hasta, 
-                                           p_id_depto::varchar, 
+        								   p_hasta, 
+                                            NULL, --todos los deptos p_id_depto::varchar, , 
                                            'si',
                                            'todos',          --  p_incluir_cierre
                                            'todos',          --  p_incluir_aitb, 
                                            'defecto_cuenta', -- p_signo_balance, 
                                            'deudor', --  p_tipo_saldo,
+                                            null,--p_id_auxiliar,
                                             null,--p_id_int_comprobante_ori,
                                             NULL,--id_ot
                                             null -- p_id_centro_costo
@@ -104,13 +119,14 @@ BEGIN
         --mayor acredor                                 
          v_resp_acreedor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
                                            p_desde, 
-                           p_hasta, 
-                                           p_id_depto::varchar, 
+        								   p_hasta, 
+                                           NULL, --todos los deptos p_id_depto::varchar, , 
                                            'si',
                                            'todos',          --  p_incluir_cierre
                                            'todos',          --  p_incluir_aitb, 
                                            'defecto_cuenta', -- p_signo_balance, 
                                            'acreedor', --  p_tipo_saldo,
+                                            null,--p_id_auxiliar,
                                             null,--p_id_int_comprobante_ori,
                                             NULL,--id_ot
                                             null -- p_id_centro_costo
@@ -433,14 +449,14 @@ BEGIN
     
     
 EXCEPTION
-        
-  WHEN OTHERS THEN
-    v_resp='';
-    v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-    v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-    v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-    raise exception '%',v_resp;
-                
+				
+	WHEN OTHERS THEN
+		v_resp='';
+		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+		raise exception '%',v_resp;
+				        
 END;
 $body$
 LANGUAGE 'plpgsql'

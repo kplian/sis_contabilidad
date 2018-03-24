@@ -1742,7 +1742,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
-                if (newValue[3] == '4' || newValue[3] == '8'|| newValue[3] == '6'){
+                if (newValue[3] == '4' || newValue[3] == '8'|| newValue[3] == '6'|| newValue[3] == '7'){
                     this.mostrarComponente(this.Cmp.codigo_control);
                     this.Cmp.codigo_control.allowBlank = false;
                 }

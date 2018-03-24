@@ -97,6 +97,8 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('importe_aux_neto','numeric');
 		$this->captura('id_funcionario','integer');		
 		$this->captura('desc_funcionario2','varchar');
+		$this->captura('fecha_cbte','date');
+		$this->captura('estado_cbte','varchar');
 
 		
 
@@ -1357,7 +1359,12 @@ class MODDocCompraVenta extends MODbase{
 		  $this->setParametro('fecha_fin','fecha_fin','date');
 		  $this->setParametro('id_gestion','id_gestion','INTEGER');
 
-		   
+		  $this->setParametro('datos','datos','VARCHAR');
+		  
+		  $this->setParametro('nro_comprobante','nro_comprobante','VARCHAR');
+		  $this->setParametro('nro_nit','nro_nit','VARCHAR');
+		  $this->setParametro('nro_autorizacion','nro_autorizacion','VARCHAR');
+		  
 		  //captura parametros adicionales para el count
 		 /* $this->setParametro('id_gestion','id_gestion','INTEGER');
 		  
@@ -1403,7 +1410,8 @@ class MODDocCompraVenta extends MODbase{
 		  
 		  $this->captura('nro_cbte','VARCHAR');
 		  $this->captura('tipo_cambio','NUMERIC');
-
+          $this->captura('id_int_comprobante','INTEGER');
+		  $this->captura('cuenta','VARCHAR');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

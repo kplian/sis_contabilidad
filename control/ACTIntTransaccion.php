@@ -334,9 +334,9 @@ class ACTIntTransaccion extends ACTbase{
 		if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
 			$this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");	
 		}
+		$this->objFunc=$this->create('MODIntTransaccion');								
+		$cbteHeader = $this->objFunc->listarIntTransaccionRepMayor($this->objParam);
 				
-		$this->objFunc=$this->create('MODIntTransaccion');		
-		$cbteHeader = $this->objFunc->listarIntTransaccionRepMayor($this->objParam);			
 		if($cbteHeader->getTipo() == 'EXITO'){										
 			return $cbteHeader;			
 		}
@@ -368,18 +368,19 @@ class ACTIntTransaccion extends ACTbase{
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
 		}
-		if($this->objParam->getParametro('tipo_formato')=='xls') {			
+		if($this->objParam->getParametro('tipo_formato')=='xls') {				
 			$this->objFun=$this->create('MODIntTransaccion');	
-			$this->res = $this->objFun->listarIntTransaccionRepMayor();
+			$this->res = $this->objFun->listarIntTransaccionRepMayor();	
 			if($this->res->getTipo()=='ERROR'){
 				$this->res->imprimirRespuesta($this->res->generarJson());
 				exit;
-			}
+			}		
 			$titulo ='Ret';
 			$nombreArchivo=uniqid(md5(session_id()).$titulo);
 			$nombreArchivo.='.xls';
 			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
-			$this->objParam->addParametro('datos',$this->res->datos);			
+			$this->objParam->addParametro('datos',$this->res->datos);
+						
 			$this->objReporteFormato=new RMayorXls($this->objParam);
 			$this->objReporteFormato->generarDatos();
 			$this->objReporteFormato->generarReporte();

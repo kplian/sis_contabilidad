@@ -621,7 +621,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'TextField',
 					id_grupo:0,
 					grid:true,
-					form:false
+					form:false,
+					bottom_filter: true,
+					filters:{pfiltro:'ic.id_int_comprobante',type:'numeric'}
 			},
 			{
 				config:{
@@ -638,7 +640,40 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					grid:true,
 					bottom_filter: true,
 					form:false
-			},			
+			},
+			{
+				config:{
+					name: 'estado_cbte',
+					fieldLabel: 'Estado Cbte.',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:10
+				},
+					type:'TextField',
+					filters:{pfiltro:'ic.estado_reg',type:'string'},
+					id_grupo:1,
+					grid:true,
+					form:false
+			},
+			{
+				config:{
+					name: 'fecha_cbte',
+					fieldLabel: 'Fecha Cbte.',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:10,
+					format: 'd/m/Y',
+					readOnly:true,
+					renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				},
+					type:'TextField',
+					filters:{pfiltro:'ic.fecha',type:'date'},
+					id_grupo:1,
+					grid:true,
+					form:false
+			},		
 	        {
 	            config:{
 	                name:'id_moneda',
@@ -1326,7 +1361,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             		
 	
 	tam_pag:50,	
-	title:'Documentos Compra/Venta',
+	title:'Documentos Compra y Venta',
 	ActSave:'../../sis_contabilidad/control/DocCompraVenta/modificarBasico',
 	ActDel:'../../sis_contabilidad/control/DocCompraVenta/eliminarDocCompraVenta',
 	ActList:'../../sis_contabilidad/control/DocCompraVenta/listarDocCompraVenta',
@@ -1373,7 +1408,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
 		'desc_tipo_doc_compra_venta','id_tipo_doc_compra_venta','nro_tramite',
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg',
-		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata','desc_funcionario2','id_funcionario'
+		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata','desc_funcionario2','id_funcionario',
+		{name:'fecha_cbte', type: 'date',dateFormat:'Y-m-d'},
+		{name:'estado_cbte', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_doc_compra_venta',

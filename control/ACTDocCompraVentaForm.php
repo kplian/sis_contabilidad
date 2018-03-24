@@ -75,7 +75,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 	
 	function reporteLCV(){
 		
-		
+		$var='';
 		if($this->objParam->getParametro('formato_reporte')=='pdf'){
 			
 			$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
@@ -138,6 +138,12 @@ class ACTDocCompraVentaForm extends ACTbase{
                 $this->res->imprimirRespuesta($this->res->generarJson());
                 exit;
             }
+			if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){			
+				$var = 'COMPRAS';
+		    }
+		    else{
+				$var = 'VENTAS';
+		     }
             //obtener titulo de reporte
             $titulo ='Lcv';
             //Genera el nombre del archivo (aleatorio + titulo)
@@ -146,6 +152,7 @@ class ACTDocCompraVentaForm extends ACTbase{
 
             $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
             $this->objParam->addParametro('datos',$this->res->datos);
+			$this->objParam->addParametro('var',$var);
             //Instancia la clase de excel
             $this->objReporteFormato=new RLcvXls($this->objParam);
             $this->objReporteFormato->generarDatos();
@@ -278,7 +285,10 @@ class ACTDocCompraVentaForm extends ACTbase{
 								"IMPORTE SUJETO a CREDITO FISCAL E = C-D" . $separador .
 								"CREDITO FISCAL F = E*13%" . $separador .
 								'CODIGO DE CONTROL' . $separador .
-								'TIPO DE COMPRA' . "\r\n");
+								'TIPO DE COMPRA' . $separador .
+								'#_CBTE' . $separador .
+								'ID_CBTE' . $separador .
+								'USUARIO' . "\r\n");
 					}else{
 						fwrite($file, "-" . $separador .
 								'N#' . $separador .
@@ -295,7 +305,10 @@ class ACTDocCompraVentaForm extends ACTbase{
 								"IMPORTE SUJETO a CREDITO FISCAL E = C-D" . $separador .
 								"CREDITO FISCAL F = E*13%" . $separador .
 								'CODIGO DE CONTROL' . $separador .
-								'TIPO DE COMPRA' . "\r\n");
+								'TIPO DE COMPRA' . $separador .
+								'#_CBTE' . $separador .
+								'ID_CBTE' . $separador .
+								'USUARIO' . "\r\n");
 					}
 									
 			 }
@@ -329,24 +342,49 @@ class ACTDocCompraVentaForm extends ACTbase{
 			 $newDate = date("d/m/Y", strtotime( $val['fecha']));			 
 			 if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'){
 						
-					
-					fwrite ($file,  "1".$separador.
-				 	                $ctd.$separador.
-			                        $newDate.$separador.
-			                        $val['nit'].$separador.
-			                        $val['razon_social'].$separador. 
-			                        $val['nro_documento'].$separador.
-									$val['nro_dui'].$separador.
-			                        $val['nro_autorizacion'].$separador.
-			                        $val['importe_doc'].$separador.
-			                        $val['total_excento'].$separador.
-									$val['subtotal'].$separador.
-									$val['importe_descuento'].$separador.
-									$val['sujeto_cf'].$separador.
-									$val['importe_iva'].$separador.
-									$val['codigo_control'].$separador.
-			                        $val['tipo_doc']."\r\n");
-		              			
+					if(trim($val['codigo_moneda'])!='BS'){	
+						fwrite ($file,  "1".$separador.
+					 	                $ctd.$separador.
+				                        $newDate.$separador.
+				                        $val['nit'].$separador.
+				                        $val['razon_social'].$separador. 
+				                        $val['nro_documento'].$separador.
+										$val['nro_dui'].$separador.
+				                        $val['nro_autorizacion'].$separador.
+				                        ($val['importe_doc'] * $val['tipo_cambio']).$separador.
+				                        ($val['total_excento'] * $val['tipo_cambio']).$separador.
+										($val['subtotal'] * $val['tipo_cambio']).$separador.
+										($val['importe_descuento'] * $val['tipo_cambio']).$separador.
+										($val['sujeto_cf'] * $val['tipo_cambio']).$separador.
+										($val['importe_iva'] * $val['tipo_cambio']).$separador.
+										$val['codigo_control'].$separador.
+										$val['tipo_doc'].$separador.
+										$val['nro_cbte'].$separador.
+										$val['id_int_comprobante'].$separador.
+				                        $val['cuenta']."\r\n");
+										
+					}
+					else{
+						fwrite ($file,  "1".$separador.
+					 	                $ctd.$separador.
+				                        $newDate.$separador.
+				                        $val['nit'].$separador.
+				                        $val['razon_social'].$separador. 
+				                        $val['nro_documento'].$separador.
+										$val['nro_dui'].$separador.
+				                        $val['nro_autorizacion'].$separador.
+				                        $val['importe_doc'].$separador.
+				                        $val['total_excento'].$separador.
+										$val['subtotal'].$separador.
+										$val['importe_descuento'].$separador.
+										$val['sujeto_cf'].$separador.
+										$val['importe_iva'].$separador.
+										$val['codigo_control'].$separador.
+					                    $val['tipo_doc'].$separador.
+					                    $val['nro_cbte'].$separador.
+										$val['id_int_comprobante'].$separador.
+				                        $val['cuenta']."\r\n");
+					}   			
 			 }
 			 else{
 				 	fwrite ($file,  "3".$separador.

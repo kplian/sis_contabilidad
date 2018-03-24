@@ -434,8 +434,11 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
        				store: new Ext.data.ArrayStore({
                         fields: ['variable', 'valor'],
                         data : [ ['no', 'No actualiza'],
-                                 ['conta', 'Sistema de Contabilidad'],
+                                 ['conta', 'Sistema de Contabilidad (Ingresos / Egresos)'],
                                  ['activos', 'Sistema de Activos FIjos'],
+                                 ['curso', 'Obras en Curso (Considera Centro de Costo)'],
+                                 ['reservas', 'Actualización de reservas'],
+                                 ['capital', 'Actualización de capital'],
                                ]
                         }),
        				valueField: 'variable',
@@ -449,7 +452,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
        				queryDelay:1000,
        				width:250,
        				minChars:2,
-	       			enableMultiSelect:true
+	       			enableMultiSelect:false
        			},
        			type:'ComboBox',
        			id_grupo:0,
@@ -457,11 +460,6 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
        			form:true
        	}
        	
-       	
-       	
-   	      
-		
-		
 	],
 	
 	title:'Cuenta',

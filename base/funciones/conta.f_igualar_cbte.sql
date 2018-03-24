@@ -103,7 +103,7 @@ BEGIN
     			
            
             IF p_show_errors THEN
-              IF v_registros.estado_reg != 'borrador'  THEN
+              IF v_registros.estado_reg not in ('borrador', 'vbcbte')  THEN
                 raise exception 'Solo puede igualar cbtes en borrador';
               END IF;
             END IF;  

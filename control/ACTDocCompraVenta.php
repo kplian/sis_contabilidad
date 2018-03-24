@@ -38,9 +38,10 @@ class ACTDocCompraVenta extends ACTbase{
             $this->objParam->addFiltro("dcv.manual = ''".$this->objParam->getParametro('manual')."''");    
         }*/
 		
-		if($this->objParam->getParametro('fecha_cbte')!=''){
+		//RCM comentado en fecha 27/02/2018 para asociar facturas coin fecha posterior al Cbte. previa consulta a RAC
+		/*if($this->objParam->getParametro('fecha_cbte')!=''){
             $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    
-        }
+        }*/
 
         if($this->objParam->getParametro('filtro_usuario') == 'si'){
             $this->objParam->addFiltro("dcv.id_usuario_reg = ".$_SESSION["ss_id_usuario"]);

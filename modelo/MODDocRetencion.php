@@ -47,17 +47,18 @@ class MODDocRetencion extends MODbase{
 		$this->captura('importe_descuento_ley','NUMERIC');
 		$this->captura('obs','VARCHAR');
 		$this->captura('nro_tramite','VARCHAR');
+		$this->captura('usr_mod','VARCHAR');
 		$this->captura('plantilla','VARCHAR');
 		
 		$this->captura('id_int_comprobante','int4');
 		$this->captura('nro_cbte','VARCHAR');
-		
-		
+		$this->captura('tipo_cambio','NUMERIC');	
 		$this->captura('it','NUMERIC');
 		
 		$this->captura('it_bienes','NUMERIC');
 		$this->captura('it_servicios','NUMERIC');
 		$this->captura('it_alquileres','NUMERIC');
+		$this->captura('it_directores','NUMERIC');
 				
 		$this->captura('iue_iva','NUMERIC');
 		 
@@ -66,13 +67,16 @@ class MODDocRetencion extends MODbase{
 		$this->captura('iue_bienes','NUMERIC');
 		$this->captura('iue_servicios','NUMERIC');
 		$this->captura('rc_iva_alquileres','NUMERIC');
+		$this->captura('rc_iva_directores','NUMERIC');
+		$this->captura('rc_iva_retirados','NUMERIC');
 		 
 		$this->captura('descuento','NUMERIC');
 		$this->captura('liquido','NUMERIC');	
 		
 		$this->captura('bienes','VARCHAR');	
 		$this->captura('servicios','VARCHAR');	
-		$this->captura('alquileres','VARCHAR');	
+		$this->captura('alquileres','VARCHAR');
+		$this->captura('directores','VARCHAR');	
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

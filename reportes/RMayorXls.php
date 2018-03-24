@@ -102,8 +102,8 @@ class RMayorXls
 		$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 		$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 		$fec = (int)($this->objParam->getParametro('fec')=== 'true');	
-		$cuenta = (int)($this->objParam->getParametro('cuenta')=== 'true');						
-		
+		$cuenta = (int)($this->objParam->getParametro('cuenta_t')=== 'true');						
+
 		$aux='';		
 		if($cc == 1){
 			array_push($var,'CENTRO COSTO');
@@ -199,6 +199,7 @@ class RMayorXls
 		$t=0;
 		$acreedor=0;
 		$ar = array();
+		
 		//
 		switch ($this->objParam->getParametro('tipo_moneda')) {
 			case 'MA':
@@ -211,7 +212,7 @@ class RMayorXls
 					$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 					$fec = (int)($this->objParam->getParametro('fec')=== 'true');
-					$cuenta = (int)($this->objParam->getParametro('cuenta')=== 'true');						
+					$cuenta = (int)($this->objParam->getParametro('cuenta_t')=== 'true');						
 					
 					$aux='';		
 					if($cc == 1){
@@ -263,7 +264,8 @@ class RMayorXls
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4, $fila, $acreedor);
 					$fila++;
 					$this->numero++;
-				}		
+				}	
+	
 				break;
 			case 'MT':			
 				foreach ($datos as $value){					
@@ -275,7 +277,7 @@ class RMayorXls
 					$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 					$fec = (int)($this->objParam->getParametro('fec')=== 'true');
-					$fec = (int)($this->objParam->getParametro('cuenta')=== 'true');							
+					$fec = (int)($this->objParam->getParametro('cuenta_t')=== 'true');							
 					
 					$aux='';		
 					if($cc == 1){
@@ -330,6 +332,7 @@ class RMayorXls
 				}	
 				break;
 			case 'MB':
+				//var_dump($datos);
 				foreach ($datos as $value){					
 					$cc= (int)($this->objParam->getParametro('cc') === 'true');		
 					$partida = (int)($this->objParam->getParametro('partida')=== 'true');
@@ -339,7 +342,7 @@ class RMayorXls
 					$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 					$fec = (int)($this->objParam->getParametro('fec')=== 'true');
-					$cuenta = (int)($this->objParam->getParametro('cuenta')=== 'true');						
+					$cuenta = (int)($this->objParam->getParametro('cuenta_t')=== 'true');						
 					
 					$aux='';		
 					if($cc == 1){

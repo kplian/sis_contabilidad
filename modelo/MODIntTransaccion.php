@@ -483,6 +483,10 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
 		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
 		$this->setParametro('tipo_filtro','tipo_filtro','varchar');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('desde','desde','date');
+		
+		$this->setParametro('datos','datos','varchar');
 		//captura parametros adicionales para el count
 	/*	$this->capturaCount('total_debe','numeric');
 		$this->capturaCount('total_haber','numeric');

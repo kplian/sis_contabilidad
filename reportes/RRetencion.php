@@ -127,7 +127,7 @@ class RRetencion extends ReportePDF {
 		$this->Cell($width_c1, $height, 'Nombre o Razón Social:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 		$this->SetFont('', '');
 		$this->SetFillColor(192,192,192, true);
-		$this->Cell($width_c2, $height, $this->datos_entidad['nombre'].' ('.$this->datos_entidad['direccion_matriz'].')', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		$this->Cell($width_c2, $height, $this->datos_entidad['nombre'], 0, 0, 'L', false, '', 0, false, 'T', 'C');
 		////////////////////////////////////////
 		$this->Cell($esp_width, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 		$this->Cell($width5, $height,'NIT:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -307,12 +307,16 @@ class RRetencion extends ReportePDF {
 		$this->SetFont('','',6);				
 		$newDate = date("d/m/Y", strtotime($val['fecha']));
 		$nombre =$this->objParam->getParametro('tipo_ret');		
+			
 		if($nombre=='todo'){
+							
 			$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15,16,16);
 			$conf_par_tablealigns=array('C','C','C','C','C','R','R','R','R','R','R','R','R','R','R','R');
 			$conf_par_tablenumbers=array(0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,0);
-			$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');		
-			$RowArray = array(  's0' => $count,
+			$conf_tableborders=array('LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR','LR');	
+			if(trim($val['codigo_moneda'])=='BS'){			
+				$RowArray = array(
+								's0' => $count,
 								's1' => $newDate,
 								's2' => trim($val['obs']),
 								's3' => trim($val['nro_documento']),
@@ -324,11 +328,31 @@ class RRetencion extends ReportePDF {
 								's9' => $val['iue_servicios'],		
 								's10' => $val['it_alquileres'],
 								's11' => $val['rc_iva_alquileres'],
-								's12' => $val['importe_descuento_ley'],
-								's13' => $val['descuento'],
+								's12' => $val['it_directores'],
+								's13' => $val['rc_iva_directores'],
 								's14' => $val['liquido'],
 								's15' => $val['nro_cbte']			
 							);
+			}else{				
+				$RowArray = array(
+							's0' => $count,
+							's1' => $newDate,
+							's2' => trim($val['obs']),
+							's3' => trim($val['nro_documento']),
+							's4'=> trim($val['plantilla']),
+							's5' => $val['importe_doc']* $val['tipo_cambio'],
+							's6' => $val['it_bienes']* $val['tipo_cambio'],
+							's7' => $val['iue_bienes']* $val['tipo_cambio'],
+							's8' => $val['it_servicios']* $val['tipo_cambio'],
+							's9' => $val['iue_servicios']* $val['tipo_cambio'],		
+							's10' => $val['it_alquileres']* $val['tipo_cambio'],
+							's11' => $val['rc_iva_alquileres']* $val['tipo_cambio'],
+							's12' => $val['it_directores']* $val['tipo_cambio'],
+							's13' => $val['rc_iva_directores']* $val['tipo_cambio'],
+							's14' => $val['liquido']* $val['tipo_cambio'],
+							's15' => $val['nro_cbte']			
+						);
+			}				
 		}else{
 			$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,16,16);
 			$conf_par_tablealigns=array('C','C','C','C','C','R','R','R','R','R','R','R');
@@ -412,6 +436,7 @@ class RRetencion extends ReportePDF {
 		$this->s11 = 0;
 		$this->s12 = 0;
 		$this->s13 = 0;
+		$this->s14 = 0;
 		foreach ($detalle as $val) {			
 			$this->imprimirLinea($val,$count,$fill);
 			$fill = !$fill;
@@ -444,28 +469,59 @@ class RRetencion extends ReportePDF {
 	//imprimirLinea suma filas
 	function calcularMontos($val){	
 		if($this->objParam->getParametro('tipo_ret')=='todo'){
-			
-			$this->s1 = $this->s1 + $val['importe_doc'];
-			$this->s2 = $this->s2 + $val['it_bienes'];
-			$this->s3 = $this->s3 + $val['iue_bienes'];
-			$this->s4 = $this->s4 + $val['it_servicios'];
-			$this->s5 = $this->s5 + $val['iue_servicios'];
-			$this->s6 = $this->s6 + $val['it_alquileres'];
-			$this->s7 = $this->s7 + $val['rc_iva_alquileres'];
-			$this->s8 = $this->s8 + $val['importe_descuento_ley'];
-			$this->s9 = $this->s9 + $val['descuento'];
-			$this->s10 = $this->s10 + $val['liquido'];
-						
-			$this->t1 = $this->t1 + $val['importe_doc'];
-			$this->t2 = $this->t2 + $val['it_bienes'];
-			$this->t3 = $this->t3 + $val['iue_bienes'];
-			$this->t4 = $this->t4 + $val['it_servicios'];
-			$this->t5 = $this->t5 + $val['iue_servicios'];
-			$this->t6 = $this->t6 + $val['it_alquileres'];
-			$this->t7 = $this->t7 + $val['rc_iva_alquileres'];
-			$this->t8 = $this->t8 + $val['importe_descuento_ley'];
-			$this->t9 = $this->t9 + $val['descuento'];
-			$this->t10 = $this->t10 + $val['liquido'];
+			if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null'){						
+				$this->s1 = $this->s1 + ($val['importe_doc']* $val['tipo_cambio']);
+				$this->s2 = $this->s2 + ($val['it_bienes']* $val['tipo_cambio']);
+				$this->s3 = $this->s3 + ($val['iue_bienes']* $val['tipo_cambio']);
+				$this->s4 = $this->s4 + ($val['it_servicios']* $val['tipo_cambio']);
+				$this->s5 = $this->s5 + ($val['iue_servicios']* $val['tipo_cambio']);
+				$this->s6 = $this->s6 + ($val['it_alquileres']* $val['tipo_cambio']);
+				$this->s7 = $this->s7 + ($val['rc_iva_alquileres']* $val['tipo_cambio']);			
+				$this->s8 = $this->s8 + ($val['it_directores']* $val['tipo_cambio']);
+				$this->s9 = $this->s9 + ($val['rc_iva_directores']* $val['tipo_cambio']);
+				$this->s10 = $this->s10 + ($val['importe_descuento_ley']* $val['tipo_cambio']);		
+				$this->s11 = $this->s11 + ($val['descuento']* $val['tipo_cambio']);
+				$this->s12 = $this->s12 + ($val['liquido']* $val['tipo_cambio']);
+							
+				$this->t1 = $this->t1 + ($val['importe_doc']* $val['tipo_cambio']);
+				$this->t2 = $this->t2 + ($val['it_bienes']* $val['tipo_cambio']);
+				$this->t3 = $this->t3 + ($val['iue_bienes']* $val['tipo_cambio']);
+				$this->t4 = $this->t4 + ($val['it_servicios']* $val['tipo_cambio']);
+				$this->t5 = $this->t5 + ($val['iue_servicios']* $val['tipo_cambio']);
+				$this->t6 = $this->t6 + ($val['it_alquileres']* $val['tipo_cambio']);
+				$this->t7 = $this->t7 + ($val['rc_iva_alquileres']* $val['tipo_cambio']);			
+				$this->t8 = $this->t8 + ($val['it_directores']* $val['tipo_cambio']);
+				$this->t9 = $this->t9 + ($val['rc_iva_directores']* $val['tipo_cambio']);			
+				$this->t10 = $this->t10 + ($val['importe_descuento_ley']* $val['tipo_cambio']);
+				$this->t11 = $this->t11 + ($val['descuento']* $val['tipo_cambio']);
+				$this->t12 = $this->t12 + ($val['liquido']* $val['tipo_cambio']);
+			}else{
+				$this->s1 = $this->s1 + $val['importe_doc'];
+				$this->s2 = $this->s2 + $val['it_bienes'];
+				$this->s3 = $this->s3 + $val['iue_bienes'];
+				$this->s4 = $this->s4 + $val['it_servicios'];
+				$this->s5 = $this->s5 + $val['iue_servicios'];
+				$this->s6 = $this->s6 + $val['it_alquileres'];
+				$this->s7 = $this->s7 + $val['rc_iva_alquileres'];			
+				$this->s8 = $this->s8 + $val['it_directores'];
+				$this->s9 = $this->s9 + $val['rc_iva_directores'];	
+				$this->s10 = $this->s10 + $val['importe_descuento_ley'];		
+				$this->s11 = $this->s11 + $val['descuento'];
+				$this->s12 = $this->s12 + $val['liquido'];
+							
+				$this->t1 = $this->t1 + $val['importe_doc'];
+				$this->t2 = $this->t2 + $val['it_bienes'];
+				$this->t3 = $this->t3 + $val['iue_bienes'];
+				$this->t4 = $this->t4 + $val['it_servicios'];
+				$this->t5 = $this->t5 + $val['iue_servicios'];
+				$this->t6 = $this->t6 + $val['it_alquileres'];
+				$this->t7 = $this->t7 + $val['rc_iva_alquileres'];			
+				$this->t8 = $this->t8 + $val['it_directores'];
+				$this->t9 = $this->t9 + $val['rc_iva_directores'];			
+				$this->t10 = $this->t10 + $val['importe_descuento_ley'];
+				$this->t11 = $this->t11 + $val['descuento'];
+				$this->t12 = $this->t12 + $val['liquido'];
+			}
 			
 		}else{
 			$this->s1 = $this->s1 + $val['importe_doc'];
@@ -519,7 +575,7 @@ class RRetencion extends ReportePDF {
 									's11' => $this->s7,
 									's12' => $this->s8,
 									's13' => $this->s9,
-									's14' => $this->s10,
+									's14' => $this->s12,
 								);
 				break;
 			case 'rcrb':
@@ -577,6 +633,10 @@ class RRetencion extends ReportePDF {
 		$this->s7 = 0;
 		$this->s8 = 0;
 		$this->s9 = 0;
+		$this->s10 = 0;
+		$this->s11 = 0;
+		$this->s12 = 0;
+		$this->s13 = 0;
 	}
 	//revisarfinPagina pie
 	function cerrarCuadroTotal(){
@@ -591,7 +651,7 @@ class RRetencion extends ReportePDF {
 				$conf_par_tablewidths=array(6,20,45,15,15,15,15,15,15,15,15,15,15,15);
 				$this->tablealigns=array('R','R','R','R','R','R','R','R','R','R','R','R','R','R','R');		
 				$this->tablenumbers=array(0,0,0,0,0,2,2,2,2,2,2,2,2,2,2);
-				$this->tableborders=array('','','','','LRTB','LRTB','LRTB','LRTB','LRTB', 'LRTB','LRTB','LRTB','LRTB','TRB');				
+				$this->tableborders=array('','','','','LRTB','LRTB','LRTB','LRTB','LRTB', 'LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','T');				
 				$RowArray = array( 
 							't1' => '',
 							't2' => '',
@@ -607,7 +667,7 @@ class RRetencion extends ReportePDF {
 							't11' => $this->t7,
 							't12' => $this->t8,
 							't13' => $this->t9,
-							't14' => $this->t10
+							't14' => $this->t12
 						);
 				break;
 			case 'rcrb':

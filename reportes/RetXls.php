@@ -106,11 +106,12 @@ class RetXls
 		}else{
 			$tipo =$this->objParam->getParametro('tipo_ret');		
 			switch ($tipo) {
-				case 'todo':				
+				case 'todo':		
+					
 					$this->docexcel->getActiveSheet()->getStyle('E1:G1')->applyFromArray($styleTitulos3);				
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5,1,'LIBRO DE RETENCIONES');						
-					$this->docexcel->getActiveSheet()->getStyle('A2:P2')->applyFromArray($styleTitulos2);
-					$this->docexcel->getActiveSheet()->getStyle('A3:P3')->applyFromArray($styleTitulos2);
+					$this->docexcel->getActiveSheet()->getStyle('A2:V2')->applyFromArray($styleTitulos2);
+					$this->docexcel->getActiveSheet()->getStyle('A3:V3')->applyFromArray($styleTitulos2);
 					$this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(15);
 					$this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(80);
 					$this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
@@ -123,12 +124,19 @@ class RetXls
 					$this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(18);
 					$this->docexcel->getActiveSheet()->getColumnDimension('L')->setWidth(18);
 					$this->docexcel->getActiveSheet()->getColumnDimension('M')->setWidth(18);
+					
 					$this->docexcel->getActiveSheet()->getColumnDimension('N')->setWidth(18);
 					$this->docexcel->getActiveSheet()->getColumnDimension('O')->setWidth(18);
-					$this->docexcel->getActiveSheet()->getColumnDimension('P')->setWidth(18);			
+					$this->docexcel->getActiveSheet()->getColumnDimension('P')->setWidth(18);
+					$this->docexcel->getActiveSheet()->getColumnDimension('Q')->setWidth(18);
+					$this->docexcel->getActiveSheet()->getColumnDimension('R')->setWidth(18);
+					$this->docexcel->getActiveSheet()->getColumnDimension('S')->setWidth(20);
+					$this->docexcel->getActiveSheet()->getColumnDimension('T')->setWidth(18);	
+					$this->docexcel->getActiveSheet()->getColumnDimension('U')->setWidth(25);
+					$this->docexcel->getActiveSheet()->getColumnDimension('V')->setWidth(25);						
 					//*************************************Cabecera************************//
-					$this->docexcel->getActiveSheet()->getStyle('A2:P2')->getAlignment()->setWrapText(true);
-					$this->docexcel->getActiveSheet()->getStyle('A3:P3')->getAlignment()->setWrapText(true);
+					$this->docexcel->getActiveSheet()->getStyle('A2:S2')->getAlignment()->setWrapText(true);
+					$this->docexcel->getActiveSheet()->getStyle('A3:S3')->getAlignment()->setWrapText(true);
 					 
 					$this->docexcel->getActiveSheet()->mergeCells('A2:A3');
 					$this->docexcel->getActiveSheet()->mergeCells('B2:B3');
@@ -137,19 +145,27 @@ class RetXls
 					$this->docexcel->getActiveSheet()->mergeCells('E2:E3');
 					$this->docexcel->getActiveSheet()->mergeCells('F2:F3');
 					$this->docexcel->getActiveSheet()->mergeCells('G2:G3');
-													
-					$this->docexcel->getActiveSheet()->mergeCells('N2:N3');
-					$this->docexcel->getActiveSheet()->mergeCells('O2:O3');				
-					$this->docexcel->getActiveSheet()->mergeCells('P2:P3');
+					
+					$this->docexcel->getActiveSheet()->mergeCells('P2:P3');								
+					$this->docexcel->getActiveSheet()->mergeCells('Q2:Q3');
+					$this->docexcel->getActiveSheet()->mergeCells('R2:R3');				
+					$this->docexcel->getActiveSheet()->mergeCells('S2:S3');
+					$this->docexcel->getActiveSheet()->mergeCells('T2:T3');
+					$this->docexcel->getActiveSheet()->mergeCells('U2:U3');
+					$this->docexcel->getActiveSheet()->mergeCells('V2:V3');
 									
+					
 					$this->docexcel->getActiveSheet()->mergeCells('H2:I2');
 					$this->docexcel->getActiveSheet()->mergeCells('J2:K2');
 					$this->docexcel->getActiveSheet()->mergeCells('L2:M2');
+					$this->docexcel->getActiveSheet()->mergeCells('N2:O2');
 	
 					$this->docexcel->getActiveSheet()->setCellValue('H2','BIENES');
 					$this->docexcel->getActiveSheet()->setCellValue('J2','SERVICIOS');
 					$this->docexcel->getActiveSheet()->setCellValue('L2','ALQUILERES');
-						
+					$this->docexcel->getActiveSheet()->setCellValue('N2','DIRECTORES');
+					$this->docexcel->getActiveSheet()->setCellValue('P2','PERSONAL RETIRADO');
+					//	
 					$this->docexcel->getActiveSheet()->setCellValue('A2','Nº');
 					$this->docexcel->getActiveSheet()->setCellValue('B2','FECHA DE LA FACTURA O DUI');
 					$this->docexcel->getActiveSheet()->setCellValue('C2','CONCEPTO');
@@ -165,9 +181,16 @@ class RetXls
 					$this->docexcel->getActiveSheet()->setCellValue('L3','IT');				
 					$this->docexcel->getActiveSheet()->setCellValue('M3','RC-IVA');
 					
-					$this->docexcel->getActiveSheet()->setCellValue('N2','IMPUESTOS DESCUENTO DE LEY');
-					$this->docexcel->getActiveSheet()->setCellValue('O2','DESCUENTOS');
-					$this->docexcel->getActiveSheet()->setCellValue('P2','LIQUIDO');
+					$this->docexcel->getActiveSheet()->setCellValue('N3','IT');				
+					$this->docexcel->getActiveSheet()->setCellValue('O3','RC-IVA');
+					$this->docexcel->getActiveSheet()->setCellValue('P3','RC-IVA');
+					
+					$this->docexcel->getActiveSheet()->setCellValue('Q2','IMPUESTOS DESCUENTO DE LEY');
+					$this->docexcel->getActiveSheet()->setCellValue('R2','DESCUENTOS');
+					$this->docexcel->getActiveSheet()->setCellValue('S2','LIQUIDO');
+					$this->docexcel->getActiveSheet()->setCellValue('T2','NRO COMPROBANTE');
+					$this->docexcel->getActiveSheet()->setCellValue('U2','ID CBTE');
+					$this->docexcel->getActiveSheet()->setCellValue('V2','USUARIO');
 					break;
 				case 'rcrb':
 					$this->docexcel->getActiveSheet()->getStyle('E1:G1')->applyFromArray($styleTitulos3);				
@@ -359,24 +382,57 @@ class RetXls
 							
 		switch ($tipo) {
 			case 'todo':
-				foreach ($datos as $value){										
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['fecha']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, trim($value['obs']));
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, trim($value['plantilla']));
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, trim($value['nro_documento']));
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, $value['nro_tramite']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, $value['importe_doc']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, $value['it_bienes']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, $value['iue_bienes']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['it_servicios']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['iue_servicios']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['it_alquileres']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12, $fila, $value['rc_iva_alquileres']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13, $fila, $value['importe_descuento_ley']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['descuento']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(15, $fila, $value['liquido']);
+				foreach ($datos as $value){
 					
+					if($value['codigo_moneda']=='BS'){
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['fecha']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, trim($value['obs']));
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, trim($value['plantilla']));
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, trim($value['nro_documento']));
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, $value['nro_tramite']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, $value['importe_doc']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, $value['it_bienes']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, $value['iue_bienes']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['it_servicios']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['iue_servicios']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['it_alquileres']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12, $fila, $value['rc_iva_alquileres']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13, $fila, $value['it_directores']);						
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['rc_iva_directores']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(15, $fila, $value['rc_iva_retirados']);
+						
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(16, $fila, $value['importe_descuento_ley']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(17, $fila, $value['descuento']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(18, $fila, $value['liquido']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(19, $fila, $value['nro_cbte']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(20, $fila, $value['id_int_comprobante']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(21, $fila, $value['usr_mod']);
+					}else{			
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['fecha']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, trim($value['obs']));
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, trim($value['plantilla']));
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, trim($value['nro_documento']));
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, $value['nro_tramite']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, $value['importe_doc']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, $value['it_bienes']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, $value['iue_bienes']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['it_servicios']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['iue_servicios']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['it_alquileres']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12, $fila, $value['rc_iva_alquileres']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13, $fila, $value['it_directores']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['rc_iva_directores']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(15, $fila, $value['rc_iva_retirados']* $value['tipo_cambio']);
+												
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(16, $fila, $value['importe_descuento_ley']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(17, $fila, $value['descuento']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(18, $fila, $value['liquido']* $value['tipo_cambio']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(19, $fila, $value['nro_cbte']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(20, $fila, $value['id_int_comprobante']);
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(21, $fila, $value['usr_mod']);					
+					}																			
 					$fila++;
 					$this->numero++;		
 				}
@@ -390,10 +446,15 @@ class RetXls
 				$this->docexcel->getActiveSheet()->getStyle('M'.(4).':M'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
 				$this->docexcel->getActiveSheet()->getStyle('N'.(4).':N'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
 				$this->docexcel->getActiveSheet()->getStyle('O'.(4).':O'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
+				
+				$this->docexcel->getActiveSheet()->getStyle('P'.(4).':P'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->getStyle('Q'.(4).':Q'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->getStyle('R'.(4).':R'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->getStyle('S'.(4).':S'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
 				//
-				$this->docexcel->getActiveSheet()->getStyle('A'.($fila+1).':P'.($fila+1).'')->applyFromArray($styleTitulos3);				
+				$this->docexcel->getActiveSheet()->getStyle('A'.($fila+1).':S'.($fila+1).'')->applyFromArray($styleTitulos3);				
 				//
-				$this->docexcel->getActiveSheet()->getStyle('G'.($fila+1).':P'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->getStyle('G'.($fila+1).':S'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
 				//			
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5,$fila+1,'TOTAL');
 				
@@ -407,6 +468,10 @@ class RetXls
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13,$fila+1,'=SUM(N4:N'.($fila-1).')');
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14,$fila+1,'=SUM(O4:O'.($fila-1).')');
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(15,$fila+1,'=SUM(P4:P'.($fila-1).')');
+				
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(16,$fila+1,'=SUM(Q4:Q'.($fila-1).')');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(17,$fila+1,'=SUM(R4:R'.($fila-1).')');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(18,$fila+1,'=SUM(S4:S'.($fila-1).')');
 												
 				$formula = '=SUM(G1:G'.($fila-1).')';
 				$sum = PHPExcel_Calculation::getInstance($this->docexcel)->calculateFormula($formula, 'A1', $this->docexcel->getActiveSheet()->getCell('A1'));

@@ -841,9 +841,6 @@ BEGIN
             from conta.tint_comprobante ic 
             where ic.id_int_comprobante = v_parametros.id_int_comprobante;
             
-            
-            
-            
             IF  v_reg_cbte.estado_reg != 'validado'  THEN
                raise exception 'solo pueden volcar comprobantes validados';
             END IF; 
@@ -1200,6 +1197,8 @@ BEGIN
                                                    v_parametros._nombre_usuario_ai, 
                                                    v_id_int_comprobante, 
                                                    'si');
+                                                   
+                                                 --  raise exception '... %',v_result;
                
                 v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado y validado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
            
@@ -1207,6 +1206,8 @@ BEGIN
                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado en borrador el cbte : id '||v_parametros.id_int_comprobante::varchar); 
             end if;   
             --Definicion de la respuesta
+            
+            --raise exception 'pasa...';
             
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
               

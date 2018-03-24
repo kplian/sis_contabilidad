@@ -36,14 +36,19 @@ v_resp_aux = conta.f_mayor_cuenta(v_registros.id_cuenta,
                                                  p_id_int_comprobante_ori,
                                                  p_id_ot,
                                                  p_id_centro_costo);
+                                                 
 
-
-
-
-
-
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+ ---------------------------------------------------------------------------------------------   
+ #00  ETR       07/03/2018        RAC KPLIAN        si el depto de manda null el mayor se hace dobre todos los departamentos
 
 */
+
+
+
+
 
 DECLARE
 
@@ -209,7 +214,13 @@ BEGIN
                             c.id_int_comprobante = p_id_int_comprobante_ori
                       END
               ) AND
-              c.id_depto::integer = ANY(va_id_deptos) AND 
+              
+              (CASE WHEN p_id_deptos is null THEN  -- #00 RAC 07/03/2018 ++ 
+                         0 = 0
+                    ELSE
+                         c.id_depto::integer = ANY(va_id_deptos)
+                    END) AND 
+              
               (CASE WHEN p_id_auxiliar is NULL  THEN  
                          0=0 
                     ELSE
@@ -307,6 +318,8 @@ BEGIN
           v_resp_final[5] = v_resp_mayor_ma;
           v_resp_final[6] = v_resp_mayor_partida_ma;
           
+          --raise notice 'resultados %',v_resp_final;
+          
           return v_resp_final;  
           
           
@@ -333,7 +346,7 @@ BEGIN
                                                  p_id_centro_costo);
  
                
-               raise notice '>>>>>>> % regresa maryo = %',v_registros.id_cuenta, v_resp_mayor;
+               --raise notice '>>>>>>> % regresa maryo = %',v_registros.id_cuenta, v_resp_mayor;
                v_resp_mayor = v_resp_mayor + v_resp_aux[1];               
                v_resp_mayor_mt = v_resp_mayor_mt + v_resp_aux[2];               
                v_resp_mayor_partida = v_resp_mayor_partida + v_resp_aux[3];               

@@ -35,7 +35,7 @@ class RLcvVentas extends  ReportePDF {
 		$this->datos_entidad = $entidad;
 		$this->datos_periodo = $periodo;
 		$this->subtotal = 0;
-		$this->SetMargins(3, 53, 5);
+		$this->SetMargins(3, 51.7, 5);
 	}
 	
 	function Header() {
@@ -53,7 +53,7 @@ class RLcvVentas extends  ReportePDF {
 		$this->SetFont('','BU',7);
 		$this->Cell(0,5,"Expresado en Bolivianos",0,1,'C');		
 		$this->Ln(2);			
-		$this->SetFont('','',10);
+		$this->SetFont('','',8);
 		
 		$height = 5;
 		$width1 = 5;
@@ -124,8 +124,9 @@ class RLcvVentas extends  ReportePDF {
 	}
 	
 	function generarCabecera(){
+		$this->SetFont('','B',5.3);
 		//armca caecera de la tabla
-		$conf_par_tablewidths=array(6,15,15,24,9,14,29,17,15,15,15,15,15,15,15,15,20);
+		$conf_par_tablewidths=array(6,13,11,20,8,17,42,15,12,15,15,15,18,15,13,19,20);
 		$conf_par_tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C','C','C','C','C');
 		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 		$conf_tableborders=array();
@@ -140,17 +141,17 @@ class RLcvVentas extends  ReportePDF {
 		$RowArray = array(
 			's0'  => 'Nº',
 			's1' => 'FECHA FACTURA', 
-			's2' => 'Nº de la FACTURA',
-			's3' => 'Nº de AUTORIZACION',
+			's2' => 'Nº DE FACTURA',
+			's3' => 'Nº DE AUTORIZACION',
 			's4' => 'ESTADO',
 			's5' => 'NIT/CI CLIENTE',
 			's6' => 'NOMBRE O RAZON SOCIAL',
-			's7' => "IMPORTE TOTAL DE LA VENTA\nA",
-			's8' => "IMPORTE ICE/ \nIEHD/ TASAS\nB",
-			's9' => "EXPORT. Y OPERACIONES EXENTAS\nC",
+			's7' => "IMPORTE TOTAL DE\nVENTA\nA",
+			's8' => "IMPORTE ICE/IEHD/\n TASAS\nB",
+			's9' => "EXPORT. Y\n OPERACIONES EXENTAS\nC",
 			's10' => "VENTAS GRAVADAS TASA CERO\nD",
 			's11' => "SUBTOTAL\nE = A-B-C-D",
-			's12' => "DESCUENTOS BONOS Y REBAJAS OTORGADAS\n F",
+			's12' => "DESCUENTOS,\nBONIFICACIONES Y REBAJAS OTORGADAS\nF",
 			's13' => "IMPORTE BASE DEBITO FISCAL\nG = E-F",
 			's14' => "DEBITO FISCAL\nH = G*13%",
 			's15' => 'CODIGO DE CONTROL',
@@ -184,10 +185,10 @@ class RLcvVentas extends  ReportePDF {
 		
 		$this->SetFillColor(224, 235, 255);
 		$this->SetTextColor(0);
-		$this->SetFont('','B',6);
+		$this->SetFont('','',5.5);
 			
-		$conf_par_tablewidths=array(6,15,15,24,9,14,29,17,15,15,15,15,15,15,15,15,20);
-		$conf_par_tablealigns=array('C','C','C','C','C','C','L','R','R','R','R','R','R','R','R','C','C');
+		$conf_par_tablewidths=array(6,13,11,20,8,17,42,15,12,15,15,15,18,15,13,19,20);
+		$conf_par_tablealigns=array('C','C','C','C','C','C','L','R','R','R','R','R','R','R','R','R','C');
 		$conf_par_tablenumbers=array(0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,0,0);
 		$conf_tableborders=array();
 		
@@ -249,15 +250,15 @@ class RLcvVentas extends  ReportePDF {
 		$dimensions = $this->getPageDimensions();
 		$hasBorder = false;		
 		$startY = $this->GetY();
-		$this->getNumLines($row['cell1data'], 80);		
+		$this->getNumLines($row['cell1data'], 100);		
 		if (($startY + 4 * 6) + $dimensions['bm'] > ($dimensions['hk'])) {		
 			$this->cerrarCuadro();	
 			$this->cerrarCuadroTotal();
-			$k = 	($startY + 4 * 6) + $dimensions['bm'] - ($dimensions['hk']);
+			$k =($startY + 4 * 6) + $dimensions['bm'] - ($dimensions['hk']);
 			if($this->total!= 0){
 				$this->AddPage();
 			}
-		}		
+		}	
 	}
 	
 	function caclularMontos($val){
@@ -303,7 +304,7 @@ class RLcvVentas extends  ReportePDF {
 	}
 	
 	function cerrarCuadro(){
-		$conf_par_tablewidths=array(6+15+15+24+9+14+29,17,15,15,15,15,15,15,15,20);
+		$conf_par_tablewidths=array(6+13+11+20+8+17+42,15,12,15,15,15,18,15,13,19,20);
 		$conf_par_tablealigns=array('R','R','R','R','R','R','R','R','R','R');
 		$conf_par_tablenumbers=array(0,2,2,2,2,2,2,2,2,2);
 		$conf_par_tableborders=array('T','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');					
@@ -333,8 +334,9 @@ class RLcvVentas extends  ReportePDF {
 		$this->s8 = 0;
 	}
 
-	function cerrarCuadroTotal(){		
-		$conf_par_tablewidths=array(6+15+15+24+9+14+29,17,15,15,15,15,15,15,15,20);
+	function cerrarCuadroTotal(){
+		//$conf_par_tablewidths=array(6,13,11,20,8,17,42,15,12,15,15,15,18,15,13,19,20);		
+		$conf_par_tablewidths=array(6+13+11+20+8+17+42,15,12,15,15,15,18,15,13,19,20);
 		$conf_par_tablealigns=array('R','R','R','R','R','R','R','R','R','R');
 		$conf_par_tablenumbers=array(0,2,2,2,2,2,2,2,2,2);
 		$conf_par_tableborders=array('','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
