@@ -4334,3 +4334,109 @@ WHERE pla.tipo_informe::text = 'retenciones'::text AND pc.descuento::text = 'si'
 /**********************************F-DEP-MANU-CONTA-0-16/02/2018****************************************/ 
 
 
+/**********************************I-DEP-MANU-CONTA-0-24/03/2018****************************************/ 
+
+
+
+CREATE OR REPLACE VIEW conta.vlcv(
+    id_doc_compra_venta,
+    tipo,
+    fecha,
+    nit,
+    razon_social,
+    nro_documento,
+    nro_dui,
+    nro_autorizacion,
+    importe_doc,
+    total_excento,
+    sujeto_cf,
+    importe_descuento,
+    subtotal,
+    credito_fiscal,
+    importe_iva,
+    codigo_control,
+    tipo_doc,
+    id_plantilla,
+    tipo_informe,
+    id_moneda,
+    codigo_moneda,
+    id_periodo,
+    id_gestion,
+    periodo,
+    gestion,
+    id_depto_conta,
+    importe_ice,
+    venta_gravada_cero,
+    subtotal_venta,
+    sujeto_df,
+    importe_excento,
+    id_usuario_reg,
+    nro_cbte,
+    tipo_cambio,
+    id_int_comprobante,
+    id_usuario_comprobante,
+    id_tipo_doc_compra_venta)
+AS
+  SELECT dcv.id_doc_compra_venta,
+         dcv.tipo,
+         dcv.fecha,
+         dcv.nit,
+         dcv.razon_social,
+         dcv.nro_documento,
+         pxp.f_iif(COALESCE(dcv.nro_dui, '0'::character varying)::text = ''::
+           text, '0'::character varying, COALESCE(dcv.nro_dui, '0'::character
+           varying)) AS nro_dui,
+         dcv.nro_autorizacion,
+         dcv.importe_doc,
+         round(COALESCE(dcv.importe_excento, 0::numeric), 2) AS total_excento,
+         round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(
+           dcv.importe_excento, 0::numeric) - COALESCE(dcv.importe_descuento, 0
+           ::numeric), 2) AS sujeto_cf,
+         round(COALESCE(dcv.importe_descuento, 0.0), 2) AS importe_descuento,
+         round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(
+           dcv.importe_excento, 0::numeric), 2) AS subtotal,
+         round(0.13 *(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(
+           dcv.importe_excento, 0::numeric) - COALESCE(dcv.importe_descuento, 0
+           ::numeric)), 2) AS credito_fiscal,
+         round(COALESCE(dcv.importe_iva, 0::numeric), 2) AS importe_iva,
+         dcv.codigo_control,
+         tdcv.codigo AS tipo_doc,
+         pla.id_plantilla,
+         pla.tipo_informe,
+         dcv.id_moneda,
+         mon.codigo AS codigo_moneda,
+         dcv.id_periodo,
+         per.id_gestion,
+         per.periodo,
+         ges.gestion,
+         dcv.id_depto_conta,
+         round(COALESCE(dcv.importe_ice, 0::numeric), 2) AS importe_ice,
+         0.00 AS venta_gravada_cero,
+         round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_ice,
+           0::numeric) - COALESCE(dcv.importe_excento, 0::numeric), 2) AS
+           subtotal_venta,
+         round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_ice,
+           0::numeric) - COALESCE(dcv.importe_excento, 0::numeric) - COALESCE(
+           dcv.importe_descuento, 0::numeric), 2) AS sujeto_df,
+         round(COALESCE(dcv.importe_excento, 0::numeric), 2) AS importe_excento,
+         dcv.id_usuario_reg,
+         comp.nro_cbte,
+         comp.tipo_cambio,
+         comp.id_int_comprobante,
+         comp.id_usuario_reg AS id_usuario_comprobante,
+         tdcv.id_tipo_doc_compra_venta
+  FROM conta.tdoc_compra_venta dcv
+       JOIN param.tplantilla pla ON pla.id_plantilla = dcv.id_plantilla
+       JOIN param.tperiodo per ON per.id_periodo = dcv.id_periodo
+       JOIN param.tgestion ges ON ges.id_gestion = per.id_gestion
+       JOIN param.tmoneda mon ON mon.id_moneda = dcv.id_moneda
+       JOIN conta.ttipo_doc_compra_venta tdcv ON tdcv.id_tipo_doc_compra_venta =
+         dcv.id_tipo_doc_compra_venta
+       LEFT JOIN conta.tint_comprobante comp ON comp.id_int_comprobante =
+         dcv.id_int_comprobante;
+         
+ 
+/**********************************F-DEP-MANU-CONTA-0-24/03/2018****************************************/ 
+         
+
+
