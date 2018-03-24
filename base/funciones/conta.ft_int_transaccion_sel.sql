@@ -36,6 +36,8 @@ DECLARE
     v_filtro_ordenes	varchar;
     v_filtro_tipo_cc	varchar;
     v_filtro			varchar;
+    v_desde				varchar;
+    v_hasta				varchar;
 			    
 BEGIN
 
@@ -465,7 +467,7 @@ BEGIN
                     
                     
                     
-                    v_filtro_tipo_cc = ' cc.id_tipo_cc in ('||v_tipo_cc||') ';
+                    v_filtro_tipo_cc = 'cc.id_tipo_cc in ('||v_tipo_cc||') ';
                 END IF;
              END IF;
             
@@ -510,7 +512,8 @@ BEGIN
 				        where icbte.estado_reg = ''validado'' 
                               and ' ||v_filtro_cuentas||' 
                               and '||v_filtro_ordenes||' 
-                              and '||v_filtro_tipo_cc||' and';
+                              and '||v_filtro_tipo_cc||'
+                              and';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -650,8 +653,9 @@ BEGIN
             v_filtro_cuentas = '0=0';
             v_filtro_ordenes = '0=0';
             v_filtro_tipo_cc = '0=0';
-    		
-             IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN             
+            v_desde =  ' (icbte.fecha::Date between '''||v_parametros.desde||'''::Date  and '''||v_parametros.hasta||'''::date)  ';
+    		--raise exception '%',v_parametros.desde;
+            IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN             
                   IF v_parametros.id_cuenta is not NULL THEN                
                       WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
                         SELECT cue.id_cuenta, cue.id_cuenta_padre
@@ -778,13 +782,18 @@ BEGIN
 						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
 				        where icbte.estado_reg = ''validado'' 
-                              and ' ||v_filtro_cuentas||' 
-                              and '||v_filtro_ordenes||' 
+                              and '||v_filtro_cuentas||' 
+                              and '||v_filtro_ordenes||'  
+                              and '||v_desde||'
                               and '||v_filtro_tipo_cc||' and';
 			
 			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;			
+			v_consulta:=v_consulta||v_parametros.filtro;            
             v_consulta:=v_consulta||'ORDER BY fecha';
+            
+            --RAISE notice '%',v_consulta; 
+            --RAISE EXCEPTION '%', v_consulta;
+            
 			return v_consulta;						
 		end;
 
