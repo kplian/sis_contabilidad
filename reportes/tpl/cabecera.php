@@ -2,7 +2,7 @@
 <tbody>
 	<tr>
 		<td style="width: 23%; color: #444444;" rowspan="4">
-			&nbsp;<br><img  style="width: 150px;" src="./../../../lib/<?php echo $_SESSION['_DIR_LOGO'];?>" alt="Logo">
+			&nbsp;<br><img  style="width: 150px; height: 68px;" src="./../../../lib/<?php echo $_SESSION['_DIR_LOGO'];?>" alt="Logo">
 		</td>		
 		<td style="width: 54%; color: #444444;" rowspan="4"><h1><?php  echo $this->cabecera[0]['desc_clase_comprobante']; ?> </h1></td>
 		<td style="width: 23%; color: #444444;"><b>Depto.:</b> <?php  echo $this->cabecera[0]['codigo_depto']; ?> </td>
