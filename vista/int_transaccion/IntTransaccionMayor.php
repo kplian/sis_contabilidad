@@ -76,7 +76,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			   			        color = 'red';
 			   			    }
 			   			    
-			   					
+			   					/*
 			   				var retorno =  String.format('<b>CC:</b> {0}, <br><b>Ptda.:</b> <font color="{1}">{2}</font><br><b>Cta.:</b>{3}<br><b>Aux.:</b>{4}',record.data['desc_centro_costo'],color, record.data['desc_partida'],
 			   					                   record.data['desc_cuenta'],record.data['desc_auxiliar']);	
 			   					
@@ -87,7 +87,24 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				   				if(record.data['desc_suborden']){
 				   					retorno = retorno + '<br><b>Sub.:</b> '+record.data['desc_suborden'];
 				   				}	
-			   				return retorno;	
+			   				return retorno;	*/
+			   				
+			   				var retorno =  String.format('<b>CC:</b> {0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo'], record.data['desc_cuenta']);	
+		   					if(record.data['desc_auxiliar']){
+			   					retorno = retorno + String.format('<b>Aux.:</b> {0}</br>', record.data['desc_auxiliar']);
+			   				}
+		   					if(record.data['desc_partida']){
+			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
+			   				}
+		   					if(record.data['desc_orden']){			   					
+			   					retorno = retorno + String.format('<b>Ord.:</b> <font> {0} {1}</font><br>', record.data['codigo_ot'], record.data['desc_orden']);
+			   				}	
+			   				if(record.data['desc_suborden']){
+			   					retorno = retorno + '<b>Sub.:</b> '+record.data['desc_suborden'];
+			   				}
+		   				    return String.format('<div class="gridmultiline">{0}</div>',retorno);
+			   				
+			   				
 		   			    	
 		   			    }
 		   			    else{
