@@ -1381,6 +1381,17 @@ select pxp.f_insert_tgui ('Reporte Retencion', 'Reporte Retencion', 'REPRET', 's
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
 VALUES 
   (E'conta_libro_ventas_detallado', E'si', E'Si la interface de libro de ventas permite el registro del detalle de la factura');
+  
+  /* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_forzar_validacion_documentos', E'si', E'cuando se fuera la validacion no permite validar el cbte si los datos o cudran, en caso contrario deja al usuario decidir');
+  
+  
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (conta_revertir_iva_comprometido', E'no', E'Por dfecto no revierte el iva comprometido, asumiendo que la solictud fue hecha sobre el valor NETO');
 
 /***********************************F-DAT-RAC-CONTA-0-22/12/2017*****************************************/ 
 
