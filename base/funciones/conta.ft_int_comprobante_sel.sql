@@ -35,6 +35,8 @@ DECLARE
     v_filtro 			varchar;
     va_id_depto			integer[];
     v_codigo_moneda_base		varchar;
+    v_desde				varchar;
+    v_hasta				varchar;
 			    
 BEGIN
 
@@ -198,6 +200,12 @@ BEGIN
                 END IF;
 
             END IF;
+            
+            v_desde =  'incbte.fecha >= '''||v_parametros.fecIni||''' and incbte.fecha <='''||v_parametros.fecFin||''' ';
+                      
+			IF (v_desde IS NULL) THEN
+            	v_desde='0=0';
+            END IF;
     		--Sentencia de la consulta
 			v_consulta := '
                            SELECT 
@@ -226,8 +234,11 @@ BEGIN
 							  JOIN conta.tcuenta cue ON cue.id_cuenta = tra.id_cuenta
                               LEFT JOIN param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
                               WHERE incbte.nro_cbte!=''''
-                              ORDER BY 1	                             
+                              AND '||v_desde||'
+                              ORDER BY incbte.fecha,incbte.id_int_comprobante	                             
                               ';
+        	--RAISE NOTICE '%',v_consulta;
+            --RAISE EXCEPTION '%',v_consulta;
 			return v_consulta;
 
 		end;

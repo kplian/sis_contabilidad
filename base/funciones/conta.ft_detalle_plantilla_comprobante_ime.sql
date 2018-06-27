@@ -109,7 +109,8 @@ BEGIN
                 codigo,
                 tipo_relacion_contable_cc,
                 campo_relacion_contable_cc,
-                campo_suborden
+                campo_suborden,
+                campo_codigo_aplicacion_rc
           	) values(
                 v_parametros.id_plantilla_comprobante,
                 v_parametros.debe_haber,
@@ -156,7 +157,8 @@ BEGIN
                 v_parametros.codigo,
                 v_parametros.tipo_relacion_contable_cc,
                 v_parametros.campo_relacion_contable_cc,
-                v_parametros.campo_suborden
+                v_parametros.campo_suborden,
+                v_parametros.campo_codigo_aplicacion_rc
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 			
 			--Definicion de la respuesta
@@ -237,7 +239,8 @@ BEGIN
                 codigo = v_parametros.codigo,
                 tipo_relacion_contable_cc = v_parametros.tipo_relacion_contable_cc,
                 campo_relacion_contable_cc = v_parametros.campo_relacion_contable_cc,
-                campo_suborden = v_parametros.campo_suborden
+                campo_suborden = v_parametros.campo_suborden,
+                campo_codigo_aplicacion_rc = v_parametros.campo_codigo_aplicacion_rc
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta

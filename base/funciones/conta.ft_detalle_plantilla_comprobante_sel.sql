@@ -96,7 +96,8 @@ BEGIN
                             cmpbdet.codigo,
                             cmpbdet.tipo_relacion_contable_cc,
                             cmpbdet.campo_relacion_contable_cc,
-                            cmpbdet.campo_suborden
+                            cmpbdet.campo_suborden,
+                            cmpbdet.campo_codigo_aplicacion_rc
                             
                         
 						from conta.tdetalle_plantilla_comprobante cmpbdet

@@ -104,17 +104,17 @@ BEGIN
        inner join conta.tcuenta cue on cue.id_cuenta = it.id_cuenta
        where it.id_int_transaccion = p_id_int_transaccion;
        
-      ---------------------------------- 
+      ----------------------------------------------------------------------------------------- 
       --   Si el comprobante tiene relacioanes identifica el tipo de cambio original
-      --   para el caso por ejemplo de ventas y devegados donde et tipo de cambio varia 
+      --   para el caso por ejemplo de ventas y devengados donde el tipo de cambio varia 
       --   RAC 29/08/2017
       --  
-      ---------------------------------
+      --------------------------------------------------------------------------------------------
       v_sw_tmp = false;
       
       v_ajustar_tipo_cambio_cbte_rel = pxp.f_get_variable_global('conta_ajustar_tipo_cambio_cbte_rel');
       
-      IF v_ajustar_tipo_cambio_cbte_rel = 'si' THEN
+      IF v_ajustar_tipo_cambio_cbte_rel = 'si'  THEN
           
           IF v_registros.id_int_comprobante_fks is not null THEN
              
@@ -133,19 +133,23 @@ BEGIN
                      ito.id_int_comprobante = ANY(v_registros.id_int_comprobante_fks)
                      and ito.estado_reg = 'activo'
                      and cue.nro_cuenta = v_registros.nro_cuenta
-                     and  co.id_moneda = v_registros.id_moneda;
+                     and  co.id_moneda = v_registros.id_moneda ;  --OJO aumentado RAC 17/04/2018 .....solo verifica si la moenda del comprobnate es la misma
              
                  -- solo si encuentra una trasaccion equivalente en el cbte relacionado recuperamso el tipo de cambio 
-                 -- de la trasaccion original, com peudne ser varias transaccion usamos el promedio aritmetico
+                 -- de la trasaccion original, como pueder ser varias transacciones usamos el promedio aritmetico
                  IF v_reg_tc is not null THEN
                  
+                       
+                       
                        IF v_reg_tc.tipo_cambio !=   v_registros.tipo_cambio   THEN                 
                           v_tipo_cambio = v_reg_tc.tipo_cambio;
                           v_registros.tipo_cambio = v_reg_tc.tipo_cambio; --modificamos el tc del consulta original
                           v_sw_tmp  =true;
                        ELSE
-                          v_tipo_cambio =v_registros.tipo_cambio_2;     
+                          v_tipo_cambio =v_registros.tipo_cambio;     
                        END IF;
+                       
+                       
                        
                        IF v_reg_tc.tipo_cambio_2 !=   v_registros.tipo_cambio_2   THEN
                           v_tipo_cambio_2 =v_reg_tc.tipo_cambio_2;

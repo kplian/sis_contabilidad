@@ -197,7 +197,7 @@ BEGIN
                            and cta.estado_reg = ''activo''
                         ORDER BY cta.nro_cuenta';
             raise notice '%',v_consulta;
-           
+            --raise EXCEPTION 'xx %',v_consulta;
             --Devuelve la respuesta
             return v_consulta;
                        

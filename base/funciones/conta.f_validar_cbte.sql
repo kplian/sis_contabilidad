@@ -733,6 +733,16 @@ BEGIN
        --raise exception 'LLEGA AL FINAL -- ';
     END IF;
     
+      IF p_id_int_comprobante = 13732    THEN
+         
+           -- raise 'LLEGa ....'; 
+         
+         
+      END IF;
+      
+    
+   
+    
    
     
     --8. Respuesta

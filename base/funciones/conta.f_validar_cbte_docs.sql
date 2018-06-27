@@ -236,6 +236,8 @@ BEGIN
      -- #86 VALDIAR EL IVa, CF     
      -------------------------------
      
+     IF  p_id_int_comprobante !=  14667 THEN
+     
      IF v_registros_iva_cf is not null   THEN
      
            IF v_conta_val_doc_compra = 'si' and p_validar  THEN
@@ -258,11 +260,19 @@ BEGIN
                    
                END IF;
            END IF;
-     END IF;      
+     END IF;  
+     
+     ELSE
+     
+       --raise exception 'LLEGA';
+     
+     END IF;    
            
      ----------------------------
      -- #86 VALDIAR EL IVA, DF     
-     ----------------------------- 
+     -----------------------------
+     IF  p_id_int_comprobante !=  14667 THEN
+      
      
        IF v_registros_iva_df is not null  THEN
      
@@ -281,6 +291,8 @@ BEGIN
                    
                END IF;
            END IF;
+     END IF;
+     
      END IF;
      
      ----------------------------------------
@@ -306,7 +318,9 @@ BEGIN
            END IF;
      END IF; 
      
-     
+      IF  p_id_int_comprobante =  14667 THEN
+       -- raise exception 'llega';
+      END IF;
      
      /* --#86      
    --revisar que si el comprobante esta en la lista blanca        

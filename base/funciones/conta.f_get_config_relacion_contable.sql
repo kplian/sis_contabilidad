@@ -7,6 +7,7 @@ CREATE OR REPLACE FUNCTION conta.f_get_config_relacion_contable (
   p_id_centro_costo integer = NULL::integer,
   p_mensaje_error varchar = NULL::character varying,
   p_id_moneda integer = NULL::integer,
+  p_codigo_aplicacion varchar = NULL::character varying,
   out ps_id_cuenta integer,
   out ps_id_auxiliar integer,
   out ps_id_partida integer,
@@ -51,6 +52,10 @@ Descripción:  Se agregan las opcion de que la relacion contables por tabla tega
 Autor: RAC
 Fcha: 05/09/2017
 Descripción:   adciona tres criterios, moneda, aplicacion, tipo de presupuesto
+##################################
+Autor: RAC
+Fcha: 09/05/2018
+Descripción:   Se hace el codigo de aplciacion lleuge como parametro opcionalmente
 ##################################
 
 */
@@ -475,7 +480,8 @@ BEGIN
             ttab.tabla_codigo_auxiliar,
             ttab.tabla_id_auxiliar,
             trel.tiene_auxiliar,
-            trel.codigo_aplicacion_catalogo
+            trel.codigo_aplicacion_catalogo,
+            ttab.tabla_codigo_aplicacion
          
           into 
              v_rec
@@ -489,22 +495,34 @@ BEGIN
           ----------------------------------------------------------------------
           v_sw_ca = FALSE;
           v_aplicacion = NULL;
-          IF v_rec.codigo_aplicacion_catalogo is not null and v_rec.codigo_aplicacion_catalogo != ''  THEN
-               v_sw_ca = TRUE;
-               v_consulta_aplicacion = 'select 
-                                     tt.'||v_rec.codigo_aplicacion_catalogo||'::varchar as  aplicacion
-                                     
-                                   from '||v_rec.tabla||' tt
-                                   where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
-                                   
-               
-               for v_rec_rel in execute(v_consulta_aplicacion) loop                                    
-                                    v_aplicacion = v_rec_rel.aplicacion;
-               end loop;                     
           
+          
+           
+       
+          
+          IF p_codigo_aplicacion IS NULL  THEN
+          
+                IF v_rec.tabla_codigo_aplicacion is not null and trim(v_rec.tabla_codigo_aplicacion) != ''  THEN
+                     v_sw_ca = TRUE;
+                     v_consulta_aplicacion = 'select 
+                                           tt.'||v_rec.tabla_codigo_aplicacion||'::varchar as  aplicacion
+                                           
+                                         from '||v_rec.tabla||' tt
+                                         where   tt.'||v_rec.tabla_id||' = '||p_id_tabla::varchar;
+                                         
+                     
+                     for v_rec_rel in execute(v_consulta_aplicacion) loop                                    
+                            v_aplicacion = v_rec_rel.aplicacion;
+                     end loop;                     
+                
+                END IF;
+          
+          ELSE
+                
+                v_aplicacion = p_codigo_aplicacion; 
+                v_sw_ca = TRUE;
           END IF;
-          
-          
+        
           
          -----------------------------------------
          --  Arma CONULTA Basica 
@@ -615,7 +633,7 @@ BEGIN
                         from param.tgestion
                         where id_Gestion = p_id_gestion;
                         
-                        raise exception '% (% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) - Centro de costo: %',COALESCE(p_mensaje_error,''),p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0');
+                        raise exception '% (% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) - Centro de costo: %  , Aplicacion (%)',COALESCE(p_mensaje_error,''),p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0'), COALESCE(v_aplicacion,'N/N');
                     end if;		
           
           
@@ -664,7 +682,7 @@ BEGIN
                               select gestion into v_gestion
                               from param.tgestion
                               where id_gestion = p_id_gestion;
-                              raise exception '% (% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) - Centro de costo: % , %, ID %',COALESCE(p_mensaje_error,''), p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0'),v_rec.tabla, p_id_tabla;
+                              raise exception '% (% - %) No se encuentra Cuenta para la Gestión % (tiene_centro_costo = %) - Centro de costo: % , %, ID %,  APLICACION %',COALESCE(p_mensaje_error,''), p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0'),v_rec.tabla, p_id_tabla, COALESCE(v_aplicacion,'N/N');
                         end if;
                   
                  ELSE
@@ -675,7 +693,7 @@ BEGIN
                            from param.tgestion
                            where id_gestion = p_id_gestion;
                        	 
-                           raise exception '% (% - %) No se encuentra Centro de costo para  la Gestión % (tiene_centro_costo = %) - Centro de costo: % , % ID % ',COALESCE(p_mensaje_error,''),p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0'),v_rec.tabla,p_id_tabla ;
+                           raise exception '% (% - %) No se encuentra Centro de costo para  la Gestión % (tiene_centro_costo = %) - Centro de costo: % , % ID % ,  APLICACION %',COALESCE(p_mensaje_error,''),p_codigo,v_registros.nombre_tipo_relacion,v_gestion,v_registros.tiene_centro_costo,COALESCE(p_id_centro_costo,'0'),v_rec.tabla,p_id_tabla , COALESCE(v_aplicacion,'N/N');
                         
                         end if;
                  

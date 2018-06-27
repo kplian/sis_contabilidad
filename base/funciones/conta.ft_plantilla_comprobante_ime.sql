@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_comprobante_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -85,7 +87,10 @@ BEGIN
                 funcion_comprobante_validado_eliminado,
                 desc_plantilla,
             	campo_cbte_relacionado,
-                codigo_tipo_relacion
+                codigo_tipo_relacion,
+                campo_tipo_cambio_2,
+                campo_tipo_cambio_3,
+                campo_id_config_cambiaria
              
           	) values(
                 v_parametros.codigo,
@@ -126,7 +131,10 @@ BEGIN
                 v_parametros.funcion_comprobante_validado_eliminado,
                 v_parametros.desc_plantilla,
             	v_parametros.campo_cbte_relacionado,
-                v_parametros.codigo_tipo_relacion
+                v_parametros.codigo_tipo_relacion,
+                v_parametros.campo_tipo_cambio_2,
+                v_parametros.campo_tipo_cambio_3,
+                v_parametros.campo_id_config_cambiaria
 							
 			)RETURNING id_plantilla_comprobante into v_id_plantilla_comprobante;
 			
@@ -186,7 +194,10 @@ BEGIN
               funcion_comprobante_validado_eliminado =v_parametros.funcion_comprobante_validado_eliminado,
               desc_plantilla = v_parametros.desc_plantilla,
               campo_cbte_relacionado = v_parametros.campo_cbte_relacionado,
-              codigo_tipo_relacion = v_parametros.codigo_tipo_relacion
+              codigo_tipo_relacion = v_parametros.codigo_tipo_relacion,
+              campo_tipo_cambio_2 = v_parametros.campo_tipo_cambio_2,
+              campo_tipo_cambio_3 = v_parametros.campo_tipo_cambio_3,
+              campo_id_config_cambiaria = v_parametros.campo_id_config_cambiaria
 			where id_plantilla_comprobante=v_parametros.id_plantilla_comprobante;
                
 			--Definicion de la respuesta

@@ -129,7 +129,8 @@ BEGIN
                         --raise exception '%, %', v_registros.codigo_cuenta, p_id_gestion;
                 		--   2.1.2)  calculamos el balance de la cuenta para las fechas indicadas
                          raise notice '>>>>>>>>>   %,%,%,%,%,%,%,%',p_desde,p_hasta,p_id_deptos,v_registros.incluir_cierre,v_registros.incluir_apertura,v_registros.incluir_aitb ,v_registros.signo_balance,v_registros.tipo_saldo;
-                         v_monto_mayor = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta,
+                         v_monto_mayor = conta.f_mayor_cuenta_tipo_cc(
+                                                        v_reg_cuenta.id_cuenta,
                         								p_desde, 
                                                         p_hasta, 
                                                         p_id_deptos, 
@@ -139,7 +140,9 @@ BEGIN
                                                         v_registros.signo_balance,
                                                         v_registros.tipo_saldo,
                                                         NULL,
-                                                        p_int_comprobante
+                                                        p_int_comprobante,
+                                                        NULL,
+                                                        v_registros.id_tipo_cc   --NUEVO aprametro de filtro
                                                         );
                                                         
                                                         
@@ -176,7 +179,8 @@ BEGIN
                                 id_auxiliar,
                                 destino,
                                 orden_cbte,
-                                monto_partida
+                                monto_partida,
+                                salta_hoja
                                 )
                             values (
                                 p_plantilla,
@@ -207,7 +211,8 @@ BEGIN
                                 v_registros.id_auxiliar,
                                 v_registros.destino,
                                 v_registros.orden_cbte,
-                                v_monto_partida);
+                                v_monto_partida,
+                                v_registros.salta_hoja);
                         
                   --    2.2) si el origen es detall
                   ELSIF  v_registros.origen = 'detalle' or (v_registros.origen = 'balance' and v_registros.destino != 'reporte') THEN
@@ -248,13 +253,14 @@ BEGIN
                                                         v_registros.signo_balance,
                                                         v_registros.tipo_saldo,
                                                         v_registros.origen,
-                                                        p_int_comprobante) ) THEN     
+                                                        p_int_comprobante,
+                                                        v_registros.id_tipo_cc ) ) THEN     
                                 raise exception 'Error al calcular balance del detalle en el nivel %', 0;
                             END IF;
                         
                         ELSE
                           --  si es una cuenta de movimiento
-                            v_monto_mayor = conta.f_mayor_cuenta(v_reg_cuenta.id_cuenta, 
+                            v_monto_mayor = conta.f_mayor_cuenta_tipo_cc(v_reg_cuenta.id_cuenta, 
                   								 p_desde, 
                                                  p_hasta, 
                                                  p_id_deptos, 
@@ -264,7 +270,9 @@ BEGIN
                                                   v_registros.signo_balance,
                                                   v_registros.tipo_saldo,
                                                   NULL,
-                                                  p_int_comprobante);
+                                                  p_int_comprobante,
+                                                  NULL,
+                                                  v_registros.id_tipo_cc);   --NUEVO aprametro de filtro);
                                                   
                             v_monto = v_monto_mayor[1];
                             v_monto_partida = v_monto_mayor[3];                 
@@ -311,7 +319,8 @@ BEGIN
                                 codigo_partida = v_registros.codigo_partida,
                                 id_auxiliar = v_registros.id_auxiliar,
                                 destino = v_registros.destino,
-                                orden_cbte = v_registros.orden_cbte
+                                orden_cbte = v_registros.orden_cbte,
+                                salta_hoja = v_registros.salta_hoja
                         WHERE id_resultado_det_plantilla = v_registros.id_resultado_det_plantilla;
                                    
                   
@@ -412,7 +421,8 @@ BEGIN
                                 codigo_partida = v_registros.codigo_partida,
                                 id_auxiliar = v_registros.id_auxiliar,
                                 destino = v_registros.destino,
-                                orden_cbte = v_registros.orden_cbte
+                                orden_cbte = v_registros.orden_cbte,
+                                salta_hoja = v_registros.salta_hoja
                         WHERE id_resultado_det_plantilla = v_registros.id_resultado_det_plantilla;
                   
                   
@@ -505,7 +515,8 @@ BEGIN
                                 destino,
                                 orden_cbte,
                                 id_cuenta,
-                                monto_partida)
+                                monto_partida,
+                                salta_hoja)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -533,7 +544,8 @@ BEGIN
                                 v_destino,
                                 v_registros.orden_cbte,
                                 v_id_cuenta,
-                                v_monto_partida);
+                                v_monto_partida,
+                                v_registros.salta_hoja);
                                 
                                
                   --   2.4) si el origen es sumatoria
@@ -574,7 +586,8 @@ BEGIN
                                 id_auxiliar,
                                 destino,
                                 orden_cbte,
-                                monto_partida)
+                                monto_partida,
+                                salta_hoja)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -601,7 +614,8 @@ BEGIN
                                 v_registros.id_auxiliar,
                                 v_registros.destino,
                                 v_registros.orden_cbte,
-                                v_monto_partida);  
+                                v_monto_partida,
+                                v_registros.salta_hoja);  
                                            
                    --   2.4) si el origen es titulo
 	               ELSEIF  v_registros.origen = 'titulo' THEN
@@ -632,7 +646,8 @@ BEGIN
                                 id_auxiliar,
                                 destino,
                                 orden_cbte,
-                                monto_partida)
+                                monto_partida,
+                                salta_hoja)
                             values (
                                 p_plantilla,
                                 v_registros.subrayar,
@@ -659,7 +674,8 @@ BEGIN
                                 v_registros.id_auxiliar,
                                 v_registros.destino,
                                 v_registros.orden_cbte,
-                                0.0);
+                                0.0,
+                                v_registros.salta_hoja);
                   END IF;
           END LOOP;
         

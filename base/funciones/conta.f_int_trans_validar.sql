@@ -6,6 +6,24 @@ CREATE OR REPLACE FUNCTION conta.f_int_trans_validar (
 )
 RETURNS boolean AS
 $body$
+/*
+	Autor: RCM
+    Fecha: 05-09-2013
+    Descripción: Función que se encarga de verificar la integridad del comprobante para posteriormente validarlo.
+ 
+  ***************************************************************************************************   
+    
+
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		05-09-2013        N/N               creacion
+ #00  ETR       05/05/2018        RAC KPLIAN        Los comprobantes manuales genera libro de bancos
+
+*/
+
+
 DECLARE
 
 
@@ -130,8 +148,9 @@ BEGIN
 
                 IF v_conta_validar_forma_pago = 'si' THEN
                    --si es un cbte de pago ...
-                   IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON') THEN
-                        IF v_registros.importe_haber > 0 and v_registros.banco = 'si'  THEN
+                   --IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') THEN
+                   IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON')  AND v_registros_cbte.codigo_plantilla not in ('CD-DEVREP-SALDOS')  THEN
+                        IF v_registros.banco = 'si'  THEN
 
                                IF v_registros.forma_pago = '' or v_registros.forma_pago is  null  THEN
                                  raise exception 'defina la forma de pago para proceder con la validación';
@@ -146,7 +165,7 @@ BEGIN
 
                                IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_cbte.codigo_plantilla in ('SOLFONDAV', 'REPOCAJA')) THEN
                                     -- si alguna transaccion tiene banco habilitado para pago
-                                    IF  not tes.f_integracion_libro_bancos(p_id_usuario,p_id_int_comprobante) THEN
+                                    IF  not tes.f_integracion_libro_bancos(p_id_usuario,p_id_int_comprobante,  v_registros.id_int_transaccion) THEN
 									  --raise exception 'error al registrar transacción en libro de bancos, comprobante %', p_id_int_comprobante;
                                     END IF;
 

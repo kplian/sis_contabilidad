@@ -88,7 +88,10 @@ BEGIN
                           cmpb.funcion_comprobante_validado_eliminado,
                           cmpb.desc_plantilla::varchar,
                           cmpb.campo_cbte_relacionado,
-                          cmpb.codigo_tipo_relacion
+                          cmpb.codigo_tipo_relacion,
+                          cmpb.campo_tipo_cambio_2,
+                          cmpb.campo_tipo_cambio_3,
+                          cmpb.campo_id_config_cambiaria
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod
@@ -180,7 +183,10 @@ BEGIN
                           cmpb.funcion_comprobante_editado,
                           cmpb.desc_plantilla,
                           cmpb.campo_cbte_relacionado,
-                          cmpb.codigo_tipo_relacion
+                          cmpb.codigo_tipo_relacion,
+                          cmpb.campo_tipo_cambio_2,
+                          cmpb.campo_tipo_cambio_3,
+                          cmpb.campo_id_config_cambiaria
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod

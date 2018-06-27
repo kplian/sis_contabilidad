@@ -211,7 +211,7 @@ BEGIN
        
           
           -- si se integra con presupeustos, y tiene presupeusto es encesario revertir
-          IF v_pre_integrar_presupuestos = 'true' and p_id_int_comprobante not in (4555,1440, 3019)   THEN 
+          IF v_pre_integrar_presupuestos = 'true' and p_id_int_comprobante not in (9969,9974,10237,10559,10556,10565,1865,10697,4927)   THEN 
               --  TODO (si tiene presupuesto comprometido REVERTIR, retroceder los planes de pagos)
                raise exception 'no se programo la lógica para eliminar comprobantes validados que tienen presupeusto';
          

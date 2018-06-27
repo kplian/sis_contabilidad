@@ -34,6 +34,7 @@ DECLARE
 	v_id_agrupador	integer;
     v_registros         	record;
     v_rec        			record;
+    v_conta_solictar_codigo_aplicacion_doc            varchar;
 			    
 BEGIN
 
@@ -56,7 +57,8 @@ BEGIN
         
              --Obtiene el periodo a partir de la fecha
         	v_rec = param.f_get_periodo_gestion(v_parametros.fecha_cbte);
-        
+            
+            v_conta_solictar_codigo_aplicacion_doc = pxp.f_get_variable_global('conta_solictar_codigo_aplicacion_doc');
         
         
         	-- creamos el grupo
@@ -114,6 +116,16 @@ BEGIN
                               or 
                                  (v_parametros.incluir_rev = 'no' and dcv.revisado in('si','no'))
                               )
+                       and (
+                               CASE 
+                                     WHEN v_conta_solictar_codigo_aplicacion_doc = 'no' THEN
+                                        0 = 0 
+                                     else
+                                      dcv.codigo_aplicacion != ''
+                                     end
+                       
+                       )       
+                              
                         ) LOOP
                         
                    

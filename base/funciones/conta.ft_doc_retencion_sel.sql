@@ -86,7 +86,7 @@ BEGIN
                     	v_tipo = '(ret.id_plantilla = 17)';
                     ELSE
                     	IF v_parametros.tipo_ret = 'todo' THEN
-                    		v_tipo = '(ret.id_plantilla = 9 OR ret.id_plantilla =10 OR ret.id_plantilla =13 OR ret.id_plantilla =17)';    
+                    		v_tipo = '(ret.id_plantilla = 9 OR ret.id_plantilla =10 OR ret.id_plantilla =13 OR ret.id_plantilla =17 OR ret.id_plantilla =44)';    
                         END IF;
                     END IF;
                 END IF;                
@@ -226,6 +226,9 @@ BEGIN
                                     WHEN ret.id_plantilla=13 THEN  
                                         ((MAX(CASE WHEN (c.descripcion LIKE '''||var_8||''' AND c.codigo_tipo_relacion LIKE '''||var_2||''') THEN (c.importe_presupuesto * ret.importe_doc)::NUMERIC END)+
                                         MAX(CASE WHEN (c.descripcion LIKE '''||var_7||''' AND c.codigo_tipo_relacion LIKE '''||var_6||''') THEN (c.importe_presupuesto * ret.importe_doc)::NUMERIC END)))::NUMERIC(18,2)    
+                                    WHEN ret.id_plantilla=44 THEN  
+                                        ((MAX(CASE WHEN (c.descripcion LIKE '''||var_8||''' AND c.codigo_tipo_relacion LIKE '''||var_2||''') THEN (c.importe_presupuesto * ret.importe_doc)::NUMERIC END)+
+                                        MAX(CASE WHEN (c.descripcion LIKE '''||var_7||''' AND c.codigo_tipo_relacion LIKE '''||var_6||''') THEN (c.importe_presupuesto * ret.importe_doc)::NUMERIC END)))::NUMERIC(18,2)        
                                 END AS descuento, 
 								--
                                 CASE
@@ -241,6 +244,9 @@ BEGIN
                                     WHEN ret.id_plantilla=13 THEN  
 										((ret.importe_doc)::NUMERIC-(MAX(CASE WHEN (c.descripcion LIKE '''||var_8||''' AND c.codigo_tipo_relacion LIKE '''||var_2||''') THEN (c.importe_presupuesto * ret.importe_doc)::NUMERIC END)+
                                         MAX(CASE WHEN (c.descripcion LIKE '''||var_7||''' AND c.codigo_tipo_relacion LIKE '''||var_6||''') THEN(c.importe_presupuesto * ret.importe_doc)::NUMERIC END)))::NUMERIC(18,2)   
+                                   WHEN ret.id_plantilla=44 THEN  
+										((ret.importe_doc)::NUMERIC-(MAX(CASE WHEN (c.descripcion LIKE '''||var_8||''' AND c.codigo_tipo_relacion LIKE '''||var_2||''') THEN (c.importe_presupuesto * ret.importe_doc)::NUMERIC END)+
+                                        MAX(CASE WHEN (c.descripcion LIKE '''||var_7||''' AND c.codigo_tipo_relacion LIKE '''||var_6||''') THEN(c.importe_presupuesto * ret.importe_doc)::NUMERIC END)))::NUMERIC(18,2)        
                                 END AS liquido,                                      
                                 --
                                 CASE 
@@ -301,7 +307,7 @@ BEGIN
 							ORDER BY ret.id_plantilla';
 			--Devuelve la respuesta 
             --raise notice '%',v_consulta;   
-		    --raise exception '-> %',v_consulta;             
+--		    raise exception '%',v_consulta;             
 			RETURN v_consulta;        	
 		END;
     ELSE

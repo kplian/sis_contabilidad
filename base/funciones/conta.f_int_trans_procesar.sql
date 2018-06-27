@@ -67,7 +67,7 @@ BEGIN
                 
           --si es un cbte de pago
            
-          IF upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON') and v_registros_cbte.codigo_sistema  != 'PLANI'  THEN  
+          IF upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') and v_registros_cbte.codigo_sistema  != 'PLANI'  THEN  
              
              
             
@@ -90,6 +90,24 @@ BEGIN
                   
                 
               END IF;
+              
+              IF v_registros.importe_debe > 0   THEN   
+                  select 
+                     rc.id_tabla
+                  into
+                     v_id_cuenta_bancaria
+                  from  conta.trelacion_contable rc
+                  inner join conta.ttipo_relacion_contable trc on trc.id_tipo_relacion_contable = rc.id_tipo_relacion_contable
+                  where      trc.codigo_tipo_relacion = 'CUEBANCING'  
+                         and rc.id_cuenta = v_registros.id_cuenta 
+                         and rc.id_gestion = v_registros_cbte.id_gestion
+                         and rc.id_auxiliar = v_registros.id_auxiliar
+                  offset 0 limit 1;
+                  
+                
+              END IF;
+              
+              
                  
                  
               IF v_id_cuenta_bancaria is not null  THEN
@@ -97,6 +115,8 @@ BEGIN
                    id_cuenta_bancaria =  v_id_cuenta_bancaria,
                    banco = 'si'   -- bandera que habilita boton de cheque  en la interface, y exige el registro en la validacion
                  WHERE id_int_transaccion = v_registros.id_int_transaccion;
+                 
+                 
                     
                 -- raise exception 'entra %', v_registros.id_int_transaccion;
               ELSE
@@ -115,6 +135,7 @@ BEGIN
               
      END LOOP;
          
+    
    
    --retorna resultado
    RETURN TRUE;

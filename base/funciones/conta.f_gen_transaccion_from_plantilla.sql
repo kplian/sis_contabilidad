@@ -180,9 +180,6 @@ BEGIN
       ELSE
       -- si no es una relacion devengado pago procesa la plantilla normalmente
            
-      
-           
-      
            --si el monto es cero saltamos el proceso, ya que no se generan transacciones
            
            IF COALESCE((v_this_hstore -> 'campo_monto')::numeric,0) > 0 or (p_reg_det_plantilla->'forma_calculo_monto') = 'diferencia' THEN
@@ -212,7 +209,10 @@ BEGIN
                                                                          (p_super->'columna_depto')::integer,--p_id_depto_conta 
                                                                          NULL, --centrode costo
                                                                          NULL, -- mensaje de error
-                                                                         (p_super->'columna_moneda')::integer);  --id_moneda
+                                                                         (p_super->'columna_moneda')::integer,
+                                                                         (v_this_hstore->'campo_codigo_aplicacion_rc')
+                                                                         
+                                                                         );  
                                   
                                                                              
                                      v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
@@ -231,7 +231,9 @@ BEGIN
                                                                          (v_this_hstore->'campo_relacion_contable_cc')::integer, 
                                                                          NULL, --centrode costo
                                                                          NULL, -- mensaje de error
-                                                                         (p_super->'columna_moneda')::integer);  --id_moneda
+                                                                         (p_super->'columna_moneda')::integer,
+                                                                         (v_this_hstore->'campo_codigo_aplicacion_rc')  
+                                                                      );  --id_moneda
                                                                              
                                      v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
                                 
@@ -262,7 +264,10 @@ BEGIN
                                                                           (v_this_hstore->'campo_relacion_contable')::integer, 
                                                                           (v_this_hstore->'campo_centro_costo')::integer,
                                                                            NULL, -- mensaje de error
-                                                                           (p_super->'columna_moneda')::integer);  --id_moneda
+                                                                           (p_super->'columna_moneda')::integer,
+                                                                           (v_this_hstore->'campo_codigo_aplicacion_rc')
+                                                                           
+                                                                           );  --id_moneda
                                                                               
                                 -- utiliza la relacion contable solo si no remplaza los valores de los campos del detalle de plantilla 
                                 

@@ -451,7 +451,7 @@ BEGIN
             END IF;
             
             --SUBSISTEMA: Obtiene el id_subsistema del Sistema de Contabilidad si es que no llega como parámetro
-        	
+
         	
             --RAC, 15/08/2017
             --  este cambio trabjo problema al editar comprobante de planillas (integrascion con libro de bancos, lo cbte de planillas no generan cheques,  OJO ANALIZAR)
@@ -628,7 +628,9 @@ BEGIN
                 forma_cambio = v_parametros.forma_cambio
 			where id_int_comprobante = v_parametros.id_int_comprobante;
             
-            
+            /*if v_parametros.id_int_comprobante = 17134 then
+            	raise exception 'En revisión ... ...: % - % - %',v_reg_cbte.tipo_cambio,v_reg_cbte.tipo_cambio_2,v_reg_cbte.tipo_cambio_3;
+            end if;*/
           
             
             -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones 
@@ -1110,14 +1112,16 @@ BEGIN
                         
                         v_registros.importe_haber_mt,--  insercion volcada de estos registros
                         v_registros.importe_debe_mt,                        
-                        v_registros.importe_recurso_mt, --  insercion volcada de estos registros
-                        
+                        v_registros.importe_recurso_mt, --  insercion volcada de estos registros                        
                         v_registros.importe_gasto_mt,
                         
-                        v_registros.importe_debe_ma,
+                        
                         v_registros.importe_haber_ma,
-                        v_registros.importe_gasto_ma,
+                        v_registros.importe_debe_ma,
                         v_registros.importe_recurso_ma,
+                        v_registros.importe_gasto_ma,
+                        
+                        
                         
                         v_registros.triangulacion ,
                         v_registros.actualizacion, 
@@ -1425,7 +1429,7 @@ BEGIN
           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado del cuenta documentada id='||v_parametros.id_int_comprobante); 
           v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
           
-          
+         
           -- Devuelve la respuesta
           return v_resp;
         

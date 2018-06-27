@@ -23,6 +23,7 @@ $body$
  #14, BOA		 18/10/2017		   RAC KPLIAN		Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados en las trasacciones CONTA_DCV_INS y CONTA_ADDCBTE_IME
  #0   ETR        05/01/2018        RAC PLIAN		Registor opcion de sw_pgs e id_funcionario para pagos simplificados 
  #87  ETR        25/02/2018        RAC KPLIAN       Considerar fechas dsitintas en las valdiacion de DUI's
+ #88  ETR        23/06/2018        RAC  KPLIAN      Solucionar Bug que permite editar fecha con diferente periodo
 ***************************************************************************/
 
 DECLARE
@@ -233,6 +234,21 @@ BEGIN
 
         -- chequear el el cliente esta registrado
         v_id_cliente = vef.f_check_cliente(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social)));
+          IF EXISTS(
+                    select
+                      1
+                    from conta.tdoc_compra_venta dcv
+                    inner join param.tplantilla pla on pla.id_plantilla=dcv.id_plantilla
+                    where         dcv.estado_reg = 'activo'
+                             and  to_char(dcv.fecha, 'YYYY-MM') = to_char(v_parametros.fecha, 'YYYY-MM') 
+                             and  dcv.nit = v_parametros.nit   --#87 OJO pienso que el nro de nit no interesa, si da problema descomentar esta linea 
+                             and  dcv.nro_autorizacion = v_parametros.nro_autorizacion
+                             and  dcv.nro_documento = v_parametros.nro_documento
+                             and  pla.tipo_informe='lcv') then
+
+                       raise exception 'Ya existe una Factura registrada con el mismo nro,  nit y nro de autorizacion para el periodo';
+
+             END IF;
       END IF;
 
 
@@ -625,8 +641,8 @@ BEGIN
    
    HISTORIAL  DE CAMBIOS
        ISSUE            FECHA:		      AUTOR               DESCRIPCION
-    #87  ETR        25/02/2018        RAC KPLIAN       Considerar fechas dsitintas en las valdiacion de DUI's
-   
+    #87  ETR        25/02/2018        RAC KPLIAN       Considerar fechas dsitintas en las valdiacion de DUI's   
+    #88  ETR        23/06/2018        RAC  KPLIAN      Solucionar Bug que permite editar fecha con diferente periodo
   ***********************************/
 
   elsif(p_transaccion='CONTA_DCV_MOD')then
@@ -654,7 +670,7 @@ BEGIN
 
       */
 
-      
+       
       --#87  recupera parametrizacion de la plantilla
         select
            p.id_plantilla,
@@ -680,12 +696,22 @@ BEGIN
         dcv.id_int_comprobante,
         dcv.id_origen,
         dcv.tabla_origen,
-        dcv.fecha
+        dcv.fecha,
+        dcv.id_periodo
       into
         v_registros
       from conta.tdoc_compra_venta dcv where dcv.id_doc_compra_venta =v_parametros.id_doc_compra_venta;
 
-	  v_rec = param.f_get_periodo_gestion(v_registros.fecha);
+	  v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
+      
+      
+      IF v_rec.po_id_periodo != v_registros.id_periodo THEN
+        raise exception 'No puede usar  una fecha de otro periodo'; --#101 
+      END IF;
+      
+      
+      
+     -- raise exception 'Periodos  %=%',v_rec.po_id_periodo, v_registros.id_periodo;
       
 	  -- valida que period de libro de compras y ventas este abierto para la antigua fecha
       IF v_tipo_informe in ('lcv' , 'retenciones') THEN
@@ -756,6 +782,22 @@ BEGIN
         --TODO  chequear que la factura de venta no este duplicada
         -- chequear el el cliente esta registrado
         v_id_cliente = vef.f_check_cliente(p_id_usuario, v_parametros.nit, upper(trim(v_parametros.razon_social)));
+        IF EXISTS(
+                    select
+                      1
+                    from conta.tdoc_compra_venta dcv
+                    inner join param.tplantilla pla on pla.id_plantilla=dcv.id_plantilla
+                    where         dcv.estado_reg = 'activo'
+                             and  to_char(dcv.fecha, 'YYYY-MM') = to_char(v_parametros.fecha, 'YYYY-MM') 
+                             and  dcv.nit = v_parametros.nit   --#87 OJO pienso que el nro de nit no interesa, si da problema descomentar esta linea 
+                             and  dcv.nro_autorizacion = v_parametros.nro_autorizacion
+                             and  dcv.nro_documento = v_parametros.nro_documento
+                             and  pla.tipo_informe='lcv'
+                             and  dcv.id_doc_compra_venta != v_parametros.id_doc_compra_venta) then
+
+                       raise exception 'Ya existe una Factura registrada con el mismo nro,  nit y nro de autorizacion para el periodo';
+
+             END IF;
       END IF;
 
 
@@ -796,8 +838,7 @@ BEGIN
       end if;
       
       --FIN RAC
-
-
+         
       --Sentencia de la modificacion
       update conta.tdoc_compra_venta set
         tipo = v_parametros.tipo,
@@ -1368,10 +1409,48 @@ BEGIN
       return v_resp;
 
     end;
+    
+   /*********************************
+   #TRANSACCION:  'CONTA_EDITAPLI_MOD'
+   #DESCRIPCION:	Edita la aplicacion del documento
+   #AUTOR:		rac
+   #FECHA:		08/05/2018
+  ***********************************/
+
+  elsif(p_transaccion='CONTA_EDITAPLI_MOD')then
+
+        begin
+
+                select 
+                   tcv.id_int_comprobante ,
+                   tcv.id_doc_compra_venta
+                into v_registros
+                from conta.tdoc_compra_venta tcv
+                where tcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+
+                /*Cambiar lso valores a 0 si es una anulacion*/
+
+                 -- if v_registros.id_int_comprobante is null  then
+                if  0 = 0 then
+               
+                    --Sentencia de la modificacion
+                    update conta.tdoc_compra_venta set
+                      codigo_aplicacion  =  v_parametros.codigo_aplicacion
+                    where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+
+                    --Definicion de la respuesta
+                    v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue modificada la aplicacion del documento');
+                    v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+
+                    --Devuelve la respuesta
+                    return v_resp;
+                else    
+                        raise exception 'Solo puede modificar la aplicación a documentos sin comprobante';
+                end if;  
 
 
 
-
+        end;
   else
 
     raise exception 'Transaccion inexistente: %',p_transaccion;

@@ -150,13 +150,37 @@ BEGIN
              
                  IF v_tipo_rel.tiene_moneda = 'no'  THEN
                  
-                       IF  EXISTS(select  1 
-                                     from conta.trelacion_contable  rc 
-                                     where rc.id_gestion = v_parametros.id_gestion 
-                                       and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
-                                       and rc.id_tabla = v_parametros.id_tabla) THEN                     
-                             raise exception 'Ya existe una relacion contable para este registro';                     
-                       END IF;   
+                       
+                       IF v_tipo_rel.tiene_aplicacion = 'si'  THEN
+                       
+                              IF  EXISTS(
+                                         select  1 
+                                           from conta.trelacion_contable  rc 
+                                           where rc.id_gestion = v_parametros.id_gestion 
+                                             and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
+                                             and rc.id_tabla = v_parametros.id_tabla
+                                             and rc.codigo_aplicacion = v_parametros.codigo_aplicacion
+                                             
+                                             
+                                             ) THEN                     
+                                   raise exception 'Ya existe una relacion contable para este registro (aplicaciones = si)';                     
+                             END IF;  
+                       
+                       
+                       ELSE
+                       
+                              IF  EXISTS(select  1 
+                                           from conta.trelacion_contable  rc 
+                                           where rc.id_gestion = v_parametros.id_gestion 
+                                             and rc.id_tipo_relacion_contable = v_parametros.id_tipo_relacion_contable                                  
+                                             and rc.id_tabla = v_parametros.id_tabla) THEN                     
+                                   raise exception 'Ya existe una relacion contable para este registro';                     
+                             END IF;  
+                       
+                       
+                       END IF;
+                 
+                       
             
                  
                  ELSE
@@ -494,13 +518,8 @@ BEGIN
                IF v_parametros.id_gestion != v_id_gestion_cc  THEN
                    raise exception 'El centro de costo no es de la misma gestión, verifique el centro';
                END IF;
-                
-            
             END IF;
             
-            
-            
-         
         
         
 			--Sentencia de la modificacion
