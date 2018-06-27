@@ -76,6 +76,10 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('campo_relacion_contable_cc','text');
 		$this->captura('campo_suborden','varchar');
 		
+		$this->captura('campo_codigo_aplicacion_rc','varchar');
+		
+		
+		
 		
 	
 		
@@ -142,6 +146,10 @@ class MODDetallePlantillaComprobante extends MODbase{
 		
 		$this->setParametro('campo_suborden','campo_suborden','varchar');
 		
+		$this->setParametro('campo_codigo_aplicacion_rc','campo_codigo_aplicacion_rc','varchar');
+		
+		
+		
 		
         
 
@@ -207,6 +215,8 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_relacion_contable_cc','campo_relacion_contable_cc','varchar');
 		
 		$this->setParametro('campo_suborden','campo_suborden','varchar');
+		
+		$this->setParametro('campo_codigo_aplicacion_rc','campo_codigo_aplicacion_rc','varchar');
 		
 
 		//Ejecuta la instruccion

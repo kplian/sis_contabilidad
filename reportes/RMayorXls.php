@@ -11,7 +11,7 @@ class RMayorXls
 	{
 		$this->objParam = $objParam;
 		$this->url_archivo = "../../../reportes_generados/".$this->objParam->getParametro('nombre_archivo');		
-		set_time_limit(400);
+		set_time_limit(800);
 		$cacheMethod = PHPExcel_CachedObjectStorageFactory:: cache_to_phpTemp;
 		$cacheSettings = array('memoryCacheSize'  => '10MB');
 		PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);		
@@ -402,7 +402,7 @@ class RMayorXls
 		}					
 	}
 	function generarReporte(){
-		$this->objWriter = PHPExcel_IOFactory::createWriter($this->docexcel, 'Excel5');
+		$this->objWriter = PHPExcel_IOFactory::createWriter($this->docexcel, 'Excel2007');
 		$this->objWriter->save($this->url_archivo);
 		$this->imprimeCabecera(0);
 	}	

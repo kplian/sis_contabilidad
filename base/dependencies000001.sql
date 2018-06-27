@@ -4437,6 +4437,99 @@ AS
          
  
 /**********************************F-DEP-MANU-CONTA-0-24/03/2018****************************************/ 
+
+
+
+/**********************************I-DEP-RAC-CONTA-0-09/05/2018****************************************/ 
+
+
+
+CREATE OR REPLACE VIEW conta.vdoc_compra_venta_proveedor(
+    id_agrupador_doc,
+    id_moneda,
+    id_int_comprobante,
+    id_plantilla,
+    importe_doc,
+    importe_excento,
+    importe_total_excento,
+    importe_descuento,
+    importe_descuento_ley,
+    importe_ice,
+    importe_it,
+    importe_iva,
+    importe_pago_liquido,
+    nro_documento,
+    nro_dui,
+    nro_autorizacion,
+    razon_social,
+    revisado,
+    manual,
+    obs,
+    nit,
+    fecha,
+    codigo_control,
+    sw_contabilizar,
+    tipo,
+    id_agrupador,
+    id_doc_compra_venta,
+    descripcion,
+    importe_neto,
+    importe_anticipo,
+    importe_pendiente,
+    importe_retgar,
+    id_auxiliar,
+    id_proveedor,
+    codigo_aplicacion)
+AS
+  SELECT ad.id_agrupador_doc,
+         dcv.id_moneda,
+         dcv.id_int_comprobante,
+         dcv.id_plantilla,
+         dcv.importe_doc,
+         dcv.importe_excento,
+         COALESCE(dcv.importe_excento, 0::numeric) + COALESCE(dcv.importe_ice, 0
+           ::numeric) AS importe_total_excento,
+         dcv.importe_descuento,
+         dcv.importe_descuento_ley,
+         dcv.importe_ice,
+         dcv.importe_it,
+         dcv.importe_iva,
+         dcv.importe_pago_liquido,
+         dcv.nro_documento,
+         dcv.nro_dui,
+         dcv.nro_autorizacion,
+         dcv.razon_social,
+         dcv.revisado,
+         dcv.manual,
+         dcv.obs,
+         dcv.nit,
+         dcv.fecha,
+         dcv.codigo_control,
+         dcv.sw_contabilizar,
+         dcv.tipo,
+         ad.id_agrupador,
+         ad.id_doc_compra_venta,
+         (((dcv.razon_social::text || ' - '::text) || ' ( '::text) ||
+           ' ) Nro Doc: '::text) || COALESCE(dcv.nro_documento)::text AS
+           descripcion,
+         dcv.importe_neto,
+         dcv.importe_anticipo,
+         dcv.importe_pendiente,
+         dcv.importe_retgar,
+         dcv.id_auxiliar,
+         pro.id_proveedor,
+         dcv.codigo_aplicacion
+  FROM conta.tagrupador_doc ad
+       JOIN conta.tdoc_compra_venta dcv ON ad.id_doc_compra_venta =
+         dcv.id_doc_compra_venta
+       LEFT JOIN conta.tauxiliar aux ON aux.id_auxiliar = dcv.id_auxiliar
+       LEFT JOIN param.tproveedor pro ON pro.codigo::text = aux.codigo_auxiliar
+         ::text;
+         
+
+/**********************************F-DEP-RAC-CONTA-0-09/05/2018****************************************/ 
+
+
          
 
 

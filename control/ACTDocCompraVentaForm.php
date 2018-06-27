@@ -1,9 +1,9 @@
 <?php
 /**
 *@package pXP
-*@file gen-ACTDocCompraVenta.php
+*@file gen-ACTDocCompraVentaForm.php
 *@author  (admin)
-*@date 18-08-2015 15:57:09
+*@date 18-08-2018 15:57:09
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
@@ -12,6 +12,9 @@ require_once(dirname(__FILE__).'/../reportes/RLcv.php');
 require_once(dirname(__FILE__).'/../reportes/RLcvVentas.php');
 require_once(dirname(__FILE__).'/../reportes/RLcvXls.php');
 
+require_once(dirname(__FILE__).'/../reportes/RComparacionMayorDiario.php');
+require_once(dirname(__FILE__).'/../reportes/RComparacionMayorDiarioXls.php');
+require_once(dirname(__FILE__).'/../reportes/RCreditoDebitoSobreVentas.php');
 
 
 class ACTDocCompraVentaForm extends ACTbase{    
@@ -107,7 +110,15 @@ class ACTDocCompraVentaForm extends ACTbase{
 		       $reporte = new RLcv($this->objParam);  
 		    }
 		    else{
-			    $reporte = new RLcvVentas($this->objParam);  
+		    	
+                if($this->objParam->getParametro('tipo_lcv')=='nota_credito_debito_sobre_ventas'){
+			        $reporte = new RCreditoDebitoSobreVentas($this->objParam);  
+
+				}else{
+					$reporte = new RLcvVentas($this->objParam); 
+				}
+				
+			     
 		     }
 		
 			 
@@ -418,7 +429,117 @@ class ACTDocCompraVentaForm extends ACTbase{
 		fclose($file);
 		return $fileName;
 	}
-	
+
+	function recuperarDatosComparacion(){    	
+	    $this->objFunc = $this->create('MODDocCompraVenta');
+		$cbteHeader = $this->objFunc->reporteComparacion($this->objParam);
+ 
+		if($cbteHeader->getTipo() == 'EXITO'){				
+			return $cbteHeader;
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}              
+		
+    }
+	function reporteComparacion(){
+		
+		$var='';
+		if($this->objParam->getParametro('formato_reporte')=='pdf'){
+			
+			$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 
+			if($this->objParam->getParametro('tipo_repo')=='endesis_erp'){
+				$dataSource = $this->recuperarDatosErpEndensisLCV();
+			}else{
+				$dataSource = $this->recuperarDatosComparacion();
+			}
+			$dataEntidad = $this->recuperarDatosEntidad();
+			$dataPeriodo = $this->recuperarDatosPeriodo();	
+			
+			
+			//parametros basicos
+			$tamano = 'LETTER';
+			$orientacion = 'L';
+			$titulo = 'Consolidado';
+			
+			
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);	
+	        
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			
+
+			//Instancia la clase de pdf
+		    if($this->objParam->getParametro('tipo_repo')=='lcv_compras_vs_libro_mayor'){
+			
+		       $reporte = new RComparacionMayorDiario($this->objParam);  
+		    }
+
+		
+			 
+	         
+			$reporte->datosHeader($dataSource->getDatos(),  $dataSource->extraData, $dataEntidad->getDatos() , $dataPeriodo->getDatos() );
+			//$this->objReporteFormato->renderDatos($this->res2->datos);
+			
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		}
+
+		if($this->objParam->getParametro('formato_reporte') == 'xls'){
+
+		    $this->objFun=$this->create('MODDocCompraVenta');
+
+            if($this->objParam->getParametro('tipo_repo')=='endesis_erp'){
+                $this->res = $this->objFun->listarRepLCVFormErpEndesis();
+            }else{
+                //$this->res = $this->objFun->RComparacionMayorDiarioXls();
+				$this->res = $this->objFun->reporteComparacion();
+            }
+
+            if($this->res->getTipo()=='ERROR'){
+                $this->res->imprimirRespuesta($this->res->generarJson());
+                exit;
+            }
+			if($this->objParam->getParametro('tipo_lcv')=='lcv_compras'){			
+				$var = 'COMPRAS';
+		    }
+		    else{
+				$var = 'VENTAS';
+		     }
+            //obtener titulo de reporte
+            $titulo ='Lcv';
+            //Genera el nombre del archivo (aleatorio + titulo)
+            $nombreArchivo=uniqid(md5(session_id()).$titulo);
+            $nombreArchivo.='.xls';
+
+            $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+            $this->objParam->addParametro('datos',$this->res->datos);
+			$this->objParam->addParametro('var',$var);
+            //Instancia la clase de excel
+            $this->objReporteFormato=new RComparacionMayorDiarioXls($this->objParam);
+            $this->objReporteFormato->generarDatos();
+            $this->objReporteFormato->generarReporte();
+
+            $this->mensajeExito=new Mensaje();
+            $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+                'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+            $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+            $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+
+        }  if($this->objParam->getParametro('formato_reporte')!='pdf' && $this->objParam->getParametro('formato_reporte')!='xls'){
+            $this->exportarTxtLcvLCV();
+        }
+        /*else{
+			$this->exportarTxtLcvLCV();
+		}*/
+	}
 	
 	
 			

@@ -26,7 +26,7 @@ class RComprobanteDiario extends ReportePDF {
 	var $cant;
 	var $valor;
 	
-	function datosHeader ($detalle,$resultado,$tpoestado,$auxiliar) {
+	function datosHeader ($detalle,$resultado,$tpoestado,$auxiliar) {			
 		$this->SetHeaderMargin(10);
 		$this->SetAutoPageBreak(TRUE, 10);
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
@@ -124,7 +124,7 @@ class RComprobanteDiario extends ReportePDF {
 			$fecIni = (int)($this->objParam->getParametro('fecIni')=== 'true');
 			$fecFin = (int)($this->objParam->getParametro('fecFin')=== 'true');	
 			$cc = (int)($this->objParam->getParametro('cc')=== 'true');	
-									
+								
 			$aux='';
 			if($y==0){
 				$cab=trim($datarow['nro_cbte']);
@@ -132,84 +132,88 @@ class RComprobanteDiario extends ReportePDF {
 			}
 			if(trim($datarow['nro_cbte'])==$cab){
 				if($sw==0){
-					$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";
+					$aux=$aux.'Nro Cbte.:'.$datarow['id_int_comprobante'].'-'.trim($datarow['nro_cbte']);				
 					//
 					if($nro_tramite == 1){
-						$aux=$aux.'Nro Tramite:'.trim($datarow['nro_tramite'])."\r\n";
+						$aux=$aux.'Nro Tramite:'.trim($datarow['nro_tramite']);
 					}else{
 						$aux=$aux.'';
 					}	
 					if($cc == 1){
-						$aux=$aux.'Centro de Costo:'.trim($datarow['desc_centro_costo'])."\r\n";			
+						$aux=$aux.'Centro de Costo:'.trim($datarow['desc_centro_costo']);			
 					}else{			
 						$aux=$aux.'';
 					}	
 					if($beneficiario == 1){
-						$aux=$aux.'Beneficiario:'.trim($datarow['beneficiario'])."\r\n";			
+						$aux=$aux.'Beneficiario:'.trim($datarow['beneficiario']);			
 					}else{			
 						$aux=$aux.'';
 					}
 					if($partida == 1){
-						$aux=$aux.'Fecha:'.trim($datarow['partida'])."\r\n";
+						$aux=$aux.'Fecha:'.trim($datarow['partida']);
 					}else{
 						$aux=$aux.'';
 					}
 					if($fecha == 1){
 						$arr = explode('-', $datarow['fecha']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-						$aux=$aux.'Fecha:'.$newDate."\r\n";
+						$aux=$aux.'Fecha:'.$newDate;
 					}else{
 						$aux=$aux.'';
 					}						
 					if($desc_tipo_relacion_comprobante == 1){
-						$aux=$aux.'Tpo. Relacion Cbte.:'.strval($datarow['desc_tipo_relacion_comprobante'])."\r\n";
+						$aux=$aux.'Tpo. Relacion Cbte.:'.strval($datarow['desc_tipo_relacion_comprobante']);
 					}else{
 						$aux=$aux.'';
 					}	
 					$sw=1;		
 				}else{
-					$aux=$aux.''."\r\n";					
-				}								
+					$aux=$aux.''."";					
+				}	
+				//var_dump($aux);							
 			}else{
 				$cab=trim($datarow['nro_cbte']);
-				$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";					
+				$aux=$aux.'Nro Cbte.:'.$datarow['id_int_comprobante'].'-'.trim($datarow['nro_cbte']);				
 				if($nro_tramite == 1){
-					$aux=$aux.'Nro Tramite:'.trim($datarow['nro_tramite'])."\r\n";
+					$aux=$aux.'Nro Tramite:'.trim($datarow['nro_tramite']);
 				}else{
 					$aux=$aux.'';
 				}
 				if($cc == 1){
-					$aux=$aux.'Centro de Costo:'.trim($datarow['cc'])."\r\n";			
+					$aux=$aux.'Centro de Costo:'.trim($datarow['cc']);			
 				}else{			
 					$aux=$aux.'';
 				}			
 				if($beneficiario == 1){
-					$aux=$aux.'Beneficiario:'.trim($datarow['beneficiario'])."\r\n";			
+					$aux=$aux.'Beneficiario:'.trim($datarow['beneficiario']);			
 				}else{			
 					$aux=$aux.'';
 				}
 				if($partida == 1){
-					$aux=$aux.'Fecha:'.trim($datarow['partida'])."\r\n";
+					$aux=$aux.'Fecha:'.trim($datarow['partida']);
 				}else{
 					$aux=$aux.'';
 				}
 				if($fecha == 1){
 					$arr = explode('-', $datarow['fecha']);
 					$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
-					$aux=$aux.'Fecha:'.$newDate."\r\n";
+					$aux=$aux.'Fecha:'.$newDate;
 				}else{
 					$aux=$aux.'';
 				}						
 				if($desc_tipo_relacion_comprobante == 1){
-					$aux=$aux.'Tpo. Relacion Cbte.:'.strval($datarow['desc_tipo_relacion_comprobante'])."\r\n";
+					$aux=$aux.'Tpo. Relacion Cbte.:'.strval($datarow['desc_tipo_relacion_comprobante']);
 				}else{
 					$aux=$aux.'';
-				}			
-			}	
+				}	
+				//var_dump($aux);		
+			}
+			//var_dump($aux);	
 			if($haber>$debe){
-				$m= "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".trim($datarow['desc_cuenta'])."\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".trim($datarow['glosa']);
+				//$m= "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".trim($datarow['desc_cuenta'])."\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".trim($datarow['glosa']);
+				$m= "-".trim($datarow['desc_cuenta'])."-".trim($datarow['glosa'])."*";
 			}else{
-				$m= trim($datarow['desc_cuenta'])."\r\n".trim($datarow['glosa']);
+				$m= trim($datarow['desc_cuenta'])."-".trim($datarow['glosa'])."*";
 			}
 			$arr = explode('-', $datarow['fecha']);
 			$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];	
@@ -226,12 +230,13 @@ class RComprobanteDiario extends ReportePDF {
 			if($debe==0 and $haber==0){
 			}
 			else{
-				if($f!=''){
+				if($f!='')
+				{				
 					if($g!=''){
 						$time1 = strtotime($f1);
 						$time2 = strtotime($f2);
 						$time3 = strtotime($newDate);
-						if ($time1 < $time3 AND $time2 > $time3){			
+						if ($time1 <= $time3 AND $time2 >= $time3){			
 							$RowArray = array(
 								's0'  => $i+1,
 								's1'  => $newDate,

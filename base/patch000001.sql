@@ -4589,6 +4589,100 @@ WITH (oids = false);
 /***********************************F-SCP-RAC-CONTA-1-03/02/2018****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-1-11/04/2018****************************************/
+
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN id_tipo_cc INTEGER;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.id_tipo_cc
+IS 'opcional en el caso de reportes, para obtener un mayor consirando el tipo de centro de costos';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN visible_menu VARCHAR(2) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_plantilla.visible_menu
+IS 'si es un reporte, es visible o no en el menu';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tresultado_det_plantilla
+  ADD COLUMN salta_hoja VARCHAR(3) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tresultado_det_plantilla.salta_hoja
+IS 'esta opcion indica si antes tenemso que cambiar de hoja';
+
+
+
+/***********************************F-SCP-RAC-CONTA-1-03/02/2018****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-25/04/2018****************************************/
+
+
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_tipo_cambio_2 VARCHAR(350);
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.campo_tipo_cambio_2
+IS 'necesaio para cuando queremos tipod e cambio covenido';
+
+
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_tipo_cambio_3 VARCHAR(350);
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.campo_tipo_cambio_3
+IS 'necesario cuando queremos tipo de cambio covenido';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_comprobante
+  ADD COLUMN campo_id_config_cambiaria VARCHAR(350);
+
+COMMENT ON COLUMN conta.tplantilla_comprobante.campo_id_config_cambiaria
+IS 'necesario cuando queremso tipo de cambio convenido';
+
+
+
+
+
+/***********************************F-SCP-RAC-CONTA-1-25/04/2018****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-1-08/05/2018****************************************/
+
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN codigo_aplicacion VARCHAR(200);
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.codigo_aplicacion
+IS 'codigo del catalogo  con la finlaidad del documento, tuli para relacioens contables';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_codigo_aplicacion_rc VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_codigo_aplicacion_rc
+IS 'codigo de aplicaicon para relaciones contable';
+
+
+/***********************************F-SCP-RAC-CONTA-1-08/05/2018****************************************/
+
+
+
+
 
 
 

@@ -127,7 +127,11 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['funcion_comprobante_editado'])?'NULL':"'".$row['funcion_comprobante_editado']."'")."," .
 							 (is_null($row['desc_plantilla'])?'NULL':"'".$row['desc_plantilla']."'")."," .
 							 (is_null($row['campo_cbte_relacionado'])?'NULL':"'".$row['campo_cbte_relacionado']."'")."," .
-							 (is_null($row['codigo_tipo_relacion'])?'NULL':"'".$row['codigo_tipo_relacion']."'").");\r\n");					
+							 (is_null($row['codigo_tipo_relacion'])?'NULL':"'".$row['codigo_tipo_relacion']."'")."," .	
+							 
+							 (is_null($row['campo_tipo_cambio_2'])?'NULL':"'".$row['campo_tipo_cambio_2']."'") ."," .	
+							 (is_null($row['campo_tipo_cambio_3'])?'NULL':"'".$row['campo_tipo_cambio_3']."'") ."," .	
+							 (is_null($row['campo_id_config_cambiaria'])?'NULL':"'".$row['campo_id_config_cambiaria']."'") .");\r\n");						
 							 
 							 	
 				}

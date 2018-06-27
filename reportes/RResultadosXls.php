@@ -201,7 +201,7 @@ class RResultadosXls
 					   
 					}
 					else{
-						$texto = trim($tabs.$val['desc_cuenta']);
+						$texto = $tabs.'('.trim($val['codigo_cuenta'].') '.$val['desc_cuenta']);
 						if($val['origen'] == 'detalle'  ||  $val['origen'] == 'detalle_formula'){
 							$texto = $this->formatearTextoDetalle($texto);	
 						}
@@ -215,7 +215,7 @@ class RResultadosXls
 																	    'name'=>Arial));
 																		
 				$sheet->getStyle(($this->equivalencias[0]).$fila)->getAlignment()->setHorizontal($posicion);															
-				$sheet->setCellValueByColumnAndRow(0,$fila,$substr($texto, 0, 40));  //ojo revisar es apra mostrar menos caracteres
+				$sheet->setCellValueByColumnAndRow(0,$fila,substr($texto, 0, 40));  //ojo revisar es apra mostrar menos caracteres
 				
 				
 				//////////////////////
@@ -338,7 +338,9 @@ class RResultadosXls
 					   
 					}
 				else{
-						$texto = $val['desc_cuenta'];
+						//$texto = $val['desc_cuenta'];
+						
+						$texto = '('.trim($val['codigo_cuenta'].') '.$val['desc_cuenta']);
 						if($val['origen'] == 'detalle'  || $val['origen'] == 'detalle_formula'){
 							$texto = $this->formatearTextoDetalle($texto);	
 						}

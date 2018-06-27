@@ -704,7 +704,9 @@ class MODIntComprobante extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);	
 		//
-		$this->setParametro('nombreVista','nombreVista','varchar');				
+		$this->setParametro('nombreVista','nombreVista','varchar');		
+		$this->setParametro('fecIni','fecIni','date');		
+		$this->setParametro('fecFin','fecFin','date');				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_int_comprobante','int4');
 		$this->captura('nro_cbte','varchar');

@@ -9,9 +9,10 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-	Phx.vista.ReporteLibroComprasVentasIVA = Ext.extend(Phx.frmInterfaz, {
+	Phx.vista.Dif_libro_contables = Ext.extend(Phx.frmInterfaz, {
 		
 		Atributos : [
+		
 		{
 			config:{
 				name: 'id_entidad',
@@ -57,12 +58,9 @@ header("content-type: text/javascript; charset=UTF-8");
 			grid:true,
 			form:true
 		},
-		
-		
-		
 		{
 			config:{
-				name:'tipo_lcv',
+				name:'tipo_repo',
 				fieldLabel:'Tipo de Reporte',
 				typeAhead: true,
 				allowBlank:false,
@@ -73,10 +71,9 @@ header("content-type: text/javascript; charset=UTF-8");
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
 	        	data :	[
-						//['endesis_erp','Libro de Compras Estandar'],
-	        	        ['lcv_compras','Libro de Compras Estandar (nueva versión)'],
-	        	        ['lcv_ventas','Libro de Ventas Estandar'],	
-						//['LCNCD','Libro de Compras NCD']					
+						
+	        	        ['lcv_compras_vs_libro_mayor','Libro de Compras vs Libro mayor '],
+				
 						]	        				
 	    		}),
 				valueField:'ID',
@@ -237,47 +234,6 @@ header("content-type: text/javascript; charset=UTF-8");
 		},
 		{
 			config:{
-				name:'id_usuario',
-				fieldLabel:'Usuario',
-				allowBlank:false,
-				emptyText:'Usuario...',
-				store: new Ext.data.JsonStore({
-
-					url: '../../sis_seguridad/control/Usuario/listarUsuario',
-					id: 'id_persona',
-					root: 'datos',
-					sortInfo:{
-						field: 'desc_person',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_usuario','desc_person','cuenta'],
-					// turn on remote sorting
-					remoteSort: true,
-					baseParams:{par_filtro:'PERSON.nombre_completo2#cuenta',_adicionar:'si'}
-				}),
-				valueField: 'id_usuario',
-				displayField: 'desc_person',
-				gdisplayField:'desc_usuario',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
-				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_person}</p></div></tpl>',
-				hiddenName: 'id_usuario',
-				forceSelection:true,
-				typeAhead: true,
-				triggerAction: 'all',
-				lazyRender:true,
-				mode:'remote',
-				pageSize:10,
-				queryDelay:1000,
-				width:250,
-				gwidth:280,
-				minChars:2
-			},
-			type:'ComboBox',
-			id_grupo:0,
-			form:true
-		},
-		{
-			config:{
 				name:'formato_reporte',
 				fieldLabel:'Formato del Reporte',
 				typeAhead: true,
@@ -288,9 +244,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
-	        	data :	[['txt','TXT'],
-						['pdf','PDF'],	
-						['csv','CSV'],
+	        	data :	[['pdf','PDF'],	
                         ['xls','XLS']]
 	    		}),
 				valueField:'ID',
@@ -302,99 +256,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo:1,
 			form:true
 		},
-		/*{
-			config:{
-				name:'datos',
-				fieldLabel:'Datos',
-				typeAhead: true,
-				allowBlank:false,
-	    		triggerAction: 'all',
-	    		emptyText:'seleccionar...',
-	    		selectOnFocus:true,
-				mode:'local',
-				store:new Ext.data.ArrayStore({
-	        	fields: ['ID', 'valor'],
-	        	data :	[['contabilizado','Contabilizado'],
-                        ['no_contabilizado','No contabilizado']]
-	    		}),
-				valueField:'ID',
-				displayField:'valor',
-				width:250,			
-				
-			},
-			type:'ComboBox',
-			id_grupo:1,
-			form:true
-		},*/
-        {
-            config: {
-                name: 'nro_comprobante',
-                fieldLabel: 'Numero de comprobante',
-                allowBlank: true,
-                anchor: '100%',
-                gwidth: 150,
-                maxLength: 150
-            },
-            type: 'TextField',
-            filters: {pfiltro: 'nro_comprobante', type: 'string'},
-            id_grupo: 1,
-            grid: true,
-            form: true
-        },
-        {
-            config: {
-                name: 'nro_nit',
-                fieldLabel: 'Numero de Nit',
-                allowBlank: true,
-                anchor: '100%',
-                gwidth: 150,
-                maxLength: 150
-            },
-            type: 'TextField',
-            filters: {pfiltro: 'nro_nit', type: 'string'},
-            id_grupo: 1,
-            grid: true,
-            form: true
-        },
-        {
-            config: {
-                name: 'nro_autorizacion',
-                fieldLabel: 'Numero de autorización',
-                allowBlank: true,
-                anchor: '100%',
-                gwidth: 150,
-                maxLength: 150
-            },
-            type: 'TextField',
-            filters: {pfiltro: 'nro_autorizacion', type: 'string'},
-            id_grupo: 1,
-            grid: true,
-            form: true
-        },
-	    {
-	        config: {
-	            labelSeparator: '',
-	            inputType: 'hidden',
-	            name: 'datos'
-	        },
-	        type: 'Field',
-	        form: true
-	    },
-        /*{
-            config:{
-                name:'id_moneda',
-                origen:'MONEDA',
-                allowBlank:false,
-                baseParams: {id_moneda_defecto: 0},
-                fieldLabel:'Moneda',
-                gdisplayField:'desc_moneda',
-                gwidth:100,
-                width:180
-            },
-            type:'ComboRec',
-            id_grupo:0,
-            form:true
-        },*/
+
+
 		],
 		
 		
@@ -407,7 +270,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		tooltipSubmit : '<b>Reporte LCV - IVA</b>',
 		
 		constructor : function(config) {
-			Phx.vista.ReporteLibroComprasVentasIVA.superclass.constructor.call(this, config);
+			Phx.vista.Dif_libro_contables.superclass.constructor.call(this, config);
 			this.init();
 			
 			this.ocultarComponente(this.Cmp.fecha_fin);
@@ -418,7 +281,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.iniciarEventos();
 			
 			//this.Cmp.datos.setValue('No contabilizado');
-			this.Cmp.datos.setValue('contabilizado');
+			//this.Cmp.datos.setValue('contabilizado');
 		},
 		
 		iniciarEventos:function(){        
@@ -470,7 +333,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			}]
 		}],
 		
-	ActSave:'../../sis_contabilidad/control/DocCompraVentaForm/reporteLCV',
+	ActSave:'../../sis_contabilidad/control/DocCompraVentaForm/reporteComparacion',
 	
     successSave :function(resp){
    

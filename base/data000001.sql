@@ -1395,6 +1395,43 @@ VALUES
 
 /***********************************F-DAT-RAC-CONTA-0-22/12/2017*****************************************/ 
 
+/***********************************I-DAT-JUAN-CONTA-0-03/04/2017*****************************************/ 
+select pxp.f_insert_tgui ('Diferencias en libros contables', 'Diferencias en libros contables', 'COLM', 'si', 12, 'sis_contabilidad/reportes/formularios/Dif_libro_contables.php', 3, '', 'Dif_libro_contables', 'CONTA');
+
+select pxp.f_insert_testructura_gui ('COLM', 'REPCON');
+
+/***********************************F-DAT-JUAN-CONTA-0-03/04/2017*****************************************/ 
 
 
 
+/***********************************I-DAT-RAC-CONTA-0-08/05/2018*****************************************/ 
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_solictar_codigo_aplicacion_doc', E'no', E'Para odcumentos de venta al generar comprobante solo considerar los documneots con codigo de aplicacion');
+  
+  ----------------------------------
+--COPY LINES TO SUBSYSTEM data.sql FILE  
+---------------------------------
+
+select param.f_import_tcatalogo_tipo ('insert','tipo_venta','CONTA','tdoc_compra_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Peaje','peaje','tipo_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Pliegos','pliegos','tipo_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Peaje Empresas del Grupo','peaje_grupo','tipo_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Servicios a Terceros','terceros','tipo_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Servicios Empresas del Grupo','servicos_grupo','tipo_venta');
+
+
+/***********************************F-DAT-RAC-CONTA-0-08/05/2018*****************************************/ 
+
+
+
+
+***********************************FIDAT-RAC-CONTA-0-29/05/2018*****************************************/ 
+
+
+select pxp.f_insert_tgui ('Estado de Auxiliares', 'Estado de Auxiliares', 'EXUMAY', 'si', 10, 'sis_contabilidad/vista/int_transaccion/FormFiltroAuxiliarMayor.php', 3, '', 'FormFiltroAuxiliarMayor', 'CONTA');
+select pxp.f_insert_testructura_gui ('EXUMAY', 'REPCON');
+
+
+***********************************F-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 

@@ -11,9 +11,9 @@ class RComprobanteDiarioXls {
 	{
 		$this->objParam = $objParam;
 		$this->url_archivo = "../../../reportes_generados/".$this->objParam->getParametro('nombre_archivo');		
-		set_time_limit(400);
+		set_time_limit(60000);
 		$cacheMethod = PHPExcel_CachedObjectStorageFactory:: cache_to_phpTemp;
-		$cacheSettings = array('memoryCacheSize'  => '10MB');
+		$cacheSettings = array('memoryCacheSize'  => '100MB');
 		PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);		
 		$this->docexcel = new PHPExcel();
 		$this->docexcel->getProperties()->setCreator("PXP")
@@ -38,7 +38,7 @@ class RComprobanteDiarioXls {
 	//
 	function imprimeCabecera() {
 		$this->docexcel->createSheet();
-		$this->docexcel->getActiveSheet()->setTitle('Libro Diario');
+		$this->docexcel->getActiveSheet()->setTitle('LIBRO DIARIO');
 		$this->docexcel->setActiveSheetIndex(0);
 		
 		$datos = $this->objParam->getParametro('datos');
@@ -95,27 +95,25 @@ class RComprobanteDiarioXls {
 		);
 		//		
 		$beneficiario = (int)($this->objParam->getParametro('beneficiario') === 'true');
-		$partida = (int)($this->objParam->getParametro('partida') === 'true');			
+		//$partida = (int)($this->objParam->getParametro('partida') === 'true');			
 		$fecha = (int)($this->objParam->getParametro('fecha')=== 'true');
 		$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 		$nro_tramite = (int)($this->objParam->getParametro('nro_tramite')=== 'true');			
-		$desc_tipo_relacion_comprobante = (int)($this->objParam->getParametro('desc_tipo_relacion_comprobante')=== 'true');					
+		//$desc_tipo_relacion_comprobante = (int)($this->objParam->getParametro('desc_tipo_relacion_comprobante')=== 'true');					
 		$fecIni = (int)($this->objParam->getParametro('fecIni')=== 'true');
 		$fecFin = (int)($this->objParam->getParametro('fecFin')=== 'true');							
 		
 		$aux='';		
-		if($beneficiario == 1){
-			array_push($var,'BENEFICIARIO');
-			$contador++;						
-		}
-		if($partida == 1){
+		
+		/*if($partida == 1){
 			array_push($var,'PARTIDA');
 			$contador++;						
-		}
+		}*/
 		if($fecha == 1){
 			array_push($var,'FECHA');
 			$contador++;						
 		}
+		
 		if($nro_comprobante == 1){
 			array_push($var,'NRO COMPROBANTE');
 			$contador++;
@@ -124,21 +122,24 @@ class RComprobanteDiarioXls {
 			array_push($var,'NRO TRAMITE');
 			$contador++;
 		}
-		if($desc_tipo_relacion_comprobante == 1 ){
-			array_push($var,'TIPO RELACIONAL COMPROBANTE');
+		array_push($var,'CUENTA CONTABLE');
 			$contador++;
-		}		
+		if($beneficiario == 1){
+			array_push($var,'BENEFICIARIO');
+			$contador++;						
+		}
+					
 		if($fecIni == 1){
 			array_push($var,'FECHA INICIAL');
-			$contador++;
+			//$contador++;
 		}	
 		if($fecFin == 1){
 			array_push($var,'FECHA FINAL');						
-			$contador++;
+			//$contador++;
 		}	
 		$this->docexcel->getActiveSheet()->setCellValue('A5','No.');
 		//titulos
-		$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'LIBRO DE MAYOR' );
+		$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'LIBRO DIARIO' );
 		$this->docexcel->getActiveSheet()->getStyle('A2:'.$this->equivalencias[$contador].'2')->applyFromArray($styleTitulos1);
 		$this->docexcel->getActiveSheet()->mergeCells('A2:'.$this->equivalencias[$contador].'2');
 				
@@ -147,10 +148,10 @@ class RComprobanteDiarioXls {
 		//*************************************Cabecera*****************************************	
 		for ($i=1; $i <= $contador; $i++) {
 			$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$i].'5',$var[$i-1]);
-			$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$i].'')->setWidth(40); 			
+			$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$i].'')->setWidth(25); 			
 		}
 		$contador+=2;
-		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador-1].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador-1].'')->setWidth(12);
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador].'')->setWidth(15);
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+1].'')->setWidth(15);
 		
@@ -196,36 +197,39 @@ class RComprobanteDiarioXls {
 			case 'MA':
 				foreach ($datos as $value){					
 					$beneficiario = (int)($this->objParam->getParametro('beneficiario') === 'true');
-					$partida = (int)($this->objParam->getParametro('partida') === 'true');			
+					//$partida = (int)($this->objParam->getParametro('partida') === 'true');			
 					$fecha = (int)($this->objParam->getParametro('fecha')=== 'true');
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 					$nro_tramite = (int)($this->objParam->getParametro('nro_tramite')=== 'true');			
-					$desc_tipo_relacion_comprobante = (int)($this->objParam->getParametro('desc_tipo_relacion_comprobante')=== 'true');					
+					//$desc_tipo_relacion_comprobante = (int)($this->objParam->getParametro('desc_tipo_relacion_comprobante')=== 'true');					
 					$fecIni = (int)($this->objParam->getParametro('fecIni')=== 'true');
-					$fecFin = (int)($this->objParam->getParametro('fecFin')=== 'true');							
+					$fecFin = (int)($this->objParam->getParametro('fecFin')=== 'true');	
 					
-					$aux='';		
-					if($beneficiario == 1){
-						array_push($ar,'Beneficiario:'.trim($value['beneficiario']));$contador++;						
-					}
-					if($partida == 1){
+					$fecFin = (int)($this->objParam->getParametro('desc_cuenta')=== 'true');
+					$fecFin = (int)($this->objParam->getParametro('desc_cuenta')=== 'true');						
+					
+					$aux='';							
+					/*if($partida == 1){
 						array_push($ar,'Ptda:'.trim($value['partida']));$contador++;						
-					}
+					}*/
 					if($fecha == 1){						
 						$arr = explode('-', $value['fecha']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
 						$aux=$aux.'Fecha:'.$newDate."\r\n";
-						array_push($ar,'Fecha:'.$newDate);$contador++;
+						array_push($ar,''.$newDate);$contador++;
 					}	
 					if($nro_comprobante == 1){
-						array_push($ar,'Ptda:'.trim($value['nro_comprobante']));$contador++;
+						array_push($ar,''.trim($value['nro_cbte']).'|'.$value['id_int_comprobante']);$contador++;
 					}
 					if($nro_tramite == 1){
-						array_push($ar,'Tramite:'.strval($value['nro_tramite']));$contador++;
+						array_push($ar,''.strval($value['nro_tramite']));$contador++;
 					}
-					if($desc_tipo_relacion_comprobante == 1 ){
-						array_push($ar,'Cbte Relacional:'.$value['desc_tipo_relacion_comprobante']);$contador++;
-					}	
+					
+					array_push($ar,''.$value['desc_cuenta']);$contador++;
+					
+					if($beneficiario == 1){
+						array_push($ar,''.trim($value['beneficiario']));$contador++;						
+					}
 					if($fecFin == 1){						
 						$arr = explode('-', $value['fecFin']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
@@ -249,7 +253,7 @@ class RComprobanteDiarioXls {
 						$v++;				
 					}	
 					$t=$t+$max;					
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa1'])."\r\n".trim($value['glosa2']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa']));
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, $value['importe_debe_ma']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, $value['importe_haber_ma']);					
 					$fila++;
@@ -259,36 +263,35 @@ class RComprobanteDiarioXls {
 			case 'MT':			
 				foreach ($datos as $value){					
 					$beneficiario = (int)($this->objParam->getParametro('beneficiario') === 'true');
-					$partida = (int)($this->objParam->getParametro('partida') === 'true');			
+					//$partida = (int)($this->objParam->getParametro('partida') === 'true');			
 					$fecha = (int)($this->objParam->getParametro('fecha')=== 'true');
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 					$nro_tramite = (int)($this->objParam->getParametro('nro_tramite')=== 'true');			
-					$desc_tipo_relacion_comprobante = (int)($this->objParam->getParametro('desc_tipo_relacion_comprobante')=== 'true');					
+					//$desc_tipo_relacion_comprobante = (int)($this->objParam->getParametro('desc_tipo_relacion_comprobante')=== 'true');					
 					$fecIni = (int)($this->objParam->getParametro('fecIni')=== 'true');
 					$fecFin = (int)($this->objParam->getParametro('fecFin')=== 'true');							
 					
 					$aux='';		
-					if($beneficiario == 1){
-						array_push($ar,'Beneficiario:'.trim($value['beneficiario']));$contador++;						
-					}
-					if($partida == 1){
+					
+					/*if($partida == 1){
 						array_push($ar,'Ptda:'.trim($value['partida']));$contador++;						
-					}
+					}*/
 					if($fecha == 1){						
 						$arr = explode('-', $value['fecha']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
 						$aux=$aux.'Fecha:'.$newDate."\r\n";
-						array_push($ar,'Fecha:'.$newDate);$contador++;
+						array_push($ar,''.$newDate);$contador++;
 					}	
 					if($nro_comprobante == 1){
-						array_push($ar,'Ptda:'.trim($value['nro_comprobante']));$contador++;
+						array_push($ar,''.trim($value['nro_cbte']).'|'.$value['id_int_comprobante']);$contador++;
 					}
 					if($nro_tramite == 1){
-						array_push($ar,'Tramite:'.strval($value['nro_tramite']));$contador++;
+						array_push($ar,''.strval($value['nro_tramite']));$contador++;
 					}
-					if($desc_tipo_relacion_comprobante == 1 ){
-						array_push($ar,'Cbte Relacional:'.$value['desc_tipo_relacion_comprobante']);$contador++;
-					}	
+					array_push($ar,''.$value['desc_cuenta']);$contador++;
+					if($beneficiario == 1){
+						array_push($ar,''.trim($value['beneficiario']));$contador++;						
+					}
 					if($fecFin == 1){						
 						$arr = explode('-', $value['fecFin']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
@@ -312,7 +315,7 @@ class RComprobanteDiarioXls {
 						$v++;				
 					}	
 					$t=$t+$max;					
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa1'])."\r\n".trim($value['glosa2']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa']));
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, $value['importe_debe_mt']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, $value['importe_haber_mt']);					
 					$fila++;
@@ -322,36 +325,36 @@ class RComprobanteDiarioXls {
 			case 'MB':
 				foreach ($datos as $value){					
 					$beneficiario = (int)($this->objParam->getParametro('beneficiario') === 'true');
-					$partida = (int)($this->objParam->getParametro('partida') === 'true');			
+					//$partida = (int)($this->objParam->getParametro('partida') === 'true');			
 					$fecha = (int)($this->objParam->getParametro('fecha')=== 'true');
 					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
 					$nro_tramite = (int)($this->objParam->getParametro('nro_tramite')=== 'true');			
-					$desc_tipo_relacion_comprobante = (int)($this->objParam->getParametro('desc_tipo_relacion_comprobante')=== 'true');					
+					//$desc_tipo_relacion_comprobante = (int)($this->objParam->getParametro('desc_tipo_relacion_comprobante')=== 'true');					
 					$fecIni = (int)($this->objParam->getParametro('fecIni')=== 'true');
 					$fecFin = (int)($this->objParam->getParametro('fecFin')=== 'true');							
 					
 					$aux='';		
-					if($beneficiario == 1){
-						array_push($ar,'Beneficiario:'.trim($value['beneficiario']));$contador++;						
-					}
-					if($partida == 1){
+					
+					/*if($partida == 1){
 						array_push($ar,'Ptda:'.trim($value['partida']));$contador++;						
-					}
+					}*/
 					if($fecha == 1){						
 						$arr = explode('-', $value['fecha']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
 						$aux=$aux.'Fecha:'.$newDate."\r\n";
-						array_push($ar,'Fecha:'.$newDate);$contador++;
+						array_push($ar,''.$newDate);$contador++;
 					}	
 					if($nro_comprobante == 1){
-						array_push($ar,'Ptda:'.trim($value['nro_comprobante']));$contador++;
+						array_push($ar,''.trim($value['nro_cbte']).'|'.$value['id_int_comprobante']);$contador++;
 					}
 					if($nro_tramite == 1){
-						array_push($ar,'Tramite:'.strval($value['nro_tramite']));$contador++;
+						array_push($ar,''.strval($value['nro_tramite']));$contador++;
 					}
-					if($desc_tipo_relacion_comprobante == 1 ){
-						array_push($ar,'Cbte Relacional:'.$value['desc_tipo_relacion_comprobante']);$contador++;
-					}	
+					array_push($ar,''.$value['desc_cuenta']);$contador++;
+					if($beneficiario == 1){
+						array_push($ar,''.trim($value['beneficiario']));$contador++;						
+					}
+					
 					if($fecFin == 1){						
 						$arr = explode('-', $value['fecFin']);
 						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
@@ -375,7 +378,7 @@ class RComprobanteDiarioXls {
 						$v++;				
 					}	
 					$t=$t+$max;					
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa1'])."\r\n".trim($value['glosa2']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa']));
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, $value['importe_debe_mb']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, $value['importe_haber_mb']);					
 					$fila++;
@@ -384,10 +387,20 @@ class RComprobanteDiarioXls {
 				break;		
 			default:			
 				break;
-		}					
+								
+		}	
+		$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+2].(6).':'.$this->equivalencias[$max+2].($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.000');
+		$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+3].(6).':'.$this->equivalencias[$max+3].($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.000');
+		//$this->docexcel->getActiveSheet()->getStyle('E'.(6).':E'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.000');
+		//$this->docexcel->getActiveSheet()->getStyle('F'.(6).':F'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.000');
+		
+		$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1,$fila+1,'TOTAL');
+		$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2,$fila+1,'=SUM('.$this->equivalencias[$max+2].'6:'.$this->equivalencias[$max+2].''.($fila-1).')');
+		$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3,$fila+1,'=SUM('.$this->equivalencias[$max+3].'6:'.$this->equivalencias[$max+3].''.($fila-1).')');
+		//$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3,$fila+1,'=SUM(F6:F'.($fila-1).')');		
 	}
 	function generarReporte(){
-		$this->objWriter = PHPExcel_IOFactory::createWriter($this->docexcel, 'Excel5');
+		$this->objWriter = PHPExcel_IOFactory::createWriter($this->docexcel, 'Excel2007');
 		$this->objWriter->save($this->url_archivo);
 		$this->imprimeCabecera(0);
 	}	

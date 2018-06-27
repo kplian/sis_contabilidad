@@ -63,7 +63,12 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('campo_cbte_relacionado','varchar');
 		$this->captura('codigo_tipo_relacion','varchar');
 		
-	
+		$this->captura('campo_tipo_cambio_2','varchar');		
+		$this->captura('campo_tipo_cambio_3','varchar');
+	    $this->captura('campo_id_config_cambiaria','varchar');
+		
+		
+		
 		
 		
         //Ejecuta la instruccion
@@ -120,6 +125,12 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('desc_plantilla','desc_plantilla','varchar');
 		$this->setParametro('campo_cbte_relacionado','campo_cbte_relacionado','varchar');
 		$this->setParametro('codigo_tipo_relacion','codigo_tipo_relacion','varchar');
+		
+		
+		$this->setParametro('campo_tipo_cambio_2','campo_tipo_cambio_2','varchar');
+		$this->setParametro('campo_tipo_cambio_3','campo_tipo_cambio_3','varchar');
+		$this->setParametro('campo_id_config_cambiaria','campo_id_config_cambiaria','varchar');
+		
 		
 		
 		
@@ -179,6 +190,12 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('desc_plantilla','desc_plantilla','varchar');
 		$this->setParametro('campo_cbte_relacionado','campo_cbte_relacionado','varchar');
 		$this->setParametro('codigo_tipo_relacion','codigo_tipo_relacion','varchar');
+		
+		
+		$this->setParametro('campo_tipo_cambio_2','campo_tipo_cambio_2','varchar');
+		$this->setParametro('campo_tipo_cambio_3','campo_tipo_cambio_3','varchar');
+		$this->setParametro('campo_id_config_cambiaria','campo_id_config_cambiaria','varchar');
+		
 		
 		
         
@@ -258,6 +275,10 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('desc_plantilla','varchar');
 			$this->captura('campo_cbte_relacionado','varchar');
 		    $this->captura('codigo_tipo_relacion','varchar');
+			
+			$this->captura('campo_tipo_cambio_2','varchar');		
+		    $this->captura('campo_tipo_cambio_3','varchar');
+	        $this->captura('campo_id_config_cambiaria','varchar');
 			
 		
 		$this->armarConsulta();	

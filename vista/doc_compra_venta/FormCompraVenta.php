@@ -5,7 +5,15 @@
  *@author  Rensi Arteaga Copari
  *@date    30-01-2014
  *@description permites subir archivos a la tabla de documento_sol
- */
+ * 
+ * 
+ * ***************************************************************************
+ H        ISTORIAL DE MODIFICACIONES:
+ #ISSUE				FECHA				AUTOR				DESCRIPCION
+ #0				 						  RAC	       Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'cd.tpago_simple_det'	
+ #9999           19/06/2018               RAC          Se incorpra el calculo inverso para DUI IVA -> Importe Doc
+ ***************************************************************************/
+
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -1701,12 +1709,22 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.Cmp.nro_documento.setValue(0);
                     this.Cmp.nro_documento.setReadOnly(true);
                     this.sw_nro_dui =  'si';
+                    //#9999  mostrar iva, monto only read  documento DUI  
+                     this.Cmp.importe_iva.setReadOnly(false);
+                     this.Cmp.importe_doc.setReadOnly(true);
+                     this.Cmp.importe_iva.allowBlank = true;
+                     this.Cmp.importe_doc.allowBlank = false;
 
                 }
                 else{
                     this.Cmp.nro_dui.allowBlank = true;
                     this.ocultarComponente(this.Cmp.nro_dui);
                     this.Cmp.nro_documento.setReadOnly(false);
+                    //#9999  documento normal
+                     this.Cmp.importe_iva.setReadOnly(true);
+                     this.Cmp.importe_doc.setReadOnly(false);
+                     this.Cmp.importe_iva.allowBlank = false;
+                     this.Cmp.importe_doc.allowBlank = true;
                 }
                 if(rec.data.sw_estacion == 'si'){
                     this.mostrarComponente(this.Cmp.estacion);//en
@@ -1735,10 +1753,11 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.importe_excento.on('change',this.calculaMontoPago,this);
             this.Cmp.importe_descuento.on('change',this.calculaMontoPago,this);
             this.Cmp.importe_descuento_ley.on('change',this.calculaMontoPago,this);
-
             this.Cmp.importe_pendiente.on('change',this.calculaMontoPago,this);
             this.Cmp.importe_anticipo.on('change',this.calculaMontoPago,this);
             this.Cmp.importe_retgar.on('change',this.calculaMontoPago,this);
+            
+            this.Cmp.importe_iva.on('change',this.calculaMontoPagoDui,this);
 
 
             this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
@@ -1834,10 +1853,32 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.importe_pago_liquido.setValue(0);
             this.iniciarImportes();
         },
+        
+        //#9999  adciona funcion que inicia el calculo de DUI
+        calculaMontoPagoDui: function(){
+        	
+        	console.log('calculaMontoPagoDui',this.sw_nro_dui)
+        	
+        	if(this.sw_nro_dui=='si'){
+        	   this.calculaMontoPago();	
+        	}
+        }, 
 
         calculaMontoPago:function(){
             var me = this,
                 descuento_ley = 0.00;
+                
+             //#9999, define el total del documento   
+             if(this.sw_nro_dui=='si'){
+                if(this.Cmp.porc_iva_cf.getValue() <= 0){
+                   alert('La plantilla de DUI no tiene definido  el porcentaje de IVA');
+                   return;
+                }
+                else{
+                	console.log('....monto....', (this.Cmp.importe_iva.getValue()/this.Cmp.porc_iva_cf.getValue()),  this.Cmp.porc_iva_cf.getValue(), this.Cmp.importe_iva.getValue() )
+                    this.Cmp.importe_doc.setValue(this.Cmp.importe_iva.getValue() / this.Cmp.porc_iva_cf.getValue());	
+                }
+             }    
 
             if(this.Cmp.importe_descuento.getValue() > 0 ){
                 if( this.Cmp.importe_descuento.getValue() > this.Cmp.importe_doc.getValue()){
@@ -1887,24 +1928,26 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.importe_it.setValue(this.Cmp.porc_it.getValue()*this.Cmp.importe_neto.getValue())
             }
 
-            //calculo iva cf
-            if(this.Cmp.porc_iva_cf.getValue() > 0 || this.Cmp.porc_iva_df.getValue() > 0){
-
-                var excento = 0.00;
-
-                if(this.Cmp.importe_excento.getValue() > 0){
-                    excento = this.Cmp.importe_excento.getValue();
-                }
-                if(this.Cmp.porc_iva_cf.getValue() > 0){
-
-                    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
-                }
-                else {
-                    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
-                }
-            }
-            else{
-            	 this.Cmp.importe_iva.setValue(0);
+            // #9999  calculo iva cf
+            if(this.sw_nro_dui=='no'){
+	            if(this.Cmp.porc_iva_cf.getValue() > 0 || this.Cmp.porc_iva_df.getValue() > 0){
+	
+	                var excento = 0.00;
+	
+	                if(this.Cmp.importe_excento.getValue() > 0){
+	                    excento = this.Cmp.importe_excento.getValue();
+	                }
+	                if(this.Cmp.porc_iva_cf.getValue() > 0){
+	
+	                    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
+	                }
+	                else {
+	                    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
+	                }
+	            }
+	            else{
+	            	 this.Cmp.importe_iva.setValue(0);
+				}
 			}
             
             if(this.mostrarFormaPago){
@@ -1921,8 +1964,9 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             
             if( this.sw_nro_dui ==  'si'){
-            	var liquido =  this.Cmp.importe_iva.getValue();
-               this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+            	//#9999 se agregas las restas por anticipo, cuentas por cobrar y retenciones de garantia
+            	var liquido =  this.Cmp.importe_iva.getValue() -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
+                this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
             }
             else{
             	var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();

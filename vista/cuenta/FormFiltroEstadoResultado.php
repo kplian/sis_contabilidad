@@ -13,7 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.FormFiltroEstadoResultado = Ext.extend(Phx.frmInterfaz,{
     constructor:function(config)
     {   
-    	this.panelResumen = new Ext.Panel({html:'Hola Prueba'});
+    	this.panelResumen = new Ext.Panel({html:''});
     	this.Grupos = [{
 
 	                    xtype: 'fieldset',
@@ -141,6 +141,25 @@ Phx.vista.FormFiltroEstadoResultado = Ext.extend(Phx.frmInterfaz,{
 	       		grid:true,
 	       		form:true
 	      },
+	       {
+	       		config:{
+	       			name: 'formato',
+	       			qtip : 'formato de salida del reporte',
+	       			fieldLabel: 'Formato',
+	       			allowBlank: false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['pdf','excel']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		valorInicial: 'pdf',
+	       		form:true
+	     },
 	      {
 	       		config:{
 	       			name: 'incluir_sinmov',

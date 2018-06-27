@@ -19,7 +19,83 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
     constructor:function(config){
 		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
 		var me = this;
-		this.Atributos = [
+		me.configurarAtributos(me);
+	
+		
+		//Esta funcion se sobre carga para la version de BOA
+		this.modificarAtributos();
+			
+		
+		//llama al constructor de la clase padre
+		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
+		
+		this.bloquearOrdenamientoGrid();
+		
+		this.cmbGestion.on('select', function(combo, record, index){
+			this.tmpGestion = record.data.gestion;
+		    this.cmbPeriodo.enable();
+		    this.cmbPeriodo.reset();
+		    this.store.removeAll();
+		    this.cmbPeriodo.store.baseParams = Ext.apply(this.cmbPeriodo.store.baseParams, {id_gestion: this.cmbGestion.getValue()});
+		    this.cmbPeriodo.modificado = true;
+        },this);
+        
+        this.cmbPeriodo.on('select', function( combo, record, index){
+			this.tmpPeriodo = record.data.periodo;
+			this.capturaFiltros();
+		    
+        },this);
+        
+        this.cmbDepto.on('select', function( combo, record, index){
+			this.capturaFiltros();
+		    
+        },this);
+        
+        
+        this.addButton('btnWizard',
+            {
+                text: 'Generar Cbte',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.loadWizard,
+                tooltip: '<b>Generar Comprobante</b><br/>Genera cbte de  para el deto selecionado'
+            }
+        );
+        
+        //Botón para Imprimir el Comprobante
+		this.addButton('btnImprimir', {
+				text : 'Imprimir',
+				iconCls : 'bprint',
+				disabled : false,
+				handler : this.imprimirLCV,
+				tooltip : '<b>Imprimir LCV en PDF</b><br/>Imprime el LCV en formato PDF para archivo'
+		});
+		
+		this.addButton('btnExpTxt',
+            {
+                text: 'Exportar TXT',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expTxt,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo TXT para LCV'
+            }
+        );
+        
+        
+        
+		
+		//this.iniciarEventos();
+		this.init();
+		this.grid.addListener('cellclick', this.oncellclick,this);
+		this.obtenerVariableGlobal();
+	},
+	
+	Atributos1:[],
+	
+	configurarAtributos: function(me){
+		this.Atributos2 = [];
+		
+		this.Atributos2 = [
 			{
 				//configuracion del componente
 				config:{
@@ -30,7 +106,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				},
 				type:'Field',
 				form:true ,
-				grid:true
+				grid:true,
+				bottom_filter: true,
+				filters: {pfiltro:'dcv.id_doc_compra_venta',type:'numeric'}
 			},
 			{
 				//configuracion del componente
@@ -150,8 +228,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	        {
 	            config:{
 	                name: 'nit',
-	                fieldLabel: 'NIT',
-	                qtip: 'Número de indentificación del proveedor',
+	                fieldLabel: 'NIT/CI',
+	                qtip: 'Número de indentificación del proveedor o Ci en caso de recibos con retenciones',
 	                allowBlank: false,
 	                emptyText:'nit ...',
 	                store:new Ext.data.JsonStore(
@@ -279,7 +357,14 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					//maskRe: /[A-Za-z0-9 ]/,
 	                //fieldStyle: 'text-transform:uppercase',
 					style:'text-transform:uppercase;',
-	                listeners:{
+					renderer:function (value,p,record){
+						if(record.data.codigo_aplicacion == ''){
+							return  String.format('<font color="red">{0}</font>',  value);
+						}
+						return  String.format('<font color="green"><b>{0}</b></font>',  value);
+						
+					 },
+					 listeners:{
 				          'change': function(field, newValue, oldValue){
 				          			  console.log('keyup ...  ')
 				          			  field.suspendEvents(true);
@@ -1015,9 +1100,23 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   grid:true,
 			   form:false
 		   },
-		   
-		   
-			{
+		   {
+			   config:{
+				   name: 'codigo_aplicacion',
+				   fieldLabel: 'Aplicación',
+				   allowBlank: true,
+				   anchor: '80%',
+				   gwidth: 100,
+				   maxLength :16,
+				   minLength:16
+			   },
+			   type:'TextField',
+			   filters:{pfiltro:'dcv.codigo_aplicacion',type:'string'},
+			   id_grupo:0,
+			   grid:true,
+			   form:false
+		   },
+		  {
 				config:{
 					name: 'estado_reg',
 					fieldLabel: 'Estado Reg.',
@@ -1124,74 +1223,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					grid:true,
 					form:false
 			}
-		],
+		];
 		
-		//Esta funcion se sobre carga para la version de BOA
-		this.modificarAtributos();
-			
-		
-		//llama al constructor de la clase padre
-		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
-		
-		this.bloquearOrdenamientoGrid();
-		
-		this.cmbGestion.on('select', function(combo, record, index){
-			this.tmpGestion = record.data.gestion;
-		    this.cmbPeriodo.enable();
-		    this.cmbPeriodo.reset();
-		    this.store.removeAll();
-		    this.cmbPeriodo.store.baseParams = Ext.apply(this.cmbPeriodo.store.baseParams, {id_gestion: this.cmbGestion.getValue()});
-		    this.cmbPeriodo.modificado = true;
-        },this);
-        
-        this.cmbPeriodo.on('select', function( combo, record, index){
-			this.tmpPeriodo = record.data.periodo;
-			this.capturaFiltros();
-		    
-        },this);
-        
-        this.cmbDepto.on('select', function( combo, record, index){
-			this.capturaFiltros();
-		    
-        },this);
-        
-        
-        this.addButton('btnWizard',
-            {
-                text: 'Generar Cbte',
-                iconCls: 'bchecklist',
-                disabled: false,
-                handler: this.loadWizard,
-                tooltip: '<b>Generar Comprobante</b><br/>Genera cbte de  para el deto selecionado'
-            }
-        );
-        
-        //Botón para Imprimir el Comprobante
-		this.addButton('btnImprimir', {
-				text : 'Imprimir',
-				iconCls : 'bprint',
-				disabled : false,
-				handler : this.imprimirLCV,
-				tooltip : '<b>Imprimir LCV en PDF</b><br/>Imprime el LCV en formato PDF para archivo'
-		});
-		
-		this.addButton('btnExpTxt',
-            {
-                text: 'Exportar TXT',
-                iconCls: 'bchecklist',
-                disabled: false,
-                handler: this.expTxt,
-                tooltip: '<b>Exportar</b><br/>Exporta a archivo TXT para LCV'
-            }
-        );
-        
-        
-        
-		
-		//this.iniciarEventos();
-		this.init();
-		this.grid.addListener('cellclick', this.oncellclick,this);
-		this.obtenerVariableGlobal();
+	  this.Atributos= this.Atributos1.concat(this.Atributos2);
 	},
 	
 	modificarAtributos: function(){
@@ -1410,7 +1444,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg',
 		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata','desc_funcionario2','id_funcionario',
 		{name:'fecha_cbte', type: 'date',dateFormat:'Y-m-d'},
-		{name:'estado_cbte', type: 'string'}
+		{name:'estado_cbte', type: 'string'},'codigo_aplicacion'
 	],
 	sortInfo:{
 		field: 'id_doc_compra_venta',

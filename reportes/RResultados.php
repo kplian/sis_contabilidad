@@ -70,6 +70,11 @@ class RResultados extends  ReportePDF {
         $sw_detalle = 1;
         foreach ($this->datos_detalle as $val) {
 			if($val['visible'] == 'si'){
+				
+				    if($val['salta_hoja'] == 'si'){
+						$this->AddPage();
+					}
+					
 						
 						
 					//necesita espacios
@@ -151,6 +156,8 @@ class RResultados extends  ReportePDF {
 		
 		            //coloca el signo
 		            $this->Cell(10,3.5,$val['signo'],'',0,'C');
+					
+					$texto = substr($texto, 0, 55);//ojo
 				   
 			        //coloca el texto
 					$this->Cell(100,3.5,$texto,'',0,$posicion);

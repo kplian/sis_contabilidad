@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.f_plantilla_capital_patrimonio (
+CREATE OR REPLACE FUNCTION conta.f_plantilla_capital_patrimonio_basico (
   p_id_usuario integer,
   p_id_int_comprobante integer,
   p_id_gestion_cbte integer,
@@ -12,7 +12,7 @@ RETURNS void AS
 $body$
 /**************************************************************************
  SISTEMA:		Tesoreria
- FUNCION: 		conta.f_plantilla_capital_patrimonio
+ FUNCION: 		conta.f_plantilla_capital_patrimonio_basico
  DESCRIPCION:   Plantilla de cbte para generar actulizacion  de capital de Patrimonio
  AUTOR: 		Rensi Arteaga Copari
  FECHA:	        16/03/2018
@@ -71,7 +71,7 @@ DECLARE
   
 BEGIN
   
-    v_nombre_funcion = 'conta.f_plantilla_capital_patrimonio';    
+    v_nombre_funcion = 'conta.f_plantilla_capital_patrimonio_basico';    
     v_total_haber = 0;
     v_total_debe = 0;
     v_ajuste_debe = 0;
@@ -205,7 +205,7 @@ BEGIN
                                                     null -- p_id_centro_costo
                                                    );
                                                    
-                   IF  COALESCE(v_resp_acreedor[1],0) >  COALESCE(v_resp_deudor[1],0) THEN
+                   IF  COALESCE(v_resp_acreedor[5],0) >  COALESCE(v_resp_deudor[5],0) THEN
                       v_saldo_tmp_cuenta_ma = COALESCE(v_resp_acreedor[5],0) - COALESCE(v_resp_deudor[5],0);
                       v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
                    ELSE
@@ -233,6 +233,71 @@ BEGIN
                                    
       END LOOP; --END LOOP lista
       
+      -------------------------------------------------------------------------------------------------
+      --  si tenemso necsidad de una suma extra solo consideramos el mayor sin balance de apertura
+      --  OJO, se piensa que al ser una cuenta especial el ajsute delsaldo incial se considera en otro proceso 
+      --   por ejemplo  actulizacion de reservas  donde se actulia la cuenta de ajsutes de capital
+      -----------------------------------------------------------------------------------------------
+      
+      
+      IF v_sw_suma_extra = 'si' THEN
+      
+           select
+             c.nombre_cuenta into v_nombre_cuenta_ajuste 
+           from conta.tcuenta c where c.id_cuenta = v_record_rel_haber.ps_id_cuenta;
+           
+          
+          v_resp_deudor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
+                                                   p_desde, 
+                                                   p_hasta, 
+                                                    NULL, --todos los deptos p_id_depto::varchar, , 
+                                                   'si',             --  p_incluir_cierre
+                                                   'no',          --  p_incluir_apertura                   --NO CONSIDERA BALANCE DE APERTURA
+                                                   'todos',          --  p_incluir_aitb, 
+                                                   'defecto_cuenta', --  p_signo_balance, 
+                                                   'deudor', --  p_tipo_saldo,
+                                                    null,--p_id_auxiliar,
+                                                    null,--p_id_int_comprobante_ori,
+                                                    NULL,--id_ot
+                                                    null -- p_id_centro_costo
+                                                   );
+                  
+           --mayor acredor                                 
+           v_resp_acreedor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
+                                                   p_desde, 
+                                                   p_hasta, 
+                                                   NULL, --todos los deptos p_id_depto::varchar, , 
+                                                   'si',             --  p_incluir_cierre
+                                                   'no',          --  p_incluir_apertura             --NO CONSIDERA BALANCE DE APERTURA
+                                                   'todos',          --  p_incluir_aitb, 
+                                                   'defecto_cuenta', -- p_signo_balance, 
+                                                   'acreedor', --  p_tipo_saldo,
+                                                    null,--p_id_auxiliar,
+                                                    null,--p_id_int_comprobante_ori,
+                                                    NULL,--id_ot
+                                                    null -- p_id_centro_costo
+                                                   );
+                                                   
+             IF  COALESCE(v_resp_acreedor[5],0) >  COALESCE(v_resp_deudor[5],0) THEN
+                 v_saldo_tmp_cuenta_ma = COALESCE(v_resp_acreedor[5],0) - COALESCE(v_resp_deudor[5],0);
+                 v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
+             ELSE
+                v_saldo_tmp_cuenta_ma = COALESCE(v_resp_deudor[5],0) - COALESCE(v_resp_acreedor[5],0);
+                v_saldo_tmp_cuenta_mb = COALESCE(v_resp_deudor[1],0) - COALESCE(v_resp_acreedor[1],0);
+             END IF; 
+             
+             v_saldo_tmp_cuenta_ma = round(v_saldo_tmp_cuenta_ma, 2); 
+             v_saldo_tmp_cuenta_mb = round(v_saldo_tmp_cuenta_mb, 2);                                      
+                                                   
+                                                   
+            v_glosa_ajuste = v_glosa_ajuste ||',  AJUSTE ACUMULADO en '|| COALESCE(v_nombre_cuenta_ajuste,'S/N')|| '  (UFV: '||v_saldo_tmp_cuenta_ma::varchar||' - BS: '||v_saldo_tmp_cuenta_mb::varchar||')' ;                                  
+                                                   
+            v_suma_acreedor_ajuste_ma =  v_suma_acreedor_ajuste_ma  + COALESCE(v_resp_acreedor[5],0);
+            v_suma_deudor_ajuste_ma = v_suma_deudor_ajuste_ma +  COALESCE(v_resp_deudor[5],0);
+            v_suma_acreedor_ajuste_mb =  v_suma_acreedor_ajuste_mb  + COALESCE(v_resp_acreedor[1],0);
+            v_suma_deudor_ajuste_mb = v_suma_deudor_ajuste_mb +  COALESCE(v_resp_deudor[1],0);
+      
+      END IF;
     
     
     
@@ -247,14 +312,14 @@ BEGIN
       v_saldo_mb  = 0;
       v_saldo_ma  = 0; 
     
-     IF v_suma_acreedor_ajuste_mb  >  v_suma_deudor_ajuste_mb  THEN
+     IF v_suma_acreedor_ajuste_ma  >  v_suma_deudor_ajuste_ma  THEN
                  
          v_sw_saldo_acredor = true;
          v_sw_actualiza = true;
          v_saldo_ma = v_suma_acreedor_ajuste_ma - v_suma_deudor_ajuste_ma;
          v_saldo_mb = v_suma_acreedor_ajuste_mb - v_suma_deudor_ajuste_mb;
                  
-     ELSEIF   v_suma_deudor_ajuste_mb > v_suma_acreedor_ajuste_mb   THEN
+     ELSEIF   v_suma_deudor_ajuste_ma > v_suma_acreedor_ajuste_ma   THEN
                  
          v_sw_saldo_acredor = false;
          v_sw_actualiza = true;
@@ -301,68 +366,6 @@ BEGIN
                           v_sw_actualiza = false;   
                        END IF;
                        
-                       
-                      
-                       -------------------------------------------------------------------------------------------------
-                        --  DE MAENRA ESPECIAL ETR mantiene en us balance de aprtura aptrimonio con saldo historio
-                        --   por esto es encesario restar  todo el ajsute previo para solo tener el ajsute del periodo indicado
-                        -----------------------------------------------------------------------------------------------
-                        
-                         select
-                           c.nombre_cuenta into v_nombre_cuenta_ajuste 
-                         from conta.tcuenta c where c.id_cuenta = v_record_rel_haber.ps_id_cuenta;
-                             
-                            
-                        v_resp_deudor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
-                                                                 p_desde, 
-                                                                 p_hasta, 
-                                                                  NULL, --todos los deptos p_id_depto::varchar, , 
-                                                                 'no',             --  p_incluir_cierre
-                                                                 'todos',          --  p_incluir_apertura                   --NO CONSIDERA BALANCE DE APERTURA
-                                                                 'todos',          --  p_incluir_aitb, 
-                                                                 'defecto_cuenta', --  p_signo_balance, 
-                                                                 'deudor', --  p_tipo_saldo,
-                                                                  null,--p_id_auxiliar,
-                                                                  null,--p_id_int_comprobante_ori,
-                                                                  NULL,--id_ot
-                                                                  null -- p_id_centro_costo
-                                                                 );
-                                    
-                         --mayor acredor                                 
-                         v_resp_acreedor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
-                                                                 p_desde, 
-                                                                 p_hasta, 
-                                                                 NULL, --todos los deptos p_id_depto::varchar, , 
-                                                                 'no',             --  p_incluir_cierre
-                                                                 'todos',          --  p_incluir_apertura             --NO CONSIDERA BALANCE DE APERTURA
-                                                                 'todos',          --  p_incluir_aitb, 
-                                                                 'defecto_cuenta', -- p_signo_balance, 
-                                                                 'acreedor', --  p_tipo_saldo,
-                                                                  null,--p_id_auxiliar,
-                                                                  null,--p_id_int_comprobante_ori,
-                                                                  NULL,--id_ot
-                                                                  null -- p_id_centro_costo
-                                                                 );
-                                                                     
-                          IF  COALESCE(v_resp_acreedor[1],0) >  COALESCE(v_resp_deudor[1],0) THEN
-                               v_saldo_tmp_cuenta_ma = COALESCE(v_resp_acreedor[5],0) - COALESCE(v_resp_deudor[5],0);
-                               v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
-                          ELSE
-                              v_saldo_tmp_cuenta_ma = COALESCE(v_resp_deudor[5],0) - COALESCE(v_resp_acreedor[5],0);
-                              v_saldo_tmp_cuenta_mb = COALESCE(v_resp_deudor[1],0) - COALESCE(v_resp_acreedor[1],0);
-                          END IF; 
-                               
-                         v_saldo_tmp_cuenta_ma = round(v_saldo_tmp_cuenta_ma, 2); 
-                         v_saldo_tmp_cuenta_mb = round(v_saldo_tmp_cuenta_mb, 2);                                      
-                                                                     
-                                                                     
-                        v_glosa_ajuste = v_glosa_ajuste ||',  MENOS AJUSTE ACUMULADO en '|| COALESCE(v_nombre_cuenta_ajuste,'S/N')|| '  (UFV: '||v_saldo_tmp_cuenta_ma::varchar||' - BS: '||v_saldo_tmp_cuenta_mb::varchar||')' ;                                  
-                                                                     
-                         --raise exception 'LLEGa  %  ------   %  dif %',v_suma_acreedor_ajuste_mb, COALESCE(v_resp_acreedor[1],0),  v_suma_acreedor_ajuste_mb  - COALESCE(v_resp_acreedor[1],0); 
-                        
-                        
-                       -- raise exception 'monto a restar %',v_saldo_tmp_cuenta_mb;
-                       
                       
                       ------------------------------------
                       --  insertar trasacción de ajuste
@@ -377,19 +380,19 @@ BEGIN
                           --  segun el tipo y el signo determinamos si va al debe o al haber 
                           IF v_sw_saldo_acredor THEN
                              IF v_diferencia_positiva THEN
-                                v_importe_haber = v_diferencia - v_saldo_tmp_cuenta_mb;
+                                v_importe_haber = v_diferencia;
                                 v_importe_debe = 0;
                              ELSE
                                 v_importe_haber = 0;
-                                v_importe_debe = v_diferencia - v_saldo_tmp_cuenta_mb;
+                                v_importe_debe = v_diferencia;
                              
                              END IF;
                           ELSE
                              IF v_diferencia_positiva THEN
                                 v_importe_haber = 0;
-                                v_importe_debe = v_diferencia - v_saldo_tmp_cuenta_mb;
+                                v_importe_debe = v_diferencia;
                              ELSE
-                                v_importe_haber = v_diferencia - v_saldo_tmp_cuenta_mb;
+                                v_importe_haber = v_diferencia;
                                 v_importe_debe = 0;
                              END IF;
                           END IF;

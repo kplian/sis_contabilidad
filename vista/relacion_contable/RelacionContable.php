@@ -442,7 +442,7 @@ Phx.vista.RelacionContable=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:true,
-	bedit: true
+	bedit: false
 })
 </script>
 		

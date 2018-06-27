@@ -1758,7 +1758,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			{
 				modal:true,
 				width:400,
-				height:400
+				height:370
 			}, 
 			{
 			}, 
@@ -1790,12 +1790,14 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				if(forma_cambio=='convenido'){
 					this.Cmp.tipo_cambio.setReadOnly(false);
 					this.Cmp.tipo_cambio_2.setReadOnly(false);
+					this.Cmp.tipo_cambio_3.setReadOnly(false);
 				}
 				else{
 					this.Cmp.tipo_cambio.setReadOnly(true);
 					this.Cmp.tipo_cambio_2.setReadOnly(true);
+					this.Cmp.tipo_cambio_3.setReadOnly(true);
 				}
-				this.Cmp.tipo_cambio_3.setReadOnly(true);
+				
 				
 				
 				Ext.Ajax.request({
@@ -1867,11 +1869,11 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				//parametros q se mostraran, si son tickeados
 				'tipo_moneda':resp.tipo_moneda,
 				'beneficiario':resp.beneficiario,
-				'partida':resp.partida,
+				//'partida':resp.partida,
 				'fecha':resp.fecha,
 				'nro_comprobante':resp.nro_comprobante,
 				'nro_tramite':resp.nro_tramite,
-				'desc_tipo_relacion_comprobante':resp.desc_tipo_relacion_comprobante,
+				//'desc_tipo_relacion_comprobante':resp.desc_tipo_relacion_comprobante,
 				'tipo_formato':resp.tipo_formato,
 				'fecIni':resp.fecIni,
 				'fecFin':resp.fecFin,
@@ -1879,7 +1881,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			},
 			success: this.successExport,		
 			failure: this.conexionFailure,
-			timeout:this.timeout,
+			timeout:3.6e+6,
 			scope:this
 		});
    },

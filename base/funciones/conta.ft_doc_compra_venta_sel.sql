@@ -38,9 +38,10 @@ DECLARE
     v_tipo   			varchar;
     v_sincronizar		varchar;
     v_gestion			integer;
-    v_filtro_ext		varchar;
-    
+    v_filtro_ext		varchar;    
     V_filtroLCV         varchar;
+    v_id_auxiliar  		integer;
+    v_id_auxiliar_2  	integer;
 
 BEGIN
 
@@ -128,8 +129,9 @@ BEGIN
                             fun.id_funcionario,
                             fun.desc_funcionario2::varchar,
                             ic.fecha as fecha_cbte,
-                            ic.estado_reg as estado_cbte
-                            
+                            ic.estado_reg as estado_cbte,
+                            COALESCE(dcv.codigo_aplicacion,'''') as  codigo_aplicacion
+                             
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
@@ -141,7 +143,7 @@ BEGIN
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
                           left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
 				        where  '||v_filtro_ext;
-
+            
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -364,7 +366,7 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-                          DISTINCT(dcv.nro_autorizacion)::numeric,
+                          DISTINCT(dcv.nro_autorizacion)::varchar,
                           dcv.nit,
                           dcv.razon_social
                           from conta.tdoc_compra_venta dcv
@@ -577,17 +579,17 @@ BEGIN
           ----------------------fin filtro ---------------------------------
           IF v_parametros.tipo_lcv = 'lcv_compras'  THEN
               v_tipo = 'compra';
-              V_filtroLCV := V_filtroLCV ||' order by fecha asc';         
+              V_filtroLCV := V_filtroLCV ||'and lcv.nro_cbte is not null  order by fecha asc';         
           ELSE
               v_tipo = 'venta';
-              V_filtroLCV := V_filtroLCV ||'order by nro_documento,fecha asc';   
+              V_filtroLCV := V_filtroLCV ||'and (lcv.nro_cbte is not null or lcv.nombre=''ANULADA'')  order by nro_documento,fecha asc';   
                
           END IF;
 		-- se agrego id_plantilla=2 para el filtro libro de ventas
           IF v_parametros.datos='contabilizado' then
-             v_filtro :=v_filtro||' and lcv.nro_cbte is not null and  lcv.id_plantilla in (1,2,25,33,27,4,36,42,38,24)';
+             v_filtro :=v_filtro||'and lcv.id_plantilla in (1,2,25,33,27,4,36,42,38,24)';
           ELSE
-             v_filtro :=v_filtro||' and lcv.nro_cbte is null and  lcv.id_plantilla in (1,2,25,33,27,4,36,42,38,24)';
+             v_filtro :=v_filtro||' and  lcv.id_plantilla in (1,2,25,33,27,4,36,42,38,24)';
           END IF;
           --Sentencia de la consulta
 		  v_consulta:='SELECT id_doc_compra_venta::BIGINT,
@@ -634,6 +636,7 @@ BEGIN
              --RAISE EXCEPTION 'iii %',v_consulta;
 			--Devuelve la respuesta
             --RAISE EXCEPTION 'Error j %',v_filtro||V_filtroLCV;
+            --RAISE EXCEPTION 'Error j %',v_consulta;
 			return v_consulta;
 
 		end;
@@ -741,7 +744,301 @@ BEGIN
 			return v_consulta;
 
 		end;
+        
+     /*********************************
+ 	#TRANSACCION:  'COMP_DIARIO_MAYOR'
+ 	#DESCRIPCION:	Comparacion de 
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
 
+	ELSEIF(p_transaccion='COMP_DIARIO_MAYOR')then
+
+    	begin
+           v_tipo:='';
+           
+           v_sincronizar = pxp.f_get_variable_global('sincronizar');
+
+           SELECT gestion into v_gestion
+           FROM param.tgestion
+           WHERE id_gestion=v_parametros.id_gestion;
+
+           --v_tabla_origen = 'conta.vlcv';
+           
+
+           IF v_parametros.filtro_sql = 'periodo'  THEN
+               v_filtro =  'and (transa.id_periodo = '||v_parametros.id_periodo||')  ';
+           ELSE
+               v_filtro =  'and (transa.fecha::Date between '''||v_parametros.fecha_ini||'''::Date  and '''||v_parametros.fecha_fin||'''::date)  ';
+           END IF;
+
+          --Sentencia de la consulta
+		  v_consulta:='SELECT 
+  transa.nro_cbte::VARCHAR as nro_cbte_mayor,
+  COALESCE(transa.importe_debe_mb,0)::NUMERIC as importe_debe_mb_mayor,
+  (round(COALESCE(lcv.credito_fiscal,0),2)-round(COALESCE(transa.importe_debe_mb,0),2))::NUMERIC  as diferencia,
+  COALESCE(lcv.nro_cbte,'''')::VARCHAR as nro_cbte_compras,
+  COALESCE(lcv.credito_fiscal,0)::NUMERIC as tota_credito_fiscal_compras,
+  transa.id_int_comprobante
+  FROM conta.vlibro_compras lcv 
+  FULL JOIN
+  conta.vlibro_mayor_iva_credito_fiscal transa  on (transa.id_int_comprobante = lcv.id_int_comprobante or transa.nro_cbte = lcv.nro_cbte) --and lcv.nro_cbte=transa.nro_cbte
+   AND lcv.id_periodo ='||v_parametros.id_periodo||'
+   
+  WHERE  transa.id_cuenta in (1864)  
+  '||v_filtro||'
+   --AND transa.cbte_reversion::text = ''no''::text AND
+   --transa.volcado::text = ''no''::text
+   AND transa.glosa1::text NOT LIKE
+   ''%ACTUALIZACIÓN DEL SALDO%''::text
+   ORDER BY lcv.credito_fiscal ASC ';
+                        
+			--raise notice 'atrapar consulta %', v_consulta;
+            --RAISE EXCEPTION 'consulta %',v_consulta;
+			--Devuelve la respuesta
+            -- RAISE EXCEPTION 'Error j %',v_consulta;
+			return v_consulta;
+
+		end;    
+      /*********************************
+ 	#TRANSACCION:  'CONTA_DCVCBR_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		Rensi Arteaga Copari
+ 	#FECHA:		04-04-2018 15:57:09
+	***********************************/
+
+	elseif(p_transaccion='CONTA_DCVCBR_SEL')then
+
+    	begin
+            
+            v_filtro_ext = ' 0 = 0 and ';
+            
+            --recuperar el auxiliardel proveedor
+            
+            
+            IF v_parametros.id_proveedor is null  THEN
+               raise exception 'necesitamos indicar el Proveedor ';
+            END IF;
+            
+            
+            select 
+               pr.id_auxiliar as id_auxiliar,
+               aux.id_auxiliar as id_auxiliar_2
+            into
+               v_id_auxiliar,
+               v_id_auxiliar_2             
+            from param.tproveedor pr 
+            inner join conta.tauxiliar aux on aux.codigo_auxiliar = pr.codigo
+            where pr.id_proveedor = v_parametros.id_proveedor;
+            
+            
+            IF v_id_auxiliar is null THEN
+               raise exception 'No se encontro auxiliar para el proveedor especificado';
+            END IF; 
+            
+            
+            IF v_id_auxiliar != v_id_auxiliar_2 THEN
+               raise exception 'Conflicto de auxliares para el proveedor, revise la  parametrización';
+            END IF;
+            
+            
+            v_filtro_ext = '  dcv.id_auxiliar = '||v_id_auxiliar::varchar||' and ';
+            
+            
+            
+            --solo listasmos docuemntos relacioandos al auxiliar del proveedor
+        
+    		--Sentencia de la consulta
+			v_consulta:='
+             WITH  doc_cobrado(
+                                     id_doc_compra_venta,                                  
+                                    importe_mb,
+                                    importe_mt) 
+                            
+                           as (
+                                    select 
+                                       dcv.id_doc_compra_venta,                                      
+                                       sum(csd.importe_mb) as importe_mb,
+                                       sum(csd.importe_mt) as importe_mt                                        
+                                    from conta.tdoc_compra_venta dcv 
+                                    inner join cbr.tcobro_simple_det csd on csd.id_doc_compra_venta = dcv.id_doc_compra_venta
+                                   
+                                    group by dcv.id_doc_compra_venta
+                           )
+            
+            select
+                            dcv.id_doc_compra_venta,
+                            dcv.revisado,
+                            dcv.movil,
+                            dcv.tipo,
+                            COALESCE(dcv.importe_excento,0)::numeric as importe_excento,
+                            dcv.id_plantilla,
+                            dcv.fecha,
+                            dcv.nro_documento,
+                            dcv.nit,
+                            COALESCE(dcv.importe_ice,0)::numeric as importe_ice,
+                            dcv.nro_autorizacion,
+                            COALESCE(dcv.importe_iva,0)::numeric as importe_iva,
+                            COALESCE(dcv.importe_descuento,0)::numeric as importe_descuento,
+                            COALESCE(dcv.importe_doc,0)::numeric as importe_doc,
+                            dcv.sw_contabilizar,
+                            COALESCE(dcv.tabla_origen,''ninguno'') as tabla_origen,
+                            dcv.estado,
+                            dcv.id_depto_conta,
+                            dcv.id_origen,
+                            dcv.obs,
+                            dcv.estado_reg,
+                            dcv.codigo_control,
+                            COALESCE(dcv.importe_it,0)::numeric as importe_it,
+                            dcv.razon_social,
+                            dcv.id_usuario_ai,
+                            dcv.id_usuario_reg,
+                            dcv.fecha_reg,
+                            dcv.usuario_ai,
+                            dcv.id_usuario_mod,
+                            dcv.fecha_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            dep.nombre as desc_depto,
+                            pla.desc_plantilla,
+                            COALESCE(dcv.importe_descuento_ley,0)::numeric as importe_descuento_ley,
+                            COALESCE(dcv.importe_pago_liquido,0)::numeric as importe_pago_liquido,
+                            dcv.nro_dui,
+                            dcv.id_moneda,
+                            mon.codigo as desc_moneda,
+                            dcv.id_int_comprobante,
+                            COALESCE(dcv.nro_tramite,''''),
+                            COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
+                            COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
+                            COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
+                            COALESCE(dcv.importe_retgar,0)::numeric as importe_retgar,
+                            COALESCE(dcv.importe_neto,0)::numeric as importe_neto,
+                            aux.id_auxiliar,
+                            aux.codigo_auxiliar,
+                            aux.nombre_auxiliar,
+                            dcv.id_tipo_doc_compra_venta,
+                            (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta,
+                            (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto,
+                            fun.id_funcionario,
+                            fun.desc_funcionario2::varchar,
+                            ic.fecha as fecha_cbte,
+                            ic.estado_reg as estado_cbte,
+                             COALESCE(doc.importe_mb,0) as importe_cobrado_mb,
+                            COALESCE(doc.importe_mt,0) as importe_cobrado_mt,
+                            case
+                              when dcv.id_moneda  = 1  then
+                                 dcv.importe_pendiente - COALESCE(doc.importe_mb,0) 
+                              when  dcv.id_moneda  = 2 then
+                                 dcv.importe_pendiente - COALESCE(doc.importe_mt ,0)
+                              else  
+                                 0 
+                            end as saldo_por_cobrar
+                            
+						from conta.tdoc_compra_venta dcv
+                          inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                          inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                          left join doc_cobrado doc on doc.id_doc_compra_venta = dcv.id_doc_compra_venta
+                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
+                          left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                          left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
+                          left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+				        where  pla.tipo_plantilla = ''venta'' and dcv.id_int_comprobante is not null and '||v_filtro_ext;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			raise notice '%', v_consulta;
+            
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+     /*********************************
+ 	#TRANSACCION:  'CONTA_DCVCBR_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		rensi
+ 	#FECHA:		04-04-2018 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_DCVCBR_CONT')then
+
+		begin
+        
+            
+            v_filtro_ext = ' 0 = 0 and ';
+            
+            --recuperar el auxiliardel proveedor
+            
+            
+            IF v_parametros.id_proveedor is null  THEN
+               raise exception 'necesitamos indicar el Proveedor ';
+            END IF;
+            
+            
+            select 
+               pr.id_auxiliar as id_auxiliar,
+               aux.id_auxiliar as id_auxiliar_2
+            into
+               v_id_auxiliar,
+               v_id_auxiliar_2             
+            from param.tproveedor pr 
+            inner join conta.tauxiliar aux on aux.codigo_auxiliar = pr.codigo
+            where pr.id_proveedor = v_parametros.id_proveedor;
+            
+            
+            IF v_id_auxiliar is null THEN
+               raise exception 'No se encontro auxiliar para el proveedor especificado';
+            END IF; 
+            
+            
+            IF v_id_auxiliar != v_id_auxiliar_2 THEN
+               raise exception 'Conflicto de auxliares para el proveedor, revise la  parametrización';
+            END IF;
+            
+            
+            v_filtro_ext = '  dcv.id_auxiliar = '||v_id_auxiliar::varchar||' and ';
+            
+            
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select
+                              count(dcv.id_doc_compra_venta),
+                              COALESCE(sum(dcv.importe_ice),0)::numeric  as total_importe_ice,
+                              COALESCE(sum(dcv.importe_excento),0)::numeric  as total_importe_excento,
+                              COALESCE(sum(dcv.importe_it),0)::numeric  as total_importe_it,
+                              COALESCE(sum(dcv.importe_iva),0)::numeric  as total_importe_iva,
+                              COALESCE(sum(dcv.importe_descuento),0)::numeric  as total_importe_descuento,
+                              COALESCE(sum(dcv.importe_doc),0)::numeric  as total_importe_doc,
+                              COALESCE(sum(dcv.importe_retgar),0)::numeric  as total_importe_retgar,
+                              COALESCE(sum(dcv.importe_anticipo),0)::numeric  as total_importe_anticipo,
+                              COALESCE(sum(dcv.importe_pendiente),0)::numeric  as tota_importe_pendiente,
+                              COALESCE(sum(dcv.importe_neto),0)::numeric  as total_importe_neto,
+                              COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
+                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
+                              COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
+						from conta.tdoc_compra_venta dcv
+                          inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                          inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
+                          left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                          left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
+                          left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+				        where   pla.tipo_plantilla = ''venta'' and dcv.id_int_comprobante is not null and '||v_filtro_ext;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+            --raise notice '%', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end; 
+             
 
     else
 

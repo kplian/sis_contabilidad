@@ -7,6 +7,7 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
+require_once(dirname(__FILE__).'/../reportes/RTransaccionmayorSaldo.php');
 require_once(dirname(__FILE__).'/../reportes/RMayorXls.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
 
@@ -163,10 +164,6 @@ class ACTIntTransaccion extends ACTbase{
 		if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
 			$this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");	
 		}
-
-		
-		
-		
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
@@ -184,8 +181,13 @@ class ACTIntTransaccion extends ACTbase{
 		$temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];		
 		$temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
 		$temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
+		
+		$temp['saldo_mb'] = $this->res->extraData['total_saldo_mb'];
+		$temp['saldo_mt'] = $this->res->extraData['total_saldo_mt'];
+		
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_int_transaccion'] = 0;
+		
 		
 		$this->res->total++;
 		
@@ -344,6 +346,57 @@ class ACTIntTransaccion extends ACTbase{
 			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
 			exit;
 		}		
+	}
+	function listarIntTransaccionMayorSaldo(){		
+		if($this->objParam->getParametro('id_int_comprobante')!=''){
+			$this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));	
+		}
+		if($this->objParam->getParametro('id_gestion')!=''){
+			$this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));	
+		}		
+		if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+			$this->objParam->addFiltro("ctc.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));	
+		}		
+		if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+			$this->objParam->addFiltro("csc.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));	
+		}
+		if($this->objParam->getParametro('id_depto')!=''){
+			$this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));	
+		}	
+		if($this->objParam->getParametro('id_partida')!=''){
+			$this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));	
+		}		
+		if($this->objParam->getParametro('id_suborden')!=''){
+			$this->objParam->addFiltro("transa.id_subordeno = ".$this->objParam->getParametro('id_suborden'));	
+		}
+		if($this->objParam->getParametro('id_auxiliar')!=''){
+			$this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));	
+		}		
+		if($this->objParam->getParametro('id_centro_costo')!=''){
+			$this->objParam->addFiltro("transa.id_centro_costo = ".$this->objParam->getParametro('id_centro_costo'));	
+		}		
+		if($this->objParam->getParametro('nro_tramite')!=''){
+			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");	
+		}
+		if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+			$this->objParam->addFiltro("(icbte.fecha::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");	
+		}		
+		if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')==''){
+			$this->objParam->addFiltro("(icbte.fecha::date  >= ''%".$this->objParam->getParametro('desde')."%''::date)");	
+		}		
+		if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
+			$this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");	
+		}
+		$this->objFunc=$this->create('MODIntTransaccion');								
+		$cbteHeader = $this->objFunc->listarMayorSaldo($this->objParam);
+				
+		if($cbteHeader->getTipo() == 'EXITO'){										
+			return $cbteHeader;			
+		}
+		else{
+			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}		
 	}	
 	//mp
 	function impReporteMayor() {
@@ -461,6 +514,84 @@ class ACTIntTransaccion extends ACTbase{
         //devolver respuesta
         $this->mensajeRes->imprimirRespuesta($this->mensajeRes->generarJson());
     }
+    
+     function listarAuxiliarCuenta(){
+		$this->objParam->defecto('ordenacion','orden');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarAuxiliarCuenta');
+		} else{
+			$this->objFunc=$this->create('MODIntTransaccion');
+			
+			$this->res=$this->objFunc->listarAuxiliarCuenta($this->objParam);
+		}
+		
+		if($this->objParam->getParametro('resumen')!='no'){
+			//adicionar una fila al resultado con el summario
+			$temp = Array();
+			$temp['importe_debe_mb'] = $this->res->extraData['total_importe_debe_mb'];
+			$temp['importe_haber_mb'] = $this->res->extraData['total_importe_haber_mb'];
+			$temp['saldo'] = $this->res->extraData['total_saldo'];
+			
+			$temp['id_int_transaccion'] = 0;
+			
+			$this->res->total++;
+			
+			$this->res->addLastRecDatos($temp);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+
+	//mp
+	function impReporteMayorSaldo() {
+		if($this->objParam->getParametro('tipo_formato')=='pdf') {
+			$nombreArchivo = uniqid(md5(session_id()).'LibroMayor').'.pdf';			
+			$dataSource = $this->listarIntTransaccionMayorSaldo();
+			$dataEntidad = "";
+			$dataPeriodo = "";	
+			$orientacion = 'P';		
+			$tamano = 'LETTER';
+			$titulo = 'Consolidado';
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);	
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$reporte = new RTransaccionmayorSaldo($this->objParam);  
+			$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
+		}
+		if($this->objParam->getParametro('tipo_formato')=='xls') {				
+			/*$this->objFun=$this->create('MODIntTransaccion');	
+			$this->res = $this->objFun->listarMayorSaldo();	
+			if($this->res->getTipo()=='ERROR'){
+				$this->res->imprimirRespuesta($this->res->generarJson());
+				exit;
+			}*/		
+			$dataSource = $this->listarIntTransaccionMayorSaldo();
+			$titulo ='Ret';
+			$nombreArchivo=uniqid(md5(session_id()).$titulo);
+			$nombreArchivo.='.xls';
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$this->objParam->addParametro('datos',$this->res->datos);
+						
+			$this->objReporteFormato=new RMayorXls($this->objParam);
+			$this->objReporteFormato->generarDatos();
+			$this->objReporteFormato->generarReporte();
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		}					
+	}
 
 		
 }

@@ -57,7 +57,8 @@ Phx.vista.RelacionContableTabla = {
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 150,
-				mode: 'remote'				
+				mode: 'remote',
+				tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{codigo_tipo_relacion}</b></p><p>{nombre_tipo_relacion}</p></div></tpl>'
 			},
 	           			
 			type:'ComboBox',

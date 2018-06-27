@@ -1,7 +1,7 @@
 <?php
 /**
 *@package pXP
-*@file    FormFiltroDiario.php
+*@file    FormMayorSaldo.php
 *@author  manuel guerra
 *@date    09-10-2017
 *@description muestra un formulario que muestra la cuenta y el monto de la transferencia
@@ -9,12 +9,12 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
+Phx.vista.FormMayorSaldo=Ext.extend(Phx.frmInterfaz,{
 		
 	layout:'fit',
 	maxCount:0,
-	constructor:function(config){   
-		Phx.vista.FormFiltroDiario.superclass.constructor.call(this,config);
+	constructor:function(config){
+		Phx.vista.FormMayorSaldo.superclass.constructor.call(this,config);
 		this.init(); 
 		this.iniciarEventos();		
 		this.loadValoresIniciales();		
@@ -28,21 +28,32 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,				
-				checked:true				
 			},
 			type:'Checkbox',			
 			form:true	
 		},{
 			config:{
-				name: 'beneficiario',
-				fieldLabel: 'Beneficiario',
+				name: 'nro_tramite',
+				fieldLabel: 'Nro de Tramite',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 50,				
+				gwidth: 50,
+				checked:true		
 			},
-			type:'Checkbox',		
-			form:true	
-		},/*{
+			type:'Checkbox',
+			form:true,		
+		},{
+			config:{
+				name: 'cuenta',
+				fieldLabel: 'Cuenta contable',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 50,
+				checked:true		
+			},
+			type:'Checkbox',
+			form:true,		
+		},{
 			config:{
 				name: 'partida',
 				fieldLabel: 'Partida',
@@ -52,20 +63,40 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 			},
 			type:'Checkbox',		
 			form:true	
-		},*/{
+		},{
 			config:{
-				name: 'fecha',
-				fieldLabel: 'Fecha',
+				name: 'cc',
+				fieldLabel: 'Centro Costo',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 50,				
+			},
+			type:'Checkbox',		
+			form:true	
+		},{
+			config:{
+				name: 'auxiliar',
+				fieldLabel: 'Auxiliar',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 50,				
+			},
+			type:'Checkbox',		
+			form:true	
+		},{
+			config:{
+				name: 'ordenes',
+				fieldLabel: 'Ordenes',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,				
 			},
 			type:'Checkbox',			
 			form:true	
-		},/*{
+		},{
 			config:{
-				name: 'nro_tramite',
-				fieldLabel: 'Nro Tramite',
+				name: 'relacional',
+				fieldLabel: 'Comprobante Relacional',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,			
@@ -74,51 +105,22 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 			form:true	
 		},{
 			config:{
-				name: 'cc',
-				fieldLabel: 'Centro de Costo',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 50,			
-			},
-			type:'Checkbox',			
-			form:true	
-		},{
-			config:{
-				name: 'desc_tipo_relacion_comprobante',
-				fieldLabel: 'Tipo de Relacion de Comprobante',
+				name: 'fec',
+				fieldLabel: 'Fecha',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 50,
-				checked:true		
+				checked:true,
+				hidden:true		
 			},
 			type:'Checkbox',
-			form:true,		
-		},*/{
-			config:{
-				name: 'fecIni',
-				fieldLabel: 'Fecha Inicial',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 50		
-			},
-			type:'DateField',
-			form:true,		
-		},{
-			config:{
-				name: 'fecFin',
-				fieldLabel: 'Fecha Final',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 50		
-			},
-			type:'DateField',
 			form:true,		
 		},{
 			config:{
 				name:'tipo_moneda',
 				fieldLabel:'Tipo de Moneda',
 				allowBlank:false,
-				emptyText:'Tipo...',
+				emptyText:'Tipo de moneda...',
 				typeAhead: true,
 				triggerAction: 'all',
 				lazyRender:true,
@@ -130,7 +132,7 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 					data : [ 
 								['MB','Moneda Base'],
 								['MT','Moneda Triangulacion'],
-								['MA','Moneda Actualizacion'],
+								['MA','Moneda Actualizacion']
 							]
 				}),
 				valueField: 'variable',
@@ -148,7 +150,7 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 				name:'tipo_formato',
 				fieldLabel:'Tipo de Reporte',
 				allowBlank:false,
-				emptyText:'Tipo...',
+				emptyText:'Tipo de reporte...',
 				typeAhead: true,
 				triggerAction: 'all',
 				lazyRender:true,
@@ -159,8 +161,7 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 					fields: ['variable', 'valor'],
 					data : [ 
 								['pdf','PDF'],
-								['pdf_c','PDF CUADRICULADA'],
-								['xls',' EXCEL'],
+								//['xls','EXCEL']
 							]
 				}),
 				valueField: 'variable',
@@ -187,17 +188,18 @@ Phx.vista.FormFiltroDiario=Ext.extend(Phx.frmInterfaz,{
 	
 	getValues:function(){		
 		var resp = {			
-			tipo_moneda:this.Cmp.tipo_moneda.getValue(),				
-			beneficiario:this.Cmp.beneficiario.getValue(),
-			//partida:this.Cmp.partida.getValue(),						
-			fecha:this.Cmp.fecha.getValue(),
-			nro_comprobante:this.Cmp.nro_comprobante.getValue(),					
-			//nro_tramite:this.Cmp.nro_tramite.getValue(),			
-			//desc_tipo_relacion_comprobante:this.Cmp.desc_tipo_relacion_comprobante.getValue(),			
-			tipo_formato:this.Cmp.tipo_formato.getValue(),			
-			fecIni:this.Cmp.fecIni.getValue(),
-			fecFin:this.Cmp.fecFin.getValue(),
-			//cc:this.Cmp.cc.getValue()	
+			tipo_moneda:this.Cmp.tipo_moneda.getValue(),
+			cc:this.Cmp.cc.getValue(),
+			partida:this.Cmp.partida.getValue(),
+			auxiliar:this.Cmp.auxiliar.getValue(),
+			ordenes:this.Cmp.ordenes.getValue(),
+			relacional:this.Cmp.relacional.getValue(),
+			nro_tramite:this.Cmp.nro_tramite.getValue(),
+			nro_comprobante:this.Cmp.nro_comprobante.getValue(),
+			tipo_formato:this.Cmp.tipo_formato.getValue(),
+			
+			fec:this.Cmp.fec.getValue(),
+			cuenta_t:this.Cmp.cuenta.getValue()
 		}
 		return resp;
 	}

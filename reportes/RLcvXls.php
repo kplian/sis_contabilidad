@@ -213,6 +213,7 @@ class RLcvXls
 		$tipo=$this->objParam->getParametro('var');
         $datos = $this->objParam->getParametro('datos');
         $this->imprimeCabecera(0);
+		//var_dump($datos);
 		if($tipo=='COMPRAS'){							
 			foreach ($datos as $value){				
 				//if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'||$this->objParam->getParametro('tipo_lcv')=='lcv_ventas'||$this->objParam->getParametro('tipo_lcv')=='LCNCD') {	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){		
@@ -283,7 +284,7 @@ class RLcvXls
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['subtotal_venta']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12, $fila, $value['importe_descuento']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13, $fila, $value['sujeto_df']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['importe_iva']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(15, $fila, $value['codigo_control']);
 					
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(16, $fila, $value['nro_cbte']);
@@ -307,7 +308,7 @@ class RLcvXls
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['subtotal_venta']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12, $fila, $value['importe_descuento']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13, $fila, $value['sujeto_df']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['importe_iva']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(15, $fila, $value['codigo_control']);
 					
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(16, $fila, $value['nro_cbte']);

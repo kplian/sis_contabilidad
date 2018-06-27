@@ -94,6 +94,68 @@ class ACTDocCompraVenta extends ACTbase{
 		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+
+
+
+ function listarDocCompraVentaCobro(){
+		$this->objParam->defecto('ordenacion','id_doc_compra_venta');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if($this->objParam->getParametro('id_periodo')!=''){
+            $this->objParam->addFiltro("dcv.id_periodo = ".$this->objParam->getParametro('id_periodo'));    
+        }
+		
+		if($this->objParam->getParametro('id_int_comprobante')!=''){
+            $this->objParam->addFiltro("dcv.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));    
+        }
+		
+		if($this->objParam->getParametro('tipo')!=''){
+            $this->objParam->addFiltro("dcv.tipo = ''".$this->objParam->getParametro('tipo')."''");    
+        }
+		
+		if($this->objParam->getParametro('sin_cbte')=='si'){
+            $this->objParam->addFiltro("dcv.id_int_comprobante is NULL");    
+        }
+		/* en algunos casos es necesario relacionar con documentos con fechas mayores
+		if($this->objParam->getParametro('manual')!=''){
+            $this->objParam->addFiltro("dcv.manual = ''".$this->objParam->getParametro('manual')."''");    
+        }*/
+		
+		//RCM comentado en fecha 27/02/2018 para asociar facturas coin fecha posterior al Cbte. previa consulta a RAC
+		/*if($this->objParam->getParametro('fecha_cbte')!=''){
+            $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha_cbte')."''::date");    
+        }*/
+
+        if($this->objParam->getParametro('filtro_usuario') == 'si'){
+            $this->objParam->addFiltro("dcv.id_usuario_reg = ".$_SESSION["ss_id_usuario"]);
+        }
+		
+		if($this->objParam->getParametro('id_depto')!=''){
+			if($this->objParam->getParametro('id_depto')!=0)
+				$this->objParam->addFiltro("dcv.id_depto_conta = ".$this->objParam->getParametro('id_depto'));    
+        }
+		
+		if($this->objParam->getParametro('id_agrupador')!=''){
+            $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
+        }
+		
+		
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODDocCompraVenta','listarDocCompraVentaCobro');
+		} else{
+			$this->objFunc=$this->create('MODDocCompraVenta');			
+			$this->res=$this->objFunc->listarDocCompraVentaCobro($this->objParam);
+		}
+		
+		
+		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
      //RAC 26/05/2017, para el listado de la grilla con  informacion de agencia
     function listarDocCompraCajero(){
 		$this->objParam->defecto('ordenacion','id_doc_compra_venta');
@@ -247,6 +309,14 @@ class ACTDocCompraVenta extends ACTbase{
 		$this->res=$this->objFunc->eliminarDocCompraVenta($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function editAplicacion(){
+		$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->res=$this->objFunc->editAplicacion($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	
 	
 	function cambiarRevision(){
 		$this->objFunc=$this->create('MODDocCompraVenta');	

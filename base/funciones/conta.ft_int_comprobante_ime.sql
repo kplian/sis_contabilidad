@@ -863,7 +863,6 @@ BEGIN
         	END IF;
             
            
-            
             --validar que el periodo se encuentre abierto
             IF not param.f_periodo_subsistema_abierto(v_reg_cbte.fecha::date, 'CONTA') THEN
                 raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_reg_cbte.fecha;
@@ -1069,6 +1068,11 @@ BEGIN
                         importe_gasto_mt,
                         importe_recurso_mt ,
                         
+                        importe_debe_ma,
+                        importe_haber_ma,
+                        importe_gasto_ma,
+                        importe_recurso_ma ,
+                        
                         triangulacion ,
                         actualizacion, 
                         id_partida_ejecucion,
@@ -1109,6 +1113,12 @@ BEGIN
                         v_registros.importe_recurso_mt, --  insercion volcada de estos registros
                         
                         v_registros.importe_gasto_mt,
+                        
+                        v_registros.importe_debe_ma,
+                        v_registros.importe_haber_ma,
+                        v_registros.importe_gasto_ma,
+                        v_registros.importe_recurso_ma,
+                        
                         v_registros.triangulacion ,
                         v_registros.actualizacion, 
                         v_id_partida_ejecucion,
@@ -1556,11 +1566,13 @@ BEGIN
             where ic.id_int_comprobante = v_parametros.id_int_comprobante;
             
             
-           
+           --RAC 18/04/2018 , RAC   com el clonado es en borrado no necesitamos vlaidar si el periodo esta abierto, comentado
+            /*
             --validar que el periodo se encuentre abierto
             IF not param.f_periodo_subsistema_abierto(v_reg_cbte.fecha::date, 'CONTA') THEN
                 raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_reg_cbte.fecha;
             END IF;
+            */
             
             
             ----------------------------------------
@@ -1819,6 +1831,11 @@ BEGIN
                         importe_recurso_mt ,
                         importe_gasto_mt,
                         
+                        importe_debe_ma,
+                        importe_haber_ma,
+                        importe_recurso_ma ,
+                        importe_gasto_ma,
+                        
                         
                         triangulacion ,
                         actualizacion, 
@@ -1857,6 +1874,13 @@ BEGIN
                         v_registros.importe_haber_mt,
                         v_registros.importe_recurso_mt,    
                         v_registros.importe_gasto_mt, 
+                        
+                        v_registros.importe_debe_ma,
+                        v_registros.importe_haber_ma,
+                        v_registros.importe_recurso_ma ,
+                        v_registros.importe_gasto_ma,
+                        
+                        
                         v_registros.triangulacion ,
                         v_registros.actualizacion, 
                         NULL,--v_registros.id_partida_ejecucion,       --com oestamos clonado , es mejor no hacer refencia al id_partida ejecucion original

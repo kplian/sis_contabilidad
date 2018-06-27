@@ -51,6 +51,7 @@ class ACTDocRetencionForm extends ACTbase{
 	//
 	function reporteRET() {
 		// 
+		//var_dump($this->objParam->getParametro('formato_reporte'));
 		if($this->objParam->getParametro('formato_reporte')=='pdf') {			
 			$nombreArchivo = uniqid(md5(session_id()).'Egresos') . '.pdf'; 			
 			//

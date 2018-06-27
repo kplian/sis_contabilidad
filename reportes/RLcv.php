@@ -511,11 +511,7 @@ class RLcv extends  ReportePDF {
 	        $this->tablealigns=array('R','R','R','R','R','R','R');
 	        $this->tablenumbers=array(0,2,2,2,2,2,2);	
 	        $this->tableborders=array('','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');				
-			/*$this->tablewidths=array(7 +15 +15 +55 +14 +12 +21,18,15,17,17,17,16);
-	        $this->tablealigns=array('R','R','R','R','R','R','R');
-	        $this->tablenumbers=array(0,2,2,2,2,2,2);	
-	        $this->tableborders=array('','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');*/
-	        
+		
 	        $RowArray = array( 
 	                    'espacio' => 'TOTAL: ',
 	                    't1' => $this->t1,

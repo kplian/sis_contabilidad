@@ -126,7 +126,7 @@ Phx.vista.IntComprobanteLd = {
             this.getBoton('btnObs').enable();
             this.getBoton('btnWizard').enable()
 			
-			if(rec.data.momento =='presupuestario'){
+			if(rec.data.momento =='presupuestario'||rec.data.momento =='contable'){  //OGO ANALIZAR MEJOR  registor de documentos en cbte contable
 				this.getBoton('btnDocCmpVnt').enable();
 			}else{
 				this.getBoton('btnDocCmpVnt').disable();

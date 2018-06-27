@@ -64,6 +64,14 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->captura('desc_auxiliar','varchar');
 		$this->captura('desc_partida','varchar');
 		
+		$this->captura('salta_hoja','varchar');
+		$this->captura('id_tipo_cc','int4');
+		$this->captura('desc_tipo_cc','varchar');
+		
+		
+		
+		
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -111,7 +119,8 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('id_auxiliar','id_auxiliar','int4');
 		$this->setParametro('destino','destino','varchar');
 		$this->setParametro('orden_cbte','orden_cbte','numeric');
-
+        $this->setParametro('salta_hoja','salta_hoja','varchar');
+		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -156,6 +165,13 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('id_auxiliar','id_auxiliar','int4');
 		$this->setParametro('destino','destino','varchar');
 		$this->setParametro('orden_cbte','orden_cbte','numeric');
+		$this->setParametro('salta_hoja','salta_hoja','varchar');
+		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+		
+		
+		
+
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

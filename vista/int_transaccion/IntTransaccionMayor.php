@@ -111,36 +111,147 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    	//cargar resumen en el panel
 		   			    	var debe = record.data["importe_debe_mb"]?record.data["importe_debe_mb"]:0,
 		   			    		haber = record.data["importe_haber_mb"]?record.data["importe_haber_mb"]:0,
-		   			    		sum_debe, sum_haber;
-		   			    	
+		   			    		sum_debe,
+		   			    		sum_haber,
+		   			    		sum_saldo_mb_d=0,
+		   			    		sum_saldo_mb_h=0;	
+		   			    	///		   			    		
+		   			    	var saldo_mb = record.data["saldo_mb"]?record.data["saldo_mb"]:0;
+		   			    	if(saldo_mb>0){
+		   			    		sum_saldo_mb_d=saldo_mb;
+		   			    		sum_saldo_mb_h=0;
+		   			    	}else{
+		   			    		sum_saldo_mb_d=0;
+		   			    		sum_saldo_mb_h=saldo_mb;
+		   			    	}		   			    	
+		   			    	///		   			    			   			 
 		   			    	if ((debe - haber ) > 0) {
 		   			    		sum_debe = debe - haber;
-		   			    		sum_haber = '';
+		   			    		sum_haber = '';		
 		   			    	}
 		   			    	else{
 		   			    		sum_debe = '';
-		   			    		sum_haber = haber - debe;
+		   			    		sum_haber = haber - debe;	   			    		
 		   			    	}
+		   			    	///		   			    	
+		   			    	sum_saldo_mb_d=sum_debe + parseFloat(sum_saldo_mb_d,2);
+		   			    	sum_saldo_mb_h=sum_haber + parseFloat(sum_saldo_mb_h,2);
+		   			    	console.log('->',sum_saldo_mb_d);
+		   			    	console.log('->',sum_saldo_mb_h);				   			    	
+		   			    	if((sum_saldo_mb_d-sum_saldo_mb_h)>0){
+		   			    		sum_saldo_mb_d=sum_saldo_mb_d-sum_saldo_mb_h;
+		   			    		sum_saldo_mb_h='';
+		   			    	}
+		   			    	else{
+		   			    		sum_saldo_mb_d='';
+		   			    		sum_saldo_mb_h=sum_saldo_mb_h-sum_saldo_mb_d;
+		   			    	}
+		   			    	//console.log('->',sum_saldo_mb_d,'--',sum_saldo_mb_h,'--',sum_debe,'--',sum_haber);
+		   			    	Ext.util.Format.number(value,'0,000.00')
+		   			    	///		   			    			   			    
 		   			    	Ext.util.Format.number(value,'0,000.00')
 		   			    	
-		   			    	var html = String.format("<table style='width:70%; border-collapse:collapse;'> \
+		   			    	//vista en dolares		   			    	
+		   			    	var debe_mt = record.data["importe_debe_mt"]?record.data["importe_debe_mt"]:0,
+		   			    		haber_mt = record.data["importe_haber_mt"]?record.data["importe_haber_mt"]:0,
+		   			    		sum_debe_mt, 
+		   			    		sum_haber_mt,
+		   			    		sum_saldo_mt,
+		   			    		sum_saldo_mt_d,
+		   			    		sum_saldo_mt_h;	
+		   			    	///		   			    		
+		   			    	var saldo_mt = record.data["saldo_mt"]?record.data["saldo_mt"]:0;
+		   			    	if(saldo_mt>0){
+		   			    		sum_saldo_mt_d=saldo_mt;
+		   			    		sum_saldo_mt_h=0;
+		   			    	}else{
+		   			    		sum_saldo_mt_d=0;
+		   			    		sum_saldo_mt_h=saldo_mt;
+		   			    	}
+		   			    	///		  
+		   			    	if ((debe_mt - haber_mt ) > 0) {
+		   			    		sum_debe_mt = debe_mt - haber_mt;
+		   			    		sum_haber_mt = '';
+		   			    	}
+		   			    	else{
+		   			    		sum_debe_mt = '';
+		   			    		sum_haber_mt = haber_mt - debe_mt;
+		   			    	}
+		   			    	///
+		   			    	sum_saldo_mt_d=sum_debe_mt + parseFloat(sum_saldo_mt_d,2);
+		   			    	sum_saldo_mt_h=sum_haber_mt + parseFloat(sum_saldo_mt_h,2);
+		   			    			   			    	
+		   			    	if((sum_saldo_mt_d-sum_saldo_mt_h)>0){
+		   			    		sum_saldo_mt_d=sum_saldo_mt_d-sum_saldo_mt_h;
+		   			    		sum_saldo_mt_h='';
+		   			    	}
+		   			    	else{
+		   			    		sum_saldo_mt_d='';
+		   			    		sum_saldo_mt_h=sum_saldo_mt_h-sum_saldo_mt_d;
+		   			    	}
+		   			    	Ext.util.Format.number(value,'0,000.00')
+		   			    	///		   
+		   			    	Ext.util.Format.number(value,'0,000.00')
+
+	   			    		var html = String.format("<table style='width:70%; border-collapse:collapse;'> \
 		   			    							  <tr>\
-													    <td >Debe </td>\
-													    <td >Haber</td> \
-													  </tr>\
-		   			    	                          <tr>\
-													    <td style='padding: 10px; border-top:  solid #000000; border-right:  solid #000000;'>{0} </td>\
-													    <td style='padding: 10px; border-top:  solid #000000;'>{1}</td> \
+													    <td >Debe BS </td>\
+													    <td >Haber BS</td> \
 													  </tr>\
 													  <tr>\
-													    <td style='padding: 10px; border-right: solid #000000;'>{2}</td>\
-													    <td style='padding: 10px;' >{3}</td>\
-													  </tr><table>" ,Ext.util.Format.number(debe,'0,000.00'), 
-													  				 Ext.util.Format.number(haber,'0,000.00'), 
-													  				 Ext.util.Format.number(sum_debe,'0,000.00'),
-													  				 Ext.util.Format.number(sum_haber,'0,000.00'));
-		   			    	
-		   			    	//var html = String.format('<p>DEBE: {0} <br> HABER: {1} </br> SALDO: {2}</p>' ,debe, haber, debe - haber);
+													    <td style='padding: 8px; border-top:  solid #000000; border-right:  solid #000000;'>{0} </td>\
+													    <td style='padding: 8px; border-top:  solid #000000;'>{1}</td> \
+													  </tr>\
+													  <tr>\
+													    <td style='padding: 8px; border-right: solid #000000;'>{2}</td>\
+													    <td style='padding: 8px;' >{3}</td>\
+													  </tr>\
+													  <tr>\
+													  	<td style='padding: 6px;' >Incluye el saldo(BS)</td>\
+													  </tr>\
+													  <tr>\
+													    <td style='padding: 8px; border-top:  solid #000000; border-right:  solid #000000;'>{8} </td>\
+													    <td style='padding: 8px; border-top:  solid #000000;'>{9}</td>\
+													  </tr>\
+													  </table>\
+													   <br>\
+													  <table style='width:70%; border-collapse:collapse;'> \
+		   			    							  <tr>\
+													    <td >Debe USD</td>\
+													    <td >Haber USD</td> \
+													  </tr>\
+		   			    	                          <tr>\
+													    <td style='padding: 8px; border-top:  solid #000000; border-right:  solid #000000;'>{4} </td>\
+													    <td style='padding: 8px; border-top:  solid #000000;'>{5}</td> \
+													  </tr>\
+													  <tr>\
+													    <td style='padding: 8px; border-right: solid #000000;'>{6}</td>\
+													    <td style='padding: 8px;' >{7}</td>\
+													  </tr>\
+													  <tr>\
+													  	<td style='padding: 6px;' >Incluye el saldo(USD)</td>\
+													  </tr>\
+													  <tr>\
+													    <td style='padding: 8px; border-top:  solid #000000; border-right:  solid #000000;'>{10} </td>\
+													    <td style='padding: 8px; border-top:  solid #000000;'>{11}</td>\
+													  </tr>\
+													  </table>" ,
+													   Ext.util.Format.number(debe,'0,000.00'), 
+													   Ext.util.Format.number(haber,'0,000.00'), 
+													   Ext.util.Format.number(sum_debe,'0,000.00'),
+													   Ext.util.Format.number(sum_haber,'0,000.00'),
+													  			 
+													   Ext.util.Format.number(debe_mt,'0,000.00'), 
+													   Ext.util.Format.number(haber_mt,'0,000.00'), 
+													   Ext.util.Format.number(sum_debe_mt,'0,000.00'),
+													   Ext.util.Format.number(sum_haber_mt,'0,000.00'),													   													   
+													   
+													   Ext.util.Format.number(sum_saldo_mb_d,'0,000.00'),
+													   Ext.util.Format.number(sum_saldo_mb_h,'0,000.00'),
+													   
+													   Ext.util.Format.number(sum_saldo_mt_d,'0,000.00'),
+													   Ext.util.Format.number(sum_saldo_mt_h,'0,000.00')
+												);
 		   			    	
 		   			    	Phx.CP.getPagina(me.idContenedorPadre).panelResumen.update(html)
 		   			    	return '<b><p align="right">Total: &nbsp;&nbsp; </p></b>';
@@ -178,7 +289,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 					type:'string'
 				},
 	   		   
-	   			grid:false,
+	   			grid:true,
 	   			form:true
 		   	},
 		   	{
@@ -408,8 +519,139 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				id_grupo: 1,
 				grid: true,
 				form: true
+			},	
+			{
+				config: {
+					name: 'saldo_mb',
+					fieldLabel: 'SALDO MB',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){	
+						t_mb=value;					
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'saldo_mb',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
+			{
+				config: {
+					name: 'saldo_mt',
+					fieldLabel: 'SALDO MT',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						t_mt=value;
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'saldo_mt',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
+			{
+				config:{
+					name: 'fecha',
+					fieldLabel: 'Fecha',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					format: 'd/m/Y', 
+					renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				},
+				type:'DateField',
+				filters:{pfiltro:'fecha',type:'date'},
+				id_grupo:1,
+				grid:true,
+				form:false
 			},
 			
+			{
+				config:{
+					name: 'nro_tramite',
+					fieldLabel: 'Num Tramite.',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:10
+				},
+				type:'Field',
+				filters:{pfiltro:'nro_tramite',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+			},
+			
+			{
+				config: {
+					name: 'tipo_cambio',
+					fieldLabel: 'Tipo Cambio ',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'transa.tipo_cambio',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
+			{
+				config: {
+					name: 'tipo_cambio_2',
+					fieldLabel: 'Tipo de Cambio MT',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100
+					
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'tipo_cambio_2',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
+			{
+				config: {
+					name: 'tipo_cambio_3',
+					fieldLabel: 'Tipo de Cambio MA',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'tipo_cambio_3',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
 			
 			
 			{
@@ -489,6 +731,36 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
+			},
+			{
+				config:{
+					name: 'glosa1',
+					fieldLabel: 'glosa cbte',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:10
+				},
+				type:'Field',
+				filters:{pfiltro:'glosa1',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+			},
+			{
+				config:{
+					name: 'codigo_cc',
+					fieldLabel: 'Ce Co',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:10
+				},
+				type:'Field',
+				filters:{pfiltro:'codigo_cc',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
 			}
 		];
 			
@@ -539,7 +811,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			});
 			
 		//mp/mp
-		this.addBotonesLibroMayor();
+		this.addBotonesLibroMayor();			
+		this.addSaldo();
 			
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
@@ -592,10 +865,15 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		{ name:'desc_auxiliar', type: 'string'},
 		{ name:'desc_partida', type: 'string'},
 		{ name:'desc_centro_costo', type: 'string'},
+		{ name:'fecha', type: 'date',dateFormat:'Y-m-d'},
+		{ name:'codigo_cc', type: 'string'},
+		{ name:'glosa_1', type: 'string'},
+		{ name:'saldo_mb', type: 'numeric'},
+		{ name:'saldo_mt', type: 'numeric'},
 		'cbte_relacional',
 		'tipo_partida','id_orden_trabajo','desc_orden',
-		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','fecha','glosa1',
-		'id_proceso_wf','id_estado_wf','id_suborden','desc_suborden',
+		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','glosa1',
+		'id_proceso_wf','id_estado_wf','id_suborden','desc_suborden','tipo_cambio','tipo_cambio_2','tipo_cambio_3','actualizacion'
 		
 	],
 	
@@ -610,7 +888,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	        )
     }),
     
-    arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','estado_reg','fecha_reg'],
+    arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','estado_reg','fecha_reg','id_auxiliar','tipo_cambio','tipo_cambio_2','tipo_cambio_3'],
 
     sortInfo:{
 		field: 'id_int_transaccion',
@@ -793,7 +1071,6 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			}],
 	//mpmpmp
 	postReloadPage:function(data){	
-		console.log("->",data.nro_tramite);	
 		ini=data.desde;
 		fin=data.hasta;
 		
@@ -830,7 +1107,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	addBotonesLibroMayor: function() {
 		this.menuLibroMayor = new Ext.Toolbar.SplitButton({
 			id: 'b-libro_mayor-' + this.idContenedor,
-			text: 'Libro Mayor',
+			text: 'Libro Mayor sin saldo',
 			disabled: false,
 			grupo:[0,1],
 			iconCls : 'bprint',
@@ -848,7 +1125,31 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		});
 		this.tbar.add(this.menuLibroMayor);
 	},
+	//mp
+	addSaldo: function() {
+		this.menuLibroMayor = new Ext.Toolbar.SplitButton({
+			id: 'c-libro_mayor-' + this.idContenedor,
+			text: 'Libro Mayor con saldo',
+			disabled: false,
+			grupo:[0,1],
+			iconCls : 'bprint',
+			handler:this.formfiltroSaldo,
+			scope: this,
+			menu:{
+				items: [{
+					id:'b-ins-mayor-pdf-' + this.idContenedor,
+					text: 'Filtrar',
+					tooltip: '<b>Filtro de parametros a visualizar</b>',
+					handler:this.formfiltroSaldo,
+					scope: this
+				}
+			]}
+		});
+		this.tbar.add(this.menuLibroMayor);
+	},
 	//
+	
+	
 	formfiltro:function(){	
 		Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/FormFiltroMayor.php',
 			'Formulario',
@@ -866,6 +1167,28 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				config:[{
 					event:'beforesave',
 					delegate: this.addLibroMayor,
+				}],
+				scope:this
+			}
+		)
+	},	
+	
+	//mp
+	formfiltroSaldo:function(){	
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/FormMayorSaldo.php',
+			'Formulario Saldo',
+			{
+				modal:true,
+				width:400,
+				height:400
+			}, 
+			{
+			}, 
+			this.idContenedor,'FormMayorSaldo', 
+			{
+				config:[{
+					event:'beforesave',
+					delegate: this.addMayorSaldo,
 				}],
 				scope:this
 			}
@@ -925,11 +1248,70 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			//argument:{wizard:wizard},
 			success: this.successExport,		
 			failure: this.conexionFailure,
-			timeout:this.timeout,
+			timeout: 3.6e+6,
+			scope:this
+		});
+	},
+	//
+	
+	//mp
+	addMayorSaldo : function (wizard,resp){		
+		Phx.CP.loadingShow();		
+		Ext.Ajax.request({
+			url:'../../sis_contabilidad/control/IntTransaccion/impReporteMayorSaldo',
+			params:
+			{	
+				'desde':ini,
+				'hasta':fin,
+				
+				'id_auxiliar':id_auxiliar,
+				'id_gestion':id_gestion,
+				'id_depto':id_depto,
+				'id_config_tipo_cuenta':id_config_tipo_cuenta,
+				'id_config_subtipo_cuenta':id_config_subtipo_cuenta,
+				'id_cuenta':id_cuenta,
+				'id_partida':id_partida,
+				'id_tipo_cc':id_tipo_cc,				
+				'id_centro_costo':id_centro_costo,																						
+				'id_orden_trabajo':id_orden_trabajo,								
+				'id_suborden':id_suborden,				
+				'nro_tramite':nro_tramite,				
+				//				
+				'aux':aux,
+				'gest':gest,
+				'depto':depto,								
+				'config_tipo_cuenta':config_tipo_cuenta,
+				'config_subtipo_cuenta':config_subtipo_cuenta,
+				'cuenta':cuenta,
+				'partidas':partida,				
+				'tipo_cc':tipo_cc,
+				'centro_costo':centro_costo,
+				'orden_trabajo':orden_trabajo,
+				'suborden':suborden,
+				'nro_tram':nro_tram,								
+				//formato pdf o xls
+				'tipo_filtro':tipo_filtro,			
+				//parametros q se mostraran, si son tickeados						
+				'tipo_moneda':resp.tipo_moneda,
+				'cc':resp.cc,
+				'partida':resp.partida,
+				'auxiliar':resp.auxiliar,
+				'ordenes':resp.ordenes,
+				'tramite':resp.nro_tramite,
+				'nro_comprobante':resp.nro_comprobante,
+				'tipo_formato':resp.tipo_formato,
+				'relacional':resp.relacional,
+				'fec':resp.fec,
+				'cuenta_t':resp.cuenta_t
+			},
+			success: this.successExport,		
+			failure: this.conexionFailure,
+			timeout: 3.6e+6,
 			scope:this
 		});
     },
-    //
+    
+    
     bnew : false,
     bedit: false,
     bdel:  false

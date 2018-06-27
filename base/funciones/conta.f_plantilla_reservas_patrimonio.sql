@@ -71,7 +71,7 @@ DECLARE
   
 BEGIN
   
-    v_nombre_funcion = 'conta.f_plantilla_capital_patrimonio';    
+    v_nombre_funcion = 'conta.f_plantilla_reservas_patrimonio';    
     v_total_haber = 0;
     v_total_debe = 0;
     v_ajuste_debe = 0;
@@ -210,7 +210,7 @@ BEGIN
                       v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
                    ELSE
                       v_saldo_tmp_cuenta_ma = COALESCE(v_resp_deudor[5],0) - COALESCE(v_resp_acreedor[5],0);
-                      v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
+                      v_saldo_tmp_cuenta_mb = COALESCE(v_resp_deudor[1],0) - COALESCE(v_resp_acreedor[1],0);
                    END IF; 
                    
                    v_saldo_tmp_cuenta_ma = round(v_saldo_tmp_cuenta_ma, 2); 
@@ -240,11 +240,7 @@ BEGIN
       -----------------------------------------------------------------------------------------------
       
       
-      IF v_sw_suma_extra = 'si' THEN
-      
-           
-          
-          v_resp_deudor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
+      v_resp_deudor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
                                                    p_desde, 
                                                    p_hasta, 
                                                     NULL, --todos los deptos p_id_depto::varchar, , 
@@ -259,8 +255,8 @@ BEGIN
                                                     null -- p_id_centro_costo
                                                    );
                   
-           --mayor acredor                                 
-           v_resp_acreedor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
+       --mayor acredor                                 
+       v_resp_acreedor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
                                                    p_desde, 
                                                    p_hasta, 
                                                    NULL, --todos los deptos p_id_depto::varchar, , 
@@ -275,27 +271,26 @@ BEGIN
                                                     null -- p_id_centro_costo
                                                    );
                                                    
-             IF  COALESCE(v_resp_acreedor[5],0) >  COALESCE(v_resp_deudor[5],0) THEN
+         IF  COALESCE(v_resp_acreedor[5],0) >  COALESCE(v_resp_deudor[5],0) THEN
                  v_saldo_tmp_cuenta_ma = COALESCE(v_resp_acreedor[5],0) - COALESCE(v_resp_deudor[5],0);
                  v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
-             ELSE
+         ELSE
                 v_saldo_tmp_cuenta_ma = COALESCE(v_resp_deudor[5],0) - COALESCE(v_resp_acreedor[5],0);
                 v_saldo_tmp_cuenta_mb = COALESCE(v_resp_deudor[1],0) - COALESCE(v_resp_acreedor[1],0);
-             END IF; 
+         END IF; 
              
-             v_saldo_tmp_cuenta_ma = round(v_saldo_tmp_cuenta_ma, 2); 
-             v_saldo_tmp_cuenta_mb = round(v_saldo_tmp_cuenta_mb, 2);                                      
+         v_saldo_tmp_cuenta_ma = round(v_saldo_tmp_cuenta_ma, 2); 
+         v_saldo_tmp_cuenta_mb = round(v_saldo_tmp_cuenta_mb, 2);                                      
                                                    
                                                    
-            v_glosa_ajuste = v_glosa_ajuste ||',  AJUSTE ACUMULADO en '|| COALESCE(v_registros.nombre_cuenta)|| '  (UFV: '||v_saldo_tmp_cuenta_ma::varchar||' - BS: '||v_saldo_tmp_cuenta_mb::varchar||')' ;                                  
+         v_glosa_ajuste = v_glosa_ajuste ||', MENOS AJUSTE ACUMULADO en '|| COALESCE(v_registros.nombre_cuenta)|| '  (UFV: '||v_saldo_tmp_cuenta_ma::varchar||' - BS: '||v_saldo_tmp_cuenta_mb::varchar||')' ;                                  
                                               
-            v_suma_acreedor_ajuste_ma =  v_suma_acreedor_ajuste_ma  + COALESCE(v_resp_acreedor[5],0);
-            v_suma_deudor_ajuste_ma = v_suma_deudor_ajuste_ma +  COALESCE(v_resp_deudor[5],0);
-            v_suma_acreedor_ajuste_mb =  v_suma_acreedor_ajuste_mb  + COALESCE(v_resp_acreedor[1],0);
-            v_suma_deudor_ajuste_mb = v_suma_deudor_ajuste_mb +  COALESCE(v_resp_deudor[1],0);
+         v_suma_acreedor_ajuste_ma =  v_suma_acreedor_ajuste_ma  - COALESCE(v_resp_acreedor[5],0);
+         v_suma_deudor_ajuste_ma = v_suma_deudor_ajuste_ma -  COALESCE(v_resp_deudor[5],0);
+         v_suma_acreedor_ajuste_mb =  v_suma_acreedor_ajuste_mb  - COALESCE(v_resp_acreedor[1],0);
+         v_suma_deudor_ajuste_mb = v_suma_deudor_ajuste_mb -  COALESCE(v_resp_deudor[1],0);
       
-      END IF;
-    
+     
     
     
     ---------------------------------------------------------------------------
@@ -335,6 +330,7 @@ BEGIN
                       ------------------------------------------------------------
                         
                       --covertir Moneda de actulizacion a moenda base
+                     -- raise exception '--- %, %, UFV %, fecha % , BS  %', v_id_moneda_act, v_id_moneda_base, v_saldo_ma, v_reg_cbte.fecha, v_saldo_mb;
                       
                      
                       v_aux_actualizado_mb = param.f_convertir_moneda (v_id_moneda_act, 

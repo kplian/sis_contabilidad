@@ -6,7 +6,6 @@
 *@date 10-06-2013 14:40:00
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -575,7 +574,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         {
             config: {
                 name: 'campo_tipo_cambio',
-                qtip: 'define de donde obtendra el tipo de cambio convenido',
+                qtip: 'define de donde obtendra el tipo de cambio convenido para MB',
                 fieldLabel: 'Tipo de cambio convenido',
                 allowBlank: true,
                 anchor: '80%',
@@ -588,6 +587,60 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+        
+         {
+            config: {
+                name: 'campo_tipo_cambio_2',
+                qtip: 'define de donde obtendra el tipo de cambio convenido para MT',
+                fieldLabel: 'Tipo de cambio 2',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpb.campo_tipo_cambio_2',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        
+        
+         {
+            config: {
+                name: 'campo_tipo_cambio_3',
+                qtip: 'define de donde obtendra el tipo de cambio convenido   para MA',
+                fieldLabel: 'Tipo de cambio 3',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpb.campo_tipo_cambio_3',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        
+         {
+            config: {
+                name: 'campo_id_config_cambiaria',
+                qtip: 'Define de don obtenemos el ID de configuracion cambiaria para tipo de cambio covenido',
+                fieldLabel: 'Configuracion cambiaria',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:200
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpb.campo_id_config_cambiaria',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        
+        
         {
             config: {
                 name: 'campo_depto_libro',
@@ -757,7 +810,8 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 	    'campo_fecha_costo_fin',
 	    'funcion_comprobante_editado','funcion_comprobante_prevalidado',
 	    'funcion_comprobante_validado_eliminado','desc_plantilla',
-	    'campo_cbte_relacionado','codigo_tipo_relacion'
+	    'campo_cbte_relacionado','codigo_tipo_relacion',
+	    'campo_tipo_cambio_2','campo_tipo_cambio_3','campo_id_config_cambiaria'
         
 		
 	],

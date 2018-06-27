@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION conta.f_plantilla_capital_patrimonio (
+CREATE OR REPLACE FUNCTION conta.f_plantilla_reservas_patrimonio_basico (
   p_id_usuario integer,
   p_id_int_comprobante integer,
   p_id_gestion_cbte integer,
@@ -12,8 +12,8 @@ RETURNS void AS
 $body$
 /**************************************************************************
  SISTEMA:		Tesoreria
- FUNCION: 		conta.f_plantilla_capital_patrimonio
- DESCRIPCION:   Plantilla de cbte para generar actulizacion  de capital de Patrimonio
+ FUNCION: 		conta.f_plantilla_reservas_patrimonio_basico
+ DESCRIPCION:   Plantilla de cbte para generar actuliza de reservas de Patrimonio
  AUTOR: 		Rensi Arteaga Copari
  FECHA:	        16/03/2018
  COMENTARIOS:
@@ -24,6 +24,7 @@ $body$
  ISSUE            FECHA:		      AUTOR                 DESCRIPCION   
  #0		          16/03/2018        RAC					   Creación
 ***************************************************************************/
+                   
 DECLARE
  v_nombre_funcion   			text;
  v_resp							varchar;
@@ -65,13 +66,12 @@ DECLARE
  v_record_rel_haber				record;
  v_sw_suma_extra                varchar;
  v_saldo_tmp_cuenta_ma          numeric;
- v_saldo_tmp_cuenta_mb          numeric;
- v_nombre_cuenta_ajuste         varchar;
+ v_saldo_tmp_cuenta_mb    numeric;
  
   
 BEGIN
   
-    v_nombre_funcion = 'conta.f_plantilla_capital_patrimonio';    
+    v_nombre_funcion = 'conta.f_plantilla_reservas_patrimonio_basico';    
     v_total_haber = 0;
     v_total_debe = 0;
     v_ajuste_debe = 0;
@@ -129,7 +129,7 @@ BEGIN
     * 
     into 
     v_record_rel_debe
-    FROM conta.f_get_config_relacion_contable( 'AJT_CAPPAT_DEBE', 
+    FROM conta.f_get_config_relacion_contable( 'AJT_RESPAT_DEBE', 
                                                p_id_gestion_cbte, 
                                                NULL,  --campo_relacion_contable
                                                NULL);
@@ -139,13 +139,13 @@ BEGIN
        * 
     into 
         v_record_rel_haber 
-    FROM conta.f_get_config_relacion_contable( 'AJT_CAPPAT_HAB', 
+    FROM conta.f_get_config_relacion_contable( 'AJT_RESPAT_HAB', 
                                                p_id_gestion_cbte, 
                                                NULL,  --campo_relacion_contable
                                                NULL); 
                                                
      IF v_record_rel_haber.ps_id_cuenta  != v_record_rel_debe.ps_id_cuenta  THEN
-         raise exception 'las cuentas parametrizadas para las relaciones AJT_CAPPAT_DEBE y  AJT_CAPPAT_HAB deben ser la misma'; 
+         raise exception 'las cuentas parametrizadas para las relaciones AJT_RESPAT_HAB y  AJT_RESPAT_DEBE deben ser la misma'; 
      END IF;  
      
                                            
@@ -166,7 +166,7 @@ BEGIN
                         where c.id_gestion = p_id_gestion_cbte
                               and c.sw_transaccional = 'movimiento'
                               and c.estado_reg = 'activo' 
-                              and c.tipo_act = 'capital' )LOOP   --RESERVAS DE PATRIMONIO
+                              and c.tipo_act = 'reservas' )LOOP   --RESERVAS DE PATRIMONIO
                               
                               
                  IF   v_record_rel_haber.ps_id_cuenta = v_registros.id_cuenta   THEN
@@ -205,7 +205,7 @@ BEGIN
                                                     null -- p_id_centro_costo
                                                    );
                                                    
-                   IF  COALESCE(v_resp_acreedor[1],0) >  COALESCE(v_resp_deudor[1],0) THEN
+                   IF  COALESCE(v_resp_acreedor[5],0) >  COALESCE(v_resp_deudor[5],0) THEN
                       v_saldo_tmp_cuenta_ma = COALESCE(v_resp_acreedor[5],0) - COALESCE(v_resp_deudor[5],0);
                       v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
                    ELSE
@@ -233,6 +233,68 @@ BEGIN
                                    
       END LOOP; --END LOOP lista
       
+      -------------------------------------------------------------------------------------------------
+      --  si tenemso necsidad de una suma extra solo consideramos el mayor sin balance de apertura
+      --  OJO, se piensa que al ser una cuenta especial el ajsute delsaldo incial se considera en otro proceso 
+      --   por ejemplo  actulizacion de reservas  donde se actulia la cuenta de ajsutes de capital
+      -----------------------------------------------------------------------------------------------
+      
+      
+      IF v_sw_suma_extra = 'si' THEN
+      
+           
+          
+          v_resp_deudor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
+                                                   p_desde, 
+                                                   p_hasta, 
+                                                    NULL, --todos los deptos p_id_depto::varchar, , 
+                                                   'si',             --  p_incluir_cierre
+                                                   'no',          --  p_incluir_apertura                   --NO CONSIDERA BALANCE DE APERTURA
+                                                   'todos',          --  p_incluir_aitb, 
+                                                   'defecto_cuenta', --  p_signo_balance, 
+                                                   'deudor', --  p_tipo_saldo,
+                                                    null,--p_id_auxiliar,
+                                                    null,--p_id_int_comprobante_ori,
+                                                    NULL,--id_ot
+                                                    null -- p_id_centro_costo
+                                                   );
+                  
+           --mayor acredor                                 
+           v_resp_acreedor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
+                                                   p_desde, 
+                                                   p_hasta, 
+                                                   NULL, --todos los deptos p_id_depto::varchar, , 
+                                                   'si',             --  p_incluir_cierre
+                                                   'no',          --  p_incluir_apertura             --NO CONSIDERA BALANCE DE APERTURA
+                                                   'todos',          --  p_incluir_aitb, 
+                                                   'defecto_cuenta', -- p_signo_balance, 
+                                                   'acreedor', --  p_tipo_saldo,
+                                                    null,--p_id_auxiliar,
+                                                    null,--p_id_int_comprobante_ori,
+                                                    NULL,--id_ot
+                                                    null -- p_id_centro_costo
+                                                   );
+                                                   
+             IF  COALESCE(v_resp_acreedor[5],0) >  COALESCE(v_resp_deudor[5],0) THEN
+                 v_saldo_tmp_cuenta_ma = COALESCE(v_resp_acreedor[5],0) - COALESCE(v_resp_deudor[5],0);
+                 v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
+             ELSE
+                v_saldo_tmp_cuenta_ma = COALESCE(v_resp_deudor[5],0) - COALESCE(v_resp_acreedor[5],0);
+                v_saldo_tmp_cuenta_mb = COALESCE(v_resp_deudor[1],0) - COALESCE(v_resp_acreedor[1],0);
+             END IF; 
+             
+             v_saldo_tmp_cuenta_ma = round(v_saldo_tmp_cuenta_ma, 2); 
+             v_saldo_tmp_cuenta_mb = round(v_saldo_tmp_cuenta_mb, 2);                                      
+                                                   
+                                                   
+            v_glosa_ajuste = v_glosa_ajuste ||',  AJUSTE ACUMULADO en '|| COALESCE(v_registros.nombre_cuenta)|| '  (UFV: '||v_saldo_tmp_cuenta_ma::varchar||' - BS: '||v_saldo_tmp_cuenta_mb::varchar||')' ;                                  
+                                              
+            v_suma_acreedor_ajuste_ma =  v_suma_acreedor_ajuste_ma  + COALESCE(v_resp_acreedor[5],0);
+            v_suma_deudor_ajuste_ma = v_suma_deudor_ajuste_ma +  COALESCE(v_resp_deudor[5],0);
+            v_suma_acreedor_ajuste_mb =  v_suma_acreedor_ajuste_mb  + COALESCE(v_resp_acreedor[1],0);
+            v_suma_deudor_ajuste_mb = v_suma_deudor_ajuste_mb +  COALESCE(v_resp_deudor[1],0);
+      
+      END IF;
     
     
     
@@ -247,14 +309,14 @@ BEGIN
       v_saldo_mb  = 0;
       v_saldo_ma  = 0; 
     
-     IF v_suma_acreedor_ajuste_mb  >  v_suma_deudor_ajuste_mb  THEN
+     IF v_suma_acreedor_ajuste_ma  >  v_suma_deudor_ajuste_ma  THEN
                  
          v_sw_saldo_acredor = true;
          v_sw_actualiza = true;
          v_saldo_ma = v_suma_acreedor_ajuste_ma - v_suma_deudor_ajuste_ma;
          v_saldo_mb = v_suma_acreedor_ajuste_mb - v_suma_deudor_ajuste_mb;
                  
-     ELSEIF   v_suma_deudor_ajuste_mb > v_suma_acreedor_ajuste_mb   THEN
+     ELSEIF   v_suma_deudor_ajuste_ma > v_suma_acreedor_ajuste_ma   THEN
                  
          v_sw_saldo_acredor = false;
          v_sw_actualiza = true;
@@ -273,10 +335,9 @@ BEGIN
                       ------------------------------------------------------------
                         
                       --covertir Moneda de actulizacion a moenda base
+                     -- raise exception '--- %, %, UFV %, fecha % , BS  %', v_id_moneda_act, v_id_moneda_base, v_saldo_ma, v_reg_cbte.fecha, v_saldo_mb;
                       
                      
-                      -- raise exception '--- %, %, UFV %, fecha % , BS  %', v_id_moneda_act, v_id_moneda_base, v_saldo_ma, v_reg_cbte.fecha, v_saldo_mb;
-     
                       v_aux_actualizado_mb = param.f_convertir_moneda (v_id_moneda_act, 
                                                 v_id_moneda_base,    
                                                 v_saldo_ma,  
@@ -301,68 +362,6 @@ BEGIN
                           v_sw_actualiza = false;   
                        END IF;
                        
-                       
-                      
-                       -------------------------------------------------------------------------------------------------
-                        --  DE MAENRA ESPECIAL ETR mantiene en us balance de aprtura aptrimonio con saldo historio
-                        --   por esto es encesario restar  todo el ajsute previo para solo tener el ajsute del periodo indicado
-                        -----------------------------------------------------------------------------------------------
-                        
-                         select
-                           c.nombre_cuenta into v_nombre_cuenta_ajuste 
-                         from conta.tcuenta c where c.id_cuenta = v_record_rel_haber.ps_id_cuenta;
-                             
-                            
-                        v_resp_deudor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
-                                                                 p_desde, 
-                                                                 p_hasta, 
-                                                                  NULL, --todos los deptos p_id_depto::varchar, , 
-                                                                 'no',             --  p_incluir_cierre
-                                                                 'todos',          --  p_incluir_apertura                   --NO CONSIDERA BALANCE DE APERTURA
-                                                                 'todos',          --  p_incluir_aitb, 
-                                                                 'defecto_cuenta', --  p_signo_balance, 
-                                                                 'deudor', --  p_tipo_saldo,
-                                                                  null,--p_id_auxiliar,
-                                                                  null,--p_id_int_comprobante_ori,
-                                                                  NULL,--id_ot
-                                                                  null -- p_id_centro_costo
-                                                                 );
-                                    
-                         --mayor acredor                                 
-                         v_resp_acreedor = conta.f_mayor_cuenta( v_record_rel_haber.ps_id_cuenta, 
-                                                                 p_desde, 
-                                                                 p_hasta, 
-                                                                 NULL, --todos los deptos p_id_depto::varchar, , 
-                                                                 'no',             --  p_incluir_cierre
-                                                                 'todos',          --  p_incluir_apertura             --NO CONSIDERA BALANCE DE APERTURA
-                                                                 'todos',          --  p_incluir_aitb, 
-                                                                 'defecto_cuenta', -- p_signo_balance, 
-                                                                 'acreedor', --  p_tipo_saldo,
-                                                                  null,--p_id_auxiliar,
-                                                                  null,--p_id_int_comprobante_ori,
-                                                                  NULL,--id_ot
-                                                                  null -- p_id_centro_costo
-                                                                 );
-                                                                     
-                          IF  COALESCE(v_resp_acreedor[1],0) >  COALESCE(v_resp_deudor[1],0) THEN
-                               v_saldo_tmp_cuenta_ma = COALESCE(v_resp_acreedor[5],0) - COALESCE(v_resp_deudor[5],0);
-                               v_saldo_tmp_cuenta_mb = COALESCE(v_resp_acreedor[1],0) - COALESCE(v_resp_deudor[1],0);
-                          ELSE
-                              v_saldo_tmp_cuenta_ma = COALESCE(v_resp_deudor[5],0) - COALESCE(v_resp_acreedor[5],0);
-                              v_saldo_tmp_cuenta_mb = COALESCE(v_resp_deudor[1],0) - COALESCE(v_resp_acreedor[1],0);
-                          END IF; 
-                               
-                         v_saldo_tmp_cuenta_ma = round(v_saldo_tmp_cuenta_ma, 2); 
-                         v_saldo_tmp_cuenta_mb = round(v_saldo_tmp_cuenta_mb, 2);                                      
-                                                                     
-                                                                     
-                        v_glosa_ajuste = v_glosa_ajuste ||',  MENOS AJUSTE ACUMULADO en '|| COALESCE(v_nombre_cuenta_ajuste,'S/N')|| '  (UFV: '||v_saldo_tmp_cuenta_ma::varchar||' - BS: '||v_saldo_tmp_cuenta_mb::varchar||')' ;                                  
-                                                                     
-                         --raise exception 'LLEGa  %  ------   %  dif %',v_suma_acreedor_ajuste_mb, COALESCE(v_resp_acreedor[1],0),  v_suma_acreedor_ajuste_mb  - COALESCE(v_resp_acreedor[1],0); 
-                        
-                        
-                       -- raise exception 'monto a restar %',v_saldo_tmp_cuenta_mb;
-                       
                       
                       ------------------------------------
                       --  insertar trasacción de ajuste
@@ -377,19 +376,19 @@ BEGIN
                           --  segun el tipo y el signo determinamos si va al debe o al haber 
                           IF v_sw_saldo_acredor THEN
                              IF v_diferencia_positiva THEN
-                                v_importe_haber = v_diferencia - v_saldo_tmp_cuenta_mb;
+                                v_importe_haber = v_diferencia;
                                 v_importe_debe = 0;
                              ELSE
                                 v_importe_haber = 0;
-                                v_importe_debe = v_diferencia - v_saldo_tmp_cuenta_mb;
+                                v_importe_debe = v_diferencia;
                              
                              END IF;
                           ELSE
                              IF v_diferencia_positiva THEN
                                 v_importe_haber = 0;
-                                v_importe_debe = v_diferencia - v_saldo_tmp_cuenta_mb;
+                                v_importe_debe = v_diferencia;
                              ELSE
-                                v_importe_haber = v_diferencia - v_saldo_tmp_cuenta_mb;
+                                v_importe_haber = v_diferencia;
                                 v_importe_debe = 0;
                              END IF;
                           END IF;
@@ -410,13 +409,13 @@ BEGIN
                               * 
                               into 
                               v_record_rel
-                              FROM conta.f_get_config_relacion_contable( 'AJT_CAPPAT_DEBE', 
+                              FROM conta.f_get_config_relacion_contable( 'AJT_RESPAT_DEBE', 
                                                                          p_id_gestion_cbte, 
                                                                          NULL,  --campo_relacion_contable
                                                                          NULL);
                                                                          
                               IF v_record_rel.ps_id_partida is null THEN
-                                 raise exception 'No se encontro relacion contable GASTO_CAPPAT';
+                                 raise exception 'No se encontro relacion contable AJT_RESPAT_DEBE';
                               END IF;                                            
                                                                          
                          ELSE
@@ -425,13 +424,13 @@ BEGIN
                                  * 
                               into 
                                   v_record_rel 
-                              FROM conta.f_get_config_relacion_contable( 'AJT_CAPPAT_HAB', 
+                              FROM conta.f_get_config_relacion_contable( 'AJT_RESPAT_HAB', 
                                                                          p_id_gestion_cbte, 
                                                                          NULL,  --campo_relacion_contable
                                                                          NULL);
                                                                          
                               IF v_record_rel.ps_id_partida is null THEN
-                                 raise exception 'No se encontro relacion contable AJT_CAPPAT_HAB';
+                                 raise exception 'No se encontro relacion contable AJT_RESPAT_HAB';
                               END IF;                                             
                              
                          END IF;
@@ -471,7 +470,7 @@ BEGIN
                                       v_id_centro_costo_depto, --centr de costo del depto contable
                                       'activo',
                                       v_record_rel.ps_id_cuenta, --cuenta de ajuste
-                                      'Ajsute por actualización de capita de las cuentas:  '|| COALESCE(v_glosa_ajuste,'NN') ,  --glosa
+                                      'Ajsute por actualización de reservas de las cuentas:  '|| COALESCE(v_glosa_ajuste,'NN') ,  --glosa
                                       p_id_int_comprobante,
                                       NULL,--v_registros.id_auxiliar,
                                       v_importe_debe,
@@ -519,13 +518,13 @@ BEGIN
             * 
           into 
             v_record_rel_con 
-          FROM conta.f_get_config_relacion_contable( 'GASTO_CAPPAT', 
+          FROM conta.f_get_config_relacion_contable( 'GASTO_RESPAT', 
                                                      p_id_gestion_cbte, 
                                                      NULL,  --campo_relacion_contable
                                                      NULL);
                                                      
           IF v_record_rel.ps_id_cuenta is null THEN
-             raise exception 'No se encontro relacion contable GASTO_CAPPAT';
+             raise exception 'No se encontro relacion contable GASTO_RESPAT';
           END IF;                                             
                                                      
      ELSE
@@ -538,13 +537,13 @@ BEGIN
              * 
           into 
               v_record_rel_con 
-          FROM conta.f_get_config_relacion_contable( 'RECURSO_CAPPAT', 
+          FROM conta.f_get_config_relacion_contable( 'RECURSO_RESPAT', 
                                                      p_id_gestion_cbte, 
                                                      NULL,  --campo_relacion_contable
                                                      NULL);
                                                      
           IF v_record_rel.ps_id_cuenta is null THEN
-             raise exception 'No se encontro relacion contable RECURSO_CAPPAT';
+             raise exception 'No se encontro relacion contable RECURSO_RESPAT';
           END IF;                                             
                                                      
          

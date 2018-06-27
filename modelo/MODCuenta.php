@@ -271,19 +271,19 @@ class MODCuenta extends MODbase{
         $this->captura('montopos','int4'); 
         $this->captura('monto','numeric'); 
         $this->captura('id_resultado_det_plantilla','int4'); 
-        $this->captura('id_cuenta_raiz','int4'); 
-		
+        $this->captura('id_cuenta_raiz','int4');		
 		$this->captura('visible','varchar'); 
 		$this->captura('incluir_cierre','varchar'); 
-		$this->captura('incluir_apertura','varchar'); 
-		
+		$this->captura('incluir_apertura','varchar'); 		
 		$this->captura('negrita','varchar'); 
 		$this->captura('cursiva','varchar'); 
-		$this->captura('espacio_previo','int4'); 
-		
+		$this->captura('espacio_previo','int4'); 		
 		$this->captura('id','int4');
 		$this->captura('plantilla','varchar');
-		$this->captura('nombre_columna','varchar');
+		$this->captura('nombre_columna','varchar');		
+		$this->captura('salta_hoja','varchar');
+		
+		
 		
 		
 

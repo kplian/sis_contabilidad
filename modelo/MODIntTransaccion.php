@@ -6,7 +6,6 @@
 *@date 01-09-2013 18:10:12
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
-
 class MODIntTransaccion extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -268,8 +267,8 @@ class MODIntTransaccion extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-
-   function listarIntTransaccionMayor(){
+	//mp
+	function listarIntTransaccionMayor(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_int_transaccion_sel';
 		$this->transaccion='CONTA_INTMAY_SEL';
@@ -282,7 +281,8 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
 		$this->setParametro('tipo_filtro','tipo_filtro','varchar');
 		
-		
+		$this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
 		//captura parametros adicionales para el count
 		$this->capturaCount('total_debe','numeric');
 		$this->capturaCount('total_haber','numeric');
@@ -291,7 +291,8 @@ class MODIntTransaccion extends MODbase{
 		$this->capturaCount('total_debe_ma','numeric');
 		$this->capturaCount('total_haber_ma','numeric');
 		
-		
+		$this->capturaCount('total_saldo_mb','numeric');
+		$this->capturaCount('total_saldo_mt','numeric');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_int_transaccion','int4');
@@ -305,9 +306,9 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('id_int_comprobante','int4');
 		$this->captura('id_auxiliar','int4');
 		$this->captura('id_usuario_reg','int4');
-		$this->captura('fecha_reg','timestamp');
+		$this->captura('fecha_reg','date');
 		$this->captura('id_usuario_mod','int4');
-		$this->captura('fecha_mod','timestamp');
+		$this->captura('fecha_mod','date');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		
@@ -326,10 +327,10 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('importe_gasto_ma','numeric');
 		$this->captura('importe_recurso_ma','numeric');
 		
-		$this->captura('desc_partida','text');
-		$this->captura('desc_centro_costo','text');
-		$this->captura('desc_cuenta','text');
-		$this->captura('desc_auxiliar','text');
+		$this->captura('desc_partida','varchar');
+		$this->captura('desc_centro_costo','varchar');
+		$this->captura('desc_cuenta','varchar');
+		$this->captura('desc_auxiliar','varchar');
 		$this->captura('tipo_partida','varchar');
 		$this->captura('id_orden_trabajo','int4');
 		$this->captura('desc_orden','varchar');		
@@ -342,6 +343,15 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('id_estado_wf','int4');		 
 		$this->captura('cbte_relacional','varchar');
 		
+		
+		$this->captura('tipo_cambio','numeric');
+		$this->captura('tipo_cambio_2','numeric');
+		$this->captura('tipo_cambio_3','numeric');
+		$this->captura('actualizacion','varchar');
+		
+		$this->captura('codigo_cc','varchar');
+		$this->captura('saldo_mb','numeric');
+		$this->captura('saldo_mt','numeric');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -549,6 +559,199 @@ class MODIntTransaccion extends MODbase{
 		return $this->respuesta;
 	}
 
-			
+    function listarAuxiliarCuenta(){ 
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_transaccion_sel';
+		$this->transaccion='CONTA_AUXMAY_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
+		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		$this->setParametro('id_cuenta','id_cuenta','int4');
+		
+		//captura parametros adicionales para el count
+		$this->capturaCount('total_importe_debe_mb','numeric');
+		$this->capturaCount('total_importe_haber_mb','numeric');
+		
+		$this->captura('id_auxiliar','int4');
+        $this->captura('codigo_auxiliar','varchar');
+        $this->captura('nombre_auxiliar','varchar');
+        $this->captura('id_cuenta','int4');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('tipo_cuenta','varchar');
+        $this->captura('sub_tipo_cuenta','varchar');
+        $this->captura('desc_sub_tipo_cuenta','varchar');
+		$this->captura('id_config_subtipo_cuenta','int4');
+		
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('saldo','numeric');
+		
+				
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}	
+
+
+	function listarIntTransaccionRepMayorXXXXX(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_transaccion_sel';
+		$this->transaccion='CONTA_REPMAYSAL_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);	
+		
+		$this->setParametro('id_moneda','id_moneda','int4');
+		$this->setParametro('id_cuenta','id_cuenta','int4');
+		$this->setParametro('id_partida','id_partida','int4');
+		$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
+		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+		$this->setParametro('tipo_filtro','tipo_filtro','varchar');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('desde','desde','date');
+		
+		$this->setParametro('datos','datos','varchar');
+		//captura parametros adicionales para el count
+	/*	$this->capturaCount('total_debe','numeric');
+		$this->capturaCount('total_haber','numeric');
+		$this->capturaCount('total_debe_mt','numeric');
+		$this->capturaCount('total_haber_mt','numeric');
+		$this->capturaCount('total_debe_ma','numeric');
+		$this->capturaCount('total_haber_ma','numeric');	*/
+		//Definicion de la lista del resultado del query
+		$this->captura('id_int_transaccion','int4');
+		$this->captura('id_partida','int4');
+		$this->captura('id_centro_costo','int4');
+		$this->captura('id_partida_ejecucion','int4');
+		$this->captura('estado_reg','varchar');
+		$this->captura('id_int_transaccion_fk','int4');
+		$this->captura('id_cuenta','int4');
+		$this->captura('glosa','varchar');
+		$this->captura('id_int_comprobante','int4');
+		$this->captura('id_auxiliar','int4');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		
+		$this->captura('importe_debe_mb','numeric');	
+		$this->captura('importe_haber_mb','numeric');
+		$this->captura('importe_gasto_mb','numeric');
+		$this->captura('importe_recurso_mb','numeric');
+		
+		$this->captura('importe_debe_mt','numeric');	
+		$this->captura('importe_haber_mt','numeric');
+		$this->captura('importe_gasto_mt','numeric');
+		$this->captura('importe_recurso_mt','numeric');
+		
+		$this->captura('importe_debe_ma','numeric');	
+		$this->captura('importe_haber_ma','numeric');
+		$this->captura('importe_gasto_ma','numeric');
+		$this->captura('importe_recurso_ma','numeric');
+		
+		$this->captura('desc_partida','text');
+		$this->captura('desc_centro_costo','text');
+		$this->captura('desc_cuenta','text');
+		$this->captura('desc_auxiliar','text');
+		$this->captura('tipo_partida','varchar');
+		$this->captura('id_orden_trabajo','int4');
+		$this->captura('desc_orden','varchar');		
+		$this->captura('nro_cbte','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('nombre_corto','varchar');
+		$this->captura('fecha','date');
+		$this->captura('glosa1','varchar');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_estado_wf','int4');
+		$this->captura('cbte_relacional','varchar');
+		$this->captura('saldo','numeric');	
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	//mp
+	function listarMayorSaldo(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_transaccion_sel';
+		$this->transaccion='CONTA_REPMAYSAL_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);	
+		
+		$this->setParametro('id_moneda','id_moneda','int4');
+		$this->setParametro('id_cuenta','id_cuenta','int4');
+		$this->setParametro('id_partida','id_partida','int4');
+		$this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
+		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+		$this->setParametro('tipo_filtro','tipo_filtro','varchar');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('desde','desde','date');
+		
+		$this->setParametro('datos','datos','varchar');
+		//Definicion de la lista del resultado del query
+		$this->captura('id_int_transaccion','int4');
+		$this->captura('id_partida','int4');
+		$this->captura('id_centro_costo','int4');
+		$this->captura('id_partida_ejecucion','int4');
+		$this->captura('estado_reg','varchar');
+		$this->captura('id_int_transaccion_fk','int4');
+		$this->captura('id_cuenta','int4');
+		$this->captura('glosa','varchar');
+		$this->captura('id_int_comprobante','int4');
+		$this->captura('id_auxiliar','int4');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','date');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','date');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		
+		$this->captura('importe_debe_mb','numeric');	
+		$this->captura('importe_haber_mb','numeric');
+		$this->captura('importe_gasto_mb','numeric');
+		$this->captura('importe_recurso_mb','numeric');
+		
+		$this->captura('importe_debe_mt','numeric');	
+		$this->captura('importe_haber_mt','numeric');
+		$this->captura('importe_gasto_mt','numeric');
+		$this->captura('importe_recurso_mt','numeric');
+		
+		$this->captura('importe_debe_ma','numeric');	
+		$this->captura('importe_haber_ma','numeric');
+		$this->captura('importe_gasto_ma','numeric');
+		$this->captura('importe_recurso_ma','numeric');
+		
+		$this->captura('desc_partida','varchar');
+		$this->captura('desc_centro_costo','varchar');
+		$this->captura('desc_cuenta','varchar');
+		$this->captura('desc_auxiliar','varchar');
+		$this->captura('tipo_partida','varchar');
+		$this->captura('id_orden_trabajo','int4');
+		$this->captura('desc_orden','varchar');		
+		$this->captura('nro_cbte','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('nombre_corto','varchar');
+		$this->captura('fecha','date');
+		$this->captura('glosa1','varchar');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_estado_wf','int4');
+		$this->captura('cbte_relacional','varchar');
+		$this->captura('saldo','numeric');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 }
 ?>

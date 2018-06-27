@@ -1,6 +1,6 @@
 <?php
 // Extend the TCPDF class to create custom MultiRow
-class RTransaccionmayor extends ReportePDF {
+class RTransaccionmayorSaldo extends ReportePDF {
 	var $datos_titulo;
 	var $datos_detalle;
 	var $ancho_hoja;
@@ -29,6 +29,7 @@ class RTransaccionmayor extends ReportePDF {
 	var $a="";
 	
 	function datosHeader ($detalle,$resultado,$tpoestado,$auxiliar) {
+		
 		$this->SetHeaderMargin(10);
 		$this->SetAutoPageBreak(TRUE, 10);
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
@@ -115,7 +116,6 @@ class RTransaccionmayor extends ReportePDF {
 				default:			
 					break;
 			}
-					
 			$cc= (int)($this->objParam->getParametro('cc') === 'true');		
 			$partida = (int)($this->objParam->getParametro('partida')=== 'true');
 			$auxiliar = (int)($this->objParam->getParametro('auxiliar')=== 'true');
@@ -175,30 +175,36 @@ class RTransaccionmayor extends ReportePDF {
 				$aux=$aux.'Fecha:'.$newDate."\r\n";
 			}else{
 				$aux=$aux.'';
-			}	*/			
-					
+			}	*/				
 			$arr = explode('-', $datarow['fecha']);
 			$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
 			
 			if($debe=='0.00'){
 				$var='haber';
-				//$sw=1;
-			}else{
+			}else{				
 				$var='debe';
-			}	
-			$acreedor = str_replace('(', '', $acreedor);
-			$acreedor = str_replace(')', '', $acreedor);
-			$acreedor = str_replace(',', '', $acreedor);
-			$acreedor=floatval($acreedor);
-		
+			}
+			if($haber=='0.00' && $debe=='0.00'){
+				$acreedor=0;
+			}else{
+				$acreedor = str_replace('(', '', $acreedor);
+				$acreedor = str_replace(')', '', $acreedor);
+				$acreedor = str_replace(',', '', $acreedor);
+				$acreedor=floatval($acreedor);
+			}						
 			if($acreedor==0){				
 				if($var=='debe'){
 					$this->tablenumbers=array(0,0,0,0,2,2,2);
 					$acreedor= (float)$debe;			
-				}else{			
-					$this->tablenumbers=array(0,0,0,0,2,2,0);
-					$acreedor= '('.(string)(number_format($haber, 2, '.', ',')).')';
-					$sw='1';						
+				}else{
+					if($haber=='0.00' && $debe=='0.00'){
+						$this->tablenumbers=array(0,0,0,0,2,2,2);
+					}else{
+						$this->tablenumbers=array(0,0,0,0,2,2,0);
+						$acreedor= '('.(string)(number_format($haber, 2, '.', ',')).')';
+						$sw='1';
+					}			
+											
 				}										
 			}			
 			else{
@@ -242,7 +248,6 @@ class RTransaccionmayor extends ReportePDF {
 				$sw='1';
 				(float)$acreedor= (string)$acreedor;						
 			}
-	
 			$this->tablealigns=array('C','L','L','L','R','R','R');			
 			$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
 			$this->tabletextcolor=array();			
@@ -396,7 +401,7 @@ class RTransaccionmayor extends ReportePDF {
 			$this->t3= '('.(string)(number_format($this->t3, 2, '.', ',')).')';
 			$this->tablenumbers=array(0,0,0,0,2,2,0);		
 		}else{
-			$this->tablenumbers=array(0,0,0,0,0,0,2);
+			$this->tablenumbers=array(0,0,0,0,2,2,2);
 		}								
 		$RowArray = array(
 					't0' => '', 

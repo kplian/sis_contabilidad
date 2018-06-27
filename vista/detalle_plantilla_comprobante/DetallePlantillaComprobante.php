@@ -207,6 +207,25 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             form:true
         },
         
+        
+        
+        {
+			config:{
+				name: 'campo_codigo_aplicacion_rc',
+				fieldLabel: 'Campo Codigo Aplicacion RC',
+				qtip:'Define el campo para obtener el codigo de aplicacion para la relacion contable',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_codigo_aplicacion_rc',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+        
         {
 			config:{
 				name: 'tabla_detalle',
@@ -907,7 +926,9 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_porc_monto_excento_var',
         {name:'campo_nombre_cheque_trans', type: 'string'},
         'prioridad_documento',
-        'campo_orden_trabajo','campo_forma_pago','codigo','tipo_relacion_contable_cc','campo_relacion_contable_cc','campo_suborden',
+        'campo_orden_trabajo','campo_forma_pago','codigo',
+        'tipo_relacion_contable_cc','campo_relacion_contable_cc','campo_suborden',
+        'campo_codigo_aplicacion_rc'
 		
 	],
 	sortInfo:{

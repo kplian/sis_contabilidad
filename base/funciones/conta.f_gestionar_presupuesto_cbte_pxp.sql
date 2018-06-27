@@ -19,7 +19,8 @@ $body$
    ISSUE            FECHA:		           AUTOR                 DESCRIPCION
  #31, ETR       27/12/2017              RAC KPLIAN           que considere los monto noejectuados, registrados por cada transaccion
  #32, ETR       06/02/2018              RAC KPLIAN           mandar glosa, datos de anticipo, descuento y iva revertido al ejecutar presupesuto 
- #88, ETR       25/02/2018              RAC KPLIAN           Hscer opcional la reversion del IVA comprometido
+ #88, ETR       25/02/2018              RAC KPLIAN           Hscer opcional la reversion del IVA comprometido 
+ #0 , ETR       29/03/2018              RAC KPLIAN           mejorar mensaje de error de presupeusto
  
           
      
@@ -299,7 +300,7 @@ BEGIN
                                              END IF;
                                          END IF;
                                            
-                                       -- raise exception 'entra.. % --  %',v_monto_cmp, v_monto_cmp_mb;
+                                       
                                         IF  v_monto_cmp  > 0 THEN
                                             --si es ejecucion restamos el monto a no ejecutar
                                             v_monto_cmp_aux   = 	v_monto_cmp	 - 	v_registros.monto_no_ejecutado;
@@ -311,6 +312,10 @@ BEGIN
                                         ELSE                                           
                                            raise exception 'monto no contemplado';
                                         END IF;
+                                        
+                                        
+                                        
+                                       
                                         
                                         --#32 monto que no ejecuta presupeusto retencion de antiicpo
                                         v_monto_desc_anticipo = v_registros.monto_no_ejecutado;                                         
@@ -346,6 +351,9 @@ BEGIN
                                                                                     v_monto_anticipo,
                                                                                     v_monto_desc_anticipo,
                                                                                     v_monto_iva_revertido);
+                                                                                    
+                                                                                    
+                                                                                         
                                                             
                                          ------------------------------------
                                          --  ACUMULAR ERRORES
@@ -361,7 +369,7 @@ BEGIN
                                                                                                v_id_moneda, 
                                                                                                v_id_moneda_base, 
                                                                                                v_momento_presupeustario, 
-                                                                                               v_monto_cmp_mb);
+                                                                                               v_monto_cmp_mb_aux);
                                                  v_sw_error = true;
                                                  
                                           ELSE
@@ -382,8 +390,9 @@ BEGIN
                                                    END IF; 
                                                   
                                           END IF; --fin id de error
-                                       
-                                       
+                                          
+                                         
+                                         
                                          -------------------------------------------------------------------------------------  
                                          --   si existe un factor a revertir y tenememos el id_partida_ejecucion, revertimos
                                          -------------------------------------------------------------------------------------
@@ -467,12 +476,17 @@ BEGIN
                                                       where it.id_int_transaccion  =   v_registros.id_int_transaccion;
                                                      
                                                   
-                                                  END IF; --fin id de error                                        
-                                         
+                                                  END IF; --fin id de error  
+                                                  
+                                                  
+                                                                                     
+                                                                                     
                                        END IF; --if la transacion tiene reversion
-                                
-                                
+                                       
+                                        
                                  END IF;  --fin if es partida presupuestaria
+                                 
+                            
                                  
                           
                           ELSIF  v_momento_aux='solo pagar'  THEN
