@@ -1479,4 +1479,15 @@ VALUES
   
   
 /***********************************F-DAT-RAC-CONTA-0-06/11/2018*****************************************/ 
+
+/***********************************I-DAT-EGS-CONTA-1-30/11/2018*****************************************/ 
+
+
+select param.f_import_tcatalogo_tipo ('insert','tauxiliar','CONTA','tauxiliar');
+select param.f_import_tcatalogo ('insert','CONTA','Nacional','nacional','tauxiliar');
+select param.f_import_tcatalogo ('insert','CONTA','Interno','interno','tauxiliar');
+select param.f_import_tcatalogo ('insert','CONTA','Internacional','internacional','tauxiliar');
+
+/***********************************F-DAT-EGS-CONTA-1-30/11/2018*****************************************/ 
+
   

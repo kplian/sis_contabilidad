@@ -32,6 +32,9 @@ $body$
  #13			18/10/2017		  RAC KPLIAN		Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados  
  #86  ETR       24/02/2018        RAC KPLIAN        Validar que el monto IVA y descuentos cuadre al validar el comprobante
  #00  ETR       08/03/2018        RAC KPLIAN        Se levanta la validacion de correlativos en fechas has el 31 de diciembe de 2018
+ #87  ETR       01/09/2018        RAC KPLIAN        Se agrega la verificaicon para cierre de transacciones con saldo cero para cuentas de pasivo y activo 
+ #88  ETR       29/11/2018        RAC KPLIAN        Se actualiza el nro de tramite en la transaccion al validar el cbte 
+
 
 */
 DECLARE
@@ -82,6 +85,7 @@ DECLARE
     v_resp_val_doc					varchar[];
     v_tes_integrar_lb_pagado		varchar;
     v_conta_forzar_validacion_documentos	varchar;
+    v_retorno           boolean; --#87
      
 
 BEGIN
@@ -729,18 +733,19 @@ BEGIN
     end if;
     
     
-    IF  p_id_int_comprobante = 4974 THEN
-       --raise exception 'LLEGA AL FINAL -- ';
-    END IF;
-    
-      IF p_id_int_comprobante = 13732    THEN
-         
-           -- raise 'LLEGa ....'; 
-         
-         
-      END IF;
+     
       
+     --#87 01/09/2018 
+    v_retorno = conta.f_validar_y_cerrar_transacciones(p_id_int_comprobante);
     
+    --#88 actulizar nro de tramite en transacciones  
+    update conta.tint_transaccion set
+      nro_tramite = v_rec_cbte.nro_tramite      
+    where id_int_comprobante =  p_id_int_comprobante;
+     
+    IF p_id_int_comprobante = 13732    THEN
+           -- raise 'LLEGa ....'; 
+    END IF;
    
     
    

@@ -26,6 +26,14 @@ $body$
  DESCRIPCION:	Ajuste par aconsiderar nuevas variables usar_cc_original, imputar_excento
  AUTOR:	    	RAC	 
  FECHA:		    05/01/2018
+ 
+ HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		05/01/2018      Rensi Arteaga Copari       Ajuste par aconsiderar nuevas variables usar_cc_original, imputar_excento
+ #98       		20/08/2018      Rensi Arteaga Copari       Feu adicionado un nnuevo tipo de aplicacion de excento para permitir la facturas de combustible
+
 ***************************************************************************/
 
 DECLARE
@@ -135,7 +143,6 @@ BEGIN
                               
                               
                              -- si es una trasaccion primeria (priorida =1 )se suma el porcentaje del monto no imponible
-                             -- FIN RAC 05/01/2017 se agregar  las condiciones para calcular el excento 
                              -- si imputar_excento, es si,  el importe  lo retira del prioridad 1 y lo imputa a la propiedad 2 que este marcada
                              
                              IF v_registros.prioridad = 1  and   v_registros.imputar_excento = 'no' THEN
@@ -143,15 +150,23 @@ BEGIN
                                    v_porc_importe_presupuesto = v_porc_importe_presupuesto + p_porc_monto_excento_var;
                              END IF;
                              
+                             
+                             --es la transaccion primaria menos el monto excento
                              IF v_registros.prioridad = 1  and   v_registros.imputar_excento = 'si' THEN
                                    v_porc_importe = v_porc_importe ;
                                    v_porc_importe_presupuesto = v_porc_importe_presupuesto;
                              END IF;
                              
+                             --#98 20/08/2018... si es te tipo nada  solo deja el porcetaje configurado sin considerar el excento
+                             IF v_registros.prioridad = 1  and   v_registros.imputar_excento = 'nada' THEN
+                                   v_porc_importe = v_registros.importe ;
+                                   v_porc_importe_presupuesto = v_registros.importe_presupuesto;
+                             END IF;
                              
+                             --#98  multiplica por el porcentaje configurado en la plantilla..... osea aplica en este porcentaje el excento apra la trasaccion
                              IF v_registros.prioridad = 2  and   v_registros.imputar_excento = 'si' THEN
-                                   v_porc_importe =  p_porc_monto_excento_var;
-                                   v_porc_importe_presupuesto =  p_porc_monto_excento_var;
+                                   v_porc_importe =  p_porc_monto_excento_var* v_registros.importe;
+                                   v_porc_importe_presupuesto =  p_porc_monto_excento_var* v_registros.importe_presupuesto;
                              END IF;
                              
                              --FIN RAC 05/01/2017

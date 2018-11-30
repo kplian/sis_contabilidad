@@ -72,7 +72,8 @@ BEGIN
                             resplan.id_tipo_relacion_comprobante,
                             resplan.relacion_unica,
                             resplan.nombre as desc_tipo_relacion_comprobante,
-                            resplan.nombre_func
+                            resplan.nombre_func,
+                            resplan.visible
 						
                         from conta.tresultado_plantilla resplan
                         inner join segu.tusuario usu1 on usu1.id_usuario = resplan.id_usuario_reg

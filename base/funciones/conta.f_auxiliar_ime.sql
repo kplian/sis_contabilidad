@@ -17,6 +17,9 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
+ ISUUE			FECHA			 AUTHOR 		 DESCRIPCION				
+ * 	1A			30/08/2018			EGS		 se aumento el campo aplicacion en las transcacciones  CONTA_AUXCTA_INS,  CONTA_AUXCTA_MOD ,CONTA_COD_AUX_GET
+ 
 
  DESCRIPCION:	
  AUTOR:			
@@ -62,7 +65,8 @@ BEGIN
 			id_usuario_reg,
 			id_usuario_mod,
 			fecha_mod,
-            corriente
+            corriente,
+            aplicacion
           	) values(
 			--v_parametros.id_empresa,
 			'activo',
@@ -72,7 +76,8 @@ BEGIN
 			p_id_usuario,
 			null,
 			null,
-            v_parametros.corriente
+            v_parametros.corriente,
+            v_parametros.aplicacion
 							
 			)RETURNING id_auxiliar into v_id_auxiliar;
 			
@@ -102,7 +107,8 @@ BEGIN
 			nombre_auxiliar = v_parametros.nombre_auxiliar,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
-            corriente = v_parametros.corriente
+            corriente = v_parametros.corriente,
+            aplicacion=v_parametros.aplicacion
 			where id_auxiliar=v_parametros.id_auxiliar;
                
 			--Definicion de la respuesta

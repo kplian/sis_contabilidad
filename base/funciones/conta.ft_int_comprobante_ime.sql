@@ -16,11 +16,16 @@ $body$
  FECHA:	        29-08-2013 00:28:30
  COMENTARIOS:	
 ***************************************************************************
- HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+		
+ 
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		29-08-2013        RCM KPLIAN        CREACION
+ #2             27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
+ #3             28-11-2018        RAC KPLIAN        al revertir comprobantes usar la fecha actual
+ 
 ***************************************************************************/
 
 DECLARE
@@ -93,6 +98,12 @@ DECLARE
     v_id_moneda_act					integer;
     v_id_gestion_cos				integer;
     v_id_gestion_cbte				integer;
+    v_glosa1                        text;
+    v_fecha_cbte_rev                date;    --#3
+    v_rec_periodo                   record;  --#3
+    v_gestion_aux                   integer; --#3
+    v_gestion_fecha				    integer; --#3
+    v_fecha_cbte_tmp                date;    --#3
    
    
 			    
@@ -843,6 +854,30 @@ BEGIN
             from conta.tint_comprobante ic 
             where ic.id_int_comprobante = v_parametros.id_int_comprobante;
             
+            ----------------------------------
+            --#3  Determinar fecha  y periodo
+            ----------------------------------
+            v_fecha_cbte_tmp = now()::date;  --#3 al revertir usa la fecha actual 
+            v_gestion_fecha =  date_part('year', v_fecha_cbte_tmp);            
+            
+            select 
+              g.gestion
+             into
+              v_gestion_aux
+            from param.tgestion g
+            inner join param.tperiodo per on per.id_gestion = g.id_gestion 
+            where per.id_periodo = v_reg_cbte.id_periodo;
+          
+            if v_gestion_aux < v_gestion_fecha then             
+              --#3 forzamos 31 de diciembre
+              v_fecha_cbte_rev = (v_gestion_aux||'-12-31')::date;
+            ELSE 
+               v_fecha_cbte_rev = v_fecha_cbte_tmp ; 
+            end if;
+            
+            --#3 obtener el periodo a partir de la fecha
+             v_rec_periodo = param.f_get_periodo_gestion(v_fecha_cbte_rev);
+            
             IF  v_reg_cbte.estado_reg != 'validado'  THEN
                raise exception 'solo pueden volcar comprobantes validados';
             END IF; 
@@ -967,7 +1002,7 @@ BEGIN
               v_reg_cbte.id_subsistema,
               v_reg_cbte.id_depto,
               v_reg_cbte.id_moneda,
-              v_reg_cbte.id_periodo,
+               v_rec_periodo.po_id_periodo,    --#3   v_reg_cbte.id_periodo,
               v_reg_cbte.id_funcionario_firma1,
               v_reg_cbte.id_funcionario_firma2,
               v_reg_cbte.id_funcionario_firma3,
@@ -975,7 +1010,7 @@ BEGIN
               v_reg_cbte.beneficiario,  			
               'borrador',
               'REVERSION CBTE ('||v_reg_cbte.nro_cbte||',  id:'||v_reg_cbte.id_int_comprobante||' )',
-              v_reg_cbte.fecha,
+              v_fecha_cbte_rev, --#3  remplaza fecha origianl ..... v_reg_cbte.fecha,,
               v_reg_cbte.glosa2,  			
               --v_parametros.momento,
               p_id_usuario,
@@ -2008,7 +2043,47 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
             
-		end;    
+		end; 
+        
+     /*********************************    
+ 	#TRANSACCION:  'CONTA_UPDGLOSA_MOD'
+ 	#DESCRIPCION:	permite modificar solo la glosa de cbte validados
+ 	#AUTOR:		    #2 RAC KPLIAN
+ 	#FECHA:		    22-08-2018 
+	***********************************/
+
+	elsif(p_transaccion='CONTA_UPDGLOSA_MOD')then
+
+		begin
+		
+            select
+               cb.glosa1
+             into 
+               v_glosa1
+            from conta.tint_comprobante cb
+            where cb.id_int_comprobante =  v_parametros.id_int_comprobante;
+        
+			------------------------------
+			--Sentencia de la modificacion
+			------------------------------
+            
+			update conta.tint_comprobante set                
+                glosa1 = v_parametros.glosa1,
+                fecha_mod = now(),
+                id_usuario_mod = p_id_usuario,
+                glosa_previa = v_glosa1
+			where id_int_comprobante = v_parametros.id_int_comprobante;
+            
+            
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','se modifico la glosa del cbte ID:'|| v_parametros.id_int_comprobante::varchar||' , valor anterior: '|| COALESCE(v_glosa1,'N/A')); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;       
         
      
     

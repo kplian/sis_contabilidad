@@ -17,6 +17,9 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
+   ISUUE			FECHA			 AUTHOR 		 DESCRIPCION	
+ 	1A			30/08/2018			EGS		 se aumento el campo aplicacion en las transcacciones CONTA_AUXCTA_SEL 
+
 
  DESCRIPCION:	
  AUTOR:			
@@ -91,7 +94,8 @@ BEGIN
 						auxcta.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        auxcta.corriente
+                        auxcta.corriente,
+                        auxcta.aplicacion
 						from conta.tauxiliar auxcta
 						inner join segu.tusuario usu1 on usu1.id_usuario = auxcta.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = auxcta.id_usuario_mod

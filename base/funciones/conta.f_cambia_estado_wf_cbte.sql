@@ -49,6 +49,9 @@ BEGIN
              inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = p_estado               
              where pw.id_proceso_wf = v_registros.id_proceso_wf;
              
+if p_id_int_comprobante = 22746 then
+	raise exception 'eliminando, %, %',v_registros.id_proceso_wf,p_estado;
+end if;  
              
              
             IF v_id_tipo_estado is NULL  THEN             

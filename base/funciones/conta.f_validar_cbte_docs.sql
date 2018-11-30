@@ -56,6 +56,9 @@ v_registros_desc_ley    	 record; -- #86 +
 v_lista_docs           		 varchar;-- #86 +
 v_reg_cbte  				 record; -- #86 +
 v_error_round                numeric;-- #86 +
+v_existe_venta   			boolean;  --#87
+v_existe_compra 			boolean ;  --#87
+v_existe_iva_cbte           boolean;
 
 
 
@@ -209,8 +212,61 @@ BEGIN
        where dcv.id_int_comprobante = p_id_int_comprobante
              and dcv.estado_reg = 'activo'
              and per.id_periodo != c.id_periodo;
+             
+             
+             
+    --------------------------------------
+    --  #87 Validtar tipos de documentos
+    ---------------------------------------         
       
-      
+      IF  exists (select 1 from conta.tdoc_compra_venta  dcv 
+                     inner join param.tplantilla plt on plt.id_plantilla = dcv.id_plantilla
+                     inner join conta.tint_comprobante c on c.id_int_comprobante = dcv.id_int_comprobante
+                 
+                  where plt.tipo_plantilla = 'compra'  and 
+                        dcv.id_int_comprobante = p_id_int_comprobante and 
+                        dcv.estado_reg = 'activo' ) THEN
+            
+            v_existe_compra = true;
+            
+       ELSE     
+            v_existe_compra = FALSE;
+       END IF;
+       
+       
+       IF  exists (select 1 from conta.tdoc_compra_venta  dcv 
+                     inner join param.tplantilla plt on plt.id_plantilla = dcv.id_plantilla
+                     inner join conta.tint_comprobante c on c.id_int_comprobante = dcv.id_int_comprobante
+                 
+                  where plt.tipo_plantilla = 'venta'  and 
+                        dcv.id_int_comprobante = p_id_int_comprobante and 
+                        dcv.estado_reg = 'activo' ) THEN
+            
+            v_existe_venta = true;
+            
+       ELSE     
+            v_existe_venta = FALSE;
+       END IF;
+    
+    
+     --------------------------------------------------------
+     --Validamos sis existe iva deberai existir un documento
+     ---------------------------------------------------------
+     IF not v_existe_venta and not v_existe_compra   AND  p_id_int_comprobante !=  32613 THEN
+         IF  COALESCE(v_registros_iva_cf.debe,0) > 0 or  COALESCE(v_registros_iva_df.haber,0) > 0 THEN
+        
+             
+            -- COALESCE(v_registros_desc_ley.haber,0)
+             v_resp_val_doc[1] = 'FALSE';
+             v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!!';
+                            
+             IF p_forzar_validacion = 'si' THEN
+               raise exception '%',v_resp_val_doc[2];
+             ELSE
+               return v_resp_val_doc;
+             END IF;
+         END IF;
+     END IF; 
         
     ---------------------------------------------         
     --#86  VALDIAR FECHAS DE LOS DOCUMENTOS
@@ -236,31 +292,32 @@ BEGIN
      -- #86 VALDIAR EL IVa, CF     
      -------------------------------
      
-     IF  p_id_int_comprobante !=  14667 THEN
+     IF  p_id_int_comprobante !=  32613 THEN
      
-     IF v_registros_iva_cf is not null   THEN
-     
-           IF v_conta_val_doc_compra = 'si' and p_validar  THEN
-                
-               IF not conta.f_comparar_numeric(COALESCE(v_registros_doc.importe_iva,0),  COALESCE(v_registros_iva_cf.debe,0) , v_error_round )  THEN  
-                  
-                  
-                  --raise exception '-- % , %'   ,v_registros_doc.importe_iva,v_registros_iva_cf.debe ;            
-               
-                   v_resp_val_doc[1] = 'FALSE';
-                   v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura CON CREDITO FISCAL o algun excento esta mal registrado). IVA cbte: ('||COALESCE(v_registros_iva_cf.debe,0)::varchar||'),  IVA Documentos : ('|| COALESCE(v_registros_doc.importe_iva,0)::varchar||').';
-                     
-                     raise exception '%',v_resp_val_doc[2]::varchar;
+       --  IF v_registros_iva_cf is not null   THEN    -- RAC 15/08/2018  se comenta por que pertia apsar cbte vinc uenta iva pero con factura relacionada
+         
+               IF v_conta_val_doc_compra = 'si' and p_validar  and v_existe_compra THEN
+                    
+                   IF not conta.f_comparar_numeric(COALESCE(v_registros_doc.importe_iva,0),  COALESCE(v_registros_iva_cf.debe,0) , v_error_round )  THEN  
                       
-                   IF p_forzar_validacion = 'si' THEN
-                     raise exception '%',v_resp_val_doc[2]::varchar;
-                   ELSE
-                     return v_resp_val_doc;
-                   END IF;
+                      
+                      --raise exception '-- % , %'   ,v_registros_doc.importe_iva,v_registros_iva_cf.debe ;            
                    
+                       v_resp_val_doc[1] = 'FALSE';
+                       v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura CON CREDITO FISCAL o algun excento esta mal registrado). IVA cbte: ('||COALESCE(v_registros_iva_cf.debe,0)::varchar||'),  IVA Documentos : ('|| COALESCE(v_registros_doc.importe_iva,0)::varchar||').';
+                         
+                         raise exception '%',v_resp_val_doc[2]::varchar;
+                          
+                       IF p_forzar_validacion = 'si' THEN
+                         raise exception '%',v_resp_val_doc[2]::varchar;
+                       ELSE
+                         return v_resp_val_doc;
+                       END IF;
+                       
+                   END IF;
                END IF;
-           END IF;
-     END IF;  
+               
+        -- END IF;  
      
      ELSE
      
@@ -271,14 +328,17 @@ BEGIN
      ----------------------------
      -- #86 VALDIAR EL IVA, DF     
      -----------------------------
-     IF  p_id_int_comprobante !=  14667 THEN
+     IF  p_id_int_comprobante !=  32613 THEN
       
      
-       IF v_registros_iva_df is not null  THEN
+      -- IF v_registros_iva_df is not null  THEN    -- RAC 15/08/2018  se comenta por que pertia apsar cbte vinc uenta iva pero con factura relacionada
      
-           IF v_conta_val_doc_compra = 'si' and p_validar  THEN
+           IF v_conta_val_doc_compra = 'si' and p_validar  and v_existe_venta  THEN
                 
-               IF not conta.f_comparar_numeric(COALESCE(v_registros_doc.importe_iva,0) , COALESCE(v_registros_iva_df.haber,0) ,v_error_round )     THEN               
+               IF not conta.f_comparar_numeric(COALESCE(v_registros_doc.importe_iva,0) , COALESCE(v_registros_iva_df.haber,0) ,v_error_round )     THEN  
+               
+               
+                   -- raise exception '-- % , %'   ,v_registros_doc.importe_iva,v_registros_iva_df.haber ;                
                
                    v_resp_val_doc[1] = 'FALSE';
                    v_resp_val_doc[2] = 'FALTA REGISTRAR ALGUN DOCUMENTO!!! (Factura CON DEBITO FISCAL o algun excento esta mal registrado). IVA DF cbte: ('|| COALESCE( v_registros_iva_df.haber,0)::varchar||'),  IVA Documentos: ('||COALESCE(v_registros_doc.importe_iva,0)::varchar ||').';
@@ -291,7 +351,7 @@ BEGIN
                    
                END IF;
            END IF;
-     END IF;
+       --END IF;
      
      END IF;
      
@@ -318,8 +378,8 @@ BEGIN
            END IF;
      END IF; 
      
-      IF  p_id_int_comprobante =  14667 THEN
-       -- raise exception 'llega';
+      IF  p_id_int_comprobante =  32613 THEN
+         --raise exception 'llega';
       END IF;
      
      /* --#86      
