@@ -66,19 +66,22 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel:'Tipo de Reporte',
 				typeAhead: true,
 				allowBlank:false,
-	    		triggerAction: 'all',
-	    		emptyText:'Tipo...',
-	    		selectOnFocus:true,
+				triggerAction: 'all',
+				emptyText:'Tipo...',
+				selectOnFocus:true,
 				mode:'local',
 				store:new Ext.data.ArrayStore({
-	        	fields: ['ID', 'valor'],
-	        	data :	[
-						//['endesis_erp','Libro de Compras Estandar'],
-	        	        ['lcv_compras','Libro de Compras Estandar (nueva versión)'],
-	        	        ['lcv_ventas','Libro de Ventas Estandar'],	
-						//['LCNCD','Libro de Compras NCD']					
-						]	        				
-	    		}),
+				fields: ['ID', 'valor'],
+				data :	
+				[
+					//['endesis_erp','Libro de Compras Estandar'],
+					['lcv_compras','Libro de Compras Estandar (nueva versión)'],
+					['lcv_ventas','Libro de Ventas Estandar'],		
+					['lbcd','LIBRO DE COMPRAS PARA NOTAS DE CREDITO/DEBITO '],
+					['lbcc','LIBRO DE VENTAS PARA NOTAS DE CREDITO / DEBITO '],	
+					//['LCNCD','Libro de Compras NCD']					
+				]					
+				}),
 				valueField:'ID',
 				displayField:'valor',
 				width:250,			

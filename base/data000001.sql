@@ -1434,4 +1434,49 @@ select pxp.f_insert_tgui ('Estado de Auxiliares', 'Estado de Auxiliares', 'EXUMA
 select pxp.f_insert_testructura_gui ('EXUMAY', 'REPCON');
 
 
+
+select conta.f_import_tplantilla ('insert','Venta con Debito Fiscal (Regularizado no entra a libros LCV)','si','si','5','1','no','no','si','si','venta','no','no','variable','0','regularizacion');
+
+
+select pxp.f_insert_tgui ('Regularización', 'Regularización', 'REGUCON', 'si', 1, '', 2, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Registro de facturas Regularización', 'Registro de facturas regularización', 'REFAREG', 'si', 1, 'sis_contabilidad/vista/doc_compra_venta/DocVentaRegul.php', 3, '', 'DocVentaRegul', 'CONTA');
+select pxp.f_insert_testructura_gui ('REGUCON', 'CONTA');
+select pxp.f_insert_testructura_gui ('REFAREG', 'REGUCON')
+
+
 ***********************************F-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 
+
+/***********************************I-DAT-EGS-CONTA-0-27/09/2018*****************************************/ 
+
+select conta.f_import_tplantilla_comprobante ('insert','CBRRG','cbr.f_gestionar_cbte_cobro_simple_eliminacion','id_cobro_simple','CBR','{$tabla.obs}','cbr.f_gestionar_cbte_cobro_simple','{$tabla.fecha}','activo','{$tabla.desc_proveedor}','{$tabla.id_depto_conta}','contable','','cbr.vcobro_simple_cbte','INGRESOCON','{$tabla.id_moneda}','{$tabla.id_gestion}','{$tabla.id_moneda},{$tabla.id_gestion},{$tabla.id_depto_conta},{$tabla.id_cobro_simple},{$tabla.id_cuenta_bancaria},{$tabla.id_funcionario},{$tabla.id_proveedor},{$tabla.importe},{$tabla.importe_mb},{$tabla.id_proveedor},{$tabla.importe_mt},{$tabla.tipo_cambio},{$tabla.tipo_cambio_ma},{$tabla.tipo_cambio_mt},{$tabla.id_config_cambiaria}','no','no','no','{$tabla.id_cuenta_bancaria}','','0','0','{$tabla.nro_tramite}','{$tabla.tipo_cambio}','{$tabla.id_depto_lb}','','','','Cobro de clientes Retencion Garantias','','','{$tabla.tipo_cambio_mt}','{$tabla.tipo_cambio_ma}','{$tabla.id_config_cambiaria}');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','CBRRG','INGREBAN','debe','si','si','','{$tabla_padre.desc_proveedor}','CUEBANCING','','{$tabla_padre.importe}','{$tabla_padre.id_cuenta_bancaria}','','no','','','','si','','','','Ingreso de Bancos','{$tabla_padre.importe}',NULL,'simple','','','no','','{$tabla_padre.id_cuenta_bancaria}','','0','0','','{$tabla_padre.desc_proveedor}','2','','',NULL,'deposito','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','CBRRG','CUXCORGH','haber','si','si','','{$tabla.desc_dcv}','CUXCRRGH','','{$tabla.importe}','{$tabla_padre.id_proveedor}','','no','','','','si','','id_cobro_simple','','Cuentas por cobrar clientes Retencion Garantias','{$tabla.importe}',NULL,'simple','','{$tabla.id_cobro_simple_det}','no','','','','','','','','2','','cbr.vcobro_simple_det',NULL,'','','','');
+
+
+
+/***********************************F-DAT-EGS-CONTA-0-27/09/2018*****************************************/ 
+
+
+/***********************************I-DAT-RAC-CONTA-0-06/11/2018*****************************************/ 
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_cod_plan_nota_credito', E'NOTACREDITODOC', NULL);
+  
+  
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_cod_plan_nota_debito', E'NOTADEBITODOC', NULL);
+  
+  
+  
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_migrar_rc_concepto_version', E'no', E'al apretar el boton para migrar relacion contable de una gestion a otra, si esta habilita insertara la nuevas relacion en funcion a la tabla conceptos_ids\r\n');
+  
+  
+  
+  
+/***********************************F-DAT-RAC-CONTA-0-06/11/2018*****************************************/ 
+  

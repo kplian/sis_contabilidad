@@ -255,7 +255,7 @@ class RLcvVentas extends  ReportePDF {
 		if (($startY + 4 * 6) + $dimensions['bm'] > ($dimensions['hk'])) {		
 			$this->cerrarCuadro();	
 			//Comentado para mostrar el total solo en la ultima hoja del libro de ventas
-			//$this->cerrarCuadroTotal();
+			$this->cerrarCuadroTotal();
 			$k =($startY + 4 * 6) + $dimensions['bm'] - ($dimensions['hk']);
 			if($this->total!= 0){
 				$this->AddPage();

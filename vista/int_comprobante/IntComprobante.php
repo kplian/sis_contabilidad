@@ -41,7 +41,15 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				handler : this.loadDocCmpVnt,
 				tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
 			});
-
+			
+			this.addButton('btnLidDia',{
+				text: 'Lista Cbtes',
+				iconCls: 'bprint',
+				disabled: false	,
+				handler: this.ListCbts,
+				tooltip: '<b>Lista de comprobantes</b>'
+			});
+			
 			this.addButton('btnAIRBP',
 					{
 						text: 'Subir AIRBP',
@@ -1913,29 +1921,67 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		},
 		
 		
-	    swEditable: function() {
-			   
-			    var rec = this.sm.getSelected().data;
-			    Phx.CP.loadingShow();
-				Ext.Ajax.request({
-					url : '../../sis_contabilidad/control/IntComprobante/swEditable',
-					params : {
-						id_int_comprobante : rec.id_int_comprobante
-					},
-					success : function(resp) {
-						Phx.CP.loadingHide();
-						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-						if (reg.ROOT.error) {
-							Ext.Msg.alert('Error', 'Al  cambiar el modo de edición: ' + reg.ROOT.error)
-						} else {
-							this.reload();
-						}
-					},
-					failure : this.conexionFailure,
-					timeout : this.timeout,
-					scope : this
-				});
-	  }
+		swEditable: function() {
+			var rec = this.sm.getSelected().data;
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url : '../../sis_contabilidad/control/IntComprobante/swEditable',
+				params : {
+					id_int_comprobante : rec.id_int_comprobante
+				},
+				success : function(resp) {
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error', 'Al  cambiar el modo de edición: ' + reg.ROOT.error)
+					} else {
+						this.reload();
+					}
+				},
+				failure : this.conexionFailure,
+				timeout : this.timeout,
+				scope : this
+			});
+		},
+		//manu
+		ListCbts : function(rec)
+		{
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/ListaCbtes.php',
+				'Lista de comprobantes',
+				{
+					modal:true,
+					width:450,
+					height:200
+				},
+				this.maestro,
+				this.idContenedor,
+				'ListaCbtes',
+				{
+					config:[{
+						event:'beforesave',
+						delegate: this.datos,
+					}],
+					scope:this
+				}
+			);
+		},
+		
+		datos : function (wizard,resp){	
+			Phx.CP.loadingShow();	
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/IntComprobante/ListadoCbte',
+				params:
+				{		
+					'id_usuario':resp.id_usuario,
+					'fecha_ini':resp.fecha_ini,			
+					'fecha_fin':resp.fecha_fin			
+				},
+				success: this.successExport,		
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+		},
 })
 </script>
 

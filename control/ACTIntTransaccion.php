@@ -11,6 +11,8 @@ require_once(dirname(__FILE__).'/../reportes/RTransaccionmayorSaldo.php');
 require_once(dirname(__FILE__).'/../reportes/RMayorXls.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
 
+require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
+
 class ACTIntTransaccion extends ACTbase{
 			
 	function listarIntTransaccion(){
@@ -152,8 +154,12 @@ class ACTIntTransaccion extends ACTbase{
 		if($this->objParam->getParametro('nro_tramite')!=''){
 			$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");	
 		}
-
-        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+		if($this->objParam->getParametro('cerrado')=='si'){
+			$this->objParam->addFiltro("transa.cerrado in (''no'')");
+		}else{
+			$this->objParam->addFiltro("transa.cerrado in (''si'',''no'')");
+		}
+		if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
 			$this->objParam->addFiltro("(icbte.fecha::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");	
 		}
 		
@@ -184,16 +190,17 @@ class ACTIntTransaccion extends ACTbase{
 		
 		$temp['saldo_mb'] = $this->res->extraData['total_saldo_mb'];
 		$temp['saldo_mt'] = $this->res->extraData['total_saldo_mt'];
+		$temp['dif'] = $this->res->extraData['dif'];
 		
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_int_transaccion'] = 0;
-		
-		
+				
 		$this->res->total++;
 		
 		$this->res->addLastRecDatos($temp);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
 
     function guardarDatosBancos(){
 		$this->objFunc=$this->create('MODIntTransaccion');	
@@ -421,7 +428,46 @@ class ACTIntTransaccion extends ACTbase{
 			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
 		}
-		if($this->objParam->getParametro('tipo_formato')=='xls') {				
+		if($this->objParam->getParametro('tipo_formato')=='xls') {
+			if($this->objParam->getParametro('id_int_comprobante')!=''){
+				$this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));	
+			}
+			if($this->objParam->getParametro('id_gestion')!=''){
+				$this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));	
+			}		
+			if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+				$this->objParam->addFiltro("ctc.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));	
+			}		
+			if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+				$this->objParam->addFiltro("csc.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));	
+			}
+			if($this->objParam->getParametro('id_depto')!=''){
+				$this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));	
+			}	
+			if($this->objParam->getParametro('id_partida')!=''){
+				$this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));	
+			}		
+			if($this->objParam->getParametro('id_suborden')!=''){
+				$this->objParam->addFiltro("transa.id_subordeno = ".$this->objParam->getParametro('id_suborden'));	
+			}
+			if($this->objParam->getParametro('id_auxiliar')!=''){
+				$this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));	
+			}		
+			if($this->objParam->getParametro('id_centro_costo')!=''){
+				$this->objParam->addFiltro("transa.id_centro_costo = ".$this->objParam->getParametro('id_centro_costo'));	
+			}		
+			if($this->objParam->getParametro('nro_tramite')!=''){
+				$this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");	
+			}
+			if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+				$this->objParam->addFiltro("(icbte.fecha::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");	
+			}		
+			if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')==''){
+				$this->objParam->addFiltro("(icbte.fecha::date  >= ''%".$this->objParam->getParametro('desde')."%''::date)");	
+			}		
+			if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
+				$this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");	
+			}				
 			$this->objFun=$this->create('MODIntTransaccion');	
 			$this->res = $this->objFun->listarIntTransaccionRepMayor();	
 			if($this->res->getTipo()=='ERROR'){
@@ -515,35 +561,52 @@ class ACTIntTransaccion extends ACTbase{
         $this->mensajeRes->imprimirRespuesta($this->mensajeRes->generarJson());
     }
     
-     function listarAuxiliarCuenta(){
-		$this->objParam->defecto('ordenacion','orden');
-		$this->objParam->defecto('dir_ordenacion','asc');
-		
-		
-		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
-			$this->objReporte = new Reporte($this->objParam,$this);
-			$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarAuxiliarCuenta');
-		} else{
-			$this->objFunc=$this->create('MODIntTransaccion');
+	function listarAuxiliarCuenta(){
+				
+		if($this->objParam->getParametro('tipo_filtro')=='con_detalle'){
+			$this->objParam->defecto('ordenacion','orden');
+			$this->objParam->defecto('dir_ordenacion','asc');	
+			if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+				$this->objReporte = new Reporte($this->objParam,$this);
+				$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarAuxiliarCuenta');
+			} else{
+				$this->objFunc=$this->create('MODIntTransaccion');				
+				$this->res=$this->objFunc->listarAuxiliarCuenta($this->objParam);
+			}			
+			if($this->objParam->getParametro('resumen')!='no'){
+				//adicionar una fila al resultado con el summario
+				$temp = Array();
+				$temp['importe_debe_mb'] = $this->res->extraData['total_importe_debe_mb'];
+				$temp['importe_haber_mb'] = $this->res->extraData['total_importe_haber_mb'];
+				$temp['saldo'] = $this->res->extraData['total_saldo_mb'];			
+				$temp['id_int_transaccion'] = 0;			
+				$this->res->total++;			
+				$this->res->addLastRecDatos($temp);
+			}			
+		}else{
 			
-			$this->res=$this->objFunc->listarAuxiliarCuenta($this->objParam);
-		}
-		
-		if($this->objParam->getParametro('resumen')!='no'){
-			//adicionar una fila al resultado con el summario
+			if($this->objParam->getParametro('tipo_filtro')=='sin_detalle'){
+				
+				if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+					$this->objReporte = new Reporte($this->objParam,$this);
+					$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarTotal');
+				} else{
+					$this->objFunc=$this->create('MODIntTransaccion');				
+					$this->res=$this->objFunc->listarTotal($this->objParam);
+				}		
+			}	
 			$temp = Array();
 			$temp['importe_debe_mb'] = $this->res->extraData['total_importe_debe_mb'];
 			$temp['importe_haber_mb'] = $this->res->extraData['total_importe_haber_mb'];
-			$temp['saldo'] = $this->res->extraData['total_saldo'];
-			
-			$temp['id_int_transaccion'] = 0;
-			
-			$this->res->total++;
-			
-			$this->res->addLastRecDatos($temp);
+			$temp['saldo'] = $this->res->extraData['total_saldo_mb'];			
+			//$temp['saldo'] = $this->res->extraData['total_importe_debe_mb']-$this->res->extraData['total_importe_haber_mb'];
+			$temp['id_int_transaccion'] = 0;			
+			$this->res->total++;			
+			$this->res->addLastRecDatos($temp);	
 		}
-		$this->res->imprimirRespuesta($this->res->generarJson());
+		$this->res->imprimirRespuesta($this->res->generarJson());	
 	}
+
 
 
 	//mp
@@ -592,6 +655,371 @@ class ACTIntTransaccion extends ACTbase{
 			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		}					
 	}
+
+    function listaDetalleComprobanteTransacciones(){
+	
+		
+		if($this->objParam->getParametro('id_gestion')!=''){
+			$this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));	
+		}
+		if($this->objParam->getParametro('fecha_ini')!='' && $this->objParam->getParametro('fecha_fin')!=''){
+			$this->objParam->addFiltro("( icbt.fecha::date  BETWEEN ''%".$this->objParam->getParametro('fecha_ini')."%''::date  and ''%".$this->objParam->getParametro('fecha_fin')."%''::date)");	
+		}
+		
+		if($this->objParam->getParametro('fecha_ini')!='' && $this->objParam->getParametro('fecha_fin')==''){
+			$this->objParam->addFiltro("( icbt.fecha::date  >= ''%".$this->objParam->getParametro('fecha_ini')."%''::date)");	
+		}
+		
+		if($this->objParam->getParametro('fecha_ini')=='' && $this->objParam->getParametro('fecha_fin')!=''){
+			$this->objParam->addFiltro("( icbt.fecha::date  <= ''%".$this->objParam->getParametro('fecha_fin')."%''::date)");	
+		}
+		
+		if($this->objParam->getParametro('id_periodo')!=''){
+			$this->objParam->addFiltro("per.id_periodo =".$this->objParam->getParametro('id_periodo'));    
+		}
+		
+		if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+				$this->objParam->addFiltro("cue.tipo_cuenta = ''".$this->objParam->getParametro('id_config_tipo_cuenta')."''");	
+		}
+		if($this->objParam->getParametro('id_cuenta')!=''){
+				$this->objParam->addFiltro("cue.id_cuenta = ".$this->objParam->getParametro('id_cuenta'));	
+		}
+		
+		$this->exportarTxtLcvLCV();
+		
+	}
+	function recuperarDatosEntidad(){    	
+		$this->objFunc = $this->create('sis_parametros/MODEntidad');
+		$cbteHeader = $this->objFunc->getEntidad($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){				
+			return $cbteHeader;
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}              
+		
+    }
+	function recuperarDatosPeriodo(){    	
+		$this->objFunc = $this->create('sis_parametros/MODPeriodo');
+		$cbteHeader = $this->objFunc->getPeriodoById($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){				
+			return $cbteHeader;
+		}
+        else{
+		    $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}              
+		
+    }
+    function exportarTxtLcvLCV(){
+		
+		//crea el objetoFunProcesoMacro que contiene todos los metodos del sistema de workflow
+		$this->objFun=$this->create('MODIntTransaccion');		
+		
+		//$this->res = $this->objFun->listarRepLCVForm();
+		$this->res = $this->objFun->listaDetalleComprobanteTransacciones();
+		
+			
+		if($this->res->getTipo()=='ERROR'){
+			$this->res->imprimirRespuesta($this->res->generarJson());
+			exit;
+		}
+		
+		$nombreArchivo = $this->crearArchivoExportacion($this->res, $this->objParam);
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Se genero con exito el archivo LCV'.$nombreArchivo,
+										'Se genero con exito el archivo LCV'.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		
+		$this->res->imprimirRespuesta($this->mensajeExito->generarJson());
+
+	 }
+	function crearArchivoExportacion($res, $Obj) {
+		
+		$separador = '|';
+		if($this->objParam->getParametro('formato_reporte') =='txt')
+		{
+			$separador = "|";
+			$ext = '.txt';
+		}
+		else{
+			//$separador = ",";
+			$separador = "|";
+			$ext = '.csv';
+		}
+		
+		 
+		$dataEntidad = $this->recuperarDatosEntidad();
+		$dataEntidadArray = $dataEntidad->getDatos();
+		$NIT = 	$dataEntidadArray['nit'];
+		 
+		if($this->objParam->getParametro('filtro_sql')=='periodo'){
+			$dataPeriodo = $this->recuperarDatosPeriodo();
+			$dataPeriodoArray = $dataPeriodo->getDatos();
+		    $sufijo = $dataPeriodoArray['periodo'].$dataPeriodoArray['gestion'];
+		}
+		else{
+			$sufijo=$this->objParam->getParametro('fecha_ini').'_'.$this->objParam->getParametro('fecha_fin');
+		}
+		
+		$nombre ='DetalleComprobante-Transaccion';
+		
+		
+		$nombre=str_replace("/", "", $nombre);
+		
+		
+		$data = $res -> getDatos();
+		$fileName = $nombre.$ext;
+		//create file
+		$file = fopen("../../../reportes_generados/$fileName","w+");
+		$ctd = 1;
+		
+		if($this->objParam->getParametro('formato_reporte') !='txt'){
+
+		    fwrite($file, pack("CCC",0xef,0xbb,0xbf));
+		}
+		if($this->objParam->getParametro('tipo_reporte') !='auditoria'){
+		      fwrite($file, 
+				'N#' . $separador .
+				'id_int_comprobante' . $separador .
+				"id_int_transaccion" . $separador . 
+				
+				//'fecha_reg' . $separador .
+				'fecha' . $separador .
+				'nro_cbte' . $separador .
+				'nro_tramite' . $separador .
+				//'glosa1' . $separador .
+				"debe_mb" . $separador .
+				"haber_mb" . $separador .
+				"saldo_debehaber_mb" . $separador .
+				"gasto_mb" . $separador .
+				"recurso_mb" . $separador . 
+				
+				"saldo_gastorecurso_mb" . $separador . 
+				"debe_mt" . $separador . 
+				"haber_mt" . $separador . 
+				"saldo_debehaber_mt" . $separador . 
+				"gasto_mt" . $separador . 
+				"recurso_mt" . $separador . 
+				
+				"saldo_gastorecurso_mt" . $separador . 
+				"debe_ma" . $separador . 
+				"haber_ma" . $separador . 
+				"saldo_debehaber_ma" . $separador . 
+				"gasto_ma" . $separador . 
+				"recurso_ma" . $separador . 
+				"saldo_gastorecurso_ma" . $separador . 
+				
+				"tc_ufv" . $separador . 
+				"tipo_cuenta" . $separador . 
+				"cuenta_nro" . $separador . 
+				"cuenta" . $separador . 
+				"partida_tipo" . $separador . 
+				"partida_codigo" . $separador . 
+				
+				"partida" . $separador . 
+				"centro_costo_techo_codigo" . $separador . 
+				"centro_costo_techo" . $separador . 
+				"centro_costo_codigo" . $separador . 
+				"centro_costo" . $separador . 
+				"aux_codigo" . $separador . 
+				"aux_nombre" . $separador . 
+                //"beneficiario" . $separador . 
+				"\r\n"
+				
+				);
+		}
+		else{
+		      fwrite($file, 
+				'N#' . $separador .
+				'id_int_comprobante' . $separador .
+				"id_int_transaccion" . $separador . 
+				
+				//'fecha_reg' . $separador .
+				'fecha' . $separador .
+				'nro_cbte' . $separador .
+				'nro_tramite' . $separador .
+				//'glosa1' . $separador .
+				"debe_mb" . $separador .
+				"haber_mb" . $separador .
+				"saldo_debehaber_mb" . $separador .
+				"gasto_mb" . $separador .
+				"recurso_mb" . $separador . 
+				
+				"saldo_gastorecurso_mb" . $separador . 
+				"debe_mt" . $separador . 
+				"haber_mt" . $separador . 
+				"saldo_debehaber_mt" . $separador . 
+				"gasto_mt" . $separador . 
+				"recurso_mt" . $separador . 
+				
+				"saldo_gastorecurso_mt" . $separador . 
+				"debe_ma" . $separador . 
+				"haber_ma" . $separador . 
+				"saldo_debehaber_ma" . $separador . 
+				"gasto_ma" . $separador . 
+				"recurso_ma" . $separador . 
+				"saldo_gastorecurso_ma" . $separador . 
+				
+				"tc_ufv" . $separador . 
+				"tipo_cuenta" . $separador . 
+				"cuenta_nro" . $separador . 
+				"cuenta" . $separador . 
+				"partida_tipo" . $separador . 
+				"partida_codigo" . $separador . 
+				
+				"partida" . $separador . 
+				"centro_costo_techo_codigo" . $separador . 
+				"centro_costo_techo" . $separador . 
+				"centro_costo_codigo" . $separador . 
+				"centro_costo" . $separador . 
+				"aux_codigo" . $separador . 
+				"aux_nombre" . $separador . 
+                //"beneficiario" . $separador . 
+				"tipo_transaccion" . $separador . 
+				"periodo" . $separador . 
+				"hora" . $separador . 
+				"fecha_reg_transaccion" . $separador . 
+				"usuario_reg_transaccion" . $separador . 
+				"nro_documento" . $separador . 
+				"glosa_transaccion" . $separador . 
+								    
+				"\r\n"
+				
+				);
+		} 
+		
+
+					
+		
+		foreach ($data as $val) {
+			
+			 $newDate = date("d/m/Y", strtotime( $val['fecha']));	
+			 		 
+             if($this->objParam->getParametro('tipo_reporte') !='auditoria'){
+					fwrite ($file, 
+				 	                $ctd.$separador.
+			                        $val['id_int_comprobante'].$separador.
+									$val['id_int_transaccion'].$separador.
+								   
+			                       // $val['fecha_reg'].$separador. 
+			                        $val['fecha'].$separador.
+									$val['nro_cbte'].$separador.
+
+			                        $val['nro_tramite'].$separador.
+			                        //$val['glosa1'].$separador.
+			                        $val['debe_mb'].$separador.
+			                        $val['haber_mb'].$separador.
+									$val['saldo_debehaber_mb'].$separador.
+									$val['gasto_mb'].$separador.
+									$val['recurso_mb'].$separador.
+									
+									$val['saldo_gastorecurso_mb'].$separador.
+			                        $val['debe_mt'].$separador.
+			                        $val['haber_mt'].$separador.
+									$val['saldo_debehaber_mt'].$separador.
+									$val['gasto_mt'].$separador.
+									$val['recurso_mt'].$separador.
+									
+									$val['saldo_gastorecurso_mt'].$separador.
+			                        $val['debe_ma'].$separador.
+			                        $val['haber_ma'].$separador.
+									$val['saldo_debehaber_ma'].$separador.
+									$val['gasto_ma'].$separador.
+									$val['recurso_ma'].$separador.
+									$val['saldo_gastorecurso_ma'].$separador.
+									
+									$val['tc_ufv'].$separador.
+									$val['tipo_cuenta'].$separador.
+									$val['cuenta_nro'].$separador.
+									$val['cuenta'].$separador.
+									$val['partida_tipo'].$separador.
+									$val['partida_codigo'].$separador.
+									
+									$val['partida'].$separador.
+									$val['centro_costo_techo_codigo'].$separador.
+									$val['centro_costo_techo'].$separador.
+									$val['centro_costo_codigo'].$separador.
+									$val['centro_costo'].$separador.
+									$val['aux_codigo'].$separador.
+									$val['aux_nombre'].$separador.
+                                    //$val['beneficiario'].$separador.
+                                    
+
+								
+			                        "\r\n"
+									);
+			 }
+			 else{
+					fwrite ($file, 
+				 	                $ctd.$separador.
+			                        $val['id_int_comprobante'].$separador.
+									$val['id_int_transaccion'].$separador.
+								   
+			                       // $val['fecha_reg'].$separador. 
+			                        $val['fecha'].$separador.
+									$val['nro_cbte'].$separador.
+
+			                        $val['nro_tramite'].$separador.
+			                        //$val['glosa1'].$separador.
+			                        $val['debe_mb'].$separador.
+			                        $val['haber_mb'].$separador.
+									$val['saldo_debehaber_mb'].$separador.
+									$val['gasto_mb'].$separador.
+									$val['recurso_mb'].$separador.
+									
+									$val['saldo_gastorecurso_mb'].$separador.
+			                        $val['debe_mt'].$separador.
+			                        $val['haber_mt'].$separador.
+									$val['saldo_debehaber_mt'].$separador.
+									$val['gasto_mt'].$separador.
+									$val['recurso_mt'].$separador.
+									
+									$val['saldo_gastorecurso_mt'].$separador.
+			                        $val['debe_ma'].$separador.
+			                        $val['haber_ma'].$separador.
+									$val['saldo_debehaber_ma'].$separador.
+									$val['gasto_ma'].$separador.
+									$val['recurso_ma'].$separador.
+									$val['saldo_gastorecurso_ma'].$separador.
+									
+									$val['tc_ufv'].$separador.
+									$val['tipo_cuenta'].$separador.
+									$val['cuenta_nro'].$separador.
+									$val['cuenta'].$separador.
+									$val['partida_tipo'].$separador.
+									$val['partida_codigo'].$separador.
+									
+									$val['partida'].$separador.
+									$val['centro_costo_techo_codigo'].$separador.
+									$val['centro_costo_techo'].$separador.
+									$val['centro_costo_codigo'].$separador.
+									$val['centro_costo'].$separador.
+									$val['aux_codigo'].$separador.
+									$val['aux_nombre'].$separador.
+                                    //$val['beneficiario'].$separador.
+                                    $val['tipo_transaccion'].$separador.
+								    $val['periodo'].$separador.
+								    $val['hora'].$separador.
+								    $val['fecha_reg_transaccion'].$separador.
+								    $val['usuario_reg_transaccion'].$separador.
+								    $val['nro_documento'].$separador.
+								    $val['glosa_transaccion'].$separador.
+			                        "\r\n"
+									);
+			 }
+			 $ctd = $ctd + 1;
+         } //end for
+         
+     
+				
+		fclose($file);
+		return $fileName;
+	}
+
+
 
 		
 }

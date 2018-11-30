@@ -98,7 +98,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
 	        	data :	[['periodo','Año y Mes'],	
-						['fechas','Rango de Fechas']]	        				
+						//['fechas','Rango de Fechas']
+						]	        				
 	    		}),
 				valueField:'ID',
 				displayField:'valor',

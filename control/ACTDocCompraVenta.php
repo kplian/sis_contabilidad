@@ -5,7 +5,18 @@
 *@author  (admin)
 *@date 18-08-2015 15:57:09
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
-*/
+ * 
+ *  *    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		  18-08-2015         N/N               creacion
+ #1200  ETR       12/07/2018        RAC KPLIAN        filtros para relacioanr notas de debito credito
+ #1999  ETR       19/07/2018        RAC KPLIAN        Relacionar facturas NCD
+ #2000  ETR       20/08/2018        EGS               aumento filtro  listar DocCompraVenta Cobro
+ #2001  ETR       12/09/2018        EGS               aumento filtros para listar DocCompraVenta Cobro  para anticipos y facturas regularizadas
+ * 
+ * */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 require_once(dirname(__FILE__).'/../reportes/RLcv.php');
@@ -55,6 +66,23 @@ class ACTDocCompraVenta extends ACTbase{
 		if($this->objParam->getParametro('id_agrupador')!=''){
             $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
         }
+		
+		//#1200  --filtro fecha
+		if($this->objParam->getParametro('fecha') !=''){
+            $this->objParam->addFiltro("dcv.fecha <= ''".$this->objParam->getParametro('fecha')."''::date");
+        }
+		//#1200  --filtro NIT
+        if($this->objParam->getParametro('nit') !=''){
+            $this->objParam->addFiltro("dcv.nit = ''".$this->objParam->getParametro('nit')."''");
+        }
+		
+		
+		if($this->objParam->getParametro('tipo_informe') !=''){
+            $this->objParam->addFiltro("pla.tipo_informe = ''".$this->objParam->getParametro('tipo_informe')."''");
+        }
+
+       //#1200  FIN 
+		
 		
 		
 		
@@ -140,8 +168,41 @@ class ACTDocCompraVenta extends ACTbase{
 		if($this->objParam->getParametro('id_agrupador')!=''){
             $this->objParam->addFiltro("dcv.id_doc_compra_venta not in (select ad.id_doc_compra_venta from conta.tagrupador_doc ad where ad.id_agrupador = ".$this->objParam->getParametro('id_agrupador').") ");    
         }
+		//I-2000////EGS-I-20/08/2018///
+		///parametro que filtra el combo de listar facturas en Sis cobros por tipo de cobro como el de retencion de garantias 
+		////los codigos de loss tipos de cobro se usan para el filtro son :
+		//cobro comun :CBRCMN
+		///cobro comun  regularizado:CBRCMNRE
+		/// cobro retencion garantias:CBRCMNRG
+		///cobro retencion garantias regularizado : CBRCMNRGRE
 		
-		
+		#2001  ETR       12/09/2018        EGS
+		if($this->objParam->getParametro('tipo_cobro')=='CBRCMN'){
+            $this->objParam->addFiltro(" (dcv.id_int_comprobante is not null or pla.tipo_informe = ''regularizacion'') ");    
+        }
+		#2001  ETR       12/09/2018        EGS
+		/*
+		if($this->objParam->getParametro('tipo_cobro')=='CBRCMNRE'){
+            $this->objParam->addFiltro(" dcv.id_int_comprobante is null");    
+        }
+       */
+		if($this->objParam->getParametro('tipo_cobro')=='CBRCMNRG'){
+            $this->objParam->addFiltro("dcv.importe_retgar > 0 and (dcv.id_int_comprobante is not null or pla.tipo_informe = ''regularizacion'')");    
+        }
+      
+		if($this->objParam->getParametro('tipo_cobro')=='CBRCMNRGRE'){
+            $this->objParam->addFiltro("dcv.importe_retgar > 0 ");    
+        }
+		#2001  ETR       12/09/2018        EGS
+		if($this->objParam->getParametro('tipo_cobro')=='CBRCMNAT'){
+            $this->objParam->addFiltro("dcv.importe_anticipo > 0 and dcv.id_int_comprobante is not null");    
+        }
+      
+		if($this->objParam->getParametro('tipo_cobro')=='CBRCMNATRE'){
+            $this->objParam->addFiltro("dcv.importe_anticipo > 0 ");    
+        }
+		#2001  ETR       12/09/2018        EGS
+		//F-2000////EGS-F-20/08/2018///
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
@@ -155,6 +216,10 @@ class ACTDocCompraVenta extends ACTbase{
 		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+
+
+
 
      //RAC 26/05/2017, para el listado de la grilla con  informacion de agencia
     function listarDocCompraCajero(){
@@ -527,9 +592,24 @@ class ACTDocCompraVenta extends ACTbase{
 		fclose($file);
 		return $fileName;
 	}
+
+    //   #1999  relacionas facturas a las notas de credito debito
+    function relacionarFacturaNCD(){
+		$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->res=$this->objFunc->relacionarFacturaNCD($this->objParam);		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	//   #1999  relacionas facturas a las notas de credito debito
+    function cargarDatosFactura(){
+		$this->objFunc=$this->create('MODDocCompraVenta');	
+		$this->res=$this->objFunc->cargarDatosFactura($this->objParam);		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 	
 	
 	
+
 			
 }
 

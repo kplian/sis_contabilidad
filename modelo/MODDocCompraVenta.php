@@ -5,6 +5,14 @@
 *@author  (admin)
 *@date 18-08-2015 15:57:09
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+ *  *  *    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		  18-08-2015          N/N               creacion
+ #1999  ETR       19/07/2018        RAC KPLIAN        Relacionar facturas NCD
+ #2000 ETR        20/08/2018        EGS               se aumento campos de importes de retencion de garantias en listarDocCompraVentaCobro
+ #2001 ETR        12/09/2018        EGS 			 se aumento los saldos separados para cobros de anticipos y rega 
 */
 class MODDocCompraVenta extends MODbase{
 	
@@ -100,6 +108,12 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('fecha_cbte','date');
 		$this->captura('estado_cbte','varchar');
 		$this->captura('codigo_aplicacion','varchar');
+		
+		$this->captura('tipo_informe','varchar');
+		$this->captura('id_doc_compra_venta_fk','int8');
+		
+		
+		
 		
 		
 
@@ -205,8 +219,13 @@ class MODDocCompraVenta extends MODbase{
 		
 		$this->captura('importe_cobrado_mb','numeric');
 		$this->captura('importe_cobrado_mt','numeric');
-		$this->captura('saldo_por_cobrar','numeric');
-		
+		$this->captura('importe_cobrado_retgar_mb','numeric');///EGS//20/08/2018  ///2000-I
+		$this->captura('importe_cobrado_retgar_mt','numeric');////EGS///20/08/2018////2000-F
+		$this->captura('importe_cobrado_ant_mb','numeric');///EGS//20/08/2018  ///2000-I
+		$this->captura('importe_cobrado_ant_mt','numeric');////EGS///20/08/2018////2000-F
+		$this->captura('saldo_por_cobrar_pendiente','numeric');//#2001 ETR        12/09/2018        EGS 
+		$this->captura('saldo_por_cobrar_retgar','numeric');//#2001 ETR        12/09/2018        EGS 
+		$this->captura('saldo_por_cobrar_anticipo','numeric');//#2001 ETR        12/09/2018        EGS 
 		
 
 		
@@ -1634,7 +1653,239 @@ class MODDocCompraVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+
+   //   #1999  relacionas facturas a las notas de credito debito
+   function relacionarFacturaNCD(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_doc_compra_venta_ime';
+		$this->transaccion='CONTA_RELFACNCD_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int8');
+		$this->setParametro('id_doc_compra_venta_fk','id_doc_compra_venta_fk','int8');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+ //   #1999  recuepra datos de factura relacionada para mostrar en el formulario
+   function cargarDatosFactura(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_doc_compra_venta_ime';
+		$this->transaccion='CONTA_GETFACNCD_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int8');
+		$this->setParametro('id_doc_compra_venta_fk','id_doc_compra_venta_fk','int8');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	//mp 15/08/2018
+	function recuperarDatosVentasDebCre(){		
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_doc_invokeiue_sel';
+		$this->transaccion='CONTA_VENTAS_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);	
 		
-			
+		$this->setParametro('filtro_sql','filtro_sql','VARCHAR');
+		$this->setParametro('id_periodo','id_periodo','int4');
+		$this->setParametro('tipo_ret','tipo_ret','VARCHAR');
+		$this->setParametro('fecha_ini','fecha_ini','DATE');
+		$this->setParametro('fecha_fin','fecha_fin','DATE');
+		$this->setParametro('id_gestion','id_gestion','int4');
+		
+		$this->captura('id_doc_compra_venta','integer');
+		$this->captura('id_doc_compra_venta_fk','integer');
+		$this->captura('id_int_comprobante','integer');		
+		$this->captura('id_periodo','integer');
+		$this->captura('id_gestion','integer');
+		
+		$this->captura('fecha','date');
+		$this->captura('nro_documento','varchar');
+		$this->captura('nit','varchar');
+		$this->captura('nro_autorizacion','varchar');
+		$this->captura('razon_social','varchar');
+		$this->captura('codigo_control','varchar');
+		
+		$this->captura('importe_doc','numeric');
+		$this->captura('importe_pago_liquido','numeric');
+		
+		$this->captura('fecha_2','date');
+		$this->captura('nro_documento_2','varchar');
+		$this->captura('nro_autorizacion_2','varchar');
+		$this->captura('importe_doc_2','numeric');	
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;		
+	}
+
+	function recuperarDatosComprasDebCre(){
+		
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_doc_invokeiue_sel';
+		$this->transaccion='CONTA_COMPRAS_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);	
+		
+		$this->setParametro('filtro_sql','filtro_sql','VARCHAR');
+		$this->setParametro('id_periodo','id_periodo','int4');
+		$this->setParametro('tipo_ret','tipo_ret','VARCHAR');
+		$this->setParametro('fecha_ini','fecha_ini','DATE');
+		$this->setParametro('fecha_fin','fecha_fin','DATE');
+		$this->setParametro('id_gestion','id_gestion','int4');
+		
+		$this->captura('id_doc_compra_venta','integer');
+		$this->captura('id_doc_compra_venta_fk','integer');
+		$this->captura('id_int_comprobante','integer');		
+		$this->captura('id_periodo','integer');
+		$this->captura('id_gestion','integer');
+		
+		$this->captura('fecha','date');
+		$this->captura('nro_documento','varchar');
+		$this->captura('nit','varchar');
+		$this->captura('nro_autorizacion','varchar');
+		$this->captura('razon_social','varchar');
+		$this->captura('codigo_control','varchar');
+		
+		$this->captura('importe_doc','numeric');
+		$this->captura('importe_pago_liquido','numeric');
+		
+		$this->captura('fecha_2','date');
+		$this->captura('nro_documento_2','varchar');
+		$this->captura('nro_autorizacion_2','varchar');
+		$this->captura('importe_doc_2','numeric');	
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();		
+		//Devuelve la respuesta
+		return $this->respuesta;		
+	}
+    /********I-MMV-28-09-2018 ERT **************/
+    function listarContraFactura(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.ft_doc_compra_venta_sel';
+        $this->transaccion='CONTA_CFD_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        //$this->setCount(false);
+        //Definicion de la lista del resultado del query
+        $this->capturaCount('total_importe_ice','numeric');
+        $this->capturaCount('total_importe_excento','numeric');
+        $this->capturaCount('total_importe_it','numeric');
+        $this->capturaCount('total_importe_iva','numeric');
+        $this->capturaCount('total_importe_descuento','numeric');
+        $this->capturaCount('total_importe_doc','numeric');
+
+        $this->capturaCount('total_importe_retgar','numeric');
+        $this->capturaCount('total_importe_anticipo','numeric');
+        $this->capturaCount('tota_importe_pendiente','numeric');
+        $this->capturaCount('total_importe_neto','numeric');
+        $this->capturaCount('total_importe_descuento_ley','numeric');
+        $this->capturaCount('total_importe_pago_liquido','numeric');
+        $this->capturaCount('total_importe_aux_neto','numeric');
+
+        $this->captura('id_contrato','int4');
+        $this->captura('id_doc_compra_venta','int8');
+        $this->captura('id_moneda','int4');
+        $this->captura('fecha','date');
+        $this->captura('nro_documento','varchar');
+        $this->captura('nit','varchar');
+        $this->captura('nro_autorizacion','varchar');
+        $this->captura('razon_social','varchar');
+        $this->captura('desc_plantilla','varchar');
+        $this->captura('nro_dui','varchar');
+        $this->captura('desc_moneda','varchar');
+        $this->captura('codigo_auxiliar','varchar');
+        $this->captura('nro_tramite','varchar');
+        $this->captura('desc_comprobante','varchar');
+        $this->captura('importe_pendiente','numeric');
+        $this->captura('importe_anticipo','numeric');
+        $this->captura('importe_retgar','numeric');
+        $this->captura('importe_neto','numeric');
+        $this->captura('importe_aux_neto','numeric');
+        $this->captura('importe_iva','numeric');
+        $this->captura('importe_descuento','numeric');
+        $this->captura('importe_doc','numeric');
+        $this->captura('importe_it','numeric');
+        $this->captura('importe_descuento_ley','numeric');
+        $this->captura('importe_pago_liquido','numeric');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function listarCodigoProveedorFactura(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.ft_doc_compra_venta_sel';
+        $this->transaccion='CONTA_CFA_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        //$this->setCount(false);
+
+        $this->captura('id_doc_compra_venta','int8');
+        $this->captura('codigo_auxiliar','varchar');
+        $this->captura('nit','varchar');
+        $this->captura('razon_social','varchar');
+        $this->captura('nro_autorizacion','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function asignarContrato(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='conta.ft_doc_compra_venta_ime';
+        $this->transaccion='CONTA_FACONT_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int8');
+        $this->setParametro('id_contrato','id_contrato','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function quitarContratoFactura(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='conta.ft_doc_compra_venta_ime';
+        $this->transaccion='CONTA_FACQUI_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int8');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    /********F-MMV-28-09-2018 ERT **************/
 }
 ?>

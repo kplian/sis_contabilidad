@@ -117,14 +117,15 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    		sum_saldo_mb_h=0;	
 		   			    	///		   			    		
 		   			    	var saldo_mb = record.data["saldo_mb"]?record.data["saldo_mb"]:0;
+								   			    	
 		   			    	if(saldo_mb>0){
 		   			    		sum_saldo_mb_d=saldo_mb;
 		   			    		sum_saldo_mb_h=0;
 		   			    	}else{
 		   			    		sum_saldo_mb_d=0;
 		   			    		sum_saldo_mb_h=saldo_mb;
-		   			    	}		   			    	
-		   			    	///		   			    			   			 
+		   			    	}			
+		   			    	///				
 		   			    	if ((debe - haber ) > 0) {
 		   			    		sum_debe = debe - haber;
 		   			    		sum_haber = '';		
@@ -133,11 +134,41 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    		sum_debe = '';
 		   			    		sum_haber = haber - debe;	   			    		
 		   			    	}
-		   			    	///		   			    	
+		   			    	///saldos
+		   			    	var t=0;
 		   			    	sum_saldo_mb_d=sum_debe + parseFloat(sum_saldo_mb_d,2);
 		   			    	sum_saldo_mb_h=sum_haber + parseFloat(sum_saldo_mb_h,2);
-		   			    	console.log('->',sum_saldo_mb_d);
-		   			    	console.log('->',sum_saldo_mb_h);				   			    	
+		   			    	sum_saldo_mb_h=saldo_mb;
+							//08/10/2018 manuel guerra
+							//muestra los resultados con saldos
+							//verifica los datos del saldo anterior, con el rango de fechas
+							sum_saldo_mb_d=saldo_mb;
+							sum_saldo_mb_h=debe-haber;
+							 
+							if(sum_saldo_mb_d>=0){
+		   			    		if(sum_saldo_mb_h>=0){
+		   			    			t=parseFloat(sum_saldo_mb_d,2)+parseFloat(sum_saldo_mb_h,2);
+		   			    		}else{		   			    			
+		   			    			t=parseFloat(sum_saldo_mb_d,2)+parseFloat(sum_saldo_mb_h,2);		   			    		
+		   			    		}
+		   			    	}else{
+		   			    		if(sum_saldo_mb_h>=0){
+		   			    			t=parseFloat(sum_saldo_mb_d,2)+parseFloat(sum_saldo_mb_h,2);
+		   			    			console.log('===',sum_saldo_mb_d,'-',sum_saldo_mb_h);
+		   			    			console.log('total->',sum_saldo_mb_d-sum_saldo_mb_h);
+		   			    		}else{
+		   			    			t=parseFloat(sum_saldo_mb_d,2)+parseFloat(sum_saldo_mb_h,2);
+		   			    		}
+		   			    	}
+		   			    	//coloca en debe o haber
+		   			    	if(t>0){
+		   			    		sum_saldo_mb_d=parseFloat(t,2);
+		   			    		sum_saldo_mb_h='';	
+		   			    	}else{
+		   			    		sum_saldo_mb_d='';
+		   			    		sum_saldo_mb_h=parseFloat(t*-1,2);
+		   			    	}
+		   			    	/*			   			  
 		   			    	if((sum_saldo_mb_d-sum_saldo_mb_h)>0){
 		   			    		sum_saldo_mb_d=sum_saldo_mb_d-sum_saldo_mb_h;
 		   			    		sum_saldo_mb_h='';
@@ -145,7 +176,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    	else{
 		   			    		sum_saldo_mb_d='';
 		   			    		sum_saldo_mb_h=sum_saldo_mb_h-sum_saldo_mb_d;
-		   			    	}
+		   			    	}*/
 		   			    	//console.log('->',sum_saldo_mb_d,'--',sum_saldo_mb_h,'--',sum_debe,'--',sum_haber);
 		   			    	Ext.util.Format.number(value,'0,000.00')
 		   			    	///		   			    			   			    
@@ -168,7 +199,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		   			    		sum_saldo_mt_d=0;
 		   			    		sum_saldo_mt_h=saldo_mt;
 		   			    	}
-		   			    	///		  
+		   			    	///		
+		   			    	
 		   			    	if ((debe_mt - haber_mt ) > 0) {
 		   			    		sum_debe_mt = debe_mt - haber_mt;
 		   			    		sum_haber_mt = '';
@@ -312,7 +344,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 					type: 'string'
 				},
 	   		   
-	   			grid:false,
+	   			grid:true,
 	   			form:true
 		   	},
 		   	{
@@ -331,7 +363,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	            type:'ComboRec',
 	            filters:{pfiltro:'cc.codigo_cc',type:'string'},
 	            id_grupo:1,
-	            grid:false,
+	            grid:true,
 	            form:true
 	        },
 	        {
@@ -422,7 +454,33 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				grid: true,
 				form: true
 			},
-			
+			{
+				config: {
+					name: 'dif',
+					fieldLabel: 'SALDO',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function(value,p,record){
+						if (record.data['dif']<0) {						
+							return String.format('{0}', '<FONT COLOR="red"><b>'+Ext.util.Format.number(record.data['dif'],'0,000.00')+'</b></FONT>');						
+						}else{
+							if (record.data['saldo']==0.00) {
+								return String.format('{0}', '<FONT size=3><b>'+Ext.util.Format.number(record.data['dif'],'0,000.00')+'</b></FONT>');		
+							}else{
+								return String.format('{0}', '<FONT COLOR="green"><b>'+Ext.util.Format.number(record.data['dif'],'0,000.00')+'</b></FONT>');
+							}							
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'transa.importe_debe_mb-transa.importe_haber_mb',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: true
+			},
 			{
 				config: {
 					name: 'importe_debe_mt',
@@ -569,7 +627,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				id_grupo: 1,
 				grid: true,
 				form: true
-			},
+			},			
 			{
 				config:{
 					name: 'fecha',
@@ -692,11 +750,14 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 100,
-								format: 'd/m/Y', 
-								renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+					format: 'd/m/Y', 
+					renderer:function (value,p,record)
+					{
+						return value?value.dateFormat('d/m/Y H:i:s'):''
+					}
 				},
 				type:'DateField',
-				filters:{pfiltro:'transa.fecha_reg',type:'date'},
+				filters:{pfiltro:'fecha_reg',type:'date'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -758,6 +819,21 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				},
 				type:'Field',
 				filters:{pfiltro:'codigo_cc',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+			},
+			{
+				config:{
+					name: 'nro_cbte',
+					fieldLabel: 'nro_cbte',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:10
+				},
+				type:'Field',
+				filters:{pfiltro:'nro_cbte',type:'string'},
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -837,7 +913,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		{ name:'id_int_comprobante', type: 'numeric'},
 		{ name:'id_auxiliar', type: 'numeric'},
 		{ name:'id_usuario_reg', type: 'numeric'},
-		{ name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{ name:'fecha_reg', type: 'date',dateFormat:'Y-m-d'},
 		{ name:'id_usuario_mod', type: 'numeric'},
 		{ name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{ name:'usr_reg', type: 'string'},
@@ -870,6 +946,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		{ name:'glosa_1', type: 'string'},
 		{ name:'saldo_mb', type: 'numeric'},
 		{ name:'saldo_mt', type: 'numeric'},
+		{ name:'dif', type: 'numeric'},
 		'cbte_relacional',
 		'tipo_partida','id_orden_trabajo','desc_orden',
 		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','glosa1',
@@ -1248,7 +1325,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			//argument:{wizard:wizard},
 			success: this.successExport,		
 			failure: this.conexionFailure,
-			timeout: 3.6e+6,
+			timeout: 4.6e+7,
 			scope:this
 		});
 	},
@@ -1306,7 +1383,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			},
 			success: this.successExport,		
 			failure: this.conexionFailure,
-			timeout: 3.6e+6,
+			timeout: 4.6e+7,
 			scope:this
 		});
     },

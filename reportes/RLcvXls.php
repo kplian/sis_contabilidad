@@ -216,8 +216,32 @@ class RLcvXls
 		//var_dump($datos);
 		if($tipo=='COMPRAS'){							
 			foreach ($datos as $value){				
-				//if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'||$this->objParam->getParametro('tipo_lcv')=='lcv_ventas'||$this->objParam->getParametro('tipo_lcv')=='LCNCD') {	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){		
-				if(trim($value['codigo_moneda'])!='BS'){	
+				//if($this->objParam->getParametro('tipo_lcv')=='lcv_compras' || $this->objParam->getParametro('tipo_lcv')=='endesis_erp'||$this->objParam->getParametro('tipo_lcv')=='lcv_ventas'||$this->objParam->getParametro('tipo_lcv')=='LCNCD') {	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){	if(trim($val['codigo_moneda'])!='BS' && trim($val['nro_cbte']) != 'Null' ){
+			        $codContro='0';
+			        if(trim($value['codigo_control'])!=''||trim($value['codigo_control'])!=null){	
+			        	$codContro=$value['codigo_control'];
+			        }
+	                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['fecha']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['nit']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, $value['razon_social']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, $value['nro_documento']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, $value['nro_dui']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, $value['nro_autorizacion']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, ($value['importe_doc'] * $value['tipo_cambio']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, ($value['total_excento'] * $value['tipo_cambio']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, ($value['subtotal'] * $value['tipo_cambio']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, ($value['importe_descuento'] * $value['tipo_cambio']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, ($value['sujeto_cf'] * $value['tipo_cambio']) );
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12, $fila, ($value['credito_fiscal'] * $value['tipo_cambio']) );
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13, $fila, $codContro);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['tipo_doc']);
+					
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(15, $fila, $value['nro_cbte']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(16, $fila, $value['id_int_comprobante']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(17, $fila, $value['cuenta']);
+							
+				/*if(trim($value['codigo_moneda'])!='BS'){	
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['fecha']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['nit']);
@@ -259,7 +283,7 @@ class RLcvXls
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(15, $fila, $value['nro_cbte']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(16, $fila, $value['id_int_comprobante']);
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(17, $fila, $value['cuenta']);
-				}
+				} */
 				$fila++;
 				$this->numero++;
 			}

@@ -4526,6 +4526,57 @@ AS
        LEFT JOIN param.tproveedor pro ON pro.codigo::text = aux.codigo_auxiliar
          ::text;
          
+         
+ CREATE OR REPLACE VIEW conta.vcbte_raiz(
+    id_int_comprobante,
+    ids,
+    nro_tramite,
+    nro_cbte,
+    estado_reg,
+    id_estado_wf,
+    fecha,
+    id_periodo,
+    id_clase_comprobante,
+    beneficiario)
+AS
+WITH RECURSIVE cbte_raiz AS(
+  SELECT ARRAY [ c_1.id_int_comprobante ] AS ids,
+         c_1.id_int_comprobante,
+         c_1.id_int_comprobante_fks,
+         c_1.glosa1,
+         c_1.nro_tramite,
+         c_1.nro_cbte,
+         c_1.id_proceso_wf,
+         c_1.estado_reg,
+         c_1.id_estado_wf
+  FROM conta.tint_comprobante c_1
+  WHERE c_1.id_int_comprobante_fks [ 1 ] IS NULL
+  UNION
+  SELECT pc.ids || c2.id_int_comprobante AS ids,
+         c2.id_int_comprobante,
+         c2.id_int_comprobante_fks,
+         c2.glosa1,
+         c2.nro_tramite,
+         c2.nro_cbte,
+         c2.id_proceso_wf,
+         c2.estado_reg,
+         c2.id_estado_wf
+  FROM conta.tint_comprobante c2,
+       cbte_raiz pc
+  WHERE c2.id_int_comprobante_fks @> ARRAY [ pc.id_int_comprobante ])
+      SELECT cl.id_int_comprobante,
+             c.ids,
+             c.nro_tramite,
+             c.nro_cbte,
+             c.estado_reg,
+             c.id_estado_wf,
+             cl.fecha,
+             cl.id_periodo,
+             cl.id_clase_comprobante,
+             cl.beneficiario
+      FROM cbte_raiz c
+           JOIN conta.tint_comprobante cl ON cl.id_int_comprobante = c.ids [ 1 ]
+             ;        
 
 /**********************************F-DEP-RAC-CONTA-0-09/05/2018****************************************/ 
 

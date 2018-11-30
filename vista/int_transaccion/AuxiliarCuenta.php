@@ -14,7 +14,7 @@ var tes=null;
 var ini=null;
 var fin=null;
 Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
-    title:'Mayor',
+	title:'Mayor',
 	constructor:function(config){		
 		var me = this;
 		this.maestro=config.maestro;
@@ -29,22 +29,19 @@ Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
 				},
 				type:'Field',
 				form:false 
-			},
-			
+			},			
 			{
 			config:{
 				name: 'detalle',
 				fieldLabel: 'M',
-				gwidth: 25, 
+				gwidth: 25,	
 				renderer:function (value,p,record){  
 					return  String.format("<div style='text-align:center'><img title='Revisar Mayor' src = '../../../lib/imagenes/connect.png' align='center'/></div>");
-				    
 				}
-			   },
-			   type:'Field',
-			   grid:true
-			},
-			
+				},
+				type:'Field',
+				grid:true
+			},			
 			{
 				config:{
 					name: 'codigo_auxiliar',
@@ -59,8 +56,7 @@ Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-			},
-			
+			},			
 			{
 				config:{
 					name: 'nombre_auxiliar',
@@ -75,9 +71,82 @@ Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-			},
-			
-				
+			},			
+			{
+				config: {
+					name: 'importe_debe_mb',
+					fieldLabel: 'Debe MB',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'importe_debe_mb',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: false
+			},			
+			{
+				config: {
+					name: 'importe_haber_mb',
+					fieldLabel: 'Haber MB',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'importe_haber_mb',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: false
+			},			
+			{
+				config: {
+					name: 'saldo',
+					fieldLabel: 'Saldo',
+					allowBlank: true,
+					width: '100%',
+					gwidth: 110,
+					galign: 'right ',
+					maxLength: 100,
+					renderer:function(value,p,record){
+						if (record.data['saldo']<0) {						
+							return String.format('{0}', '<FONT COLOR="red"><b>'+Ext.util.Format.number(record.data['saldo'],'0,000.00')+'</b></FONT>');						
+						}else{
+							if (record.data['saldo']==0.00) {
+								return String.format('{0}', '<FONT size=3><b>'+Ext.util.Format.number(record.data['saldo'],'0,000.00')+'</b></FONT>');		
+							}else{
+								return String.format('{0}', '<FONT COLOR="green"><b>'+Ext.util.Format.number(record.data['saldo'],'0,000.00')+'</b></FONT>');
+							}							
+						}
+					}
+				},
+				type: 'NumberField',
+				filters: {pfiltro: 'saldo',type: 'numeric'},
+				id_grupo: 1,
+				grid: true,
+				form: false
+			},							
 			{
 				config:{
 					name: 'nro_cuenta',
@@ -92,8 +161,7 @@ Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-			},
-			
+			},			
 			{
 				config:{
 					name: 'nombre_cuenta',
@@ -108,8 +176,7 @@ Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-			},
-			
+			},			
 			{
 				config:{
 					name: 'tipo_cuenta',
@@ -140,83 +207,7 @@ Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-			},
-			
-			{
-				config: {
-					name: 'importe_debe_mb',
-					fieldLabel: 'Debe MB',
-					allowBlank: true,
-					width: '100%',
-					gwidth: 110,
-					galign: 'right ',
-					maxLength: 100,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
-						}
-					}
-				},
-				type: 'NumberField',
-				filters: {pfiltro: 'importe_debe_mb',type: 'numeric'},
-				id_grupo: 1,
-				grid: true,
-				form: false
-			},
-			
-			{
-				config: {
-					name: 'importe_haber_mb',
-					fieldLabel: 'Haber MB',
-					allowBlank: true,
-					width: '100%',
-					gwidth: 110,
-					galign: 'right ',
-					maxLength: 100,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
-						}
-					}
-				},
-				type: 'NumberField',
-				filters: {pfiltro: 'importe_haber_mb',type: 'numeric'},
-				id_grupo: 1,
-				grid: true,
-				form: false
-			},
-			
-			{
-				config: {
-					name: 'saldo',
-					fieldLabel: 'Saldo',
-					allowBlank: true,
-					width: '100%',
-					gwidth: 110,
-					galign: 'right ',
-					maxLength: 100,
-					renderer:function (value,p,record){
-						if(record.data.tipo_reg != 'summary'){
-							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
-						}
-						else{
-							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
-						}
-					}
-				},
-				type: 'NumberField',
-				filters: {pfiltro: 'saldo',type: 'numeric'},
-				id_grupo: 1,
-				grid: true,
-				form: false
-			}
-			
+			}		
 		];
 			
 		//llama al constructor de la clase padre
@@ -231,31 +222,31 @@ Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
 	ActList: '../../sis_contabilidad/control/IntTransaccion/listarAuxiliarCuenta',
 	id_store: 'id_tipo_estado_columna',
 	fields: [
-		 'id_auxiliar',
-        'codigo_auxiliar',
-        'nombre_auxiliar',
-        'id_cuenta',
-        'nro_cuenta',
-        'nombre_cuenta',
-        'tipo_cuenta',
-        'sub_tipo_cuenta',
-        'desc_sub_tipo_cuenta',
-         'id_config_subtipo_cuenta', 
-        'importe_debe_mb',
-        'importe_haber_mb',
-        'saldo'
+		'id_auxiliar',
+		'codigo_auxiliar',
+		'nombre_auxiliar',
+		'id_cuenta',
+		'nro_cuenta',
+		'nombre_cuenta',
+		'tipo_cuenta',
+		'sub_tipo_cuenta',
+		'desc_sub_tipo_cuenta',
+		 'id_config_subtipo_cuenta', 
+		'importe_debe_mb',
+		'importe_haber_mb',
+		'saldo'
 	],
 	
-    sortInfo:{
+	sortInfo:{
 		field: 'nombre_auxiliar',
 		direction: 'ASC'
 	},
 	bdel: true,
 	bsave: false,
 	
-	onReloadPage:function(param){	
-		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
-		var me = this;
+	onReloadPage:function(param){
+		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.		
+		var me = this;				
 		this.initFiltro(param);
 	},
 	
@@ -269,59 +260,49 @@ Phx.vista.AuxiliarCuenta = Ext.extend(Phx.gridInterfaz,{
 		if(rec.data.tipo_reg != 'summary'){
 			var tb = Phx.vista.AuxiliarCuenta.superclass.preparaMenu.call(this);
 			return tb;
-		}
-		
+		}		
 		return undefined;
 	},
 	liberaMenu : function() {
-			var tb = Phx.vista.AuxiliarCuenta.superclass.liberaMenu.call(this);
-	},
-	
+		var tb = Phx.vista.AuxiliarCuenta.superclass.liberaMenu.call(this);
+	},	
 			
-    bnew : false,
-    bedit: false,
-    bdel:  false,
-	oncellclick : function(grid, rowIndex, columnIndex, e) {
-		
-	    var record = this.store.getAt(rowIndex).data,
-	        fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field nam
-	    
-        var PagMaes = Phx.CP.getPagina(this.idContenedorPadre);
-        var desde = PagMaes.Cmp.desde.getValue(); 
-        var hasta = PagMaes.Cmp.hasta.getValue();
-        if (fieldName == 'detalle') {	    	
-	    	
-			    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/FormFiltro.php',
-		                    'Mayor',
-		                    {
-		                        width:'100%',
-		                        height:'100%',
-		                    },
-		                    { maestro:record.data,
-		                      detalle: {
-		                      	        'tipo_filtro': 'fechas',
-		                      	        'desde': desde,
-		                      	        'hasta': hasta,
-		                      	        'id_config_subtipo_cuenta': record.id_config_subtipo_cuenta,
-		                      	        'desc_csc': record.desc_csc,
-		                      	        'desc_auxiliar': record.nombre_auxiliar,
-		                      	        'id_cuenta': record.id_cuenta,
-		                      	        'desc_cuenta': record.nombre_cuenta,
-		                      	        'desc_csc': record.desc_sub_tipo_cuenta,
-		                      	        'id_auxiliar': record.id_auxiliar
-		                      	      }
-		                      
-		                     },
-		                    this.idContenedor,
-		                    'FormFiltro'
-		           );
-	       
-	       
-	        
-	    }
-	    
-	    
-		
-	}
+	bnew : false,
+	bedit: false,
+	bdel:  false,
+	oncellclick : function(grid, rowIndex, columnIndex, e) {		
+		var record = this.store.getAt(rowIndex).data,fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field nam
+		var PagMaes = Phx.CP.getPagina(this.idContenedorPadre);
+		var desde = PagMaes.Cmp.desde.getValue();
+		var hasta = PagMaes.Cmp.hasta.getValue();
+		if (fieldName == 'detalle') {		
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/FormFiltro.php',
+			'Mayor',
+			{
+				width:'100%',
+				height:'100%',
+			},
+			{	
+				maestro:record.data,
+				detalle:
+				{
+					'tipo_filtro': 'fechas',
+					'desde': desde,
+					'hasta': hasta,
+					'id_config_subtipo_cuenta': record.id_config_subtipo_cuenta,
+					'desc_csc': record.desc_csc,
+					'desc_auxiliar': record.nombre_auxiliar,
+					'id_cuenta': record.id_cuenta,
+					'desc_cuenta': record.nombre_cuenta,		
+					'desc_csc': record.desc_sub_tipo_cuenta,
+					'id_auxiliar': record.id_auxiliar
+				}
+			},
+			this.idContenedor,
+			'FormFiltro'
+			);
+		}
+	},
+
 })
 </script>

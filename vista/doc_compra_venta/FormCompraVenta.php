@@ -5,13 +5,13 @@
  *@author  Rensi Arteaga Copari
  *@date    30-01-2014
  *@description permites subir archivos a la tabla de documento_sol
- * 
- * 
- * ***************************************************************************
- H        ISTORIAL DE MODIFICACIONES:
- #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				 						  RAC	       Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'cd.tpago_simple_det'	
- #9999           19/06/2018               RAC          Se incorpra el calculo inverso para DUI IVA -> Importe Doc
+ * **    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		  20-09-2011        RAC KPLIAN              creacion
+ #0999 ETR        20/08/2018        RAC KPLIAN              agrega filtro por defecto para tipo de documento segun informe lcv, retenciones, ncd, todos
+  #9999           19/06/2018               RAC          Se incorpra el calculo inverso para DUI IVA -> Importe Doc
  ***************************************************************************/
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -37,6 +37,7 @@ header("content-type: text/javascript; charset=UTF-8");
         parFilConcepto:'desc_ingas#par.codigo',
         tipo_pres_gasto: 'gasto',
         tipo_pres_recurso: 'recurso',
+        tipo_informe:'todos',  //#0999 filtro por defecto para tipo de plantilla
         plantillaProrrateo: [], //07/12/2017 , RAc adcionar plantilal de prorrateo
         sw_nro_dui: 'no',
         constructor:function(config)
@@ -92,7 +93,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
                 this.megrid.getTopToolbar().disable();
             }
-            this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.Cmp.tipo.getValue()});
+            
+            this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, 
+            	                                              {
+            	                                              	tipo_plantilla:this.Cmp.tipo.getValue(),
+            	                                              	tipo_informe: this.data.tipo_informe?this.data.tipo_informe:'todos'
+            	                                              });
 
         },
         
@@ -1120,8 +1126,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'nit',
-                        fieldLabel: 'NIT',
-                        qtip: 'Número de indentificación del proveedor',
+                        fieldLabel: 'NIT/CI',
+                        qtip: 'Número de indentificación del proveedor - o CI en caso de retenciones',
                         allowBlank: false,
                         emptyText:'nit ...',
                         store:new Ext.data.JsonStore(
@@ -1165,7 +1171,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'razon_social',
-                        fieldLabel: 'Razón Social',
+                        fieldLabel: 'Razón Social / Nombre',
                         allowBlank: false,
                         maskRe: /[A-Za-z0-9 &-. ñ Ñ]/,
                         fieldStyle: 'text-transform:uppercase',

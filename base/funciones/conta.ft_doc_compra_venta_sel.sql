@@ -42,6 +42,7 @@ DECLARE
     V_filtroLCV         varchar;
     v_id_auxiliar  		integer;
     v_id_auxiliar_2  	integer;
+    v_consulta1         varchar;
 
 BEGIN
 
@@ -606,6 +607,7 @@ BEGIN
                                importe_descuento::numeric,
                                subtotal::numeric,
                                credito_fiscal::numeric,
+                               --(credito_fiscal::numeric*lcv.tipo_cambio)::numeric as credito_fiscal,
                                importe_iva::numeric,
                                codigo_control::varchar,
                                tipo_doc::varchar,
@@ -632,10 +634,10 @@ BEGIN
                                and '||v_filtro||V_filtroLCV;
                         
                        
-			raise notice '%', v_consulta;
-             --RAISE EXCEPTION 'iii %',v_consulta;
+			raise notice '%', v_tipo;
+            --RAISE EXCEPTION 'iii %',v_filtro;
 			--Devuelve la respuesta
-            --RAISE EXCEPTION 'Error j %',v_filtro||V_filtroLCV;
+            --RAISE EXCEPTION ' %',' trabajando  ';
             --RAISE EXCEPTION 'Error j %',v_consulta;
 			return v_consulta;
 
@@ -755,7 +757,59 @@ BEGIN
 	ELSEIF(p_transaccion='COMP_DIARIO_MAYOR')then
 
     	begin
-           v_tipo:='';
+        
+        v_consulta1 ='';
+        v_consulta1 = 'create temp table vlibro_compras_temporal(
+                       -- id_libro_compra_temporal serial,
+                        nro_cbte varchar,
+                        credito_fiscal NUMERIC,
+                        id_int_comprobante integer
+                        ) on commit drop';           
+        execute(v_consulta1); 
+            
+        v_consulta1 ='';
+        v_consulta1 = 'create temp table vlibro_mayor_iva_credito_fiscal(
+                        --id_libro_mayor_iva_credito_temporal serial,
+                        nro_cbte varchar,
+                        importe_debe_mb NUMERIC,
+                        id_int_comprobante integer
+                        ) on commit drop';           
+        execute(v_consulta1); 
+        
+        v_consulta1 ='';
+        v_consulta1 ='INSERT INTO vlibro_compras_temporal 
+                      (SELECT 
+                      COALESCE(lcv.nro_cbte,'''')::VARCHAR as nro_cbte,
+                      COALESCE(lcv.credito_fiscal,0)::NUMERIC as credito_fiscal,
+                      lcv.id_int_comprobante::integer
+                      FROM conta.vlibro_compras lcv where  lcv.id_periodo ='||v_parametros.id_periodo||' AND lcv.nro_cbte is not null)';
+        execute(v_consulta1);
+                
+        v_consulta1 ='';
+        v_consulta1 ='INSERT INTO vlibro_mayor_iva_credito_fiscal 
+                       (SELECT 
+                        transa.nro_cbte::VARCHAR as nro_cbte_mayor,
+                        COALESCE(transa.importe_debe_mb,0)::NUMERIC as importe_debe_mb,
+                        transa.id_int_comprobante 
+                        FROM  conta.vlibro_mayor_iva_credito_fiscal transa  
+                        WHERE  transa.id_cuenta in (1864)  
+                        AND transa.id_periodo = '||v_parametros.id_periodo||'
+                        AND transa.glosa1::text NOT LIKE
+                       ''%ACTUALIZACIÓN DEL SALDO%''::text)';  
+        execute(v_consulta1);                    
+        
+        v_consulta = 'select
+                        transa.nro_cbte::VARCHAR as nro_cbte_mayor,
+                        COALESCE(transa.importe_debe_mb,0)::NUMERIC as importe_debe_mb_mayor,
+                        (round(COALESCE(lcv.credito_fiscal,0),2)-round(COALESCE(transa.importe_debe_mb,0),2))::NUMERIC  as diferencia,
+                        COALESCE(lcv.nro_cbte,'''')::VARCHAR as nro_cbte_compras,
+                        COALESCE(lcv.credito_fiscal,0)::NUMERIC as tota_credito_fiscal_compras,
+                        transa.id_int_comprobante
+                        FROM vlibro_compras_temporal lcv 
+                        FULL JOIN 
+                        vlibro_mayor_iva_credito_fiscal transa on transa.id_int_comprobante = lcv.id_int_comprobante';
+        
+        /*   v_tipo:='';
            
            v_sincronizar = pxp.f_get_variable_global('sincronizar');
 
@@ -793,10 +847,8 @@ BEGIN
    ''%ACTUALIZACIÓN DEL SALDO%''::text
    ORDER BY lcv.credito_fiscal ASC ';
                         
-			--raise notice 'atrapar consulta %', v_consulta;
-            --RAISE EXCEPTION 'consulta %',v_consulta;
-			--Devuelve la respuesta
-            -- RAISE EXCEPTION 'Error j %',v_consulta;
+			raise notice 'atrapar consulta %', v_filtro;*/
+
 			return v_consulta;
 
 		end;    

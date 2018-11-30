@@ -71,8 +71,8 @@ class RLibroMayorXls {
 			
 			$fecha_ini =$this->objParam->getParametro('fecha_ini');
 		    $fecha_fin = $this->objParam->getParametro('fecha_fin');
-			var_dump($fecha_ini);
-			var_dump($fecha_fin);
+			//var_dump($fecha_ini);
+			//var_dump($fecha_fin);
 		
 			$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $this->Cell($width_c1, $height, 'DEL:', 0, 0, 'L', false, '', 0, false, 'T', 'C');

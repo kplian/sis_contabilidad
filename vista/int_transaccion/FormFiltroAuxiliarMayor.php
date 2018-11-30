@@ -10,77 +10,76 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.FormFiltroAuxiliarMayor=Ext.extend(Phx.frmInterfaz,{
-    constructor:function(config)
-    {   
-    	
-    	console.log('configuracion.... ',config)
-    	this.panelResumen = new Ext.Panel({html:''});
-    	this.Grupos = [{
+	constructor:function(config)
+	{
+		
+		console.log('configuracion.... ',config)
+		this.panelResumen = new Ext.Panel({html:''});
+		this.Grupos = 
+		[
+			{
+				xtype: 'fieldset',
+				border: false,
+				autoScroll: true,
+				layout: 'form',
+				items: [],
+				id_grupo: 0
+			},this.panelResumen
+		];
 
-	                    xtype: 'fieldset',
-	                    border: false,
-	                    autoScroll: true,
-	                    layout: 'form',
-	                    items: [],
-	                    id_grupo: 0
-				               
-				    },
-				     this.panelResumen
-				    ];
-				    
-        Phx.vista.FormFiltroAuxiliarMayor.superclass.constructor.call(this,config);
-        this.init(); 
-        this.iniciarEventos(); 
-        
-        if(config.detalle){
+		Phx.vista.FormFiltroAuxiliarMayor.superclass.constructor.call(this,config);
+		this.init(); 
+		this.iniciarEventos(); 
+		
+		if(config.detalle){
 			//cargar los valores para el filtro
 			this.loadForm({data: config.detalle});
 			var me = this;
 			setTimeout(function(){
 				me.onSubmit()
 			}, 1500);
-		}       
-    },
-    
-    Atributos:[
-            {
-	   			config:{
-	   				name : 'id_gestion',
-	   				origen : 'GESTION',
-	   				fieldLabel : 'Gestion',
-	   				gdisplayField: 'desc_gestion',
-	   				allowBlank : false,
-	   				width: 150
-	   			},
-	   			type : 'ComboRec',
-	   			id_grupo : 0,
-	   			form : true
-	   	   },
-	   	   {
-				config:{
-					name: 'desde',
-					fieldLabel: 'Desde',
-					allowBlank: false,
-					format: 'd/m/Y',
-					width: 150
-				},
-				type: 'DateField',
-				id_grupo: 0,
-				form: true
-		  },
-		  {
-				config:{
-					name: 'hasta',
-					fieldLabel: 'Hasta',
-					allowBlank: false,
-					format: 'd/m/Y',
-					width: 150
-				},
-				type: 'DateField',
-				id_grupo: 0,
-				form: true
-		  },
-		  {
+		}
+	},
+	
+	Atributos:[
+		{
+			config:{
+				name : 'id_gestion',
+				origen : 'GESTION',
+				fieldLabel : 'Gestion',
+				gdisplayField: 'desc_gestion',
+				allowBlank : false,
+				width: 150
+			},
+			type : 'ComboRec',
+			id_grupo : 0,
+			form : true
+		},
+		{
+			config:{
+				name: 'desde',
+				fieldLabel: 'Desde',
+				allowBlank: false,
+				format: 'd/m/Y',
+				width: 150
+			},
+			type: 'DateField',
+			id_grupo: 0,
+			form: true
+		},
+		{
+			config:{
+				name: 'hasta',
+				fieldLabel: 'Hasta',
+				allowBlank: false,
+				format: 'd/m/Y',
+				width: 150
+			},
+			type: 'DateField',
+			id_grupo: 0,
+			form: true
+		},
+		{
 			config: {
 					name: 'id_config_subtipo_cuenta',
 					fieldLabel: 'Subtipo',
@@ -117,69 +116,131 @@ Phx.vista.FormFiltroAuxiliarMayor=Ext.extend(Phx.frmInterfaz,{
 			type: 'ComboBox',
 			id_grupo: 0,
 			form: true
-		 },
-		 {
-   			config:{
-   				sysorigen: 'sis_contabilidad',
-       		    name: 'id_cuenta',
-   				origen: 'CUENTA',
-   				allowBlank: true,
-   				fieldLabel: 'Cuenta',
-   				gdisplayField: 'desc_cuenta',
-   				baseParams: { sw_transaccional: undefined },
-   				width: 150
-       	     },
-   			type: 'ComboRec',
-   			id_grupo: 0,
-   			form: true
-	   	},
-	   	{
-   			config:{
-   				sysorigen: 'sis_contabilidad',
-       		    name: 'id_auxiliar',
-   				origen: 'AUXILIAR',
-   				allowBlank: true,
-   				gdisplayField: 'desc_auxiliar',
-   				fieldLabel: 'Auxiliar',
-   				width: 150
-       	     },
-   			type:'ComboRec',
-   			id_grupo: 0,
-   			form: true
-	   	}
-
-    ],
-    labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
-    east: {
-          url: '../../../sis_contabilidad/vista/int_transaccion/AuxiliarCuenta.php',
-          width: '60%',
-          cls: 'AuxiliarCuenta'
-         },
-    title: 'Filtro de Auxilairess',
-    // Funcion guardar del formulario
-    onSubmit: function(o) {
-    	var me = this;
-    	if (me.form.getForm().isValid()) {
-             var parametros = me.getValForm()
-             this.onEnablePanel(this.idContenedor + '-east', parametros)                    
-        }
-    },
-     
-    loadValoresIniciales: function(){
-    	Phx.vista.FormFiltroAuxiliarMayor.superclass.loadValoresIniciales.call(this);
-    	
-    },
-    iniciarEventos:function(){
-    	this.Cmp.id_gestion.on('select', function(cmb, rec, ind){    		
-    		 Ext.apply(this.Cmp.id_cuenta.store.baseParams,{id_gestion: rec.data.id_gestion});			
+		},
+		{
+			config:{
+				sysorigen: 'sis_contabilidad',
+				name: 'id_cuenta',
+				origen: 'CUENTA',
+				allowBlank: true,
+				fieldLabel: 'Cuenta',
+				gdisplayField: 'desc_cuenta',
+				baseParams: { sw_transaccional: undefined },
+				width: 150
+			},
+			type: 'ComboRec',
+			id_grupo: 0,
+			form: true
+		},
+		{
+			config:{
+				sysorigen: 'sis_contabilidad',
+				name: 'id_auxiliar',
+				origen: 'AUXILIAR',
+				allowBlank: true,
+				gdisplayField: 'desc_auxiliar',
+				fieldLabel: 'Auxiliar',
+				width: 150
+			},
+			type:'ComboRec',
+			id_grupo: 0,
+			form: true
+		},
+		{
+			config : {
+				name:'tipo',
+				qtip:'Tipo...',
+				fieldLabel : 'Tipo',
+				resizable:true,
+				allowBlank:true,
+				emptyText:'Seleccione un catálogo...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_parametros/control/Catalogo/listarCatalogoCombo',
+					id: 'id_catalogo',
+					root: 'datos',
+					sortInfo:{
+						field: 'orden',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_catalogo','codigo','descripcion'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams: {par_filtro:'descripcion',cod_subsistema:'CONTA',catalogo_tipo:'tauxiliar'}
+				}),
+				enableMultiSelect:true,    				
+				valueField: 'codigo',
+				displayField: 'descripcion',
+				gdisplayField: 'tipo',
+				forceSelection:true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender:true,
+				mode:'remote',
+				pageSize:10,
+				queryDelay:1000,
+				width:180,
+				minChars:2
+			},
+			type:'ComboBox',
+			//filters:{pfiltro:'provee.tipo',type:'string'},
+			id_grupo:0,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name : 'tipo_estado',
+				fieldLabel : 'Estado',
+				items: [
+					{boxLabel: 'Abiertos', name: 'tipo_estado', inputValue: 'abierto', checked: true},
+					{boxLabel: 'Global', name: 'tipo_estado', inputValue: 'cerrado'}
+				],
+			},
+			type : 'RadioGroupField',
+			id_grupo : 0,
+			form : true
+		},
+		{
+			config:{
+				name : 'tipo_filtro',
+				fieldLabel : 'Filtros',
+				items: [
+					{boxLabel: 'Con detalle', name: 'tipo_filtro', inputValue: 'con_detalle', checked: true},
+					{boxLabel: 'Total', name: 'tipo_filtro', inputValue: 'sin_detalle'}
+				],
+			},
+			type : 'RadioGroupField',
+			id_grupo : 0,
+			form : true
+		},
+	],
+	labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
+	east: {
+		url: '../../../sis_contabilidad/vista/int_transaccion/AuxiliarCuenta.php',
+		width: '60%',
+		cls: 'AuxiliarCuenta'
+	},
+	title: 'Filtro de Auxiliares',
+	// Funcion guardar del formulario
+	onSubmit: function(o) {		
+		var me = this;
+		if (me.form.getForm().isValid()) {
+			var parametros = me.getValForm();
+			this.onEnablePanel(this.idContenedor + '-east', parametros);
+		}
+	},
+	
+	loadValoresIniciales: function(){
+		Phx.vista.FormFiltroAuxiliarMayor.superclass.loadValoresIniciales.call(this);		
+	},
+	
+	iniciarEventos:function(){
+		this.Cmp.id_gestion.on('select', function(cmb, rec, ind){    		
+			 Ext.apply(this.Cmp.id_cuenta.store.baseParams,{id_gestion: rec.data.id_gestion});			
 			 this.Cmp.id_cuenta.reset();			
 			 this.Cmp.id_cuenta.modificado = true;
-    		
-    	},this);
-    	
-    	
-    	
-    }
-    
-})    
+		},this);
+	},
+})
 </script>

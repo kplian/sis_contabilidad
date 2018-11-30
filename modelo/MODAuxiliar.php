@@ -5,7 +5,12 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-02-2013 20:44:52
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+ *  	ISUUE			FECHA			AUTHOR 		DESCRIPCION				
+ * 		1A			30/08/2018			EGS		 se aumento el campo aplicacion
+ * 
+ * 
 */
+
 
 class MODAuxiliar extends MODbase{
 	
@@ -38,6 +43,7 @@ class MODAuxiliar extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('corriente','varchar');
+		$this->captura('aplicacion','varchar');//////EGS- 30/08/2018--  1A
 		
 		
 		//Ejecuta la instruccion
@@ -60,6 +66,7 @@ class MODAuxiliar extends MODbase{
 		$this->setParametro('codigo_auxiliar','codigo_auxiliar','varchar');
 		$this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
 		$this->setParametro('corriente','corriente','varchar');
+		$this->setParametro('aplicacion','aplicacion','varchar');//////EGS- 30/08/2018--  1A
 		
 
 		//Ejecuta la instruccion
@@ -83,6 +90,7 @@ class MODAuxiliar extends MODbase{
 		$this->setParametro('codigo_auxiliar','codigo_auxiliar','varchar');
 		$this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
 		$this->setParametro('corriente','corriente','varchar');
+		$this->setParametro('aplicacion','aplicacion','varchar'); //////EGS- 30/08/2018--  1A
 		
 
 		//Ejecuta la instruccion

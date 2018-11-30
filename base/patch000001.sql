@@ -4678,8 +4678,86 @@ COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_codigo_aplicacion_r
 IS 'codigo de aplicaicon para relaciones contable';
 
 
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_doc_compra_venta_fk BIGINT;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_doc_compra_venta_fk
+IS 'referencia para notas de credito y debito';
+
+ALTER TABLE conta.tresultado_plantilla
+  ADD COLUMN visible VARCHAR(50) DEFAULT 'si' NOT NULL;  
+  
+  
+  
+ALTER TABLE param.ttipo_cc
+  ADD COLUMN operativo VARCHAR(4) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN param.ttipo_cc.operativo
+IS 'los nodos de moviemitno  que estan operacionales pueden imputarce para compras';
+
+
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN glosa_previa VARCHAR DEFAULT '' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_comprobante.glosa_previa
+IS 'para almacenar como respaldo glosas modificadas';
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN cerrado VARCHAR(10) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.cerrado
+IS 'este campo serviria para identificar las trasacciones de tipo cobro o cuenta por pagar que ya fueron cerradas';
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_int_comprobante_cierre INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_int_comprobante_cierre
+IS 'identifica el comrpobante con que fue cerrado , solo tenemso este dato cuando el cierre es automatico, cuadno se valida algun cbte';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN fecha_cerrado TIMESTAMP WITHOUT TIME ZONE;
+
+COMMENT ON COLUMN conta.tint_transaccion.fecha_cerrado
+IS 'fecah en la que ce cierran las trasacciones de cobros o cuentas por pagar';
+
+
+
+create index idx_id_int_comprobante_fks on conta.tint_comprobante using GIN (id_int_comprobante_fks)
+
+
+CREATE INDEX idx_id_int_comprobante_fks1 on conta.tint_comprobante ((id_int_comprobante_fks[1]));
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN id_contrato INTEGER;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.id_contrato
+IS 'hace referencia al contrato de ventas en facturas de venta util para bancarizar ventas';
+
+ --------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_origen INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_origen
+IS 'hace referencia al id usardo por el generador de cbte para crear esta trasaccion';
+
+
+
+
 /***********************************F-SCP-RAC-CONTA-1-08/05/2018****************************************/
 
+/***********************************I-SCP-EGS-CONTA-1-30/08/2018****************************************/
+ALTER TABLE conta.tauxiliar
+ADD COLUMN aplicacion VARCHAR(50);
+/***********************************F-SCP-EGS-CONTA-1-30/08/2018****************************************/
 
 
 

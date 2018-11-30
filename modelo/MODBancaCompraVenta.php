@@ -71,51 +71,29 @@ class MODBancaCompraVenta extends MODbase{
 		$this->captura('id_contrato','int4');
 		$this->captura('id_proveedor','int4');
 		$this->captura('desc_proveedor2','varchar');
-         $this->captura('desc_contrato','text');     
-		 $this->captura('id_cuenta_bancaria','int4'); 
-		 $this->captura('desc_cuenta_bancaria','varchar'); 
-		 $this->captura('id_documento','int4'); 
-		 $this->captura('desc_documento','varchar'); 
+		$this->captura('desc_contrato','text');     
+		$this->captura('id_cuenta_bancaria','int4'); 
+		$this->captura('desc_cuenta_bancaria','varchar'); 
+		$this->captura('id_documento','int4'); 
+		$this->captura('desc_documento','varchar'); 
 		$this->captura('periodo','varchar'); 
 		$this->captura('saldo','numeric');
 		$this->captura('monto_contrato','numeric');
 		$this->captura('gestion','int4');
-		
 		$this->captura('banca_seleccionada','int4');
-		
 		$this->captura('numero_cuota','int4');
-		$this->captura('tramite_cuota','varchar'); 
-
-	$this->captura('id_proceso_wf','int4');
+		$this->captura('tramite_cuota','varchar');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('resolucion','varchar'); 
+		$this->captura('tipo_monto','varchar'); 
+		$this->captura('retencion_cuota','numeric');
+		$this->captura('multa_cuota','numeric');
+		$this->captura('rotulo_comercial','varchar'); 
+		$this->captura('estado_libro','varchar'); 
+		$this->captura('periodo_servicio','varchar');
 	
-	
-	$this->captura('resolucion','varchar'); 
-	$this->captura('tipo_monto','varchar'); 
-	
-	
-	$this->captura('retencion_cuota','numeric');
-	$this->captura('multa_cuota','numeric');
-	$this->captura('rotulo_comercial','varchar'); 
-	$this->captura('estado_libro','varchar'); 
-	
-	$this->captura('periodo_servicio','varchar');
-	
-	$this->captura('lista_negra','varchar');
-	
-	$this->captura('tipo_bancarizacion','varchar');
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-	
-		
+		//$this->captura('lista_negra','varchar');
+		//$this->captura('tipo_bancarizacion','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

@@ -5,6 +5,12 @@
 *@author  (admin)
 *@date 29-08-2013 00:28:30
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ * SSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		29-08-2013        RCM KPLIAN        CREACION
+ #2             27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
+ *  
+ * 1A			21/08/2018		EGS					se creo la funcion listarIntComprobanteCombo
 */
 //require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
 // convert to PDF
@@ -16,6 +22,7 @@ require_once(dirname(__FILE__).'/../reportes/RIntCbte.php');
 require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario.php');
 require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario_cuad.php');
 require_once(dirname(__FILE__).'/../reportes/RComprobanteDiarioXls.php');
+require_once(dirname(__FILE__).'/../reportes/RCbteXls.php');
 //
 class ACTIntComprobante extends ACTbase{
 	
@@ -54,6 +61,11 @@ class ACTIntComprobante extends ACTbase{
 		}
 
 		//RCM 01/09/2017
+		
+		if($this->objParam->getParametro('estado_reg_estado')!= ''){
+			$this->objParam->addFiltro("incbte.estado_reg = ''".$this->objParam->getParametro('estado_reg_estado')."''");    
+		}
+		
 		if($this->objParam->getParametro('id_int_comprobante')!= ''){
 			$this->objParam->addFiltro("incbte.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));    
 		}
@@ -735,7 +747,67 @@ class ACTIntComprobante extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-
+	
+	//#2 RAC, 27-08-2018  se añade trasaccion para modificar glosa de comprobantes validados
+	function modificarGlosaIntComprobante(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->modificarGlosaIntComprobante($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	
+		////////////EGS-F-21/08/2018///    1A	
+	function listarIntComprobanteCombo(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+	
+		if($this->objParam->getParametro('estado_reg')!= ''){
+			$this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
+		}
+		/*
+		if($this->objParam->getParametro('clase_comprobante')!= ''){
+			$this->objParam->addFiltro("clc.movimiento = ''".$this->objParam->getParametro('clase_comprobante')."''");    
+		}*/
+		
+		if($this->objParam->getParametro('clase_comprobante')!= ''){
+			$this->objParam->addFiltro("clc.movimiento in(''".$this->objParam->getParametro('clase_comprobante')."'',''".$this->objParam->getParametro('clase_comprobante1')."'')");  
+		}
+	
+		$this->objFunc=$this->create('MODIntComprobante');
+			
+		$this->res=$this->objFunc->listarIntComprobanteCombo($this->objParam);
+		
+		
+		
+		//echo dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php';exit;
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}	
+	
+	////////////EGS-F-21/08/2018///    1A	
+	
+	//mp
+	function ListadoCbte() {						
+		$this->objFun=$this->create('MODIntComprobante');	
+		$this->res = $this->objFun->listadoCbtes();
+		if($this->res->getTipo()=='ERROR'){
+			$this->res->imprimirRespuesta($this->res->generarJson());
+			exit;
+		}
+		$titulo ='Cbtes';
+		$nombreArchivo=uniqid(md5(session_id()).$titulo);
+		$nombreArchivo.='.xls';
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		$this->objParam->addParametro('datos',$this->res->datos);			
+		$this->objReporteFormato=new RCbteXls($this->objParam);
+		$this->objReporteFormato->generarDatos();
+		$this->objReporteFormato->generarReporte();
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());				
+	}
+	
 }
 
 ?>

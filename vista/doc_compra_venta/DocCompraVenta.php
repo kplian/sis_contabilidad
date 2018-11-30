@@ -5,6 +5,16 @@
 *@author  (admin)
 *@date 18-08-2015 15:57:09
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * 
+ * 
+ * 
+ *    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		  8-08-2015         N/N               creacion
+ #1200  ETR       12/07/2018        RAC KPLIAN        Se Agrega capacidad de relacionar facturaa las notas de debito credito
+ #1201  ETR       21/08/2018        RAC KPLIAN        se añadi filtro apra no generar cbte para NCD notas de credito debito
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -15,6 +25,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
     tabEnter: true,
     tipoDoc: 'venta',
     regitrarDetalle: 'si',
+    sw_ncd: 'no',//#1201  21/08/2018  deshabilitar el generador de comprobantes para notas de credito debito
     nombreVista: 'DocCompraVenta',
     constructor:function(config){
 		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
@@ -81,6 +92,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             }
         );
         
+        this.crearFormAuto();
+        
+       
         
         
 		
@@ -99,10 +113,26 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			{
 				//configuracion del componente
 				config:{
-						labelSeparator:'',
+						labelSeparator:':',
 						inputType:'hidden',
+						fieldLabel: 'ID',
 						name: 'id_doc_compra_venta',
-						gwidth: 40,
+						gwidth: 100,
+		                renderer: function (value, p, record, rowIndex, colIndex){  
+		                	   if(record.data.tipo_reg != 'summary'){
+			                	   	var res = value;
+			                	   	if(record.data.id_doc_compra_venta_fk){
+			                	   		 return  String.format('<b><font color="green"> {0} / {1}</font></b>',value, record.data.id_doc_compra_venta_fk);
+			                	   	}
+			                	   	else{
+			                	   	   return  String.format('<b>{0}</b>',value);	
+			                	   	}
+		            	       }
+		            	       else{
+		            	       	  return '';
+		            	       } 
+		                 }
+					
 				},
 				type:'Field',
 				form:true ,
@@ -1444,7 +1474,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg',
 		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata','desc_funcionario2','id_funcionario',
 		{name:'fecha_cbte', type: 'date',dateFormat:'Y-m-d'},
-		{name:'estado_cbte', type: 'string'},'codigo_aplicacion'
+		{name:'estado_cbte', type: 'string'},'codigo_aplicacion','tipo_informe','id_doc_compra_venta_fk'
 	],
 	sortInfo:{
 		field: 'id_doc_compra_venta',
@@ -1573,6 +1603,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             this.getBoton('del').enable();
          } 
          
+         
          if(this.regitrarDetalle == 'si'){
          	this.getBoton('btnWizard').enable();
          }
@@ -1608,7 +1639,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
                     	id_periodo:   this.cmbPeriodo.getValue(),  
                     	id_depto_conta: this.cmbDepto.getValue(),
                         gestion: this.tmpGestion,
-                        tipoDoc: this.tipoDoc
+                        tipoDoc: this.tipoDoc,
+                        sw_ncd: this.sw_ncd
                     },
                     this.idContenedor,
                     'WizardAgrupador')
@@ -1669,7 +1701,229 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
         	nomRep = Phx.CP.CRIPT.Encriptar(nomRep);
         }
         window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
-	}
+	},
+	
+	//#1200  crea formulario factura
+	crearFormAuto:function(){
+		  this.formAuto = new Ext.form.FormPanel({
+            baseCls: 'x-plain',
+            autoDestroy: true,           
+            border: false,
+            layout: 'form',
+            autoHeight: true,           
+    
+            items: [
+		            {
+		                name: 'id_doc_compra_venta_fk',
+		                xtype:"combo",
+		                fieldLabel: 'Documento ID',
+		                allowBlank: false,
+		                emptyText:'Elija una plantilla...',
+		                store:new Ext.data.JsonStore(
+		                {
+		                    url: '../../sis_contabilidad/control/DocCompraVenta/listarDocCompraVenta',
+		                    id: 'id_doc_compra_venta',
+		                    root:'datos',
+		                    sortInfo:{
+		                        field:'desc_plantilla',
+		                        direction:'ASC'
+		                    },
+		                    totalProperty:'total',
+		                    fields: ['id_doc_compra_venta','revisado','nro_documento','nit',
+		                    'desc_plantilla', 'desc_moneda','importe_doc','nro_documento',
+		                    'tipo','razon_social','fecha','importe_pendiente','importe_cobrado_mb','importe_cobrado_mt','saldo_por_cobrar'],
+		                    remoteSort: true,
+		                    baseParams:{par_filtro:'mon.codigo#pla.desc_plantilla#dcv.razon_social#dcv.nro_documento#dcv.nit#dcv.importe_doc'}
+		                }),
+		                tpl:'<tpl for=".">\
+		                       <div class="x-combo-list-item"><p><b>{razon_social},  NIT: {nit}</b></p>\
+		                       <p>{desc_plantilla} </p><p>Doc: {nro_documento} de Fecha: {fecha}</p>\
+		                       <p>Doc: {importe_doc}  - {desc_moneda}</p> <p>Por cobrar {importe_pendiente} {desc_moneda}</p><p>Cobrado {importe_cobrado_mb} BS</p><p><font color="green"> Cobrado {importe_cobrado_mt} USD</font></p><p>Saldo: {saldo_por_cobrar} {desc_moneda}</p></div></tpl>',
+		                       
+		                       
+		                valueField: 'id_doc_compra_venta',
+		                hiddenValue: 'id_doc_compra_venta',
+		                displayField: 'desc_plantilla',
+		                //gdisplayField:'nro_documento',
+		                listWidth:'280',
+		                forceSelection:true,
+		                typeAhead: false,
+		                triggerAction: 'all',
+		                lazyRender:true,
+		                mode:'remote',
+		                pageSize:20,
+		                queryDelay:500,
+		                gwidth: 100,
+		                minChars:2
+		            },
+		            {
+			                name: 'monto',
+			                xtype:"field",		                
+			                fieldLabel: 'Monto',
+			                readOnly: true
+			        },
+		            {
+			                name: 'nro_doc',
+			                xtype:"field",		                
+			                fieldLabel: 'Nro',
+			                readOnly: true
+			        },
+		            {
+			                name: 'fecha',
+			                xtype:"field",		                
+			                fieldLabel: 'Fecha',
+			                readOnly: true
+			        },
+		            {
+			                name: 'razon_social',
+			                xtype:"field",		            
+			                fieldLabel: 'Razon Social',
+			                readOnly: true
+			        },
+		            {
+			                name: 'id_doc_compra_venta',
+			                xtype:"field",
+			                inputType:'hidden'
+			        }
+			       
+						
+		            
+            ]
+        });
+        
+		
+		
+		this.wAuto = new Ext.Window({
+            title: 'Configuracion',
+            collapsible: true,
+            maximizable: true,
+            autoDestroy: true,
+            width: 380,
+            height: 250,
+            layout: 'fit',
+            plain: true,
+            bodyStyle: 'padding:5px;',
+            buttonAlign: 'center',
+            items: this.formAuto,
+            modal:true,
+             closeAction: 'hide',
+            buttons: [{
+                text: 'Guardar',
+                handler: this.saveAuto,
+                scope: this
+                
+            },
+             {
+                text: 'Cancelar',
+                handler: function(){ this.wAuto.hide() },
+                scope: this
+            }]
+        });
+        
+         this.cmpIdDocCompraVentaFk = this.formAuto.getForm().findField('id_doc_compra_venta_fk');
+         this.cmpIdDocCompraVenta = this.formAuto.getForm().findField('id_doc_compra_venta');
+         
+       
+         this.cmpIdDocCompraVentaFk.on('select',function(cmb,rec){
+         	  this.formAuto.getForm().findField('monto').setValue(rec.data.importe_doc);
+         	  this.formAuto.getForm().findField('nro_doc').setValue(rec.data.nro_documento);
+         	  this.formAuto.getForm().findField('fecha').setValue(rec.data.fecha);
+         	  this.formAuto.getForm().findField('razon_social').setValue(rec.data.razon_social);
+         }, this)
+         
+         
+	},
+	
+	 mostarFormAuto:function(){	 	
+	 	    var rec = this.sm.getSelected();
+			var data = rec.data;
+			var me = this;
+			if (data && data.tipo_informe  == 'ncd') {
+				
+				this.cmpIdDocCompraVentaFk.store.baseParams.fecha  = data.fecha;
+				this.cmpIdDocCompraVentaFk.store.baseParams.tipo_informe  = 'lcv';
+				this.cmpIdDocCompraVentaFk.store.baseParams.tipo  = data.tipo=='compra'?'venta':'compra';
+				this.cmpIdDocCompraVentaFk.store.baseParams.nit  = data.nit;
+  	            this.cmpIdDocCompraVentaFk.modificado = true;
+  	            
+  	            
+				
+				if(data.id_doc_compra_venta_fk){
+					     //is edit
+					 	Phx.CP.loadingShow();
+						Ext.Ajax.request({
+							url : '../../sis_contabilidad/control/DocCompraVenta/cargarDatosFactura',
+							params : {
+								'id_doc_compra_venta' :  data.id_doc_compra_venta,
+								'id_doc_compra_venta_fk': data.id_doc_compra_venta_fk
+							},
+							success : function(response){								
+								  me.wAuto.show();
+								  
+								  //set invoice values
+								  Phx.CP.loadingHide();
+								  var reg = Ext.util.JSON.decode(Ext.util.Format.trim(response.responseText));
+								  me.formAuto.load(reg.ROOT.datos);
+								  
+								  this.formAuto.getForm().findField('monto').setValue(reg.ROOT.datos.importe_doc);
+					         	  this.formAuto.getForm().findField('nro_doc').setValue(reg.ROOT.datos.nro_documento);
+					         	  this.formAuto.getForm().findField('fecha').setValue(reg.ROOT.datos.fecha);
+					         	  this.formAuto.getForm().findField('razon_social').setValue(reg.ROOT.datos.razon_social);
+					         	  this.cmpIdDocCompraVenta.setValue(data.id_doc_compra_venta);
+					         	  this.cmpIdDocCompraVentaFk.setValue(reg.ROOT.datos.id_doc_compra_venta_fk);
+					         	  this.cmpIdDocCompraVentaFk.setRawValue(reg.ROOT.datos.nro_autorizacion);
+								  
+							},
+							failure : this.conexionFailure,
+							timeout : this.timeout,
+							scope : this
+						});					
+				}
+				else{
+					  //dont have id
+					   me.wAuto.show();
+					   me.formAuto.getForm().reset();
+					   this.cmpIdDocCompraVenta.setValue();
+					   this.cmpIdDocCompraVenta.setValue(data.id_doc_compra_venta);
+				}				
+			}
+   },
+   
+   saveAuto: function(){
+		    var d = this.getSelectedData();
+		    Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_contabilidad/control/DocCompraVenta/relacionarFacturaNCD',
+                params: { 
+                	      id_doc_compra_venta: this.cmpIdDocCompraVenta.getValue(),
+                	      id_doc_compra_venta_fk: this.cmpIdDocCompraVentaFk.getValue()
+                	    },
+                success: this.successSinc,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+		
+	},
+	successSinc:function(resp){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+            	if(this.wOt){
+            		this.wOt.hide(); 
+            	}
+            	if(this.wAuto){
+            		this.wAuto.hide(); 
+            	}
+                
+                this.reload();
+             }else{
+                alert('ocurrio un error durante el proceso')
+            }
+    },
+	
+	
+	
     
     
 })

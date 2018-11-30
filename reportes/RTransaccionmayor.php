@@ -27,6 +27,7 @@ class RTransaccionmayor extends ReportePDF {
 	var $valor;
 	var $signo="";
 	var $a="";
+	var $k=1;
 	
 	function datosHeader ($detalle,$resultado,$tpoestado,$auxiliar) {
 		$this->SetHeaderMargin(10);
@@ -97,8 +98,10 @@ class RTransaccionmayor extends ReportePDF {
 		$acreedor=0;
 		$var='';
 		$sw="0";
+		$i=1;
 		foreach ($this->getDataSource() as $datarow) {
 			
+				
 			switch ($this->objParam->getParametro('tipo_moneda')) {
 				case 'MA':
 					$debe=$datarow['importe_debe_ma'];
@@ -132,7 +135,7 @@ class RTransaccionmayor extends ReportePDF {
 				$aux=$aux.'Nro Cbte.:'.trim($datarow['nro_cbte'])."\r\n";
 			}else{
 				$aux=$aux.'';
-			}	
+			}			
 			if($tramite == 1){
 				$aux=$aux.'Tramite:'.strval($datarow['nro_tramite'])."\r\n";
 			}else{
@@ -245,9 +248,10 @@ class RTransaccionmayor extends ReportePDF {
 	
 			$this->tablealigns=array('C','L','L','L','R','R','R');			
 			$this->tableborders=array('RLTB','RLTB','RLTB','RLTB','RLTB','RLTB','RLTB','RLTB');
-			$this->tabletextcolor=array();			
+			$this->tabletextcolor=array();		
+			//var_dump($i.'|'.$datarow['id_int_comprobante'].'|');
 			$RowArray = array(
-				's0' => $i+1,
+				's0' => $i,
 				's1' => $newDate,
 				's2' => $aux,
 				's3' => trim($datarow['glosa1'])."\r\n".trim($datarow['glosa']),
@@ -257,7 +261,8 @@ class RTransaccionmayor extends ReportePDF {
 			);
 			$fill = !$fill;					
 			$this->total = $this->total -1;			
-			$i++;		
+			$i++;
+			$k++;		
 			$this-> MultiRow($RowArray,$fill,0);			
 			$this->revisarfinPagina($datarow);			
 		}			
@@ -305,6 +310,7 @@ class RTransaccionmayor extends ReportePDF {
 	//
 	//imprimirLinea suma filas
 	function calcularMontos($val){
+		//var_dump($this->objParam->getParametro('tipo_moneda'));
 		switch ($this->objParam->getParametro('tipo_moneda')) {
 			case 'MA':
 				$this->s1 = $this->s1 + $val['importe_debe_ma'];
@@ -339,7 +345,9 @@ class RTransaccionmayor extends ReportePDF {
 			default:			
 				break;
 		}
-		$this->t3=$this->t1-$this->t2;			
+		$this->t3=$this->t1-$this->t2;
+		//var_dump($val['importe_debe_mb']."*".$val['importe_haber_mb'].'==>'.$this->t3);
+		//var_dump($val['importe_haber_mb']);				
 	}	
 	//revisarfinPagina pie
 	function cerrarCuadro(){		
@@ -387,17 +395,24 @@ class RTransaccionmayor extends ReportePDF {
 	}
 	//revisarfinPagina pie
 	function cerrarCuadroTotal(){
+		//var_dump('&'.$this->t1.'&'.$this->t2.'&'.$this->t3);
 		$conf_par_tablewidths=array(7,15,50,60,20,20,20);					
 		$this->tablealigns=array('R','R','R','R','R','R','R');		
 		$this->tablenumbers=array(0,0,0,0,2,2,2);
 		$this->tableborders=array('','','','','LRTB','LRTB','LRTB');
+		// 
+		//$this->t3 =number_format((float)$this->t3, 2, '.',',');
+		//var_dump($this->t3);
+		//$this->t3=(float)$this->t3;
 		if(($this->t3)<0){
 			$this->t3=($this->t3)*-1;
-			$this->t3= '('.(string)(number_format($this->t3, 2, '.', ',')).')';
+			$this->t3= '('.(string)(number_format((float)$this->t3, 2, '.', ',')).')';
+			//var_dump($this->t3);
 			$this->tablenumbers=array(0,0,0,0,2,2,0);		
 		}else{
 			$this->tablenumbers=array(0,0,0,0,0,0,2);
-		}								
+		}
+		//var_dump($k."=>".$this->t3);								
 		$RowArray = array(
 					't0' => '', 
 					't1' => '',
@@ -426,13 +441,13 @@ class RTransaccionmayor extends ReportePDF {
 			$desde = $this->objParam->getParametro('desde');
 			array_push($var,$desde);
 			array_push($desc,'DESDE:');
-			$cant++;	
+			$cant=(int)$cant++;
 		}
 		if($this->objParam->getParametro('hasta')!=null){
 			$hasta = $this->objParam->getParametro('hasta');
 			array_push($var,$hasta);
 			array_push($desc,'HASTA:');
-			$cant++;	
+			$cant=(int)$cant++;	
 		}
 		if($this->objParam->getParametro('aux')!=null){
 			$aux = $this->objParam->getParametro('aux');

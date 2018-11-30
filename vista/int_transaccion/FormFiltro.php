@@ -42,10 +42,8 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 				me.onSubmit()
 			}, 1500);
 			
-		}  
-       
-        
-        
+		}
+	
     },
     
   
@@ -83,7 +81,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 				config:{
 					name: 'desde',
 					fieldLabel: 'Desde',
-					allowBlank: true,
+					allowBlank: false,
 					format: 'd/m/Y',
 					width: 150
 				},
@@ -95,7 +93,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 				config:{
 					name: 'hasta',
 					fieldLabel: 'Hasta',
-					allowBlank: true,
+					allowBlank: false,
 					format: 'd/m/Y',
 					width: 150
 				},
@@ -332,7 +330,20 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 			type: 'Field',
 			id_grupo: 0,
 			form: true
-		}
+		},
+		{
+			config:{
+				name : 'cerrado',
+				fieldLabel : 'Filtrar Cerradas',
+				items: [
+					{boxLabel: 'Si', name: 'cerrado', inputValue: 'si'},
+					{boxLabel: 'No', name: 'cerrado', inputValue: 'no', checked: true}
+				],
+			},
+			type : 'RadioGroupField',
+			id_grupo : 0,
+			form : true
+		 }
 
 	],
 	labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
@@ -363,28 +374,30 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 			var ot=this.Cmp.id_orden_trabajo.lastSelectionText;
 			var suborden=this.Cmp.id_suborden.lastSelectionText;
 			var nro_tram=this.Cmp.nro_tramite.lastSelectionText;		
-					
+			var cerrar= this.Cmp.cerrado.getValue();		
 			this.onEnablePanel(this.idContenedor + '-east', 
-				Ext.apply(parametros,{	'gest': gest,
-										'dpto': dpto,
-										'tpocuenta': tpocuenta,
-										'subtpocuenta': subtpocuenta,
-										'cuenta': cuenta,
-										'auxiliar': auxiliar,
-										'partida': partida,
-										'tcc' : tcc,										
-										'cc' : cc,
-										'ot' : ot,
-										'suborden' : suborden,
-										'nro_tram' : nro_tram
-									 }));
-        }
-    },
+				Ext.apply(parametros,{	
+					'gest': gest,
+					'dpto': dpto,
+					'tpocuenta': tpocuenta,
+					'subtpocuenta': subtpocuenta,
+					'cuenta': cuenta,
+					'auxiliar': auxiliar,
+					'partida': partida,
+					'tcc' : tcc,										
+					'cc' : cc,
+					'ot' : ot,
+					'suborden' : suborden,
+					'nro_tram' : nro_tram,
+					'cerrar':cerrar
+				}));
+		}
+	},
 	//
-    iniciarEventos:function(){
-    	this.Cmp.id_gestion.on('select', function(cmb, rec, ind){
-    		
-    		 Ext.apply(this.Cmp.id_cuenta.store.baseParams,{id_gestion: rec.data.id_gestion})
+	iniciarEventos:function(){
+		this.Cmp.id_gestion.on('select', function(cmb, rec, ind){
+			
+		 Ext.apply(this.Cmp.id_cuenta.store.baseParams,{id_gestion: rec.data.id_gestion})
 			 Ext.apply(this.Cmp.id_partida.store.baseParams,{id_gestion: rec.data.id_gestion})
 			 Ext.apply(this.Cmp.id_centro_costo.store.baseParams,{id_gestion: rec.data.id_gestion})
 			 this.Cmp.id_cuenta.reset();

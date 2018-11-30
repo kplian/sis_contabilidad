@@ -135,7 +135,10 @@ Phx.vista.ReporteRetenciones = Ext.extend(Phx.frmInterfaz,{
 						['todo','Todos'],
 						['rcrb','Recibo con Retenciones Bienes'],
 						['rcrs','Recibo con Retenciones Servicios'],	
-						['rcra','Recibo con Retenciones de Alquiler']		
+						['rcra','Recibo con Retenciones de Alquiler'],
+						['rcrd','Recibo con Retenciones de Directores'],
+						['rcrpr','Recibo con Retenciones de Personal retirado'],
+						['INVOICE (EXTERIOR - IUE/BE)','Invoice(exterior-IUE/BE)']	/////EGS//////	
 					]				
 				}),
 				valueField:'ID',

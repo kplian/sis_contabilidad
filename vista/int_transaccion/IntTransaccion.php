@@ -134,7 +134,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				width: 380,
 				listWidth: 380,
 				gwidth:600,
-				baseParams:{tipo_pres:"gasto,administrativo,recurso,ingreso_egreso"},				
+				baseParams:{tipo_pres:"gasto,administrativo,recurso,ingreso_egreso",operativos_todos:"si"},					
    				renderer:function (value, p, record){
 	   			    var color = 'green';
 	   			    if(record.data["tipo_reg"] != 'summary'){

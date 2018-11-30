@@ -120,6 +120,7 @@ class MODAgrupador extends MODbase{
 		$this->setParametro('id_moneda','id_moneda','int4');
 		$this->setParametro('fecha_cbte','fecha_cbte','date');
 		$this->setParametro('incluir_rev','incluir_rev','varchar');
+		$this->setParametro('sw_ncd','sw_ncd','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

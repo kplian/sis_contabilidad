@@ -274,6 +274,36 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 			form: true
 		},
 		
+			/////EGS///
+		 {
+	       		config:{
+	       			name:'visible',
+	       			fieldLabel:'visible',
+	       			allowBlank:false,
+	       			emptyText:'visible...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',	       		    
+	       		    gwidth: 100,
+	       		    store:new Ext.data.ArrayStore({
+		        	fields: ['ID', 'valor'],
+		        	data :	[['si','si'],	
+		        			['no','no']]
+		        				
+		    		}),
+					valueField:'ID',
+					value:'si',
+					displayField:'valor',
+					//renderer:function (value, p, record){if (value == 1) {return 'si'} else {return 'no'}}
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,	       		
+	       		grid:true,
+	       		form:true
+	       },
+	       ///////////////EGS///
+		
 		
 		
 		
@@ -484,6 +514,7 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		{name:'visible', type: 'string'},///EGS//
 		'tipo',
         'cbte_aitb',
         'cbte_apertura',

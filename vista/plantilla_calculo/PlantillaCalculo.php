@@ -267,7 +267,7 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'imputar_excento',
                 fieldLabel: 'Imputar Excento',
-                qtip: 'si es prioridad 1 no se suma el excento, si es prioriad 2 e monto es el excento',
+                qtip: 'si es prioridad 1 y si,  suma el monto excento, prioridad 1 y no, resta  el monto excento, 1 y nada respeta el porcentaje. <br> Si es prioriad 2 e monto es el excento',
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -275,13 +275,13 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender: true,
                 mode: 'local',
-                store: ['si','no']
+                store: ['si','no','nada']
             },
             type:'ComboBox',
             id_grupo:1,
             filters:{   pfiltro:'imputar_excento',
                         type: 'list',
-                         options: ['si','no']  
+                         options: ['si','no','nada']  
                     },
             valorInicial: 'no',        
             grid:true,
