@@ -141,7 +141,7 @@ ALTER TYPE conta.maestro_comprobante
 
 
 
-/***********************************I-TYP-RAC-CONTA-0-19/12/2017****************************************/
+/***********************************I-TYP-RAC-CONTA-1-19/12/2017****************************************/
 
 ALTER TYPE conta.maestro_comprobante
   ADD ATTRIBUTE columna_clase_comprobante VARCHAR(200);  
@@ -153,6 +153,6 @@ ALTER TYPE conta.maestro_comprobante
   ADD ATTRIBUTE columna_tipo_cambio_3 NUMERIC,
   ADD ATTRIBUTE columna_id_config_cambiaria INTEGER;
 
-/***********************************F-TYP-RAC-CONTA-0-19/12/2017****************************************/
+/***********************************F-TYP-RAC-CONTA-1-19/12/2017****************************************/
   
   
