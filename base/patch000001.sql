@@ -4686,16 +4686,6 @@ IS 'referencia para notas de credito y debito';
 
 ALTER TABLE conta.tresultado_plantilla
   ADD COLUMN visible VARCHAR(50) DEFAULT 'si' NOT NULL;  
-  
-  
-  
-ALTER TABLE param.ttipo_cc
-  ADD COLUMN operativo VARCHAR(4) DEFAULT 'si' NOT NULL;
-
-COMMENT ON COLUMN param.ttipo_cc.operativo
-IS 'los nodos de moviemitno  que estan operacionales pueden imputarce para compras';
-
-
 
 ALTER TABLE conta.tint_comprobante
   ADD COLUMN glosa_previa VARCHAR DEFAULT '' NOT NULL;
