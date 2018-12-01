@@ -1391,7 +1391,7 @@ VALUES
   
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
 VALUES 
-  (conta_revertir_iva_comprometido', E'no', E'Por dfecto no revierte el iva comprometido, asumiendo que la solictud fue hecha sobre el valor NETO');
+  (E'conta_revertir_iva_comprometido', E'no', E'Por dfecto no revierte el iva comprometido, asumiendo que la solictud fue hecha sobre el valor NETO');
 
 /***********************************F-DAT-RAC-CONTA-0-22/12/2017*****************************************/ 
 
@@ -1427,7 +1427,7 @@ select param.f_import_tcatalogo ('insert','CONTA','Servicios Empresas del Grupo'
 
 
 
-***********************************FIDAT-RAC-CONTA-0-29/05/2018*****************************************/ 
+/***********************************I-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 
 
 
 select pxp.f_insert_tgui ('Estado de Auxiliares', 'Estado de Auxiliares', 'EXUMAY', 'si', 10, 'sis_contabilidad/vista/int_transaccion/FormFiltroAuxiliarMayor.php', 3, '', 'FormFiltroAuxiliarMayor', 'CONTA');
