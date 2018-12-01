@@ -143,8 +143,6 @@ ALTER TYPE conta.maestro_comprobante
 
 /***********************************I-TYP-RAC-CONTA-1-19/12/2017****************************************/
 
-ALTER TYPE conta.maestro_comprobante
-  ADD ATTRIBUTE columna_clase_comprobante VARCHAR(200);  
   
   --------------- SQL ---------------
 
