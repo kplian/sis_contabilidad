@@ -1441,7 +1441,7 @@ select conta.f_import_tplantilla ('insert','Venta con Debito Fiscal (Regularizad
 select pxp.f_insert_tgui ('Regularización', 'Regularización', 'REGUCON', 'si', 1, '', 2, '', '', 'CONTA');
 select pxp.f_insert_tgui ('Registro de facturas Regularización', 'Registro de facturas regularización', 'REFAREG', 'si', 1, 'sis_contabilidad/vista/doc_compra_venta/DocVentaRegul.php', 3, '', 'DocVentaRegul', 'CONTA');
 select pxp.f_insert_testructura_gui ('REGUCON', 'CONTA');
-select pxp.f_insert_testructura_gui ('REFAREG', 'REGUCON')
+select pxp.f_insert_testructura_gui ('REFAREG', 'REGUCON');
 
 
 /***********************************F-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 
