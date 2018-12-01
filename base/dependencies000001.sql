@@ -352,15 +352,6 @@ ALTER TABLE conta.tint_transaccion
 
 /***********************************F-DEP-RCM-CONTA-0-21/10/2013*****************************************/
 
-/***********************************I-DEP-RCM-CONTA-0-13/12/2013*****************************************/
-
-CREATE TRIGGER tr_trelacion_contable
-  		AFTER INSERT OR UPDATE OR DELETE 
-  		ON conta.trelacion_contable FOR EACH ROW 
-  		EXECUTE PROCEDURE conta.f_tri_trelacion_contable();
-
-  		
-/***********************************F-DEP-RCM-CONTA-0-13/12/2013*****************************************/
 
 /***********************************I-DEP-JRR-CONTA-0-24/04/2014*****************************************/
 
@@ -4578,7 +4569,547 @@ WITH RECURSIVE cbte_raiz AS(
            JOIN conta.tint_comprobante cl ON cl.id_int_comprobante = c.ids [ 1 ]
              ;        
 
+
 /**********************************F-DEP-RAC-CONTA-0-09/05/2018****************************************/ 
+
+
+/**********************************I-DEP-RAC-CONTA-0-01/12/2018****************************************/ 
+DROP VIEW conta.vretencion;
+DROP VIEW conta.vlcv;
+DROP VIEW conta.vint_transaccion_analisis;
+
+CREATE OR REPLACE VIEW conta.v_doc_venta_det (
+    nro_documento,
+    nit,
+    nro_autorizacion,
+    importe_doc,
+    razon_social,
+    id_concepto_ingas,
+    desc_ingas,
+    id_partida,
+    codgio_partida,
+    nombre_partida,
+    id_centro_costo,
+    tipo_cc_codigo,
+    descripcion,
+    id_doc_compra_venta,
+    id_int_comprobante,
+    id_partida_ejecucion_doc)
+AS
+ SELECT cv.nro_documento,
+    cv.nit,
+    cv.nro_autorizacion,
+    cv.importe_doc,
+    cv.razon_social,
+    dc.id_concepto_ingas,
+    ci.desc_ingas,
+    dc.id_partida,
+    p.codigo AS codgio_partida,
+    p.nombre_partida,
+    dc.id_centro_costo,
+    tc.codigo AS tipo_cc_codigo,
+    tc.descripcion,
+    cv.id_doc_compra_venta,
+    cv.id_int_comprobante,
+    dc.id_partida_ejecucion AS id_partida_ejecucion_doc
+   FROM conta.tdoc_compra_venta cv
+     JOIN conta.tdoc_concepto dc ON cv.id_doc_compra_venta = dc.id_doc_compra_venta
+     JOIN pre.tpartida p ON dc.id_partida = p.id_partida
+     JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas = dc.id_concepto_ingas
+     JOIN param.tcentro_costo cc ON dc.id_centro_costo = cc.id_centro_costo
+     JOIN param.ttipo_cc tc ON tc.id_tipo_cc = cc.id_tipo_cc
+  WHERE cv.tipo::text = 'venta'::text
+  ORDER BY cv.nro_documento;
+
+CREATE OR REPLACE VIEW conta.vcbte_con_descuentos_ley (
+    id_int_comprobante,
+    fecha,
+    id_moneda,
+    estado_reg,
+    descuentos_ley)
+AS
+ SELECT c.id_int_comprobante,
+    c.fecha,
+    c.id_moneda,
+    c.estado_reg,
+    sum(t.importe_haber) AS descuentos_ley
+   FROM conta.tint_comprobante c
+     JOIN conta.tint_transaccion t ON c.id_int_comprobante = t.id_int_comprobante
+     JOIN conta.tcuenta cu ON cu.id_cuenta = t.id_cuenta
+  WHERE cu.nro_cuenta::text = ANY (ARRAY['2.1.3.02.003.003'::character varying::text, '2.1.3.02.005.001'::character varying::text, '2.1.3.02.004.001'::character varying::text, '2.1.3.02.003.002'::character varying::text])
+  GROUP BY c.id_int_comprobante, c.fecha, c.id_moneda, c.estado_reg;
+
+CREATE OR REPLACE VIEW conta.vdoc_descuentos_verificacion (
+    id_int_comprobante,
+    id_moneda,
+    list,
+    importe_descuento_ley)
+AS
+ SELECT dcv.id_int_comprobante,
+    dcv.id_moneda,
+    pxp.list(dcv.id_doc_compra_venta::character varying::text) AS list,
+    sum(dcv.importe_descuento_ley) AS importe_descuento_ley
+   FROM conta.tdoc_compra_venta dcv
+  GROUP BY dcv.id_int_comprobante, dcv.id_moneda;
+
+CREATE OR REPLACE VIEW conta.vint_transaccion_analisis (
+    importe_debe_mb,
+    importe_haber_mb,
+    importe_debe_mt,
+    importe_haber_mt,
+    importe_debe_ma,
+    importe_haber_ma,
+    id_orden_trabajo,
+    codigo_ot,
+    desc_orden,
+    id_tipo_cc,
+    ids,
+    id_int_comprobante,
+    codigo_partida,
+    id_int_transaccion,
+    id_cuenta,
+    id_auxiliar,
+    fecha,
+    id_periodo,
+    sw_movimiento,
+    descripcion_partida,
+    id_partida,
+    codigo_cuenta,
+    descripcion_cuenta,
+    tipo_cuenta)
+AS
+ SELECT "int".importe_debe_mb,
+    "int".importe_haber_mb,
+    "int".importe_debe_mt,
+    "int".importe_haber_mt,
+    "int".importe_debe_ma,
+    "int".importe_haber_ma,
+    COALESCE(ot.id_orden_trabajo, 0) AS id_orden_trabajo,
+    COALESCE(ot.codigo, 'S/O'::character varying) AS codigo_ot,
+    COALESCE(ot.desc_orden, 'No tiene una orden asignada'::character varying) AS desc_orden,
+    tcc.id_tipo_cc,
+    tcc.ids,
+    cbt.id_int_comprobante,
+    COALESCE(par.codigo, 'S/P'::character varying) AS codigo_partida,
+    "int".id_int_transaccion,
+    "int".id_cuenta,
+    "int".id_auxiliar,
+    cbt.fecha,
+    cbt.id_periodo,
+    par.sw_movimiento,
+    COALESCE(par.nombre_partida, 'No tiene una partida asignada'::character(1)::character varying) AS descripcion_partida,
+    COALESCE(par.id_partida, 0) AS id_partida,
+    cue.nro_cuenta AS codigo_cuenta,
+    cue.nombre_cuenta AS descripcion_cuenta,
+    cue.tipo_cuenta
+   FROM conta.tint_transaccion "int"
+     JOIN conta.tint_comprobante cbt ON cbt.id_int_comprobante = "int".id_int_comprobante
+     JOIN param.tcentro_costo cc ON cc.id_centro_costo = "int".id_centro_costo
+     JOIN param.vtipo_cc_raiz tcc ON tcc.id_tipo_cc = cc.id_tipo_cc
+     JOIN conta.tcuenta cue ON cue.id_cuenta = "int".id_cuenta
+     LEFT JOIN conta.torden_trabajo ot ON "int".id_orden_trabajo = ot.id_orden_trabajo
+     LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida
+  WHERE cbt.estado_reg::text = 'validado'::text;
+
+CREATE OR REPLACE VIEW conta.vlcv (
+    id_doc_compra_venta,
+    tipo,
+    fecha,
+    nit,
+    razon_social,
+    nro_documento,
+    nro_dui,
+    nro_autorizacion,
+    importe_doc,
+    total_excento,
+    sujeto_cf,
+    importe_descuento,
+    subtotal,
+    credito_fiscal,
+    importe_iva,
+    codigo_control,
+    tipo_doc,
+    id_plantilla,
+    tipo_informe,
+    id_moneda,
+    codigo_moneda,
+    id_periodo,
+    id_gestion,
+    periodo,
+    gestion,
+    id_depto_conta,
+    importe_ice,
+    venta_gravada_cero,
+    subtotal_venta,
+    sujeto_df,
+    importe_excento,
+    id_usuario_reg,
+    nro_cbte,
+    tipo_cambio,
+    id_int_comprobante,
+    id_usuario_comprobante,
+    id_tipo_doc_compra_venta,
+    nombre,
+    volcado)
+AS
+ SELECT dcv.id_doc_compra_venta,
+    dcv.tipo,
+    dcv.fecha,
+    dcv.nit,
+    dcv.razon_social,
+    dcv.nro_documento,
+    pxp.f_iif(COALESCE(dcv.nro_dui, '0'::character varying)::text = ''::text, '0'::character varying, COALESCE(dcv.nro_dui, '0'::character varying)) AS nro_dui,
+    dcv.nro_autorizacion,
+    dcv.importe_doc,
+    round(COALESCE(dcv.importe_excento, 0::numeric), 2) AS total_excento,
+    round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_excento, 0::numeric) - COALESCE(dcv.importe_descuento, 0::numeric), 2) AS sujeto_cf,
+    round(COALESCE(dcv.importe_descuento, 0.0), 2) AS importe_descuento,
+    round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_excento, 0::numeric), 2) AS subtotal,
+    round(0.13 * (COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_excento, 0::numeric) - COALESCE(dcv.importe_descuento, 0::numeric)), 2) AS credito_fiscal,
+    round(COALESCE(dcv.importe_iva, 0::numeric), 2) AS importe_iva,
+    dcv.codigo_control,
+    tdcv.codigo AS tipo_doc,
+    pla.id_plantilla,
+    pla.tipo_informe,
+    dcv.id_moneda,
+    mon.codigo AS codigo_moneda,
+    dcv.id_periodo,
+    per.id_gestion,
+    per.periodo,
+    ges.gestion,
+    dcv.id_depto_conta,
+    round(COALESCE(dcv.importe_ice, 0::numeric), 2) AS importe_ice,
+    0.00 AS venta_gravada_cero,
+    round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_ice, 0::numeric) - COALESCE(dcv.importe_excento, 0::numeric), 2) AS subtotal_venta,
+    round(COALESCE(dcv.importe_doc, 0::numeric) - COALESCE(dcv.importe_ice, 0::numeric) - COALESCE(dcv.importe_excento, 0::numeric) - COALESCE(dcv.importe_descuento, 0::numeric), 2) AS sujeto_df,
+    round(COALESCE(dcv.importe_excento, 0::numeric), 2) AS importe_excento,
+    dcv.id_usuario_reg,
+    comp.nro_cbte,
+        CASE
+            WHEN mon.id_moneda = 1 THEN 1::numeric
+            ELSE comp.tipo_cambio
+        END AS tipo_cambio,
+    comp.id_int_comprobante,
+    comp.id_usuario_reg AS id_usuario_comprobante,
+    tdcv.id_tipo_doc_compra_venta,
+    tdcv.nombre,
+    comp.volcado
+   FROM conta.tdoc_compra_venta dcv
+     JOIN param.tplantilla pla ON pla.id_plantilla = dcv.id_plantilla
+     JOIN param.tperiodo per ON per.id_periodo = dcv.id_periodo
+     JOIN param.tgestion ges ON ges.id_gestion = per.id_gestion
+     JOIN param.tmoneda mon ON mon.id_moneda = dcv.id_moneda
+     JOIN conta.ttipo_doc_compra_venta tdcv ON tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+     LEFT JOIN conta.tint_comprobante comp ON comp.id_int_comprobante = dcv.id_int_comprobante;
+
+CREATE OR REPLACE VIEW conta.vlibro_bancos (
+    id_int_comprobante,
+    debe,
+    haber,
+    fecha,
+    nro_comprobante,
+    id_cuenta_bancaria)
+AS
+ SELECT lb.id_int_comprobante,
+        CASE
+            WHEN lb.importe_deposito = 0::numeric THEN NULL::text
+            ELSE to_char(lb.importe_deposito, '999G999G999D99'::text)
+        END AS debe,
+        CASE
+            WHEN lb.importe_cheque = 0::numeric AND lb.estado::text <> 'anulado'::text THEN NULL::text
+            ELSE to_char(lb.importe_cheque, '999G999G999D99'::text)
+        END AS haber,
+    to_char(lb.fecha::timestamp with time zone, 'dd/mm/yyyy'::text) AS fecha,
+    lb.nro_comprobante,
+    lb.id_cuenta_bancaria
+   FROM tes.tts_libro_bancos lb
+     LEFT JOIN tes.tts_libro_bancos lbp ON lbp.id_libro_bancos = lb.id_libro_bancos_fk
+     LEFT JOIN conta.tint_comprobante a ON a.id_int_comprobante = lb.id_int_comprobante
+     JOIN tes.tcuenta_bancaria k ON k.id_cuenta_bancaria = lb.id_cuenta_bancaria
+  WHERE
+        CASE
+            WHEN 'Todos'::text = 'Todos'::text THEN lb.estado::text = ANY (ARRAY['impreso'::character varying, 'entregado'::character varying, 'cobrado'::character varying, 'anulado'::character varying, 'reingresado'::character varying, 'depositado'::character varying, 'transferido'::character varying, 'sigep_swift'::character varying]::text[])
+            WHEN 'Todos'::text = 'impreso y entregado'::text THEN lb.estado::text = ANY (ARRAY['impreso'::character varying, 'entregado'::character varying]::text[])
+            ELSE lb.estado::text = 'Todos'::text
+        END AND
+        CASE
+            WHEN 'Todos'::text = 'Todos'::text THEN lb.tipo::text = ANY (ARRAY['cheque'::character varying, 'deposito'::character varying, 'debito_automatico'::character varying, 'transferencia_carta'::character varying]::text[])
+            WHEN 'Todos'::text = 'transferencia_interna'::text THEN lb.tipo::text = ANY (ARRAY['transf_interna_debe'::character varying, 'transf_interna_haber'::character varying]::text[])
+            ELSE lb.tipo::text = 'Todos'::text
+        END AND
+        CASE
+            WHEN 0 = 0 THEN 0 = 0
+            ELSE lb.id_finalidad = 0
+        END
+  ORDER BY lb.fecha;
+
+CREATE OR REPLACE VIEW conta.vlibro_compras (
+    id_int_comprobante,
+    credito_fiscal,
+    id_periodo,
+    nro_cbte,
+    cuenta,
+    id_moneda,
+    tipo_cambio)
+AS
+ SELECT comp.id_int_comprobante,
+        CASE
+            WHEN dcv.id_moneda = 1 THEN sum(0.13 * (COALESCE(round(dcv.importe_doc, 2), 0::numeric) - COALESCE(round(dcv.importe_excento, 2), 0::numeric) - COALESCE(round(dcv.importe_descuento, 2), 0::numeric)))
+            ELSE sum(0.13 * (COALESCE(round(dcv.importe_doc, 2), 0::numeric) - COALESCE(round(dcv.importe_excento, 2), 0::numeric) - COALESCE(round(dcv.importe_descuento, 2), 0::numeric))) * comp.tipo_cambio
+        END AS credito_fiscal,
+    dcv.id_periodo,
+    comp.nro_cbte,
+    usu.cuenta,
+    dcv.id_moneda,
+        CASE
+            WHEN dcv.id_moneda = 1 THEN 1::numeric
+            ELSE comp.tipo_cambio
+        END AS tipo_cambio
+   FROM conta.tdoc_compra_venta dcv
+     JOIN conta.ttipo_doc_compra_venta tdcv ON tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+     JOIN param.tplantilla p ON p.id_plantilla = dcv.id_plantilla
+     LEFT JOIN conta.tint_comprobante comp ON comp.id_int_comprobante = dcv.id_int_comprobante AND comp.nro_cbte IS NOT NULL
+     LEFT JOIN segu.tusuario usu ON usu.id_usuario = comp.id_usuario_reg
+  WHERE p.tipo_informe::text = 'lcv'::text AND dcv.tipo::text = 'compra'::text AND comp.nro_cbte IS NOT NULL
+  GROUP BY comp.id_int_comprobante, dcv.id_periodo, comp.nro_cbte, usu.cuenta, comp.tipo_cambio, dcv.id_moneda;
+
+CREATE OR REPLACE VIEW conta.vlibro_mayor_banco (
+    id_int_comprobante,
+    fecha,
+    nro_cbte,
+    importe_debe_mb,
+    importe_haber_mb,
+    glosa1,
+    tipo_cambio,
+    moneda,
+    id_periodo,
+    cbte_reversion,
+    volcado,
+    id_cuenta,
+    id_gestion)
+AS
+ WITH RECURSIVE cbtrevertidos(id_int_comprobante, fecha, nro_cbte, importe_debe_mb, importe_haber_mb, glosa1, tipo_cambio, moneda, id_periodo, cbte_reversion, volcado, id_cuenta) AS (
+         SELECT icbte_1.id_int_comprobante,
+            icbte_1.fecha,
+            icbte_1.nro_cbte,
+            COALESCE(transa_1.importe_debe_mb, 0::numeric) AS importe_debe_mb,
+            COALESCE(transa_1.importe_haber_mb, 0::numeric) AS importe_haber_mb,
+            icbte_1.glosa1,
+            icbte_1.tipo_cambio,
+            m_1.moneda,
+            per_1.id_periodo,
+            icbte_1.cbte_reversion,
+            icbte_1.volcado,
+            cue_1.id_cuenta
+           FROM conta.tint_transaccion transa_1
+             JOIN conta.tint_comprobante icbte_1 ON icbte_1.id_int_comprobante = transa_1.id_int_comprobante AND icbte_1.cbte_reversion::text = 'si'::text
+             JOIN param.tmoneda m_1 ON m_1.id_moneda = transa_1.id_moneda
+             JOIN param.tperiodo per_1 ON per_1.id_periodo = icbte_1.id_periodo
+             JOIN segu.tusuario usu1_1 ON usu1_1.id_usuario = transa_1.id_usuario_reg
+             JOIN conta.tcuenta cue_1 ON cue_1.id_cuenta = transa_1.id_cuenta
+          WHERE icbte_1.estado_reg::text = 'validado'::text
+          ORDER BY icbte_1.id_int_comprobante, transa_1.fecha_reg
+        )
+ SELECT icbte.id_int_comprobante,
+    icbte.fecha,
+    icbte.nro_cbte,
+    COALESCE(transa.importe_debe_mb, 0::numeric) - COALESCE(( SELECT rev.importe_haber_mb
+           FROM cbtrevertidos rev
+          WHERE rev.glosa1::text ~~ (('%'::text || icbte.nro_cbte::text) || '%'::text) AND rev.nro_cbte::text = icbte.nro_cbte::text), 0::numeric) AS importe_debe_mb,
+    COALESCE(transa.importe_haber_mb, 0::numeric) - COALESCE(( SELECT rev.importe_debe_mb
+           FROM cbtrevertidos rev
+          WHERE rev.glosa1::text ~~ (('%'::text || icbte.nro_cbte::text) || '%'::text) AND rev.nro_cbte::text = icbte.nro_cbte::text), 0::numeric) AS importe_haber_mb,
+    icbte.glosa1,
+    icbte.tipo_cambio,
+    m.moneda,
+    per.id_periodo,
+    icbte.cbte_reversion,
+    icbte.volcado,
+    transa.id_cuenta,
+    per.id_gestion
+   FROM conta.tint_transaccion transa
+     JOIN conta.tint_comprobante icbte ON icbte.id_int_comprobante = transa.id_int_comprobante AND (icbte.volcado::text = 'si'::text OR icbte.volcado::text = 'no'::text)
+     JOIN param.tmoneda m ON m.id_moneda = transa.id_moneda
+     JOIN param.tperiodo per ON per.id_periodo = icbte.id_periodo
+     JOIN segu.tusuario usu1 ON usu1.id_usuario = transa.id_usuario_reg
+     JOIN conta.tcuenta cue ON cue.id_cuenta = transa.id_cuenta
+  WHERE icbte.estado_reg::text = 'validado'::text AND 0 = 0 AND 0 = 0
+  ORDER BY icbte.id_int_comprobante, transa.fecha_reg;
+
+CREATE OR REPLACE VIEW conta.vlibro_mayor_iva_credito_fiscal (
+    id_int_comprobante,
+    importe_debe_mb,
+    importe_haber_mb,
+    nro_cbte,
+    fecha,
+    id_gestion,
+    id_cuenta,
+    id_periodo,
+    cbte_reversion,
+    volcado,
+    glosa1,
+    id_int_comprobante_fks)
+AS
+ WITH RECURSIVE cbtrevertidos(id_int_comprobante, importe_debe_mb, importe_haber_mb, nro_cbte, fecha, id_gestion, id_cuenta, id_periodo, cbte_reversion, volcado) AS (
+         SELECT transa.id_int_comprobante,
+            sum(COALESCE(round(transa.importe_debe_mb, 2), 0::numeric)) AS importe_debe_mb,
+            sum(COALESCE(round(transa.importe_haber_mb, 2), 0::numeric)) AS importe_haber_mb,
+            icbte.nro_cbte,
+            icbte.fecha,
+            per.id_gestion,
+            transa.id_cuenta,
+            per.id_periodo,
+            icbte.cbte_reversion,
+            icbte.volcado,
+            icbte.glosa1,
+            icbte.id_int_comprobante_fks
+           FROM conta.tint_transaccion transa
+             JOIN conta.tint_comprobante icbte ON icbte.id_int_comprobante = transa.id_int_comprobante AND icbte.glosa1::text !~~* '%LIQUIDACIÓN DE IMPUESTOS%'::text AND icbte.estado_reg::text = 'validado'::text AND icbte.cbte_reversion::text = 'si'::text
+             JOIN param.tperiodo per ON per.id_periodo = icbte.id_periodo
+             JOIN conta.tcuenta cue ON cue.id_cuenta = transa.id_cuenta
+             JOIN conta.tconfig_subtipo_cuenta cst ON cst.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta AND cst.nombre::text = 'IVA-CF'::text
+             JOIN conta.tauxiliar aux ON aux.id_auxiliar = transa.id_auxiliar
+             JOIN param.tmoneda m ON m.id_moneda = transa.id_moneda
+          GROUP BY transa.id_int_comprobante, icbte.nro_cbte, icbte.fecha, per.id_gestion, transa.id_cuenta, per.id_periodo, icbte.cbte_reversion, icbte.volcado, icbte.glosa1, icbte.id_int_comprobante_fks
+        )
+ SELECT transa.id_int_comprobante,
+        CASE
+            WHEN sum(COALESCE(round(transa.importe_debe_mb, 2), 0::numeric)) = COALESCE(( SELECT sum(rev.importe_haber_mb) AS sum
+               FROM cbtrevertidos rev
+              WHERE rev.glosa1::text ~~ (('%'::text || icbte.nro_cbte::text) || '%'::text) OR regexp_replace(regexp_replace(rev.id_int_comprobante_fks::character varying::text, '{'::text, ''::text), '}'::text, ''::text)::character varying::integer = icbte.id_int_comprobante), 0::numeric) THEN 0::numeric
+            ELSE sum(COALESCE(round(transa.importe_debe_mb, 2), 0::numeric)) - COALESCE(( SELECT sum(rev.importe_haber_mb) AS sum
+               FROM cbtrevertidos rev
+              WHERE rev.glosa1::text ~~ (('%'::text || icbte.nro_cbte::text) || '%'::text) OR regexp_replace(regexp_replace(rev.id_int_comprobante_fks::character varying::text, '{'::text, ''::text), '}'::text, ''::text)::character varying::integer = icbte.id_int_comprobante), 0::numeric)
+        END AS importe_debe_mb,
+    sum(COALESCE(round(transa.importe_haber_mb, 2), 0::numeric)) - COALESCE(( SELECT sum(rev.importe_haber_mb) AS sum
+           FROM cbtrevertidos rev
+          WHERE rev.glosa1::text ~~ (('%'::text || icbte.nro_cbte::text) || '%'::text) OR regexp_replace(regexp_replace(rev.id_int_comprobante_fks::character varying::text, '{'::text, ''::text), '}'::text, ''::text)::character varying::integer = icbte.id_int_comprobante), 0::numeric) AS importe_haber_mb,
+    icbte.nro_cbte,
+    icbte.fecha,
+    per.id_gestion,
+    transa.id_cuenta,
+    per.id_periodo,
+    icbte.cbte_reversion,
+    icbte.volcado,
+    icbte.glosa1,
+    icbte.id_int_comprobante_fks
+   FROM conta.tint_transaccion transa
+     JOIN conta.tint_comprobante icbte ON icbte.id_int_comprobante = transa.id_int_comprobante AND icbte.glosa1::text !~~* '%LIQUIDACIÓN DE IMPUESTOS%'::text AND icbte.estado_reg::text = 'validado'::text AND (icbte.volcado::text = 'si'::text OR icbte.volcado::text = 'no'::text) AND icbte.cbte_reversion::text = 'no'::text
+     JOIN param.tperiodo per ON per.id_periodo = icbte.id_periodo
+     JOIN conta.tcuenta cue ON cue.id_cuenta = transa.id_cuenta
+     JOIN conta.tconfig_subtipo_cuenta cst ON cst.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta AND cst.nombre::text = 'IVA-CF'::text
+     JOIN conta.tauxiliar aux ON aux.id_auxiliar = transa.id_auxiliar
+     JOIN param.tmoneda m ON m.id_moneda = transa.id_moneda
+     LEFT JOIN cbtrevertidos revert ON icbte.id_int_comprobante = revert.id_int_comprobante AND revert.importe_debe_mb > 0::numeric
+  GROUP BY transa.id_int_comprobante, icbte.nro_cbte, icbte.fecha, per.id_gestion, transa.id_cuenta, per.id_periodo, icbte.cbte_reversion, icbte.volcado, icbte.glosa1, revert.id_int_comprobante, revert.importe_debe_mb, icbte.id_int_comprobante_fks, icbte.id_int_comprobante
+ HAVING revert.importe_debe_mb <> 0::numeric OR revert.importe_debe_mb IS NULL
+UNION
+ SELECT revert.id_int_comprobante,
+    sum(revert.importe_debe_mb) AS importe_debe_mb,
+    sum(revert.importe_haber_mb) AS importe_haber_mb,
+    revert.nro_cbte,
+    revert.fecha,
+    revert.id_gestion,
+    revert.id_cuenta,
+    revert.id_periodo,
+    revert.cbte_reversion,
+    revert.volcado,
+    revert.glosa1,
+    icbte.id_int_comprobante_fks
+   FROM conta.tint_transaccion transa
+     JOIN conta.tint_comprobante icbte ON icbte.id_int_comprobante = transa.id_int_comprobante AND icbte.glosa1::text !~~* '%LIQUIDACIÓN DE IMPUESTOS%'::text AND icbte.estado_reg::text = 'validado'::text AND (icbte.volcado::text = 'si'::text OR icbte.volcado::text = 'no'::text) AND icbte.cbte_reversion::text = 'no'::text
+     JOIN param.tperiodo per ON per.id_periodo = icbte.id_periodo
+     JOIN conta.tcuenta cue ON cue.id_cuenta = transa.id_cuenta
+     JOIN conta.tauxiliar aux ON aux.id_auxiliar = transa.id_auxiliar
+     JOIN param.tmoneda m ON m.id_moneda = transa.id_moneda
+     RIGHT JOIN cbtrevertidos revert ON icbte.id_int_comprobante = revert.id_int_comprobante AND revert.importe_debe_mb > 0::numeric
+  GROUP BY revert.id_int_comprobante, revert.importe_debe_mb, revert.nro_cbte, revert.fecha, revert.id_gestion, revert.id_cuenta, revert.id_periodo, revert.cbte_reversion, revert.volcado, revert.glosa1, icbte.id_int_comprobante_fks
+ HAVING revert.importe_debe_mb <> 0::numeric OR revert.importe_debe_mb IS NULL;
+
+
+CREATE OR REPLACE VIEW conta.vretencion (
+    id_doc_compra_venta,
+    obs,
+    tipo,
+    fecha,
+    nit,
+    razon_social,
+    nro_documento,
+    nro_autorizacion,
+    importe_doc,
+    codigo_control,
+    tipo_doc,
+    id_plantilla,
+    tipo_informe,
+    id_moneda,
+    codigo_moneda,
+    id_periodo,
+    id_gestion,
+    periodo,
+    gestion,
+    id_depto_conta,
+    id_usuario_reg,
+    descripcion,
+    importe_presupuesto,
+    importe,
+    importe_descuento_ley,
+    desc_plantilla,
+    nro_tramite,
+    id_int_comprobante,
+    nro_cbte,
+    tipo_cambio,
+    usr_mod)
+AS
+ SELECT dcv.id_doc_compra_venta,
+    dcv.obs,
+    dcv.tipo,
+    dcv.fecha,
+    dcv.nit,
+    dcv.razon_social,
+    dcv.nro_documento,
+    dcv.nro_autorizacion,
+    dcv.importe_doc,
+    dcv.codigo_control,
+    tdcv.codigo AS tipo_doc,
+    pla.id_plantilla,
+    pla.tipo_informe,
+    dcv.id_moneda,
+    mon.codigo AS codigo_moneda,
+    dcv.id_periodo,
+    per.id_gestion,
+    per.periodo,
+    ges.gestion,
+    dcv.id_depto_conta,
+    dcv.id_usuario_reg,
+    pc.descripcion,
+    pc.importe_presupuesto,
+    pc.importe,
+    dcv.importe_descuento_ley,
+    pla.desc_plantilla,
+    dcv.nro_tramite,
+    dcv.id_int_comprobante,
+    t.nro_cbte,
+    t.tipo_cambio,
+    usu2.cuenta AS usr_mod
+   FROM conta.tdoc_compra_venta dcv
+     JOIN param.tplantilla pla ON pla.id_plantilla = dcv.id_plantilla
+     JOIN conta.tplantilla_calculo pc ON dcv.id_plantilla = pc.id_plantilla
+     JOIN param.tperiodo per ON per.id_periodo = dcv.id_periodo
+     JOIN param.tgestion ges ON ges.id_gestion = per.id_gestion
+     JOIN param.tmoneda mon ON mon.id_moneda = dcv.id_moneda
+     JOIN conta.ttipo_doc_compra_venta tdcv ON tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+     JOIN conta.tint_comprobante t ON t.id_int_comprobante = dcv.id_int_comprobante
+     LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = dcv.id_usuario_reg
+  WHERE pla.tipo_informe::text = 'retenciones'::text AND pc.descuento::text = 'si'::text;
+
+
+
+
+
+
+/**********************************F-DEP-RAC-CONTA-0-01/12/2018****************************************/ 
+
+
 
 
          
