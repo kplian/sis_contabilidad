@@ -4718,7 +4718,7 @@ IS 'fecah en la que ce cierran las trasacciones de cobros o cuentas por pagar';
 
 
 
-create index idx_id_int_comprobante_fks on conta.tint_comprobante using GIN (id_int_comprobante_fks)
+create index idx_id_int_comprobante_fks on conta.tint_comprobante using GIN (id_int_comprobante_fks);
 
 
 CREATE INDEX idx_id_int_comprobante_fks1 on conta.tint_comprobante ((id_int_comprobante_fks[1]));
