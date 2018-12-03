@@ -20,6 +20,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 	ISSUE 		 FECHA   		AUTOR				 DESCRIPCION:  
 	#1			29/11/2018		EGS					se hizo validacion para forzar a escoger un axuiliar si existe para la cuenta    
+  #2      30/11/2018    CHROS       CONTROL PARA EVITAR EDITAR DATOS EN TRANSACCIONES
 ***************************************************************************/
 
 DECLARE
@@ -494,8 +495,28 @@ BEGIN
             from conta.tint_transaccion tr
             where tr.id_int_transaccion =  v_parametros.id_int_transaccion;
              
+            --#2 CHROS
             IF v_registros_trans.id_partida_ejecucion is not null THEN
-               raise exception 'No puede editar trasacciones que vengas de otros sistemas, para no romper la integridad presupuestaria';
+              IF v_parametros.id_centro_costo <> v_registros_trans.id_centro_costo THEN
+                raise exception 'No es posible cambiar el CENTRO DE COSTO para no romper la integridad presupuestaria';
+              ELSEIF v_parametros.id_partida <> v_registros_trans.id_partida THEN
+                raise exception 'No es posible cambiar la PARTIDA para no romper la integridad presupuestaria';
+              ELSEIF v_parametros.id_orden_trabajo <> v_registros_trans.id_orden_trabajo THEN
+                raise exception 'No es posible cambiar la ORDEN para no romper la integridad presupuestaria';
+              ELSEIF v_parametros.id_suborden <> v_registros_trans.id_suborden THEN
+                raise exception 'No es posible cambiar la SUB-ORDEN para no romper la integridad presupuestaria';
+              ELSEIF v_parametros.importe_debe <> v_registros_trans.importe_debe THEN
+                raise exception 'No es posible cambiar la DEBE para no romper la integridad presupuestaria';
+              ELSEIF v_parametros.importe_haber <> v_registros_trans.importe_haber THEN
+                raise exception 'No es posible cambiar la HABER para no romper la integridad presupuestaria';
+              ELSEIF v_parametros.tipo_cambio <> v_registros_trans.tipo_cambio THEN
+                raise exception 'No es posible cambiar la BS->BS para no romper la integridad presupuestaria';
+              ELSEIF v_parametros.tipo_cambio_2 <> v_registros_trans.tipo_cambio_2 THEN
+                raise exception 'No es posible cambiar la BS->USD para no romper la integridad presupuestaria';
+              ELSEIF v_parametros.tipo_cambio_3 <> v_registros_trans.tipo_cambio_3 THEN
+                raise exception 'No es posible cambiar la BS->UFV para no romper la integridad presupuestaria';
+              END IF;
+              --raise exception 'No puede editar trasacciones que vengas de otros sistemas, para no romper la integridad presupuestaria';
             END IF;
              
             -- si el tipo de cambia varia a de la cabecara marcamos la cabecera, 

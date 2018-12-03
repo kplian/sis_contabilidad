@@ -69,7 +69,8 @@ BEGIN
               glosa,
               id_tipo_relacion_comprobante,
               relacion_unica,
-              nombre_func
+              nombre_func,
+              visible
           	) values(
               v_parametros.codigo,
               'activo',
@@ -89,7 +90,8 @@ BEGIN
               v_parametros.glosa,
               v_parametros.id_tipo_relacion_comprobante,
               v_parametros.relacion_unica,
-              v_parametros.nombre_func
+              v_parametros.nombre_func,
+              v_parametros.visible
 							
 			
 			
@@ -131,7 +133,8 @@ BEGIN
               glosa = v_parametros.glosa,
               id_tipo_relacion_comprobante = v_parametros.id_tipo_relacion_comprobante,
               relacion_unica = v_parametros.relacion_unica,
-              nombre_func = v_parametros.nombre_func
+              nombre_func = v_parametros.nombre_func,
+              visible =  v_parametros.visible
 			where id_resultado_plantilla = v_parametros.id_resultado_plantilla;
                
 			--Definicion de la respuesta

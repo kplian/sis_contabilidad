@@ -4686,16 +4686,6 @@ IS 'referencia para notas de credito y debito';
 
 ALTER TABLE conta.tresultado_plantilla
   ADD COLUMN visible VARCHAR(50) DEFAULT 'si' NOT NULL;  
-  
-  
-  
-ALTER TABLE param.ttipo_cc
-  ADD COLUMN operativo VARCHAR(4) DEFAULT 'si' NOT NULL;
-
-COMMENT ON COLUMN param.ttipo_cc.operativo
-IS 'los nodos de moviemitno  que estan operacionales pueden imputarce para compras';
-
-
 
 ALTER TABLE conta.tint_comprobante
   ADD COLUMN glosa_previa VARCHAR DEFAULT '' NOT NULL;
@@ -4728,7 +4718,7 @@ IS 'fecah en la que ce cierran las trasacciones de cobros o cuentas por pagar';
 
 
 
-create index idx_id_int_comprobante_fks on conta.tint_comprobante using GIN (id_int_comprobante_fks)
+create index idx_id_int_comprobante_fks on conta.tint_comprobante using GIN (id_int_comprobante_fks);
 
 
 CREATE INDEX idx_id_int_comprobante_fks1 on conta.tint_comprobante ((id_int_comprobante_fks[1]));
@@ -4757,6 +4747,237 @@ IS 'hace referencia al id usardo por el generador de cbte para crear esta trasac
 /***********************************I-SCP-EGS-CONTA-1-30/08/2018****************************************/
 ALTER TABLE conta.tauxiliar
 ADD COLUMN aplicacion VARCHAR(50);
+
+CREATE TABLE conta.tdesglose_ingreso_caja (
+  id_int_comprobante INTEGER NOT NULL,
+  id_int_transaccion INTEGER,
+  nro_cuenta_errada VARCHAR(100),
+  id_cuenta_errada INTEGER,
+  id_cuenta_requerida INTEGER,
+  id_partida_errada INTEGER,
+  id_partida_requerida INTEGER,
+  id_auxiliar_errado INTEGER,
+  id_auxiliar_requerido INTEGER,
+  importe_debe_mb NUMERIC(18,2),
+  importe_haber_mb NUMERIC(18,2)
+) 
+WITH (oids = false);
+
+ALTER TABLE conta.tcuenta
+  ADD COLUMN act_cbte_apertura VARCHAR(20) DEFAULT 'todos'::character varying NOT NULL;
+
+COMMENT ON COLUMN conta.tcuenta.act_cbte_apertura
+IS 'al actualizar incluir el cbte de apertura, todos, no, solo_apertura,';
+
+ALTER TABLE conta.tcuenta
+  ADD COLUMN cuenta_actualizacion VARCHAR(20);
+
+CREATE TABLE conta.tdeclaraciones_juridicas (
+  id_usuario_reg INTEGER,
+  id_usuario_mod INTEGER,
+  fecha_reg TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  fecha_mod TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  estado_reg VARCHAR(10) DEFAULT 'activo'::character varying,
+  id_usuario_ai INTEGER,
+  usuario_ai VARCHAR(300),
+  id_declaracion_juridica SERIAL,
+  tipo VARCHAR(100),
+  id_periodo INTEGER,
+  id_gestion INTEGER,
+  codigo VARCHAR(20),
+  descripcion TEXT,
+  importe NUMERIC(20,0),
+  fila INTEGER,
+  estado VARCHAR(20) DEFAULT 'no validado'::character varying
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+ALTER TABLE conta.tdeclaraciones_juridicas
+  ALTER COLUMN tipo SET STATISTICS 0;
+
+ALTER TABLE conta.tdeclaraciones_juridicas
+  ALTER COLUMN id_gestion SET STATISTICS 0;
+
+ALTER TABLE conta.tdeclaraciones_juridicas
+  ALTER COLUMN codigo SET STATISTICS 0;
+
+ALTER TABLE conta.tdeclaraciones_juridicas
+  ALTER COLUMN importe SET STATISTICS 0;
+
+
+CREATE TABLE conta.tdetalle_det_reporte_aux (
+  id_usuario_reg INTEGER,
+  id_usuario_mod INTEGER,
+  fecha_reg TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  fecha_mod TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  estado_reg VARCHAR(10) DEFAULT 'activo'::character varying,
+  id_usuario_ai INTEGER,
+  usuario_ai VARCHAR(300),
+  id_detalle_det_reporte_aux SERIAL,
+  concepto TEXT,
+  partida TEXT,
+  origen VARCHAR(50),
+  orden_fila INTEGER,
+  id_plantilla_reporte INTEGER
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+
+ALTER TABLE conta.tplantilla_calculo
+  ADD COLUMN usar_cc_original VARCHAR(8) DEFAULT 'no'::character varying NOT NULL;
+
+COMMENT ON COLUMN conta.tplantilla_calculo.usar_cc_original
+IS 'permite configurar si usar el centro de costo original , en caso contrario permite usar el adminsitrativo';
+
+
+ALTER TABLE conta.tplantilla_calculo
+  ADD COLUMN imputar_excento VARCHAR(8) DEFAULT 'no'::character varying NOT NULL;
+
+COMMENT ON COLUMN conta.tplantilla_calculo.imputar_excento
+IS 'si es prioridad 1 no se suma el excento, si es prioriad 2 e monto es el excento';
+
+
+CREATE TABLE conta.tplantilla_det_reporte (
+  id_usuario_reg INTEGER,
+  id_usuario_mod INTEGER,
+  fecha_reg TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  fecha_mod TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  estado_reg VARCHAR(10) DEFAULT 'activo'::character varying,
+  id_usuario_ai INTEGER,
+  usuario_ai VARCHAR(300),
+  id_plantilla_det_reporte SERIAL,
+  id_plantilla_reporte INTEGER,
+  codigo_columna VARCHAR(100),
+  columna VARCHAR(100),
+  origen VARCHAR(200),
+  concepto TEXT,
+  partida VARCHAR(1000),
+  nombre_columna TEXT,
+  saldo_inical VARCHAR(5),
+  formulario VARCHAR(50),
+  codigo_formulario TEXT,
+  order_fila INTEGER,
+  saldo_anterior VARCHAR(50),
+  calculo VARCHAR(10),
+  concepto2 TEXT,
+  partida2 TEXT,
+  operacion VARCHAR(50),
+  periodo VARCHAR(80),
+  origen2 VARCHAR(50),
+  tipo VARCHAR(50),
+  formula VARCHAR(50),
+  tipo_aux VARCHAR(20),
+  tipo_detalle VARCHAR(10) DEFAULT 'si'::character varying,
+  glosa TEXT
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+
+CREATE TABLE conta.tplantilla_reporte (
+  id_usuario_reg INTEGER,
+  id_usuario_mod INTEGER,
+  fecha_reg TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  fecha_mod TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  estado_reg VARCHAR(10) DEFAULT 'activo'::character varying,
+  id_usuario_ai INTEGER,
+  usuario_ai VARCHAR(300),
+  id_plantilla_reporte SERIAL,
+  tipo VARCHAR(100),
+  nombre VARCHAR(100),
+  modalidad VARCHAR(100),
+  glosa TEXT
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+
+
+ALTER TABLE conta.ttipo_estado_columna
+  ADD COLUMN clase VARCHAR(300);
+
+COMMENT ON COLUMN conta.ttipo_estado_columna.clase
+IS 'nombre de la clase que se ejecuta para msotrar el detalle';
+
+
+COMMENT ON COLUMN conta.ttipo_relacion_contable.tiene_moneda
+IS 'sii considera o no la moneda del cbte para definir la relacion contable';
+
+
+COMMENT ON TABLE conta.trelacion_contable
+IS 'esta tabla permite configurar cuenta partida y  auxioar para diferentes conceptos (tabla relacion contable), 
+centralizando la parametrizacion en un unico lugar y facilitar la generacion de comprobantes';
+
+
+
+COMMENT ON COLUMN conta.trelacion_contable.id_moneda
+IS 'identifica la moenda para la relacion contabile';
+
+
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN monto_no_ejecutado NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.monto_no_ejecutado
+IS 'monto que no se va aejcutar , en la monada de la trasaccion';
+
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN monto_no_ejecutado_mb NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.monto_no_ejecutado_mb
+IS 'monto a no ejecutar en moneda base';
+
+
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_cuenta_bolsa INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_cuenta_bolsa
+IS 'cuenta temporal';
+
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_partida_ejecucion_tmp INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_partida_ejecucion_tmp
+IS 'partida ejecucion del comprometido, que se almacena temporalmente para operaciones manaules auxiliares';
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN obs_dba VARCHAR;
+
+COMMENT ON COLUMN conta.tint_transaccion.obs_dba
+IS 'cambios dba';
+
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN temp_importe_ma_aux NUMERIC;
+
+COMMENT ON COLUMN conta.tint_transaccion.temp_importe_ma_aux
+IS 'temporal para salver error de cbte cruzados';
+
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN nro_tramite VARCHAR(70);
+
+COMMENT ON COLUMN conta.tint_transaccion.nro_tramite
+IS 'Los nro de tramtie de copian de la cabecera al validar el cbte,  solo los cbte de cierre y apetura tiene una logica diferente por que acumulan el valor para un nro de tramite en especifico, esto queire decir que el cbte de apertura tendra transaccion con diferentes nro de tramite';
+
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN fecha_doc_bk DATE;
+
+
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN num_tra_bk VARCHAR;
+
+
+ALTER TABLE conta.tdoc_concepto
+  ADD COLUMN id_partida_ejecucion INTEGER;
+
+
 /***********************************F-SCP-EGS-CONTA-1-30/08/2018****************************************/
 
 

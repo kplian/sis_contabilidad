@@ -85,9 +85,17 @@ BEGIN
                 	IF v_parametros.tipo_ret = 'rcra' THEN
                     	v_tipo = '(ret.id_plantilla = 17)';
                     ELSE
-                    	IF v_parametros.tipo_ret = 'todo' THEN
-                    		v_tipo = '(ret.id_plantilla = 9 OR ret.id_plantilla =10 OR ret.id_plantilla =13 OR ret.id_plantilla =17 OR ret.id_plantilla =44)';    
-                        END IF;
+                    	IF v_parametros.tipo_ret = 'rcrd' THEN
+                    		v_tipo = '(ret.id_plantilla = 13)';
+                    	ELSE
+                        	IF v_parametros.tipo_ret = 'rcrpr' THEN
+                                v_tipo = '(ret.id_plantilla = 44)';
+                            ELSE
+                              IF v_parametros.tipo_ret = 'todo' THEN
+                                  v_tipo = '(ret.id_plantilla = 9 OR ret.id_plantilla =10 OR ret.id_plantilla =13 OR ret.id_plantilla =17 OR ret.id_plantilla =44)';    
+                              END IF;
+                            END IF;
+                        END IF;   
                     END IF;
                 END IF;                
             END IF;
@@ -306,8 +314,8 @@ BEGIN
                                       ret.tipo_cambio 
 							ORDER BY ret.id_plantilla';
 			--Devuelve la respuesta 
-            --raise notice '%',v_consulta;   
---		    raise exception '%',v_consulta;             
+           --raise notice '%',v_consulta;   
+		  --	raise exception '%',v_consulta;             
 			RETURN v_consulta;        	
 		END;
     ELSE

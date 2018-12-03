@@ -104,13 +104,14 @@ BEGIN
                    select
                       id_doc_compra_venta
                    from conta.tdoc_compra_venta dcv 
+                   inner join param.tplantilla plt on plt.id_plantilla = dcv.id_plantilla
                    where     dcv.id_depto_conta = v_parametros.id_depto_conta
                         and  dcv.tipo = v_parametros.tipo
                         and  (dcv.fecha::Date BETWEEN v_parametros.fecha_ini::Date and v_parametros.fecha_fin::Date)
                         and dcv.id_moneda = v_parametros.id_moneda
                         and dcv.manual = 'si'   --solo documentos registrdos manaulmente
                         and dcv.id_int_comprobante is NULL  --solo documentos que no esten en ningun comprobante
-                        and dcv.tabla_origen is null  --solo los documentos registrados en libro de compras o ventas
+                        and (dcv.tabla_origen is null or dcv.tabla_origen = 'vef.tventa')  --solo los documentos registrados en libro de compras o ventas
                         and  (
                                  (v_parametros.incluir_rev = 'si' and dcv.revisado = 'si') 
                               or 
@@ -124,12 +125,17 @@ BEGIN
                                       dcv.codigo_aplicacion != ''
                                      end
                        
-                       )       
-                              
+                           )  
+                       and (
+                             case
+                               WHEN v_parametros.sw_ncd = 'no' THEN
+                                   plt.tipo_informe != 'ncd'
+                               ELSE
+                                   plt.tipo_informe = 'ncd'
+                               END
+                            )
                         ) LOOP
                         
-                   
-            
                    --insertamos documento al grupo
                    INSERT INTO 
                           conta.tagrupador_doc

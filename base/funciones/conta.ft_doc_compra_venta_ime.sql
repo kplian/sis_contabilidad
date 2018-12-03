@@ -19,11 +19,12 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 
  ISSUE            FECHA:		      AUTOR               DESCRIPCION
- #0				 18-08-2015        RAC KPLIAN 		Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
- #14, BOA		 18/10/2017		   RAC KPLIAN		Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados en las trasacciones CONTA_DCV_INS y CONTA_ADDCBTE_IME
- #0   ETR        05/01/2018        RAC PLIAN		Registor opcion de sw_pgs e id_funcionario para pagos simplificados 
- #87  ETR        25/02/2018        RAC KPLIAN       Considerar fechas dsitintas en las valdiacion de DUI's
- #88  ETR        23/06/2018        RAC  KPLIAN      Solucionar Bug que permite editar fecha con diferente periodo
+ #0				   18-08-2015        RAC KPLIAN 		Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tdoc_compra_venta'
+ #14,   BOA		   18/10/2017		 RAC KPLIAN		Al validar comprobantes vamos actualizar e nro de tramite en doc_compra_venta si estan relacionados en las trasacciones CONTA_DCV_INS y CONTA_ADDCBTE_IME
+ #0     ETR        05/01/2018        RAC PLIAN		Registor opcion de sw_pgs e id_funcionario para pagos simplificados 
+ #87    ETR        25/02/2018        RAC KPLIAN       Considerar fechas dsitintas en las valdiacion de DUI's
+ #88    ETR        23/06/2018        RAC  KPLIAN      Solucionar Bug que permite editar fecha con diferente periodo
+ #1999  ETR        19/07/2018        RAC  KPLIAN      Relacionar facturas NCD
 ***************************************************************************/
 
 DECLARE
@@ -57,6 +58,9 @@ DECLARE
   v_id_funcionario			integer;
   v_sw_pgs					varchar;
   v_reg_plantilla			record;
+  
+  v_registros_ncd   		record;   -- #1999
+  v_suma_otros_creditos     numeric;  -- #1999
 
 
 BEGIN
@@ -1451,6 +1455,173 @@ BEGIN
 
 
         end;
+        
+  /*********************************
+   #TRANSACCION:  'CONTA_RELFACNCD_IME'
+   #DESCRIPCION:   ISSUE 1999 ,  relaciona facturas a documentos del tipo notas de credito y debito
+   #AUTOR:		rac
+   #FECHA:		08/07/2018
+  ***********************************/
+
+  elsif(p_transaccion='CONTA_RELFACNCD_IME')then
+
+        begin
+        
+            select 
+               dcv.nit,
+               dcv.importe_doc,
+               dcv.id_moneda,
+               dcv.fecha,
+               dcv.id_moneda
+            into
+              v_registros_ncd
+            from conta.tdoc_compra_venta dcv 
+            where dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+         
+            select 
+               dcv.nit,
+               dcv.id_moneda,
+               dcv.importe_doc,
+               dcv.fecha,
+               dcv.id_moneda
+            into
+              v_registros
+            from conta.tdoc_compra_venta dcv 
+            where dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta_fk;
+            
+            IF v_registros.nit != v_registros_ncd.nit  THEN
+               raise exception 'El nit no se correponde con la factura deberia ser: % ', v_registros_ncd.nit;
+            END IF;
+               
+            
+             IF v_registros.fecha > v_registros_ncd.fecha  THEN
+               raise exception 'la fecha de la factura asociada debe ser menor o igual a: % ', v_registros_ncd.fecha;
+            END IF;
+            
+            IF v_registros.id_moneda != v_registros_ncd.id_moneda  THEN
+               raise exception 'tiene que ser de la misma moneda';
+            END IF;
+            
+            --revisamos que el importe no supera el 90%
+            --lsitamos si tiene otra nostas de credito debito
+            select 
+               sum(dcv.importe_doc) into v_suma_otros_creditos
+            from conta.tdoc_compra_venta dcv 
+            where       dcv.id_doc_compra_venta_fk = v_parametros.id_doc_compra_venta_fk   
+                   AND  dcv.id_doc_compra_venta != v_parametros.id_doc_compra_venta
+                   AND  dcv.estado_reg = 'activo';
+                   
+                   
+             IF   ( COALESCE(v_suma_otros_creditos,0) + v_registros_ncd.importe_doc ) >  (v_registros.importe_doc * 0.9)   THEN
+                     raise exception 'El monto total sobrepasa el 90 porciento del documento original';
+             END IF;      
+            
+            --raise exception 'llega.... % , %',v_parametros.id_doc_compra_venta_fk, v_parametros.id_doc_compra_venta;
+        
+            UPDATE conta.tdoc_compra_venta dcv set
+              id_doc_compra_venta_fk = v_parametros.id_doc_compra_venta_fk
+            WHERE dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+            
+            
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','factura NCD relacionada : ID '||v_parametros.id_doc_compra_venta::varchar||'  id FK'||v_parametros.id_doc_compra_venta_fk::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+            
+        end;
+    /*********************************
+   #TRANSACCION:  'CONTA_GETFACNCD_IME'
+   #DESCRIPCION:   ISSUE 1999 ,  recupera datos de la factura relacionada
+   #AUTOR:		rac
+   #FECHA:		23/07/2018
+  ***********************************/
+
+  elsif(p_transaccion='CONTA_GETFACNCD_IME')then
+
+        begin
+        
+            select 
+               dcv.nit,
+               dcv.importe_doc,
+               dcv.nro_documento,
+               dcv.razon_social,
+               dcv.id_moneda,
+               dcv.fecha,
+               dcv.nro_autorizacion
+            into
+              v_registros_ncd
+            from conta.tdoc_compra_venta dcv 
+            where dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta_fk;
+         
+            
+            
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','factura NCD relacionada : ID '||v_parametros.id_doc_compra_venta::varchar||'  id FK'||v_parametros.id_doc_compra_venta_fk::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta_fk',v_parametros.id_doc_compra_venta_fk::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'nit',v_registros_ncd.nit::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'importe_doc',v_registros_ncd.importe_doc::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'razon_social',v_registros_ncd.razon_social::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'fecha',v_registros_ncd.fecha::varchar);            
+            v_resp = pxp.f_agrega_clave(v_resp,'nro_documento',v_registros_ncd.nro_documento::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'nro_autorizacion',v_registros_ncd.nro_autorizacion::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+            
+        end;        
+     /*********************************
+   #TRANSACCION:  'CONTA_FACONT_IME'
+   #DESCRIPCION:   Relacionar contrato con factura
+   #AUTOR:		MMV
+   #FECHA:		28/09/2018
+  ***********************************/
+  elsif(p_transaccion='CONTA_FACONT_IME')then
+
+	begin
+    --- raise exception 'contrato % doc %',v_parametros.id_contrato,v_parametros.id_doc_compra_venta;
+        update conta.tdoc_compra_venta  set
+        id_contrato = v_parametros.id_contrato
+        where id_doc_compra_venta = v_parametros.id_doc_compra_venta;  
+        
+      --Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta modificado(a)');
+      v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+      
+      --Devuelve la respuesta
+            return v_resp;
+
+            
+        end;      
+    /*********************************
+   #TRANSACCION:  'CONTA_FACQUI_IME'
+   #DESCRIPCION:   Quitar relacion factura con contrato
+   #AUTOR:		MMV
+   #FECHA:		28/09/2018
+  ***********************************/
+  elsif(p_transaccion='CONTA_FACQUI_IME')then
+
+	begin
+     
+        update conta.tdoc_compra_venta  set
+        id_contrato = null
+        where id_doc_compra_venta = v_parametros.id_doc_compra_venta;  
+        
+      --Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta modificado(a)');
+      v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_parametros.id_doc_compra_venta::varchar);
+      
+      --Devuelve la respuesta
+            return v_resp;
+
+            
+        end;                
+        
+            
   else
 
     raise exception 'Transaccion inexistente: %',p_transaccion;

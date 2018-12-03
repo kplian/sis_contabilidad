@@ -31,6 +31,8 @@ Descripcion:
  #0        		27/08/2013      Rensi Arteaga Copari       Esta funcion evalua un detalle de trasaccion especifico e inserta 
    												           las trasacciones generadas en int_trasaccion y hace una llamada recursiva para procesar transacciones secundarias asociadas
  #0       		17/11/2017      Rensi Arteaga Copari       BUG, En calculo por diferencia se considera lso montos de gastos y recurso
+ #123           27/09/2018      Rarteaga                   Se adiciona el dato de tabla origien la guardar la trasaccion para rastreo
+
 
 
 
@@ -90,6 +92,9 @@ BEGIN
      *********************************************************************************************/      
              v_this_hstore = hstore(v_this);
              
+             
+             
+             
              FOR v_i in 1..(p_tamano) loop
              
                
@@ -114,7 +119,9 @@ BEGIN
            
              END LOOP;
              
-          
+          IF p_id_usuario = 429 THEN
+              -- raise exception 'llega...xx   %', v_this_hstore ;
+             END IF;
      /********************************************************
      *  Si la plantilla es del tipo relacion devengado pago
      * 
@@ -349,6 +356,8 @@ BEGIN
                       v_record_int_tran.porc_monto_excento_var = (v_this_hstore->'campo_porc_monto_excento_var')::varchar;
                       v_record_int_tran.nombre_cheque_trans = (v_this_hstore->'campo_nombre_cheque_trans')::varchar;
                       v_record_int_tran.forma_pago = (v_this_hstore->'campo_forma_pago')::varchar;
+                      v_record_int_tran.id_origen = (v_this_hstore->'campo_id_tabla_detalle')::integer; --#123 17/09/2018 se acicion el id de la tabla origen para rastreo
+
                       
                     -- raise notice '>>>>>>>>>>>>>>>>>>   glosa %',(v_this_hstore->'campo_concepto_transaccion');
                       

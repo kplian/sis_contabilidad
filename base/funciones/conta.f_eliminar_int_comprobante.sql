@@ -35,7 +35,8 @@ BEGIN
     into v_rec_cbte
     from conta.tint_comprobante
     where id_int_comprobante = p_id_int_comprobante;
-        
+
+
     --------------------------------------
     -- Si el comprobante esta en borrador
     --------------------------------------
@@ -47,14 +48,14 @@ BEGIN
               
               delete from wf.tdocumento_wf wf 
               where wf.id_proceso_wf = v_rec_cbte.id_proceso_wf;
-                  
+   
     
                -- verifica que no tenga numero, solo si no es un cbte migrado de la regional
                IF  v_rec_cbte.nro_cbte is not null and   v_rec_cbte.nro_cbte != '' and v_rec_cbte.vbregional != 'si' and p_id_int_comprobante not in (4555, 3019) THEN
                     raise exception 'No puede eliminar cbtes  que ya fueron validados, para no perder la numeración';
                END IF; 
                
-               
+              
                
                IF  v_rec_cbte.temporal = 'no'  THEN 
                
@@ -63,6 +64,10 @@ BEGIN
                                                          p_id_int_comprobante, 
                                                          'eliminado', 
                                                           'Cbte eliminado');
+                                                          
+if p_id_int_comprobante = 22746 then
+	raise exception 'Revisando para eliminación::: %',v_rec_cbte.temporal;
+end if;
                END IF;
                 
                 

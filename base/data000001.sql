@@ -37,38 +37,6 @@ select pxp.f_insert_testructura_gui ('CTA', 'CONTA');
 select pxp.f_insert_testructura_gui ('AUXCTA', 'CONTA');
 select pxp.f_insert_testructura_gui ('ODT', 'CONTA'); 
 
-----------------------------------------------
---  DEF DE FUNCIONES
---------------------------------------------------
-
-select pxp.f_insert_tfuncion ('conta.f_cuenta_ime', 'Funcion para tabla     ', 'CONTA');
-select pxp.f_insert_tfuncion ('conta.f_cuenta_sel', 'Funcion para tabla     ', 'CONTA');
-select pxp.f_insert_tfuncion ('conta.f_auxiliar_sel', 'Funcion para tabla     ', 'CONTA');
-select pxp.f_insert_tfuncion ('conta.f_auxiliar_ime', 'Funcion para tabla     ', 'CONTA');
-select pxp.f_insert_tfuncion ('conta.f_orden_trabajo_sel', 'Funcion para tabla     ', 'CONTA');
-select pxp.f_insert_tfuncion ('conta.f_orden_trabajo_ime', 'Funcion para tabla     ', 'CONTA');
-
----------------------------------
---DEF DE PROCEDIMIETOS
----------------------------------
-
-select pxp.f_insert_tprocedimiento ('CONTA_CTA_INS', 'Insercion de registros', 'si', '', '', 'conta.f_cuenta_ime');
-select pxp.f_insert_tprocedimiento ('CONTA_CTA_MOD', 'Modificacion de registros', 'si', '', '', 'conta.f_cuenta_ime');
-select pxp.f_insert_tprocedimiento ('CONTA_CTA_ELI', 'Eliminacion de registros', 'si', '', '', 'conta.f_cuenta_ime');
-select pxp.f_insert_tprocedimiento ('CONTA_CTA_SEL', 'Consulta de datos', 'si', '', '', 'conta.f_cuenta_sel');
-select pxp.f_insert_tprocedimiento ('CONTA_CTA_CONT', 'Conteo de registros', 'si', '', '', 'conta.f_cuenta_sel');
-select pxp.f_insert_tprocedimiento ('CONTA_CTA_ARB_SEL', 'Consulta de datos', 'si', '', '', 'conta.f_cuenta_sel');
-select pxp.f_insert_tprocedimiento ('CONTA_AUXCTA_SEL', 'Consulta de datos', 'si', '', '', 'conta.f_auxiliar_sel');
-select pxp.f_insert_tprocedimiento ('CONTA_AUXCTA_CONT', 'Conteo de registros', 'si', '', '', 'conta.f_auxiliar_sel');
-select pxp.f_insert_tprocedimiento ('CONTA_AUXCTA_INS', 'Insercion de registros', 'si', '', '', 'conta.f_auxiliar_ime');
-select pxp.f_insert_tprocedimiento ('CONTA_AUXCTA_MOD', 'Modificacion de registros', 'si', '', '', 'conta.f_auxiliar_ime');
-select pxp.f_insert_tprocedimiento ('CONTA_AUXCTA_ELI', 'Eliminacion de registros', 'si', '', '', 'conta.f_auxiliar_ime');
-select pxp.f_insert_tprocedimiento ('CONTA_ODT_SEL', 'Consulta de datos', 'si', '', '', 'conta.f_orden_trabajo_sel');
-select pxp.f_insert_tprocedimiento ('CONTA_ODT_CONT', 'Conteo de registros', 'si', '', '', 'conta.f_orden_trabajo_sel');
-select pxp.f_insert_tprocedimiento ('CONTA_ODT_INS', 'Insercion de registros', 'si', '', '', 'conta.f_orden_trabajo_ime');
-select pxp.f_insert_tprocedimiento ('CONTA_ODT_MOD', 'Modificacion de registros', 'si', '', '', 'conta.f_orden_trabajo_ime');
-select pxp.f_insert_tprocedimiento ('CONTA_ODT_ELI', 'Eliminacion de registros', 'si', '', '', 'conta.f_orden_trabajo_ime');
-
 
 select pxp.f_insert_tgui ('Config Tipo Cuenta', 'Configuracion de numero para los tipos de cuenta', 'CTIP', 'si', 1, 'sis_contabilidad/vista/config_tipo_cuenta/ConfigTipoCuenta.php', 2, '', 'ConfigTipoCuenta', 'CONTA');
 select pxp.f_insert_testructura_gui ('CTIP', 'CONTA');
@@ -1391,7 +1359,7 @@ VALUES
   
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
 VALUES 
-  (conta_revertir_iva_comprometido', E'no', E'Por dfecto no revierte el iva comprometido, asumiendo que la solictud fue hecha sobre el valor NETO');
+  (E'conta_revertir_iva_comprometido', E'no', E'Por dfecto no revierte el iva comprometido, asumiendo que la solictud fue hecha sobre el valor NETO');
 
 /***********************************F-DAT-RAC-CONTA-0-22/12/2017*****************************************/ 
 
@@ -1427,7 +1395,7 @@ select param.f_import_tcatalogo ('insert','CONTA','Servicios Empresas del Grupo'
 
 
 
-***********************************FIDAT-RAC-CONTA-0-29/05/2018*****************************************/ 
+/***********************************I-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 
 
 
 select pxp.f_insert_tgui ('Estado de Auxiliares', 'Estado de Auxiliares', 'EXUMAY', 'si', 10, 'sis_contabilidad/vista/int_transaccion/FormFiltroAuxiliarMayor.php', 3, '', 'FormFiltroAuxiliarMayor', 'CONTA');
@@ -1441,10 +1409,10 @@ select conta.f_import_tplantilla ('insert','Venta con Debito Fiscal (Regularizad
 select pxp.f_insert_tgui ('Regularización', 'Regularización', 'REGUCON', 'si', 1, '', 2, '', '', 'CONTA');
 select pxp.f_insert_tgui ('Registro de facturas Regularización', 'Registro de facturas regularización', 'REFAREG', 'si', 1, 'sis_contabilidad/vista/doc_compra_venta/DocVentaRegul.php', 3, '', 'DocVentaRegul', 'CONTA');
 select pxp.f_insert_testructura_gui ('REGUCON', 'CONTA');
-select pxp.f_insert_testructura_gui ('REFAREG', 'REGUCON')
+select pxp.f_insert_testructura_gui ('REFAREG', 'REGUCON');
 
 
-***********************************F-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 
+/***********************************F-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 
 
 /***********************************I-DAT-EGS-CONTA-0-27/09/2018*****************************************/ 
 

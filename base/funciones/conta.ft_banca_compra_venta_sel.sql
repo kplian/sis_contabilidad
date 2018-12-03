@@ -1,7 +1,13 @@
-CREATE OR REPLACE FUNCTION conta.ft_banca_compra_venta_sel(p_administrador int4, p_id_usuario int4, p_tabla varchar, p_transaccion varchar)
-  RETURNS varchar
-AS
-$BODY$
+--------------- SQL ---------------
+
+CREATE OR REPLACE FUNCTION conta.ft_banca_compra_venta_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
   /************************************************************************** 
   SISTEMA:        Sistema de Contabilidad
  FUNCION:         conta.ft_banca_compra_venta_sel
@@ -60,16 +66,14 @@ BEGIN
       end if;             
                         
       
-       if v_parametros.banca_documentos = 'endesis'
-        then
-        
+--       if v_parametros.banca_documentos = 'endesis' then
+                      if v_parametros.banca_documentos = 'pxp' then
         --creacion de tabla temporal del endesis 
           v_consulta:='WITH tabla_temporal_documentos AS (
               SELECT * FROM dblink('''||v_host||''',
           ''SELECT id_documento,razon_social FROM sci.tct_documento''
                    ) AS d (id_documento integer,razon_social varchar(255))
-              )';
-              
+              )';              
               v_consulta:=v_consulta||' select
 						banca.id_banca_compra_venta,
 						banca.num_cuenta_pago,
@@ -125,9 +129,9 @@ BEGIN
                         banca.multa_cuota,
                         provee.rotulo_comercial,
                         banca.estado_libro,
-                        banca.periodo_servicio,
-                        banca.lista_negra,
-                        banca.tipo_bancarizacion
+                        banca.periodo_servicio
+                        --banca.lista_negra,
+                        --banca.tipo_bancarizacion
 						from conta.tbanca_compra_venta banca
 						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
@@ -141,12 +145,8 @@ BEGIN
                         inner join param.tgestion ges on ges.id_gestion = per.id_gestion
                         left join tabla_temporal_documentos doc on doc.id_documento = banca.id_documento
                         where ';
-
-                        
-       
-       elsif v_parametros.banca_documentos = 'pxp'
-       then
-       
+       elsif v_parametros.banca_documentos = 'ende'  then
+     
        v_consulta:='select
 						banca.id_banca_compra_venta,
 						banca.num_cuenta_pago,
@@ -192,8 +192,7 @@ BEGIN
                         banca.saldo,
                         contra.monto as monto_contrato,
                         ges.gestion,
-                        '||v_id_banca_compra_venta_seleccionado||' as banca_seleccionada,
-                        
+                        '||v_id_banca_compra_venta_seleccionado||' as banca_seleccionada,                        
                         banca.numero_cuota,
             			banca.tramite_cuota	,
                         banca.id_proceso_wf,
@@ -203,9 +202,9 @@ BEGIN
                         banca.multa_cuota,
                         provee.rotulo_comercial,
                         banca.estado_libro,
-                        banca.periodo_servicio,
-                        banca.lista_negra,
-                        banca.tipo_bancarizacion
+                        banca.periodo_servicio
+                        --banca.lista_negra,
+                        --banca.tipo_bancarizacion
 						from conta.tbanca_compra_venta banca
 						inner join segu.tusuario usu1 on usu1.id_usuario = banca.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = banca.id_usuario_mod
@@ -219,23 +218,15 @@ BEGIN
                         inner join param.tgestion ges on ges.id_gestion = per.id_gestion
                         left join conta.tdoc_compra_venta doc on doc.id_doc_compra_venta = banca.id_documento
                         where ';
-                        
-       
         end if;
-        
-     
       --Definicion de la respuesta
       v_consulta:=v_consulta||v_parametros.filtro;
-      
-      
-       
       v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' ||
-        v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad ||
-        ' offset ' || v_parametros.puntero;
-        
-       
-      
-
+      v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;        
+      IF p_id_usuario = 428 THEN
+      	raise notice '%', v_consulta;
+      	raise exception '%', v_consulta;
+      END IF; 
       --Devuelve la respuesta
       return v_consulta;
 
@@ -291,5 +282,9 @@ BEGIN
   v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
   raise exception '%',v_resp;
 END;
-$BODY$
-LANGUAGE plpgsql VOLATILE;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;
