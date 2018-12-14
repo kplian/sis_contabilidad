@@ -152,5 +152,4 @@ ALTER TYPE conta.maestro_comprobante
   ADD ATTRIBUTE columna_id_config_cambiaria INTEGER;
 
 /***********************************F-TYP-RAC-CONTA-1-19/12/2017****************************************/
-  
-  
+

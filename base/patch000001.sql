@@ -4981,8 +4981,27 @@ ALTER TABLE conta.tdoc_concepto
 /***********************************F-SCP-EGS-CONTA-1-30/08/2018****************************************/
 
 
+/***********************************I-SCP-CAP-CONTA-0-06/12/2018****************************************/
+
+ALTER TABLE conta.tdeclaraciones_juridicas
+  ADD CONSTRAINT tdeclaraciones_juridicas_pkey 
+    PRIMARY KEY (id_declaracion_juridica) NOT DEFERRABLE;
+
+ALTER TABLE conta.tdesglose_ingreso_caja
+  ADD CONSTRAINT tdesglose_ingreso_caja_pkey 
+    PRIMARY KEY (id_int_comprobante) NOT DEFERRABLE;
+
+ALTER TABLE conta.tdetalle_det_reporte_aux
+  ADD CONSTRAINT tdetalle_det_reporte_aux_pkey 
+    PRIMARY KEY (id_detalle_det_reporte_aux) NOT DEFERRABLE;
+
+ALTER TABLE conta.tplantilla_det_reporte
+  ADD CONSTRAINT tplantilla_det_reporte_pkey 
+    PRIMARY KEY (id_plantilla_det_reporte) NOT DEFERRABLE;
+
+ALTER TABLE conta.tplantilla_reporte
+  ADD CONSTRAINT tplantilla_reporte_pkey 
+    PRIMARY KEY (id_plantilla_reporte) NOT DEFERRABLE;
 
 
-
-
-
+/***********************************F-SCP-CAP-CONTA-0-06/12/2018****************************************/

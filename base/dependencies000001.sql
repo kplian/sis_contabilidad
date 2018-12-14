@@ -2835,7 +2835,7 @@ ALTER TABLE conta.tentrega
 
        
     
-    CREATE VIEW conta.ventrega (
+CREATE VIEW conta.ventrega (
     id_entrega,
     estado,
     c31,
@@ -3928,8 +3928,6 @@ UNION ALL
 
 
 
-DROP VIEW conta.vint_transaccion_analisis;
-
 CREATE OR REPLACE VIEW conta.vint_transaccion_analisis
 AS
   SELECT "int".importe_debe_mb,
@@ -4008,7 +4006,7 @@ AS
          tcc.id_tipo_cc,
          tcc.ids,
          cbt.id_int_comprobante,
-         COALESCE(par.codigo, 'S/P'::character varying) AS codigo_partida,
+         COALESCE(par.codigo, 'S/P'::varchar(30)) AS codigo_partida,
          "int".id_int_transaccion,
          "int".id_cuenta,
          "int".id_auxiliar,
@@ -4016,7 +4014,7 @@ AS
          cbt.id_periodo,
          par.sw_movimiento,
          COALESCE(par.nombre_partida, 'No tiene una partida asignada'::character
-           (1)::character varying) AS descripcion_partida,
+           (1)::character varying(150)) AS descripcion_partida,
          COALESCE(par.id_partida, 0) AS id_partida,
          cue.nro_cuenta AS codigo_cuenta,
          cue.nombre_cuenta AS descripcion_cuenta,
@@ -5115,3 +5113,123 @@ AS
          
 
 
+/**********************************I-DEP-CAP-CONTA-0-04/12/2018****************************************/
+
+DROP VIEW conta.vint_transaccion_analisis;
+
+CREATE OR REPLACE VIEW conta.vint_transaccion_analisis (
+    importe_debe_mb,
+    importe_haber_mb,
+    importe_debe_mt,
+    importe_haber_mt,
+    importe_debe_ma,
+    importe_haber_ma,
+    id_orden_trabajo,
+    codigo_ot,
+    desc_orden,
+    id_tipo_cc,
+    ids,
+    id_int_comprobante,
+    codigo_partida,
+    id_int_transaccion,
+    id_cuenta,
+    id_auxiliar,
+    fecha,
+    id_periodo,
+    sw_movimiento,
+    descripcion_partida,
+    id_partida,
+    codigo_cuenta,
+    descripcion_cuenta,
+    tipo_cuenta)
+AS
+ SELECT "int".importe_debe_mb,
+    "int".importe_haber_mb,
+    "int".importe_debe_mt,
+    "int".importe_haber_mt,
+    "int".importe_debe_ma,
+    "int".importe_haber_ma,
+    COALESCE(ot.id_orden_trabajo, 0) AS id_orden_trabajo,
+    COALESCE(ot.codigo, 'S/O'::character varying) AS codigo_ot,
+    COALESCE(ot.desc_orden, 'No tiene una orden asignada'::character varying) AS desc_orden,
+    tcc.id_tipo_cc,
+    tcc.ids,
+    cbt.id_int_comprobante,
+    COALESCE(par.codigo, 'S/P'::character varying) AS codigo_partida,
+    "int".id_int_transaccion,
+    "int".id_cuenta,
+    "int".id_auxiliar,
+    cbt.fecha,
+    cbt.id_periodo,
+    par.sw_movimiento,
+    COALESCE(par.nombre_partida, 'No tiene una partida asignada'::character(1)::character varying) AS descripcion_partida,
+    COALESCE(par.id_partida, 0) AS id_partida,
+    cue.nro_cuenta AS codigo_cuenta,
+    cue.nombre_cuenta AS descripcion_cuenta,
+    cue.tipo_cuenta
+   FROM conta.tint_transaccion "int"
+     JOIN conta.tint_comprobante cbt ON cbt.id_int_comprobante = "int".id_int_comprobante
+     JOIN param.tcentro_costo cc ON cc.id_centro_costo = "int".id_centro_costo
+     JOIN param.vtipo_cc_raiz tcc ON tcc.id_tipo_cc = cc.id_tipo_cc
+     JOIN conta.tcuenta cue ON cue.id_cuenta = "int".id_cuenta
+     LEFT JOIN conta.torden_trabajo ot ON "int".id_orden_trabajo = ot.id_orden_trabajo
+     LEFT JOIN pre.tpartida par ON par.id_partida = "int".id_partida
+  WHERE cbt.estado_reg::text = 'validado'::text;
+
+  
+DROP VIEW conta.vlibro_bancos;
+
+CREATE OR REPLACE VIEW conta.vlibro_bancos (
+    id_int_comprobante,
+    debe,
+    haber,
+    fecha,
+    nro_comprobante,
+    id_cuenta_bancaria)
+AS
+ SELECT lb.id_int_comprobante,
+        CASE
+            WHEN lb.importe_deposito = 0::numeric THEN NULL::text
+            ELSE to_char(lb.importe_deposito, '999G999G999D99'::text)
+        END AS debe,
+        CASE
+            WHEN lb.importe_cheque = 0::numeric AND lb.estado::text <> 'anulado'::text THEN NULL::text
+            ELSE to_char(lb.importe_cheque, '999G999G999D99'::text)
+        END AS haber,
+    to_char(lb.fecha::timestamp with time zone, 'dd/mm/yyyy'::text) AS fecha,
+    lb.nro_comprobante,
+    lb.id_cuenta_bancaria
+   FROM tes.tts_libro_bancos lb
+     LEFT JOIN tes.tts_libro_bancos lbp ON lbp.id_libro_bancos = lb.id_libro_bancos_fk
+     LEFT JOIN conta.tint_comprobante a ON a.id_int_comprobante = lb.id_int_comprobante
+     JOIN tes.tcuenta_bancaria k ON k.id_cuenta_bancaria = lb.id_cuenta_bancaria
+  WHERE
+        CASE
+            WHEN 'Todos'::text = 'Todos'::text THEN lb.estado::text = ANY (ARRAY['impreso'::character varying, 'entregado'::character varying, 'cobrado'::character varying, 'anulado'::character varying, 'reingresado'::character varying, 'depositado'::character varying, 'transferido'::character varying, 'sigep_swift'::character varying]::text[])
+            WHEN 'Todos'::text = 'impreso y entregado'::text THEN lb.estado::text = ANY (ARRAY['impreso'::character varying, 'entregado'::character varying]::text[])
+            ELSE lb.estado::text = 'Todos'::text
+        END AND
+        CASE
+            WHEN 'Todos'::text = 'Todos'::text THEN lb.tipo::text = ANY (ARRAY['cheque'::character varying, 'deposito'::character varying, 'debito_automatico'::character varying, 'transferencia_carta'::character varying]::text[])
+            WHEN 'Todos'::text = 'transferencia_interna'::text THEN lb.tipo::text = ANY (ARRAY['transf_interna_debe'::character varying, 'transf_interna_haber'::character varying]::text[])
+            ELSE lb.tipo::text = 'Todos'::text
+        END AND
+        CASE
+            WHEN 0 = 0 THEN 0 = 0
+            ELSE lb.id_finalidad = 0
+        END
+  ORDER BY lb.fecha;
+
+
+
+CREATE TRIGGER tr_trelacion_contable
+  AFTER INSERT OR UPDATE OR DELETE 
+  ON conta.trelacion_contable
+  
+FOR EACH ROW 
+  EXECUTE PROCEDURE conta.f_tri_trelacion_contable();
+
+ALTER TABLE conta.trelacion_contable
+  DISABLE TRIGGER tr_trelacion_contable;
+
+/**********************************F-DEP-CAP-CONTA-0-04/12/2018****************************************/

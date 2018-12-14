@@ -20,6 +20,7 @@ $body$
    
  #0        		05-09-2013        N/N               creacion
  #00  ETR       05/05/2018        RAC KPLIAN        Los comprobantes manuales genera libro de bancos
+ #01  ETR       13/12/2018        JJA               Correccion problema de no geracion de cheque para devoluciones de cuenta documentadas
 
 */
 
@@ -149,7 +150,11 @@ BEGIN
                 IF v_conta_validar_forma_pago = 'si' THEN
                    --si es un cbte de pago ...
                    --IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') THEN
-                   IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON')  AND v_registros_cbte.codigo_plantilla not in ('CD-DEVREP-SALDOS')  THEN
+                   
+                   --JJA 13/12/2018 Se comento la condision por que no generaba el cheque al realizar la devolucion de saldo de cuenta documentada
+                   --IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON')  AND v_registros_cbte.codigo_plantilla not in ('CD-DEVREP-SALDOS')  THEN
+                   IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') THEN
+                   
                         IF v_registros.banco = 'si'  THEN
 
                                IF v_registros.forma_pago = '' or v_registros.forma_pago is  null  THEN
@@ -162,8 +167,11 @@ BEGIN
                                v_conta_integrar_libro_bancos = pxp.f_get_variable_global('conta_integrar_libro_bancos');
 
                                v_valor = param.f_get_depto_param( v_registros_cbte.id_depto, 'ENTREGA');
+                               
+                               --JJA 13/12/2018 Se comento la condision por que no generaba el cheque al realizar la devolucion de saldo de cuenta documentada y se agrego la plantilla CD-DEVREP-SALDOS
+                               --IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_cbte.codigo_plantilla in ('SOLFONDAV', 'REPOCAJA')) THEN
+                               IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_cbte.codigo_plantilla in ('SOLFONDAV', 'REPOCAJA','CD-DEVREP-SALDOS')) THEN
 
-                               IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_cbte.codigo_plantilla in ('SOLFONDAV', 'REPOCAJA')) THEN
                                     -- si alguna transaccion tiene banco habilitado para pago
                                     IF  not tes.f_integracion_libro_bancos(p_id_usuario,p_id_int_comprobante,  v_registros.id_int_transaccion) THEN
 									  --raise exception 'error al registrar transacción en libro de bancos, comprobante %', p_id_int_comprobante;
