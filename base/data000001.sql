@@ -1511,6 +1511,24 @@ select param.f_import_tcatalogo ('insert','CONTA','Nacional','nacional','tauxili
 select param.f_import_tcatalogo ('insert','CONTA','Interno','interno','tauxiliar');
 select param.f_import_tcatalogo ('insert','CONTA','Internacional','internacional','tauxiliar');
 
+select param.f_import_tcatalogo_tipo ('insert','finalidad_nota_debito_sobre_compra','CONTA','tdoc_compra_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Cobro Clientes por Peaje','cbr_peaje','finalidad_nota_debito_sobre_compra');
+
+
+
+select param.f_import_tcatalogo_tipo ('insert','tipo_venta_nota_debito','CONTA','tdoc_compra_venta');
+select param.f_import_tcatalogo ('insert','CONTA','PLIEGOS CLIENTES DEL EXTRANJERO','pliegos','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','CLIENTES POR PEAJE E INGRESOS TARIFARIO','peaje','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','PEAJES EMPRESAS DEL GRUPO','peaje_grupo','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','SERVICIOS TERCEROS Y PLIEGOS A PROVEEDORES NACIONALES','terceros','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','SERVICIOS A EMPRESAS DEL GRUPO','servicos_grupo','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','VENTA ACTIVOS FIJOS','activo_fijo','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','VENTA DE SUMINISTROS A PROVEEDORES','suministros','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','MULTAS A PROVEEDORES','multas','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','Alquiler de Parqueo al Personal','parqueo','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','Intereses por prestamos al personal','intereses','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','Cobro Clientes por Peaje','cbr_peaje','tipo_venta_nota_debito');
+
 /***********************************F-DAT-EGS-CONTA-1-30/11/2018*****************************************/ 
 
   
