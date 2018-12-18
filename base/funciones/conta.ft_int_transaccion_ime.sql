@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -134,7 +132,7 @@ BEGIN
               where cua.estado_reg = 'activo' and cu.id_cuenta =  v_parametros.id_cuenta;
               
               IF v_count_auxiliar > 0 and v_parametros.id_auxiliar is null then
-              RAISE EXCEPTION 'Esta Cuenta tiene por lo menos un auxiliar elija uno';
+              --RAISE EXCEPTION 'Esta Cuenta tiene por lo menos un auxiliar elija uno';
               END IF;
           --#1	29/11/2018	EGS	 
          
@@ -471,7 +469,8 @@ BEGIN
               where  cua.estado_reg = 'activo' and cu.id_cuenta = v_parametros.id_cuenta;
               
               IF v_count_auxiliar >0 and v_parametros.id_auxiliar is null then
-              RAISE EXCEPTION 'Esta Cuenta tiene por lo menos un auxiliar elija uno';
+              --chros comentado, pero se debe analizar bajo qué consideraciones se debe controlar la edición de transacciones
+              --RAISE EXCEPTION 'Esta Cuenta tiene por lo menos un auxiliar elija uno';
               END IF;
     		--#1	29/11/2018	EGS	 
         
@@ -483,7 +482,8 @@ BEGIN
                cbt.id_moneda_act,
                cbt.tipo_cambio_2,
                cbt.tipo_cambio_3,
-               cbt.id_moneda
+               cbt.id_moneda,
+               cbt.cbte_reversion
              into
                v_registros
              from conta.tint_comprobante cbt
@@ -496,7 +496,7 @@ BEGIN
             where tr.id_int_transaccion =  v_parametros.id_int_transaccion;
              
             --#2 CHROS
-            IF v_registros_trans.id_partida_ejecucion is not null THEN
+            IF v_registros_trans.id_partida_ejecucion is not null and v_registros.cbte_reversion='no' THEN
               IF v_parametros.id_centro_costo <> v_registros_trans.id_centro_costo THEN
                 raise exception 'No es posible cambiar el CENTRO DE COSTO para no romper la integridad presupuestaria';
               ELSEIF v_parametros.id_partida <> v_registros_trans.id_partida THEN
@@ -518,7 +518,7 @@ BEGIN
               END IF;
               --raise exception 'No puede editar trasacciones que vengas de otros sistemas, para no romper la integridad presupuestaria';
             END IF;
-             
+            
             -- si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
             -- para que no actulice automaricamente las transacciones si es modificada
             IF      v_registros.tipo_cambio !=  v_parametros.tipo_cambio 
@@ -661,15 +661,15 @@ BEGIN
 
     begin
     
-      ---------------
+          --#2 CHROS añadido cbte.cbte_reversion='no' para no permitir eliminar transacciones que no sean de un comprobante revertido
+          ---------------
           --VALIDACIONES
           ---------------
           --VerIfica el estado, solamente puede eliminarse cuando esté en estao borrador
           if not exists(select 1 from conta.tint_transaccion tra
-                inner join conta.tint_comprobante cbte
-                on cbte.id_int_comprobante = tra.id_int_comprobante
+                inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
                 where tra.id_int_transaccion = v_parametros.id_int_transaccion
-                and cbte.estado_reg = 'borrador' and cbte.sw_editable = 'si') then
+                and ((cbte.estado_reg = 'borrador' and cbte.sw_editable = 'si') or cbte.cbte_reversion='no')) then
             raise exception 'Eliminación no realizada: el comprobante no está en estado Borrador o no es editable';
           end if;
             
@@ -727,3 +727,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION conta.ft_int_transaccion_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

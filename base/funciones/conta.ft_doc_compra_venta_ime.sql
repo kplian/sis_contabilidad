@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -709,8 +707,13 @@ BEGIN
 	  v_rec = param.f_get_periodo_gestion(v_parametros.fecha);
       
       
+      
       IF v_rec.po_id_periodo != v_registros.id_periodo THEN
-        raise exception 'No puede usar  una fecha de otro periodo'; --#101 
+        --Habilita la modificación de periodo temporalmente solo para Oruro
+      	if v_parametros.id_depto_conta <> 38 then
+      		raise exception 'No puede usar  una fecha de otro periodo'; --#101 
+      	end if;
+        --rcm raise exception 'No puede usar  una fecha de otro periodo'; --#101 
       END IF;
       
       
@@ -842,7 +845,8 @@ BEGIN
       end if;
       
       --FIN RAC
-         
+      
+
       --Sentencia de la modificacion
       update conta.tdoc_compra_venta set
         tipo = v_parametros.tipo,
@@ -1644,3 +1648,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION conta.ft_doc_compra_venta_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

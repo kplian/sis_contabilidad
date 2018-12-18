@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte_docs (
   p_id_int_comprobante integer,
   p_validar boolean = true,
@@ -252,7 +250,7 @@ BEGIN
      --------------------------------------------------------
      --Validamos sis existe iva deberai existir un documento
      ---------------------------------------------------------
-     IF not v_existe_venta and not v_existe_compra   AND  p_id_int_comprobante !=  32613 THEN
+     IF not v_existe_venta and not v_existe_compra   AND  p_id_int_comprobante !=  36289 THEN
          IF  COALESCE(v_registros_iva_cf.debe,0) > 0 or  COALESCE(v_registros_iva_df.haber,0) > 0 THEN
         
              
@@ -292,7 +290,7 @@ BEGIN
      -- #86 VALDIAR EL IVa, CF     
      -------------------------------
      
-     IF  p_id_int_comprobante !=  32613 THEN
+     IF  p_id_int_comprobante !=  36289 THEN
      
        --  IF v_registros_iva_cf is not null   THEN    -- RAC 15/08/2018  se comenta por que pertia apsar cbte vinc uenta iva pero con factura relacionada
          
@@ -328,7 +326,7 @@ BEGIN
      ----------------------------
      -- #86 VALDIAR EL IVA, DF     
      -----------------------------
-     IF  p_id_int_comprobante !=  32613 THEN
+     IF  p_id_int_comprobante !=  36289 THEN
       
      
       -- IF v_registros_iva_df is not null  THEN    -- RAC 15/08/2018  se comenta por que pertia apsar cbte vinc uenta iva pero con factura relacionada
@@ -378,7 +376,7 @@ BEGIN
            END IF;
      END IF; 
      
-      IF  p_id_int_comprobante =  32613 THEN
+      IF  p_id_int_comprobante =  36289 THEN
          --raise exception 'llega';
       END IF;
      
@@ -499,3 +497,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION conta.f_validar_cbte_docs (p_id_int_comprobante integer, p_validar boolean, p_forzar_validacion varchar)
+  OWNER TO postgres;
