@@ -1531,4 +1531,7 @@ select param.f_import_tcatalogo ('insert','CONTA','Cobro Clientes por Peaje','cb
 
 /***********************************F-DAT-EGS-CONTA-1-30/11/2018*****************************************/ 
 
-  
+/***********************************I-DAT-MMV-CONTA-92-19/12/2018*****************************************/
+select pxp.f_insert_tgui ('Auxiliares Detalle ', 'Auxiliares Detalle ', 'LMT', 'si', 2, 'sis_contabilidad/vista/int_transaccion/FormFiltroMayorNroTramite.php', 3, '', 'FormFiltroMayorNroTramite', 'CONTA');
+select pxp.f_insert_testructura_gui ('LMT', 'MOVSAL');
+/***********************************F-DAT-MMV-CONTA-92-19/12/2018*****************************************/

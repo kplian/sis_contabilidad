@@ -17,10 +17,10 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
+ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+  #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares 'CONTA_MROMAYOR_SEL','CONTA_MROMAYOR_CONT','CONTA_AUXRE_SEL'
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+
 ***************************************************************************/
 
 DECLARE
@@ -2208,7 +2208,389 @@ BEGIN
 			return v_consulta;
 
 		end; 
-           
+     --------------#92 INI-MMV------------
+        /*********************************
+        #TRANSACCION:  'CONTA_MROMAYOR_SEL' #92
+        #DESCRIPCION:	actualización reporte de detalle de auxiliares
+        #AUTOR:		MMV
+        #FECHA:		07-12-2018
+        ***********************************/
+        elseif(p_transaccion='CONTA_MROMAYOR_SEL')then
+            begin
+                 v_consulta:='with basica as (select 	cb.id_int_comprobante,
+                                                        t.id_cuenta,
+                                                        cu.nro_cuenta,
+                                                        cu.nombre_cuenta,
+                                                        COALESCE(t.id_auxiliar,0) as id_auxiliar,
+                                                        au.codigo_auxiliar,
+                                                        au.nombre_auxiliar,
+                                                        t.nro_tramite,
+                                                        cb.fecha,
+                                                        cb.glosa1,
+                                                        t.importe_debe_mb,
+                                                        t.importe_haber_mb,
+                                                        t.importe_debe_mt,
+                                                        t.importe_haber_mt,
+                                                        t.importe_debe_ma,
+                                                        t.importe_haber_ma
+                                                        from conta.tint_transaccion t
+                                                        inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
+                                                        inner join conta.tcuenta cu on cu.id_cuenta = t.id_cuenta
+                                                        inner  join conta.tauxiliar au on au.id_auxiliar = t.id_auxiliar
+                                                        inner join conta.tconfig_subtipo_cuenta su on su.id_config_subtipo_cuenta = cu.id_config_subtipo_cuenta
+                                                        inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
+                                                        inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
+                                                        where cb.estado_reg = ''validado'' and  t.id_auxiliar = '||v_parametros.id_auxiliar||'
+                                                        and pe.id_gestion = '||v_parametros.id_gestion||' and  cb.fecha::date BETWEEN '''||v_parametros.desde||'''::Date and '''||v_parametros.hasta||'''::date)
+                 				 select  t.id_int_comprobante,
+                                         t.id_cuenta,
+                                         t.nro_cuenta,
+                                         t.nombre_cuenta,
+                                         t.id_auxiliar,
+                                         t.codigo_auxiliar,
+                                         t.nombre_auxiliar,
+                                         t.nro_tramite,
+                                         t.fecha,
+                                         t.glosa1,
+                                         sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
+                                         sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
+                                         (case
+                                              when sum(COALESCE(t.importe_haber_mb,0)) >  sum(COALESCE(t.importe_debe_mb,0)) then
+                                                   sum(COALESCE(t.importe_haber_mb,0)) - sum(COALESCE(t.importe_debe_mb,0))
+                                              when sum(COALESCE(t.importe_debe_mb,0)) > sum(COALESCE(t.importe_haber_mb,0)) then
+                                                  sum(COALESCE(t.importe_debe_mb,0)) - sum(COALESCE(t.importe_haber_mb,0))
+                                          end )as saldo_mb,
+                                         sum(COALESCE(t.importe_debe_mt,0)) as importe_debe_mt,
+                                         sum(COALESCE(t.importe_haber_mt,0)) as importe_haber_mt,
+                                          (case
+                                              when sum(COALESCE(t.importe_haber_mt,0)) >  sum(COALESCE(t.importe_debe_mt,0)) then
+                                                   sum(COALESCE(t.importe_haber_mt,0)) - sum(COALESCE(t.importe_debe_mt,0))
+                                              when sum(COALESCE(t.importe_debe_mt,0)) > sum(COALESCE(t.importe_haber_mt,0)) then
+                                                  sum(COALESCE(t.importe_debe_mt,0)) - sum(COALESCE(t.importe_haber_mt,0))
+                                          end )as saldo_mt,
+                                         sum(COALESCE(t.importe_debe_ma,0)) as importe_debe_ma,
+                                         sum(COALESCE(t.importe_haber_ma,0)) as importe_haber_ma,
+                                         (case
+                                              when sum(COALESCE(t.importe_haber_ma,0)) >  sum(COALESCE(t.importe_debe_ma,0)) then
+                                                   sum(COALESCE(t.importe_haber_ma,0)) - sum(COALESCE(t.importe_debe_ma,0))
+                                              when sum(COALESCE(t.importe_debe_ma,0)) > sum(COALESCE(t.importe_haber_ma,0)) then
+                                                  sum(COALESCE(t.importe_debe_ma,0)) - sum(COALESCE(t.importe_haber_ma,0))
+                                        end )as saldo_ma
+                                       from basica t
+                                       where ';
+              --Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+          	v_consulta:=v_consulta||'group by  t.id_cuenta,
+                                               t.nro_cuenta,
+                                               t.id_auxiliar,
+                                               t.nro_tramite,
+                                               t.codigo_auxiliar,
+                                               t.nombre_cuenta,
+                                               t.nombre_auxiliar,
+                                               t.fecha,
+                                               t.id_int_comprobante,
+                                               t.glosa1 order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+
+                 return v_consulta;
+
+            end;
+
+
+    	/*********************************
+        #TRANSACCION:  'CONTA_MROMAYOR_CONT' #92
+        #DESCRIPCION:	count actualización reporte de detalle de auxiliares
+        #AUTOR:		MMV
+        #FECHA:		07-12-2018
+        ***********************************/
+
+		elsif(p_transaccion='CONTA_MROMAYOR_CONT')then
+
+			begin
+            v_consulta:= 'with basica as (select 	cb.id_int_comprobante,
+                                                    t.id_cuenta,
+                                                    cu.nro_cuenta,
+                                                    cu.nombre_cuenta,
+                                                    COALESCE(t.id_auxiliar,0) as id_auxiliar,
+                                                    au.codigo_auxiliar,
+                                                    au.nombre_auxiliar,
+                                                    t.nro_tramite,
+                                                    cb.fecha,
+                                                    t.importe_debe_mb,
+                                                    t.importe_haber_mb,
+                                                    t.importe_debe_mt,
+                                                    t.importe_haber_mt,
+                                                    t.importe_debe_ma,
+                                                    t.importe_haber_ma
+                                                    from conta.tint_transaccion t
+                                                    inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
+                                                    inner join conta.tcuenta cu on cu.id_cuenta = t.id_cuenta
+                                                    inner  join conta.tauxiliar au on au.id_auxiliar = t.id_auxiliar
+                                                    inner join conta.tconfig_subtipo_cuenta su on su.id_config_subtipo_cuenta = cu.id_config_subtipo_cuenta
+                                                    inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
+                                                    inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
+                                                    where cb.estado_reg = ''validado'' and  t.id_auxiliar = '||v_parametros.id_auxiliar||'
+                                                    and pe.id_gestion = '||v_parametros.id_gestion||' and  cb.fecha::date BETWEEN '''||v_parametros.desde||'''::Date and '''||v_parametros.hasta||'''::date),
+                                contar as (select    t.id_int_comprobante,
+                                                     t.id_cuenta,
+                                                     t.nro_cuenta,
+                                                     t.nombre_cuenta,
+                                                     t.id_auxiliar,
+                                                     t.codigo_auxiliar,
+                                                     t.nombre_auxiliar,
+                                                     t.nro_tramite,
+                                                     t.fecha,
+                                                     sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
+                                                     sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
+                                                     sum(COALESCE(t.importe_debe_mt,0)) as importe_debe_mt,
+                                                     sum(COALESCE(t.importe_haber_mt,0)) as importe_haber_mt,
+                                                     sum(COALESCE(t.importe_debe_ma,0)) as importe_debe_ma,
+                                                     sum(COALESCE(t.importe_haber_ma,0)) as importe_haber_ma
+                                                   from basica t
+                                                   group by
+                                                     t.id_cuenta,
+                                                     t.nro_cuenta,
+                                                     t.id_auxiliar,
+                                                     t.nro_tramite,
+                                                     t.codigo_auxiliar,
+                                                     t.nombre_cuenta,
+                                                     t.nombre_auxiliar,
+                                                     t.fecha,
+                                                     t.id_int_comprobante)
+                                  select count(c.id_int_comprobante),
+                                  		 sum (c.importe_debe_mb) as importe_debe_mb_total,
+                                         sum (c.importe_haber_mb) as importe_haber_mb_total,
+                                         (case
+                                              when sum(COALESCE(c.importe_haber_mb,0)) >  sum(COALESCE(c.importe_debe_mb,0)) then
+                                                   sum(COALESCE(c.importe_haber_mb,0)) - sum(COALESCE(c.importe_debe_mb,0))
+                                              when sum(COALESCE(c.importe_debe_mb,0)) > sum(COALESCE(c.importe_haber_mb,0)) then
+                                                  sum(COALESCE(c.importe_debe_mb,0)) - sum(COALESCE(c.importe_haber_mb,0))
+                                          end )as saldo_mb_total,
+                                         sum (c.importe_debe_mt) as importe_debe_mt_total,
+                                         sum (c.importe_haber_mt) as importe_haber_mt_total,
+                                          (case
+                                              when sum(COALESCE(c.importe_haber_mt,0)) >  sum(COALESCE(c.importe_debe_mt,0)) then
+                                                   sum(COALESCE(c.importe_haber_mt,0)) - sum(COALESCE(c.importe_debe_mt,0))
+                                              when sum(COALESCE(c.importe_debe_mt,0)) > sum(COALESCE(c.importe_haber_mt,0)) then
+                                                   sum(COALESCE(c.importe_debe_mt,0)) - sum(COALESCE(c.importe_haber_mt,0))
+                                          end ) saldo_mt_total,
+                                         sum (c.importe_debe_ma) as importe_debe_ma_total,
+                                         sum (c.importe_haber_ma) as importe_haber_ma_total,
+                                         (case
+                                              when sum(COALESCE(c.importe_haber_ma,0)) >  sum(COALESCE(c.importe_debe_ma,0)) then
+                                                   sum(COALESCE(c.importe_haber_ma,0)) - sum(COALESCE(c.importe_debe_ma,0))
+                                              when sum(COALESCE(c.importe_debe_ma,0)) > sum(COALESCE(c.importe_haber_ma,0)) then
+                                                  sum(COALESCE(c.importe_debe_ma,0)) - sum(COALESCE(c.importe_haber_ma,0))
+                                        end ) as saldo_ma_total
+                                  from contar c
+                                  where ';
+			v_consulta:=v_consulta||v_parametros.filtro;
+			return v_consulta;
+
+		end;
+      /*********************************
+        #TRANSACCION:  'CONTA_AUXRE_SEL' #92
+        #DESCRIPCION:	actualización reporte de detalle de auxiliares formato xls
+        #AUTOR:		MMV
+        #FECHA:		07-12-2018
+        ***********************************/
+        elseif(p_transaccion='CONTA_AUXRE_SEL')then
+            begin
+
+                  CREATE TEMPORARY TABLE temporal( 	 id_int_comprobante integer,
+                                                     id_cuenta integer,
+                                                     nro_cuenta varchar,
+                                                     nombre_cuenta varchar,
+                                                     id_auxiliar integer,
+                                                     codigo_auxiliar varchar,
+                                                     nombre_auxiliar varchar,
+                                                     nro_tramite varchar,
+                                                     fecha date,
+                                                     glosa1 varchar,
+                                                     importe_debe_mb numeric,
+                                                     importe_haber_mb numeric,
+                                                     saldo_mb numeric,
+                                                     importe_debe_mt numeric,
+                                                     importe_haber_mt numeric,
+                                                     saldo_mt numeric,
+                                                     tipo varchar )ON COMMIT DROP;
+
+            with basica as (select 	cb.id_int_comprobante,
+						t.id_cuenta,
+						cu.nro_cuenta,
+                        cu.nombre_cuenta,
+                        COALESCE(t.id_auxiliar,0) as id_auxiliar,
+                        au.codigo_auxiliar,
+                        au.nombre_auxiliar,
+                        t.nro_tramite,
+                        cb.fecha,
+                        cb.glosa1,
+                        t.importe_debe_mb,
+                        t.importe_haber_mb,
+                        t.importe_debe_mt,
+                        t.importe_haber_mt,
+                        t.importe_debe_ma,
+                        t.importe_haber_ma
+                      from conta.tint_transaccion t
+                        inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
+                        inner join conta.tcuenta cu on cu.id_cuenta = t.id_cuenta
+                        inner  join conta.tauxiliar au on au.id_auxiliar = t.id_auxiliar
+                        inner join conta.tconfig_subtipo_cuenta su on su.id_config_subtipo_cuenta = cu.id_config_subtipo_cuenta
+                        inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
+                        inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
+                        where cb.estado_reg = 'validado' and  t.id_auxiliar = v_parametros.id_auxiliar
+                        and pe.id_gestion = v_parametros.id_gestion and  cb.fecha::date BETWEEN v_parametros.desde and v_parametros.hasta
+                    )insert into temporal(   id_int_comprobante,
+                                             id_cuenta,
+                                             nro_cuenta,
+                                             nombre_cuenta,
+                                             id_auxiliar,
+                                             codigo_auxiliar,
+                                             nombre_auxiliar,
+                                             nro_tramite,
+                                             fecha,
+                                             glosa1,
+                                             importe_debe_mb,
+                                             importe_haber_mb,
+                                             saldo_mb,
+                                             importe_debe_mt,
+                                             importe_haber_mt,
+                                             tipo)select   t.id_int_comprobante,
+                                                           t.id_cuenta,
+                                                           t.nro_cuenta,
+                                                           t.nombre_cuenta,
+                                                           t.id_auxiliar,
+                                                           t.codigo_auxiliar,
+                                                           t.nombre_auxiliar,
+                                                           t.nro_tramite,
+                                                           t.fecha,
+                                                           t.glosa1,
+                                                           sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
+                                                           sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
+                                                           0::numeric as saldo_mb,
+                                                           sum(COALESCE(t.importe_debe_mt,0)) as importe_debe_mt,
+                                                           sum(COALESCE(t.importe_haber_mt,0)) as importe_haber_mt,
+                                                           'A'::varchar as tipo
+                                                         from basica t
+                                                         group by
+                                                           t.id_cuenta,
+                                                           t.nro_cuenta,
+                                                           t.id_auxiliar,
+                                                           t.nro_tramite,
+                                                           t.codigo_auxiliar,
+                                                           t.nombre_cuenta,
+                                                           t.nombre_auxiliar,
+                                                           t.fecha,
+                                                           t.id_int_comprobante,
+                                                           t.glosa1;
+                ---totales
+                        with basica as (select 	cb.id_int_comprobante,
+                                                t.id_cuenta,
+                                                cu.nro_cuenta,
+                                                cu.nombre_cuenta,
+                                                COALESCE(t.id_auxiliar,0) as id_auxiliar,
+                                                au.codigo_auxiliar,
+                                                au.nombre_auxiliar,
+                                                t.nro_tramite,
+                                                cb.fecha,
+                                                t.importe_debe_mb,
+                                                t.importe_haber_mb,
+                                                t.importe_debe_mt,
+                                                t.importe_haber_mt,
+                                                t.importe_debe_ma,
+                                                t.importe_haber_ma
+                                              from conta.tint_transaccion t
+                                                inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
+                                                inner join conta.tcuenta cu on cu.id_cuenta = t.id_cuenta
+                                                inner  join conta.tauxiliar au on au.id_auxiliar = t.id_auxiliar
+                                                inner join conta.tconfig_subtipo_cuenta su on su.id_config_subtipo_cuenta = cu.id_config_subtipo_cuenta
+                                                inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
+                                                inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
+                                                where cb.estado_reg = 'validado' and  t.id_auxiliar = v_parametros.id_auxiliar
+                                                and pe.id_gestion = v_parametros.id_gestion and  cb.fecha::date BETWEEN v_parametros.desde and v_parametros.hasta
+                        ),
+                        totales as (select  t.id_int_comprobante,
+                                           t.id_cuenta,
+                                           t.nro_cuenta,
+                                           t.nombre_cuenta,
+                                           t.id_auxiliar,
+                                           t.codigo_auxiliar,
+                                           t.nombre_auxiliar,
+                                           t.nro_tramite,
+                                           t.fecha,
+                                           sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
+                                           sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
+                                           sum(COALESCE(t.importe_debe_mt,0)) as importe_debe_mt,
+                                           sum(COALESCE(t.importe_haber_mt,0)) as importe_haber_mt,
+                                           sum(COALESCE(t.importe_debe_ma,0)) as importe_debe_ma,
+                                           sum(COALESCE(t.importe_haber_ma,0)) as importe_haber_ma
+                                         from basica t
+                                         group by
+                                           t.id_cuenta,
+                                           t.nro_cuenta,
+                                           t.id_auxiliar,
+                                           t.nro_tramite,
+                                           t.codigo_auxiliar,
+                                           t.nombre_cuenta,
+                                           t.nombre_auxiliar,
+                                           t.fecha,
+                                           t.id_int_comprobante)
+                    insert into temporal(   id_int_comprobante,
+                                             id_cuenta,
+                                             nro_cuenta,
+                                             nombre_cuenta,
+                                             id_auxiliar,
+                                             codigo_auxiliar,
+                                             nombre_auxiliar,
+                                             nro_tramite,
+                                             fecha,
+                                             glosa1,
+                                             importe_debe_mb,
+                                             importe_haber_mb,
+                                             saldo_mb,
+                                             importe_debe_mt,
+                                             importe_haber_mt,
+                                             tipo)select null as id_int_comprobante,
+                                                        null as id_cuenta,
+                                                        null as nro_cuenta,
+                                                        null as nombre_cuenta,
+                                                        null as id_auxiliar,
+                                                        null as codigo_auxiliar,
+                                                        null as nombre_auxiliar,
+                                                        ts.nro_tramite,
+                                                        null as fecha,
+                                                        null as glosa1,
+                                                        sum (ts.importe_debe_mb) as importe_debe_mb,
+                                                        sum (ts.importe_haber_mb) as importe_haber_mb,
+                                                        sum (ts.importe_debe_mb )-  sum (ts.importe_haber_mb) as saldo_mb,
+                                                        sum (ts.importe_debe_mt) as importe_debe_mt,
+                                                        sum (ts.importe_haber_mt) as importe_haber_mt,
+                                                        'B'::varchar as tipo
+                                                 from totales ts
+                                                 group by ts.nro_tramite;
+
+
+            v_consulta:='select  t.id_int_comprobante,
+                                 t.id_cuenta,
+                                 t.nro_cuenta,
+                                 t.nombre_cuenta,
+                                 t.id_auxiliar,
+                                 t.codigo_auxiliar,
+                                 t.nombre_auxiliar,
+                                 t.nro_tramite,
+                                 t.fecha,
+                                 t.glosa1,
+                                 t.importe_debe_mb,
+                                 t.importe_haber_mb,
+                                 t.saldo_mb,
+                                 t.importe_debe_mt,
+                                 t.importe_haber_mt,
+                                 t.tipo
+                            from temporal t
+                            order by t.nro_tramite,t.tipo';
+            return v_consulta;
+        end;
+        --------------#92 FIN-MMV------------
     else
 					     
 		raise exception 'Transaccion inexistente';

@@ -6,12 +6,18 @@
 *@date 01-09-2013 18:10:12
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
+/**
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares
+ */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayorSaldo.php');
 require_once(dirname(__FILE__).'/../reportes/RMayorXls.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
-
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
+require_once(dirname(__FILE__).'/../reportes/RAuxliarTramitesXls.php'); //#92
+
 
 class ACTIntTransaccion extends ACTbase{
 			
@@ -1019,7 +1025,51 @@ class ACTIntTransaccion extends ACTbase{
 		return $fileName;
 	}
 
-
+    /***************#92-INI-MMV**************/
+    function mayorNroTramite(){
+        $this->objParam->defecto('ordenacion','orden');
+        $this->objParam->defecto('dir_ordenacion','asc');
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','mayorNroTramite');
+        } else{
+            $this->objFunc=$this->create('MODIntTransaccion');
+            $this->res=$this->objFunc->mayorNroTramite($this->objParam);
+        }
+        //adicionar una fila al resultado con el summario
+        $temp = Array();
+        $temp['codigo_auxiliar'] = 'Total';
+        $temp['importe_debe_mb'] = $this->res->extraData['importe_debe_mb_total'];
+        $temp['importe_haber_mb'] = $this->res->extraData['importe_haber_mb_total'];
+        $temp['saldo_mb'] = $this->res->extraData['saldo_mb_total'];
+        $temp['importe_debe_mt'] = $this->res->extraData['importe_debe_mt_total'];
+        $temp['importe_haber_mt'] = $this->res->extraData['importe_haber_mt_total'];
+        $temp['saldo_mt'] = $this->res->extraData['saldo_mt_total'];
+        $temp['importe_debe_ma'] = $this->res->extraData['importe_debe_ma_total'];
+        $temp['importe_haber_ma'] = $this->res->extraData['importe_haber_ma_total'];
+        $temp['saldo_ma'] = $this->res->extraData['saldo_ma_total'];
+        $temp['id_int_comprobante'] = 0;
+        $this->res->total++;
+        $this->res->addLastRecDatos($temp);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function reporteAuxliarTramite() {
+        $this->objFunc=$this->create('MODIntTransaccion');
+        $this->res=$this->objFunc->mayorNroTramiteReporte($this->objParam);
+        $titulo = 'Auxiliar';
+        $nombreArchivo = uniqid(md5(session_id()) . $titulo);
+        $nombreArchivo .= '.xls';
+        $this->objParam->addParametro('nombre_archivo', $nombreArchivo);
+        $this->objParam->addParametro('datos', $this->res->datos);
+        $this->objReporteFormato=new RAuxliarTramitesXls($this->objParam);
+        $this->objReporteFormato->generarDatos();
+        $this->objReporteFormato->generarReporte();
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
+    /***************#92-FIN-MMV**************/
 
 		
 }
