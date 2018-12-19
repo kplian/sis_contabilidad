@@ -4,12 +4,11 @@ CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS
-$body$
+RETURNS varchar AS'
 /**************************************************************************
  SISTEMA:    Sistema de Contabilidad
  FUNCION:     conta.ft_int_transaccion_ime
- DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tint_transaccion'
+ DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla ''conta.tint_transaccion''
  AUTOR:      (admin)
  FECHA:          01-09-2013 18:10:12
  COMENTARIOS:  
@@ -17,7 +16,7 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 	ISSUE 		 FECHA   		AUTOR				 DESCRIPCION:  
-	#1			29/11/2018		EGS					se hizo validacion para forzar a escoger un axuiliar si existe para la cuenta    
+	#90			19/12/2018		EGS					se hizo validacion para forzar a escoger un axuiliar si existe para la cuenta    
   #2      30/11/2018    CHROS       CONTROL PARA EVITAR EDITAR DATOS EN TRANSACCIONES
 ***************************************************************************/
 
@@ -55,20 +54,20 @@ DECLARE
   v_haber numeric;
   v_reg_trans   record;
   v_r  record;
-  v_count_auxiliar				INTEGER;--#1	29/11/2018	EGS	
+  v_count_auxiliar				varchar;--#1	19/12/2018	EGS	
 BEGIN
 
-    v_nombre_funcion = 'conta.ft_int_transaccion_ime';
+    v_nombre_funcion = ''conta.ft_int_transaccion_ime'';
     v_parametros = pxp.f_get_record(p_tabla);
 
   /*********************************    
-   #TRANSACCION:  'CONTA_INTRANSA_INS'
+   #TRANSACCION:  ''CONTA_INTRANSA_INS''
    #DESCRIPCION:  Insercion de registros
    #AUTOR:    admin  
    #FECHA:    01-09-2013 18:10:12
   ***********************************/
 
-  if(p_transaccion='CONTA_INTRANSA_INS')then
+  if(p_transaccion=''CONTA_INTRANSA_INS'')then
           
         begin
         
@@ -103,16 +102,16 @@ BEGIN
                  or v_registros.tipo_cambio_3 !=  v_parametros.tipo_cambio_3 THEN
               
               update conta.tint_comprobante set
-                sw_tipo_cambio = 'si'
+                sw_tipo_cambio = ''si''
               where id_int_comprobante =  v_parametros.id_int_comprobante;
             
             END IF;
             
             --verifica si presupeusto y iguala con la contabilidad
             
-            v_conta_ejecucion_igual_pres_conta = pxp.f_get_variable_global('conta_ejecucion_igual_pres_conta');
+            v_conta_ejecucion_igual_pres_conta = pxp.f_get_variable_global(''conta_ejecucion_igual_pres_conta'');
         
-            IF v_conta_ejecucion_igual_pres_conta  = 'no' THEN            
+            IF v_conta_ejecucion_igual_pres_conta  = ''no'' THEN            
                v_monto_gasto = v_parametros.importe_gasto;
                v_monto_recurso = v_parametros.importe_recurso;
             ELSE
@@ -121,20 +120,20 @@ BEGIN
             END IF;
             
                   
-        --#1	29/11/2018	EGS	 
+        --#1	19/12/2018	EGS	 
       
               SELECT
-                count( cua.id_auxiliar) 
+                cu.ex_auxiliar 
               INTO
               v_count_auxiliar                   
               FROM conta.tcuenta cu
               left join conta.tcuenta_auxiliar cua on cua.id_cuenta = cu.id_cuenta
-              where cua.estado_reg = 'activo' and cu.id_cuenta =  v_parametros.id_cuenta;
+              where cua.estado_reg = ''activo'' and cu.id_cuenta =  v_parametros.id_cuenta;
               
-              IF v_count_auxiliar > 0 and v_parametros.id_auxiliar is null then
-              --RAISE EXCEPTION 'Esta Cuenta tiene por lo menos un auxiliar elija uno';
+              IF v_count_auxiliar = ''si'' and  v_parametros.id_auxiliar is null then
+                RAISE EXCEPTION ''Esta Cuenta exige un auxiliar escoja uno'';
               END IF;
-          --#1	29/11/2018	EGS	 
+          --#1	19/12/2018	EGS	 
          
        
           -----------------------------
@@ -168,7 +167,7 @@ BEGIN
             ) values(
                 v_parametros.id_partida,
                 v_parametros.id_centro_costo,
-                'activo',
+                ''activo'',
                 v_parametros.id_cuenta,
                 v_parametros.glosa,
                 v_parametros.id_int_comprobante,
@@ -200,13 +199,13 @@ BEGIN
             
             -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
-              raise exception 'Error al procesar transacciones';
+              raise exception ''Error al procesar transacciones'';
             END IF;
             
       
       --Definicion de la respuesta
-      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción almacenado(a) con exito (id_int_transaccion'||v_id_int_transaccion||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_id_int_transaccion::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Transacción almacenado(a) con exito (id_int_transaccion''||v_id_int_transaccion||'')''); 
+            v_resp = pxp.f_agrega_clave(v_resp,''id_int_transaccion'',v_id_int_transaccion::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -214,16 +213,16 @@ BEGIN
     end;
         
     /*********************************    
-   #TRANSACCION:  'CONTA_INTRANSAXLS_INS'
+   #TRANSACCION:  ''CONTA_INTRANSAXLS_INS''
    #DESCRIPCION:  Insercion de registros desde excel
    #AUTOR:    admin  
    #FECHA:    01-09-2013 18:10:12
   ***********************************/
 
-  elsif(p_transaccion='CONTA_TRANSAXLS_INS')then
+  elsif(p_transaccion=''CONTA_TRANSAXLS_INS'')then
               
     begin
-     --raise exception 'AAAAAAAAA %',v_parametros;
+     --raise exception ''AAAAAAAAA %'',v_parametros;
      
      v_haber = 0;
      v_debe = 0;
@@ -247,14 +246,14 @@ BEGIN
      
       
       
-      if not pxp.f_existe_parametro(p_tabla,'debe') and not pxp.f_existe_parametro(p_tabla,'haber') then
-        raise exception 'No existen valores Debe/Haber para la cuenta "%"', v_parametros.cuenta;
+      if not pxp.f_existe_parametro(p_tabla,''debe'') and not pxp.f_existe_parametro(p_tabla,''haber'') then
+        raise exception ''No existen valores Debe/Haber para la cuenta "%"'', v_parametros.cuenta;
       else
       
         
-        if pxp.f_existe_parametro(p_tabla,'debe') then
+        if pxp.f_existe_parametro(p_tabla,''debe'') then
           
-          if v_parametros.debe is null or  v_parametros.debe = ''  or  v_parametros.debe = ' ' then
+          if v_parametros.debe is null or  v_parametros.debe = ''''  or  v_parametros.debe = '' '' then
             v_debe = 0;
            else
             v_debe = v_parametros.debe::numeric;
@@ -263,33 +262,33 @@ BEGIN
         
         
         
-        if pxp.f_existe_parametro(p_tabla,'haber') then
-          if  v_parametros.haber is null or  v_parametros.haber = ' ' or  v_parametros.haber = '' then
+        if pxp.f_existe_parametro(p_tabla,''haber'') then
+          if  v_parametros.haber is null or  v_parametros.haber = '' '' or  v_parametros.haber = '''' then
             v_haber = 0;
           else
              v_haber = v_parametros.haber::numeric;
           end if;
         end if;
         
-         -- raise exception 'DEBE %  HABER %', v_parametros.debe, v_parametros.haber;
+         -- raise exception ''DEBE %  HABER %'', v_parametros.debe, v_parametros.haber;
         
         
         v_id_cuenta = null;
         select c.id_cuenta
         into v_id_cuenta
         from conta.tcuenta c
-        where c.sw_transaccional='movimiento' and c.id_gestion=v_id_gestion
+        where c.sw_transaccional=''movimiento'' and c.id_gestion=v_id_gestion
         and c.nro_cuenta=v_parametros.cuenta;
         if v_id_cuenta is null then
-          raise exception 'No se encontró la cuenta %', v_parametros.cuenta;
+          raise exception ''No se encontró la cuenta %'', v_parametros.cuenta;
         end if;
         
         v_id_auxiliar = null;
         
       
         
-        if  pxp.f_existe_parametro(p_tabla,'auxiliar') THEN
-          if v_parametros.auxiliar<>'' then
+        if  pxp.f_existe_parametro(p_tabla,''auxiliar'') THEN
+          if v_parametros.auxiliar<>'''' then
             select 
               a.id_auxiliar
             into 
@@ -307,10 +306,10 @@ BEGIN
               
               
               if v_id_auxiliar is null then
-                raise exception 'No existe el auxiliar "%"', v_parametros.auxiliar;
+                raise exception ''No existe el auxiliar "%"'', v_parametros.auxiliar;
               else
                 insert into conta.tcuenta_auxiliar (id_usuario_reg, fecha_reg, estado_reg, id_auxiliar, id_cuenta)
-                values (p_id_usuario, now(), 'activo', v_id_auxiliar, v_id_cuenta);
+                values (p_id_usuario, now(), ''activo'', v_id_auxiliar, v_id_cuenta);
               end if;
               
               
@@ -327,9 +326,9 @@ BEGIN
         into v_id_centro_costo
         from param.ttipo_cc tcc
         join param.tcentro_costo cc on cc.id_tipo_cc=tcc.id_tipo_cc
-        where tcc.movimiento='si' and cc.id_gestion=v_id_gestion and tcc.codigo=v_parametros.centro_costo;
+        where tcc.movimiento=''si'' and cc.id_gestion=v_id_gestion and tcc.codigo=v_parametros.centro_costo;
         if v_id_centro_costo is null then
-          raise exception 'No se encontró el Centro de Costo "%"', v_parametros.centro_costo;
+          raise exception ''No se encontró el Centro de Costo "%"'', v_parametros.centro_costo;
         end if;
 
         
@@ -344,16 +343,16 @@ BEGIN
           from pre.tpartida p
           where p.id_gestion=v_id_gestion and p.codigo=v_parametros.partida;
           if v_id_partida is null then
-            raise exception 'La partida "%" no se encuentra registrado', v_parametros.auxiliar;
+            raise exception ''La partida "%" no se encuentra registrado'', v_parametros.auxiliar;
           else
             insert into conta.tcuenta_partida (id_usuario_reg, fecha_reg, estado_reg, id_cuenta, id_partida, sw_deha, se_rega)
-            values (p_id_usuario, now(), 'activo', v_id_cuenta, v_id_partida, 'debe', 'gasto');
+            values (p_id_usuario, now(), ''activo'', v_id_cuenta, v_id_partida, ''debe'', ''gasto'');
           end if;
         end if;
         
-       -- raise exception 'DEBE %  HABER %', v_debe, v_haber;
+       -- raise exception ''DEBE %  HABER %'', v_debe, v_haber;
         if COALESCE(v_debe,0)  = 0 and COALESCE(v_haber,0) = 0   then
-           raise exception 'por lo menso debe tener importe en el debe o en el haber';
+           raise exception ''por lo menso debe tener importe en el debe o en el haber'';
         end if;
   
         --inserta trasaccion
@@ -398,7 +397,7 @@ BEGIN
         VALUES (
           1::integer,
           now(),
-          'activo',
+          ''activo'',
           v_parametros.id_int_comprobante::integer,
           v_id_cuenta::integer,
           v_id_auxiliar::integer,
@@ -433,15 +432,15 @@ BEGIN
         
         --select it.importe_debe, it.importe_haber into v_r from conta.tint_transaccion it  where it.id_int_transaccion = v_id_transaccion ;
         
-        -- raise exception 'importes % ', v_r;
+        -- raise exception ''importes % '', v_r;
         -- calcular moneda base y triangulacion
         PERFORM  conta.f_calcular_monedas_transaccion(v_id_int_transaccion);
         
-        -- raise exception 'importes % ', v_r;
+        -- raise exception ''importes % '', v_r;
         
         --Definicion de la respuesta
-        v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción almacenado(a) con exito (id_int_transaccion'||v_id_int_transaccion||')'); 
-        v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_id_int_transaccion::varchar);
+        v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Transacción almacenado(a) con exito (id_int_transaccion''||v_id_int_transaccion||'')''); 
+        v_resp = pxp.f_agrega_clave(v_resp,''id_int_transaccion'',v_id_int_transaccion::varchar);
         --Devuelve la respuesta
         
       end if;
@@ -449,30 +448,30 @@ BEGIN
     end;
 
   /*********************************    
-   #TRANSACCION:  'CONTA_INTRANSA_MOD'
+   #TRANSACCION:  ''CONTA_INTRANSA_MOD''
    #DESCRIPCION:  Modificacion de registros
    #AUTOR:    admin  
    #FECHA:    01-09-2013 18:10:12
   ***********************************/
 
-  elsif(p_transaccion='CONTA_INTRANSA_MOD')then
+  elsif(p_transaccion=''CONTA_INTRANSA_MOD'')then
 
     begin	
     
-    		   --#1	29/11/2018	EGS	 
+    		   --#1	19/12/2018	EGS	 
+   
               SELECT
-                count( cua.id_auxiliar) 
+                cu.ex_auxiliar 
               INTO
               v_count_auxiliar                   
               FROM conta.tcuenta cu
               left join conta.tcuenta_auxiliar cua on cua.id_cuenta = cu.id_cuenta
-              where  cua.estado_reg = 'activo' and cu.id_cuenta = v_parametros.id_cuenta;
+              where cua.estado_reg = ''activo'' and cu.id_cuenta =  v_parametros.id_cuenta;
               
-              IF v_count_auxiliar >0 and v_parametros.id_auxiliar is null then
-              --chros comentado, pero se debe analizar bajo qué consideraciones se debe controlar la edición de transacciones
-              --RAISE EXCEPTION 'Esta Cuenta tiene por lo menos un auxiliar elija uno';
+              IF v_count_auxiliar = ''si'' and  v_parametros.id_auxiliar is null then
+                RAISE EXCEPTION ''Esta Cuenta exige un auxiliar escoja uno'';
               END IF;
-    		--#1	29/11/2018	EGS	 
+    		--#1	19/12/2018	EGS	 
         
               select
                cbt.id_moneda,
@@ -496,27 +495,27 @@ BEGIN
             where tr.id_int_transaccion =  v_parametros.id_int_transaccion;
              
             --#2 CHROS
-            IF v_registros_trans.id_partida_ejecucion is not null and v_registros.cbte_reversion='no' THEN
+            IF v_registros_trans.id_partida_ejecucion is not null and v_registros.cbte_reversion=''no'' THEN
               IF v_parametros.id_centro_costo <> v_registros_trans.id_centro_costo THEN
-                raise exception 'No es posible cambiar el CENTRO DE COSTO para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar el CENTRO DE COSTO para no romper la integridad presupuestaria'';
               ELSEIF v_parametros.id_partida <> v_registros_trans.id_partida THEN
-                raise exception 'No es posible cambiar la PARTIDA para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar la PARTIDA para no romper la integridad presupuestaria'';
               ELSEIF v_parametros.id_orden_trabajo <> v_registros_trans.id_orden_trabajo THEN
-                raise exception 'No es posible cambiar la ORDEN para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar la ORDEN para no romper la integridad presupuestaria'';
               ELSEIF v_parametros.id_suborden <> v_registros_trans.id_suborden THEN
-                raise exception 'No es posible cambiar la SUB-ORDEN para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar la SUB-ORDEN para no romper la integridad presupuestaria'';
               ELSEIF v_parametros.importe_debe <> v_registros_trans.importe_debe THEN
-                raise exception 'No es posible cambiar la DEBE para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar la DEBE para no romper la integridad presupuestaria'';
               ELSEIF v_parametros.importe_haber <> v_registros_trans.importe_haber THEN
-                raise exception 'No es posible cambiar la HABER para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar la HABER para no romper la integridad presupuestaria'';
               ELSEIF v_parametros.tipo_cambio <> v_registros_trans.tipo_cambio THEN
-                raise exception 'No es posible cambiar la BS->BS para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar la BS->BS para no romper la integridad presupuestaria'';
               ELSEIF v_parametros.tipo_cambio_2 <> v_registros_trans.tipo_cambio_2 THEN
-                raise exception 'No es posible cambiar la BS->USD para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar la BS->USD para no romper la integridad presupuestaria'';
               ELSEIF v_parametros.tipo_cambio_3 <> v_registros_trans.tipo_cambio_3 THEN
-                raise exception 'No es posible cambiar la BS->UFV para no romper la integridad presupuestaria';
+                raise exception ''No es posible cambiar la BS->UFV para no romper la integridad presupuestaria'';
               END IF;
-              --raise exception 'No puede editar trasacciones que vengas de otros sistemas, para no romper la integridad presupuestaria';
+              --raise exception ''No puede editar trasacciones que vengas de otros sistemas, para no romper la integridad presupuestaria'';
             END IF;
             
             -- si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
@@ -526,7 +525,7 @@ BEGIN
                 or  v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_3 THEN
               
               update conta.tint_comprobante set
-                sw_tipo_cambio = 'si'
+                sw_tipo_cambio = ''si''
               where id_int_comprobante =  v_parametros.id_int_comprobante;
             
             END IF;
@@ -539,8 +538,8 @@ BEGIN
                 inner join conta.tint_comprobante cbte
                 on cbte.id_int_comprobante = tra.id_int_comprobante
                 where tra.id_int_transaccion = v_parametros.id_int_transaccion
-                and cbte.estado_reg in ('borrador', 'vbcbte')  and cbte.sw_editable = 'si') then
-            raise exception 'Modificación no realizada: el comprobante no está en estado Borrador o no es editable';
+                and cbte.estado_reg in (''borrador'', ''vbcbte'')  and cbte.sw_editable = ''si'') then
+            raise exception ''Modificación no realizada: el comprobante no está en estado Borrador o no es editable'';
           end if;
             
             
@@ -555,16 +554,16 @@ BEGIN
                                     from conta.tint_rel_devengado rd
                                     where   (rd.id_int_transaccion_dev = v_parametros.id_int_transaccion
                                          or rd.id_int_transaccion_pag = v_parametros.id_int_transaccion)
-                                         and rd.estado_reg = 'activo' )LOOP
+                                         and rd.estado_reg = ''activo'' )LOOP
                       DELETE FROM 
                         conta.tint_rel_devengado 
                       WHERE id_int_rel_devengado = v_registros.id_int_rel_devengado;
             END LOOP;
             
             
-            v_conta_ejecucion_igual_pres_conta = pxp.f_get_variable_global('conta_ejecucion_igual_pres_conta');
+            v_conta_ejecucion_igual_pres_conta = pxp.f_get_variable_global(''conta_ejecucion_igual_pres_conta'');
         
-            IF v_conta_ejecucion_igual_pres_conta  = 'no' THEN            
+            IF v_conta_ejecucion_igual_pres_conta  = ''no'' THEN            
                v_monto_gasto = v_parametros.importe_gasto;
                v_monto_recurso = v_parametros.importe_recurso;
             ELSE
@@ -605,12 +604,12 @@ BEGIN
             
             -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
-              raise exception 'Error al procesar transacciones';
+              raise exception ''Error al procesar transacciones'';
             END IF;
                
       --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción modificado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Transacción modificado(a)''); 
+            v_resp = pxp.f_agrega_clave(v_resp,''id_int_transaccion'',v_parametros.id_int_transaccion::varchar);
                
             --Devuelve la respuesta
             return v_resp;
@@ -619,13 +618,13 @@ BEGIN
         
         
     /*********************************    
-   #TRANSACCION:  'CONTA_SAVTRABAN_MOD'
+   #TRANSACCION:  ''CONTA_SAVTRABAN_MOD''
    #DESCRIPCION:  actuliza datos bancarios para la transaccion
    #AUTOR:    rensi (kplian)  
    #FECHA:    04-08-2015 18:10:12
   ***********************************/
 
-  elsif(p_transaccion='CONTA_SAVTRABAN_MOD')then
+  elsif(p_transaccion=''CONTA_SAVTRABAN_MOD'')then
 
     begin
         
@@ -642,8 +641,8 @@ BEGIN
             
                
       --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','datos bancarios actualizados para la transaccion del cbte)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''datos bancarios actualizados para la transaccion del cbte)''); 
+            v_resp = pxp.f_agrega_clave(v_resp,''id_int_transaccion'',v_parametros.id_int_transaccion::varchar);
                
             --Devuelve la respuesta
             return v_resp;
@@ -651,17 +650,17 @@ BEGIN
     end;
 
   /*********************************    
-   #TRANSACCION:  'CONTA_INTRANSA_ELI'
+   #TRANSACCION:  ''CONTA_INTRANSA_ELI''
    #DESCRIPCION:  Eliminacion de registros
    #AUTOR:    admin  
    #FECHA:    01-09-2013 18:10:12
   ***********************************/
 
-  elsif(p_transaccion='CONTA_INTRANSA_ELI')then
+  elsif(p_transaccion=''CONTA_INTRANSA_ELI'')then
 
     begin
     
-          --#2 CHROS añadido cbte.cbte_reversion='no' para no permitir eliminar transacciones que no sean de un comprobante revertido
+          --#2 CHROS añadido cbte.cbte_reversion=''no'' para no permitir eliminar transacciones que no sean de un comprobante revertido
           ---------------
           --VALIDACIONES
           ---------------
@@ -669,8 +668,8 @@ BEGIN
           if not exists(select 1 from conta.tint_transaccion tra
                 inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
                 where tra.id_int_transaccion = v_parametros.id_int_transaccion
-                and ((cbte.estado_reg = 'borrador' and cbte.sw_editable = 'si') or cbte.cbte_reversion='no')) then
-            raise exception 'Eliminación no realizada: el comprobante no está en estado Borrador o no es editable';
+                and ((cbte.estado_reg = ''borrador'' and cbte.sw_editable = ''si'') or cbte.cbte_reversion=''no'')) then
+            raise exception ''Eliminación no realizada: el comprobante no está en estado Borrador o no es editable'';
           end if;
             
           
@@ -682,7 +681,7 @@ BEGIN
                                     from conta.tint_rel_devengado rd
                                     where   (rd.id_int_transaccion_dev = v_parametros.id_int_transaccion
                                          or rd.id_int_transaccion_pag = v_parametros.id_int_transaccion)
-                                         and rd.estado_reg = 'activo' )LOOP
+                                         and rd.estado_reg = ''activo'' )LOOP
                                          
                       DELETE FROM 
                         conta.tint_rel_devengado 
@@ -697,8 +696,8 @@ BEGIN
             where id_int_transaccion = v_parametros.id_int_transaccion;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción eliminado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Transacción eliminado(a)''); 
+            v_resp = pxp.f_agrega_clave(v_resp,''id_int_transaccion'',v_parametros.id_int_transaccion::varchar);
               
             --Devuelve la respuesta
             return v_resp;
@@ -707,26 +706,22 @@ BEGIN
          
   else
      
-      raise exception 'Transaccion inexistente: %',p_transaccion;
+      raise exception ''Transaccion inexistente: %'',p_transaccion;
 
   end if;
 
 EXCEPTION
         
   WHEN OTHERS THEN
-    v_resp='';
-    v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-    v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-    v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-    raise exception '%',v_resp;
+    v_resp='''';
+    v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',SQLERRM);
+    v_resp = pxp.f_agrega_clave(v_resp,''codigo_error'',SQLSTATE);
+    v_resp = pxp.f_agrega_clave(v_resp,''procedimientos'',v_nombre_funcion);
+    raise exception ''%'',v_resp;
                 
 END;
-$body$
-LANGUAGE 'plpgsql'
+'LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION conta.ft_int_transaccion_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;
