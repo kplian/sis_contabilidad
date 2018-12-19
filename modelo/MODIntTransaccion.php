@@ -6,6 +6,11 @@
 *@date 01-09-2013 18:10:12
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
+/**
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares
+ */
 class MODIntTransaccion extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -878,6 +883,85 @@ class MODIntTransaccion extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+    /***************#92-INI-MMV**************/
+    function mayorNroTramite(){
+        $this->procedimiento='conta.ft_int_transaccion_sel';
+        $this->transaccion='CONTA_MROMAYOR_SEL';
+        $this->tipo_procedimiento='SEL';
 
+        $this->setParametro('desde','desde','date');
+        $this->setParametro('hasta','hasta','date');
+        $this->setParametro('id_auxiliar','id_auxiliar','int4');
+        $this->setParametro('id_gestion','id_gestion','int4');
+
+        $this->capturaCount('importe_debe_mb_total','numeric');
+        $this->capturaCount('importe_haber_mb_total','numeric');
+        $this->capturaCount('saldo_mb_total','numeric');
+
+        $this->capturaCount('importe_debe_mt_total','numeric');
+        $this->capturaCount('importe_haber_mt_total','numeric');
+        $this->capturaCount('saldo_mt_total','numeric');
+
+        $this->capturaCount('importe_debe_ma_total','numeric');
+        $this->capturaCount('importe_haber_ma_total','numeric');
+        $this->capturaCount('saldo_ma_total','numeric');
+
+        $this->captura('id_int_comprobante','int4');
+        $this->captura('id_cuenta','int4');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('id_auxiliar','int4');
+        $this->captura('codigo_auxiliar','varchar');
+        $this->captura('nombre_auxiliar','varchar');
+        $this->captura('nro_tramite','varchar');
+        $this->captura('fecha','date');
+        $this->captura('glosa1','varchar');
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('saldo_mb','numeric');
+        $this->captura('importe_debe_mt','numeric');
+        $this->captura('importe_haber_mt','numeric');
+        $this->captura('saldo_mt','numeric');
+        $this->captura('importe_debe_ma','numeric');
+        $this->captura('importe_haber_ma','numeric');
+        $this->captura('saldo_ma','numeric');
+
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }
+    function mayorNroTramiteReporte(){
+        $this->procedimiento='conta.ft_int_transaccion_sel';
+        $this->transaccion='CONTA_AUXRE_SEL';
+        $this->tipo_procedimiento='SEL';
+        $this->setCount(false);
+        $this->setParametro('desde','desde','date');
+        $this->setParametro('hasta','hasta','date');
+        $this->setParametro('id_auxiliar','id_auxiliar','int4');
+        $this->setParametro('id_gestion','id_gestion','int4');
+
+        $this->captura('id_int_comprobante','int4');
+        $this->captura('id_cuenta','int4');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('id_auxiliar','int4');
+        $this->captura('codigo_auxiliar','varchar');
+        $this->captura('nombre_auxiliar','varchar');
+        $this->captura('nro_tramite','varchar');
+        $this->captura('fecha','date');
+        $this->captura('glosa1','varchar');
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('saldo_mb','numeric');
+        $this->captura('importe_debe_mt','numeric');
+        $this->captura('importe_haber_mt','numeric');
+        $this->captura('tipo','varchar');
+
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //var_dump($this->respuesta);exit;
+        return $this->respuesta;
+    }
+    /***************#92-FIN-MMV**************/
 }
 ?>
