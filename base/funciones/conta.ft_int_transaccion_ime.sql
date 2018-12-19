@@ -17,45 +17,46 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 	ISSUE 		 FECHA   		AUTOR				 DESCRIPCION:  
-	#1			29/11/2018		EGS					se hizo validacion para forzar a escoger un axuiliar si existe para la cuenta    
-  #2      30/11/2018    CHROS       CONTROL PARA EVITAR EDITAR DATOS EN TRANSACCIONES
+  #2      		30/11/2018    	CHROS       		CONTROL PARA EVITAR EDITAR DATOS EN TRANSACCIONES
+  #90			19/12/2018		EGS					se hizo validacion para forzar a escoger un axuiliar si existe para la cuenta    
+
 ***************************************************************************/
 
 DECLARE
 
-  v_nro_requerimiento      integer;
-  v_parametros             record;
-    v_registros        record;
-    v_registros_trans    record;
-  v_id_requerimiento       integer;
-  v_resp                varchar;
-  v_nombre_funcion        text;
-  v_mensaje_error         text;
-  v_id_int_transaccion  integer;
+     	v_nro_requerimiento      	integer;
+      	v_parametros             	record;
+        v_registros        			record;
+        v_registros_trans    		record;
+     	v_id_requerimiento       	integer;
+     	v_resp                		varchar;
+      	v_nombre_funcion        	text;
+      	v_mensaje_error         	text;
+      	v_id_int_transaccion  		integer;
     
-     v_importe_debe      numeric;
-     v_importe_haber     numeric;    
-     v_importe_debe_mb     numeric;
-     v_importe_haber_mb    numeric;
-     v_id_moneda_base    integer;
-     v_tc_1         numeric;
-     v_tc_2         numeric;
-     v_monto         numeric;
-     v_factor        numeric;
-     v_conta_ejecucion_igual_pres_conta    varchar;
-     v_monto_recurso             numeric;
-     v_monto_gasto               numeric;
-  v_id_transaccion integer;
-  v_id_cuenta integer;
-  v_id_auxiliar integer;
-  v_id_centro_costo integer;
-  v_id_gestion integer;
-  v_id_partida integer;
-  v_debe numeric;
-  v_haber numeric;
-  v_reg_trans   record;
-  v_r  record;
-  v_count_auxiliar				INTEGER;--#1	29/11/2018	EGS	
+       	v_importe_debe      		numeric;
+       	v_importe_haber     		numeric;    
+       	v_importe_debe_mb     		numeric;
+       	v_importe_haber_mb    		numeric;
+       	v_id_moneda_base    		integer;
+       	v_tc_1         				numeric;
+      	v_tc_2         				numeric;
+      	v_monto         			numeric;
+       	v_factor        			numeric;
+       	v_conta_ejecucion_igual_pres_conta    varchar;
+      	v_monto_recurso             numeric;
+       	v_monto_gasto               numeric;
+        v_id_transaccion 			integer;
+        v_id_cuenta 				integer;
+        v_id_auxiliar 				integer;
+        v_id_centro_costo 			integer;
+        v_id_gestion 				integer;
+        v_id_partida 				integer;
+        v_debe						numeric;
+        v_haber 					numeric;
+        v_reg_trans   				record;
+        v_r  						record;
+        v_exi_auxiliar				varchar;--#90	19/12/2018	EGS	
 BEGIN
 
     v_nombre_funcion = 'conta.ft_int_transaccion_ime';
@@ -121,20 +122,20 @@ BEGIN
             END IF;
             
                   
-        --#1	29/11/2018	EGS	 
+        --#90	19/12/2018	EGS	 
       
               SELECT
-                count( cua.id_auxiliar) 
+                cu.ex_auxiliar 
               INTO
-              v_count_auxiliar                   
+              v_exi_auxiliar                   
               FROM conta.tcuenta cu
               left join conta.tcuenta_auxiliar cua on cua.id_cuenta = cu.id_cuenta
               where cua.estado_reg = 'activo' and cu.id_cuenta =  v_parametros.id_cuenta;
               
-              IF v_count_auxiliar > 0 and v_parametros.id_auxiliar is null then
-              --RAISE EXCEPTION 'Esta Cuenta tiene por lo menos un auxiliar elija uno';
+              IF v_exi_auxiliar = 'si' and  v_parametros.id_auxiliar is null then
+                RAISE EXCEPTION 'Esta Cuenta exige un auxiliar escoja uno';
               END IF;
-          --#1	29/11/2018	EGS	 
+          --#90	19/12/2018	EGS	 
          
        
           -----------------------------
@@ -459,20 +460,20 @@ BEGIN
 
     begin	
     
-    		   --#1	29/11/2018	EGS	 
+    		   --#90	19/12/2018	EGS	 
+   
               SELECT
-                count( cua.id_auxiliar) 
+                cu.ex_auxiliar 
               INTO
-              v_count_auxiliar                   
+              v_exi_auxiliar                   
               FROM conta.tcuenta cu
               left join conta.tcuenta_auxiliar cua on cua.id_cuenta = cu.id_cuenta
-              where  cua.estado_reg = 'activo' and cu.id_cuenta = v_parametros.id_cuenta;
+              where cua.estado_reg = 'activo' and cu.id_cuenta =  v_parametros.id_cuenta;
               
-              IF v_count_auxiliar >0 and v_parametros.id_auxiliar is null then
-              --chros comentado, pero se debe analizar bajo qué consideraciones se debe controlar la edición de transacciones
-              --RAISE EXCEPTION 'Esta Cuenta tiene por lo menos un auxiliar elija uno';
+              IF v_exi_auxiliar = 'si' and  v_parametros.id_auxiliar is null then
+                RAISE EXCEPTION 'Esta Cuenta exige un auxiliar escoja uno';
               END IF;
-    		--#1	29/11/2018	EGS	 
+    		--#90	19/12/2018	EGS	 
         
               select
                cbt.id_moneda,
@@ -727,6 +728,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION conta.ft_int_transaccion_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;
