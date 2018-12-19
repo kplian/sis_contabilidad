@@ -5,6 +5,8 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-02-2013 15:04:03
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ 	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
+  #  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta	
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -354,6 +356,40 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 	       		grid:true,
 	       		form:true
 	       },
+	              /// #  1 17/12/2018	EGS	
+	       {
+			config:{
+				name:'ex_auxiliar',
+				fieldLabel:'Exigir Auxiliar',
+				typeAhead: true,
+				allowBlank:false,
+				triggerAction: 'all',
+				emptyText:'Elija',
+				selectOnFocus:false,
+				forceSelection:true,
+				mode:'local',
+				store:new Ext.data.ArrayStore({
+					fields: ['ID', 'valor'],
+					data :	[
+						['no','no'],
+						['si','si']
+						
+					]
+				}),
+				valueField:'ID',
+				displayField:'valor',
+				width:250,
+				listeners: {
+					'afterrender': function(combo){			  
+						combo.setValue('no');
+					}
+				}				
+			},
+			type:'ComboBox',
+			id_grupo:1,
+			form:true
+			},
+			/// #  1 17/12/2018	EGS	
 	       {
 	       		config:{
 	       			name:'sw_control_efectivo',
@@ -485,7 +521,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'sw_transaccional', type: 'string'},
 		{name:'id_gestion', type: 'numeric'},'desc_moneda',
 		'valor_incremento','eeff','sw_control_efectivo',
-		'id_config_subtipo_cuenta','desc_csc','tipo_act'
+		'id_config_subtipo_cuenta','desc_csc','tipo_act',
+		{name:'ex_auxiliar', type: 'string'} /// #  1 17/12/2018	EGS	
 		
 	],
 	cmbGestion: new Ext.form.ComboBox({
