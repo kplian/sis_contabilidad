@@ -9,6 +9,7 @@
 /**
 HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#2        19/12/2108		  Miguel Mamani	  reporte proyectos excel
 #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares
  */
 class MODIntTransaccion extends MODbase{
@@ -963,5 +964,36 @@ class MODIntTransaccion extends MODbase{
         return $this->respuesta;
     }
     /***************#92-FIN-MMV**************/
+    /***************#2-INI-MMV**************/
+    function reporteProyecto(){
+        $this->procedimiento='conta.f_reporte_centro_costo';
+        $this->transaccion='CONTA_CCR_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this-> setCount(false);
+        $this->setTipoRetorno('record');
+
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('desde','desde','date');
+        $this->setParametro('hasta','hasta','date');
+        $this->setParametro('id_cuenta','id_cuenta','int4');
+        $this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+        $this->setParametro('id_centro_costo','id_centro_costo','int4');
+        $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+        $this->captura('id_tipo_cc','int4');
+        $this->captura('id_tipo_cc_fk','int4');
+        $this->captura('codigo_tcc','varchar');
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('saldo_mb','numeric');
+        $this->captura('nivel','int4');
+        $this->captura('sw_tipo','varchar');
+        $this->captura('codigo','varchar');
+        $this->armarConsulta();
+        /*echo $this->getConsulta();
+        exit;*/
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }
+    /***************#2-FIN-MMV**************/
 }
 ?>
