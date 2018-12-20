@@ -1,7 +1,9 @@
 <?php
-//incluimos la libreria
-//echo dirname(__FILE__);
-//include_once(dirname(__FILE__).'/../PHPExcel/Classes/PHPExcel.php');
+/**
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
+ */
 class RProyectosArbol
 {
     private $docexcel;

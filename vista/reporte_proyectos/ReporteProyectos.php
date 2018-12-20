@@ -1,20 +1,20 @@
 <?php
 /**
  *@package pXP
- *@file gen-Categoria.php
- *@author  (admin)
- *@date 20-04-2017 00:51:02
+ *@file gReporteProyectos.php
+ *@author  (Miguel Mamani)
+ *@date 19/12/2108
  *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
  */
-
+/**
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
+ */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-
-
-
     Phx.vista.ReporteProyectos = Ext.extend(Phx.frmInterfaz, {
-
         Atributos : [
             /* {
                  config:{
