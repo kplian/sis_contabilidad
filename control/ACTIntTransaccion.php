@@ -9,6 +9,7 @@
 /**
 HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
 #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares
  */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
@@ -17,6 +18,7 @@ require_once(dirname(__FILE__).'/../reportes/RMayorXls.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../reportes/RAuxliarTramitesXls.php'); //#92
+require_once(dirname(__FILE__).'/../reportes/RProyectosArbol.php');//#2
 
 
 class ACTIntTransaccion extends ACTbase{
@@ -1070,7 +1072,27 @@ class ACTIntTransaccion extends ACTbase{
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
     }
     /***************#92-FIN-MMV**************/
+    /***************#2-INI-MMV**************/
+    function reporteProyecto()
+    {
+        $this->objFunc = $this->create('MODIntTransaccion');
+        $this->res = $this->objFunc->reporteProyecto($this->objParam);
+        //var_dump($this->res);exit;
+        $titulo = 'Proyectos';
+        $nombreArchivo = uniqid(md5(session_id()) . $titulo);
+        $nombreArchivo .= '.xls';
+        $this->objParam->addParametro('nombre_archivo', $nombreArchivo);
+        $this->objParam->addParametro('datos', $this->res->datos);
 
+        $this->objReporteFormato = new RProyectosArbol($this->objParam);
+        $this->objReporteFormato->imprimirDatos();
+        $this->objReporteFormato->generarReporte();
+        $this->mensajeExito = new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado', 'Se genero con éxito el reporte: ' . $nombreArchivo, 'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
+    /***************#2-FIN-MMV**************/
 		
 }
 
