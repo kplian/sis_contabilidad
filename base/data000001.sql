@@ -1535,3 +1535,15 @@ select param.f_import_tcatalogo ('insert','CONTA','Cobro Clientes por Peaje','cb
 select pxp.f_insert_tgui ('Auxiliares Detalle ', 'Auxiliares Detalle ', 'LMT', 'si', 2, 'sis_contabilidad/vista/int_transaccion/FormFiltroMayorNroTramite.php', 3, '', 'FormFiltroMayorNroTramite', 'CONTA');
 select pxp.f_insert_testructura_gui ('LMT', 'MOVSAL');
 /***********************************F-DAT-MMV-CONTA-92-19/12/2018*****************************************/
+
+/***********************************I-DAT-MMV-CONTA-2-19/12/2018*****************************************/
+select pxp.f_insert_tgui ('Reporte Proyectos', 'Reporte Proyectos', 'RRP', 'si', 11, 'sis_contabilidad/vista/reporte_proyectos/ReporteProyectos.php', 3, '', 'ReporteProyectos', 'CONTA');
+select pxp.f_insert_testructura_gui ('RRP', 'REPCON');
+/***********************************F-DAT-MMV-CONTA-2-19/12/2018*****************************************/
+
+/***********************************I-DAT-MMV-CONTA-4-20/12/2018*****************************************/
+select conta.f_import_tresultado_plantilla ('insert','C-IN','activo','Asiento de cierre de las cuentas de ingreso','cbte','no','no','resultado','rango','Asiento de cierre de las cuentas de ingreso','PAGOCON','C-IN','C-IN','conta.f_plantilla_cierre_ingreso');
+select conta.f_import_tresultado_plantilla ('insert','C-GAS','activo','Asiento de cierre de las cuentas de Gasto','cbte','no','no','resultado','rango','Asiento de cierre de las cuentas de Gasto','PAGOCON','C-GAS','C-GAS','conta.f_plantilla_cierre_gasto');
+select conta.f_import_tresultado_plantilla ('insert','C-UTI','activo','Asiento de Cierre de la Cuenta Utilidad de Gestión','cbte','no','no','resultado','rango','Cierre de cuenta utilidad por Gestion ','PAGOCON','C-UTI','C-UTI','conta.f_plantilla_cierre_utilidad');
+select conta.f_import_tresultado_plantilla ('insert','C-CBL','activo','Asiento de Cierre de las Cuentas de Balance','cbte','no','no','balance','rango','Asiento de Cierre de las Cuentas de Balance','DIARIOCON','C-CBL','C-CBL','conta.f_plantilla_cierre_balance');
+/***********************************F-DAT-MMV-CONTA-4-20/12/2018*****************************************/
