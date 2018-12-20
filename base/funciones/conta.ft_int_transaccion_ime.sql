@@ -19,7 +19,7 @@ $body$
 	ISSUE 		 FECHA   		AUTOR				 DESCRIPCION:  
   #2      		30/11/2018    	CHROS       		CONTROL PARA EVITAR EDITAR DATOS EN TRANSACCIONES
   #90			19/12/2018		EGS					se hizo validacion para forzar a escoger un axuiliar si existe para la cuenta    
-
+  #3 endetr   20/12/2018  CHROS     permitir cambiar montos de transacción con un límite de centavo
 ***************************************************************************/
 
 DECLARE
@@ -507,9 +507,15 @@ BEGIN
               ELSEIF v_parametros.id_suborden <> v_registros_trans.id_suborden THEN
                 raise exception 'No es posible cambiar la SUB-ORDEN para no romper la integridad presupuestaria';
               ELSEIF v_parametros.importe_debe <> v_registros_trans.importe_debe THEN
-                raise exception 'No es posible cambiar la DEBE para no romper la integridad presupuestaria';
+                --#3 endetr
+                IF ABS(v_parametros.importe_debe - v_registros_trans.importe_debe)>0.01 THEN
+                  raise exception 'No es posible cambiar la DEBE para no romper la integridad presupuestaria';
+                END IF;
               ELSEIF v_parametros.importe_haber <> v_registros_trans.importe_haber THEN
-                raise exception 'No es posible cambiar la HABER para no romper la integridad presupuestaria';
+                --#3 endetr
+                IF ABS(v_parametros.importe_haber - v_registros_trans.importe_haber)>0.01 THEN
+                  raise exception 'No es posible cambiar la HABER para no romper la integridad presupuestaria';
+                END IF;
               ELSEIF v_parametros.tipo_cambio <> v_registros_trans.tipo_cambio THEN
                 raise exception 'No es posible cambiar la BS->BS para no romper la integridad presupuestaria';
               ELSEIF v_parametros.tipo_cambio_2 <> v_registros_trans.tipo_cambio_2 THEN
