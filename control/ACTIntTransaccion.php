@@ -11,6 +11,7 @@ HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
 #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares
+#5			24/12/2108		  Manuel Guerra	  Correcion de sumas en axuiliares
  */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayorSaldo.php');
@@ -570,10 +571,10 @@ class ACTIntTransaccion extends ACTbase{
     }
     
 	function listarAuxiliarCuenta(){
-				
-		if($this->objParam->getParametro('tipo_filtro')=='con_detalle'){
-			$this->objParam->defecto('ordenacion','orden');
-			$this->objParam->defecto('dir_ordenacion','asc');	
+		#5
+		$this->objParam->defecto('ordenacion','orden');
+		$this->objParam->defecto('dir_ordenacion','asc');			
+		if($this->objParam->getParametro('tipo_filtro')=='con_detalle'){			
 			if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 				$this->objReporte = new Reporte($this->objParam,$this);
 				$this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarAuxiliarCuenta');

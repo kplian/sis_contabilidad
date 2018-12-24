@@ -19,7 +19,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
   #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares 'CONTA_MROMAYOR_SEL','CONTA_MROMAYOR_CONT','CONTA_AUXRE_SEL'
-
+  #5		 24/12/2108		  Manuel Guerra	  Correcion de sumas en axuiliares 'CONTA_TOTAUX_CONT'	
 
 ***************************************************************************/
 
@@ -1915,7 +1915,8 @@ BEGIN
         #FECHA:		01-09-2018 18:10:12
         ***********************************/
 
-		elsif(p_transaccion='CONTA_TOTAUX_CONT')then
+		
+			elsif(p_transaccion='CONTA_TOTAUX_CONT')then
 
 			begin   
             v_filtro_aux = ' 0=0 ';
@@ -1926,18 +1927,7 @@ BEGIN
             IF v_parametros.tipo_estado='abierto' then
                 v_aux = 'AND saldo!=0';
             END IF;
-             
-            IF  pxp.f_existe_parametro(p_tabla,'id_auxiliar')  THEN
-            	IF v_parametros.id_auxiliar is not NULL THEN
-                	v_filtro_aux = ' transa.id_auxiliar in ('||v_parametros.id_auxiliar::varchar||') ';
-             	END IF;            
-            END IF;
-            
-            IF  pxp.f_existe_parametro(p_tabla,'id_config_subtipo_cuenta')  THEN             
-            	IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
-                	v_filtro_tipo = ' csc.id_config_subtipo_cuenta in ('||v_parametros.id_config_subtipo_cuenta::varchar||') ';
-             	END IF;            
-            END IF;   
+          
             IF pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN             
             	IF v_parametros.id_cuenta is not NULL THEN                
                 	WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
@@ -1960,7 +1950,28 @@ BEGIN
                  	v_auxiliar='null::integer';
                     v_auxiliar_b='';          
                 END IF;                
-            END IF;            
+            END IF;             
+               
+            IF  pxp.f_existe_parametro(p_tabla,'id_auxiliar')  THEN
+            	IF v_parametros.id_auxiliar is not NULL THEN
+                	v_filtro_aux = ' transa.id_auxiliar in ('||v_parametros.id_auxiliar::varchar||') ';
+             	END IF;            
+            END IF;
+            
+            IF  pxp.f_existe_parametro(p_tabla,'id_config_subtipo_cuenta')  THEN             
+            	IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
+                	v_filtro_tipo = ' csc.id_config_subtipo_cuenta in ('||v_parametros.id_config_subtipo_cuenta::varchar||') ';
+             	END IF;            
+            END IF;  
+            --#5   
+            --preguntar si id_cuenta es nulo no enviar
+            IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
+            	v_auxiliar_c = 'csc.id_config_subtipo_cuenta';
+                v_auxiliar_d = 'csc.id_config_subtipo_cuenta';
+			ELSE
+                v_auxiliar_c = '0';                	
+                v_auxiliar_d = 'aux.aplicacion';                    
+            END IF;        
 			--Sentencia de la consulta de conteo de registros            	                                    
             v_consulta:='select
                             count (*),
@@ -1973,13 +1984,13 @@ BEGIN
                           aux.id_auxiliar,
                           aux.codigo_auxiliar,
                           aux.nombre_auxiliar,
-                          cue.id_cuenta AS id_cuenta,
+                          '||v_auxiliar||' AS id_cuenta,
                           NULL::VARCHAR AS nro_cuenta,
                           NULL::VARCHAR AS nombre_cuenta,
                           NULL::VARCHAR AS tipo_cuenta,
                           NULL::VARCHAR AS sub_tipo_cuenta,
                           NULL::VARCHAR AS desc_sub_tipo_cuenta,
-                          csc.id_config_subtipo_cuenta as id_config_subtipo_cuenta,
+                          '||v_auxiliar_c||' as id_config_subtipo_cuenta,
 
                           COALESCE(sum(transa.importe_debe_mb),0) as importe_debe_mb,
                           COALESCE(sum(transa.importe_haber_mb),0) as importe_haber_mb,
@@ -2003,21 +2014,20 @@ BEGIN
                                     aux.id_auxiliar,
                                     aux.codigo_auxiliar,
                                     aux.nombre_auxiliar,
-                                    cue.id_cuenta,
-                                    csc.id_config_subtipo_cuenta
+                                    '||v_auxiliar_b||'
+                                    '||v_auxiliar_d||'
                                     ORDER BY 
                                     aux.codigo_auxiliar
                                     ';
         	v_consulta:=v_consulta||' ) Q where ';
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||v_aux;
-            --raise notice '%',v_consulta;  
-            --raise EXCEPTION '%',v_consulta;                                                  
+                                                 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end; 
-    /*********************************    
+	/*********************************    
  	#TRANSACCION:  'CONTA_LDCTRANS_SEL'
  	#DESCRIPCION:	
  	#AUTOR:		JUAN	
