@@ -6,6 +6,11 @@
 *@date    30-01-2014
 *@description permites subir archivos a la tabla de documento_sol
 */
+/**
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#6 			27/12/2108		  Manuel Guerra	  agrego el filtro de cbtes de cierre
+ */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 
@@ -333,6 +338,27 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 		},
 		{
 			config:{
+				name: 'cbte_cierre',
+				qtip : 'Incluir los comprobantes de cierre en el balance',
+				fieldLabel: 'Incluir cbtes. cierres',
+				allowBlank: false,
+				emptyText:'Tipo...',
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender:true,
+				mode: 'local',
+				width:150,	
+				store:['no','balance','resultado','todos']
+			},
+			type:'ComboBox',
+			id_grupo:0,
+			valorInicial: 'no',
+			grid:true,
+			form:true
+		},
+		// #6
+		{
+			config:{
 				name : 'cerrado',
 				fieldLabel : 'Filtrar Cerradas',
 				items: [
@@ -355,6 +381,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 	},
 	title: 'Filtro de mayores',
 	// Funcion guardar del formulario
+	//#6
 	onSubmit: function(o) {    	
 		var me = this;
 		if (me.form.getForm().isValid()) {		
@@ -374,7 +401,8 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 			var ot=this.Cmp.id_orden_trabajo.lastSelectionText;
 			var suborden=this.Cmp.id_suborden.lastSelectionText;
 			var nro_tram=this.Cmp.nro_tramite.lastSelectionText;		
-			var cerrar= this.Cmp.cerrado.getValue();		
+			var cerrar= this.Cmp.cerrado.getValue();	
+			var cbte_cierre= this.Cmp.cbte_cierre.getValue();		
 			this.onEnablePanel(this.idContenedor + '-east', 
 				Ext.apply(parametros,{	
 					'gest': gest,
@@ -389,7 +417,8 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 					'ot' : ot,
 					'suborden' : suborden,
 					'nro_tram' : nro_tram,
-					'cerrar':cerrar
+					'cerrar':cerrar,
+					'cbte_cierre':cbte_cierre
 				}));
 		}
 	},

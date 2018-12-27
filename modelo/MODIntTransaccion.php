@@ -11,6 +11,7 @@ HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #2        19/12/2108		  Miguel Mamani	  reporte proyectos excel
 #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares
+#6 			27/12/2108		  Manuel Guerra	  agrego el filtro de cbtes de cierre
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -274,6 +275,7 @@ class MODIntTransaccion extends MODbase{
 		return $this->respuesta;
 	}
 	//mp
+	#6
 	function listarIntTransaccionMayor(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_int_transaccion_sel';
@@ -290,6 +292,7 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('desde','desde','date');
 		$this->setParametro('hasta','hasta','date');
 		$this->setParametro('cerrado','cerrado','varchar');
+		$this->setParametro('cbte_cierre','cbte_cierre','varchar');
 		//captura parametros adicionales para el count
 		$this->capturaCount('total_debe','numeric');
 		$this->capturaCount('total_haber','numeric');
