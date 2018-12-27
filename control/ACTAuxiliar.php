@@ -4,9 +4,14 @@
 *@file ACTAuxiliar.php
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-02-2013 20:44:52
-*@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+*@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+*  	ISUUE			FECHA			AUTHOR 		DESCRIPCION
+*   #23           27/12/2018    Miguel Mamani   Reporte Detalle Auxiliares por Cuenta
+*
+*
+*
 */
-
+require_once(dirname(__FILE__).'/../reportes/RAuxilarDetalle.php');#23
 class ACTAuxiliar extends ACTbase{    
 			
 	function listarAuxiliar(){
@@ -77,6 +82,48 @@ class ACTAuxiliar extends ACTbase{
         $this->res=$this->objFunc->validarAuxiliar($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+    /************I-#23-MMV**************/
+    function listarAuxiliarDetalle(){
+        $this->objFunc = $this->create('MODAuxiliar');
+        $cbteHeader = $this->objFunc->reporteAuxiliarDetalle($this->objParam);
+        if($cbteHeader->getTipo() == 'EXITO'){
+            return $cbteHeader;
+        }
+        else{
+            $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+            exit;
+        }
+    }
+
+    function listarNulosAuxiliares(){
+        $this->objFunc = $this->create('MODAuxiliar');
+        $cbteHeader = $this->objFunc->reporteNulosAuxiliares($this->objParam);
+        if($cbteHeader->getTipo() == 'EXITO'){
+            return $cbteHeader;
+        }
+        else{
+            $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+            exit;
+        }
+    }
+    function reporteAuxiliarDetalle(){
+        $dataSource = $this->listarAuxiliarDetalle();
+        $dataSourceNull = $this->listarNulosAuxiliares();
+
+        $titulo = 'Auxilarle Detalle';
+        $nombreArchivo = uniqid(md5(session_id()) . $titulo);
+        $nombreArchivo .= '.xls';
+        $this->objParam->addParametro('nombre_archivo', $nombreArchivo);
+        $this->objParam->addParametro('datos', $this->res->datos);
+        $reporte = new RAuxilarDetalle($this->objParam);
+        $reporte->datosHeader($dataSource->getDatos(),$dataSourceNull->getDatos());
+        $reporte->generarReporte();
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
+    /************F-#23-MMV**************/
 }
 
 ?>

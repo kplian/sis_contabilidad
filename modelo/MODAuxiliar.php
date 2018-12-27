@@ -5,7 +5,8 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-02-2013 20:44:52
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
- *  	ISUUE			FECHA			AUTHOR 		DESCRIPCION				
+ *  	ISUUE			FECHA			AUTHOR 		DESCRIPCION
+ *      #23        27/12/2018    Miguel Mamani     		Reporte Detalle Auxiliares por Cuenta
  * 		1A			30/08/2018			EGS		 se aumento el campo aplicacion
  * 
  * 
@@ -153,6 +154,64 @@ class MODAuxiliar extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+	/************I-#23-MMV**************/
+    function reporteAuxiliarDetalle(){
+        $this->procedimiento='conta.f_reporte_c_detalle_auxliar';
+        $this->transaccion='CONTA_RDA_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this-> setCount(false);
+        $this->setTipoRetorno('record');
+
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('desde','desde','date');
+        $this->setParametro('hasta','hasta','date');
+        $this->setParametro('id_cuenta','id_cuenta','int4');
+        $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+        $this->captura('id_auxiliar_cc','int4');
+        $this->captura('id_auxiliar_fk','int4');
+        $this->captura('codigo_aux','varchar');
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('saldo_mb','numeric');
+        $this->captura('nivel','int4');
+        $this->captura('sw_tipo','varchar');
+        $this->captura('codigo','varchar');
+        $this->armarConsulta();
+        /*echo $this->getConsulta();
+        exit;*/
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }
+    function reporteNulosAuxiliares(){
+        $this->procedimiento='conta.f_reporte_c_detalle_auxliar';
+        $this->transaccion='CONTA_AUXN_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this-> setCount(false);
+        $this->setTipoRetorno('record');
+
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('desde','desde','date');
+        $this->setParametro('hasta','hasta','date');
+        $this->setParametro('id_cuenta','id_cuenta','int4');
+        $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+
+        $this->captura('id_cuenta','int4');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('id_int_comprobante','int4');
+        $this->captura('fecha','date');
+        $this->captura('nro_cbte','varchar');
+        $this->captura('glosa1','varchar');
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('saldo_mb','numeric');
+
+        $this->armarConsulta();
+        /*echo $this->getConsulta();
+        exit;*/
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }
+    /************F-#23-MMV**************/
 }
 ?>
