@@ -3,6 +3,7 @@
 HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
+#10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
  */
 class RProyectosArbol
 {
@@ -51,12 +52,24 @@ class RProyectosArbol
 
 
     function imprimirTitulo($sheet){
-        $titulo = 'Árbol Proyectos';
+        //#10
+        $Tc = 'Tipo Costo: ('.$this->objParam->getParametro('tipo_costo').')';
+        if($this->objParam->getParametro('cuenta') != ''){
+            $cuenta = ' Cuenta: ('.$this->objParam->getParametro('cuenta').')';
+        }else{
+            $cuenta = '';
+        }
+        if($this->objParam->getParametro('centro_costo') != ''){
+            $Cc = ' Centro Costo: ('.$this->objParam->getParametro('centro_costo').')';
+        }else{
+            $Cc = '';
+        }
+        //#10
+
+        $titulo = 'Árbol  '.$Tc.$cuenta.$Cc;
         $fechas = 'Del '.$this->objParam->getParametro('desde').' al '.$this->objParam->getParametro('hasta');
-        $moneda = 'Expresado en moneda base';
-
+        $moneda = '(Expresado en '.$this->objParam->getParametro('moneda').')';  //#10
         //TODO imprimir titulo
-
         $sheet->getColumnDimension($this->equivalencias[0])->setWidth(2);
         $sheet->getColumnDimension($this->equivalencias[1])->setWidth(2);
         $sheet->getColumnDimension($this->equivalencias[2])->setWidth(2);
@@ -75,7 +88,7 @@ class RProyectosArbol
             'name'=>Arial));
 
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $sheet->setCellValueByColumnAndRow(0,2,strtoupper($titulo));
+        $sheet->setCellValueByColumnAndRow(0,2,$titulo);
         $sheet->mergeCells('A2:T2');
 
         //FECHAS
@@ -93,7 +106,7 @@ class RProyectosArbol
             'name'=>Arial));
 
         $sheet->getStyle('A4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $sheet->setCellValueByColumnAndRow(0,3,$moneda);
+        $sheet->setCellValueByColumnAndRow(0,4,$moneda);
         $sheet->mergeCells('A4:T4');
 
     }

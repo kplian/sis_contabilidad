@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte_docs (
   p_id_int_comprobante integer,
   p_validar boolean = true,
@@ -19,6 +21,7 @@ $body$
  ISSUE            FECHA:		      AUTOR                 DESCRIPCION
    
  #86  ETR       24/02/2018        RAC KPLIAN        Validar que el monto IVA y descuentos cuadre al validar el comprobante
+ #9   ETR       02/01/2019        RAC KPLIAN        No inclir cbte de paertura o cierre en esta validaciones
 
  
 ***************************************************************************/
@@ -250,7 +253,7 @@ BEGIN
      --------------------------------------------------------
      --Validamos sis existe iva deberai existir un documento
      ---------------------------------------------------------
-     IF not v_existe_venta and not v_existe_compra   AND  p_id_int_comprobante !=  36289 THEN
+     IF not v_existe_venta and not v_existe_compra   AND  p_id_int_comprobante !=  36289  AND  p_validar  THEN  --#09 no incluyes cbte de apertura o cierre
          IF  COALESCE(v_registros_iva_cf.debe,0) > 0 or  COALESCE(v_registros_iva_df.haber,0) > 0 THEN
         
              
@@ -497,6 +500,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION conta.f_validar_cbte_docs (p_id_int_comprobante integer, p_validar boolean, p_forzar_validacion varchar)
-  OWNER TO postgres;

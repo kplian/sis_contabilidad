@@ -12,6 +12,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #2        19/12/2108		  Miguel Mamani	  reporte proyectos excel
 #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares
 #6 			27/12/2108		  Manuel Guerra	  agrego el filtro de cbtes de cierre
+#10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -897,7 +898,8 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('hasta','hasta','date');
         $this->setParametro('id_auxiliar','id_auxiliar','int4');
         $this->setParametro('id_gestion','id_gestion','int4');
-
+        $this->setParametro('nro_tramite','nro_tramite','varchar');
+        
         $this->capturaCount('importe_debe_mb_total','numeric');
         $this->capturaCount('importe_haber_mb_total','numeric');
         $this->capturaCount('saldo_mb_total','numeric');
@@ -943,6 +945,7 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('hasta','hasta','date');
         $this->setParametro('id_auxiliar','id_auxiliar','int4');
         $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('nro_tramite','nro_tramite','varchar');
 
         $this->captura('id_int_comprobante','int4');
         $this->captura('id_cuenta','int4');
@@ -982,6 +985,8 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('id_tipo_cc','id_tipo_cc','int4');
         $this->setParametro('id_centro_costo','id_centro_costo','int4');
         $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+        $this->setParametro('tipo_moneda','tipo_moneda','varchar'); //#10
+
         $this->captura('id_tipo_cc','int4');
         $this->captura('id_tipo_cc_fk','int4');
         $this->captura('codigo_tcc','varchar');

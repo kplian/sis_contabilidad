@@ -1,11 +1,11 @@
 <?php
 /**
- *@package pXP
- *@file gen-IntComprobante.php
- *@author  (admin)
- *@date 29-08-2013 00:28:30
- *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
- */
+ 
+HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE        FORK			FECHA:		      AUTOR                 DESCRIPCION
+ #7			endeetr		27/12/2018		manuel guerra				crearon listado de tramites, y la modifiacion del nrotramite_aux
+*/
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -99,8 +99,15 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 	                    handler : this.onOpenObs,
 	                    tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
 	         });
+	         
 
-			
+			this.addButton('btnNroTramite', {
+				text : 'Editar Nro Tramite',
+				iconCls : 'balert',
+				disabled : true,
+				handler : this.loadWizardTramite,
+				tooltip : '<b>Hacer editable Nro Tramite</b>'
+			});
 
 			this.bloquearOrdenamientoGrid();
 
@@ -135,9 +142,6 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				    this.capturaFiltros();
 			     }
 			},this); 
-			
-			
-			
 			
 			this.iniciarEventos();
 			this.addBotonesLibroDiario();
@@ -1051,7 +1055,25 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			id_grupo : 0,
 			grid : true,
 			form : false
-		}],
+		},{
+			config : {
+				name : 'nro_tramite_aux',
+				gwidth : 150,
+				fieldLabel : 'Nro. Trámite Aux',
+			},
+			type : 'Field',
+			id_grupo : 0,
+			/*filters : {
+				pfiltro : 'incbte.nro_tramite',
+				type : 'string'
+			},*/
+			grid : true,
+			///bottom_filter : true,
+			form : false,
+		}
+		
+		
+		],
 
 		Grupos : [{
 			layout : 'column',
@@ -1219,7 +1241,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
 		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 'tipo_cambio_3', 'id_moneda_act',
 		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 'ope_3',
-		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio'],
+		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio',
+		'nro_tramite_aux'],
 
 		rowExpander : new Ext.ux.grid.RowExpander({
 			tpl : new Ext.Template('<br>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Clase cbte:&nbsp;&nbsp;</b> {desc_clase_comprobante}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Origen:&nbsp;&nbsp;</b> {desc_subsistema}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Beneficiario:&nbsp;&nbsp;</b> {beneficiario}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa1} {glosa2}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Frima 1:&nbsp;&nbsp;</b> {desc_firma1} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 2:&nbsp;&nbsp;</b> {desc_firma2} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 3:&nbsp;&nbsp;</b> {desc_firma3} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>')
@@ -1982,6 +2005,34 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				scope:this
 			});
 		},
+		preparaMenu : function(n) {
+			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
+			var rec = this.sm.getSelected();
+			this.getBoton('btnNroTramite').enable();			
+			return tb;
+		},
+		//
+		liberaMenu : function() {
+			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
+			this.getBoton('btnNroTramite').disable(); 
+		},
+		//#7
+		loadWizardTramite : function() {			
+			var rec = this.sm.getSelected();			
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardTramiteCbte.php', 
+			'Cambiar nro tramite ...', {
+				width : 400,
+				height : 150
+			}, {
+				'id_int_comprobante': rec.data.id_int_comprobante,
+				'nro_tramite_aux': rec.data.nro_tramite_aux
+			}, 
+			this.idContenedor, 'WizardTramiteCbte')
+		},	
+		
+		
+		
+		
 })
 </script>
 

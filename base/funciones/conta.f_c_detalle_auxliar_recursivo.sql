@@ -14,7 +14,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
  #23        27/12/2018    Miguel Mamani     		Reporte Detalle Auxiliares por Cuenta
-
+ #10        02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
 
 ***************************************************************************/
 DECLARE
@@ -36,9 +36,15 @@ BEGIN
                                  cu.id_cuenta_padre as id_tipo_aux_fk_abuelo,
                                  cu.nro_cuenta ||' ('||cu.nombre_cuenta||')' as codigo_aux_abuelo,
                                  cu.nro_cuenta,
-                                 sum(tm.importe_debe_mb) as importe_debe_mb,
+                                 sum(tm.importe_debe_mb)  as importe_debe_mb,
                                  sum(tm.importe_haber_mb) as importe_haber_mb,
-                                 (sum(tm.importe_debe_mb) - sum(tm.importe_haber_mb)) as saldo_mb
+                                 (sum(tm.importe_debe_mb) - sum(tm.importe_haber_mb)) as saldo_mb,
+                                 sum(tm.importe_debe_mt)  as importe_debe_mt, --#10
+                                 sum(tm.importe_haber_mt) as importe_haber_mt, --#10
+                                 (sum(tm.importe_debe_mt) - sum(tm.importe_haber_mt)) as saldo_mt, --#10
+                                 sum(tm.importe_debe_ma)  as importe_debe_ma, --#10
+                                 sum(tm.importe_haber_ma) as importe_haber_ma, --#10
+                                 (sum(tm.importe_debe_ma) - sum(tm.importe_haber_ma)) as saldo_ma --#10
                          from tmp_prog tm
                          inner join conta.tcuenta cu on cu.id_cuenta = tm.id_auxiliar_fk
                          where case
@@ -50,17 +56,22 @@ BEGIN
                                    cu.nro_cuenta,
                                    cu.nombre_cuenta)LOOP
 
-  insert into tmp_prog ( id_auxiliar_cc,
-                         id_auxiliar_fk,
-                         codigo_aux,
-                         codigo,
-                         importe_debe_mb,
-                         importe_haber_mb,
-                         saldo_mb,
-                         nivel,
-                         sw_tipo
-                           )
-                           values (
+    insert into tmp_prog ( id_auxiliar_cc,
+                           id_auxiliar_fk,
+                           codigo_aux,
+                           codigo,
+                           importe_debe_mb,
+                           importe_haber_mb,
+                           saldo_mb,
+                           importe_debe_mt, --#10
+                           importe_haber_mt, --#10
+                           saldo_mt, --#10
+                           importe_debe_ma, --#10
+                           importe_haber_ma, --#10
+                           saldo_ma, --#10
+                           nivel,
+                           sw_tipo
+                           )values (
                            v_registros.id_auxiliar_fk,
                            v_registros.id_tipo_aux_fk_abuelo,
                            v_registros.codigo_aux_abuelo,
@@ -68,6 +79,12 @@ BEGIN
                            v_registros.importe_debe_mb,
                            v_registros.importe_haber_mb,
                            v_registros.saldo_mb,
+                           v_registros.importe_debe_mt, --#10
+                           v_registros.importe_haber_mt, --#10
+                           v_registros.saldo_mt, --#10
+                           v_registros.importe_debe_ma, --#10
+                           v_registros.importe_haber_ma, --#10
+                           v_registros.saldo_ma, --#10
                            p_nivel,
                            'titulo'
                            );

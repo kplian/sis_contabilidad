@@ -17,9 +17,9 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-ISSUE		 FECHA:				 AUTOR:				DESCRIPCION:	
- 1A			23/08/2018				EGS				se creo las transsacciones CONTA_INCBTECB_SEL,CONTA_INCBTECB_CONT
- 
+ISSUE	FORK		 FECHA:				 AUTOR:				DESCRIPCION:	
+ 1A					23/08/2018				EGS				se creo las transsacciones CONTA_INCBTECB_SEL,CONTA_INCBTECB_CONT
+ #7		endeETR		27/12/2018			manuel guerra		agrega columna nro_tramite_aux, y listado de tramites
 			
  DESCRIPCION:	
  AUTOR:			
@@ -82,6 +82,7 @@ BEGIN
 
             END IF;
     		--Sentencia de la consulta
+            --#7
 			v_consulta := 'select
                               incbte.id_int_comprobante,
                               incbte.id_clase_comprobante,
@@ -149,8 +150,8 @@ BEGIN
                               incbte.forma_cambio,
                               incbte.ope_3,
                               incbte.tipo_cambio_3,
-                              incbte.id_moneda_act
-                              
+                              incbte.id_moneda_act,
+                              incbte.nro_tramite_aux
                               
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
@@ -1059,7 +1060,63 @@ BEGIN
 			return v_consulta;
 
 		end;				
-					
+	
+    /*********************************
+ 	#TRANSACCION:  'CONTA_LISTRA_SEL'
+ 	#DESCRIPCION:	Listado de nro tramites
+ 	#AUTOR:		#7  Manuel guerra
+ 	#FECHA:		28-12-2018
+	***********************************/
+    elseif(p_transaccion='CONTA_LISTRA_SEL') then
+
+    	begin
+    		--Sentencia de la consulta
+			v_consulta :=  'SELECT 
+            				t2.id_proceso_wf,
+            				w.nro_tramite
+                            
+                            FROM wf.tproceso_wf w
+                            JOIN (
+                                    SELECT 
+                                    DISTINCT ON (nro_tramite) nro_tramite,
+                                    id_proceso_wf
+                                    FROM wf.tproceso_wf 
+                            	 )t2
+                            ON t2.id_proceso_wf = w.id_proceso_wf 
+                            where 0=0 and';
+			--Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro; 
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			--Devuelve la respuesta
+			return v_consulta;
+		end;
+    
+    /*********************************
+ 	#TRANSACCION:  'CONTA_LISTRA_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		#7  Manuel guerra
+ 	#FECHA:		28-12-20180
+	***********************************/
+
+	elsif(p_transaccion='CONTA_LISTRA_CONT')then
+		begin
+     		--Sentencia de la consulta
+			v_consulta :=  'SELECT 
+            				count(w.id_proceso_wf)
+                            FROM wf.tproceso_wf w
+                            JOIN (
+                                    SELECT 
+                                    DISTINCT ON (nro_tramite) nro_tramite,
+                                    id_proceso_wf
+                                    FROM wf.tproceso_wf 
+                            	 )t2
+                            ON t2.id_proceso_wf = w.id_proceso_wf                             
+                            where 0=0 and';
+            v_consulta:=v_consulta||v_parametros.filtro; 
+			--Devuelve la respuesta
+			return v_consulta;
+		end;
+    				
 	else
 					     
 		raise exception 'Transaccion inexistente';

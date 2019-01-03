@@ -1,11 +1,3 @@
-CREATE OR REPLACE FUNCTION conta.f_reporte_centro_costo (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS SETOF record AS
-$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.f_reporte_centro_costo
@@ -16,8 +8,8 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
-  #2        20/12/2018    Miguel Mamani     Reporte Proyectos
-
+  #2        20/12/2018    Miguel Mamani     		Reporte Proyectos
+  #10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
 
 ***************************************************************************/
 
@@ -51,7 +43,13 @@ BEGIN
                                          codigo varchar,
                                          importe_debe_mb numeric,
                                          importe_haber_mb numeric,
-                                         saldo_mb NUMERIC,
+                                         saldo_mb numeric,
+                                         importe_debe_mt numeric, --#10
+                                         importe_haber_mt numeric, --#10
+                                         saldo_mt numeric, --#10
+                                         importe_debe_ma numeric, --#10
+                                         importe_haber_ma numeric, --#10
+                                         saldo_ma numeric, --#10
                                          nivel integer,
                                          sw_tipo varchar )ON COMMIT DROP;
        --raise EXCEPTION 'v_parametros.id_cuenta %',v_parametros.id_cuenta;
@@ -90,7 +88,11 @@ BEGIN
                                                       cc.codigo_cc as codigo,
                                                       pa.codigo||' '|| pa.nombre_partida as codigo_tcc,
                                                       t.importe_debe_mb,
-                                                      t.importe_haber_mb
+                                                      t.importe_haber_mb,
+                                                      t.importe_debe_mt, --#10
+                                                      t.importe_haber_mt, --#10
+                                                      t.importe_debe_ma, --#10
+                                                      t.importe_haber_ma --#10
                                                       from conta.tint_transaccion t
                                                       inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
                                                       inner join pre.tpartida pa on pa.id_partida = t.id_partida
@@ -129,7 +131,13 @@ BEGIN
                                                            p.codigo,
                                                           sum(p.importe_debe_mb) as importe_debe_mb,
                                                           sum(p.importe_haber_mb) as importe_haber_mb,
-                                                          (sum(p.importe_debe_mb) - sum(p.importe_haber_mb)) as saldo_mb
+                                                          sum(p.importe_debe_mb) - sum(p.importe_haber_mb) as saldo_mb,
+                                                          sum(COALESCE(p.importe_debe_mt,0)) as importe_debe_mt, --#10
+                                                          sum(COALESCE(p.importe_haber_mt,0)) as importe_haber_mt, --#10
+                                                          sum(COALESCE(p.importe_debe_mt,0)) - sum(COALESCE(p.importe_haber_mt,0)) as saldo_mt, --#10
+                                                          sum(COALESCE(p.importe_debe_ma,0)) as importe_debe_ma, --#10
+                                                          sum(COALESCE(p.importe_haber_ma,0)) as importe_haber_ma, --#10
+                                                          sum(COALESCE(p.importe_debe_ma,0)) - sum(COALESCE(p.importe_haber_ma,0)) as saldo_ma    --#10
                                                     from partida p
                                                     group by p.id_tipo_cc,
                                                              p.id_tipo_cc_fk,
@@ -143,6 +151,12 @@ BEGIN
                                    importe_debe_mb,
                                    importe_haber_mb,
                                    saldo_mb,
+                                   importe_debe_mt, --#10
+                                   importe_haber_mt, --#10
+                                   saldo_mt, --#10
+                                   importe_debe_ma, --#10
+                                   importe_haber_ma, --#10
+                                   saldo_ma, --#10
                                    nivel,
                                    sw_tipo
                                   )
@@ -154,6 +168,12 @@ BEGIN
                                    v_record.importe_debe_mb,
                                    v_record.importe_haber_mb,
                                    v_record.saldo_mb,
+                                   v_record.importe_debe_mt, --#10
+                                   v_record.importe_haber_mt, --#10
+                                   v_record.saldo_mt, --#10
+                                   v_record.importe_debe_ma, --#10
+                                   v_record.importe_haber_ma, --#10
+                                   v_record.saldo_ma, --#10
                                    4,
                                    'movimiento'
                                   );
@@ -167,12 +187,33 @@ BEGIN
 
            PERFORM conta.f_reporte_tcc_recursivo(v_nivel-1);
 
-          FOR v_registros in (select     tm.id_tipo_cc,
+          FOR v_registros in (select    tm.id_tipo_cc,
                                         tm.id_tipo_cc_fk,
                                         tm.codigo_tcc,
-                                        sum(tm.importe_debe_mb) as importe_debe_mb,
-                                        sum(tm.importe_haber_mb) as importe_haber_mb,
-                                        sum(tm.saldo_mb) as saldo_mb,
+                                        case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                    sum(tm.importe_debe_mb)
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    sum(tm.importe_debe_mt)
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    sum(tm.importe_debe_ma)
+                                         end as importe_debe_mb, --#10
+          								case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                    sum(tm.importe_haber_mb)
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    sum(tm.importe_haber_mt)
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    sum(tm.importe_haber_mt)
+                                         end as importe_haber_mb, --#10
+                                         case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                    sum(tm.saldo_mb)
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    sum(tm.saldo_mt)
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    sum(tm.saldo_ma)
+                                         end as saldo_mb, --#10
                                         tm.nivel,
                                         tm.sw_tipo,
                                         tm.codigo
@@ -203,9 +244,3 @@ EXCEPTION
 		raise exception '%',v_resp;
 
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100 ROWS 1000;

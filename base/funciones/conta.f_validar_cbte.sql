@@ -1,17 +1,3 @@
---------------- SQL ---------------
-
-CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
-  p_id_usuario integer,
-  p_id_usuario_ai integer,
-  p_usuario_ai varchar,
-  p_id_int_comprobante integer,
-  p_igualar varchar = 'no'::character varying,
-  p_origen varchar = 'pxp'::character varying,
-  p_fecha_ejecucion date = NULL::date,
-  p_validar_doc boolean = true
-)
-RETURNS varchar AS
-$body$
 /*
 	Autor: RCM
     Fecha: 05-09-2013
@@ -34,6 +20,8 @@ $body$
  #00  ETR       08/03/2018        RAC KPLIAN        Se levanta la validacion de correlativos en fechas has el 31 de diciembe de 2018
  #87  ETR       01/09/2018        RAC KPLIAN        Se agrega la verificaicon para cierre de transacciones con saldo cero para cuentas de pasivo y activo 
  #88  ETR       29/11/2018        RAC KPLIAN        Se actualiza el nro de tramite en la transaccion al validar el cbte 
+ #7   ETR       27/12/2018        RAC KPLIAN        Se adiciona nro de tramite auxiliar 
+ #9   ETR       02/01/2019        RAC KPLIAN        Validacion de nro de comprobantes de cbte de apertura en deptos regionales     
 
 
 */
@@ -128,10 +116,12 @@ BEGIN
         c.id_periodo,
         cc.id_documento,   --documento con que se genera la numeracion
         cc.codigo as codigo_cbte,
-        sis.codigo as codigo_sistema
+        sis.codigo as codigo_sistema,
+        dep.prioridad
 	  into 
         v_rec_cbte
     from conta.tint_comprobante c
+    inner join param.tdepto dep on  dep.id_depto = c.id_depto --#9 recupera depto de conta 
     inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = c.id_clase_comprobante
     inner join param.tperiodo p on p.id_periodo = c.id_periodo
     inner join segu.tsubsistema sis on sis.id_subsistema = c.id_subsistema
@@ -454,9 +444,11 @@ BEGIN
              
                 -- Si no es un cbte de apertura (pero su clase de cbte admite cbte de apertura) 
                 -- y estamos en enero fuerza el saltar inicio (dejar el primer numero para el cbte de apertura)
+                -- #9  aplica esta primera regla solo para comprobantes de la central  (prioridad = 0)
                 
-                IF  v_tiene_apertura = 'si' and v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  THEN
-                     
+                IF  v_tiene_apertura = 'si' and v_rec_cbte.cbte_apertura = 'no' and   to_char(v_rec_cbte.fecha::date, 'MM')::varchar = '01'  and v_rec_cbte.prioridad = 0  THEN  
+                
+                      --#9  REGLA PARA RESERVAR NUMERO, se aplica solo al depto central, priridad = 0
                 
                        v_nro_cbte =  param.f_obtener_correlativo(
                                  v_doc, 
@@ -475,7 +467,7 @@ BEGIN
                                  'si',  --par_saltar_inicio
                                  'no');
                 
-                ELSEIF v_rec_cbte.cbte_apertura = 'no' THEN
+                ELSEIF v_rec_cbte.cbte_apertura = 'no' THEN    --REGLA COMUN PARA LA MAYORIA DE LOS CBTES
                     --si no es un comprobante de apertura y no es enero genera la nmeracion normalmente
                    v_nro_cbte =  param.f_obtener_correlativo(
                                  v_doc, 
@@ -487,7 +479,7 @@ BEGIN
                                  NULL);
                 
                 
-                 ELSEIF v_rec_cbte.cbte_apertura = 'si' THEN
+                 ELSEIF v_rec_cbte.cbte_apertura = 'si'  and v_rec_cbte.prioridad = 0  THEN  -- #9 si es un cbte de paertura fuerza obtener el primer numero,
                    --si es un comprobante de inicio fuerza a optener el primer numero
                     v_nro_cbte =  param.f_obtener_correlativo(
                                v_doc, 
@@ -529,7 +521,8 @@ BEGIN
            
            --Se guarda el número del comprobante 
             update conta.tint_comprobante set
-              nro_cbte = v_nro_cbte
+              nro_cbte = v_nro_cbte,
+              nro_tramite_aux =  v_rec_cbte.nro_tramite -- #7 actulizada nro de tamite exuilar , incialmente igual al original
             where id_int_comprobante = p_id_int_comprobante;
           
           
@@ -763,9 +756,3 @@ WHEN OTHERS THEN
 			raise exception '%',v_resp;
    
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;

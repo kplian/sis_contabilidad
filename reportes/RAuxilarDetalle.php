@@ -6,7 +6,8 @@
  *@date 27/12/2018
  *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
  *  	ISUUE			FECHA			AUTHOR 		DESCRIPCION
- *   #23           27/12/2018    Miguel Mamani   Reporte Detalle Auxiliares por Cuenta
+ *      #23           27/12/2018    Miguel Mamani   Reporte Detalle Auxiliares por Cuenta
+ *      #10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
  *
  *
  *
@@ -52,7 +53,6 @@
             76=>'BY',77=>'BZ');
     }
     function datosHeader ($detalle,$nules) {
-
                         $this->datos_detalle = $detalle;
                         $this->nules = $nules;
     }
@@ -127,10 +127,10 @@
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,3,'DETALLE AUXILIARES DE LA CUENTA '.$datos[0]['codigo_aux']);
         $this->docexcel->getActiveSheet()->getStyle('A3:E3')->applyFromArray($titulosCabezera);
         $this->docexcel->getActiveSheet()->mergeCells('A3:E3');
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,4,'(Expresado en Bolivianos)');
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,4,'(Expresado en '.$this->objParam->getParametro('moneda').')'); //#10
         $this->docexcel->getActiveSheet()->getStyle('A4:E4')->applyFromArray($titulossubcabezera);
         $this->docexcel->getActiveSheet()->mergeCells('A4:E4');
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,5,'Desde: '.date_format(date_create($this->objParam->getParametro('desde')),'d/m/y').' Dasta: '.$this->objParam->getParametro('hasta'));
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,5,'Desde: '.date_format(date_create($this->objParam->getParametro('desde')),'d/m/y').' Hasta: '.$this->objParam->getParametro('hasta'));
         $this->docexcel->getActiveSheet()->getStyle('A5:E5')->applyFromArray($titulossubcabezera);
         $this->docexcel->getActiveSheet()->mergeCells('A5:E5');
         $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(40);
@@ -170,32 +170,34 @@
         $this->imprimeCabecera();
         $fila = 8;
         $datos = $this->datos_detalle;
+        $si = count($datos);
+        if($si > 1) {
+            foreach ($datos as $value) {
+                if ($value['sw_tipo'] == 'titulo') {
+                    $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $value['codigo']);
+                } else {
+                    $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['codigo']);
 
-        foreach ($datos as $value){
-            if($value['sw_tipo'] == 'titulo'){
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,$fila,$value['codigo']);
-            }else{
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2,$fila,$value['codigo']);
-
+                }
+                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['codigo_aux']);
+                if ($value['sw_tipo'] == 'titulo') {
+                    $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, $value['saldo_mb']);
+                } else {
+                    $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, $value['saldo_mb']);
+                }
+                $this->docexcel->getActiveSheet()->getStyle("D$fila:E$fila")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                $this->docexcel->getActiveSheet()->getStyle("A$fila:F$fila")->applyFromArray($border);
+                $fila++;
+                $this->fila_aux = $fila;
             }
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1,$fila,$value['codigo_aux']);
-            if($value['sw_tipo'] == 'titulo'){
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4,$fila,$value['saldo_mb']);
-            }else{
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3,$fila,$value['saldo_mb']);
-            }
-            $this->docexcel->getActiveSheet()->getStyle("D$fila:E$fila")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-            $this->docexcel->getActiveSheet()->getStyle("A$fila:F$fila")->applyFromArray($border);
-            $fila ++;
-            $this->fila_aux = $fila;
+            $fill = $this->fila_aux;
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fill, 'Total');
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fill, '=SUM(D8:D' . ($fill - 1) . ')');
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fill, '=SUM(E8:E' . ($fill - 1) . ')');
+            $this->docexcel->getActiveSheet()->getStyle("D$fill:E$fill")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+            $this->docexcel->getActiveSheet()->getStyle("A$fill:E$fill")->applyFromArray($total);
+            $fille = $this->fila_aux + 3;
         }
-        $fill = $this->fila_aux ;
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2,$fill,'Total');
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3,$fill,'=SUM(D8:D'.($fill -1 ).')');
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4,$fill,'=SUM(E8:E'.($fill - 1).')');
-        $this->docexcel->getActiveSheet()->getStyle("D$fill:E$fill")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-        $this->docexcel->getActiveSheet()->getStyle("A$fill:E$fill")->applyFromArray($total);
-        $fille = $this->fila_aux + 3;
         $styleTitulos3 = array(
             'font'  => array(
                 'bold'  => true,
@@ -232,7 +234,7 @@
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fille, 'Saldo');
             $this->docexcel->getActiveSheet()->getStyle("A$fille:E$fille")->getAlignment()->setWrapText(true);
             $this->docexcel->getActiveSheet()->getStyle("A$fille:E$fille")->applyFromArray($styleTitulos3);
-        }
+
         $datosNules = $this->nules;
         $filaNuls = $this->fila_aux + 4;
         foreach ($datosNules as $value){
@@ -251,6 +253,7 @@
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4,$bill,'=SUM(E'.($fille +1).':E'.($bill - 1).')');
         $this->docexcel->getActiveSheet()->getStyle("E$bill:E$bill")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
         $this->docexcel->getActiveSheet()->getStyle("A$bill:E$bill")->applyFromArray($total);
+        }
 
     }
 

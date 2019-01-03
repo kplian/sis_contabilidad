@@ -17,7 +17,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
   #23        27/12/2018    Miguel Mamani     		Reporte Detalle Auxiliares por Cuenta
-
+  #10        02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
 
 ***************************************************************************/
 
@@ -51,11 +51,15 @@ BEGIN
                                          codigo varchar,
                                          importe_debe_mb numeric,
                                          importe_haber_mb numeric,
-                                         saldo_mb NUMERIC,
+                                         saldo_mb numeric,
+                                         importe_debe_mt numeric, --#10
+                                         importe_haber_mt numeric, --#10
+                                         saldo_mt numeric, --#10
+                                         importe_debe_ma numeric, --#10
+                                         importe_haber_ma numeric, --#10
+                                         saldo_ma numeric, --#10
                                          nivel integer,
                                          sw_tipo varchar )ON COMMIT DROP;
-
-
 
 
           FOR v_record in (with basica as (select 	t.id_cuenta,
@@ -65,7 +69,11 @@ BEGIN
                                                     aux.codigo_auxiliar,
                                                     aux.nombre_auxiliar,
                                                     t.importe_debe_mb,
-                                                    t.importe_haber_mb
+                                                    t.importe_haber_mb,
+                                                    t.importe_debe_mt, --#10
+                                                    t.importe_haber_mt, --#10
+                                                    t.importe_debe_ma, --#10
+                                                    t.importe_haber_ma --#10
                                                   from conta.tint_transaccion t
                                                     inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
                                                     left join conta.tauxiliar aux on aux.id_auxiliar = t.id_auxiliar
@@ -89,7 +97,13 @@ BEGIN
                                      t.codigo_auxiliar as codigo,
                                      sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
                                      sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
-                                     sum(COALESCE(t.importe_debe_mb,0)) - sum(COALESCE(t.importe_haber_mb,0)) as saldo_mb
+                                     sum(COALESCE(t.importe_debe_mb,0)) - sum(COALESCE(t.importe_haber_mb,0)) as saldo_mb,
+                                     sum(COALESCE(t.importe_debe_mt,0)) as importe_debe_mt, --#10
+                                     sum(COALESCE(t.importe_haber_mt,0)) as importe_haber_mt, --#10
+                                     sum(COALESCE(t.importe_debe_mt,0)) - sum(COALESCE(t.importe_haber_mt,0)) as saldo_mt, --#10
+                                     sum(COALESCE(t.importe_debe_ma,0)) as importe_debe_ma, --#10
+                                     sum(COALESCE(t.importe_haber_ma,0)) as importe_haber_ma, --#10
+                                     sum(COALESCE(t.importe_debe_ma,0)) - sum(COALESCE(t.importe_haber_ma,0)) as saldo_ma --#10
                                    from basica t
                                    group by
                                      t.id_auxiliar,
@@ -105,6 +119,12 @@ BEGIN
                                    importe_debe_mb,
                                    importe_haber_mb,
                                    saldo_mb,
+                                   importe_debe_mt, --#10
+                                   importe_haber_mt, --#10
+                                   saldo_mt, --#10
+                                   importe_debe_ma, --#10
+                                   importe_haber_ma, --#10
+                                   saldo_ma, --#10
                                    nivel,
                                    sw_tipo
                                   )
@@ -116,6 +136,12 @@ BEGIN
                                    v_record.importe_debe_mb,
                                    v_record.importe_haber_mb,
                                    v_record.saldo_mb,
+                                   v_record.importe_debe_mt, --#10
+                                   v_record.importe_haber_mt, --#10
+                                   v_record.saldo_mt, --#10
+                                   v_record.importe_debe_ma, --#10
+                                   v_record.importe_haber_ma, --#10
+                                   v_record.saldo_ma, --#10
                                    2,
                                    'movimiento'
                                   );
@@ -129,12 +155,33 @@ BEGIN
 
            PERFORM conta.f_c_detalle_auxliar_recursivo(v_nivel-1);
 
-          FOR v_registros in (select     tm.id_auxiliar_cc,
+          FOR v_registros in (select    tm.id_auxiliar_cc,
                                         tm.id_auxiliar_fk,
                                         tm.codigo_aux,
-                                        sum(tm.importe_debe_mb) as importe_debe_mb,
-                                        sum(tm.importe_haber_mb) as importe_haber_mb,
-                                        sum(tm.saldo_mb) as saldo_mb,
+                                        case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                    sum(tm.importe_debe_mb)
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    sum(tm.importe_debe_mt)
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    sum(tm.importe_debe_ma)
+                                         end as importe_debe_mb,
+          								case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                    sum(tm.importe_haber_mb)
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    sum(tm.importe_haber_mt)
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    sum(tm.importe_haber_mt)
+                                         end as importe_haber_mb,  --#10
+                                         case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                    sum(tm.saldo_mb)
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    sum(tm.saldo_mt)
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    sum(tm.saldo_ma)
+                                         end as saldo_mb,  --#10
                                         tm.nivel,
                                         tm.sw_tipo,
                                         tm.codigo
@@ -159,9 +206,30 @@ BEGIN
                                         cb.fecha,
                                         cb.nro_cbte,
                                         cb.glosa1,
-                                        t.importe_debe_mb,
-                                        t.importe_haber_mb,
-                                        t.importe_debe_mb - t.importe_haber_mb as saldo_mb
+                                        case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                    t.importe_debe_mb
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    t.importe_debe_mt
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    t.importe_debe_ma
+                                             end as importe_debe_mb,
+          								case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                    t.importe_haber_mb
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    t.importe_haber_mt
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    t.importe_haber_ma
+                                         end as importe_haber_mb,  --#10
+                                         case
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                                     t.importe_debe_mb - t.importe_haber_mb
+                                             when v_parametros.tipo_moneda = 'MT' then
+                                                    t.importe_debe_mt - t.importe_haber_mt
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                                    t.importe_debe_ma - t.importe_haber_ma
+                                         end as saldo_mb  --#10
                                       from conta.tint_transaccion t
                                         inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
                                         left join conta.tauxiliar aux on aux.id_auxiliar = t.id_auxiliar

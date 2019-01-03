@@ -13,8 +13,8 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
- #2        20/12/2018    Miguel Mamani     Reporte Proyectos
-
+ #2        20/12/2018    Miguel Mamani     		Reporte Proyectos
+ #10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
 
 ***************************************************************************/
 DECLARE
@@ -36,9 +36,15 @@ BEGIN
                                  tcc.id_tipo_cc_fk as id_tipo_cc_fk_abuelo,
                                  tcc.codigo ||' - '||tcc.descripcion as codigo_tcc_abuelo,
                                  tcc.codigo,
-                                 sum(tm.importe_debe_mb) as importe_debe_mb,
+                                 sum(tm.importe_debe_mb)  as importe_debe_mb,
                                  sum(tm.importe_haber_mb) as importe_haber_mb,
-                                 (sum(tm.importe_debe_mb) - sum(tm.importe_haber_mb)) as saldo_mb
+                                 (sum(tm.importe_debe_mb) - sum(tm.importe_haber_mb)) as saldo_mb,
+                                 sum(tm.importe_debe_mt)  as importe_debe_mt, -- #10
+                                 sum(tm.importe_haber_mt) as importe_haber_mt, -- #10
+                                 (sum(tm.importe_debe_mt) - sum(tm.importe_haber_mt)) as saldo_mt, -- #10
+                                 sum(tm.importe_debe_ma)  as importe_debe_ma, -- #10
+                                 sum(tm.importe_haber_ma) as importe_haber_ma, -- #10
+                                 (sum(tm.importe_debe_ma) - sum(tm.importe_haber_ma)) as saldo_ma -- #10
                          from tmp_prog tm
                          inner join  param.ttipo_cc tcc on tcc.id_tipo_cc = tm.id_tipo_cc_fk
                          where case
@@ -61,6 +67,12 @@ BEGIN
                            importe_debe_mb,
                            importe_haber_mb,
                            saldo_mb,
+                           importe_debe_mt,
+                           importe_haber_mt,
+                           saldo_mt,
+                           importe_debe_ma,
+                           importe_haber_ma,
+                           saldo_ma,
                            nivel,
                            sw_tipo
                            )
@@ -72,6 +84,12 @@ BEGIN
                            v_registros.importe_debe_mb,
                            v_registros.importe_haber_mb,
                            v_registros.saldo_mb,
+                           v_registros.importe_debe_mt, -- #10
+                           v_registros.importe_haber_mt, -- #10
+                           v_registros.saldo_mt, -- #10
+                           v_registros.importe_debe_ma, -- #10
+                           v_registros.importe_haber_ma, -- #10
+                           v_registros.saldo_ma, -- #10
                            p_nivel,
                            'titulo'
                            );
