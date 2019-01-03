@@ -26,7 +26,8 @@ $body$
  #2             27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
  #3             28-11-2018        RAC KPLIAN        al revertir comprobantes usar la fecha actual
  #7 endeETR     27-12-2018        MANUEL GUERRA     se modifica el nro tramite_aux del cbte
- #8 ETR         27-12-2018        RAC KPLIAN        se invierte valifacion de gestion y proceso de trasacciones, al editar comprobante          
+ #8 ETR         27-12-2018        RAC KPLIAN        se invierte valifacion de gestion y proceso de trasacciones, al editar comprobante  
+ #13 ETR        03-01-2019        RAC KPLIAN        se considera en reversion si la trasaccion fue forzada a comprometer (trabaja de manera similar a las actulizaciones)        
  
 ***************************************************************************/
 
@@ -1116,7 +1117,8 @@ BEGIN
                         triangulacion ,
                         actualizacion, 
                         id_partida_ejecucion,
-                        id_partida_ejecucion_dev
+                        id_partida_ejecucion_dev,
+                        forzar_comprometer           --#13 considera si esta forzado a comprometido
                         
                     ) values(
                         v_registros.id_partida,
@@ -1164,7 +1166,8 @@ BEGIN
                         v_registros.triangulacion ,
                         v_registros.actualizacion, 
                         v_id_partida_ejecucion,
-                        v_registros.id_partida_ejecucion_dev
+                        v_registros.id_partida_ejecucion_dev,
+                        v_registros.forzar_comprometer           --#13 considera si esta forzado a comprometido
                         
                     )RETURNING id_int_transaccion into v_id_int_transaccion;
                     

@@ -21,6 +21,7 @@ $body$
  #32, ETR       06/02/2018              RAC KPLIAN           mandar glosa, datos de anticipo, descuento y iva revertido al ejecutar presupesuto 
  #88, ETR       25/02/2018              RAC KPLIAN           Hscer opcional la reversion del IVA comprometido 
  #0 , ETR       29/03/2018              RAC KPLIAN           mejorar mensaje de error de presupeusto
+ #13, ETR       03/01/2019              RAC KPLIAN           Se considera la opcion de forzar comprometido 
  
           
      
@@ -73,6 +74,7 @@ DECLARE
  v_monto_desc_anticipo		numeric;
  v_monto_iva_revertido		numeric;
  v_conta_revertir_iva_comprometido   varchar; --#88 ++
+ v_comprometer                       varchar; --#13 ++
   
     
 BEGIN
@@ -191,7 +193,8 @@ BEGIN
                                      par.codigo as codigo_partida,
                                      it.actualizacion,
                                      it.monto_no_ejecutado_mb,
-                                     it.monto_no_ejecutado
+                                     it.monto_no_ejecutado,
+                                     it.forzar_comprometer      --#13
                                   from conta.tint_transaccion it
                                   inner join pre.tpartida par on par.id_partida = it.id_partida
                                   inner join pre.tpresupuesto pr on pr.id_centro_costo = 
@@ -266,8 +269,9 @@ BEGIN
                                          
                                          ---  revisar si esto esta bien
                                          IF v_registros_comprobante.momento_comprometido = 'no' THEN
-                                                -- solo permite comprometer partidas de actulizacion (transaccion que igualan el comprobante)
-                                               IF v_registros.id_partida_ejecucion is null  and v_registros.actualizacion = 'no'  THEN                                       
+                                                -- solo permite comprometer partidas de actulizacion (transaccion que igualan el comprobante) 
+                                                --#13  y que no esten marcadas para forzar el compromiso, forzar_comprometer = 'si'
+                                               IF v_registros.id_partida_ejecucion is null  and v_registros.actualizacion = 'no' AND  v_registros.forzar_comprometer = 'no' THEN                                       
                                                    raise exception 'El comprobante  no esta marcado para comprometer, y no tiene un origen comprometido';
                                                 END IF; 
                                          END IF;
@@ -327,6 +331,13 @@ BEGIN
                                             v_glosa = '';
                                         END IF;
                                         
+                                        --#13 considera si necesario forzar el comprometido
+                                        v_comprometer = v_registros_comprobante.momento_comprometido;
+                                        IF  v_registros.forzar_comprometer = 'si' THEN
+                                           v_comprometer = 'si';
+                                        END IF;
+                                        
+                                        
                                         
                                         -- llamamos a la funcion de ejecucion
                                         v_resp_ges = pre.f_gestionar_presupuesto_v2(
@@ -344,7 +355,7 @@ BEGIN
                                                                                     v_registros.id_int_transaccion,--p_fk_llave, 
                                                                                     v_registros_comprobante.nro_tramite, 
                                                                                     p_id_int_comprobante, 
-                                                                                    v_registros_comprobante.momento_comprometido, 
+                                                                                    v_comprometer,   --#13 
                                                                                     v_registros_comprobante.momento_ejecutado, 
                                                                                     v_registros_comprobante.momento_pagado,
                                                                                     v_glosa,

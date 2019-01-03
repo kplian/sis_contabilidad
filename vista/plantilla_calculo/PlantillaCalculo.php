@@ -5,6 +5,9 @@
 *@author  rcm
 *@date 30-08-2013 19:01:20
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#13        03/01/2019    Miguel Mamani     		Sirve para facturas  que necesitan lelvar ejejcucion a otro centro de costo
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -313,8 +316,34 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             egrid: true,
             form:true
-       },       
-       {
+       },
+        ///#13
+        {
+            config:{
+                name: 'reset_partida_eje',
+                fieldLabel: 'Reset Partida',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{   pfiltro:'imputar_excento',
+                type: 'list',
+                options: ['si','no']
+            },
+            valorInicial: 'no',
+            grid:true,
+            egrid: true,
+            form:true
+        },
+        ///#13
+        {
             config:{
                 name: 'estado_reg',
                 fieldLabel: 'Estado Reg.',
@@ -416,7 +445,10 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         {name:'usr_mod', type: 'string'},
         {name:'importe_presupuesto', type: 'numeric'},
         {name:'descuento', type: 'string'},        
-        'usar_cc_original', 'imputar_excento','sw_registro'
+        'usar_cc_original',
+        'imputar_excento',
+        'sw_registro',
+        'reset_partida_eje'  // #13
         
     ],
     sortInfo:{

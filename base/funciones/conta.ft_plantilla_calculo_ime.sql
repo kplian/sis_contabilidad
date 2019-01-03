@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_calculo_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,13 +12,11 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_calculo'
  AUTOR: 		 (admin)
  FECHA:	        28-08-2013 19:01:20
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
- HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+HISTORIAL DE MODIFICACIONES:
+ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+  #13        03/01/2019    Miguel Mamani     		Sirve para facturas  que necesitan lelvar ejejcucion a otro centro de costo
 ***************************************************************************/
 
 DECLARE
@@ -33,21 +29,21 @@ DECLARE
 	v_mensaje_error         text;
 	v_id_plantilla_calculo	integer;
     v_registros  record;
-			    
+
 BEGIN
 
     v_nombre_funcion = 'conta.ft_plantilla_calculo_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PLACAL_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		28-08-2013 19:01:20
 	***********************************/
 
 	if(p_transaccion='CONTA_PLACAL_INS')then
-					
+
         begin
         	--Sentencia de la insercion
         	insert into conta.tplantilla_calculo(
@@ -67,7 +63,8 @@ BEGIN
                 descuento,
                 usar_cc_original,
                 imputar_excento,
-                sw_registro
+                sw_registro,
+                reset_partida_eje --#13
           	) values(
                 v_parametros.prioridad,
                 v_parametros.debe_haber,
@@ -85,11 +82,12 @@ BEGIN
                 v_parametros.descuento	,
                 v_parametros.usar_cc_original,
                 v_parametros.imputar_excento,
-                v_parametros.sw_registro			
+                v_parametros.sw_registro,
+                v_parametros.reset_partida_eje	--#13
 			)RETURNING id_plantilla_calculo into v_id_plantilla_calculo;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla de Cálculo almacenado(a) con exito (id_plantilla_calculo'||v_id_plantilla_calculo||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla de Cálculo almacenado(a) con exito (id_plantilla_calculo'||v_id_plantilla_calculo||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla_calculo',v_id_plantilla_calculo::varchar);
 
             --Devuelve la respuesta
@@ -97,10 +95,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PLACAL_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		28-08-2013 19:01:20
 	***********************************/
 
@@ -122,7 +120,8 @@ BEGIN
                 descuento = v_parametros.descuento,
                 usar_cc_original =  v_parametros.usar_cc_original,
                 imputar_excento  = v_parametros.imputar_excento	,
-                sw_registro = v_parametros.sw_registro
+                sw_registro = v_parametros.sw_registro,
+                reset_partida_eje = v_parametros.reset_partida_eje --#13
 			where id_plantilla_calculo=v_parametros.id_plantilla_calculo;
                
 			--Definicion de la respuesta
