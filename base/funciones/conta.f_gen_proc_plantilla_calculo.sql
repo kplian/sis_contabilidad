@@ -33,7 +33,7 @@ $body$
    
  #0        		05/01/2018      Rensi Arteaga Copari       Ajuste par aconsiderar nuevas variables usar_cc_original, imputar_excento
  #98       		20/08/2018      Rensi Arteaga Copari       Feu adicionado un nnuevo tipo de aplicacion de excento para permitir la facturas de combustible
-
+ #13            03/01/2018      RAC KPLIAN                 PRocesa la opcion resetear partida ejecucion de las plantillas de calculo
 ***************************************************************************/
 
 DECLARE
@@ -95,7 +95,7 @@ BEGIN
      
     v_cont = 1;
      -- FOR obtener las plantillas calculos del documento(id_plantlla)
-     FOR v_registros in ( 
+    FOR v_registros in ( 
                           SELECT  pc.id_plantilla_calculo,
                                   pc.debe_haber,
                                   pc.codigo_tipo_relacion,
@@ -107,7 +107,8 @@ BEGIN
                                   plan.sw_monto_excento,
                                   pc.imputar_excento,
                                   pc.usar_cc_original,
-                                  pc.sw_registro
+                                  pc.sw_registro,
+                                  pc.reset_partida_eje
                           FROM  conta.tplantilla_calculo pc 
                           inner join param.tplantilla plan on plan.id_plantilla = pc.id_plantilla
                           WHERE pc.estado_reg = 'activo' and
@@ -324,8 +325,20 @@ BEGIN
                      
                      IF v_registros.sw_registro = 'si'  THEN
                      
+                        --#13  si esta habilitado se resetea el campo partida ejejcucion
+                        IF v_registros.reset_partida_eje  = 'si' THEN
+                             v_record_int_tran.id_partida_ejecucion = NULL;                        
+                        END IF;
+                     
                        --inserta transaccion en tabla
                        v_reg_id_int_transaccion = conta.f_gen_inser_transaccion(hstore(v_record_int_tran), p_id_usuario);
+                       
+                        --#13  si la partida ejecucion fue reseteada necesitamos  forzar el compromiso,.... forzar_comprometer
+                        IF v_registros.reset_partida_eje  = 'si' THEN                        
+                             UPDATE conta.tint_transaccion t SET
+                                forzar_comprometer = 'si'
+                             WHERE t.id_int_transaccion = v_reg_id_int_transaccion;                                                   
+                        END IF;
                      
                        v_int_resp[v_cont] = v_reg_id_int_transaccion;
                        v_cont = v_cont + 1;

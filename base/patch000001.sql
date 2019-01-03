@@ -5034,3 +5034,24 @@ where s.estado_reg = 'validado';
 /***********************************F-SCP-EGS-CONTA-7-27/12/2018****************************************/
 
 
+/***********************************I-SCP-RAC-CONTA-13-27/12/2018****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tplantilla_calculo
+  ADD COLUMN reset_partida_eje VARCHAR(2) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tplantilla_calculo.reset_partida_eje
+IS 'incica si resetemao o no la partida ejecucion,  al generar la trasaccion, por defecto no, sirve para facturas  que necesitan lelvar ejejcucion a otro centro de costo';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN forzar_comprometer VARCHAR DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN conta.tint_transaccion.forzar_comprometer
+IS 'este valor sobre escribe el valor de comprometer de la cabecera del comprobante';
+
+/***********************************F-SCP-RAC-CONTA-13-27/12/2018****************************************/
+
