@@ -5,7 +5,11 @@
 *@author  (admin)
 *@date 28-08-2013 19:01:20
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#13        03/01/2019    Miguel Mamani     		Sirve para facturas  que necesitan lelvar ejejcucion a otro centro de costo
+
+ */
 
 class MODPlantillaCalculo extends MODbase{
 	
@@ -40,6 +44,7 @@ class MODPlantillaCalculo extends MODbase{
 		$this->captura('usar_cc_original','varchar');
 		$this->captura('imputar_excento','varchar');		
 		$this->captura('sw_registro','varchar');
+		$this->captura('reset_partida_eje','varchar'); // #13
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -68,7 +73,7 @@ class MODPlantillaCalculo extends MODbase{
 		$this->setParametro('usar_cc_original','usar_cc_original','varchar');		
 		$this->setParametro('imputar_excento','imputar_excento','varchar');		
 		$this->setParametro('sw_registro','sw_registro','varchar');
-		
+        $this->setParametro('reset_partida_eje','reset_partida_eje','varchar');//#13
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -99,7 +104,7 @@ class MODPlantillaCalculo extends MODbase{
 		$this->setParametro('usar_cc_original','usar_cc_original','varchar');		
 		$this->setParametro('imputar_excento','imputar_excento','varchar');
 		$this->setParametro('sw_registro','sw_registro','varchar');
-		
+        $this->setParametro('reset_partida_eje','reset_partida_eje','varchar');//#13
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
