@@ -1,3 +1,15 @@
+CREATE OR REPLACE FUNCTION conta.f_validar_cbte (
+  p_id_usuario integer,
+  p_id_usuario_ai integer,
+  p_usuario_ai varchar,
+  p_id_int_comprobante integer,
+  p_igualar varchar = 'no'::character varying,
+  p_origen varchar = 'pxp'::character varying,
+  p_fecha_ejecucion date = NULL::date,
+  p_validar_doc boolean = true
+)
+RETURNS varchar AS
+$body$
 /*
 	Autor: RCM
     Fecha: 05-09-2013
@@ -756,3 +768,12 @@ WHEN OTHERS THEN
 			raise exception '%',v_resp;
    
 END;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;
+
+ALTER FUNCTION conta.f_validar_cbte (p_id_usuario integer, p_id_usuario_ai integer, p_usuario_ai varchar, p_id_int_comprobante integer, p_igualar varchar, p_origen varchar, p_fecha_ejecucion date, p_validar_doc boolean)
+  OWNER TO postgres;
