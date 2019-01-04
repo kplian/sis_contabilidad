@@ -34,6 +34,7 @@ $body$
  #00  ETR       08/03/2018        RAC KPLIAN        Se levanta la validacion de correlativos en fechas has el 31 de diciembe de 2018
  #87  ETR       01/09/2018        RAC KPLIAN        Se agrega la verificaicon para cierre de transacciones con saldo cero para cuentas de pasivo y activo 
  #88  ETR       29/11/2018        RAC KPLIAN        Se actualiza el nro de tramite en la transaccion al validar el cbte 
+ #7   ETR       27/12/2018        RAC KPLIAN        Se adiciona nro de tramite auxiliar     
 
 
 */
@@ -529,7 +530,8 @@ BEGIN
            
            --Se guarda el número del comprobante 
             update conta.tint_comprobante set
-              nro_cbte = v_nro_cbte
+              nro_cbte = v_nro_cbte,
+              nro_tramite_aux =  v_rec_cbte.nro_tramite -- #7 actulizada nro de tamite exuilar , incialmente igual al original
             where id_int_comprobante = p_id_int_comprobante;
           
           

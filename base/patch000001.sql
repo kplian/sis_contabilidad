@@ -5014,3 +5014,23 @@ ALTER TABLE conta.tcuenta
 /***********************************F-SCP-EGS-CONTA-0-18/12/2018****************************************/
 
 
+
+/***********************************I-SCP-EGS-CONTA-7-27/12/2018****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN nro_tramite_aux VARCHAR(70);
+
+COMMENT ON COLUMN conta.tint_comprobante.nro_tramite_aux
+IS 'nro de tramtie euxiliar que peude ser modificado para calculo de reportes';
+
+
+update conta.tint_comprobante s set
+  nro_tramite_aux = nro_tramite
+where s.estado_reg = 'validado';
+
+
+/***********************************F-SCP-EGS-CONTA-7-27/12/2018****************************************/
+
+
