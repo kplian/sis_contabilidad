@@ -10,6 +10,7 @@ ISSUE     FORK          FECHA:		       AUTOR                 DESCRIPCION
  #0        		     29-08-2013        RCM KPLIAN        CREACION
  #2                  27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
  #7      ENDEERT		27-12-2018     MANUEL GUERRA     crearon listado de tramites, y la modifiacion del nrotramite_aux
+ #15     ENDEERT		04-01-2019     Miguel Mamani     corrección filtro por gestión interfaz visto bueno comprobantes
  * 1A			21/08/2018		EGS					se creo la funcion listarIntComprobanteCombo
 */
 //require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
@@ -42,7 +43,7 @@ class ACTIntComprobante extends ACTbase{
         }
 		
 		if($this->objParam->getParametro('id_clase_comprobante')!=''){
-            $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");    
+            $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");
         }
 		
 		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'  || $this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
@@ -94,8 +95,14 @@ class ACTIntComprobante extends ACTbase{
 		if($this->objParam->getParametro('id_deptos')!=''){
             $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
         }
-		
-		
+        ////MMV #15 ///////
+       if($this->objParam->getParametro('id_clase_comprobante')!=''){
+           $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");
+       }
+       if($this->objParam->getParametro('id_gestion')!=''){
+           $this->objParam->addFiltro("incbte.id_gestion in (".$this->objParam->getParametro('id_gestion').")");
+       }
+       ////MMV #15 ///////
 		if($this->objParam->getParametro('momento')!= ''){
 			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
 		}
