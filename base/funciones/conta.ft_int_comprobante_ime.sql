@@ -25,6 +25,7 @@ $body$
  #0        		29-08-2013        RCM KPLIAN        CREACION
  #2             27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
  #3             28-11-2018        RAC KPLIAN        al revertir comprobantes usar la fecha actual
+ #8 ETR         27-12-2018        RAC KPLIAN        se invierte valifacion de gestion y proceso de trasacciones, al editar comprobante          
  
 ***************************************************************************/
 
@@ -655,14 +656,9 @@ BEGIN
               
             END IF;
             
-            -- procesar las trasaaciones (con diversos propositos, ejm validar  cuentas bancarias)
-            
-            
-            IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
-              raise exception 'Error al procesar transacciones';
-            END IF;
-            
+                        
             -- si la fecha varia revisar si es necesario cambiar de gestion
+            --#8 se invierte el orden de esta fin, analizando cambio defecha en gestion antes que procesar las trasacciones
             
             IF v_parametros.fecha != v_reg_cbte.fecha THEN
                
@@ -684,6 +680,12 @@ BEGIN
                END IF;
                
             
+            END IF;
+            
+            --#8 se invierte el orden de esta fin, analizando cambio defecha en gestion antes que procesar las trasacciones
+            -- procesar las trasaaciones (con diversos propositos, ejm validar  cuentas bancarias)
+            IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
+              raise exception 'Error al procesar transacciones';
             END IF;
             
             
