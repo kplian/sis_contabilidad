@@ -95,14 +95,14 @@ class ACTIntComprobante extends ACTbase{
 		if($this->objParam->getParametro('id_deptos')!=''){
             $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
         }
-        ////MMV #15 ///////
+        ////MMV-- #15  --///////
        if($this->objParam->getParametro('id_clase_comprobante')!=''){
            $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");
        }
        if($this->objParam->getParametro('id_gestion')!=''){
            $this->objParam->addFiltro("incbte.id_gestion in (".$this->objParam->getParametro('id_gestion').")");
        }
-       ////MMV #15 ///////
+       ////MMV-- #15 --///////
 		if($this->objParam->getParametro('momento')!= ''){
 			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
 		}
