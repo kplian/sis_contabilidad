@@ -12,6 +12,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
 #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares
 #5			24/12/2108		  Manuel Guerra	  Correcion de sumas en axuiliares
+#6			27/12/2108		  Manuel Guerra	  Agregar filtro de cbtes de cierre
  */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayorSaldo.php');
@@ -140,8 +141,22 @@ class ACTIntTransaccion extends ACTbase{
 		if($this->objParam->getParametro('id_depto')!=''){
 			$this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));	
 		}
-		
-		
+		#6
+		if($this->objParam->getParametro('cbte_cierre')=='todos'){			
+			$this->objParam->addFiltro("icbte.cbte_cierre in (''no'',''balance'',''resultado'')");
+		}else{
+			if($this->objParam->getParametro('cbte_cierre')=='balance'){
+				$this->objParam->addFiltro("icbte.cbte_cierre in (''balance'')");
+			}else{
+				if($this->objParam->getParametro('cbte_cierre')=='resultado'){
+					$this->objParam->addFiltro("icbte.cbte_cierre in (''resultado'')");
+				}else{
+					if($this->objParam->getParametro('cbte_cierre')=='no'){
+						$this->objParam->addFiltro("icbte.cbte_cierre in (''no'')");
+					}
+				}						
+			}		
+		}
 		 
 		if($this->objParam->getParametro('id_partida')!=''){
 			$this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));	
