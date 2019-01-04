@@ -5054,4 +5054,12 @@ COMMENT ON COLUMN conta.tint_transaccion.forzar_comprometer
 IS 'este valor sobre escribe el valor de comprometer de la cabecera del comprobante';
 
 /***********************************F-SCP-RAC-CONTA-13-27/12/2018****************************************/
+/***********************************I-SCP-EGS-CONTA-8-04/01/2019****************************************/
+ALTER TABLE conta.ttabla_relacion_contable
+  ADD COLUMN codigo VARCHAR;
+COMMENT ON COLUMN conta.ttabla_relacion_contable.codigo
+IS 'codigo identificador';
+/***********************************F-SCP-EGS-CONTA-8-04/01/2019****************************************/
+
+
 
