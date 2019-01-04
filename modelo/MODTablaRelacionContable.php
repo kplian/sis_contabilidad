@@ -5,7 +5,9 @@
 *@author  (admin)
 *@date 16-05-2013 21:05:26
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+	ISSUE			FECHA				AUTHOR 			DESCRIPCION
+ 	#14	endeEtr 	04/01/2019			EGS				se agrego el campo de codigo y la funcion exportarDatos() para la exportacion de configuracion	
+ */
 
 class MODTablaRelacionContable extends MODbase{
 	
@@ -21,6 +23,7 @@ class MODTablaRelacionContable extends MODbase{
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_tabla_relacion_contable','int4');
+		$this->captura('codigo','varchar'); //#14	04/01/2019	EGS	
 		$this->captura('estado_reg','varchar');
 		$this->captura('tabla','varchar');
 		$this->captura('esquema','varchar');
@@ -66,6 +69,7 @@ class MODTablaRelacionContable extends MODbase{
 		$this->setParametro('tabla_codigo_auxiliar','tabla_codigo_auxiliar','varchar');
 		$this->setParametro('tabla_id_auxiliar','tabla_id_auxiliar','varchar');
 		$this->setParametro('tabla_codigo_aplicacion','tabla_codigo_aplicacion','varchar');
+		$this->setParametro('codigo','codigo','varchar'); //#14	04/01/2019	EGS	
 		
 		
             
@@ -95,6 +99,7 @@ class MODTablaRelacionContable extends MODbase{
 		$this->setParametro('tabla_codigo_auxiliar','tabla_codigo_auxiliar','varchar');
         $this->setParametro('tabla_id_auxiliar','tabla_id_auxiliar','varchar');		
 		$this->setParametro('tabla_codigo_aplicacion','tabla_codigo_aplicacion','varchar');
+		$this->setParametro('codigo','codigo','varchar'); //#14	04/01/2019	EGS	
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -120,6 +125,54 @@ class MODTablaRelacionContable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+		
+		 //#14	04/01/2019	EGS	
+	    function exportarDatos() {
+		
+		$this->procedimiento='conta.ft_tabla_relacion_contable_sel';
+			$this->transaccion='CONTA_EXPTRC_SEL';
+			$this->tipo_procedimiento='SEL';
+			$this->setCount(false);
+			
+		    $this->setParametro('id_tabla_relacion_contable','id_tabla_relacion_contable','integer');
+			
+			//Definicion de la lista del resultado del query
+
+				$this->captura('tipo_reg','varchar');		
+				$this->captura('id_tabla_relacion_contable','int4');
+				$this->captura('codigo','varchar');
+				$this->captura('estado_reg','varchar');
+				$this->captura('tabla','varchar');
+				$this->captura('esquema','varchar');
+				$this->captura('tabla_id','varchar');
+				$this->captura('fecha_reg','timestamp');
+				$this->captura('id_usuario_reg','int4');
+				$this->captura('fecha_mod','timestamp');
+				$this->captura('id_usuario_mod','int4');
+				$this->captura('usr_reg','varchar');
+				$this->captura('usr_mod','varchar');
+				$this->captura('tabla_id_fk','varchar');
+				$this->captura('recorrido_arbol','varchar');
+				$this->captura('tabla_codigo_auxiliar','varchar');
+				$this->captura('tabla_id_auxiliar','varchar');
+				
+				$this->captura('tabla_codigo_aplicacion','varchar');
+			
+		
+				$this->armarConsulta();	
+				
+		        $this->ejecutarConsulta(); 
+				 		
+				////////////////////////////
+				
+				
+				if($this->respuesta->getTipo() == 'ERROR'){
+					return $this->respuesta;
+				}
+
+		       return $this->respuesta;		
+			
+			} //#14	04/01/2019	EGS	
 			
 }
 ?>

@@ -5,7 +5,9 @@
 *@author  (admin)
 *@date 16-05-2013 21:51:43
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
-*/
+ ISSUE			FECHA				AUTHOR 			DESCRIPCION
+ #14	endeEtr 	04/01/2019			EGS				se agrego el boton para la exportacion de configuracion	
+ */
 
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -17,8 +19,35 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.TipoRelacionContable.superclass.constructor.call(this,config);
 		this.init();		
 		this.iniciarEventos();
+		 //#14	04/01/2019	EGS	
+		this.addButton('btnWizard',
+            {
+                text: 'Exportar Plantilla',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expProceso,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo SQL la plantilla'
+            }
+        ); //#14	04/01/2019	EGS	
 			
 	},
+	 //#14	04/01/2019	EGS	
+	expProceso : function(resp){
+			var data=this.sm.getSelected().data;
+			console.log('data',data);
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url: '../../sis_contabilidad/control/TipoRelacionContable/exportarDatos',
+				params: { 'id_tipo_relacion_contable' : data.id_tipo_relacion_contable },
+				success: this.successExport,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});
+			
+	}, //#14	04/01/2019	EGS	
+	
+	
 	tam_pag:50,
 			
 	Atributos:[
@@ -445,7 +474,28 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			}
 
 		},this);
-	}	
+	},
+	 //#14	04/01/2019	EGS	  
+   	preparaMenu: function(n) {
+
+		var data = this.getSelectedData();
+		var tb = this.tbar;
+		Phx.vista.TipoRelacionContable.superclass.preparaMenu.call(this, n);
+        
+		this.getBoton('btnWizard').enable();
+
+		return tb
+	},
+	
+	liberaMenu: function() {
+		var tb = Phx.vista.TipoRelacionContable.superclass.liberaMenu.call(this);
+		if (tb) {
+			this.getBoton('btnWizard').disable();
+			           
+           
+		}
+		return tb
+	},	//#14	04/01/2019	EGS	
 })
 </script>
 		
