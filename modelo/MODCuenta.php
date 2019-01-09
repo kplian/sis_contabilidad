@@ -6,8 +6,10 @@
 *@date 21-02-2013 15:04:03
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
  	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
-   #  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta	
-*/
+   	#  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
+	# 16	ENDETRASM	 09/01/2018			Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
+
+ */
 
 class MODCuenta extends MODbase{
 	
@@ -95,7 +97,7 @@ class MODCuenta extends MODbase{
 			 $this->captura('desc_csc','varchar');
 			 $this->captura('tipo_act','varchar');
 			 $this->captura('ex_auxiliar','varchar');/// #  1 17/12/2018	EGS				
-			 
+			 $this->captura('cuenta_actualizacion','varchar');/// # 16
 		     //Ejecuta la instruccion
 		     $this->armarConsulta();
 			 $this->ejecutarConsulta();
@@ -125,8 +127,8 @@ class MODCuenta extends MODbase{
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
 		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
 		$this->setParametro('tipo_act','tipo_act','varchar');
-		$this->setParametro('ex_auxiliar','ex_auxiliar','varchar');/// #  1 17/12/2018	EGS	
-		
+		$this->setParametro('ex_auxiliar','ex_auxiliar','varchar');/// #  1 17/12/2018	EGS
+        $this->setParametro('cuenta_actualizacion','cuenta_actualizacion','varchar'); //#16
 		
 
 		//Ejecuta la instruccion
@@ -161,9 +163,10 @@ class MODCuenta extends MODbase{
 		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
 		$this->setParametro('tipo_act','tipo_act','varchar');
 		$this->setParametro('ex_auxiliar','ex_auxiliar','varchar');/// #  1 17/12/2018	EGS	
-		
-		
-		//Ejecuta la instruccion
+        $this->setParametro('cuenta_actualizacion','cuenta_actualizacion','varchar'); //#16
+
+
+        //Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 
