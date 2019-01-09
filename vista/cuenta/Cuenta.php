@@ -6,8 +6,10 @@
 *@date 21-02-2013 15:04:03
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
  	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
-  #  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta	
-*/
+    #  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
+    # 16	ENDETRASM	 09/01/2018			Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
+
+ */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -475,6 +477,9 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
                                  ['curso', 'Obras en Curso (Considera Centro de Costo)'],
                                  ['reservas', 'Actualización de reservas'],
                                  ['capital', 'Actualización de capital'],
+                                 ['gasto', 'Actualización de Gasto'] ,//#16
+                                 ['utilidad', 'Actualización de Utilidad'], //#16
+                                 ['ingresos', 'Actualización de Ingresos'] //#16
                                ]
                         }),
        				valueField: 'variable',
@@ -494,7 +499,53 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
        			id_grupo:0,
        			grid:true,
        			form:true
-       	}
+       	},
+
+        ////#16
+        {
+            config: {
+                name: 'cuenta_actualizacion',
+                fieldLabel: 'Actualizar Cuenta',
+                allowBlank: true,
+                emptyText: 'Elija una opción...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_contabilidad/control/Cuenta/listarCuenta',
+                    id: 'id_cuenta',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'nro_cuenta',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_cuenta','nombre_cuenta','desc_cuenta','nro_cuenta','gestion','desc_moneda'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams: {par_filtro:'nro_cuenta#nombre_cuenta#desc_cuenta','filtro_ges':'actual'}
+                }),
+                displayField: 'nro_cuenta',
+                valueField: 'nro_cuenta',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p><p>Nombre:{nombre_cuenta}</p> <p>({desc_moneda}) - {gestion}</p></div></tpl>',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 500,
+                queryDelay: 1000,
+                anchor: '50%',
+                gwidth:200,
+                width: 350,
+                minChars: 2,
+                renderer:function (value, p, record){
+                    return String.format('{0}',record.data['cuenta_actualizacion']);
+                }
+            },
+            type: 'ComboBox',
+            id_grupo: 1,
+            grid: true,
+            form: true
+        }
+        ////#!&
        	
 	],
 	
@@ -522,7 +573,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'id_gestion', type: 'numeric'},'desc_moneda',
 		'valor_incremento','eeff','sw_control_efectivo',
 		'id_config_subtipo_cuenta','desc_csc','tipo_act',
-		{name:'ex_auxiliar', type: 'string'} /// #  1 17/12/2018	EGS	
+		{name:'ex_auxiliar', type: 'string'}, /// #  1 17/12/2018	EGS
+        {name:'cuenta_actualizacion', type: 'string'} /// #16
 		
 	],
 	cmbGestion: new Ext.form.ComboBox({
