@@ -6,8 +6,9 @@
 *@date 21-02-2013 15:04:03
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
  	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
-    #  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
-    # 16	ENDETRASM	 09/01/2018			Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
+    #  1			     17/12/2018			EGS						Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
+    # 16	ENDETRASM	 09/01/2018			Miguel Mamani			Asignar Cuenta para actualizare en las cuentas de gasto
+    # 19	ENDETRASM	 09/01/2019		   Miguel Mamani			Correcion filtro por gestion cuentas
 
  */
 header("content-type: text/javascript; charset=UTF-8");
@@ -23,8 +24,14 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 		this.loaderTree.baseParams={id_gestion:0};
 		this.init();
 		this.iniciarEventos();
-		
-		this.cmbGestion.on('select',this.capturaFiltros,this);
+		//#19
+        this.cmbGestion.on('select', function(combo, record, index){
+            this.capturaFiltros();
+            this.iniciarEventoGestion();
+
+        },this);
+        //#19
+		//this.cmbGestion.on('select',this.capturaFiltros ,this); #19
 		this.addButton('bAux',{text:'Auxiliares',iconCls: 'blist',disabled:true,handler:this.onButonAux,tooltip: '<b>Auxiliares de la cuenta</b><br/>Se habilita si esta cuenta tiene permitido el registro de auxiliares '});
         this.addButton('btnImprimir',
 			{
@@ -519,8 +526,8 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
                     totalProperty: 'total',
                     fields: ['id_cuenta','nombre_cuenta','desc_cuenta','nro_cuenta','gestion','desc_moneda'],
                     // turn on remote sorting
-                    remoteSort: true,
-                    baseParams: {par_filtro:'nro_cuenta#nombre_cuenta#desc_cuenta','filtro_ges':'actual'}
+                    remoteSort: true
+                   // baseParams: {par_filtro:'nro_cuenta#nombre_cuenta#desc_cuenta','filtro_ges':'actual'} #19
                 }),
                 displayField: 'nro_cuenta',
                 valueField: 'nro_cuenta',
@@ -796,6 +803,14 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
     		  title:'Partidas', 
     		  width:'60%',
     		  cls:'CuentaPartida'
-		  }]
+		  }],
+    //#19
+    iniciarEventoGestion: function (){
+        Ext.apply(this.Cmp.cuenta_actualizacion.store.baseParams,{par_filtro:'nro_cuenta#nombre_cuenta#desc_cuenta','id_gestion': this.cmbGestion.getValue()});
+    }
+    //#19
 })
 </script>
+
+
+
