@@ -5,6 +5,9 @@
 *@author  (admin)
 *@date 08-07-2015 13:12:43
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#10        02/01/2019    	  Miguel Mamani          Solo permitir 31 caracteres en nombre de la plantilla
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -98,7 +101,7 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:300
+				maxLength:31 //#10 
 			},
 				type:'TextField',
 				filters:{pfiltro:'resplan.nombre',type:'string'},
