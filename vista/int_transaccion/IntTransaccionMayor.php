@@ -1169,7 +1169,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		orden_trabajo=data.ot ;				
 		suborden=data.suborden;		
 		nro_tram=data.nro_tramite;
-		nro_tram_aux=data.nro_tramite_aux;
+		//nro_tram_aux=data.nro_tramite_aux; 	// aun no se subio esta parte de codigo
 		//
 		tipo_filtro=data.tipo_filtro;			
 		id_auxiliar=data.id_auxiliar;
@@ -1313,7 +1313,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				'orden_trabajo':orden_trabajo,
 				'suborden':suborden,
 				'nro_tram':nro_tram,
-				'nro_tram_aux':nro_tram_aux,								
+				//'nro_tram_aux':nro_tram_aux,			// aun no se subio esta parte de codigo
 				//formato pdf o xls
 				'tipo_filtro':tipo_filtro,			
 				//parametros q se mostraran, si son tickeados						
@@ -1373,7 +1373,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				'orden_trabajo':orden_trabajo,
 				'suborden':suborden,
 				'nro_tram':nro_tram,	
-				'nro_tram_aux':nro_tram_aux,							
+				//'nro_tram_aux':nro_tram_aux,// aun no se subio esta parte de codigo
 				//formato pdf o xls
 				'tipo_filtro':tipo_filtro,			
 				//parametros q se mostraran, si son tickeados						
