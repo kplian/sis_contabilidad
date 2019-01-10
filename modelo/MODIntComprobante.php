@@ -8,18 +8,19 @@
  * 
     HISTORIAL DE MODIFICACIONES:
    	
- ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+ ISSUE        FORK			FECHA:		      AUTOR                 DESCRIPCION
    
- #0        		29-08-2013        RCM KPLIAN        CREACION
- #2             27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
- *1A			21/08/2018		EGS				    se creo la funcion listarIntComprobanteCombo
+ #0        				29-08-2013        RCM KPLIAN        		CREACION
+ #2             		27-08-2018        RAC KPLIAN        		se añade trasaccion para modicar glosa
+ *1A					21/08/2018		EGS				    		se creo la funcion listarIntComprobanteCombo
+ #7			endeetr		27/12/2018		manuel guerra				crearon listado de tramites, y la modifiacion del nrotramite_aux
 */
 class MODIntComprobante extends MODbase{
 	
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+	#7		
 	function listarIntComprobante(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_int_comprobante_sel';
@@ -97,7 +98,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('ope_3','varchar');
 		$this->captura('tipo_cambio_3','numeric');
 		$this->captura('id_moneda_act','int4');
-		
+		$this->captura('nro_tramite_aux','varchar');
 		
 		
 		//Ejecuta la instruccion
@@ -916,6 +917,38 @@ class MODIntComprobante extends MODbase{
 		$this->captura('fecha_reg','date');		
 		$this->captura('nombre','varchar');
 		
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	//
+	function modificarTramiIntCbte(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_TRAMCBT_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
+		$this->setParametro('nro_tramite_aux','nro_tramite_aux','varchar');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	//#7
+	function listadoTramites(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_comprobante_sel';
+		$this->transaccion='CONTA_LISTRA_SEL';
+		$this->tipo_procedimiento='SEL';
+		//Definicion de la lista del resultado del query		
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('nro_tramite','varchar');
+							
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 		//Devuelve la respuesta

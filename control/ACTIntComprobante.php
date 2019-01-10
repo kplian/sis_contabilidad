@@ -5,11 +5,11 @@
 *@author  (admin)
 *@date 29-08-2013 00:28:30
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
- * SSUE            FECHA:		      AUTOR                 DESCRIPCION
+ISSUE     FORK          FECHA:		       AUTOR                 DESCRIPCION
    
- #0        		29-08-2013        RCM KPLIAN        CREACION
- #2             27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
- *  
+ #0        		     29-08-2013        RCM KPLIAN        CREACION
+ #2                  27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
+ #7      ENDEERT		27-12-2018     MANUEL GUERRA     crearon listado de tramites, y la modifiacion del nrotramite_aux
  * 1A			21/08/2018		EGS					se creo la funcion listarIntComprobanteCombo
 */
 //require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
@@ -806,6 +806,20 @@ class ACTIntComprobante extends ACTbase{
 		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());				
+	}
+	//#7
+	function modificarTramiIntCbte(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->modificarTramiIntCbte($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	//#7
+	function listadoTramites(){
+		$this->objParam->defecto('ordenacion','nro_tramite');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		$this->objFunc=$this->create('MODIntComprobante');			
+		$this->res=$this->objFunc->listadoTramites($this->objParam);		
+		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	
 }

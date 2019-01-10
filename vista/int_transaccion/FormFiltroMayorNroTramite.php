@@ -91,6 +91,19 @@ header("content-type: text/javascript; charset=UTF-8");
                 type:'ComboRec',
                 id_grupo: 0,
                 form: true
+            },
+            {
+                config:{
+                    name : 'nro_tramite',
+                    fieldLabel : 'Nro Tramite',
+                    items: [
+                        {boxLabel: 'Normal', name: 'nro_tramite', inputValue: 'normal'},
+                        {boxLabel: 'Modificado', name: 'nro_tramite', inputValue: 'modificado', checked: true}
+                    ]
+                },
+                type : 'RadioGroupField',
+                id_grupo : 0,
+                form : true
             }
         ],
         labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',

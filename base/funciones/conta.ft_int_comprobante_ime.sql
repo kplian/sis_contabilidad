@@ -25,6 +25,7 @@ $body$
  #0        		29-08-2013        RCM KPLIAN        CREACION
  #2             27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
  #3             28-11-2018        RAC KPLIAN        al revertir comprobantes usar la fecha actual
+ #7 endeETR     27-12-2018        MANUEL GUERRA     se modifica el nro tramite_aux del cbte
  #8 ETR         27-12-2018        RAC KPLIAN        se invierte valifacion de gestion y proceso de trasacciones, al editar comprobante          
  
 ***************************************************************************/
@@ -105,7 +106,7 @@ DECLARE
     v_gestion_aux                   integer; --#3
     v_gestion_fecha				    integer; --#3
     v_fecha_cbte_tmp                date;    --#3
-   
+    v_nro_tramite_aux               varchar;    --#7
    
 			    
 BEGIN
@@ -1595,8 +1596,7 @@ BEGIN
 	elsif(p_transaccion='CONTA_CLONARCBTE_IME')then
 
 		begin
-        
-          
+
             select 
              ic.*,
              p.id_gestion 
@@ -2087,8 +2087,37 @@ BEGIN
             
 		end;       
         
-     
-    
+     /*********************************    
+ 	#TRANSACCION:  'CONTA_TRAMCBT_MOD'
+ 	#DESCRIPCION:	permite modificar solo la glosa de cbte validados
+ 	#AUTOR:		    #7 MANUEL GUERRA
+ 	#FECHA:		    27-12-2018 
+	***********************************/
+
+	elsif(p_transaccion='CONTA_TRAMCBT_MOD')then
+
+		begin
+			select
+               nro_tramite::VARCHAR
+             into 
+               v_nro_tramite_aux::varchar
+            from wf.tproceso_wf
+            where id_proceso_wf = v_parametros.nro_tramite_aux::integer;            
+            
+			update conta.tint_comprobante set                              	
+                fecha_mod = now(),
+                id_usuario_mod = p_id_usuario,
+                nro_tramite_aux = v_nro_tramite_aux::VARCHAR
+			where id_int_comprobante = v_parametros.id_int_comprobante;
+ 
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','se modifico el nro de tramite_aux del cbte ID:'|| v_parametros.id_int_comprobante::varchar); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;       
     
     else
      

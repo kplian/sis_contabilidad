@@ -434,6 +434,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var desde = PagMaes.Cmp.desde.getValue();
             var hasta = PagMaes.Cmp.hasta.getValue();
             var id_gestion = PagMaes.Cmp.id_gestion.getValue();
+            var nro_tramite = PagMaes.Cmp.nro_tramite.getValue();
             if (fieldName == 'detalle') {
                 Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/FormFiltro.php',
                     'Mayor',
@@ -449,7 +450,8 @@ header("content-type: text/javascript; charset=UTF-8");
                                 'desde': desde,
                                 'hasta': hasta,
                                 'id_gestion': id_gestion,
-                                'id_auxiliar': record.id_auxiliar
+                                'id_auxiliar': record.id_auxiliar,
+                                'nro_tramite': nro_tramite
                             }
                     },
                     this.idContenedor,
@@ -463,6 +465,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var hasta = PagMaes.Cmp.hasta.getValue();
             var id_auxiliar = PagMaes.Cmp.id_auxiliar.getValue();
             var id_gestion = PagMaes.Cmp.id_gestion.getValue();
+            var nro_tramite = PagMaes.Cmp.nro_tramite.getValue();
             Phx.CP.loadingShow();
             Ext.Ajax.request({
                 url: '../../sis_contabilidad/control/IntTransaccion/reporteAuxliarTramite',
@@ -471,7 +474,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     'desde': desde,
                     'hasta': hasta,
                     'id_gestion': id_gestion,
-                    'id_auxiliar': id_auxiliar
+                    'id_auxiliar': id_auxiliar,
+                    'nro_tramite': nro_tramite
                 },
                 success: this.successExport,
                 failure: this.conexionFailure,
