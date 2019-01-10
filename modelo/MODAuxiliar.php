@@ -6,9 +6,9 @@
 *@date 21-02-2013 20:44:52
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
  *  	ISUUE			FECHA			AUTHOR 		DESCRIPCION
- *      #23        27/12/2018    Miguel Mamani     		Reporte Detalle Auxiliares por Cuenta
  * 		1A			30/08/2018			EGS		 se aumento el campo aplicacion
- * 
+ *      #23        27/12/2018    Miguel Mamani     		Reporte Detalle Auxiliares por Cuenta
+ *      #10        02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
  * 
 */
 
@@ -167,6 +167,8 @@ class MODAuxiliar extends MODbase{
         $this->setParametro('hasta','hasta','date');
         $this->setParametro('id_cuenta','id_cuenta','int4');
         $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+        $this->setParametro('tipo_moneda','tipo_moneda','varchar'); ///#10 MMMV
+
         $this->captura('id_auxiliar_cc','int4');
         $this->captura('id_auxiliar_fk','int4');
         $this->captura('codigo_aux','varchar');
@@ -194,6 +196,7 @@ class MODAuxiliar extends MODbase{
         $this->setParametro('hasta','hasta','date');
         $this->setParametro('id_cuenta','id_cuenta','int4');
         $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+        $this->setParametro('tipo_moneda','tipo_moneda','varchar'); ///#10 MMMV
 
         $this->captura('id_cuenta','int4');
         $this->captura('nro_cuenta','varchar');

@@ -7,17 +7,14 @@
  *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema*  	ISUUE			FECHA			AUTHOR 		DESCRIPCION
  *  	ISUUE			FECHA			AUTHOR 		DESCRIPCION
  *   #23           27/12/2018    Miguel Mamani   Reporte Detalle Auxiliares por Cuenta
+ *  #10        02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
  */
 
 
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-
-
-
     Phx.vista.ReporteDetalleAuxiliar = Ext.extend(Phx.frmInterfaz, {
-
         Atributos : [
             {
                 config:{
@@ -90,7 +87,40 @@ header("content-type: text/javascript; charset=UTF-8");
                 valorInicial: 'no',
                 grid:true,
                 form:true
-            }
+            },
+
+            //#10
+            {
+                config:{
+                    name:'tipo_moneda',
+                    fieldLabel:'Tipo de Moneda',
+                    allowBlank:false,
+                    emptyText:'Tipo de moneda...',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode: 'local',
+                    valueField: 'tipo_moneda',
+                    gwidth: 100,
+                    store:new Ext.data.ArrayStore({
+                        fields: ['variable', 'valor'],
+                        data : [
+                            ['MB','Moneda Base'],
+                            ['MT','Moneda Triangulacion'],
+                            ['MA','Moneda Actualizacion']
+                        ]
+                    }),
+                    valueField: 'variable',
+                    displayField: 'valor',
+                    listeners: {
+                        'afterrender': function(combo){
+                            combo.setValue('MB');
+                        }
+                    }
+                },
+                type:'ComboBox',
+                form:true
+            } //#10
         ],
         topBar : true,
         botones : false,
@@ -130,6 +160,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         agregarArgsExtraSubmit: function() {
             this.argumentExtraSubmit.id_gestions = this.Cmp.id_gestion.getRawValue();
+            this.argumentExtraSubmit.moneda = this.Cmp.tipo_moneda.getRawValue();  //#10
 
         }
     })

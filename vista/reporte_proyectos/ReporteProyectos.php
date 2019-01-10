@@ -10,27 +10,13 @@
 HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
+#10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
     Phx.vista.ReporteProyectos = Ext.extend(Phx.frmInterfaz, {
         Atributos : [
-            /* {
-                 config:{
-                     name : 'tipo_filtro',
-                     fieldLabel : 'Filtros',
-                     items: [
-                         {boxLabel: 'Gestión', name: 'tipo_filtro', inputValue: 'gestion', checked: true},
-                         {boxLabel: 'Fechas', name: 'tipo_filtro', inputValue: 'fechas'}
-                     ]
-
-
-                 },
-                 type : 'RadioGroupField',
-                 id_grupo : 0,
-                 form : true
-             },*/
             {
                 config:{
                     name : 'id_gestion',
@@ -135,21 +121,39 @@ header("content-type: text/javascript; charset=UTF-8");
                 valorInicial: 'no',
                 grid:true,
                 form:true
-            }/*,
+            },
+            //#10 MMV
             {
                 config:{
-                    name : 'cerrado',
-                    fieldLabel : 'Reporte Arbol',
-                    items: [
-                        {boxLabel: 'Si', name: 'cerrado', inputValue: 'si'},
-                        {boxLabel: 'No', name: 'cerrado', inputValue: 'no', checked: true}
-                    ]
+                    name:'tipo_moneda',
+                    fieldLabel:'Tipo de Moneda',
+                    allowBlank:false,
+                    emptyText:'Tipo de moneda...',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode: 'local',
+                    valueField: 'tipo_moneda',
+                    gwidth: 100,
+                    store:new Ext.data.ArrayStore({
+                        fields: ['variable', 'valor'],
+                        data : [
+                            ['MB','Moneda Base'],
+                            ['MT','Moneda Triangulacion'],
+                            ['MA','Moneda Actualizacion']
+                        ]
+                    }),
+                    valueField: 'variable',
+                    displayField: 'valor',
+                    listeners: {
+                        'afterrender': function(combo){
+                            combo.setValue('MB');
+                        }
+                    }
                 },
-                type : 'RadioGroupField',
-                id_grupo : 0,
-                form : true
-            }*/
-
+                type:'ComboBox',
+                form:true
+            } // #10 MMV
         ],
         topBar : true,
         botones : false,
@@ -192,7 +196,10 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         agregarArgsExtraSubmit: function() {
             this.argumentExtraSubmit.id_gestions = this.Cmp.id_gestion.getRawValue();
-
+            this.argumentExtraSubmit.moneda = this.Cmp.tipo_moneda.getRawValue(); //#10
+            this.argumentExtraSubmit.tipo_costo = this.Cmp.id_tipo_cc.getRawValue();
+            this.argumentExtraSubmit.cuenta = this.Cmp.id_cuenta.getRawValue();
+            this.argumentExtraSubmit.centro_costo = this.Cmp.id_centro_costo.getRawValue();
         }
     })
 
