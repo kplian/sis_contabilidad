@@ -5,6 +5,11 @@
 *@author  (admin)
 *@date 01-09-2013 18:10:12
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+********************************************************************************
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			     AUTOR				 DESCRIPCION:
+#17 		09/01/2019		        Manuel Guerra	  agrego el filtro de nro_tramite_aux
+#20         10/01/2019 ENDETRAS     Miguel Mamani     Ocultar botón para exportar datos de grilla
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -1146,7 +1151,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				gdisplayField:'nro_cbte',
 				value:'nro_cbte'
 			}],
-	//mpmpmp
+	//#17
 	postReloadPage:function(data){	
 		ini=data.desde;
 		fin=data.hasta;
@@ -1164,6 +1169,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		orden_trabajo=data.ot ;				
 		suborden=data.suborden;		
 		nro_tram=data.nro_tramite;
+		//nro_tram_aux=data.nro_tramite_aux; 	// aun no se subio esta parte de codigo
 		//
 		tipo_filtro=data.tipo_filtro;			
 		id_auxiliar=data.id_auxiliar;
@@ -1306,7 +1312,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				'centro_costo':centro_costo,
 				'orden_trabajo':orden_trabajo,
 				'suborden':suborden,
-				'nro_tram':nro_tram,								
+				'nro_tram':nro_tram,
+				//'nro_tram_aux':nro_tram_aux,			// aun no se subio esta parte de codigo
 				//formato pdf o xls
 				'tipo_filtro':tipo_filtro,			
 				//parametros q se mostraran, si son tickeados						
@@ -1365,7 +1372,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				'centro_costo':centro_costo,
 				'orden_trabajo':orden_trabajo,
 				'suborden':suborden,
-				'nro_tram':nro_tram,								
+				'nro_tram':nro_tram,	
+				//'nro_tram_aux':nro_tram_aux,// aun no se subio esta parte de codigo
 				//formato pdf o xls
 				'tipo_filtro':tipo_filtro,			
 				//parametros q se mostraran, si son tickeados						
@@ -1391,7 +1399,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
     
     bnew : false,
     bedit: false,
-    bdel:  false
+    bdel:  false,
+    bexcel: false //#20
 })
 </script>
 		
