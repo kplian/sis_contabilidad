@@ -19,6 +19,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
   # 19	ENDETRASM	 09/01/2019			Miguel Mamani			Plantilla actualizaciones des ingresos y modificación para la plantilla actualizaciones gastos
+  # 21  ENDETRASM	 16/01/2019			Miguel Mamamni			Se modifico a se 0 moneda internaciona y ufv por es una actualizacion de los UFV que es nomeda base
 
 ***************************************************************************/
 
@@ -276,20 +277,27 @@ BEGIN
                               glosa,
                               id_int_comprobante,
                               id_auxiliar,
+
                               importe_debe,
                               importe_haber,
                               importe_gasto,
                               importe_recurso,
-                              importe_debe_mb,
-                              importe_haber_mb,
+
+                               importe_debe_mb,
+                               importe_haber_mb,
+                               importe_gasto_mb,
+                               importe_recurso_mb,
+
                               importe_debe_mt,
                               importe_haber_mt,
                               importe_gasto_mt,
                               importe_recurso_mt,
+
                               importe_debe_ma,
                               importe_haber_ma,
                               importe_gasto_ma,
                               importe_recurso_ma,
+
                               id_usuario_reg,
                               fecha_reg,
                               actualizacion
@@ -301,20 +309,20 @@ BEGIN
                               'CUADRO DE ACTUALIZACION  DE INGRESOS AL '||p_hasta,
                               p_id_int_comprobante,
                               null,
+
                               v_importe_debe,
                               v_importe_haber,
                               v_importe_debe,
                               v_importe_haber,
+
                               v_importe_debe,
                               v_importe_haber,
-                              v_actualiza_deudor_mt,
-                              v_actualiza_acreedor_mt,
-                              v_actualiza_deudor_mt,
-                              v_actualiza_acreedor_mt,--MT
-                              v_actualiza_deudor_ma,
-                              v_actualiza_acreedor_ma,
-                              v_actualiza_deudor_ma,
-                              v_actualiza_acreedor_ma, --MA
+                              v_importe_debe,
+                              v_importe_haber,
+
+
+                              0,0,0,0, --MT --# 21
+                              0,0,0,0, --MA --# 21
                               p_id_usuario,
                               now(),
                               'si'
@@ -384,22 +392,27 @@ BEGIN
                                       glosa,
                                       id_int_comprobante,
                                       id_auxiliar,
+
                                       importe_debe,
                                       importe_haber,
                                       importe_gasto,
                                       importe_recurso,
+
                                       importe_debe_mb,
                                       importe_haber_mb,
                                       importe_gasto_mb,
                                       importe_recurso_mb,
+
                                       importe_debe_mt,
                                       importe_haber_mt,
                                       importe_gasto_mt,
                                       importe_recurso_mt,
+
                                       importe_debe_ma,
                                       importe_haber_ma,
                                       importe_gasto_ma,
                                       importe_recurso_ma,
+
                                       id_usuario_reg,
                                       fecha_reg,
                                       actualizacion
@@ -411,22 +424,19 @@ BEGIN
                                       'CUADRO DE ACTUALIZACION  DE INGRESOS AL '||p_hasta,
                                       p_id_int_comprobante,
                                       NULL,--v_registros.id_auxiliar,
+
                                       v_ajuste_debe,
                                       v_ajuste_haber,
                                       v_ajuste_debe,
                                       v_ajuste_haber,
+
                                       v_ajuste_debe,
                                       v_ajuste_haber,
                                       v_ajuste_debe,
                                       v_ajuste_haber,
-                                      v_actualiza_deudor_mt,
-                                      v_actualiza_acreedor_mt,
-                                      v_actualiza_deudor_mt,
-                                      v_actualiza_acreedor_mt,--MT
-                                      v_actualiza_deudor_ma,
-                                      v_actualiza_acreedor_ma,
-                                      v_actualiza_deudor_ma,
-                                      v_actualiza_acreedor_ma, --MA
+
+                                      0,0,0,0, --MT --# 21
+                                      0,0,0,0, --MA --# 21
                                       p_id_usuario,
                                       now(),
                                       'si');

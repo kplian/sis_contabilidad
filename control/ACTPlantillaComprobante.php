@@ -4,8 +4,11 @@
 *@file gen-ACTPlantillaComprobante.php
 *@author  (admin)
 *@date 10-06-2013 14:40:00
-*@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
-*/
+*@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo,
+ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+# 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+
+ */
 
 class ACTPlantillaComprobante extends ACTbase{    
 			
@@ -196,8 +199,10 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['campo_forma_pago'])?'NULL':"'".$row['campo_forma_pago']."'")."," .	
 							 
 							 (is_null($row['tipo_relacion_contable_cc'])?'NULL':"'".$row['tipo_relacion_contable_cc']."'")."," .
-							 (is_null($row['campo_relacion_contable_cc'])?'NULL':"'".$row['campo_relacion_contable_cc']."'")."," .	
-							 (is_null($row['campo_suborden'])?'NULL':"'".$row['campo_suborden']."'") .");\r\n");
+							 (is_null($row['campo_relacion_contable_cc'])?'NULL':"'".$row['campo_relacion_contable_cc']."'")."," .
+							 (is_null($row['campo_suborden'])?'NULL':"'".$row['campo_suborden']."'") .
+                             (is_null($row['incluir_desc_doc'])?'NULL':"'".$row['incluir_desc_doc']."'") .  //#21
+                                ");\r\n");
 							 
 							 						
 				}

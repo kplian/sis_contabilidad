@@ -5,7 +5,10 @@
 *@author  (admin)
 *@date 10-06-2013 14:51:03
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
-*/
+ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+# 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+
+ */
 
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -110,7 +113,37 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            grid:true,
            form:true
           },
-        
+        //#21
+        {
+            config:{
+                name:'incluir_desc_doc',
+                fieldLabel:'Incluir Documento',
+                qtip:'Este campo indica si vamos a procesar los descuento para las registros secundario del docuemento, los  incluimos  todos, o solo los que descuento es igual a si, o  los descuentos igual a no.  EJEMPLO sirve para llevar lso descuentos de servicios o iue be al comprobante de pago, pero permite dejar el via en el cobte de diario',
+                typeAhead: true,
+                allowBlank:true,
+                triggerAction: 'all',
+                emptyText:'Tipo...',
+                selectOnFocus:true,
+                mode:'local',
+                store:new Ext.data.ArrayStore({
+                    fields: ['ID', 'valor'],
+                    data :	[
+                        ['todos','Todos'],
+                        ['descuento','Descuento'],
+                        ['no_descuento','No descuento']
+                    ]
+                }),
+                valueField:'ID',
+                displayField:'valor',
+                anchor: '50%',
+                gwidth:100
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        //#21
         {
             config:{
                 name: 'prioridad_documento',
@@ -164,7 +197,6 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            grid:true,
            form:true
           },
-          
         {
             config: {
                 name: 'tipo_relacion_contable',
@@ -429,6 +461,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+
 		{
 			config:{
 				name: 'campo_concepto_transaccion',
@@ -452,7 +485,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:150
+				maxLength:300 //#21
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpbdet.campo_monto',type:'string'},
@@ -587,7 +620,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
-                maxLength:150
+                maxLength:300  //#21
             },
             type:'TextArea',
             filters:{pfiltro:'cmpbdet.campo_monto_pres',type:'string'},
@@ -928,7 +961,8 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'prioridad_documento',
         'campo_orden_trabajo','campo_forma_pago','codigo',
         'tipo_relacion_contable_cc','campo_relacion_contable_cc','campo_suborden',
-        'campo_codigo_aplicacion_rc'
+        'campo_codigo_aplicacion_rc',
+        'incluir_desc_doc'//#21
 		
 	],
 	sortInfo:{

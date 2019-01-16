@@ -19,7 +19,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
   # 19	ENDETRASM	 09/01/2019			Miguel Mamani			Plantilla actualizaciones des ingresos y modificación para la plantilla actualizaciones gastos
-
+  # 21  ENDETRASM	 16/01/2019			Miguel Mamamni			Se modifico a se 0 moneda internaciona y ufv por es una actualizacion de los UFV que es nomeda base
 ***************************************************************************/
 
 
@@ -184,6 +184,14 @@ BEGIN
                 v_sw_saldo_acredor = false;
               	v_saldo_ma = v_resp_deudor[5] - v_resp_acreedor[5];
               	v_saldo_mb = v_resp_deudor[1] - v_resp_acreedor[1];
+
+           elsif  v_resp_deudor[5] = v_resp_acreedor[5]  then
+
+            	v_sw_actualiza = true;
+                v_sw_saldo_acredor = false;
+              	v_saldo_ma = v_resp_deudor[5] - v_resp_acreedor[5];
+              	v_saldo_mb = v_resp_deudor[1] - v_resp_acreedor[1];
+
           else
 
           raise notice 'Paso algo malo no se puede realizar la actualizacion';
@@ -209,7 +217,10 @@ BEGIN
                		v_diferencia = v_saldo_mb - v_aux_actualizado_mb ;
                 	v_diferencia_positiva = false;
                   	v_sw_actualiza = true;
-
+ 				elsif v_saldo_mb  = v_aux_actualizado_mb then
+               		v_diferencia = v_saldo_mb - v_aux_actualizado_mb ;
+                	v_diferencia_positiva = false;
+                  	v_sw_actualiza = true;
                else
 
           			raise notice 'Paso algo malo no se puede realizar la actualizacion';
@@ -287,22 +298,27 @@ BEGIN
                               glosa,
                               id_int_comprobante,
                               id_auxiliar,
+
                               importe_debe,
                               importe_haber,
                               importe_gasto,
                               importe_recurso,
+
                               importe_debe_mb,
                               importe_haber_mb,
                               importe_gasto_mb,
                               importe_recurso_mb,
+
                               importe_debe_mt,
                               importe_haber_mt,
-                              importe_gasto_mt,
-                              importe_recurso_mt,
+                              importe_gasto_mt,   ---# 21
+                              importe_recurso_mt,  ---# 21
+
                               importe_debe_ma,
                               importe_haber_ma,
                               importe_gasto_ma,
                               importe_recurso_ma,
+
                               id_usuario_reg,
                               fecha_reg,
                               actualizacion
@@ -314,22 +330,19 @@ BEGIN
                               'ACTUALIZACIÓN  DE GASTOS '||p_hasta,
                               p_id_int_comprobante,
                               NULL,--v_registros.id_auxiliar,
+
                               v_importe_debe,
                               v_importe_haber,
                               v_importe_debe,
                               v_importe_haber,
+
                               v_importe_debe,
                               v_importe_haber,
                               v_importe_debe,
                               v_importe_haber,--MB
-                              v_actualiza_deudor_mt,
-                              v_actualiza_acreedor_mt,
-                              v_actualiza_deudor_mt,
-                              v_actualiza_acreedor_mt,--MT
-                              v_actualiza_deudor_ma,
-                              v_actualiza_acreedor_ma,
-                              v_actualiza_deudor_ma,
-                              v_actualiza_acreedor_ma, --MA
+
+                              0,0,0,0, --MT  ---# 21
+                              0,0,0,0, --MA   ---# 21
                               p_id_usuario,
                               now(),
                               'si'
@@ -339,12 +352,12 @@ BEGIN
 
 
                else
-               raise exception 'Algo salio mal :( ---> %',v_registros.id_cuenta;
+               raise exception 'Algo salio mal 1 :( ---> %',v_registros.id_cuenta;
                end if ;
 
           else
 
-          raise exception 'Salio algo mal cuenta --> %',v_registros.id_cuenta;
+          raise exception 'Salio algo mal cuenta 2 --> %',v_registros.id_cuenta;
 
           end if;
 
@@ -399,22 +412,27 @@ BEGIN
                                     glosa,
                                     id_int_comprobante,
                                     id_auxiliar,
+
                                     importe_debe,
                                     importe_haber,
                                     importe_gasto,
                                     importe_recurso,
+
                                     importe_debe_mb,
                                     importe_haber_mb,
                                     importe_gasto_mb,
                                     importe_recurso_mb,
+
                                     importe_debe_mt,
                                     importe_haber_mt,
                                     importe_gasto_mt,
                                     importe_recurso_mt,
+
                                     importe_debe_ma,
                                     importe_haber_ma,
                                     importe_gasto_ma,
                                     importe_recurso_ma,
+
                                     id_usuario_reg,
                                     fecha_reg,
                                     actualizacion
@@ -426,37 +444,34 @@ BEGIN
                                     'ACTUALIZACIÓN  DE GASTOS '||p_hasta,
                                     p_id_int_comprobante,
                                     NULL,
+
                                     v_ajuste_debe,
                                     v_ajuste_haber,
                                     v_ajuste_debe,
                                     v_ajuste_haber,
+
                                     v_ajuste_debe,
                                     v_ajuste_haber,
                                     v_ajuste_debe,
                                     v_ajuste_haber,
-                                    v_actualiza_deudor_mt,
-                                    v_actualiza_acreedor_mt,
-                                    v_actualiza_deudor_mt,
-                                    v_actualiza_acreedor_mt,--MT
-                                    v_actualiza_deudor_ma,
-                                    v_actualiza_acreedor_ma,
-                                    v_actualiza_deudor_ma,
-                                    v_actualiza_acreedor_ma, --MA
+
+                                    0,0,0,0, --MT --# 21
+                                    0,0,0,0, --MA --# 21
                                     p_id_usuario,
                                     now(),
                                     'si'
                                 );
-	
-        
+
+
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'
