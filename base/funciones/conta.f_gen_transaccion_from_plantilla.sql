@@ -32,10 +32,7 @@ Descripcion:
    												           las trasacciones generadas en int_trasaccion y hace una llamada recursiva para procesar transacciones secundarias asociadas
  #0       		17/11/2017      Rensi Arteaga Copari       BUG, En calculo por diferencia se considera lso montos de gastos y recurso
  #123           27/09/2018      Rarteaga                   Se adiciona el dato de tabla origien la guardar la trasaccion para rastreo
-
-
-
-
+ #21            10/01/2019      RArteaga                   añade parametro a la llamda de generar desde plantilla, para considerar descuentos
 */
 
 
@@ -610,7 +607,8 @@ BEGIN
                                                             (v_this_hstore->'campo_monto')::numeric, 
                                                             p_id_usuario,
                                                             (p_super->'columna_depto')::integer,--p_id_depto_conta 
-                                                            (p_super->'columna_gestion')::integer, 
+                                                            (p_super->'columna_gestion')::integer,
+                                                            (p_reg_det_plantilla->'incluir_desc_doc')::varchar, --#21
                                                             (p_reg_det_plantilla->'prioridad_documento')::integer,
                                                             'no',
                                                             (v_this_hstore->'campo_porc_monto_excento_var')::numeric 
