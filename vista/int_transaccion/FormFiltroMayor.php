@@ -6,6 +6,12 @@
 *@date    09-10-2017
 *@description muestra un formulario que muestra la cuenta y el monto de la transferencia
 */
+/*
+ ISSUE      FORK         FECHA:		         AUTOR                              DESCRIPCION
+ #24       ENDEETR  	18/01/2019        manuel guerra            agregando el texto TM(todas las monedas) para generarlo en formato excel
+*/
+
+
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -115,7 +121,9 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 			},
 			type:'Checkbox',
 			form:true,		
-		},{
+		},
+		//#24
+		{
 			config:{
 				name:'tipo_moneda',
 				fieldLabel:'Tipo de Moneda',
@@ -129,10 +137,11 @@ Phx.vista.FormFiltroMayor=Ext.extend(Phx.frmInterfaz,{
 				gwidth: 100,
 				store:new Ext.data.ArrayStore({
 					fields: ['variable', 'valor'],
-					data : [ 
+					data : [ 								
 								['MB','Moneda Base'],
 								['MT','Moneda Triangulacion'],
-								['MA','Moneda Actualizacion']
+								['MA','Moneda Actualizacion'],
+								['TM','Todas las monedas(Solo excel)']
 							]
 				}),
 				valueField: 'variable',
