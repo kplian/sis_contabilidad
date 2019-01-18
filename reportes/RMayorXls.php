@@ -1,4 +1,10 @@
 <?php
+/*
+ ISSUE      FORK         FECHA:		         AUTOR                              DESCRIPCION
+ #24       ENDEETR  	18/01/2019        manuel guerra            agrega las columnas dolares y Ufvs, incluyendo totales
+*/
+
+
 class RMayorXls
 {
 	private $docexcel;
@@ -152,12 +158,18 @@ class RMayorXls
 		//*************************************Cabecera*****************************************	
 		for ($i=1; $i <= $contador; $i++) {
 			$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$i].'5',$var[$i-1]);
-			$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$i].'')->setWidth(40); 			
+			$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$i].'')->setWidth(35); 			
 		}
 		$contador+=3;
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador-1].'')->setWidth(15);
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador].'')->setWidth(15);
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+1].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+2].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+3].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+4].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+5].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+6].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+7].'')->setWidth(15);
 		
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$i].'')->setWidth(40);
 		$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-2].'5','GLOSA');
@@ -176,7 +188,25 @@ class RMayorXls
 				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-1].'5','DEBE'.' '.'MB');
 				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador].'5','HABER'.' '.'MB');
 				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+1].'5','SALDO'.' '.'MB');			
-				break;		
+				break;
+			#24		
+			case 'TM':					
+				$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+7].'5')->getAlignment()->setWrapText(true);
+				$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+7].'5')->applyFromArray($styleTitulos2);	
+						
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-1].'5','DEBE'.' '.'MB');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador].'5','HABER'.' '.'MB');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+1].'5','SALDO'.' '.'MB');	
+				
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+2].'5','DEBE'.' '.'MT');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+3].'5','HABER'.' '.'MT');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+4].'5','SALDO'.' '.'MT');
+				
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+5].'5','DEBE'.' '.'MA');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+6].'5','HABER'.' '.'MA');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+7].'5','SALDO'.' '.'MA');
+				$contador+=9;							
+				break;			
 			default:			
 				break;
 		}
@@ -184,6 +214,32 @@ class RMayorXls
 	//
 	function generarDatos()
 	{
+		$styleTitulos2 = array(
+			'font'  => array(
+			    'bold'  => true,
+			    'size'  => 9,
+			    'name'  => 'Arial',
+			    'color' => array(
+			        'rgb' => 'FFFFFF'
+			    )
+			
+			),
+			'alignment' => array(
+			    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+			    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+			),
+			'fill' => array(
+			    'type' => PHPExcel_Style_Fill::FILL_SOLID,
+			    'color' => array(
+			        'rgb' => '0066CC'
+			    )
+			),
+			'borders' => array(
+			    'allborders' => array(
+			        'style' => PHPExcel_Style_Border::BORDER_THIN
+			    )
+			)
+		);
 		$styleTitulos3 = array(
 			'alignment' => array(
 				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
@@ -396,7 +452,121 @@ class RMayorXls
 					$fila++;
 					$this->numero++;
 				}			
-				break;		
+				break;	
+			#24	
+			case 'TM':
+				foreach ($datos as $value){					
+					$cc= (int)($this->objParam->getParametro('cc') === 'true');		
+					$partida = (int)($this->objParam->getParametro('partida')=== 'true');
+					$auxiliar = (int)($this->objParam->getParametro('auxiliar')=== 'true');
+					$ordenes = (int)($this->objParam->getParametro('ordenes')=== 'true');
+					$tramite = (int)($this->objParam->getParametro('tramite')=== 'true');
+					$crel = (int)($this->objParam->getParametro('relacional')=== 'true');			
+					$nro_comprobante = (int)($this->objParam->getParametro('nro_comprobante')=== 'true');
+					$fec = (int)($this->objParam->getParametro('fec')=== 'true');
+					$cuenta = (int)($this->objParam->getParametro('cuenta_t')=== 'true');						
+					
+					$aux='';		
+					if($cc == 1){
+						array_push($ar,trim($value['desc_centro_costo']));$contador++;						
+					}
+					if($partida == 1){
+						array_push($ar,trim($value['desc_partida']));$contador++;						
+					}
+					if($auxiliar == 1){
+						array_push($ar,trim($value['desc_auxiliar']));$contador++;						
+					}
+					if($ordenes == 1){
+						array_push($ar,trim($value['desc_partida']));$contador++;
+					}
+					if($tramite == 1){
+						array_push($ar,strval($value['nro_tramite']));$contador++;
+					}
+					if($crel == 1 ){
+						array_push($ar,$value['cbte_relacional']);$contador++;
+					}		
+					if($nro_comprobante == 1){
+						array_push($ar,trim($value['nro_cbte']));$contador++;
+					}	
+					if($fec == 1){						
+						$arr = explode('-', $value['fecha']);
+						$newDate = $arr[2].'-'.$arr[1].'-'.$arr[0];
+						$aux=$aux.$newDate."\r\n";
+						array_push($ar,$newDate);$contador++;
+					}
+					if($cuenta == 1){
+						array_push($ar,trim($value['desc_cuenta']));$contador++;
+					}
+					if($k==1){
+						$max=$contador;
+					}
+					$k=2;
+					$v=0;				
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
+					for ($i=$t; $i < $max+$t ; $i++) { 						
+						$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($v+1, $fila, $ar[$i]);
+						$v++;				
+					}	
+					$t=$t+$max;					
+					
+					$acreedor = ($value['importe_debe_mb']-$value['importe_haber_mb']) + $acreedor;													
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, trim($value['glosa1'])."\r\n".trim($value['glosa']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, $value['importe_debe_mb']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, $value['importe_haber_mb']);					
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4, $fila, $acreedor);										
+														
+					$acreedort = ($value['importe_debe_mt']-$value['importe_haber_mt']) + $acreedort;	
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+5, $fila, $value['importe_debe_mt']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+6, $fila, $value['importe_haber_mt']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+7, $fila, $acreedort);
+					
+					$acreedora = ($value['importe_debe_ma']-$value['importe_haber_ma']) + $acreedora;	
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+8, $fila, $value['importe_debe_ma']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+9, $fila, $value['importe_haber_ma']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+10, $fila, $acreedora);
+										
+					$fila++;
+					$this->numero++;
+				}
+				$this->docexcel->getActiveSheet()->getStyle('A'.($fila+1).':'.$this->equivalencias[$max+10].($fila+1).'')->applyFromArray($styleTitulos2);
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila+1,'TOTAL');
+				//bs
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+2].'6:'.$this->equivalencias[$max+2].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');				
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2,$fila+1,'=SUM('.$this->equivalencias[$max+2].'6:'.$this->equivalencias[$max+2].($fila-1).')');
+																
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+3].'6:'.$this->equivalencias[$max+3].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3,$fila+1,'=SUM('.$this->equivalencias[$max+3].'6:'.$this->equivalencias[$max+3].($fila-1).')');
+				
+				$deb = 'SUM('.$this->equivalencias[$max+2].'6:'.$this->equivalencias[$max+2].($fila-1).')';					
+				$hab = 'SUM('.$this->equivalencias[$max+3].'6:'.$this->equivalencias[$max+3].($fila-1).')';	
+				$vari = '=+'.$deb.'-'.$hab;
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+4].'6:'.$this->equivalencias[$max+4].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4,$fila+1,$vari);
+				//dolares
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+5].'6:'.$this->equivalencias[$max+5].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+5,$fila+1,'=SUM('.$this->equivalencias[$max+5].'6:'.$this->equivalencias[$max+5].($fila-1).')');
+								
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+6].'6:'.$this->equivalencias[$max+6].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+6,$fila+1,'=SUM('.$this->equivalencias[$max+6].'6:'.$this->equivalencias[$max+6].($fila-1).')');
+				
+				$deb = 'SUM('.$this->equivalencias[$max+5].'6:'.$this->equivalencias[$max+5].($fila-1).')';					
+				$hab = 'SUM('.$this->equivalencias[$max+6].'6:'.$this->equivalencias[$max+6].($fila-1).')';	
+				$vari = '=+'.$deb.'-'.$hab;
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+7].'6:'.$this->equivalencias[$max+7].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+7,$fila+1,$vari);
+				//ufv
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+8,$fila+1,'=SUM('.$this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila-1).')');
+								
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+9].'6:'.$this->equivalencias[$max+9].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+9,$fila+1,'=SUM('.$this->equivalencias[$max+9].'6:'.$this->equivalencias[$max+9].($fila-1).')');
+				
+				$deb = 'SUM('.$this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila-1).')';					
+				$hab = 'SUM('.$this->equivalencias[$max+9].'6:'.$this->equivalencias[$max+9].($fila-1).')';	
+				$vari = '=+'.$deb.'-'.$hab;
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+10].'6:'.$this->equivalencias[$max+10].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+10,$fila+1,$vari);
+				break;	
 			default:			
 				break;
 		}					
