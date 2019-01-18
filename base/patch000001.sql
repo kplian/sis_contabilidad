@@ -5063,3 +5063,14 @@ IS 'codigo identificador';
 
 
 
+
+/***********************************I-SCP-RAC-CONTA-21-10/01/2019****************************************/
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN incluir_desc_doc VARCHAR(10) DEFAULT 'todos' NOT NULL;
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.incluir_desc_doc
+IS '(todos, decuento, no_descuento), este campo indica si vamos a procesadar los descuento para las registros secundario deldocuemento, lso incluimos  todos, o solo los que descuento es igual a si, o  los descuentos igual a no.  EJEMPLO sirve para llevar lso descuentos de servicios o iue be al comprobante de pago, pero permite dejar el via en el cobte de diario';
+
+/***********************************F-SCP-RAC-CONTA-21-10/01/2019****************************************/
+

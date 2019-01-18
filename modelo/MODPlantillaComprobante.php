@@ -5,7 +5,11 @@
 *@author  (admin)
 *@date 10-06-2013 14:40:00
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+# 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+
+
+ */
 
 class MODPlantillaComprobante extends MODbase{
 	
@@ -356,7 +360,7 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('tipo_relacion_contable_cc','varchar');
 		    $this->captura('campo_relacion_contable_cc','text');
 			$this->captura('campo_suborden','varchar');
-			
+            $this->captura('incluir_desc_doc','varchar');//#21
 		
 			
 			$this->armarConsulta();
