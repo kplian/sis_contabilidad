@@ -11,7 +11,8 @@
    
  #0        		  20-09-2011        RAC KPLIAN              creacion
  #0999 ETR        20/08/2018        RAC KPLIAN              agrega filtro por defecto para tipo de documento segun informe lcv, retenciones, ncd, todos
-  #9999           19/06/2018               RAC          Se incorpra el calculo inverso para DUI IVA -> Importe Doc
+  #9999           19/06/2018               RAC              Se incorpra el calculo inverso para DUI IVA -> Importe Doc
+ #12	endeetr	  24/10/2018			EGS					Se aumento el parametro id_plantilla en la verificacion de concepto de gasto y se añadio que  baseParams de idConcepto_ingas  sea deacuerdo a ncd tambien que los centros de costo sean deacuerdo a ncd
  ***************************************************************************/
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -38,6 +39,7 @@ header("content-type: text/javascript; charset=UTF-8");
         tipo_pres_gasto: 'gasto',
         tipo_pres_recurso: 'recurso',
         tipo_informe:'todos',  //#0999 filtro por defecto para tipo de plantilla
+        excluir_tipo_informe:'ninguno',  //#0999 filtro por defecto para tipo de plantilla
         plantillaProrrateo: [], //07/12/2017 , RAc adcionar plantilal de prorrateo
         sw_nro_dui: 'no',
         constructor:function(config)
@@ -97,7 +99,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, 
             	                                              {
             	                                              	tipo_plantilla:this.Cmp.tipo.getValue(),
-            	                                              	tipo_informe: this.data.tipo_informe?this.data.tipo_informe:'todos'
+            	                                              	tipo_informe: this.data.tipo_informe?this.data.tipo_informe:'todos',
+            	                                              	excluir_tipo_informe: this.data.excluir_tipo_informe?this.data.excluir_tipo_informe:'ninguno'
             	                                              });
 
         },
@@ -168,7 +171,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
                     emptyText : 'Centro Costo...',
                     allowBlank: false,
-                    baseParams: (me.data.tipoDoc == 'compra')?{tipo_pres:me.tipo_pres_gasto, filtrar:'grupo_ep'}:{tipo_pres: me.tipo_pres_recurso, filtrar:'grupo_ep'}
+                     //#12 EGS	
+                    baseParams: (me.data.tipo_informe=='ncd')?(me.data.tipoDoc != 'compra')?{tipo_pres:me.tipo_pres_gasto, filtrar:'grupo_ep'}:{tipo_pres: me.tipo_pres_recurso, filtrar:'grupo_ep'}:(me.data.tipoDoc == 'compra')?{tipo_pres:me.tipo_pres_gasto, filtrar:'grupo_ep'}:{tipo_pres: me.tipo_pres_recurso, filtrar:'grupo_ep'}
                 }),
 
                 'id_orden_trabajo': new Ext.form.ComboRec({
@@ -361,7 +365,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         cargarDatosMaestro: function(){
-
+			console.log('this.data.tipo_informe',this.data.tipo_informe);
             this.detCmp.id_orden_trabajo.store.baseParams.fecha_solicitud = this.Cmp.fecha.getValue().dateFormat('d/m/Y');
             this.detCmp.id_orden_trabajo.modificado = true;
 
@@ -374,7 +378,13 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             this.detCmp.id_centro_costo.modificado = true;
             //cuando esta el la inteface de presupeustos no filtra por bienes o servicios
-            this.detCmp.id_concepto_ingas.store.baseParams.movimiento=(this.Cmp.tipo.getValue()=='compra')?'gasto':'recurso';
+            //#12 EGS		
+            if (this.data.tipo_informe=='ncd') {          	
+              this.detCmp.id_concepto_ingas.store.baseParams.movimiento=(this.Cmp.tipo.getValue()=='compra')?'recurso':'gasto';
+            } else{
+              this.detCmp.id_concepto_ingas.store.baseParams.movimiento=(this.Cmp.tipo.getValue()=='compra')?'gasto':'recurso';	
+            };
+            //#12 EGS	
             this.detCmp.id_concepto_ingas.store.baseParams.id_gestion=this.Cmp.id_gestion.getValue();
             this.detCmp.id_concepto_ingas.modificado = true;
 
@@ -2193,6 +2203,8 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         checkRelacionConcepto: function(cfg){
+        	//console.log('data',this.Cmp.id_plantilla.getValue());
+        	
             var me = this;
             Phx.CP.loadingShow();
             Ext.Ajax.request({
@@ -2201,7 +2213,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_centro_costo: cfg.id_centro_costo,
                     id_gestion: cfg.id_gestion,
                     id_concepto_ingas: cfg.id_concepto_ingas,
-                    relacion: me.data.tipoDoc
+                    relacion: me.data.tipoDoc,
+                    id_plantilla:this.Cmp.id_plantilla.getValue() //#12					24/10/2018			EGS	
                 },
                 success: function(resp){
                     Phx.CP.loadingHide();

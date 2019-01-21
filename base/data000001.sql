@@ -1552,3 +1552,77 @@ select pxp.f_insert_tgui ('Detalle Auxiliares por Cuenta', 'Detalle Auxiliares p
 select pxp.f_insert_testructura_gui ('RDA', 'REPCON');
 /***********************************F-DAT-MMV-CONTA-23-27/12/2018*****************************************/
 
+/***********************************I-DAT-EGS-CONTA-2-03/01/2019*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_cod_plan_nota_debito', E'NOTADEBITODOC', NULL),
+  (E'conta_cod_plan_nota_credito', E'NOTACREDITODOC', NULL);
+
+/***********************************F-DAT-EGS-CONTA-2-03/01/2019*****************************************/
+
+/***********************************I-DAT-EGS-CONTA-3-09/01/2019*****************************************/
+
+/*catalogos*/
+select param.f_import_tcatalogo_tipo ('insert','finalidad_nota_debito_sobre_compra','CONTA','tdoc_compra_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Cobro Clientes por Peaje','cbr_peaje','finalidad_nota_debito_sobre_compra');
+
+select param.f_import_tcatalogo_tipo ('insert','tipo_venta_nota_debito','CONTA','tdoc_compra_venta');
+select param.f_import_tcatalogo ('insert','CONTA','PLIEGOS CLIENTES DEL EXTRANJERO','pliegos','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','CLIENTES POR PEAJE E INGRESOS TARIFARIO','peaje','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','PEAJES EMPRESAS DEL GRUPO','peaje_grupo','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','SERVICIOS TERCEROS Y PLIEGOS A PROVEEDORES NACIONALES','terceros','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','SERVICIOS A EMPRESAS DEL GRUPO','servicos_grupo','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','VENTA ACTIVOS FIJOS','activo_fijo','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','VENTA DE SUMINISTROS A PROVEEDORES','suministros','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','MULTAS A PROVEEDORES','multas','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','Alquiler de Parqueo al Personal','parqueo','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','Intereses por prestamos al personal','intereses','tipo_venta_nota_debito');
+select param.f_import_tcatalogo ('insert','CONTA','Cobro Clientes por Peaje','cbr_peaje','tipo_venta_nota_debito');
+
+
+select param.f_import_tcatalogo_tipo ('insert','tipo_credito_sobre_venta','CONTA','tdoc_compra_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Devolución Peaje Empresas de Grupo','dev_peaje_grupo','tipo_credito_sobre_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Devolución Peaje  Otros','dev_peaje_otros','tipo_credito_sobre_venta');
+
+/*insercion de relaciones contables*/
+select conta.f_import_ttipo_relacion_contable ('insert','DEVVENTA','TCON','Devoluciones sobre Ventas','activo','si-general','si','no','flujo_presupuestaria','recurso_gasto','no','no','si','');
+select conta.f_import_ttipo_relacion_contable ('insert','DEVCOMPRA','TCON','Devoluciones sobre compras','activo','si-general','si','no','flujo_presupuestaria','recurso_gasto','no','no','si','');
+
+select conta.f_import_ttipo_relacion_contable ('insert','CUXCOBRARNOTAS','TPRO','Cuenta por Cobrar Notas de debito por ventas','activo','si-general','si','dinamico','flujo','recurso_gasto','no','no','no','');
+select conta.f_import_ttipo_relacion_contable ('insert','CUXPAGARNOTAS','TPRO','Cuenta por pagar notas de credito por ventas','activo','si-general','si','dinamico','flujo','recurso_gasto','si','no','no','');
+select conta.f_import_ttipo_relacion_contable ('insert','CXPDEV','TPRO','Cuenta por Pagar Devoluciones','activo','no','si','dinamico','flujo_presupuestaria','recurso_gasto','si','no','no','tipo_credito_sobre_venta');
+select conta.f_import_ttipo_relacion_contable ('insert','CXCDFPRO','TPRO','CUENTAS POR COBRAR CLIENTES','activo','no','si','dinamico','flujo_presupuestaria','recurso_gasto','si','no','no','tipo_venta_nota_debito');
+
+
+/*insercion de plantillas de comprobante*/
+select conta.f_import_tplantilla_comprobante ('insert','NOTACREDITODOC','conta.f_ges_cbte_eliminacion_doc_compra_venta','id_agrupador','CONTA','Notas Credito','','{$tabla.fecha_cbte}','activo','','{$tabla.id_depto_conta}','contable','','conta.vagrupador','DIARIO','{$tabla.id_moneda}','{$tabla.id_gestion}','{$tabla.id_moneda},{$tabla.id_gestion},{$tabla.id_depto_conta},{id_agrupador}','no','no','no','','','','','','','','','','','Notas de Credito de Facturas sobre Ventas','','','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTACREDITODOC','NOTACREDITO.1','debe','si','si','','{$tabla.descripcion}','DEVVENTA','','{$tabla.precio_total_final}','{$tabla.id_concepto_ingas}','{$tabla.id_plantilla}','si','{$tabla.id_centro_costo}','','','si','','id_agrupador','','Concepto de Gasto','{$tabla.precio_total_final}',NULL,'simple','','{$tabla.id_doc_concepto}','no','','','','','','{$tabla.importe_total_excento}','','2','{$tabla.id_orden_trabajo}','conta.vdoc_compra_venta_det',NULL,'','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTACREDITODOC','NOTACREDITO.5','haber','no','si','','','CXPDEV','','{$tabla.importe_pendiente}','{$tabla.id_proveedor}','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','cuentas por pagar','{$tabla.importe_pendiente}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta_proveedor',NULL,'','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTACREDITODOC','NOTACREDITO.3','haber','no','si','','','CMRETGARDF','','{$tabla.importe_retgar}','','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','retencion de garantia','{$tabla.importe_retgar}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTACREDITODOC','NOTACREDITO.2','haber','no','si','','','CMPDEF','','{$tabla.importe_pago_liquido}','','','no','','','','si','','id_agrupador','','cuenta para bancos','{$tabla.importe_pago_liquido}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTACREDITODOC','NOTACREDITO.4','haber','no','si','','','CMRETANTD','','{$tabla.importe_anticipo}','','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','retención de anticipos','{$tabla.importe_anticipo}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'','','','');
+
+
+select conta.f_import_tplantilla_comprobante ('insert','NOTADEBITODOC','conta.f_ges_cbte_eliminacion_doc_compra_venta','id_agrupador','CONTA','Notas Debito','','{$tabla.fecha_cbte}','activo','','{$tabla.id_depto_conta}','presupuestario','','conta.vagrupador','DIARIO','{$tabla.id_moneda}','{$tabla.id_gestion}','{$tabla.id_moneda},{$tabla.id_gestion},{$tabla.id_depto_conta},{id_agrupador}','si','si','no','','','','','','','','','','','Notas de Debito de Facturas sobre Compras','','','','','');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTADEBITODOC','NOTADEBITO.3','debe','si','si','','','VRETGARDFPRO','','{$tabla.importe_retgar}','{$tabla.id_proveedor}','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','Retencion de garantías por cobrar','{$tabla.importe_retgar}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta_proveedor',NULL,'','','','''todos');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTADEBITODOC','NOTADEBITO.4','debe','no','si','','','VRETANTDPRO','','{$tabla.importe_anticipo}','{$tabla.id_proveedor}','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','descuento de anticipo pagados por adelantado','{$tabla.importe_anticipo}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta_proveedor',NULL,'','','','''todos');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTADEBITODOC','NOTADEBITO.2','debe','si','si','','','VENDEF','','{$tabla.importe_pago_liquido}','','','no','','','','si','','id_agrupador','','ingreso a bancos','{$tabla.importe_pago_liquido}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta',NULL,'','','','''todos');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTADEBITODOC','NOTADEBITO.1','haber','si','si','','{$tabla.descripcion}','DEVCOMPRA','','{$tabla.precio_total_final}','{$tabla.id_concepto_ingas}','{$tabla.id_plantilla}','si','{$tabla.id_centro_costo}','','','si','','id_agrupador','','Venta concepto de gasto','{$tabla.precio_total_final}',NULL,'simple','','{$tabla.id_doc_concepto}','no','','','','','','{$tabla.importe_total_excento}','','2','{$tabla.id_orden_trabajo}','conta.vdoc_compra_venta_det',NULL,'','','','''todos');
+select conta.f_import_tdetalle_plantilla_comprobante ('insert','NOTADEBITODOC','NOTADEBITO.5','debe','no','si','','','CXCDFPRO','','{$tabla.importe_pendiente}','{$tabla.id_proveedor}','','no','','{$tabla.id_auxiliar}','','si','','id_agrupador','','cuentas por cobrar','{$tabla.importe_pendiente}',NULL,'simple','','{$tabla.id_doc_compra_venta}','no','','','','','','','','2','','conta.vdoc_compra_venta_proveedor',NULL,'','','','''todos');
+
+/*insercion de plantillas de documento*/
+select conta.f_import_tplantilla ('insert','Notas de Debito Fiscal Sobre Compras','si','si','6','4','no','no','si','si','venta','no','no','variable','0','ncd');
+select conta.f_import_tplantilla_calculo ('insert','Notas de Debito Fiscal Sobre Compras','ingreso por devolucion','1','haber','porcentaje','','0.87','0.87','no');
+select conta.f_import_tplantilla_calculo ('insert','Notas de Debito Fiscal Sobre Compras','IVA-DF','2','haber','porcentaje','IVA-DF','0.13','0.13','no');
+select conta.f_import_tplantilla_calculo ('insert','Notas de Debito Fiscal Sobre Compras','cuentas por cobrar','3','debe','porcentaje','CUXCOBRARNOTAS','1','1','no');
+
+select conta.f_import_tplantilla ('insert','Notas de Crédito Fiscal Sobre Ventas','si','si','6','4','no','no','si','si','compra','no','no','variable','0','ncd');
+select conta.f_import_tplantilla_calculo ('insert','Notas de Crédito Fiscal Sobre Ventas','IVA-CF','2','debe','porcentaje','IVA-CF','0.13','0.13','no');
+select conta.f_import_tplantilla_calculo ('insert','Notas de Crédito Fiscal Sobre Ventas','Cuentas por pagar','3','haber','porcentaje','CUXPAGARNOTAS','1','1','no');
+select conta.f_import_tplantilla_calculo ('insert','Notas de Crédito Fiscal Sobre Ventas','Perdida por devolución','1','debe','porcentaje','','0.87','0.87','no');
+
+/***********************************F-DAT-EGS-CONTA-3-09/01/2019*****************************************/
+/***********************************I-DAT-MMV-CONTA-19-09/01/2019****************************************/
+select conta.f_import_tresultado_plantilla ('insert','ACT-ING','activo','Actualizaciones Ingresos','cbte','si','no','no','rango','ACTUALIZACIÓN  DE INGRESOS','DIARIOCON','no','ACT-ING','conta.f_plantilla_actualizacion_ingresos');
+/***********************************F-DAT-MMV-CONTA-19-09/01/2019****************************************/

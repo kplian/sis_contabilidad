@@ -23,6 +23,8 @@ $body$
  #87    ETR        25/02/2018        RAC KPLIAN       Considerar fechas dsitintas en las valdiacion de DUI's
  #88    ETR        23/06/2018        RAC  KPLIAN      Solucionar Bug que permite editar fecha con diferente periodo
  #1999  ETR        19/07/2018        RAC  KPLIAN      Relacionar facturas NCD
+ #2000  ETR        03/10/2018        RAC  KPLIAN      Para la isnercion y edicion se añade opcionalmente el parametro codigo_aplicacion 
+ #12    ETR        12/10/2018        RAC  KPLIAN      Se añade  pametro para isnertar el id_doc_compra_venta_fk para notas de credito
 ***************************************************************************/
 
 DECLARE
@@ -59,6 +61,9 @@ DECLARE
   
   v_registros_ncd   		record;   -- #1999
   v_suma_otros_creditos     numeric;  -- #1999
+  v_codigo_aplicacion       varchar;  -- #2000 
+  v_id_contrato             integer;  -- #2000 
+  v_id_doc_compra_venta_fk  integer;  -- #123
 
 
 BEGIN
@@ -159,7 +164,20 @@ BEGIN
          v_sw_pgs = 'no';
       end if;      
       --FIN RAC
-
+      
+      --# 2000, valida el campo codigo de aplicacion
+      if (pxp.f_existe_parametro(p_tabla,'codigo_aplicacion')) then
+          v_codigo_aplicacion = v_parametros.codigo_aplicacion;     
+      end if; 
+      
+      if (pxp.f_existe_parametro(p_tabla,'id_contrato')) then
+          v_id_contrato = v_parametros.id_contrato;     
+      end if;
+      
+      --#123 
+       if (pxp.f_existe_parametro(p_tabla,'id_doc_compra_venta_fk')) then
+          v_id_doc_compra_venta_fk = v_parametros.id_doc_compra_venta_fk;     
+      end if; 
      
       
       
@@ -306,7 +324,10 @@ BEGIN
         id_int_comprobante,
         nro_tramite,
         id_funcionario,
-        sw_pgs
+        sw_pgs,
+        codigo_aplicacion,      --#1999
+        id_contrato,            --#2000
+        id_doc_compra_venta_fk  --#123
 
       ) values(
         v_parametros.tipo,
@@ -349,7 +370,10 @@ BEGIN
         v_id_int_comprobante,
         v_nro_tramite,
         v_id_funcionario,
-        v_sw_pgs
+        v_sw_pgs,
+        v_codigo_aplicacion,      --#1999
+        v_id_contrato,            --#2000
+        v_id_doc_compra_venta_fk  --#123
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -645,6 +669,7 @@ BEGIN
        ISSUE            FECHA:		      AUTOR               DESCRIPCION
     #87  ETR        25/02/2018        RAC KPLIAN       Considerar fechas dsitintas en las valdiacion de DUI's   
     #88  ETR        23/06/2018        RAC  KPLIAN      Solucionar Bug que permite editar fecha con diferente periodo
+    #2000  ETR        03/10/2018        RAC KPLIAN       modifica opcionalmente l codigo de aplicacion
   ***********************************/
 
   elsif(p_transaccion='CONTA_DCV_MOD')then
@@ -846,6 +871,15 @@ BEGIN
       
       --FIN RAC
       
+      --# 2000, valida el campo codigo de aplicacion
+      if (pxp.f_existe_parametro(p_tabla,'codigo_aplicacion')) then
+          v_codigo_aplicacion = v_parametros.codigo_aplicacion;     
+      end if; 
+      
+      if (pxp.f_existe_parametro(p_tabla,'id_contrato')) then
+          v_id_contrato = v_parametros.id_contrato;     
+      end if;
+      
 
       --Sentencia de la modificacion
       update conta.tdoc_compra_venta set
@@ -879,7 +913,9 @@ BEGIN
         id_auxiliar = v_parametros.id_auxiliar,
         id_int_comprobante = v_id_int_comprobante,
         id_funcionario = v_id_funcionario,
-        sw_pgs = v_sw_pgs
+        sw_pgs = v_sw_pgs,
+        codigo_aplicacion = v_codigo_aplicacion,
+        id_contrato = v_id_contrato
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
@@ -1648,6 +1684,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION conta.ft_doc_compra_venta_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;

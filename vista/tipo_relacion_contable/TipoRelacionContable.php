@@ -371,7 +371,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 						// turn on remote sorting
 						remoteSort: true,
 						baseParams: {
-							par_filtro: 'nombre'
+							par_filtro: 'pacati.nombre' //#12
 						}
 					}),
 					valueField: 'nombre',

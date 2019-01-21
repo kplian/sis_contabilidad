@@ -14,7 +14,7 @@
    
  #0        		  8-08-2015         N/N               creacion
  #1200  ETR       12/07/2018        RAC KPLIAN        Se Agrega capacidad de relacionar facturaa las notas de debito credito
- #1201  ETR       21/08/2018        RAC KPLIAN        se añadi filtro apra no generar cbte para NCD notas de credito debito
+ #12    ETR       21/08/2018        RAC KPLIAN        se añadi filtro apra no generar cbte para NCD notas de credito debito
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>

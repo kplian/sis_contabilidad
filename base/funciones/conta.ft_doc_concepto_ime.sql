@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_concepto_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -18,9 +16,13 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+   HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0             15-09-2015        RAC                 Creacion 
+ #123           16/10/2018        RAC                 Validacion de concepto de gasto incluye la posibilidad de que sea un documento de NCD  
+ #12             24/10/2018        EGS                 verificacion de concepto de gasto cuando es un documento ncd 	
+	
 ***************************************************************************/
 
 DECLARE
@@ -39,6 +41,8 @@ DECLARE
     v_id_partida	integer;
     v_id_auxiliar	integer;
     v_id_gestion	integer;
+    
+    v_registros_pla			record;
 			    
 BEGIN
 
@@ -56,6 +60,12 @@ BEGIN
 					
         begin
         
+        	
+        	IF p_id_usuario = 428 THEN
+              -- raise notice '%', v_parametros.tabla_origen;
+             --  raise exception '%', v_parametros.tabla_origen;
+            END IF;
+        
             select
             cig.desc_ingas
             into
@@ -71,23 +81,36 @@ BEGIN
              SELECT 
               dcv.tipo,
               dcv.id_periodo,
-              per.id_gestion
+              per.id_gestion,
+              plt.tipo_informe,  --#123    recupera tipo de informe
+              dcv.codigo_aplicacion  --#123    recupera tipo de informe , codigo de aplicacion
              into
               v_registros_doc
              FROM conta.tdoc_compra_venta dcv 
+             inner join param.tplantilla plt on plt.id_plantilla = dcv.id_plantilla   
              inner join param.tperiodo per on per.id_periodo = dcv.id_periodo
              where dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
              
-         
-             --obtener partida, cuenta auxiliar del concepto de gasto
-            IF v_registros_doc.tipo = 'compra' THEN
-               v_codigo_rel = 'CUECOMP';  --codigo de relacion contable para compras
-            ELSE
-               v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
-            END IF;
-            
-            --Validar si tiene relacion contable        
-            SELECT 
+             --#123            
+             IF v_registros_doc.tipo_informe = 'ncd'   THEN  --#123 si el tipo de informe es igual a una nota de credito debito varia la relacin contable
+                  --obtener partida, cuenta auxiliar del concepto de gasto
+                  IF v_registros_doc.tipo = 'compra' THEN
+                     v_codigo_rel = 'DEVVENTA';  --codigo de relacion contable para notas de credito sobre ventas 
+                  ELSE
+                     v_codigo_rel = 'DEVCOMPRA';  --codigo de relacion contable para notas de debito sobre compras
+                  END IF;
+                  
+             ELSE
+                   --obtener partida, cuenta auxiliar del concepto de gasto
+                  IF v_registros_doc.tipo = 'compra' THEN
+                     v_codigo_rel = 'CUECOMP';  --codigo de relacion contable para compras
+                  ELSE
+                     v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
+                  END IF;
+             END IF; 
+           
+           --Validar si tiene relacion contable        
+           SELECT 
               ps_id_partida ,
               ps_id_cuenta,
               ps_id_auxiliar
@@ -95,12 +118,17 @@ BEGIN
               v_id_partida,
               v_id_cuenta, 
               v_id_auxiliar
-            FROM conta.f_get_config_relacion_contable(v_codigo_rel, 
+           FROM conta.f_get_config_relacion_contable(v_codigo_rel, 
                                                      v_registros_doc.id_gestion, 
                                                      v_parametros.id_concepto_ingas, 
                                                      v_parametros.id_centro_costo,  
-                                                     'No se encontro relación contable para el conceto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
-          
+                                                     'No se encontro relación contable para el conceto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ',
+                                                     NULL,
+                                                     v_registros_doc.codigo_aplicacion    --#123  codigo de aplicacion...
+                                                     );
+           
+           
+        
         
            IF  v_id_cuenta is NULL THEN
                raise exception 'no se encontro relacion contable ...';
@@ -181,25 +209,39 @@ BEGIN
               from param.tconcepto_ingas cig
               where cig.id_concepto_ingas =  v_parametros.id_concepto_ingas;
               
-            --obtiene datos del documento
-            
+         
+            --obtiene datos del documento            
              SELECT 
               dcv.tipo,
               dcv.id_periodo,
-              per.id_gestion
+              per.id_gestion,
+              plt.tipo_informe,  --#123    recupera tipo de informe
+              dcv.codigo_aplicacion  --#123    recupera tipo de informe , codigo de aplicacion
              into
               v_registros_doc
              FROM conta.tdoc_compra_venta dcv 
+             inner join param.tplantilla plt on plt.id_plantilla = dcv.id_plantilla   
              inner join param.tperiodo per on per.id_periodo = dcv.id_periodo
              where dcv.id_doc_compra_venta = v_parametros.id_doc_compra_venta;
              
-         
-             --obtener partida, cuenta auxiliar del concepto de gasto
-            IF v_registros_doc.tipo = 'compra' THEN
-               v_codigo_rel = 'CUECOMP';  --codigo de relacion contable para compras
-            ELSE
-               v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
-            END IF;
+          
+           IF v_registros_doc.tipo_informe = 'ncd'   THEN  --#123 si el tipo de informe es igual a una nota de credito debito varia la relacin contable
+                --obtener partida, cuenta auxiliar del concepto de gasto
+                IF v_registros_doc.tipo = 'compra' THEN
+                   v_codigo_rel = 'DEVVENTA';  --codigo de relacion contable para notas de credito sobre ventas 
+                ELSE
+                   v_codigo_rel = 'DEVCOMPRA';  --codigo de relacion contable para notas de debito sobre compras
+                END IF;
+                
+           ELSE
+                 --obtener partida, cuenta auxiliar del concepto de gasto
+                IF v_registros_doc.tipo = 'compra' THEN
+                   v_codigo_rel = 'CUECOMP';  --codigo de relacion contable para compras
+                ELSE
+                   v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
+                END IF;
+           END IF; 
+            
             
             --Validar si tiene relacion contable        
             SELECT 
@@ -286,14 +328,38 @@ BEGIN
 	elsif(p_transaccion='CONTA_VERCONCEP_IME')then
 
 		begin
-            
-            --obtener partida, cuenta auxiliar del concepto de gasto
-            IF v_parametros.relacion = 'compra' THEN
-               v_codigo_rel = 'CUECOMP';  --codigo de relacion contable para compras
-            ELSE
-               v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
-            END IF;
-            
+          ---obtencion de los datos del tipo de plantilla
+            --#12             24/10/2018        EGS          
+           select 
+           pla.id_plantilla,
+           pla.tipo_plantilla,
+           pla.tipo_informe
+           into
+           v_registros_pla
+           from param.tplantilla pla
+           where pla.id_plantilla = v_parametros.id_plantilla;
+           
+           
+           
+           --#123 
+            IF v_registros_pla.tipo_informe = 'ncd'   THEN  --#123 si el tipo de informe es igual a una nota de credito debito varia la relacin contable
+                --obtener partida, cuenta auxiliar del concepto de gasto
+                IF v_parametros.relacion = 'compra' THEN
+                   v_codigo_rel = 'DEVVENTA';  --codigo de relacion contable para notas de credito sobre ventas 
+                ELSE
+                   v_codigo_rel = 'DEVCOMPRA';  --codigo de relacion contable para notas de debito sobre compras
+                END IF;
+                
+           ELSE
+                 --obtener partida, cuenta auxiliar del concepto de gasto
+                IF v_parametros.relacion = 'compra' THEN
+                   v_codigo_rel = 'CUECOMP';  --codigo de relacion contable para compras
+                ELSE
+                   v_codigo_rel = 'CUEVENT';  --codigo de relacion contable para ventas
+                END IF;
+           END IF; 
+         
+            --#12             24/10/2018        EGS 
             SELECT 
               ps_id_partida ,
               ps_id_cuenta,

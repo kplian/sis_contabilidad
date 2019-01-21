@@ -14,8 +14,10 @@
  #1200  ETR       12/07/2018        RAC KPLIAN        filtros para relacioanr notas de debito credito
  #1999  ETR       19/07/2018        RAC KPLIAN        Relacionar facturas NCD
  #2000  ETR       20/08/2018        EGS               aumento filtro  listar DocCompraVenta Cobro
+ #1201  ETR       11/09/2018        RAC               Adciona filtro apra buscar en varios tipos de informe  tipos_infromes 
  #2001  ETR       12/09/2018        EGS               aumento filtros para listar DocCompraVenta Cobro  para anticipos y facturas regularizadas
- * 
+ #12   ETR       17/10/2018        RAC KPLIAN        El listado de factura normales se excluyer las facturas del tipo inform NCD  
+ 
  * */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
@@ -82,6 +84,15 @@ class ACTDocCompraVenta extends ACTbase{
         }
 
        //#1200  FIN 
+	   //#1201 add tipos_informes, para listar facturas LCV y facturas regularizadas
+       if($this->objParam->getParametro('tipos_informes') !=''){
+            $this->objParam->addFiltro("pla.tipo_informe in (".$this->objParam->getParametro('tipos_informes').")");
+        }
+		
+		//#123  se exlcuye facturas NCD de los listados de compra y ventas...
+		if($this->objParam->getParametro('nombre_vista') =='DocCompra' || $this->objParam->getParametro('nombre_vista') =='DocVenta'){
+			$this->objParam->addFiltro("pla.tipo_informe not in (''ncd'')");
+		}
 		
 		
 		
@@ -606,6 +617,65 @@ class ACTDocCompraVenta extends ACTbase{
 		$this->res=$this->objFunc->cargarDatosFactura($this->objParam);		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	 function listarContraFactura(){
+        $this->objParam->defecto('ordenacion','id_contrato');
+        $this->objParam->defecto('dir_ordenacion','asc');
+       // var_dump($this->objParam->getParametro('id_contrato'));exit;
+        if($this->objParam->getParametro('id_contrato') != '') {
+            $this->objParam->addFiltro(" dcv.id_contrato = " . $this->objParam->getParametro('id_contrato'));
+        }
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODDocCompraVenta','listarContraFactura');
+        } else{
+            $this->objFunc=$this->create('MODDocCompraVenta');
+
+            $this->res=$this->objFunc->listarContraFactura($this->objParam);
+        }
+        $temp = Array();
+        $temp['importe_ice'] = $this->res->extraData['total_importe_ice'];
+        $temp['importe_excento'] = $this->res->extraData['total_importe_excento'];
+        $temp['importe_it'] = $this->res->extraData['total_importe_it'];
+        $temp['importe_iva'] = $this->res->extraData['total_importe_iva'];
+        $temp['importe_descuento'] = $this->res->extraData['total_importe_descuento'];
+        $temp['importe_doc'] = $this->res->extraData['total_importe_doc'];
+        $temp['importe_retgar'] = $this->res->extraData['total_importe_retgar'];
+        $temp['importe_anticipo'] = $this->res->extraData['total_importe_anticipo'];
+        $temp['importe_pendiente'] = $this->res->extraData['tota_importe_pendiente'];
+        $temp['importe_neto'] = $this->res->extraData['total_importe_neto'];
+        $temp['importe_descuento_ley'] = $this->res->extraData['total_importe_descuento_ley'];
+        $temp['importe_pago_liquido'] = $this->res->extraData['total_importe_pago_liquido'];
+        $temp['importe_aux_neto'] = $this->res->extraData['total_importe_aux_neto'];
+
+        $temp['tipo_reg'] = 'summary';
+        $temp['id_doc_compra_venta'] = 0;
+        
+        $this->res->total++;
+        $this->res->addLastRecDatos($temp);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function listarCodigoProveedorFactura(){
+        $this->objParam->defecto('ordenacion','id_doc_compra_venta');
+        $this->objParam->defecto('dir_ordenacion','asc');
+        if($this->objParam->getParametro('codigo_auxiliar') != '') {
+            $this->objParam->addFiltro(" au.codigo_auxiliar = " ."''". $this->objParam->getParametro('codigo_auxiliar')."''");
+        }
+        $this->objFunc=$this->create('MODDocCompraVenta');
+        $this->res=$this->objFunc->listarCodigoProveedorFactura($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function insertarContrato(){
+        $this->objFunc=$this->create('MODDocCompraVenta');
+        $this->res=$this->objFunc->asignarContrato($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function eleminarContrato(){
+        $this->objFunc=$this->create('MODDocCompraVenta');
+        $this->res=$this->objFunc->quitarContratoFactura($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 	
 	
 	

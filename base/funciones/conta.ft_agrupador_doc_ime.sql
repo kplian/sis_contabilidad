@@ -17,10 +17,10 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
+ISSUE  						AUTHOR  				FECHA   					DESCRIPCION
+#12							EGS						08/10/2018					se agrego validacion para variables globales de notas de credito y debito
+#12							EGS						08/11/2018					se agrego la logica para mostrar que  las facturas estan anuladas antes que genere un comprobante
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
 ***************************************************************************/
 
 DECLARE
@@ -37,6 +37,10 @@ DECLARE
     v_registros				record;
     v_id_int_comprobante     integer;
     v_nro_tramite			varchar;
+    
+    v_item					record; 		--#12	EGS	08/11/2018
+    v_lista_facturas_Anuladas varchar;		--#12	EGS	08/11/2018
+    v_bandera				boolean;		--#12	EGS	08/11/2018
 			    
 BEGIN
 
@@ -133,23 +137,65 @@ BEGIN
 		begin
 			
             -- recupera datos del agrupador
+            
+            ----#12 	EGS		08/10/2018	
             select
-              ag.tipo
+              ag.tipo,
+              agd.id_doc_compra_venta,
+              pla.tipo_plantilla,
+              pla.tipo_informe
+            
             into
              v_rec_agru
             from conta.tagrupador ag
+            left join conta.tagrupador_doc agd on agd.id_agrupador = ag.id_agrupador
+            left join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta=agd.id_doc_compra_venta
+            left join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
             where  ag.id_agrupador = v_parametros.id_agrupador;
+           --#12 	EGS	08/11/2018 
+           v_lista_facturas_Anuladas='';
+           v_bandera = FALSE;
+        	FOR v_item IN ( 
+           		 SELECT	
+            		agdd.id_doc_compra_venta,
+            		dcv.nro_documento,
+                    tdcv.nombre  
+            	 FROM	conta.tagrupador_doc agdd
+            		left join  conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = agdd.id_doc_compra_venta
+                    left join  conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+          		 WHERE agdd.id_agrupador = v_parametros.id_agrupador)LOOP
+                
+                IF v_item.nombre='ANULADA' THEN
+                v_bandera = TRUE;
+               	v_lista_facturas_Anuladas = v_item.nro_documento||','||v_lista_facturas_Anuladas;
+                 
+                END IF;
+
+            END  LOOP;
             
+            IF v_bandera = TRUE THEN    
+           		RAISE EXCEPTION	'En la Generacion de Comprobante Fallo la Facturas Con nro Doc % quitelas de la lista Por Favor estan en Estado Anulado',v_lista_facturas_Anuladas;
+			END IF;
+             --#12	EGS	08/11/2018   
             
-            --recuepra codgio de la plantillade comprobante
-            IF  v_rec_agru.tipo = 'compra' THEN
+            --recuepra codgio de la plantilla de comprobante
+            IF  v_rec_agru.tipo = 'compra' and v_rec_agru.tipo_informe <> 'ncd' THEN
                 v_codigo_pla =  pxp.f_get_variable_global('conta_cod_plan_compra');
-            ELSE
-                v_codigo_pla =  pxp.f_get_variable_global('conta_cod_plan_venta');
+            ELSIF v_rec_agru.tipo = 'venta' and v_rec_agru.tipo_informe <> 'ncd' THEN
+            	v_codigo_pla =  pxp.f_get_variable_global('conta_cod_plan_venta');
+            ELSIF v_rec_agru.tipo = 'compra' and v_rec_agru.tipo_informe = 'ncd' THEN  --#12	EGS	08/10/2018
+            	v_codigo_pla =  pxp.f_get_variable_global('conta_cod_plan_nota_credito');--#12	EGS	08/10/2018	
+            ELSIF v_rec_agru.tipo = 'venta' and v_rec_agru.tipo_informe = 'ncd' THEN     --#12	 EGS	08/10/2018	
+            	v_codigo_pla =  pxp.f_get_variable_global('conta_cod_plan_nota_debito');--#12	EGS	08/10/2018	
+                         
             END IF;
             
             
-             --  Si NO  se contabiliza nacionalmente
+             ----#12 	EGS		08/10/2018	
+             
+            --raise exception 'hola %',v_rec_agru;
+            
+             -- Si NO  se contabiliza nacionalmente
             v_id_int_comprobante =   conta.f_gen_comprobante (
                                                    v_parametros.id_agrupador,
                                                    v_codigo_pla,
