@@ -56,6 +56,10 @@ Descripción:   adciona tres criterios, moneda, aplicacion, tipo de presupuesto
 Autor: RAC
 Fcha: 09/05/2018
 Descripción:   Se hace el codigo de aplciacion lleuge como parametro opcionalmente
+##################################Autor: RAC
+Fcha: 25/10/2018
+   #123
+Descripción: verifica si la relacion contable esta habilitada para usar aplciaciones 
 ##################################
 
 */
@@ -481,7 +485,8 @@ BEGIN
             ttab.tabla_id_auxiliar,
             trel.tiene_auxiliar,
             trel.codigo_aplicacion_catalogo,
-            ttab.tabla_codigo_aplicacion
+            ttab.tabla_codigo_aplicacion,
+            trel.tiene_aplicacion
          
           into 
              v_rec
