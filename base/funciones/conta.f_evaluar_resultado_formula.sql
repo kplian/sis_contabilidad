@@ -7,6 +7,13 @@ CREATE OR REPLACE FUNCTION conta.f_evaluar_resultado_formula (
 )
 RETURNS numeric [] AS
 $body$
+/***************************************************************************
+ HISTORIAL DE MODIFICACIONES:
+ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+  #27 		 24/01/2109		  Manuel Guerra	  Se corrigio un error de duplicidad de signos
+
+***************************************************************************/
+
 DECLARE
 
 
@@ -38,7 +45,6 @@ v_monto_retorno					numeric[];
 
 BEGIN
 
-   --  raise exception  '%, % ,%', p_destino, p_formula, p_plantilla;
    
    v_nombre_funcion = 'conta.f_evaluar_resultado_formula';
    v_tmp_formula = p_formula;
@@ -123,7 +129,8 @@ BEGIN
              --------------------------------------------
              --  REMPLAZA VALROES DE LAS VARIABLES
              --------------------------------------------
-             v_formula_evaluado = replace(v_formula_evaluado, '{'||v_columna_nueva[v_i]||'}', v_monto::varchar);
+             --#27
+             v_formula_evaluado = replace(v_formula_evaluado, '{'||v_columna_nueva[v_i]||'}', '('||v_monto||')'::varchar);
              v_formula_evaluado_partida = replace(v_formula_evaluado_partida, '{'||v_columna_nueva[v_i]||'}', COALESCE(v_monto_partida::varchar,'0'));
                                 
        END LOOP;
