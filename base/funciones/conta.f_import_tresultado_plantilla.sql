@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_import_tresultado_plantilla (
   p_accion varchar,
   p_codigo varchar,
@@ -12,13 +10,24 @@ CREATE OR REPLACE FUNCTION conta.f_import_tresultado_plantilla (
   p_periodo_calculo varchar,
   p_glosa varchar,
   p_codigo_clase_comprobante varchar,
-  p_id_resultado_plantilla_hijo varchar,
   p_relacion_unica varchar = 'no'::character varying,
   p_codigo_tipo_relacion_comprobante varchar = ''::character varying,
   p_nombre_func varchar = NULL::character varying
 )
 RETURNS varchar AS
 $body$
+/**************************************************************************
+ SISTEMA:		Sistema de Contabilidad
+ FUNCION: 		f_import_tresultado_plantilla
+ DESCRIPCION:   Funcion que importar plantillas de resultado
+ AUTOR: 		 admin
+ FECHA:	        19/03/2017
+ COMENTARIOS:
+***************************************************************************
+ HISTORIAL DE MODIFICACIONES:
+ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+  #26		  23/01/2019		  MMV				 Se quito el parámetro p_id_resultado_plantilla_hijo de la función
+***************************************************************************/
 DECLARE
 	v_id_resultado_plantilla		integer;
     v_id_clase_comprobante		    integer;
