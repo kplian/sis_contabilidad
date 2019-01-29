@@ -3,6 +3,7 @@
  ISSUE      FORK         FECHA:		         AUTOR                              DESCRIPCION
  #24       ENDEETR  	18/01/2019        manuel guerra            agrega las columnas dolares y Ufvs, incluyendo totales
  #25       ENDEETR  	18/01/2019        manuel guerra            agrega la columna id_cbte, al reporte excel
+ #29       ENDEETR  	29/01/2019        manuel guerra            agregar la columna: glosa de la transaccion
 */
 
 
@@ -154,8 +155,8 @@ class RMayorXls
 		$this->docexcel->getActiveSheet()->getStyle('A2:'.$this->equivalencias[$contador].'2')->applyFromArray($styleTitulos1);
 		$this->docexcel->getActiveSheet()->mergeCells('A2:'.$this->equivalencias[$contador].'2');
 				
-		$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+5].'5')->getAlignment()->setWrapText(true);
-		$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+5].'5')->applyFromArray($styleTitulos2);
+		$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+6].'5')->getAlignment()->setWrapText(true);
+		$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+6].'5')->applyFromArray($styleTitulos2);
 		//*************************************Cabecera*****************************************	
 		for ($i=1; $i <= $contador; $i++) {
 			$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$i].'5',$var[$i-1]);
@@ -172,10 +173,14 @@ class RMayorXls
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+6].'')->setWidth(15);
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+7].'')->setWidth(15);
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+8].'')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$contador+9].'')->setWidth(15);
 		
 		$this->docexcel->getActiveSheet()->getColumnDimension(''.$this->equivalencias[$i].'')->setWidth(40);
+		
 		$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-2].'5','CBTE');
-		$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-1].'5','GLOSA');
+		$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador-1].'5','GLOSA CBTE');
+		$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador].'5','GLOSA TRANS');
+		
 		switch ($this->objParam->getParametro('tipo_moneda')) {
 			case 'MA':				
 				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador].'5','DEBE'.' '.'MA');
@@ -194,19 +199,19 @@ class RMayorXls
 				break;
 			#24		
 			case 'TM':					
-				$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+8].'5')->getAlignment()->setWrapText(true);
-				$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+8].'5')->applyFromArray($styleTitulos2);	
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador].'5','DEBE'.' '.'MB');
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+1].'5','HABER'.' '.'MB');
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+2].'5','SALDO'.' '.'MB');	
+				$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+9].'5')->getAlignment()->setWrapText(true);
+				$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$contador+9].'5')->applyFromArray($styleTitulos2);	
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+1].'5','DEBE'.' '.'MB');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+2].'5','HABER'.' '.'MB');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+3].'5','SALDO'.' '.'MB');	
 				
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+3].'5','DEBE'.' '.'MT');
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+4].'5','HABER'.' '.'MT');
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+5].'5','SALDO'.' '.'MT');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+4].'5','DEBE'.' '.'MT');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+5].'5','HABER'.' '.'MT');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+6].'5','SALDO'.' '.'MT');
 				
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+6].'5','DEBE'.' '.'MA');
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+7].'5','HABER'.' '.'MA');
-				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+8].'5','SALDO'.' '.'MA');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+7].'5','DEBE'.' '.'MA');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+8].'5','HABER'.' '.'MA');
+				$this->docexcel->getActiveSheet()->setCellValue(''.$this->equivalencias[$contador+9].'5','SALDO'.' '.'MA');
 				$contador+=9;							
 				break;			
 			default:			
@@ -516,62 +521,63 @@ class RMayorXls
 					$acreedor = ($value['importe_debe_mb']-$value['importe_haber_mb']) + $acreedor;		
 					#25											
 					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+1, $fila, $value['id_int_comprobante']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, trim($value['glosa1'])."\r\n".trim($value['glosa']));
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, $value['importe_debe_mb']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4, $fila, $value['importe_haber_mb']);					
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+5, $fila, $acreedor);										
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila, trim($value['glosa1']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila, trim($value['glosa']));
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4, $fila, $value['importe_debe_mb']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+5, $fila, $value['importe_haber_mb']);					
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+6, $fila, $acreedor);										
 														
 					$acreedort = ($value['importe_debe_mt']-$value['importe_haber_mt']) + $acreedort;	
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+6, $fila, $value['importe_debe_mt']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+7, $fila, $value['importe_haber_mt']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+8, $fila, $acreedort);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+7, $fila, $value['importe_debe_mt']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+8, $fila, $value['importe_haber_mt']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+9, $fila, $acreedort);
 					
 					$acreedora = ($value['importe_debe_ma']-$value['importe_haber_ma']) + $acreedora;	
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+9, $fila, $value['importe_debe_ma']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+10, $fila, $value['importe_haber_ma']);
-					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+11, $fila, $acreedora);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+10, $fila, $value['importe_debe_ma']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+11, $fila, $value['importe_haber_ma']);
+					$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+12, $fila, $acreedora);
 										
 					$fila++;
 					$this->numero++;
 				}
 				$this->docexcel->getActiveSheet()->getStyle('A'.($fila+1).':'.$this->equivalencias[$max+11].($fila+1).'')->applyFromArray($styleTitulos2);
-				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+2, $fila+1,'TOTAL');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3, $fila+1,'TOTAL');
 				//bs
-				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+3].'6:'.$this->equivalencias[$max+3].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');				
-				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+3,$fila+1,'=SUM('.$this->equivalencias[$max+3].'6:'.$this->equivalencias[$max+3].($fila-1).')');
-																
-				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+4].'6:'.$this->equivalencias[$max+4].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+4].'6:'.$this->equivalencias[$max+4].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');				
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+4,$fila+1,'=SUM('.$this->equivalencias[$max+4].'6:'.$this->equivalencias[$max+4].($fila-1).')');
-				
-				$deb = 'SUM('.$this->equivalencias[$max+3].'6:'.$this->equivalencias[$max+3].($fila-1).')';					
-				$hab = 'SUM('.$this->equivalencias[$max+4].'6:'.$this->equivalencias[$max+4].($fila-1).')';	
-				$vari = '=+'.$deb.'-'.$hab;
+																
 				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+5].'6:'.$this->equivalencias[$max+5].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
-				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+5,$fila+1,$vari);
-				//dolares
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+5,$fila+1,'=SUM('.$this->equivalencias[$max+5].'6:'.$this->equivalencias[$max+5].($fila-1).')');
+				
+				$deb = 'SUM('.$this->equivalencias[$max+4].'6:'.$this->equivalencias[$max+4].($fila-1).')';					
+				$hab = 'SUM('.$this->equivalencias[$max+5].'6:'.$this->equivalencias[$max+5].($fila-1).')';	
+				$vari = '=+'.$deb.'-'.$hab;
 				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+6].'6:'.$this->equivalencias[$max+6].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
-				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+6,$fila+1,'=SUM('.$this->equivalencias[$max+6].'6:'.$this->equivalencias[$max+6].($fila-1).')');
-								
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+6,$fila+1,$vari);
+				//dolares
 				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+7].'6:'.$this->equivalencias[$max+7].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+7,$fila+1,'=SUM('.$this->equivalencias[$max+7].'6:'.$this->equivalencias[$max+7].($fila-1).')');
-				
-				$deb = 'SUM('.$this->equivalencias[$max+6].'6:'.$this->equivalencias[$max+6].($fila-1).')';					
-				$hab = 'SUM('.$this->equivalencias[$max+7].'6:'.$this->equivalencias[$max+7].($fila-1).')';	
-				$vari = '=+'.$deb.'-'.$hab;
-				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
-				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+8,$fila+1,$vari);
-				//ufv
-				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+9].'6:'.$this->equivalencias[$max+9].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
-				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+9,$fila+1,'=SUM('.$this->equivalencias[$max+9].'6:'.$this->equivalencias[$max+9].($fila-1).')');
 								
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+8,$fila+1,'=SUM('.$this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila-1).')');
+				
+				$deb = 'SUM('.$this->equivalencias[$max+7].'6:'.$this->equivalencias[$max+8].($fila-1).')';					
+				$hab = 'SUM('.$this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila-1).')';	
+				$vari = '=+'.$deb.'-'.$hab;
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+9].'6:'.$this->equivalencias[$max+9].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+9,$fila+1,$vari);
+				//ufv
 				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+10].'6:'.$this->equivalencias[$max+10].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+10,$fila+1,'=SUM('.$this->equivalencias[$max+10].'6:'.$this->equivalencias[$max+10].($fila-1).')');
-				
-				$deb = 'SUM('.$this->equivalencias[$max+9].'6:'.$this->equivalencias[$max+9].($fila-1).')';					
-				$hab = 'SUM('.$this->equivalencias[$max+10].'6:'.$this->equivalencias[$max+10].($fila-1).')';	
-				$vari = '=+'.$deb.'-'.$hab;
+								
 				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+11].'6:'.$this->equivalencias[$max+11].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
-				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+11,$fila+1,$vari);
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+11,$fila+1,'=SUM('.$this->equivalencias[$max+11].'6:'.$this->equivalencias[$max+11].($fila-1).')');
+				
+				$deb = 'SUM('.$this->equivalencias[$max+10].'6:'.$this->equivalencias[$max+10].($fila-1).')';					
+				$hab = 'SUM('.$this->equivalencias[$max+11].'6:'.$this->equivalencias[$max+11].($fila-1).')';	
+				$vari = '=+'.$deb.'-'.$hab;
+				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+12].'6:'.$this->equivalencias[$max+12].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
+				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+12,$fila+1,$vari);
 				break;	
 			default:			
 				break;
