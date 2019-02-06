@@ -36,6 +36,7 @@ $body$
  #98       		20/08/2018      Rensi Arteaga Copari       Feu adicionado un nnuevo tipo de aplicacion de excento para permitir la facturas de combustible
  #13            03/01/2018      RAC KPLIAN                 PRocesa la opcion resetear partida ejecucion de las plantillas de calculo
  #21            10/01/2019      RArteaga                   Considerar configuracion apra aplicacar o no descuentos,  incluir_desc_doc 
+ #30  ETR       05/02/2019      RArtega                    Se adciona campo para almacenar los centro de costo original en plantillas secundaias para facilitar reportes
 ***************************************************************************/
 
 DECLARE
@@ -262,6 +263,9 @@ BEGIN
                              
                              v_record_int_tran.importe_reversion = v_monto_revertir;
                              v_record_int_tran.factor_reversion = v_factor_reversion;
+                             
+                             --#30 salva el centro de costo original antes de una posible modificacion
+                             v_record_int_tran.id_centro_costo_ori = v_record_int_tran.id_centro_costo;
                              
                              
                              -- si no es una trasaccion primaria obtener centro de costo del departamento

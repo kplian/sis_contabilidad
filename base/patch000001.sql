@@ -5074,3 +5074,17 @@ IS '(todos, decuento, no_descuento), este campo indica si vamos a procesadar los
 
 /***********************************F-SCP-RAC-CONTA-21-10/01/2019****************************************/
 
+
+
+
+/***********************************I-SCP-RAC-CONTA-30-05/02/2019****************************************/
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN id_centro_costo_ori INTEGER;
+
+COMMENT ON COLUMN conta.tint_transaccion.id_centro_costo_ori
+IS 'cuando usamos plantilla se generar trasaccionales adicionales, que peuden varias el cc segun configuracion, en este campo almanceamos el original para fines de reportes';
+
+/***********************************F-SCP-RAC-CONTA-30-05/02/2019****************************************/
+
