@@ -7,7 +7,7 @@
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
-
+#31  EndeETR       06/02/2019           EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
 
  */
 
@@ -361,7 +361,7 @@ class MODPlantillaComprobante extends MODbase{
 		    $this->captura('campo_relacion_contable_cc','text');
 			$this->captura('campo_suborden','varchar');
             $this->captura('incluir_desc_doc','varchar');//#21
-		
+            $this->captura('campo_codigo_aplicacion_rc','varchar');//#31           		
 			
 			$this->armarConsulta();
 			$consulta=$this->getConsulta();			

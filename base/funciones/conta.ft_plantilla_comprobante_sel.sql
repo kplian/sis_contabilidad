@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -19,7 +17,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
  # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
-
+ #31  EndeETR       06/02/2019          EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
 ***************************************************************************/
 
 DECLARE
@@ -261,7 +259,8 @@ BEGIN
                             cmpbdet.tipo_relacion_contable_cc,
                             cmpbdet.campo_relacion_contable_cc,
                             cmpbdet.campo_suborden,
-                            cmpbdet.incluir_desc_doc --#21
+                            cmpbdet.incluir_desc_doc, --#21
+                            cmpbdet.campo_codigo_aplicacion_rc --#31
 						from conta.tdetalle_plantilla_comprobante cmpbdet
                         inner join conta.tplantilla_comprobante cmpb on cmpb.id_plantilla_comprobante = cmpbdet.id_plantilla_comprobante
 						left join  conta.tdetalle_plantilla_comprobante cmpbdet2 on cmpbdet2.id_detalle_plantilla_comprobante  = cmpbdet.id_detalle_plantilla_fk
