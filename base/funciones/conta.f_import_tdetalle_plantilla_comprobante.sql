@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_import_tdetalle_plantilla_comprobante (
   p_accion varchar,
   p_codigo_plantilla varchar,
@@ -43,47 +41,63 @@ CREATE OR REPLACE FUNCTION conta.f_import_tdetalle_plantilla_comprobante (
   p_campo_forma_pago varchar,
   p_tipo_relacion_contable_cc varchar = ''::character varying,
   p_campo_relacion_contable_cc varchar = ''::character varying,
-  p_campo_suborden varchar = ''::character varying
+  p_campo_suborden varchar = ''::character varying,
+  p_incluir_desc_doc varchar = ''::character varying,
+  p_campo_codigo_aplicacion_rc varchar = ''::character varying
 )
 RETURNS varchar AS
 $body$
+/**************************************************************************
+ SISTEMA:		Sistema de Contabilidad
+ FUNCION: 		conta.f_import_tdetalle_plantilla_comprobante
+ DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.f_import_tdetalle_plantilla_comprobante'
+ AUTOR: 		 (admin)
+ FECHA:	        11/01/2019
+ COMENTARIOS:
+***************************************************************************
+ HISTORIAL DE MODIFICACIONES:
+ ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+ # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+ #31  EndeETR       06/02/2019          EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
+***************************************************************************/
+
 DECLARE
-	
+
     v_id_plantilla_comprobante		integer;
     v_id_detalle_plantilla_comprobante	integer;
     v_id_detalle_plantilla_comprobante_fk	integer;
 BEGIN
-	 
+
 
 
     select id_plantilla_comprobante into v_id_plantilla_comprobante
-    from conta.tplantilla_comprobante pc    
+    from conta.tplantilla_comprobante pc
     where trim(lower(pc.codigo)) = trim(lower(p_codigo_plantilla));
-    
-    
+
+
     select id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante
-    from conta.tdetalle_plantilla_comprobante dpc    
+    from conta.tdetalle_plantilla_comprobante dpc
     where trim(lower(dpc.codigo)) = trim(lower(p_codigo))
           and id_plantilla_comprobante = v_id_plantilla_comprobante;
-          
-   
+
+
 
   select id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante_fk
-    from conta.tdetalle_plantilla_comprobante dpc    
+    from conta.tdetalle_plantilla_comprobante dpc
     where trim(lower(dpc.codigo)) = trim(lower(p_codigo_fk))
-          and id_plantilla_comprobante = v_id_plantilla_comprobante;       
-          
-          
-    
-    
+          and id_plantilla_comprobante = v_id_plantilla_comprobante;
+
+
+
+
     if (p_accion = 'delete') then
-    	
+
         update conta.tdetalle_plantilla_comprobante set estado_reg = 'inactivo'
     	where id_detalle_plantilla_comprobante = v_id_detalle_plantilla_comprobante;
-    
+
     else
         if (v_id_detalle_plantilla_comprobante is null)then
-        		
+
             --Sentencia de la insercion
         	insert into conta.tdetalle_plantilla_comprobante(
                 id_plantilla_comprobante,
@@ -106,18 +120,18 @@ BEGIN
                 fecha_reg,
                 id_usuario_reg,
                 fecha_mod,
-                id_usuario_mod,           
-                primaria, 
-                otros_campos, 
-                nom_fk_tabla_maestro, 
-                campo_partida_ejecucion , 
-                descripcion , 
-                campo_monto_pres , 
-                id_detalle_plantilla_fk , 
-                forma_calculo_monto, 
-                func_act_transaccion, 
-                campo_id_tabla_detalle, 
-                rel_dev_pago, 
+                id_usuario_mod,
+                primaria,
+                otros_campos,
+                nom_fk_tabla_maestro,
+                campo_partida_ejecucion ,
+                descripcion ,
+                campo_monto_pres ,
+                id_detalle_plantilla_fk ,
+                forma_calculo_monto,
+                func_act_transaccion,
+                campo_id_tabla_detalle,
+                rel_dev_pago,
                 campo_trasaccion_dev,
                 campo_id_cuenta_bancaria,
                 campo_id_cuenta_bancaria_mov,
@@ -131,7 +145,9 @@ BEGIN
                 codigo,
                 tipo_relacion_contable_cc,
                 campo_relacion_contable_cc,
-                campo_suborden
+                campo_suborden,
+                incluir_desc_doc, --/#21
+                campo_codigo_aplicacion_rc --#31
           	) values(
                 v_id_plantilla_comprobante,
                 p_debe_haber,
@@ -154,18 +170,18 @@ BEGIN
                 1,
                 null,
                 null,
-                
-                p_primaria, 
-                p_otros_campos, 
-                p_nom_fk_tabla_maestro, 
-                p_campo_partida_ejecucion , 
-                p_descripcion , 
-                p_campo_monto_pres , 
-                v_id_detalle_plantilla_comprobante_fk , 
-                p_forma_calculo_monto, 
-                p_func_act_transaccion, 
-                p_campo_id_tabla_detalle, 
-                p_rel_dev_pago, 
+
+                p_primaria,
+                p_otros_campos,
+                p_nom_fk_tabla_maestro,
+                p_campo_partida_ejecucion ,
+                p_descripcion ,
+                p_campo_monto_pres ,
+                v_id_detalle_plantilla_comprobante_fk ,
+                p_forma_calculo_monto,
+                p_func_act_transaccion,
+                p_campo_id_tabla_detalle,
+                p_rel_dev_pago,
                 p_campo_trasaccion_dev,
                 p_campo_id_cuenta_bancaria,
                 p_campo_id_cuenta_bancaria_mov,
@@ -179,11 +195,13 @@ BEGIN
                 p_codigo,
                 p_tipo_relacion_contable_cc,
                 p_campo_relacion_contable_cc,
-                p_campo_suborden
+                p_campo_suborden,
+                p_incluir_desc_doc, --#21
+                p_campo_codigo_aplicacion_rc  --#31
 			);
-           
-                
-        else            
+
+
+        else
             update conta.tdetalle_plantilla_comprobante set
               id_plantilla_comprobante = v_id_plantilla_comprobante,
               debe_haber = p_debe_haber,
@@ -202,18 +220,18 @@ BEGIN
               campo_auxiliar = p_campo_auxiliar,
               campo_fecha = p_campo_fecha,
               fecha_mod = now(),
-              id_usuario_mod = 1,            
-              primaria=p_primaria, 
-              otros_campos=p_otros_campos, 
-              nom_fk_tabla_maestro=p_nom_fk_tabla_maestro, 
-              campo_partida_ejecucion=p_campo_partida_ejecucion , 
-              descripcion=p_descripcion , 
-              campo_monto_pres=p_campo_monto_pres , 
-              id_detalle_plantilla_fk=v_id_detalle_plantilla_comprobante_fk , 
-              forma_calculo_monto=p_forma_calculo_monto, 
-              func_act_transaccion=p_func_act_transaccion, 
-              campo_id_tabla_detalle=p_campo_id_tabla_detalle, 
-              rel_dev_pago=p_rel_dev_pago, 
+              id_usuario_mod = 1,
+              primaria=p_primaria,
+              otros_campos=p_otros_campos,
+              nom_fk_tabla_maestro=p_nom_fk_tabla_maestro,
+              campo_partida_ejecucion=p_campo_partida_ejecucion ,
+              descripcion=p_descripcion ,
+              campo_monto_pres=p_campo_monto_pres ,
+              id_detalle_plantilla_fk=v_id_detalle_plantilla_comprobante_fk ,
+              forma_calculo_monto=p_forma_calculo_monto,
+              func_act_transaccion=p_func_act_transaccion,
+              campo_id_tabla_detalle=p_campo_id_tabla_detalle,
+              rel_dev_pago=p_rel_dev_pago,
               campo_trasaccion_dev=p_campo_trasaccion_dev,
               campo_id_cuenta_bancaria = p_campo_id_cuenta_bancaria,
               campo_id_cuenta_bancaria_mov = p_campo_id_cuenta_bancaria_mov,
@@ -227,7 +245,9 @@ BEGIN
               codigo = p_codigo,
               tipo_relacion_contable_cc = p_tipo_relacion_contable_cc ,
               campo_relacion_contable_cc = p_campo_relacion_contable_cc,
-              campo_suborden = p_campo_suborden
+              campo_suborden = p_campo_suborden,
+              incluir_desc_doc = p_incluir_desc_doc, --#21
+              campo_codigo_aplicacion_rc = p_campo_codigo_aplicacion_rc --#21
 			where id_detalle_plantilla_comprobante=v_id_detalle_plantilla_comprobante;
              
               
