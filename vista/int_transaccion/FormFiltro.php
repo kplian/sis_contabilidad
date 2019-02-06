@@ -10,6 +10,7 @@
 HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #6 			27/12/2108		  Manuel Guerra	  agrego el filtro de cbtes de cierre
+#17 		09/01/2019		  Manuel Guerra	  agrego el filtro de nro_tramite_aux
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -336,6 +337,18 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 			id_grupo: 0,
 			form: true
 		},
+		//#17
+		{
+			config: {
+				name: 'nro_tramite_aux',
+				allowBlank: true,
+				fieldLabel: 'Nro. Trámite Aux',
+				width: 150
+			},
+			type: 'Field',
+			id_grupo: 0,
+			form: true
+		},
 		{
 			config:{
 				name: 'cbte_cierre',
@@ -381,7 +394,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 	},
 	title: 'Filtro de mayores',
 	// Funcion guardar del formulario
-	//#6
+	//#6  #17
 	onSubmit: function(o) {    	
 		var me = this;
 		if (me.form.getForm().isValid()) {		
@@ -400,7 +413,8 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 			var cc=this.Cmp.id_centro_costo.lastSelectionText;
 			var ot=this.Cmp.id_orden_trabajo.lastSelectionText;
 			var suborden=this.Cmp.id_suborden.lastSelectionText;
-			var nro_tram=this.Cmp.nro_tramite.lastSelectionText;		
+			var nro_tram=this.Cmp.nro_tramite.lastSelectionText;
+			var nro_tram_aux=this.Cmp.nro_tramite_aux.lastSelectionText;		
 			var cerrar= this.Cmp.cerrado.getValue();	
 			var cbte_cierre= this.Cmp.cbte_cierre.getValue();		
 			this.onEnablePanel(this.idContenedor + '-east', 
@@ -417,6 +431,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 					'ot' : ot,
 					'suborden' : suborden,
 					'nro_tram' : nro_tram,
+					'nro_tram_aux' : nro_tram_aux,
 					'cerrar':cerrar,
 					'cbte_cierre':cbte_cierre
 				}));
