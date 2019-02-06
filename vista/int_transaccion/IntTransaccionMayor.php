@@ -10,6 +10,7 @@ HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			     AUTOR				 DESCRIPCION:
 #17 		09/01/2019		        Manuel Guerra	  agrego el filtro de nro_tramite_aux
 #20         10/01/2019 ENDETRAS     Miguel Mamani     Ocultar botón para exportar datos de grilla
+#22         14/01/2019 ENDETRAS     Miguel Mamamni    Mostrar boton para exportar datos de grilla
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -849,7 +850,13 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		
     	//llama al constructor de la clase padre
 		Phx.vista.IntTransaccionMayor.superclass.constructor.call(this,config);
-		
+        this.addButton('ReportExcel',{
+            grupo:[0,1],
+            text :'Exportar Excel',
+            iconCls : 'bpdf32',
+            disabled: true,
+            handler : this.onButtonReporteExcel
+        });
 		this.addButton('chkdep',{	text:'Dependencias',
 				iconCls: 'blist',
 				disabled: true,
@@ -898,7 +905,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
 		this.init();
-		
+
 	},
 	
 	
@@ -1375,7 +1382,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				'nro_tram':nro_tram,	
 				//'nro_tram_aux':nro_tram_aux,// aun no se subio esta parte de codigo
 				//formato pdf o xls
-				'tipo_filtro':tipo_filtro,			
+				'tipo_filtro':tipo_filtro,
 				//parametros q se mostraran, si son tickeados						
 				'tipo_moneda':resp.tipo_moneda,
 				'cc':resp.cc,
@@ -1395,12 +1402,49 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 			scope:this
 		});
     },
-    
-    
+    onButtonReporteExcel:function(){
+        Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            url:'../../sis_contabilidad/control/IntTransaccion/reporteExcelTransaccion',
+            params:
+                {    'desde':ini,
+                    'hasta':fin,
+                    'id_auxiliar':id_auxiliar,
+                    'id_gestion':id_gestion,
+                    'id_depto':id_depto,
+                    'id_config_tipo_cuenta':id_config_tipo_cuenta,
+                    'id_config_subtipo_cuenta':id_config_subtipo_cuenta,
+                    'id_cuenta':id_cuenta,
+                    'id_partida':id_partida,
+                    'id_tipo_cc':id_tipo_cc,
+                    'id_centro_costo':id_centro_costo,
+                    'id_orden_trabajo':id_orden_trabajo,
+                    'id_suborden':id_suborden,
+                    'nro_tramite':nro_tramite,
+                    //
+                    'aux':aux,
+                    'gest':gest,
+                    'depto':depto,
+                    'config_tipo_cuenta':config_tipo_cuenta,
+                    'config_subtipo_cuenta':config_subtipo_cuenta,
+                    'cuenta':cuenta,
+                    'partidas':partida,
+                    'tipo_cc':tipo_cc,
+                    'centro_costo':centro_costo,
+                    'orden_trabajo':orden_trabajo,
+                    'suborden':suborden,
+                    'nro_tram':nro_tram
+                },
+            success: this.successExport,
+            failure: this.conexionFailure,
+            timeout: 4.6e+7,
+            scope:this
+        });
+    },
     bnew : false,
     bedit: false,
     bdel:  false,
-    bexcel: false //#20
+    bexcel: true //#20 #22
 })
 </script>
 		
