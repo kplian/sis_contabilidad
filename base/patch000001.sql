@@ -5088,3 +5088,10 @@ IS 'cuando usamos plantilla se generar trasaccionales adicionales, que peuden va
 
 /***********************************F-SCP-RAC-CONTA-30-05/02/2019****************************************/
 
+/***********************************I-SCP-MMV-CONTA-33-08/02/2019****************************************/
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN documento_iva VARCHAR(4);
+
+ALTER TABLE conta.tint_comprobante
+  ALTER COLUMN documento_iva SET DEFAULT 'si';
+/***********************************F-SCP-MMV-CONTA-33-08/02/2019****************************************/
