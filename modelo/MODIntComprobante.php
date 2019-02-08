@@ -14,6 +14,7 @@
  #2             		27-08-2018        RAC KPLIAN        		se añade trasaccion para modicar glosa
  *1A					21/08/2018		EGS				    		se creo la funcion listarIntComprobanteCombo
  #7			endeetr		27/12/2018		manuel guerra				crearon listado de tramites, y la modifiacion del nrotramite_aux
+#32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
 */
 class MODIntComprobante extends MODbase{
 	
@@ -99,6 +100,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('tipo_cambio_3','numeric');
 		$this->captura('id_moneda_act','int4');
 		$this->captura('nro_tramite_aux','varchar');
+		$this->captura('documento_iva','varchar'); //#32
 		
 		
 		//Ejecuta la instruccion
@@ -265,6 +267,7 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('tipo_cambio_3','tipo_cambio_3','numeric');
 		$this->setParametro('id_config_cambiaria','id_config_cambiaria','integer');
 		$this->setParametro('forma_cambio','forma_cambio','varchar');
+		$this->setParametro('documento_iva','documento_iva','varchar'); //#32
 		
 		
 
@@ -318,7 +321,7 @@ class MODIntComprobante extends MODbase{
 		$this->setParametro('tipo_cambio_3','tipo_cambio_3','numeric');
 		$this->setParametro('id_config_cambiaria','id_config_cambiaria','integer');
 		$this->setParametro('forma_cambio','forma_cambio','varchar');
-		
+        $this->setParametro('documento_iva','documento_iva','varchar'); //#32
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,16 +12,18 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tint_comprobante'
  AUTOR: 		 (admin)
  FECHA:	        29-08-2013 00:28:30
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-ISSUE	FORK		 FECHA:				 AUTOR:				DESCRIPCION:	
+ISSUE	FORK		 FECHA:				 AUTOR:				DESCRIPCION:
  1A					23/08/2018				EGS				se creo las transsacciones CONTA_INCBTECB_SEL,CONTA_INCBTECB_CONT
  #7		endeETR		27/12/2018			manuel guerra		agrega columna nro_tramite_aux, y listado de tramites
-			
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ #32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
+
+
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -40,40 +40,40 @@ DECLARE
     v_codigo_moneda_base		varchar;
     v_desde				varchar;
     v_hasta				varchar;
-    v_func				varchar;			    
+    v_func				varchar;
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_int_comprobante_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_INCBTE_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
     if(p_transaccion='CONTA_INCBTE_SEL') then
-     				
+
     	begin
-        
+
             v_id_moneda_base=param.f_get_moneda_base();
             v_filtro = ' 0 = 0 and ';
 
-            select 
+            select
              *
             into
              v_registro_moneda
-            from param.tmoneda m 
+            from param.tmoneda m
             where m.id_moneda = v_id_moneda_base;
-            
+
             -- si no es administrador, solo puede listar al responsable del depto o al usuario que creo e documentos
-            IF p_administrador !=1 THEN  
-               
-                select  
+            IF p_administrador !=1 THEN
+
+                select
                    pxp.aggarray(depu.id_depto)
-                into 
+                into
                    va_id_depto
-                from param.tdepto_usuario depu 
+                from param.tdepto_usuario depu
                 where depu.id_usuario =  p_id_usuario and depu.cargo in ('responsable','administrador');
 
 				IF v_parametros.nombreVista != 'IntComprobanteLd' THEN
@@ -151,8 +151,8 @@ BEGIN
                               incbte.ope_3,
                               incbte.tipo_cambio_3,
                               incbte.id_moneda_act,
-                              incbte.nro_tramite_aux
-                              
+                              incbte.nro_tramite_aux,
+                              incbte.documento_iva -- #32
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf

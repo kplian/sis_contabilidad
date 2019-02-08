@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_validar_cbte_docs (
   p_id_int_comprobante integer,
   p_validar boolean = true,
@@ -13,17 +11,17 @@ $body$
  DESCRIPCION:   valida que los coumentos cuadren con el cbte
  AUTOR: 		 (rac)  kplian
  FECHA:	        13/06/2017
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
-   	
+
  ISSUE            FECHA:		      AUTOR                 DESCRIPCION
-   
+
  #86  ETR       24/02/2018        RAC KPLIAN        Validar que el monto IVA y descuentos cuadre al validar el comprobante
  #9   ETR       02/01/2019        RAC KPLIAN        No inclir cbte de paertura o cierre en esta validaciones
+ #32  ETR		08/01/2019			 MMV			Permitir validar Los comprobantes de Cierre y Asjuste Moneda
 
- 
 ***************************************************************************/
 
 DECLARE
@@ -66,40 +64,46 @@ v_existe_iva_cbte           boolean;
 BEGIN
 
    v_nombre_funcion = 'conta.f_validar_cbte_docs';
-   
+
    v_conta_val_doc_venta = pxp.f_get_variable_global('conta_val_doc_venta');
-   v_conta_val_doc_compra = pxp.f_get_variable_global('conta_val_doc_compra');   
+   v_conta_val_doc_compra = pxp.f_get_variable_global('conta_val_doc_compra');
    v_conta_dif_doc_cbte = pxp.f_get_variable_global('conta_dif_doc_cbte')::numeric;
-   v_conta_lista_blanca_cbte_docs = pxp.f_get_variable_global('conta_lista_blanca_cbte_docs'); 
+   v_conta_lista_blanca_cbte_docs = pxp.f_get_variable_global('conta_lista_blanca_cbte_docs');
    v_conta_val_doc_otros_subcuentas_compras = pxp.f_get_variable_global('conta_val_doc_otros_subcuentas_compras');
    va_aux = string_to_array(v_conta_val_doc_otros_subcuentas_compras,',');
-   
+
    --#obtenemos el periodo del cbte y la fecha
    v_error_round = v_conta_dif_doc_cbte::numeric   ;-- #86 + error de redondeo apra validacion
-   
-   
+
+
    v_resp_val_doc[1] = 'TRUE';
-   
+
    --#86   considerar casos en los que si se salta la validacio de codumentos, por ejemplo cbte volcados, de reversion
    IF p_forzar_validacion = 'si' THEN
       p_validar  =TRUE;
    END IF;
-   
-   select 
+
+   select
       c.fecha,
       c.volcado,
       c.cbte_reversion,
       c.cbte_apertura,
       c.cbte_cierre,
-      c.cbte_aitb
+      c.cbte_aitb,
+      c.documento_iva --#32
      into
        v_reg_cbte
-   from conta.tint_comprobante c  
+   from conta.tint_comprobante c
    where   c.id_int_comprobante =  p_id_int_comprobante;
-   
-   
-   IF v_reg_cbte.cbte_cierre = 'si'   or v_reg_cbte.cbte_apertura = 'si' or  v_reg_cbte.cbte_reversion  = 'si'or v_reg_cbte.cbte_aitb  = 'si' THEN
-      p_validar  =FALSE;  --soltamso la validacion solo apra casos especificamos
+
+   --#32
+   IF 	v_reg_cbte.cbte_cierre != 'no' or  --#32
+   		v_reg_cbte.cbte_apertura = 'si' or
+        v_reg_cbte.cbte_reversion  = 'si'or
+        v_reg_cbte.cbte_aitb  = 'si' or
+        v_reg_cbte.documento_iva = 'no'   --#32
+   THEN
+      p_validar  = FALSE;  --soltamso la validacion solo apra casos especificamos
    END IF;
    
    

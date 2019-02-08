@@ -1622,3 +1622,13 @@ select conta.f_import_tresultado_plantilla ('insert','ACT-ING','activo','Actuali
 select pxp.f_insert_tgui ('Cuadro de Actualizaciones', 'Cuadro de Actualizaciones', 'RCA', 'si', 22, 'sis_contabilidad/vista/cuadro_actualizacion/CuadroActualizacion.php', 3, '', 'CuadroActualizacion', 'CONTA');
 select pxp.f_insert_testructura_gui ('RCA', 'REPCON');
 /***********************************F-DAT-MMV-CONTA-28-28/01/2019****************************************/
+
+/***********************************I-DAT-MMV-CONTA-32-08/02/2019****************************************/
+select conta.f_import_tresultado_plantilla ('insert','AJUS-MT','activo','Asiento Ajuste moneda MT','cbte','no','no','no','rango','Asiento Ajusto moneda MT','DIARIOCON','no','AJUS-MT','conta.f_plantilla_ajuste_moneda_mt');
+select conta.f_import_tresultado_plantilla ('insert','AJUS-MA','activo','Asiento Ajuste Moneda MA','cbte','si','no','no','rango','Ajuste moneda MA','DIARIOCON','no','AJUS-MA','conta.f_plantilla_ajuste_moneda_ma');
+select conta.f_import_tresultado_plantilla ('insert','APE-CU','activo','Asiento Apertura','cbte','no','si','no','rango','Asiento de Apertura Cuentas','DIARIOCON','no','APE-CU','conta.f_plantilla_apertura_cuenta');
+select conta.f_import_tresultado_plantilla ('insert','C-CBL','activo','Asiento Cuentas de Balance','cbte','no','no','balance','rango','Asiento de Cierre de las Cuentas de Balance','DIARIOCON','C-CBL','C-CBL','conta.f_plantilla_cierre_balance');
+select conta.f_import_tresultado_plantilla ('insert','C-UTI','activo','Asiento de Utilidad de Gestión','cbte','no','no','resultado','rango','Cierre de cuenta utilidad por Gestion ','DIARIOCON','C-UTI','C-UTI','conta.f_plantilla_cierre_utilidad');
+select conta.f_import_tresultado_plantilla ('insert','C-GAS','activo','Cierre de las cuentas de Gasto','cbte','no','no','resultado','rango','Asiento de cierre de las cuentas de Gasto','DIARIOCON','C-GAS','C-GAS','conta.f_plantilla_cierre_gasto');
+select conta.f_import_tresultado_plantilla ('insert','C-IN','activo','Cerrar de cuentas de Ingreso','cbte','no','no','resultado','rango','Asiento de cierre de las cuentas de ingreso','DIARIOCON','C-IN','C-IN','conta.f_plantilla_cierre_ingreso');
+/***********************************F-DAT-MMV-CONTA-32-08/02/2019****************************************/
