@@ -15,6 +15,7 @@
  *1A					21/08/2018		EGS				    		se creo la funcion listarIntComprobanteCombo
  #7			endeetr		27/12/2018		manuel guerra				crearon listado de tramites, y la modifiacion del nrotramite_aux
 #32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
+#33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
 */
 class MODIntComprobante extends MODbase{
 	
@@ -481,7 +482,8 @@ class MODIntComprobante extends MODbase{
 		$this->captura('importe_haber','numeric');
 		$this->captura('importe_debe_mb','numeric');
 		$this->captura('importe_haber_mb','numeric');
-		
+        $this->captura('importe_debe_mt','numeric'); //#33
+        $this->captura('importe_haber_mt','numeric'); //#33
 		$this->captura('sw_movimiento','varchar');
 		$this->captura('tipo_partida','varchar');
 		$this->captura('tipo_cambio','numeric');

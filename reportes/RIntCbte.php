@@ -1,4 +1,15 @@
 <?php
+/**
+ *@package pXP
+ *@file RIntCbte.php
+ *@author  (admin)
+ *@date 29-08-2013 00:28:30
+ *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+ *
+HISTORIAL DE MODIFICACIONES:
+ISSUE        FORK			FECHA:		      AUTOR                 DESCRIPCION
+#33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
+ */
 // Extend the TCPDF class to create custom MultiRow
 class RIntCbte extends  ReportePDF {
 	var $cabecera;
@@ -14,7 +25,9 @@ class RIntCbte extends  ReportePDF {
 	var $tot_haber;
 	var $tot_debe_mb;
 	var $tot_haber_mb;
-	
+    var $tot_debe_mt; //#33
+    var $tot_haber_mt; //#33
+
 	function datosHeader ( $detalle) {
 		
 		 
@@ -28,7 +41,6 @@ class RIntCbte extends  ReportePDF {
 	}
 	
 	function Header() {
-			
 		 if($this->page==1){
 		 	   // $this->SetMargins(15, 40, 5);
 				$newDate = date("d/m/Y", strtotime( $this->cabecera[0]['fecha']));		
@@ -65,12 +77,14 @@ class RIntCbte extends  ReportePDF {
 		$tot_debe = 0;
 		$tot_haber = 0;
 		if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base']){
-		    $this->with_col = '55%';
+		    //$this->with_col = '55%'; Para monstar en moneda Base moneda Dolar
+            $this->with_col = '45%';  //#33
 	    }
 	    else{
 		   $this->with_col = '45%';
 	    }
-		
+
+
 		$with_col = $this->with_col;
 		
 		
@@ -78,19 +92,16 @@ class RIntCbte extends  ReportePDF {
 		ob_start();
 		include(dirname(__FILE__).'/../reportes/tpl/glosa.php');
         $content = ob_get_clean();
-		
 		ob_start();
 		include(dirname(__FILE__).'/../reportes/tpl/cabeceraDetalle.php');
         $content2 = ob_get_clean();
 		$this->writeHTML($content.$content2, false, false, true, false, '');
-		
 		$this->SetFont ('helvetica', '', 5 , '', 'default', true );
-		
 		//$this->Ln(2);
 		foreach($this->detalleCbte as $key=>$val){
 		   	
 		   $sw = 1;	
-		   if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&  $val['importe_debe'] == 0 && $val['importe_haber'] == 0){
+		   if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&  $val['importe_debe'] != 0 && $val['importe_haber'] != 0){
 				$sw = 0;	
 		   }
 		   
@@ -109,6 +120,8 @@ class RIntCbte extends  ReportePDF {
 				$this->tot_haber+=$val['importe_haber'];
 				$this->tot_debe_mb+=$val['importe_debe_mb'];
 				$this->tot_haber_mb+=$val['importe_haber_mb'];
+                $this->tot_debe_mt+=$val['importe_debe_mt'];   //#33
+                $this->tot_haber_mt+=$val['importe_haber_mt'];   //#33
 				
 		    }	
 			

@@ -8,6 +8,8 @@
  	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
    	#  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
 	# 16	ENDETRASM	 09/01/2018			Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
+	#  28	     	17/12/2018			MMV							Reporte cuadro de actualización
+   #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
 
  */
 
@@ -228,9 +230,9 @@ class MODCuenta extends MODbase{
 		$this->setParametro('tipo_cuenta','tipo_cuenta','varchar'); 
 		$this->setParametro('incluir_cierre','incluir_cierre','varchar');  
 		$this->setParametro('tipo_balance','tipo_balance','varchar'); 
-		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');      
-	            
-	    //Definicion de la lista del resultado del query
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');
+        $this->setParametro('tipo_moneda','tipo_moneda','varchar'); //#33
+       //Definicion de la lista del resultado del query
 	     $this->captura('id_cuenta','int4');     
 		 $this->captura('nro_cuenta','varchar');
 		 $this->captura('nombre_cuenta','varchar');
@@ -432,7 +434,45 @@ class MODCuenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	/***************-#28-*************/
+    /*function listarCuadroActualizacion(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.f_cuadro_actualizacion';
+        $this-> setCount(false);
+        $this->setTipoRetorno('record');
+        $this->transaccion='CONTA_RUA_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
 
+        $this->setParametro('desde','desde','date');
+        $this->setParametro('hasta','hasta','date');
+        $this->setParametro('nivel','nivel','integer');
+        $this->setParametro('tipo_cuenta','tipo_cuenta','varchar');
+        $this->setParametro('tipo_balance','tipo_balance','varchar');
+        $this->setParametro('incluir_sinmov','incluir_sinmov','varchar');
+        $this->setParametro('fecha_moneda','fecha_moneda','date');
+        $this->setParametro('tipo_moneda','tipo_moneda','varchar');
+        //Definicion de la lista del resultado del query
+        $this->captura('id_cuenta','int4');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('id_cuenta_padre','int4');
+        $this->captura('debe_ma','numeric');
+        $this->captura('haber_ma','numeric');
+        $this->captura('saldo_ma','numeric');
+        $this->captura('importe_mb','numeric');
+        $this->captura('saldo_mayor','numeric');
+        $this->captura('saldo_actulizacion','numeric');
+        $this->captura('nivel','int4');
+        $this->captura('tipo_cuenta','varchar');
+        $this->captura('movimiento','varchar');
+        $this->captura('tipo_cambio','numeric');
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+       
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }*/
+    /***************-#28-*************/
 
 			
 }
