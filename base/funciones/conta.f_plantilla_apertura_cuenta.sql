@@ -192,183 +192,190 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                         v_importe_debe_mt = 0;
                         v_importe_haber_mt = 0;
 
-                        IF v_sw_saldo_acredor THEN
+                            IF v_sw_saldo_acredor THEN
 
-                                v_importe_haber = 0;
-                                v_importe_debe = v_saldo_mb;
+                                    v_importe_haber = 0;
+                                    v_importe_debe = v_saldo_mb;
 
-                                v_importe_haber_ma  = 0;
-                                v_importe_debe_ma	= v_saldo_ma;
+                                    v_importe_haber_ma  = 0;
+                                    v_importe_debe_ma	= v_saldo_ma;
 
-                                v_importe_haber_mt 	= 0;
-                                v_importe_debe_mt 	= v_saldo_mt;
-
-                                select  ps_id_partida
-                                    into
-                                    v_id_partida
-                                  from conta.f_get_config_relacion_contable( 'CIER-DEBE',
-                                                                               p_id_gestion_cbte,
-                                                                               null,  --campo_relacion_contable
-                                                                               null);
-
-                        ELSE
+                                    v_importe_haber_mt 	= 0;
+                                    v_importe_debe_mt 	= v_saldo_mt;
+                            ELSE
 
 
-                   				v_importe_haber = v_saldo_mb;
-                                v_importe_debe 	= 0;
+                                    v_importe_haber = v_saldo_mb;
+                                    v_importe_debe 	= 0;
 
-                                v_importe_haber_ma  = v_saldo_ma;
-                                v_importe_debe_ma	= 0;
+                                    v_importe_haber_ma  = v_saldo_ma;
+                                    v_importe_debe_ma	= 0;
 
-                                v_importe_haber_mt 	= v_saldo_mt;
-                                v_importe_debe_mt 	= 0;
-
-                          select  ps_id_partida
-                                    into
-                                    v_id_partida
-                                    from conta.f_get_config_relacion_contable( 'CIER-HABER',
-                                                                               p_id_gestion_cbte,
-                                                                               NULL,  --campo_relacion_contable
-                                                                               NULL);
+                                    v_importe_haber_mt 	= v_saldo_mt;
+                                    v_importe_debe_mt 	= 0;
 
 
+                            END IF;
 
-
-                        END IF;
-
-                       IF(v_record_mov.id_cuenta <> 0)THEN
-                           IF(NOT EXISTS (select 1
-                                          from conta.tcuenta_ids id
-                                          where id.id_cuenta_uno = v_record_mov.id_cuenta))THEN
-
-
-                                   raise exception 'NO HAY UN REPLICACION DE LA CUENTA %',(select cu.nro_cuenta ||' - '||cu.nombre_cuenta
-                                                                                            from conta.tcuenta cu
-                                                                                            where cu.id_cuenta = v_record_mov.id_cuenta);
-                           ELSE
-
-                                  select id.id_cuenta_dos
-                                          into
-                                          v_id_cuenta_sg
-                                  from conta.tcuenta_ids id
-                                  where id.id_cuenta_uno = v_record_mov.id_cuenta;
-                           END IF;
-                       END IF;
-
-                          IF(v_record_mov.id_partida <> 0)THEN
-                               IF(NOT EXISTS (	select 1
-                                                from pre.tpartida_ids pi
-                                                 where pi.id_partida_uno = v_record_mov.id_partida))THEN
-
-                                         raise exception 'NO HAY UN REPLICACION DE LA PARITDA % ',( select par.codigo ||' - '||par.nombre_partida
-                                                                                                   from pre.tpartida par
-                                                                                                   where par.id_partida = v_record_mov.id_partida);
-                               ELSE
-
-                                       select pi.id_partida_dos
-                                            into
-                                        v_id_partida_sg
-                                          from pre.tpartida_ids pi
-                                          where pi.id_partida_uno = v_record_mov.id_partida;
-
-                               END IF;
-                          END IF;
-
-                          IF(v_record_mov.id_centro_costo <> 0)THEN
+                           IF(v_record_mov.id_cuenta <> 0)THEN
                                IF(NOT EXISTS (select 1
-                                        from pre.tpresupuesto_ids ipe
-                                        where ipe.id_presupuesto_uno = v_record_mov.id_centro_costo))THEN
+                                              from conta.tcuenta_ids id
+                                              where id.id_cuenta_uno = v_record_mov.id_cuenta))THEN
 
 
-                                       raise exception 'NO HAY UN REPLICACION DE LA CENTRO COSTO % id (%)',(select pres.descripcion
-                                                                                                      from pre.tpresupuesto pres
-                                                                                                      where pres.id_presupuesto = v_record_mov.id_centro_costo),v_record_mov.id_centro_costo;
+                                       raise exception 'NO HAY UN REPLICACION DE LA CUENTA %',(select cu.nro_cuenta ||' - '||cu.nombre_cuenta
+                                                                                                from conta.tcuenta cu
+                                                                                                where cu.id_cuenta = v_record_mov.id_cuenta);
                                ELSE
 
-                                         select ipe.id_presupuesto_dos
-                                        into
-                                                v_id_centro_costo_sg
-                                        from pre.tpresupuesto_ids ipe
-                                        where ipe.id_presupuesto_uno = v_record_mov.id_centro_costo;
-
+                                      select id.id_cuenta_dos
+                                              into
+                                              v_id_cuenta_sg
+                                      from conta.tcuenta_ids id
+                                      where id.id_cuenta_uno = v_record_mov.id_cuenta;
                                END IF;
                            END IF;
 
+                            IF(v_record_mov.id_partida <> 0)THEN
+                                 IF(NOT EXISTS (	select 1
+                                                  from pre.tpartida_ids pi
+                                                   where pi.id_partida_uno = v_record_mov.id_partida))THEN
 
+                                           raise exception 'NO HAY UN REPLICACION DE LA PARITDA % ',( select par.codigo ||' - '||par.nombre_partida
+                                                                                                     from pre.tpartida par
+                                                                                                     where par.id_partida = v_record_mov.id_partida);
+                                 ELSE
 
-
-
-
-                 IF v_saldo_mb != 0  or  v_saldo_ma != 0 or v_saldo_mt != 0 THEN
-
-                        insert into conta.tint_transaccion(
-                                    id_partida,
-                                    id_centro_costo,
-                                    estado_reg,
-                                    id_cuenta,
-                                    glosa,
-                                    id_int_comprobante,
-                                    id_auxiliar,
-                                    importe_debe,
-                                    importe_haber,
-                                    importe_gasto,
-                                    importe_recurso,
-                                    importe_debe_mb,
-                                    importe_haber_mb,
-                                    importe_gasto_mb,
-                                    importe_recurso_mb,
-                                    importe_debe_mt,
-                                    importe_haber_mt,
-                                    importe_gasto_mt,
-                                    importe_recurso_mt,
-                                    importe_debe_ma,
-                                    importe_haber_ma,
-                                    importe_gasto_ma,
-                                    importe_recurso_ma,
-                                    id_usuario_reg,
-                                    fecha_reg,
-                                    actualizacion
-                                ) values(
-                                    case
-                                      when v_record_mov.id_partida = 0 then
-                                          v_id_partida
-                                      else
+                                         select pi.id_partida_dos
+                                              into
                                           v_id_partida_sg
-                                      end,
-                                   v_id_centro_costo_sg,
-                                    'activo',
-                                    v_id_cuenta_sg,
-                                    'Asiento de Apertura',
-                                    p_id_int_comprobante,
-                                    case
-                                      when v_record_mov.id_auxiliar = 0 then
-                                          null
-                                      else
-                                          v_record_mov.id_auxiliar
-                                      end,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe_mt,
-                                    v_importe_haber_mt,
-                                    v_importe_debe_mt,
-                                    v_importe_haber_mt, --MT
-                                    v_importe_debe_ma,
-                                    v_importe_haber_ma,
-                                    v_importe_debe_ma,
-                                    v_importe_haber_ma, --MA
-                                    p_id_usuario,
-                                    now(),
-                                    'si' );
-                         END IF;
+                                            from pre.tpartida_ids pi
+                                            where pi.id_partida_uno = v_record_mov.id_partida;
 
-                ELSE
-                    raise exception 'Error';
+                                 END IF;
+                            END IF;
+
+                              IF(v_record_mov.id_centro_costo <> 0)THEN
+                                   IF(NOT EXISTS (select 1
+                                            from pre.tpresupuesto_ids ipe
+                                            where ipe.id_presupuesto_uno = v_record_mov.id_centro_costo))THEN
+
+
+                                           raise exception 'NO HAY UN REPLICACION DE LA CENTRO COSTO % id (%)',(select pres.descripcion
+                                                                                                          from pre.tpresupuesto pres
+                                                                                                          where pres.id_presupuesto = v_record_mov.id_centro_costo),v_record_mov.id_centro_costo;
+                                   ELSE
+
+                                             select ipe.id_presupuesto_dos
+                                            into
+                                                    v_id_centro_costo_sg
+                                            from pre.tpresupuesto_ids ipe
+                                            where ipe.id_presupuesto_uno = v_record_mov.id_centro_costo;
+
+                                   END IF;
+                               END IF;
+                               
+                              
+                               
+                              IF  v_record_mov.id_partida = 0 THEN
+                               
+                                    IF v_sw_saldo_acredor THEN
+
+                                          select  ps_id_partida
+                                              into
+                                              v_id_partida
+                                            from conta.f_get_config_relacion_contable( 'CIER-DEBE',
+                                                                                         p_id_gestion_cbte,
+                                                                                         null,  --campo_relacion_contable
+                                                                                         null);
+                                      ELSE
+
+                                         select  ps_id_partida
+                                              into
+                                              v_id_partida
+                                              from conta.f_get_config_relacion_contable( 'CIER-HABER',
+                                                                                         p_id_gestion_cbte,
+                                                                                         NULL,  --campo_relacion_contable
+                                                                                         NULL);
+                                      END IF;
+                                      
+                                       
+                               END IF;
+
+
+
+
+
+
+                     IF v_saldo_mb != 0  or  v_saldo_ma != 0 or v_saldo_mt != 0 THEN
+
+                            insert into conta.tint_transaccion(
+                                        id_partida,
+                                        id_centro_costo,
+                                        estado_reg,
+                                        id_cuenta,
+                                        glosa,
+                                        id_int_comprobante,
+                                        id_auxiliar,
+                                        importe_debe,
+                                        importe_haber,
+                                        importe_gasto,
+                                        importe_recurso,
+                                        importe_debe_mb,
+                                        importe_haber_mb,
+                                        importe_gasto_mb,
+                                        importe_recurso_mb,
+                                        importe_debe_mt,
+                                        importe_haber_mt,
+                                        importe_gasto_mt,
+                                        importe_recurso_mt,
+                                        importe_debe_ma,
+                                        importe_haber_ma,
+                                        importe_gasto_ma,
+                                        importe_recurso_ma,
+                                        id_usuario_reg,
+                                        fecha_reg,
+                                        actualizacion
+                                    ) values(
+                                        case
+                                          when v_record_mov.id_partida = 0 then
+                                              v_id_partida
+                                          else
+                                              v_id_partida_sg
+                                          end,
+                                       v_id_centro_costo_sg,
+                                        'activo',
+                                        v_id_cuenta_sg,
+                                        'Asiento de Apertura',
+                                        p_id_int_comprobante,
+                                        case
+                                          when v_record_mov.id_auxiliar = 0 then
+                                              null
+                                          else
+                                              v_record_mov.id_auxiliar
+                                          end,
+                                        v_importe_debe,
+                                        v_importe_haber,
+                                        v_importe_debe,
+                                        v_importe_haber,
+                                        v_importe_debe,
+                                        v_importe_haber,
+                                        v_importe_debe,
+                                        v_importe_haber,
+                                        v_importe_debe_mt,
+                                        v_importe_haber_mt,
+                                        v_importe_debe_mt,
+                                        v_importe_haber_mt, --MT
+                                        v_importe_debe_ma,
+                                        v_importe_haber_ma,
+                                        v_importe_debe_ma,
+                                        v_importe_haber_ma, --MA
+                                        p_id_usuario,
+                                        now(),
+                                        'si' );
+                     END IF;
+
+              
                 END IF;
     END LOOP;
 
