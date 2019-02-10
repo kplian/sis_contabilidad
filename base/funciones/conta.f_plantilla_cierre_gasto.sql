@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_plantilla_cierre_gasto (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -56,6 +58,14 @@ DECLARE
 
   v_partida_haber						integer;
   v_id_cuenta							integer;
+  
+  
+  v_total_haber_saldo   						numeric;
+  v_total_debe_saldo 	 						numeric;
+  v_total_haber_ma_saldo   					numeric;
+  v_total_debe_ma_saldo 	 					numeric;
+  v_total_haber_mt_saldo    					numeric;
+  v_total_debe_mt_saldo 			numeric;
 
 BEGIN
 v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
@@ -116,8 +126,16 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                     v_sw_actualiza = false;
                     v_sw_saldo_acredor = false;
                     v_saldo_mb  = 0;
+                    v_saldo_ma  = 0;
+                    v_saldo_mt  = 0;
 
-                     IF v_record_mov.acreedor > v_record_mov.deudor  THEN
+                     IF v_record_mov.acreedor =v_record_mov.deudor and 
+                        v_record_mov.importe_haber_ma = v_record_mov.importe_debe_ma and
+                        v_record_mov.importe_haber_mt = v_record_mov.importe_debe_mt   THEN
+                        
+                         v_sw_actualiza = false;
+                     
+                     ELSEIF v_record_mov.acreedor > v_record_mov.deudor  THEN
 
                                 v_sw_saldo_acredor = true;
                                 v_sw_actualiza = true;
@@ -125,7 +143,7 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                                 v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
                                 v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
 
-                     ELSEIF v_record_mov.deudor > v_record_mov.acreedor THEN
+                     ELSE 
 
                                v_sw_saldo_acredor = false;
                                v_sw_actualiza = true;
@@ -133,15 +151,7 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                                v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
                                v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
 
-                     ELSEIF  v_record_mov.deudor = v_record_mov.acreedor THEN
-                               v_sw_saldo_acredor = true;
-                               v_sw_actualiza = true;
-                               v_saldo_mb = 0;
-                               v_saldo_ma = 0;
-                               v_saldo_mt = 0;
-
-                     ELSE
-                         v_sw_actualiza = false;
+                    
                      END IF;
 
 
@@ -297,58 +307,94 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
               v_id_cuenta
               from conta.tcuenta c
               where c.nro_cuenta = '3.1.3.02.001.001' and c.id_gestion = p_id_gestion_cbte;
+            
+    IF v_total_debe > v_total_haber THEN
+          v_total_debe_saldo = v_total_debe - v_total_haber;
+          v_total_haber_saldo= 0;
+          v_total_debe_ma_saldo = v_total_debe_ma - v_total_haber_ma;
+          v_total_haber_ma_saldo = 0;
+          v_total_debe_mt_saldo = v_total_debe_mt - v_total_haber_mt;
+          v_total_haber_mt_saldo = 0;
+    
+    ELSEIF v_total_debe <  v_total_haber THEN
+          v_total_debe_saldo =0;
+          v_total_haber_saldo= v_total_haber - v_total_debe;
+          v_total_debe_ma_saldo = 0 ;
+          v_total_haber_ma_saldo = v_total_haber_ma - v_total_debe_ma;
+          v_total_debe_mt_saldo = 0;
+          v_total_haber_mt_saldo = v_total_haber_mt - v_total_debe_mt;
+    ELSE
+          v_total_debe_saldo =0;
+          v_total_haber_saldo= 0;
+          v_total_debe_ma_saldo = 0 ;
+          v_total_haber_ma_saldo = 0;
+          v_total_debe_mt_saldo = 0;
+          v_total_haber_mt_saldo = 0;
+      
+    END IF; 
+      
+       
+      
+     IF   v_total_debe_saldo =0 OR 
+          v_total_haber_saldo= 0 OR 
+          v_total_debe_ma_saldo = 0 OR 
+          v_total_haber_ma_saldo = 0 OR 
+          v_total_debe_mt_saldo = 0 OR 
+          v_total_haber_mt_saldo = 0 THEN       
 
-   insert into conta.tint_transaccion(
-                                        id_partida,
-                                        id_centro_costo,
-                                        estado_reg,
-                                        id_cuenta,
-                                        glosa,
-                                        id_int_comprobante,
-                                        id_auxiliar,
-                                        importe_debe,
-                                        importe_haber,
-                                        importe_gasto,
-                                        importe_recurso,
-                                        importe_debe_mb,
-                                        importe_haber_mb,
-                                        importe_gasto_mb,
-                                        importe_recurso_mb,
-                                        importe_debe_mt,
-                                        importe_haber_mt,
-                                        importe_gasto_mt,
-                                        importe_recurso_mt,
-                                        importe_debe_ma,
-                                        importe_haber_ma,
-                                        importe_gasto_ma,
-                                        importe_recurso_ma,
-                                        id_usuario_reg,
-                                        fecha_reg,
-                                        actualizacion
-                                    ) values(
-                                        v_partida_haber,   --partida de flujo
-                                        v_id_centro_costo_depto, -- v_id_centro_costo_depto, --centr de costo del depto contable
-                                        'activo',
-                                        v_id_cuenta, --la misma cuenta sobre la que hicimos el mayor
-                                        'Asiento de cierre de las cuentas de Gasto',  --glosa
-                                        p_id_int_comprobante,
-                                        NULL,--v_registros.id_auxiliar,
-                                        v_total_debe,
-                                        v_total_haber,
-                                        v_total_debe,
-                                        v_total_haber,
-                                        v_total_debe,
-                                        v_total_haber,
-                                        v_total_debe,
-                                        v_total_haber,
-                                        v_total_debe_mt,v_total_haber_mt,v_total_debe_mt,v_total_haber_mt, --MT
-                                        v_total_debe_ma,v_total_haber_ma,v_total_debe_ma,v_total_haber_ma,--MA
-                                        p_id_usuario,
-                                        now(),
-                                        'si'
-                                    );
+         insert into conta.tint_transaccion(
+                                              id_partida,
+                                              id_centro_costo,
+                                              estado_reg,
+                                              id_cuenta,
+                                              glosa,
+                                              id_int_comprobante,
+                                              id_auxiliar,
+                                              importe_debe,
+                                              importe_haber,
+                                              importe_gasto,
+                                              importe_recurso,
+                                              importe_debe_mb,
+                                              importe_haber_mb,
+                                              importe_gasto_mb,
+                                              importe_recurso_mb,
+                                              importe_debe_mt,
+                                              importe_haber_mt,
+                                              importe_gasto_mt,
+                                              importe_recurso_mt,
+                                              importe_debe_ma,
+                                              importe_haber_ma,
+                                              importe_gasto_ma,
+                                              importe_recurso_ma,
+                                              id_usuario_reg,
+                                              fecha_reg,
+                                              actualizacion
+                                          ) values(
+                                              v_partida_haber,   --partida de flujo
+                                              v_id_centro_costo_depto, -- v_id_centro_costo_depto, --centr de costo del depto contable
+                                              'activo',
+                                              v_id_cuenta, --la misma cuenta sobre la que hicimos el mayor
+                                              'Asiento de cierre de las cuentas de Gasto',  --glosa
+                                              p_id_int_comprobante,
+                                              NULL,--v_registros.id_auxiliar,
+                                              v_total_debe_saldo,
+                                              v_total_haber_saldo,
+                                              v_total_debe_saldo,
+                                              v_total_haber_saldo,
+                                              v_total_debe_saldo,
+                                              v_total_haber_saldo,
+                                              v_total_debe_saldo,
+                                              v_total_haber_saldo,
+                                              v_total_debe_mt_saldo,v_total_haber_mt_saldo,v_total_debe_mt_saldo,v_total_haber_mt_saldo, --MT
+                                              v_total_debe_ma_saldo,v_total_haber_ma_saldo,v_total_debe_ma_saldo,v_total_haber_ma_saldo,--MA
+                                              p_id_usuario,
+                                              now(),
+                                              'si'
+                                          );
 
-
+             END IF;
+             
+             
 EXCEPTION
 
 	WHEN OTHERS THEN

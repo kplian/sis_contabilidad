@@ -59,6 +59,10 @@ v_monto_recurso						numeric;
 v_id_int_comprobante_fk				integer[];
 v_id_tipo_relacion_comprobante		integer;
 
+v_id_moneda_tri	integer;
+v_id_moneda_act	integer;
+v_registros_cc  record;
+
  
 
 BEGIN
@@ -268,6 +272,10 @@ BEGIN
          v_id_moneda_base = param.f_get_moneda_base();
          
          
+            v_id_moneda_tri  = param.f_get_moneda_triangulacion();
+            v_id_moneda_act  = param.f_get_moneda_actualizacion();
+         
+         
          
          -----------------------------------------
          --   INICIA TRAMITE
@@ -354,6 +362,20 @@ BEGIN
             raise exception 'el estado inicial para cbtes debe ser borrador, revise la configuración del WF';
           END IF;
           
+          
+          
+     SELECT  
+       po_id_config_cambiaria ,
+       po_valor_tc1 ,
+       po_valor_tc2 ,
+       po_valor_tc3 ,
+       po_tc1 ,
+       po_tc2  ,
+       po_tc3
+     into
+      v_registros_cc
+     FROM conta.f_get_tipo_cambio_segu_config(1,v_parametros.fecha,'nacional','si', 'O');
+          
          
                     
          ------------------------------------
@@ -379,7 +401,15 @@ BEGIN
               id_estado_wf,
               id_int_comprobante_fks,
               id_tipo_relacion_comprobante,
-              manual
+              manual,
+              
+              id_config_cambiaria,
+              tipo_cambio_2,
+              localidad,
+              id_moneda_tri,
+              forma_cambio,
+              id_moneda_act,
+              tipo_cambio_3
           	) 
             values(
               v_registros_plantilla.id_clase_comprobante,			
@@ -387,7 +417,7 @@ BEGIN
               v_parametros.id_depto,
               v_id_moneda_base,
               v_rec.po_id_periodo,
-              1, --tipo de cambio para moenda base
+              v_registros_cc.po_valor_tc1, --tipo de cambio para moenda base
               'borrador',
               v_registros_plantilla.glosa,
               v_parametros.fecha,
@@ -401,8 +431,18 @@ BEGIN
               v_id_estado_wf,
               v_id_int_comprobante_fk,
               v_id_tipo_relacion_comprobante,
-              'si'
+              'si',
+              
+              v_registros_cc.po_id_config_cambiaria,--id_config_cambiaria,
+              v_registros_cc.po_valor_tc2,--tipo_cambio_2,
+              'nacional',
+              v_id_moneda_tri,
+              'oficial',
+              v_id_moneda_act,
+              v_registros_cc.po_valor_tc3--tipo_cambio_3
 		   )RETURNING id_int_comprobante into v_id_int_comprobante;
+           
+          
             
             
          
