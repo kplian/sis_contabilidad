@@ -101,7 +101,7 @@ class RIntCbte extends  ReportePDF {
 		foreach($this->detalleCbte as $key=>$val){
 		   	
 		   $sw = 1;	
-		   if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&  $val['importe_debe'] != 0 && $val['importe_haber'] != 0){
+		   if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&  $val['importe_debe'] == 0 && $val['importe_haber'] == 0){
 				$sw = 0;	
 		   }
 		   

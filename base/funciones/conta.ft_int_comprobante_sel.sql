@@ -525,7 +525,7 @@ BEGIN
                                                 left join pre.tpartida par on par.id_partida = tra.id_partida
                                                 left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
                                                 left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
-                                                where cbte.id_proceso_wf =  ''||v_parametros.id_proceso_wf||''
+                                                where cbte.id_proceso_wf =  '||v_parametros.id_proceso_wf||'
 
                                                 group by
                                                   cue.nro_cuenta,
