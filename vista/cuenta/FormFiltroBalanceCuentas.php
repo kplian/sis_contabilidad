@@ -5,6 +5,9 @@
 *@author  Rensi Arteaga Copari 
 *@date    30-01-2014
 *@description permites subir archivos a la tabla de documento_sol
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#33         10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -219,7 +222,39 @@ Phx.vista.FormFiltroBalanceCuentas=Ext.extend(Phx.frmInterfaz,{
 	       		id_grupo:0,
 	       		valorInicial: 'pdf',
 	       		form:true
-	     }
+	     },
+        //#33 MMV
+        {
+            config:{
+                name:'tipo_moneda',
+                fieldLabel:'Tipo de Moneda',
+                allowBlank:false,
+                emptyText:'Tipo de moneda...',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                valueField: 'tipo_moneda',
+                gwidth: 100,
+                store:new Ext.data.ArrayStore({
+                    fields: ['variable', 'valor'],
+                    data : [
+                        ['MB','Moneda Base'],
+                        ['MT','Moneda Triangulacion'],
+                        ['MA','Moneda Actualizacion']
+                    ]
+                }),
+                valueField: 'variable',
+                displayField: 'valor',
+                listeners: {
+                    'afterrender': function(combo){
+                        combo.setValue('MB');
+                    }
+                }
+            },
+            type:'ComboBox',
+            form:true
+        } // #33
     ],
     labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
     title: 'Filtro de mayores',

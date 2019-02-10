@@ -19,7 +19,7 @@ ISSUE	FORK		 FECHA:				 AUTOR:				DESCRIPCION:
  1A					23/08/2018				EGS				se creo las transsacciones CONTA_INCBTECB_SEL,CONTA_INCBTECB_CONT
  #7		endeETR		27/12/2018			manuel guerra		agrega columna nro_tramite_aux, y listado de tramites
  #32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
-
+ #33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
 
  DESCRIPCION:
  AUTOR:
@@ -41,6 +41,8 @@ DECLARE
     v_desde				varchar;
     v_hasta				varchar;
     v_func				varchar;
+    v_id_moneda			integer;	 --#33
+    v_id_monedar_mt		integer;     --#33
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_int_comprobante_sel';
@@ -365,14 +367,39 @@ BEGIN
 	elsif(p_transaccion='CONTA_CABCBT_SEL')then
 
     	begin
-             v_id_moneda_base=param.f_get_moneda_base();
+            --Moneda Base MB
+        v_id_moneda_base  =param.f_get_moneda_base();
+         ------------#33------------
+        ---Obtener La moneda del comprobante cabezera
+        select  incbte.id_moneda
+            	into
+        		v_id_moneda
+        from conta.vint_comprobante incbte
+        where incbte.id_proceso_wf =v_parametros.id_proceso_wf;
 
-            --recuperar el codigo de la moneda base
+          --recuperar el codigo de la moneda base
 
-            select
-               m.codigo into v_codigo_moneda_base
-            from param.tmoneda m
-            where m.id_moneda = v_id_moneda_base;
+          if(v_id_moneda = v_id_moneda_base)then
+
+              select id_moneda
+                      into
+                      v_id_monedar_mt
+              from param.tmoneda
+              where tipo_moneda='intercambio';
+
+            select m.codigo into v_codigo_moneda_base
+                  from param.tmoneda m
+                  where m.id_moneda = v_id_monedar_mt;
+
+            	---  v_id_moneda_base = v_id_monedar_mt;
+          else
+
+           select m.codigo into v_codigo_moneda_base
+                  from param.tmoneda m
+                  where m.id_moneda = v_id_moneda_base;
+
+          end if;
+          ------------#33------------
 
 
     		--Sentencia de la consulta
@@ -444,7 +471,7 @@ BEGIN
     	begin
        
     		--Sentencia de la consulta
-			v_consulta:='select    
+			v_consulta:='select
                                 nro_cuenta,
                                 nombre_cuenta,
                                 codigo_auxiliar,
@@ -454,18 +481,20 @@ BEGIN
                                 nombre_partida,
                                 desc_orden,
                                 glosa,
-                                importe_gasto, 
+                                importe_gasto,
                                 importe_recurso,
-                                importe_debe, 
+                                importe_debe,
                                 importe_haber,
                                 importe_debe_mb,
                                 importe_haber_mb,
+                                importe_debe_mt, --#33
+                                importe_haber_mt, --#33
                                 sw_movimiento,
                                 tipo_partida,
                                 tipo_cambio
                                 FROM ((select
-                                                  CASE 
-                                                    WHEN  (sum(tra.importe_debe) > 0 or sum(tra.importe_debe_mb) >0) then  1 
+                                                  CASE
+                                                    WHEN  (sum(tra.importe_debe) > 0 or sum(tra.importe_debe_mb) >0) then  1
                                                     ELSE   2
                                                    END as tipo,
                                                   max(tra.orden) as orden_rank,
@@ -480,23 +509,25 @@ BEGIN
                                                   tra.glosa::varchar as glosa,
                                                   sum(tra.importe_gasto) as importe_gasto,
                                                   sum(tra.importe_recurso) as importe_recurso,
-                                                  sum(tra.importe_debe) as importe_debe, 
+                                                  sum(tra.importe_debe) as importe_debe,
                                                   sum(tra.importe_haber) as importe_haber,
                                                   sum(tra.importe_debe_mb) as importe_debe_mb,
                                                   sum(tra.importe_haber_mb) as importe_haber_mb,
+                                                  sum(tra.importe_debe_mt) as importe_debe_mt, --#33
+                                                  sum(tra.importe_haber_mt) as importe_haber_mt, --#33
                                                   par.sw_movimiento,
                                                   par.tipo as tipo_partida,
                                                   tra.tipo_cambio
                                                 from conta.tint_transaccion tra
                                                 inner join conta.tint_comprobante cbte on cbte.id_int_comprobante = tra.id_int_comprobante
-                                                inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta  
+                                                inner join conta.tcuenta cue on cue.id_cuenta = tra.id_cuenta
                                                 inner join param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
                                                 left join pre.tpartida par on par.id_partida = tra.id_partida
                                                 left join conta.tauxiliar aux on aux.id_auxiliar = tra.id_auxiliar
                                                 left join conta.torden_trabajo ot on ot.id_orden_trabajo = tra.id_orden_trabajo
-                                                where cbte.id_proceso_wf =  '||v_parametros.id_proceso_wf||'
-                                                
-                                                group by 
+                                                where cbte.id_proceso_wf =  ''||v_parametros.id_proceso_wf||''
+
+                                                group by
                                                   cue.nro_cuenta,
                                                   cue.nombre_cuenta,
                                                   aux.codigo_auxiliar,
@@ -510,10 +541,10 @@ BEGIN
                                                   par.tipo,
                                                   tra.tipo_cambio
                                           )
-                                          
-                                                  
-                                ) iii 
-                                
+
+
+                                ) iii
+
                                 order by tipo, orden_rank';
 						
 			

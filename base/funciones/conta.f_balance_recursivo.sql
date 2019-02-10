@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_balance_recursivo (
   p_desde date,
   p_hasta date,
@@ -9,12 +7,26 @@ CREATE OR REPLACE FUNCTION conta.f_balance_recursivo (
   p_id_cuenta_padre integer,
   p_tipo_cuenta varchar,
   p_incluir_cierre varchar = 'no'::character varying,
-  p_tipo_balance varchar = 'general'::character varying
+  p_tipo_balance varchar = 'general'::character varying,
+  p_tipo_moneda varchar = 'MB'::character varying
 )
 RETURNS numeric AS
 $body$
-DECLARE
+/**************************************************************************
+ SISTEMA:		Sistema de Contabilidad
+ FUNCION: 		conta.f_balance
+ DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tcuenta'
+ AUTOR: 		ADMIN
+ FECHA:	        21-02-2013 15:04:03
+ COMENTARIOS:
+***************************************************************************
+ HISTORIAL DE MODIFICACIONES:
+ HISTORIAL DE MODIFICACIONES:
+	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
+   #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
 
+***************************************************************************/
+DECLARE
 
 v_parametros  		record;
 v_registros 		record;
@@ -28,7 +40,7 @@ v_id_gestion  		integer;
 va_tipo_cuenta		varchar[];
 v_gestion 			integer;
 v_sw_force			boolean;
- 
+
 
 BEGIN
 
@@ -36,32 +48,32 @@ BEGIN
     -- 0) inicia suma
     v_suma = 0;
     v_sw_force = FALSE;
-    
+
     --arma array de tipos de cuenta
     va_tipo_cuenta = string_to_array(p_tipo_cuenta,',');
-     
+
     v_gestion = (SELECT EXTRACT(YEAR FROM p_hasta))::integer;
-    select 
+    select
        ges.id_gestion
     into
-      v_id_gestion  
+      v_id_gestion
     from param.tgestion ges
     WHERE ges.gestion = v_gestion  and ges.estado_reg = 'activo';
-    
-   
+
+
      -- incremetmaos el nivel
     v_nivel = p_nivel_ini +1;
-           
+
     -- obtiene la gestion de la fecha inicial
-           
-     select 
+
+     select
              ges.id_gestion
      into
-            v_id_gestion  
+            v_id_gestion
      from param.tgestion ges
       WHERE ges.gestion = (SELECT EXTRACT(YEAR FROM p_hasta::Date))::integer  and ges.estado_reg = 'activo';
-           
-     -- FOR listado de cuenta basicas de la gestion 
+
+     -- FOR listado de cuenta basicas de la gestion
      FOR  v_registros in (
                               select c.id_cuenta,
                                  c.nro_cuenta,
@@ -72,42 +84,50 @@ BEGIN
                                  c.sw_transaccional,
                                  cc.movimiento
                                 from conta.tcuenta c
-                                inner join conta.tconfig_tipo_cuenta cc on cc.tipo_cuenta = c.tipo_cuenta   
-                                where c.estado_reg = 'activo' 
-                                    and 
-                                      CASE 
+                                inner join conta.tconfig_tipo_cuenta cc on cc.tipo_cuenta = c.tipo_cuenta
+                                where c.estado_reg = 'activo'
+                                    and
+                                      CASE
                                           WHEN p_id_cuenta_padre is null THEN
                                                c.id_cuenta_padre is NULL and c.id_gestion = v_id_gestion
                                           ELSE
-                                               c.id_cuenta_padre = p_id_cuenta_padre 
-                                          END 
-                                
-                                   AND 
+                                               c.id_cuenta_padre = p_id_cuenta_padre
+                                          END
+
+                                   AND
                                    (  (p_tipo_balance = 'general'  and  'balance' = ANY(c.eeff))
-                                         or 
-                                       (p_tipo_balance = 'resultado'  and  'resultado' = ANY(c.eeff)) 
-                                          or 
+                                         or
+                                       (p_tipo_balance = 'resultado'  and  'resultado' = ANY(c.eeff))
+                                          or
                                        (p_tipo_balance = 'todos' and c.tipo_cuenta = ANY(va_tipo_cuenta))
                                      )
                                    )   LOOP
-                                   
-                                   
-                   
+
+
+
                    IF v_registros.sw_transaccional = 'movimiento' THEN
                        va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
-                       v_mayor = va_mayor[1];   
+                       if (p_tipo_moneda = 'MB')then --#33
+                       		v_mayor = va_mayor[1];
+                       elsif(p_tipo_moneda = 'MT')then
+                       		v_mayor = va_mayor[2];
+                       elsif(p_tipo_moneda = 'MA')then
+                       		v_mayor = va_mayor[5];
+                       end if;--#33
+
                    ELSE
                        -- llamada recursiva del balance general
                         v_mayor = conta.f_balance_recursivo(
-                                               p_desde, 
-                                               p_hasta, 
-                                               p_id_deptos, 
-                                               v_nivel, 
-                                               p_nivel_final, 
+                                               p_desde,
+                                               p_hasta,
+                                               p_id_deptos,
+                                               v_nivel,
+                                               p_nivel_final,
                                                v_registros.id_cuenta,
                                                p_tipo_cuenta,
                                                p_incluir_cierre,
-                                               p_tipo_balance);
+                                               p_tipo_balance,
+                                               p_tipo_moneda);
                    END IF;              
                                    
                 
