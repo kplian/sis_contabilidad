@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_plantilla_cierre_utilidad (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -51,6 +53,13 @@ DECLARE
   v_aux_debe						numeric;
   v_aux_heber						numeric;
   v_id_cuenta						integer;
+  
+  v_total_debe_aux		numeric;
+      v_total_haber_aux		numeric;
+      v_total_debe_mt_aux		numeric;
+      v_total_haber_mt_aux		numeric;
+      v_total_debe_ma_aux		numeric;
+      v_total_haber_ma_aux		numeric;
 
 BEGIN
 v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
@@ -109,250 +118,250 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
                                                                 group by t.id_cuenta)LOOP
 
 
-                    v_sw_actualiza = false;
-                    v_sw_saldo_acredor = false;
+                          v_sw_actualiza = false;
+                          v_sw_saldo_acredor = false;
 
-                     v_saldo_mb  = 0;
-                      v_saldo_mt = 0;
-                      v_saldo_ma = 0;
+                           v_saldo_mb  = 0;
+                            v_saldo_mt = 0;
+                            v_saldo_ma = 0;
 
-                      v_aux_debe = 0;
-                      v_aux_heber = 0;
+                            v_aux_debe = 0;
+                            v_aux_heber = 0;
 
-                    --  v_aux_debe = v_record_mov.deudor + v_record_mov.importe_debe_mt + v_record_mov.importe_debe_ma;
-                    --  v_aux_heber = v_record_mov.acreedor + v_record_mov.importe_haber_mt + v_record_mov.importe_haber_ma;
+                          --  v_aux_debe = v_record_mov.deudor + v_record_mov.importe_debe_mt + v_record_mov.importe_debe_ma;
+                          --  v_aux_heber = v_record_mov.acreedor + v_record_mov.importe_haber_mt + v_record_mov.importe_haber_ma;
 
-                     IF v_record_mov.acreedor > v_record_mov.deudor  THEN
+                           IF v_record_mov.acreedor > v_record_mov.deudor  THEN
 
-                                v_sw_saldo_acredor = true;
-                                v_sw_actualiza = true;
-                                v_saldo_mb = v_record_mov.acreedor - v_record_mov.deudor;
-                                v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
-
-
-
-                              if  v_record_mov.importe_haber_mt > v_record_mov.importe_debe_mt  then
-                                	v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
-                              elsif v_record_mov.importe_debe_mt > v_record_mov.importe_haber_mt then
-                              		v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
-                              end if ;
+                                      v_sw_saldo_acredor = true;
+                                      v_sw_actualiza = true;
+                                      v_saldo_mb = v_record_mov.acreedor - v_record_mov.deudor;
+                                      v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
+                                       v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
+                                   
 
 
-                     ELSEIF v_record_mov.deudor > v_record_mov.acreedor THEN
+                           ELSEIF v_record_mov.deudor > v_record_mov.acreedor THEN
 
-                               v_sw_saldo_acredor = false;
-                               v_sw_actualiza = true;
-                               v_saldo_mb = v_record_mov.deudor - v_record_mov.acreedor;
-                               v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
+                                     v_sw_saldo_acredor = false;
+                                     v_sw_actualiza = true;
+                                     v_saldo_mb = v_record_mov.deudor - v_record_mov.acreedor;
+                                     v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
+                                     v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
+                                   
 
-                       if  v_record_mov.importe_haber_mt > v_record_mov.importe_debe_mt  then
-                                	v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
-                              elsif v_record_mov.importe_debe_mt > v_record_mov.importe_haber_mt then
-                              		v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
-                              end if;
+                           ELSEIF  v_record_mov.deudor = v_record_mov.acreedor THEN                              
+                                     v_sw_actualiza = false;
+                                     v_saldo_mb = 0;
+                                     v_saldo_ma = 0;
+                                     v_saldo_mt = 0;
 
-                     ELSEIF  v_record_mov.deudor = v_record_mov.acreedor THEN
-                               v_sw_saldo_acredor = true;
-                               v_sw_actualiza = true;
-                               v_saldo_mb = 0;
-                               v_saldo_ma = 0;
-                               v_saldo_mt = 0;
-
-                     ELSE
-                         v_sw_actualiza = false;
-                     END IF;
+                           ELSE
+                               v_sw_actualiza = false;
+                           END IF;
 
 
 
-                    IF v_sw_actualiza THEN
+                          IF v_sw_actualiza THEN
 
-                        v_importe_debe = 0;
-                        v_importe_haber = 0;
-                        v_importe_debe_ma	= 0;
-                        v_importe_haber_ma = 0;
-                        v_importe_debe_mt = 0;
-                        v_importe_haber_mt = 0;
+                              v_importe_debe = 0;
+                              v_importe_haber = 0;
+                              v_importe_debe_ma	= 0;
+                              v_importe_haber_ma = 0;
+                              v_importe_debe_mt = 0;
+                              v_importe_haber_mt = 0;
 
-                        IF v_sw_saldo_acredor THEN
+                              IF v_sw_saldo_acredor THEN
 
-                                v_importe_haber = 0;
-                                v_importe_debe = v_saldo_mb;
+                                      v_importe_haber = 0;
+                                      v_importe_debe = v_saldo_mb;
 
-                                v_importe_haber_ma  = 0;
-                                v_importe_debe_ma	= v_saldo_ma;
+                                      v_importe_haber_ma  = 0;
+                                      v_importe_debe_ma	= v_saldo_ma;
 
-                                v_importe_haber_mt 	= 0;
-                                v_importe_debe_mt 	= v_saldo_mt;
+                                      v_importe_haber_mt 	= 0;
+                                      v_importe_debe_mt 	= v_saldo_mt;
 
 
 
-                                select  ps_id_partida
+                                      select  ps_id_partida
+                                          into
+                                          v_id_partida
+                                        from conta.f_get_config_relacion_contable( 'CIER-DEBE',
+                                                                                     p_id_gestion_cbte,
+                                                                                     null,  --campo_relacion_contable
+                                                                                     null);
+
+                                      --  raise exception ''
+
+                              ELSE
+                                      v_importe_haber = v_saldo_mb;
+                                      v_importe_debe 	= 0;
+
+                                      v_importe_haber_ma  = v_saldo_ma;
+                                      v_importe_debe_ma	= 0;
+
+                                      v_importe_haber_mt 	= v_saldo_mt;
+                                      v_importe_debe_mt 	= 0;
+
+
+                                   select  ps_id_partida
+                                          into
+                                          v_id_partida
+                                          from conta.f_get_config_relacion_contable( 'CIER-HABER',
+                                                                                     p_id_gestion_cbte,
+                                                                                     NULL,  --campo_relacion_contable
+                                                                                     NULL);
+                              END IF;
+
+
+
+                        IF v_saldo_mb != 0  or  v_saldo_ma != 0 or v_saldo_mt != 0 THEN
+
+                              insert into conta.tint_transaccion(
+                                          id_partida,
+                                          id_centro_costo,
+                                          estado_reg,
+                                          id_cuenta,
+                                          glosa,
+                                          id_int_comprobante,
+                                          id_auxiliar,
+                                          importe_debe,
+                                          importe_haber,
+                                          importe_gasto,
+                                          importe_recurso,
+                                          importe_debe_mb,
+                                          importe_haber_mb,
+                                          importe_gasto_mb,
+                                          importe_recurso_mb,
+                                          importe_debe_mt,
+                                          importe_haber_mt,
+                                          importe_gasto_mt,
+                                          importe_recurso_mt,
+                                          importe_debe_ma,
+                                          importe_haber_ma,
+                                          importe_gasto_ma,
+                                          importe_recurso_ma,
+                                          id_usuario_reg,
+                                          fecha_reg,
+                                          actualizacion
+                                      ) values(
+                                          v_id_partida,
+                                          v_id_centro_costo_depto,
+                                          'activo',
+                                          v_record_mov.id_cuenta,
+                                          'Asiento de Cierre de las Cuentas de Gasto ',
+                                          p_id_int_comprobante,
+                                          null,
+                                          v_importe_debe,
+                                          v_importe_haber,
+                                          v_importe_debe,
+                                          v_importe_haber,
+                                          v_importe_debe,
+                                          v_importe_haber,
+                                          v_importe_debe,
+                                          v_importe_haber,
+                                          v_importe_debe_mt,
+                                          v_importe_haber_mt,
+                                          v_importe_debe_mt,
+                                          v_importe_haber_mt, --MT
+                                          v_importe_debe_ma,
+                                          v_importe_haber_ma,
+                                          v_importe_debe_ma,
+                                          v_importe_haber_ma, --MA
+                                          p_id_usuario,
+                                          now(),
+                                          'si' );
+
+                                      SELECT  ps_id_partida
+                                        into
+                                        v_partida_haber
+                                        FROM conta.f_get_config_relacion_contable( 'CIER-HABER',
+                                                                                   p_id_gestion_cbte,
+                                                                                   NULL,  --campo_relacion_contable
+                                                                                   NULL);
+
+                                                          IF v_partida_haber is null THEN
+                                                             raise exception 'No se encontro relacion contable CIER-HABER';
+                                                          END IF;
+                                                          
+                                                          
+                                    select c.id_cuenta
                                     into
-                                    v_id_partida
-                                  from conta.f_get_config_relacion_contable( 'CIER-DEBE',
-                                                                               p_id_gestion_cbte,
-                                                                               null,  --campo_relacion_contable
-                                                                               null);
+                                    v_id_cuenta
+                                    from conta.tcuenta c
+                                    where c.nro_cuenta = '3.1.3.01.001.001' and c.id_gestion = p_id_gestion_cbte;
 
-                                --  raise exception ''
+                                     insert into conta.tint_transaccion(
+                                          id_partida,
+                                          id_centro_costo,
+                                          estado_reg,
+                                          id_cuenta,
+                                          glosa,
+                                          id_int_comprobante,
+                                          id_auxiliar,
+                                          
+                                          importe_debe,
+                                          importe_haber,
+                                          importe_gasto,
+                                          importe_recurso,
+                                          
+                                          importe_debe_mb,
+                                          importe_haber_mb,
+                                          importe_gasto_mb,
+                                          importe_recurso_mb,
+                                          
+                                          importe_debe_mt,
+                                          importe_haber_mt,
+                                          importe_gasto_mt,
+                                          importe_recurso_mt,
+                                          
+                                          importe_debe_ma,
+                                          importe_haber_ma,
+                                          importe_gasto_ma,
+                                          importe_recurso_ma,
+                                          
+                                          id_usuario_reg,
+                                          fecha_reg,
+                                          actualizacion
+                                      ) values(
+                                          v_id_partida,
+                                          v_id_centro_costo_depto,
+                                          'activo',
+                                          v_id_cuenta,
+                                          'Asiento de utilidad de gestion',
+                                          p_id_int_comprobante,
+                                          null,
+                                          v_importe_haber,
+                                          v_importe_debe,
+                                          v_importe_haber,
+                                          v_importe_debe,
+                                          
+                                          v_importe_haber,
+                                          v_importe_debe,
+                                          v_importe_haber,
+                                          v_importe_debe,
+                                          
+                                          v_importe_haber_mt ,
+                                          v_importe_debe_mt ,
+                                          v_importe_haber_mt ,
+                                          v_importe_debe_mt ,
+                                          
+                                          v_importe_haber_ma ,
+                                          v_importe_debe_ma,
+                                          v_importe_haber_ma ,
+                                          v_importe_debe_ma,
+                                          
+                                          p_id_usuario,
+                                          now(),
+                                          'si' );
 
-                        ELSE
-                                v_importe_haber = v_saldo_mb;
-                                v_importe_debe 	= 0;
+                                          v_sw_minimo = true;
+                                END IF;
 
-                                v_importe_haber_ma  = v_saldo_ma;
-                                v_importe_debe_ma	= 0;
-
-                                v_importe_haber_mt 	= v_saldo_mt;
-                                v_importe_debe_mt 	= 0;
-
-
-                             select  ps_id_partida
-                                    into
-                                    v_id_partida
-                                    from conta.f_get_config_relacion_contable( 'CIER-HABER',
-                                                                               p_id_gestion_cbte,
-                                                                               NULL,  --campo_relacion_contable
-                                                                               NULL);
-                        END IF;
-
-
-
-                  IF v_saldo_mb != 0  or  v_saldo_ma != 0 or v_saldo_mt != 0 THEN
-
-                        insert into conta.tint_transaccion(
-                                    id_partida,
-                                    id_centro_costo,
-                                    estado_reg,
-                                    id_cuenta,
-                                    glosa,
-                                    id_int_comprobante,
-                                    id_auxiliar,
-                                    importe_debe,
-                                    importe_haber,
-                                    importe_gasto,
-                                    importe_recurso,
-                                    importe_debe_mb,
-                                    importe_haber_mb,
-                                    importe_gasto_mb,
-                                    importe_recurso_mb,
-                                    importe_debe_mt,
-                                    importe_haber_mt,
-                                    importe_gasto_mt,
-                                    importe_recurso_mt,
-                                    importe_debe_ma,
-                                    importe_haber_ma,
-                                    importe_gasto_ma,
-                                    importe_recurso_ma,
-                                    id_usuario_reg,
-                                    fecha_reg,
-                                    actualizacion
-                                ) values(
-                                    v_id_partida,
-                                    v_id_centro_costo_depto,
-                                    'activo',
-                                    v_record_mov.id_cuenta,
-                                    'Asiento de Cierre de las Cuentas de Gasto ',
-                                    p_id_int_comprobante,
-                                    null,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe_mt,
-                                    v_importe_haber_mt,
-                                    v_importe_debe_mt,
-                                    v_importe_haber_mt, --MT
-                                    v_importe_debe_ma,
-                                    v_importe_haber_ma,
-                                    v_importe_debe_ma,
-                                    v_importe_haber_ma, --MA
-                                    p_id_usuario,
-                                    now(),
-                                    'si' );
-
-                                SELECT  ps_id_partida
-                                  into
-                                  v_partida_haber
-                                  FROM conta.f_get_config_relacion_contable( 'CIER-HABER',
-                                                                             p_id_gestion_cbte,
-                                                                             NULL,  --campo_relacion_contable
-                                                                             NULL);
-
-                                                    IF v_partida_haber is null THEN
-                                                       raise exception 'No se encontro relacion contable CIER-HABER';
-                                                    END IF;
-     select c.id_cuenta
-              into
-              v_id_cuenta
-              from conta.tcuenta c
-              where c.nro_cuenta = '3.1.3.01.001.001' and c.id_gestion = p_id_gestion_cbte;
-
-                               insert into conta.tint_transaccion(
-                                    id_partida,
-                                    id_centro_costo,
-                                    estado_reg,
-                                    id_cuenta,
-                                    glosa,
-                                    id_int_comprobante,
-                                    id_auxiliar,
-                                    importe_debe,
-                                    importe_haber,
-                                    importe_gasto,
-                                    importe_recurso,
-                                    importe_debe_mb,
-                                    importe_haber_mb,
-                                    importe_gasto_mb,
-                                    importe_recurso_mb,
-                                    importe_debe_mt,
-                                    importe_haber_mt,
-                                    importe_gasto_mt,
-                                    importe_recurso_mt,
-                                    importe_debe_ma,
-                                    importe_haber_ma,
-                                    importe_gasto_ma,
-                                    importe_recurso_ma,
-                                    id_usuario_reg,
-                                    fecha_reg,
-                                    actualizacion
-                                ) values(
-                                    v_id_partida,
-                                    v_id_centro_costo_depto,
-                                    'activo',
-                                    v_id_cuenta,
-                                    'Asiento de utilidad de gestion',
-                                    p_id_int_comprobante,
-                                    null,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber,
-                                    v_importe_debe,
-                                    v_importe_haber_mt ,
-                                    v_importe_debe_mt ,
-                                    v_importe_haber_mt ,
-                                    v_importe_debe_mt ,
-                                    v_importe_haber_ma ,
-                                    v_importe_debe_ma,
-                                    v_importe_haber_ma ,
-                                    v_importe_debe_ma,
-                                    p_id_usuario,
-                                    now(),
-                                    'si' );
-
-                                    v_sw_minimo = true;
-                          END IF;
-
-                ELSE
-                   raise exception 'Algo salio mal con la cuenta ';
-                END IF;
+                      ELSE
+                         raise exception 'Algo salio mal con la cuenta ';
+                      END IF;
 
           END LOOP;
 

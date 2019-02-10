@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_plantilla_apertura_cuenta (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -118,7 +120,7 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
 					v_aux_heber = v_record_mov.acreedor + v_record_mov.importe_haber_mt + v_record_mov.importe_haber_ma;
 
 
-
+/*
                      IF v_aux_heber > v_aux_debe  THEN
 
                                 v_sw_saldo_acredor = false;
@@ -148,6 +150,33 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
 
                      ELSE
                          v_sw_actualiza = false;
+                     END IF;*/
+                     
+                     IF ( v_record_mov.deudor = v_record_mov.acreedor ) 
+                       AND  ( v_record_mov.importe_debe_mt =  v_record_mov.importe_haber_mt)  
+                         AND ( v_record_mov.importe_debe_ma = v_record_mov.importe_haber_ma)  
+                         
+                         THEN          
+                            
+                            v_sw_actualiza = false;  --SALDO ES IGUAL A CERO 
+
+                      ELSEIF(v_record_mov.deudor < v_record_mov.acreedor  )    THEN
+
+                                  v_sw_saldo_acredor = false;
+                                  v_sw_actualiza = true;
+                                  v_saldo_mb = v_record_mov.acreedor - v_record_mov.deudor;
+                                  v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
+                                  v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
+
+                     ELSE 
+
+                                 v_sw_saldo_acredor = true;
+                                 v_sw_actualiza = true;
+                                 v_saldo_mb = v_record_mov.deudor - v_record_mov.acreedor;
+                                 v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
+                                 v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
+
+                     
                      END IF;
 
 

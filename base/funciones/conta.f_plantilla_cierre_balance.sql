@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_plantilla_cierre_balance (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -65,12 +67,19 @@ BEGIN
 	  FOR v_record_mov in ( with basica as (select 	t.id_centro_costo,
                                                     t.id_cuenta,
                                                     COALESCE(t.id_auxiliar,0) as id_auxiliar,
+                                                    /*case
+                                                       when par.id_partida is not NULL then
+                                                         par.id_partida
+                                                        else
+                                                           0
+                                                        end as id_partida,*/
                                                     case
                                                        when  par.sw_movimiento = 'presupuestaria' then
                                                          par.id_partida
                                                         else
                                                            0
-                                                        end as id_partida,
+                                                        end as id_partida,    
+                                                        
                                                     t.importe_debe_mb,
                                                     t.importe_haber_mb,
                                                     t.importe_debe_mt,
@@ -85,27 +94,47 @@ BEGIN
                                               inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
                                               inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
                                               where cb.estado_reg = 'validado'  and tc.tipo_cuenta in ('activo','patrimonio','pasivo')
-                                              and pe.id_gestion = p_id_gestion_cbte and  cb.fecha::date BETWEEN p_desde and p_hasta
-                                              )select t.id_centro_costo,
+                                              and pe.id_gestion = p_id_gestion_cbte and  cb.fecha::date BETWEEN p_desde and p_hasta),
+                                saldo as (   select t.id_centro_costo,
                                                       t.id_cuenta,
                                                       t.id_auxiliar,
                                                       t.id_partida,
-                                                      sum(COALESCE(t.importe_debe_mb,0)) as deudor,
-                                                      sum(COALESCE(t.importe_haber_mb,0)) as acreedor,
+                                                      sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
+                                                      sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
+                                                      
+                                                      (sum(COALESCE(t.importe_debe_mb,0)) - sum(COALESCE(t.importe_haber_mb,0))) as saldo_mb,
+                                                      
                                                       sum(COALESCE(t.importe_debe_mt,0)) as importe_debe_mt,
                                                       sum(COALESCE(t.importe_haber_mt,0)) as importe_haber_mt,
+                                                      
+                                                      (sum(COALESCE(t.importe_debe_mt,0)) - sum(COALESCE(t.importe_haber_mt,0)) )as saldo_mt,
+                                                      
                                                       sum(COALESCE(t.importe_debe_ma,0)) as importe_debe_ma,
-                                                      sum(COALESCE(t.importe_haber_ma,0)) as importe_haber_ma
+                                                      sum(COALESCE(t.importe_haber_ma,0))as importe_haber_ma,
+                                                      
+                                                      (sum(COALESCE(t.importe_debe_ma,0)) - sum(COALESCE(t.importe_haber_ma,0)) ) as saldo_ma
                                                       from basica t
                                                       group by
                                                             t.id_centro_costo,
                                                             t.id_cuenta,
                                                             t.id_auxiliar,
-                                                            t.id_partida )LOOP
+                                                            t.id_partida)
+                                                            select  t.id_centro_costo,
+                                                                    t.id_cuenta,
+                                                                    t.id_auxiliar,
+                                                                    t.id_partida,
+                                                                    t.importe_debe_mb as deudor,--MB
+                                                                    t.importe_haber_mb as acreedor,
+                                                                    t.importe_debe_mt,--MT
+                                                                    t.importe_haber_mt,
+                                                                    t.importe_debe_ma,--MA
+                                                                    t.importe_haber_ma
+                                                            from saldo t  )LOOP
 
 
                     v_sw_actualiza = false;
                     v_sw_saldo_acredor = false;
+                    
                     v_saldo_mb  = 0;
                     v_saldo_mt = 0;
                     v_saldo_ma = 0;
@@ -115,9 +144,19 @@ BEGIN
 
                     v_aux_debe = v_record_mov.deudor + v_record_mov.importe_debe_mt + v_record_mov.importe_debe_ma;
 					v_aux_heber = v_record_mov.acreedor + v_record_mov.importe_haber_mt + v_record_mov.importe_haber_ma;
+                    /*
+                   
+                   IF ( v_record_mov.deudor = v_record_mov.acreedor ) 
+                       AND  ( v_record_mov.importe_debe_mt =  v_record_mov.importe_haber_mt)  
+                        AND ( v_record_mov.importe_debe_ma = v_record_mov.importe_haber_ma)  
+                         THEN          
+                            
+                            v_sw_actualiza = false;  --SALDO ES IGUAL A CERO 
 
-
-                     IF v_aux_heber > v_aux_debe  THEN
+                    ELSEIF (v_record_mov.deudor < v_record_mov.acreedor  or v_record_mov.deudor =  v_record_mov.acreedor)  
+                        AND (v_record_mov.importe_debe_mt < v_record_mov.importe_haber_mt or v_record_mov.importe_debe_mt =  v_record_mov.importe_haber_mt)
+                      --  AND  (v_record_mov.importe_debe_ma < v_record_mov.importe_haber_ma or v_record_mov.importe_debe_ma = v_record_mov.importe_haber_ma  )  
+                        THEN
 
                                 v_sw_saldo_acredor = true;
                                 v_sw_actualiza = true;
@@ -125,7 +164,10 @@ BEGIN
                                 v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
                                 v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
 
-                     ELSEIF v_aux_debe > v_aux_heber THEN
+                     ELSEIF (v_record_mov.deudor > v_record_mov.acreedor or v_record_mov.deudor =  v_record_mov.acreedor  )  
+                       AND  (v_record_mov.importe_debe_mt > v_record_mov.importe_haber_mt or v_record_mov.importe_debe_mt =  v_record_mov.importe_haber_mt) 
+                       --  AND  (v_record_mov.importe_debe_ma > v_record_mov.importe_haber_ma or v_record_mov.importe_debe_ma = v_record_mov.importe_haber_ma) 
+                          THEN
 
                                v_sw_saldo_acredor = false;
                                v_sw_actualiza = true;
@@ -133,26 +175,57 @@ BEGIN
                                v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
                                v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
 
-                     ELSEIF  v_aux_debe = v_aux_heber THEN
-
-                               v_sw_saldo_acredor = true;
-                               v_sw_actualiza = true;
-                               v_saldo_mb = 0;
-                               v_saldo_ma = 0;
-                               v_saldo_mt = 0;
-
                      ELSE
-                         v_sw_actualiza = false;
-                     END IF;
+                        raise exception  ' %,% ,% , %, %, %  SALDOS NEGATIVOS  % , %, %, %', v_record_mov.deudor,
+                                                                                             v_record_mov.acreedor, 
+                                                                                              v_record_mov.importe_debe_ma, 
+                                                                                              v_record_mov.importe_haber_ma, 
+                                                                                              v_record_mov.importe_debe_mt ,  
+                                                                                              v_record_mov.importe_haber_mt,   
+                                                                                               v_record_mov.id_centro_costo , 
+                                                                                               v_record_mov.id_cuenta,
+                                                                                               v_record_mov.id_auxiliar,v_record_mov.id_partida
+                                                                                               ;
+                        --v_sw_actualiza = false;
+                     END IF;*/
 
+
+                   IF ( v_record_mov.deudor = v_record_mov.acreedor ) 
+                       AND  ( v_record_mov.importe_debe_mt =  v_record_mov.importe_haber_mt)  
+                         AND ( v_record_mov.importe_debe_ma = v_record_mov.importe_haber_ma)  
+                         
+                         THEN          
+                            
+                            v_sw_actualiza = false;  --SALDO ES IGUAL A CERO 
+
+                    ELSEIF(v_record_mov.deudor < v_record_mov.acreedor  )    THEN
+
+                                v_sw_saldo_acredor = true;
+                                v_sw_actualiza = true;
+                                v_saldo_mb = v_record_mov.acreedor - v_record_mov.deudor;
+                                v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
+                                v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
+
+                   ELSE 
+
+                               v_sw_saldo_acredor = false;
+                               v_sw_actualiza = true;
+                               v_saldo_mb = v_record_mov.deudor - v_record_mov.acreedor;
+                               v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
+                               v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
+
+                     
+                     END IF;
 
 
                     IF v_sw_actualiza THEN
 
                         v_importe_debe = 0;
                         v_importe_haber = 0;
-                        v_importe_debe_ma	= 0;
+                        
+                        v_importe_debe_ma = 0;
                         v_importe_haber_ma = 0;
+                        
                         v_importe_debe_mt = 0;
                         v_importe_haber_mt = 0;
 
@@ -198,7 +271,6 @@ BEGIN
                         END IF;
 
 
-                  IF v_saldo_mb != 0  or  v_saldo_ma != 0 or v_saldo_mt != 0 THEN
 
                         insert into conta.tint_transaccion(
                                     id_partida,
@@ -264,10 +336,10 @@ BEGIN
                                     p_id_usuario,
                                     now(),
                                     'si' );
-                           END IF;
+                          
 
                 ELSE
-                    raise exception 'Error';
+                  --  raise exception 'Error';
                 END IF;
 
           END LOOP;

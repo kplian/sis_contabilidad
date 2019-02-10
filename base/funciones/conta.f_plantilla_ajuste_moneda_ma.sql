@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_plantilla_ajuste_moneda_ma (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -64,6 +66,12 @@ DECLARE
     v_ajuste_haber 					numeric;
     v_ajuste_debe					numeric;
     v_partida                       integer;
+    v_auxiliar						integer;
+    v_importe_total_deb_ma	numeric;
+    v_importe_total_haber_ma	numeric;
+    v_saldo	numeric;
+
+
 BEGIN
 
  	v_nombre_funcion = 'conta.f_plantilla_ajuste_moneda_ma';
@@ -81,70 +89,72 @@ BEGIN
       from conta.tint_comprobante
       where id_int_comprobante = p_id_int_comprobante;
 
-	  FOR v_record_mov in (with basica as (select t.id_centro_costo,
-                                                  cc.codigo_tcc,
-                                                  cc.descripcion_tcc,
-                                                  t.id_cuenta,
-                                                  cu.nro_cuenta,
-                                                  cu.nombre_cuenta,
-                                                   COALESCE(t.id_auxiliar,0) as id_auxiliar,
-                                                  au.codigo_auxiliar,
-                                                  t.importe_debe_mb,
-                                                  t.importe_haber_mb,
-                                                  t.importe_debe_mt,
-                                                  t.importe_haber_mt,
-                                                  t.importe_debe_ma,
-                                                  t.importe_haber_ma
-                                            from conta.tint_transaccion t
-                                            inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
-                                            inner join conta.tcuenta cu on cu.id_cuenta = t.id_cuenta
-                                            inner join conta.tconfig_subtipo_cuenta su on su.id_config_subtipo_cuenta = cu.id_config_subtipo_cuenta
-                                            inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
-                                            inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
-                                            inner join param.vcentro_costo cc on cc.id_centro_costo = t.id_centro_costo
-                                            inner join conta.tauxiliar au on au.id_auxiliar = t.id_auxiliar
-                                            where cb.estado_reg = 'validado' and tc.tipo_cuenta in ('activo','pasivo')
-                                            and pe.id_gestion = p_id_gestion_cbte and  cb.fecha::date BETWEEN p_desde and p_hasta
-                                            and cb.cbte_cierre <> 'balance'),
-                              resultado as (select t.id_cuenta,
-                                                    t.nro_cuenta,
-                                                    t.nombre_cuenta,
-                                                    t.id_centro_costo,
-                                                    t.codigo_tcc,
-                                                    t.descripcion_tcc,
-                                                    t.id_auxiliar,
-                                                    t.codigo_auxiliar,
-                                                    sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
-                                                    sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
-                                                    sum(COALESCE(t.importe_debe_mb,0)) - sum(COALESCE(t.importe_haber_mb,0)) as saldo_mb,
-                                                    sum(COALESCE(t.importe_debe_mt,0)) as importe_debe_mt,
-                                                    sum(COALESCE(t.importe_haber_mt,0)) as importe_haber_mt,
-                                                    sum(COALESCE(t.importe_debe_mt,0)) - sum(COALESCE(t.importe_haber_mt,0)) as saldo_mt,
-                                                    sum(COALESCE(t.importe_debe_ma,0)) as importe_debe_ma,
-                                                    sum(COALESCE(t.importe_haber_ma,0)) as importe_haber_ma,
-                                                    sum(COALESCE(t.importe_debe_ma,0)) - sum(COALESCE(t.importe_haber_ma,0)) as saldo_ma
-                                                    from basica t
-                                                     group by
-                                                          t.id_centro_costo,
-                                                          t.codigo_tcc,
-                                                          t.descripcion_tcc,
-                                                          t.nro_cuenta,
-                                                          t.nombre_cuenta,
-                                                          t.id_auxiliar,
-                                                          t.codigo_auxiliar,
-                                                          t.id_cuenta
-                                                          order by nro_cuenta)
-                                            select  t.id_cuenta,
-                                                    t.id_centro_costo,
-                                                    t.descripcion_tcc,
-                                                    t.id_auxiliar,
+	  FOR v_record_mov in ( with basica as (select 	t.id_centro_costo,
+                                                    t.id_cuenta,
+                                                    COALESCE(t.id_auxiliar,0) as id_auxiliar,
+                                                    /*case
+                                                       when par.id_partida is not NULL then
+                                                         par.id_partida
+                                                        else
+                                                           0
+                                                        end as id_partida,*/
+                                                    case
+                                                       when  par.sw_movimiento = 'presupuestaria' then
+                                                         par.id_partida
+                                                        else
+                                                           0
+                                                        end as id_partida,    
+                                                        
                                                     t.importe_debe_mb,
                                                     t.importe_haber_mb,
                                                     t.importe_debe_mt,
                                                     t.importe_haber_mt,
                                                     t.importe_debe_ma,
                                                     t.importe_haber_ma
-                                                    from resultado t
+                                              from conta.tint_transaccion t
+                                              inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
+                                              inner join  pre.tpartida par on par.id_partida = t.id_partida
+                                              inner join conta.tcuenta cu on cu.id_cuenta = t.id_cuenta
+                                              inner join conta.tconfig_subtipo_cuenta su on su.id_config_subtipo_cuenta = cu.id_config_subtipo_cuenta
+                                              inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
+                                              inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
+                                              where cb.estado_reg = 'validado'  and tc.tipo_cuenta in ('activo','patrimonio','pasivo')
+                                              and pe.id_gestion = p_id_gestion_cbte and  cb.fecha::date BETWEEN p_desde and p_hasta),
+                                saldo as (   select t.id_centro_costo,
+                                                      t.id_cuenta,
+                                                      t.id_auxiliar,
+                                                      t.id_partida,
+                                                      sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
+                                                      sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
+                                                      
+                                                      (sum(COALESCE(t.importe_debe_mb,0)) - sum(COALESCE(t.importe_haber_mb,0))) as saldo_mb,
+                                                      
+                                                      sum(COALESCE(t.importe_debe_mt,0)) as importe_debe_mt,
+                                                      sum(COALESCE(t.importe_haber_mt,0)) as importe_haber_mt,
+                                                      
+                                                      (sum(COALESCE(t.importe_debe_mt,0)) - sum(COALESCE(t.importe_haber_mt,0)) )as saldo_mt,
+                                                      
+                                                      sum(COALESCE(t.importe_debe_ma,0)) as importe_debe_ma,
+                                                      sum(COALESCE(t.importe_haber_ma,0))as importe_haber_ma,
+                                                      
+                                                      (sum(COALESCE(t.importe_debe_ma,0)) - sum(COALESCE(t.importe_haber_ma,0)) ) as saldo_ma
+                                                      from basica t
+                                                      group by
+                                                            t.id_centro_costo,
+                                                            t.id_cuenta,
+                                                            t.id_auxiliar,
+                                                            t.id_partida)
+                                                            select  t.id_centro_costo,
+                                                                    t.id_cuenta,
+                                                                    t.id_auxiliar,
+                                                                    t.id_partida,
+                                                                    t.importe_debe_mb as deudor,--MB
+                                                                    t.importe_haber_mb as acreedor,
+                                                                    t.importe_debe_mt,--MT
+                                                                    t.importe_haber_mt,
+                                                                    t.importe_debe_ma,--MA
+                                                                    t.importe_haber_ma
+                                                            from saldo t 
                                               where t.saldo_mb =0 and t.saldo_mt = 0 and t.saldo_ma <> 0)LOOP
 
 
@@ -191,18 +201,22 @@ BEGIN
 
                                 v_importe_haber_mt 	= 0;
                                 v_importe_debe_mt 	= 0;
-
-								select  ps_id_cuenta,
-                                		  ps_id_centro_costo
-                                    into
-                                    	v_cuenta,
-                                        v_centro_costo
-                                  from conta.f_get_config_relacion_contable( 'GAN-RD',
-                                                                               p_id_gestion_cbte,
-                                                                               null,  --campo_relacion_contable
-                                                                               null);
-
-
+                                
+               
+               
+                          select  ps_id_cuenta,
+                                  ps_id_centro_costo,
+                                  ps_id_partida,
+                                  ps_id_auxiliar
+                            into
+                                v_cuenta,
+                                v_centro_costo,
+                                v_partida,
+                                v_auxiliar
+                          from conta.f_get_config_relacion_contable( 'GAN-RD',
+                                                                       p_id_gestion_cbte,
+                                                                       null,  --campo_relacion_contable
+                                                                       null);
 
                         ELSE
                                 v_importe_haber = 0;
@@ -214,15 +228,22 @@ BEGIN
                                 v_importe_haber_mt 	= 0;
                                 v_importe_debe_mt 	= 0;
 
-								select  ps_id_cuenta,
-                                		ps_id_centro_costo
-                                    into
-                                    	v_cuenta,
-                                        v_centro_costo
-                                  from conta.f_get_config_relacion_contable( 'PER-RD',
-                                                                               p_id_gestion_cbte,
-                                                                               null,  --campo_relacion_contable
-                                                                               null);
+					select  ps_id_cuenta,
+                            ps_id_centro_costo,
+                            ps_id_partida,
+                            ps_id_auxiliar
+                        into
+                            v_cuenta,
+                            v_centro_costo,
+                            v_partida,
+                            v_auxiliar						
+                      from conta.f_get_config_relacion_contable( 'PER-RD',
+                                                                   p_id_gestion_cbte,
+                                                                   null,  --campo_relacion_contable
+                                                                   null);
+  
+                        
+
 
                         END IF;
 
@@ -266,7 +287,12 @@ BEGIN
                                     fecha_reg,
                                     actualizacion
                                 ) values(
-                                    null,
+                                    case
+                                      when v_record_mov.id_partida = 0 then
+                                          v_partida
+                                      else
+                                          v_record_mov.id_partida
+                                      end,
                                     v_record_mov.id_centro_costo,
                                     'activo',
                                     v_record_mov.id_cuenta,
@@ -301,23 +327,47 @@ BEGIN
 	IF not v_sw_minimo THEN
        raise exception 'No se actualizo ninguna cuenta';
     END IF;
-
-
-
-
-            v_ajuste_debe = 0;
-           	v_ajuste_haber =  v_total_debe_ma;
+    
+    
+    
+    v_saldo = 0;
+    v_importe_total_deb_ma = 0 ;
+    v_importe_total_haber_ma = 0;
+    
+    
+    select 
+      sum(t.importe_debe),
+      sum(t.importe_haber)
+     
+    into
+      v_importe_total_deb_ma,
+      v_importe_total_haber_ma
+    
+    from conta.tint_transaccion  t
+    where t.id_int_comprobante = p_id_int_comprobante ;
+    
+    IF v_importe_total_deb_ma   >  v_importe_total_haber_ma   THEN
+    
+        v_saldo = v_importe_total_deb_ma - v_importe_total_haber_ma;
+         
+         v_ajuste_debe = 0;
+         v_ajuste_haber =  v_saldo;
             select  ps_id_cuenta,
                     ps_id_centro_costo,
-                    ps_id_partida
+                    ps_id_partida,
+                    ps_id_auxiliar
               into
                   v_cuenta,
                   v_centro_costo,
-                  v_partida
+                  v_partida,
+                  v_auxiliar
             from conta.f_get_config_relacion_contable( 'GAN-RD',
                                                          p_id_gestion_cbte,
                                                          null,  --campo_relacion_contable
                                                          null);
+                                                         
+                                                         
+          
 
           IF v_cuenta is null THEN
              raise exception 'No se encontro relacion contablePER-RD';
@@ -362,7 +412,7 @@ BEGIN
                   v_cuenta,
                   'Asiento ajuste monde MA1',
                   p_id_int_comprobante,
-                  null,
+                  v_auxiliar,
                   v_ajuste_debe,
                   v_ajuste_haber,
                   v_ajuste_debe,
@@ -378,22 +428,30 @@ BEGIN
                   'si'
               );
 
-
-           v_ajuste_debe = v_total_haber_ma;
-           v_ajuste_haber = 0;
+                                               
+                                                         
+                                                         
+    ELSE
+        v_saldo = v_importe_total_haber_ma - v_importe_total_deb_ma;
+        
+         v_ajuste_debe = v_saldo;
+         v_ajuste_haber = 0;
 
            select  ps_id_cuenta,
                     ps_id_centro_costo,
-                    ps_id_partida
+                    ps_id_partida,
+                    ps_id_auxiliar
                 into
                     v_cuenta,
                     v_centro_costo,
-                    v_partida
+                    v_partida,
+                    v_auxiliar						
               from conta.f_get_config_relacion_contable( 'PER-RD',
                                                            p_id_gestion_cbte,
                                                            null,  --campo_relacion_contable
                                                            null);
-
+                                                           
+            
 
           IF v_cuenta is null THEN
              raise exception 'No se encontro relacion contable GAN-RD';
@@ -438,7 +496,7 @@ BEGIN
                   v_cuenta,
                   'Asiento ajuste monde MA2',
                   p_id_int_comprobante,
-                  null,
+                  v_auxiliar,
                   v_ajuste_debe,
                   v_ajuste_haber,
                   v_ajuste_debe,
@@ -453,62 +511,18 @@ BEGIN
                   now(),
                   'si'
               );
+                                                
 
-              insert into conta.tint_transaccion(
-                  id_partida,
-                  id_centro_costo,
-                  estado_reg,
-                  id_cuenta,
-                  glosa,
-                  id_int_comprobante,
-                  id_auxiliar,
+    END IF;
+    
+   -- raise exception 'saldo...  %',;
 
-                  importe_debe,
-                  importe_haber,
-                  importe_gasto,
-                  importe_recurso,
 
-                  importe_debe_mb,
-                  importe_haber_mb,
-                  importe_gasto_mb,
-                  importe_recurso_mb,
 
-                  importe_debe_mt,
-                  importe_haber_mt,
-                  importe_gasto_mt,
-                  importe_recurso_mt,
 
-                  importe_debe_ma,
-                  importe_haber_ma,
-                  importe_gasto_ma,
-                  importe_recurso_ma,
-
-                  id_usuario_reg,
-                  fecha_reg,
-                  actualizacion
-              ) values(
-                  v_partida,
-                  v_centro_costo,
-                  'activo',
-                  v_cuenta,
-                  'Asiento ajuste monde MA2',
-                  p_id_int_comprobante,
-                  null,
-                  0.16,
-                  0,
-                  0.16,
-                  0, --BS
-                  0,0,0,0, --MB
-                  0,0,0,0, --MT
-                  0.16,
-                  0,
-                  0.16,
-                  0, --MA
-                  p_id_usuario,
-                  now(),
-                  'si'
-              );
-
+           
+         
+         
 
 	update conta.tint_comprobante set
     id_moneda = 3
