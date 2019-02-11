@@ -65,6 +65,40 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		{
+            config:{
+                    name:'id_orden_trabajo_fk',
+                    fieldLabel: 'Orden Padre',
+                    qtip: 'Permitie estructura la orden en formato árbol',
+                    sysorigen:'sis_contabilidad',
+                    store : new Ext.data.JsonStore({
+                            url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajoRama',
+                            id : 'id_orden_trabajo',
+                            root: 'datos',
+                            sortInfo:{
+                                    field: 'motivo_orden',
+                                    direction: 'ASC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden'],
+                            remoteSort: true,
+                            baseParams:{par_filtro:'desc_orden#motivo_orden'}
+                    }),
+	       		    origen:'OT',
+	       		    gdisplayField: 'desc_otp',
+	       		    hiddenName: 'id_orden_trabajo_fk',
+                    allowBlank:true,
+                    gwidth:200,
+                    width: 380,
+   				    listWidth: 380
+            },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'odt.desc_otp',type:'string'},
+            grid:true,
+            form:true
+        },
+		
 		
 		{
 			config:{
@@ -82,8 +116,6 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
-		
-		
 		{
 			config:{
 				name: 'fecha_final',
@@ -163,14 +195,14 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
        		    lazyRender:true,
        		    mode: 'local',
        		    valueField: 'inicio',    
-       		    store:['centro','pep','orden','estadistico']
+       		    store:['centro','edt','orden','estadistico']
 			},
 			type:'ComboBox',
 			id_grupo:1,
 			filters:{	
 	       		         type: 'list',
 	       				 pfiltro:'odt.tipo',
-	       				 options: ['centro','pep','orden','estadistica']
+	       				 options: ['centro','edt','orden','estadistica']
 	       		 	},
 	        valorInicial:'estadistica',
 			grid:true,
@@ -273,7 +305,7 @@ Phx.vista.OrdenTrabajo=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'tipo','movimiento','codigo','descripcion','id_orden_trabajo_fk'
+		{name:'usr_mod', type: 'string'},'tipo','movimiento','codigo','descripcion','id_orden_trabajo_fk','desc_otp'
 		
 	],
 	

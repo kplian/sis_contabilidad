@@ -27,7 +27,7 @@ Phx.vista.DocCompraBOA = {
     modificarAtributos: function(){
         	this.Atributos[this.getIndAtributo('estacion')].grid=true;
             this.Atributos[this.getIndAtributo('codigo_noiata')].grid=true;
-            this.Atributos[this.getIndAtributo('nombre')].grid=true; 
+            this.Atributos[this.getIndAtributo('nombre')].grid=true;
 
     },
     

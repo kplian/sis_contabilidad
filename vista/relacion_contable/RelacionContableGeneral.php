@@ -51,15 +51,28 @@ Phx.vista.RelacionContableGeneral = {
 			this.Cmp.id_auxiliar.enable(); 
 			this.Cmp.id_partida.enable(); 
 			
+			this.Cmp.codigo_aplicacion.enable();
+			this.Cmp.id_tipo_presupuesto.enable();
+			this.Cmp.id_moneda.enable();
+			
 			this.Cmp.id_centro_costo.modificado = true;
 			this.Cmp.id_cuenta.modificado = true;
 			this.Cmp.id_auxiliar.modificado = true;
 			this.Cmp.id_partida.modificado = true;
+			this.Cmp.codigo_aplicacion.modificado = true;
+		    this.Cmp.id_tipo_presupuesto.modificado = true;
+		    this.Cmp.id_moneda.modificado = true;
+		
+			
 			
 			this.Cmp.id_centro_costo.reset();
 			this.Cmp.id_cuenta.reset();
 			this.Cmp.id_auxiliar.reset();
 			this.Cmp.id_partida.reset();
+			this.Cmp.codigo_aplicacion.reset();
+		    this.Cmp.id_tipo_presupuesto.reset();
+		    this.Cmp.id_moneda.reset();
+			
 			
 		}, this);	
 		
@@ -86,6 +99,10 @@ Phx.vista.RelacionContableGeneral = {
 		this.Cmp.id_cuenta.disable();  
 		this.Cmp.id_auxiliar.disable(); 
 		this.Cmp.id_partida.disable();
+		this.Cmp.codigo_aplicacion.disable();
+		this.Cmp.id_tipo_presupuesto.disable();
+		this.Cmp.id_moneda.disable();
+			
 		this.habilitarCampos();
 		
 	} ,
@@ -147,6 +164,50 @@ Phx.vista.RelacionContableGeneral = {
 			this.ocultarComponente(this.Cmp.id_auxiliar);
 			this.setAllowBlank(this.Cmp.id_auxiliar, true);
 		}
+		
+		//moneda
+		if (this.maestro.tiene_moneda == 'si') {			
+			this.mostrarComponente(this.Cmp.id_moneda);
+			this.setAllowBlank(this.Cmp.id_moneda, true);
+			
+		} else {
+			this.Cmp.id_moneda.reset();
+			this.ocultarComponente(this.Cmp.id_moneda);
+			this.setAllowBlank(this.Cmp.id_moneda, true);
+			
+		}
+		//tiene_tipo_centro
+		
+		if (this.maestro.tiene_tipo_centro == 'si') {			
+			this.mostrarComponente(this.Cmp.id_tipo_presupuesto);
+			this.setAllowBlank(this.Cmp.id_tipo_presupuesto, true);
+			
+		} else {			
+			this.Cmp.id_tipo_presupuesto.reset();
+			this.ocultarComponente(this.Cmp.id_tipo_presupuesto);
+			this.setAllowBlank(this.Cmp.id_tipo_presupuesto, true);
+		}
+		
+		//tiene_aplicacion
+		if (this.maestro.tiene_aplicacion == 'si') {
+						
+			this.mostrarComponente(this.Cmp.codigo_aplicacion);
+			this.setAllowBlank(this.Cmp.codigo_aplicacion, true);
+			this.Cmp.codigo_aplicacion.enable();
+			this.Cmp.codigo_aplicacion.store.baseParams.catalogo_tipo = this.maestro.codigo_aplicacion_catalogo ;
+			this.Cmp.codigo_aplicacion.modificado = true;
+			
+			
+			
+		} else {
+			
+			this.Cmp.codigo_aplicacion.reset();
+			this.ocultarComponente(this.Cmp.codigo_aplicacion);
+			this.setAllowBlank(this.Cmp.codigo_aplicacion, true);
+		}
+		
+		
+		
 	}
 };
 </script>

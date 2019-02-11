@@ -5,7 +5,10 @@
 *@author  (admin)
 *@date 10-06-2013 14:51:03
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+# 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+
+ */
 
 class MODDetallePlantillaComprobante extends MODbase{
 	
@@ -76,6 +79,11 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('campo_relacion_contable_cc','text');
 		$this->captura('campo_suborden','varchar');
 		
+		$this->captura('campo_codigo_aplicacion_rc','varchar');
+		$this->captura('incluir_desc_doc','varchar'); //#21
+		
+		
+		
 		
 	
 		
@@ -141,6 +149,11 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_relacion_contable_cc','campo_relacion_contable_cc','varchar');
 		
 		$this->setParametro('campo_suborden','campo_suborden','varchar');
+		
+		$this->setParametro('campo_codigo_aplicacion_rc','campo_codigo_aplicacion_rc','varchar');
+		$this->setParametro('incluir_desc_doc','incluir_desc_doc','varchar'); //#21
+		
+		
 		
 		
         
@@ -208,6 +221,8 @@ class MODDetallePlantillaComprobante extends MODbase{
 		
 		$this->setParametro('campo_suborden','campo_suborden','varchar');
 		
+		$this->setParametro('campo_codigo_aplicacion_rc','campo_codigo_aplicacion_rc','varchar');
+        $this->setParametro('incluir_desc_doc','incluir_desc_doc','varchar'); //#21
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

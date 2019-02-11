@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_revisa_periodo_compra_venta (
   p_id_usuario integer,
   p_id_depto_conta integer,
@@ -36,52 +34,54 @@ va_variables		varchar[];
 v_monto_haber		numeric;
 v_monto_debe		numeric;
 v_reg_pcv           record;
- 
+
 
 BEGIN
 
    v_nombre_funcion = 'conta.f_revisa_periodo_compra_venta';
-   
-   
-   select 
+
+
+   select
     *
-   into 
+   into
     v_reg_pcv
-   from conta.tperiodo_compra_venta pcv 
-   where pcv.id_periodo = p_id_periodo 
+   from conta.tperiodo_compra_venta pcv
+   inner join param.tperiodo per on per.id_periodo=pcv.id_periodo
+   where pcv.id_periodo = p_id_periodo
    and pcv.id_depto = p_id_depto_conta
    and pcv.estado_reg = 'activo';
-   
+
    IF  v_reg_pcv is null THEN
-     raise exception 'No se encontró un periodo para el departamento  y fecha determinados';
+     raise exception 'No se encontró un periodo para el departamento contable y fecha determinados';
    END IF;
-   
+
     IF v_reg_pcv.estado = 'abierto' THEN
        RETURN TRUE;
     ELSIF   v_reg_pcv.estado = 'cerrado' THEN
-       raise exception 'El periodo del libro de compras y ventas se en cuentra cerrado'; 
+       raise exception 'El periodo % del libro de compras y ventas se encuentra Cerrado.', pxp.f_obtener_literal_periodo(v_reg_pcv.periodo,0) ;
     ELSIF   v_reg_pcv.estado = 'cerrado_parcial' THEN
-    
+
       --TODO verifica si el usuario tiene permisos,
         -- puede crearce una tabla espcifica para otorgar permisos a los usuario por depto de conta
         -- puede ser tambien la tabla de usuarios del depto
-    
+
         IF exists (select 1 from param.tdepto_usuario du
-                  where du.id_depto = p_id_depto_conta 
+                  where du.id_depto = p_id_depto_conta
                   and du.id_usuario = p_id_usuario
                   and du.estado_reg = 'activo')  THEN
-        
+
             RETURN TRUE;
-                   
-        ELSE   
-           raise exception 'El periodo se encuentra parcialmente cerrado y el usuario no es miembro del departametno de contabilidad';
+
+        ELSE
+           raise exception 'El periodo % se encuentra parcialmente cerrado y el usuario no es miembro del departametno de contabilidad.', pxp.f_obtener_literal_periodo(v_reg_pcv.periodo,0);
         END IF;
-    
+
     ELSE
-     raise exception 'Estado no reconocido'; 
+     raise exception 'Estado no reconocido';
    END IF;
-   
-   
+
+
+
 
 
 EXCEPTION

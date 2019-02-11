@@ -106,7 +106,10 @@ BEGIN
               codigo_partida,
               id_auxiliar,
               destino,
-              orden_cbte
+              orden_cbte,
+              salta_hoja,
+              id_tipo_cc
+              
           	) values(
 			v_parametros.orden,
 			v_parametros.font_size,
@@ -141,8 +144,10 @@ BEGIN
             v_parametros.codigo_partida,
             v_parametros.id_auxiliar,
             v_parametros.destino,
-            v_parametros.orden_cbte
-			)RETURNING id_resultado_det_plantilla into v_id_resultado_det_plantilla;
+            v_parametros.orden_cbte,
+            v_parametros.salta_hoja,
+            v_parametros.id_tipo_cc
+		)RETURNING id_resultado_det_plantilla into v_id_resultado_det_plantilla;
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Resultado almacenado(a) con exito (id_resultado_det_plantilla'||v_id_resultado_det_plantilla||')'); 
@@ -217,7 +222,9 @@ BEGIN
               codigo_partida = v_parametros.codigo_partida,
               id_auxiliar = v_parametros.id_auxiliar,
               destino = v_parametros.destino,
-              orden_cbte = v_parametros.orden_cbte
+              orden_cbte = v_parametros.orden_cbte,
+              salta_hoja = v_parametros.salta_hoja,
+              id_tipo_cc = v_parametros.id_tipo_cc
 			where id_resultado_det_plantilla=v_parametros.id_resultado_det_plantilla;
                
 			--Definicion de la respuesta

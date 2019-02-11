@@ -5,6 +5,16 @@
 *@author  (admin)
 *@date 18-08-2015 15:57:09
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * 
+ * 
+ * 
+ *    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		  8-08-2015         N/N               creacion
+ #1200  ETR       12/07/2018        RAC KPLIAN        Se Agrega capacidad de relacionar facturaa las notas de debito credito
+ #12    ETR       21/08/2018        RAC KPLIAN        se añadi filtro apra no generar cbte para NCD notas de credito debito
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -15,21 +25,120 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
     tabEnter: true,
     tipoDoc: 'venta',
     regitrarDetalle: 'si',
+    sw_ncd: 'no',//#1201  21/08/2018  deshabilitar el generador de comprobantes para notas de credito debito
+    nombreVista: 'DocCompraVenta',
     constructor:function(config){
 		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
 		var me = this;
+		me.configurarAtributos(me);
+	
 		
+		//Esta funcion se sobre carga para la version de BOA
+		this.modificarAtributos();
+			
 		
-	   this.Atributos = [
+		//llama al constructor de la clase padre
+		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
+		
+		this.bloquearOrdenamientoGrid();
+		
+		this.cmbGestion.on('select', function(combo, record, index){
+			this.tmpGestion = record.data.gestion;
+		    this.cmbPeriodo.enable();
+		    this.cmbPeriodo.reset();
+		    this.store.removeAll();
+		    this.cmbPeriodo.store.baseParams = Ext.apply(this.cmbPeriodo.store.baseParams, {id_gestion: this.cmbGestion.getValue()});
+		    this.cmbPeriodo.modificado = true;
+        },this);
+        
+        this.cmbPeriodo.on('select', function( combo, record, index){
+			this.tmpPeriodo = record.data.periodo;
+			this.capturaFiltros();
+		    
+        },this);
+        
+        this.cmbDepto.on('select', function( combo, record, index){
+			this.capturaFiltros();
+		    
+        },this);
+        
+        
+        this.addButton('btnWizard',
+            {
+                text: 'Generar Cbte',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.loadWizard,
+                tooltip: '<b>Generar Comprobante</b><br/>Genera cbte de  para el deto selecionado'
+            }
+        );
+        
+        //Botón para Imprimir el Comprobante
+		this.addButton('btnImprimir', {
+				text : 'Imprimir',
+				iconCls : 'bprint',
+				disabled : false,
+				handler : this.imprimirLCV,
+				tooltip : '<b>Imprimir LCV en PDF</b><br/>Imprime el LCV en formato PDF para archivo'
+		});
+		
+		this.addButton('btnExpTxt',
+            {
+                text: 'Exportar TXT',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expTxt,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo TXT para LCV'
+            }
+        );
+        
+        this.crearFormAuto();
+        
+       
+        
+        
+		
+		//this.iniciarEventos();
+		this.init();
+		this.grid.addListener('cellclick', this.oncellclick,this);
+		this.obtenerVariableGlobal();
+	},
+	
+	Atributos1:[],
+	
+	configurarAtributos: function(me){
+		this.Atributos2 = [];
+		
+		this.Atributos2 = [
 			{
 				//configuracion del componente
 				config:{
-						labelSeparator:'',
+						labelSeparator:':',
 						inputType:'hidden',
-						name: 'id_doc_compra_venta'
+						fieldLabel: 'ID',
+						name: 'id_doc_compra_venta',
+						gwidth: 100,
+		                renderer: function (value, p, record, rowIndex, colIndex){  
+		                	   if(record.data.tipo_reg != 'summary'){
+			                	   	var res = value;
+			                	   	if(record.data.id_doc_compra_venta_fk){
+			                	   		 return  String.format('<b><font color="green"> {0} / {1}</font></b>',value, record.data.id_doc_compra_venta_fk);
+			                	   	}
+			                	   	else{
+			                	   	   return  String.format('<b>{0}</b>',value);	
+			                	   	}
+		            	       }
+		            	       else{
+		            	       	  return '';
+		            	       } 
+		                 }
+					
 				},
 				type:'Field',
-				form:true 
+				form:true ,
+				grid:true,
+				bottom_filter: true,
+				filters: {pfiltro:'dcv.id_doc_compra_venta',type:'numeric'}
 			},
 			{
 				//configuracion del componente
@@ -129,9 +238,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                	   if(value == 'si'){
 	                	      checked = 'checked';
 	                	   }
-	                	   /*if(record.data.id_int_comprobante){
+	                	   if(record.data.id_int_comprobante){
 	                	      state = 'disabled';
-	                	   }*/
+	                	   }
 	                	   if(record.data.tipo_reg != 'summary'){
 	            	         return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
 	            	       }
@@ -149,8 +258,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	        {
 	            config:{
 	                name: 'nit',
-	                fieldLabel: 'NIT',
-	                qtip: 'Número de indentificación del proveedor',
+	                fieldLabel: 'NIT/CI',
+	                qtip: 'Número de indentificación del proveedor o Ci en caso de recibos con retenciones',
 	                allowBlank: false,
 	                emptyText:'nit ...',
 	                store:new Ext.data.JsonStore(
@@ -278,7 +387,14 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					//maskRe: /[A-Za-z0-9 ]/,
 	                //fieldStyle: 'text-transform:uppercase',
 					style:'text-transform:uppercase;',
-	                listeners:{
+					renderer:function (value,p,record){
+						if(record.data.codigo_aplicacion == ''){
+							return  String.format('<font color="red">{0}</font>',  value);
+						}
+						return  String.format('<font color="green"><b>{0}</b></font>',  value);
+						
+					 },
+					 listeners:{
 				          'change': function(field, newValue, oldValue){
 				          			  console.log('keyup ...  ')
 				          			  field.suspendEvents(true);
@@ -620,7 +736,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					type:'TextField',
 					id_grupo:0,
 					grid:true,
-					form:false
+					form:false,
+					bottom_filter: true,
+					filters:{pfiltro:'ic.id_int_comprobante',type:'numeric'}
 			},
 			{
 				config:{
@@ -637,7 +755,40 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					grid:true,
 					bottom_filter: true,
 					form:false
-			},			
+			},
+			{
+				config:{
+					name: 'estado_cbte',
+					fieldLabel: 'Estado Cbte.',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:10
+				},
+					type:'TextField',
+					filters:{pfiltro:'ic.estado_reg',type:'string'},
+					id_grupo:1,
+					grid:true,
+					form:false
+			},
+			{
+				config:{
+					name: 'fecha_cbte',
+					fieldLabel: 'Fecha Cbte.',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:10,
+					format: 'd/m/Y',
+					readOnly:true,
+					renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				},
+					type:'TextField',
+					filters:{pfiltro:'ic.fecha',type:'date'},
+					id_grupo:1,
+					grid:true,
+					form:false
+			},		
 	        {
 	            config:{
 	                name:'id_moneda',
@@ -684,7 +835,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					anchor: '80%',
 					gwidth: 100,
 					maxLength :16,
-					minLength:16
+					minLength:9
 				},
 					type:'TextField',
 					filters:{pfiltro:'dcv.nro_dui',type:'string'},
@@ -963,7 +1114,39 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			   grid:false,
 			   form:false
 		   },
-			{
+		   {
+			   config:{
+				   name: 'desc_funcionario2',
+				   fieldLabel: 'Funcionario',
+				   allowBlank: true,
+				   anchor: '80%',
+				   gwidth: 100,
+				   maxLength :16,
+				   minLength:16
+			   },
+			   type:'TextField',
+			   filters:{pfiltro:'fun.desc_funcionario2',type:'string'},
+			   id_grupo:0,
+			   grid:true,
+			   form:false
+		   },
+		   {
+			   config:{
+				   name: 'codigo_aplicacion',
+				   fieldLabel: 'Aplicación',
+				   allowBlank: true,
+				   anchor: '80%',
+				   gwidth: 100,
+				   maxLength :16,
+				   minLength:16
+			   },
+			   type:'TextField',
+			   filters:{pfiltro:'dcv.codigo_aplicacion',type:'string'},
+			   id_grupo:0,
+			   grid:true,
+			   form:false
+		   },
+		  {
 				config:{
 					name: 'estado_reg',
 					fieldLabel: 'Estado Reg.',
@@ -1070,74 +1253,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					grid:true,
 					form:false
 			}
-		],
+		];
 		
-		//Esta funcion se sobre carga para la version de BOA
-		this.modificarAtributos();
-			
-		
-		//llama al constructor de la clase padre
-		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
-		
-		this.bloquearOrdenamientoGrid();
-		
-		this.cmbGestion.on('select', function(combo, record, index){
-			this.tmpGestion = record.data.gestion;
-		    this.cmbPeriodo.enable();
-		    this.cmbPeriodo.reset();
-		    this.store.removeAll();
-		    this.cmbPeriodo.store.baseParams = Ext.apply(this.cmbPeriodo.store.baseParams, {id_gestion: this.cmbGestion.getValue()});
-		    this.cmbPeriodo.modificado = true;
-        },this);
-        
-        this.cmbPeriodo.on('select', function( combo, record, index){
-			this.tmpPeriodo = record.data.periodo;
-			this.capturaFiltros();
-		    
-        },this);
-        
-        this.cmbDepto.on('select', function( combo, record, index){
-			this.capturaFiltros();
-		    
-        },this);
-        
-        
-        this.addButton('btnWizard',
-            {
-                text: 'Generar Cbte',
-                iconCls: 'bchecklist',
-                disabled: false,
-                handler: this.loadWizard,
-                tooltip: '<b>Generar Comprobante</b><br/>Genera cbte de  para el deto selecionado'
-            }
-        );
-        
-        //Botón para Imprimir el Comprobante
-		this.addButton('btnImprimir', {
-				text : 'Imprimir',
-				iconCls : 'bprint',
-				disabled : false,
-				handler : this.imprimirLCV,
-				tooltip : '<b>Imprimir LCV en PDF</b><br/>Imprime el LCV en formato PDF para archivo'
-		});
-		
-		this.addButton('btnExpTxt',
-            {
-                text: 'Exportar TXT',
-                iconCls: 'bchecklist',
-                disabled: false,
-                handler: this.expTxt,
-                tooltip: '<b>Exportar</b><br/>Exporta a archivo TXT para LCV'
-            }
-        );
-        
-        
-        
-		
-		//this.iniciarEventos();
-		this.init();
-		this.grid.addListener('cellclick', this.oncellclick,this);
-		this.obtenerVariableGlobal();
+	  this.Atributos= this.Atributos1.concat(this.Atributos2);
 	},
 	
 	modificarAtributos: function(){
@@ -1175,10 +1293,12 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	
 	capturaFiltros:function(combo, record, index){
         this.desbloquearOrdenamientoGrid();
+        this.store.baseParams.nombre_vista = this.nombreVista;
         if(this.validarFiltros()){
         	this.store.baseParams.id_gestion = this.cmbGestion.getValue();
 	        this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
 	        this.store.baseParams.id_depto = this.cmbDepto.getValue();
+	        
 	        this.load(); 
         }
         
@@ -1305,7 +1425,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             		
 	
 	tam_pag:50,	
-	title:'Documentos Compra/Venta',
+	title:'Documentos Compra y Venta',
 	ActSave:'../../sis_contabilidad/control/DocCompraVenta/modificarBasico',
 	ActDel:'../../sis_contabilidad/control/DocCompraVenta/eliminarDocCompraVenta',
 	ActList:'../../sis_contabilidad/control/DocCompraVenta/listarDocCompraVenta',
@@ -1352,7 +1472,9 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'importe_pago_liquido','nro_dui','id_moneda','desc_moneda',
 		'desc_tipo_doc_compra_venta','id_tipo_doc_compra_venta','nro_tramite',
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg',
-		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata'
+		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata','desc_funcionario2','id_funcionario',
+		{name:'fecha_cbte', type: 'date',dateFormat:'Y-m-d'},
+		{name:'estado_cbte', type: 'string'},'codigo_aplicacion','tipo_informe','id_doc_compra_venta_fk'
 	],
 	sortInfo:{
 		field: 'id_doc_compra_venta',
@@ -1370,7 +1492,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             this.store.baseParams.id_gestion=this.cmbGestion.getValue();
             this.store.baseParams.id_periodo = this.cmbPeriodo.getValue();
             this.store.baseParams.id_depto = this.cmbDepto.getValue();
-            
+            this.store.baseParams.nombre_vista = this.nombreVista;
             Phx.vista.DocCompraVenta.superclass.onButtonAct.call(this);
         }
     },
@@ -1378,22 +1500,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
    formTitulo: 'Registro de Documento Compra',
    abrirFormulario: function(tipo, record){
    	       var me = this;
-   	       console.log(' me.regitrarDetalle', me.regitrarDetalle)
-	       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVenta.php',
+   	       me.objSolForm = Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/FormCompraVenta.php',
 	                                me.formTitulo,
 	                                {
 	                                    modal:true,
 	                                    width:'90%',
-										height:'60%'
+										height:(me.regitrarDetalle == 'si')? '100%':'60%',
 
-										/*if (me.regitrarDetalle == 'si')
-									    {
-										   height:'100%'
-									    }
-										else
-	   									{
-	   										height:'50%'
-	   									}*/
 
 	                                    
 	                                }, { data: { 
@@ -1490,6 +1603,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             this.getBoton('del').enable();
          } 
          
+         
          if(this.regitrarDetalle == 'si'){
          	this.getBoton('btnWizard').enable();
          }
@@ -1525,7 +1639,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
                     	id_periodo:   this.cmbPeriodo.getValue(),  
                     	id_depto_conta: this.cmbDepto.getValue(),
                         gestion: this.tmpGestion,
-                        tipoDoc: this.tipoDoc
+                        tipoDoc: this.tipoDoc,
+                        sw_ncd: this.sw_ncd
                     },
                     this.idContenedor,
                     'WizardAgrupador')
@@ -1534,13 +1649,13 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             
     },
     imprimirLCV : function() {
-		
+		        
 				if(this.validarFiltros){
 					    var me = this;
 					    Phx.CP.loadingShow();
 						Ext.Ajax.request({
 							//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
-							url : '../../sis_contabilidad/control/DocCompraVenta/reporteLCV',
+							url : '../../sis_contabilidad/control/DocCompraVentaRepo/reporteLCV',
 							params : {
 								'id_periodo' : me.cmbPeriodo.getValue(),
 								'id_depto' : me.cmbDepto.getValue(),
@@ -1586,9 +1701,229 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
         	nomRep = Phx.CP.CRIPT.Encriptar(nomRep);
         }
         window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
-	}
+	},
+	
+	//#1200  crea formulario factura
+	crearFormAuto:function(){
+		  this.formAuto = new Ext.form.FormPanel({
+            baseCls: 'x-plain',
+            autoDestroy: true,           
+            border: false,
+            layout: 'form',
+            autoHeight: true,           
     
+            items: [
+		            {
+		                name: 'id_doc_compra_venta_fk',
+		                xtype:"combo",
+		                fieldLabel: 'Documento ID',
+		                allowBlank: false,
+		                emptyText:'Elija una plantilla...',
+		                store:new Ext.data.JsonStore(
+		                {
+		                    url: '../../sis_contabilidad/control/DocCompraVenta/listarDocCompraVenta',
+		                    id: 'id_doc_compra_venta',
+		                    root:'datos',
+		                    sortInfo:{
+		                        field:'desc_plantilla',
+		                        direction:'ASC'
+		                    },
+		                    totalProperty:'total',
+		                    fields: ['id_doc_compra_venta','revisado','nro_documento','nit',
+		                    'desc_plantilla', 'desc_moneda','importe_doc','nro_documento',
+		                    'tipo','razon_social','fecha','importe_pendiente','importe_cobrado_mb','importe_cobrado_mt','saldo_por_cobrar'],
+		                    remoteSort: true,
+		                    baseParams:{par_filtro:'mon.codigo#pla.desc_plantilla#dcv.razon_social#dcv.nro_documento#dcv.nit#dcv.importe_doc'}
+		                }),
+		                tpl:'<tpl for=".">\
+		                       <div class="x-combo-list-item"><p><b>{razon_social},  NIT: {nit}</b></p>\
+		                       <p>{desc_plantilla} </p><p>Doc: {nro_documento} de Fecha: {fecha}</p>\
+		                       <p>Doc: {importe_doc}  - {desc_moneda}</p> <p>Por cobrar {importe_pendiente} {desc_moneda}</p><p>Cobrado {importe_cobrado_mb} BS</p><p><font color="green"> Cobrado {importe_cobrado_mt} USD</font></p><p>Saldo: {saldo_por_cobrar} {desc_moneda}</p></div></tpl>',
+		                       
+		                       
+		                valueField: 'id_doc_compra_venta',
+		                hiddenValue: 'id_doc_compra_venta',
+		                displayField: 'desc_plantilla',
+		                //gdisplayField:'nro_documento',
+		                listWidth:'280',
+		                forceSelection:true,
+		                typeAhead: false,
+		                triggerAction: 'all',
+		                lazyRender:true,
+		                mode:'remote',
+		                pageSize:20,
+		                queryDelay:500,
+		                gwidth: 100,
+		                minChars:2
+		            },
+		            {
+			                name: 'monto',
+			                xtype:"field",		                
+			                fieldLabel: 'Monto',
+			                readOnly: true
+			        },
+		            {
+			                name: 'nro_doc',
+			                xtype:"field",		                
+			                fieldLabel: 'Nro',
+			                readOnly: true
+			        },
+		            {
+			                name: 'fecha',
+			                xtype:"field",		                
+			                fieldLabel: 'Fecha',
+			                readOnly: true
+			        },
+		            {
+			                name: 'razon_social',
+			                xtype:"field",		            
+			                fieldLabel: 'Razon Social',
+			                readOnly: true
+			        },
+		            {
+			                name: 'id_doc_compra_venta',
+			                xtype:"field",
+			                inputType:'hidden'
+			        }
+			       
+						
+		            
+            ]
+        });
+        
+		
+		
+		this.wAuto = new Ext.Window({
+            title: 'Configuracion',
+            collapsible: true,
+            maximizable: true,
+            autoDestroy: true,
+            width: 380,
+            height: 250,
+            layout: 'fit',
+            plain: true,
+            bodyStyle: 'padding:5px;',
+            buttonAlign: 'center',
+            items: this.formAuto,
+            modal:true,
+             closeAction: 'hide',
+            buttons: [{
+                text: 'Guardar',
+                handler: this.saveAuto,
+                scope: this
+                
+            },
+             {
+                text: 'Cancelar',
+                handler: function(){ this.wAuto.hide() },
+                scope: this
+            }]
+        });
+        
+         this.cmpIdDocCompraVentaFk = this.formAuto.getForm().findField('id_doc_compra_venta_fk');
+         this.cmpIdDocCompraVenta = this.formAuto.getForm().findField('id_doc_compra_venta');
+         
+       
+         this.cmpIdDocCompraVentaFk.on('select',function(cmb,rec){
+         	  this.formAuto.getForm().findField('monto').setValue(rec.data.importe_doc);
+         	  this.formAuto.getForm().findField('nro_doc').setValue(rec.data.nro_documento);
+         	  this.formAuto.getForm().findField('fecha').setValue(rec.data.fecha);
+         	  this.formAuto.getForm().findField('razon_social').setValue(rec.data.razon_social);
+         }, this)
+         
+         
+	},
+	
+	 mostarFormAuto:function(){	 	
+	 	    var rec = this.sm.getSelected();
+			var data = rec.data;
+			var me = this;
+			if (data && data.tipo_informe  == 'ncd') {
+				
+				this.cmpIdDocCompraVentaFk.store.baseParams.fecha  = data.fecha;
+				this.cmpIdDocCompraVentaFk.store.baseParams.tipo_informe  = 'lcv';
+				this.cmpIdDocCompraVentaFk.store.baseParams.tipo  = data.tipo=='compra'?'venta':'compra';
+				this.cmpIdDocCompraVentaFk.store.baseParams.nit  = data.nit;
+  	            this.cmpIdDocCompraVentaFk.modificado = true;
+  	            
+  	            
+				
+				if(data.id_doc_compra_venta_fk){
+					     //is edit
+					 	Phx.CP.loadingShow();
+						Ext.Ajax.request({
+							url : '../../sis_contabilidad/control/DocCompraVenta/cargarDatosFactura',
+							params : {
+								'id_doc_compra_venta' :  data.id_doc_compra_venta,
+								'id_doc_compra_venta_fk': data.id_doc_compra_venta_fk
+							},
+							success : function(response){								
+								  me.wAuto.show();
+								  
+								  //set invoice values
+								  Phx.CP.loadingHide();
+								  var reg = Ext.util.JSON.decode(Ext.util.Format.trim(response.responseText));
+								  me.formAuto.load(reg.ROOT.datos);
+								  
+								  this.formAuto.getForm().findField('monto').setValue(reg.ROOT.datos.importe_doc);
+					         	  this.formAuto.getForm().findField('nro_doc').setValue(reg.ROOT.datos.nro_documento);
+					         	  this.formAuto.getForm().findField('fecha').setValue(reg.ROOT.datos.fecha);
+					         	  this.formAuto.getForm().findField('razon_social').setValue(reg.ROOT.datos.razon_social);
+					         	  this.cmpIdDocCompraVenta.setValue(data.id_doc_compra_venta);
+					         	  this.cmpIdDocCompraVentaFk.setValue(reg.ROOT.datos.id_doc_compra_venta_fk);
+					         	  this.cmpIdDocCompraVentaFk.setRawValue(reg.ROOT.datos.nro_autorizacion);
+								  
+							},
+							failure : this.conexionFailure,
+							timeout : this.timeout,
+							scope : this
+						});					
+				}
+				else{
+					  //dont have id
+					   me.wAuto.show();
+					   me.formAuto.getForm().reset();
+					   this.cmpIdDocCompraVenta.setValue();
+					   this.cmpIdDocCompraVenta.setValue(data.id_doc_compra_venta);
+				}				
+			}
+   },
    
+   saveAuto: function(){
+		    var d = this.getSelectedData();
+		    Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_contabilidad/control/DocCompraVenta/relacionarFacturaNCD',
+                params: { 
+                	      id_doc_compra_venta: this.cmpIdDocCompraVenta.getValue(),
+                	      id_doc_compra_venta_fk: this.cmpIdDocCompraVentaFk.getValue()
+                	    },
+                success: this.successSinc,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+		
+	},
+	successSinc:function(resp){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+            	if(this.wOt){
+            		this.wOt.hide(); 
+            	}
+            	if(this.wAuto){
+            		this.wAuto.hide(); 
+            	}
+                
+                this.reload();
+             }else{
+                alert('ocurrio un error durante el proceso')
+            }
+    },
+	
+	
+	
     
     
 })

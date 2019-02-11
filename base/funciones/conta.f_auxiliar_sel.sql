@@ -17,6 +17,9 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
+   ISUUE			FECHA			 AUTHOR 		 DESCRIPCION	
+ 	1A			30/08/2018			EGS		 se aumento el campo aplicacion en las transcacciones CONTA_AUXCTA_SEL 
+
 
  DESCRIPCION:	
  AUTOR:			
@@ -30,6 +33,9 @@ DECLARE
 	v_nombre_funcion   	text;
 	v_resp				varchar;
     v_inner 			varchar;
+    v_filtor_tipo_cc	varchar;
+    v_id_cuenta_permitidas	varchar;
+    v_add_filtro	varchar; 
 			    
 BEGIN
 
@@ -47,14 +53,31 @@ BEGIN
      				
     	begin
         
-            v_inner = '';   
+            v_inner = '';
+            v_add_filtro   = ' 0=0 and '; 
         
-            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN
-            
-            
-               v_inner = 'inner join conta.tcuenta_auxiliar c on  c.id_auxiliar = auxcta.id_auxiliar and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
-            
+            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN      
+                  v_inner = 'inner join conta.tcuenta_auxiliar c on  c.id_auxiliar = auxcta.id_auxiliar and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
             END IF;
+            
+            
+            v_filtor_tipo_cc = pxp.f_get_variable_global('conta_filtrar_cuenta_por_tipo_cc_interface_junior');
+            
+             IF v_filtor_tipo_cc = 'si'  and   pxp.f_existe_parametro(p_tabla, 'id_centro_costo')  THEN
+             
+                 select 
+                   pxp.list(tccc.id_auxiliar::varchar)
+                 into
+                    v_id_cuenta_permitidas
+                 from conta.ttipo_cc_cuenta tccc  
+                 inner join param.tcentro_costo cc on tccc.id_tipo_cc = cc.id_tipo_cc                 
+                 where cc.id_centro_costo = v_parametros.id_centro_costo;
+                 
+                 v_add_filtro = '  auxcta.id_auxiliar in ('|| COALESCE(v_id_cuenta_permitidas,'0') ||')  and '; 
+               
+            END IF;
+            
+            
         
         
     		--Sentencia de la consulta
@@ -71,13 +94,14 @@ BEGIN
 						auxcta.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        auxcta.corriente
+                        auxcta.corriente,
+                        auxcta.aplicacion
 						from conta.tauxiliar auxcta
 						inner join segu.tusuario usu1 on usu1.id_usuario = auxcta.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = auxcta.id_usuario_mod
 				        left join param.tempresa emp on emp.id_empresa=auxcta.id_empresa '||
                         v_inner || '
-				        where  ';
+				        where  '||v_add_filtro;
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -100,11 +124,26 @@ BEGIN
 		begin
             v_inner = ''; 
         
-            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN
-            
-            
+            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN           
                v_inner = 'inner join conta.tcuenta_auxiliar c on  c.id_auxiliar = auxcta.id_auxiliar and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
+            END IF;
             
+            v_filtor_tipo_cc = pxp.f_get_variable_global('conta_filtrar_cuenta_por_tipo_cc_interface_junior');
+            
+             IF v_filtor_tipo_cc = 'si'  and   pxp.f_existe_parametro(p_tabla, 'id_centro_costo')  THEN
+            
+            
+                 
+                 select 
+                   pxp.list(tccc.id_auxiliar::varchar)
+                 into
+                    v_id_cuenta_permitidas
+                 from conta.ttipo_cc_cuenta tccc  
+                 inner join param.tcentro_costo cc on tccc.id_tipo_cc = cc.id_tipo_cc                 
+                 where cc.id_centro_costo = v_parametros.id_centro_costo;
+                 
+                 v_add_filtro = '  auxcta.id_auxiliar in ('|| COALESCE(v_id_cuenta_permitidas,'0') ||')  and '; 
+               
             END IF;
         
 			--Sentencia de la consulta de conteo de registros

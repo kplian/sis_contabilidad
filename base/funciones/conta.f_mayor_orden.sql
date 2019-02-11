@@ -103,6 +103,21 @@ BEGIN
      --iniciamos acumulador en cero
      v_resp_mayor = 0;
      v_resp_mayor_mt = 0;
+     v_resp_mayor_partida = 0;
+     v_resp_mayor_partida_mt  = 0;
+     
+     v_resp_final[1] = 0;
+     v_resp_final[2] = 0;
+     v_resp_final[3] = 0;
+     v_resp_final[4] = 0;
+     v_resp_final[5] =  0;
+     v_resp_final[6] = 0;
+     v_resp_final[7] = 0;
+     v_resp_final[8] = 0;
+     v_resp_final[9] = 0;
+     v_resp_final[10] = 0;
+     v_resp_final[11] = 0;
+     v_resp_final[12] = 0;
      
      va_id_deptos = string_to_array(p_id_deptos,',')::INTEGER[];
      
@@ -170,7 +185,7 @@ BEGIN
         --  calculo de tipo de resultado
         --------------------------------
           IF  p_tipo_saldo = 'balance' THEN
-            
+           
                --forzar saldo deudor
                v_resp_mayor = COALESCE(v_sum_debe,0) - COALESCE(v_sum_haber,0);
                v_resp_mayor_mt = COALESCE(v_sum_debe_mt,0) - COALESCE(v_sum_haber_mt,0); 
@@ -190,6 +205,8 @@ BEGIN
                v_resp_mayor_mt = COALESCE(v_sum_haber_mt,0);               
                v_resp_mayor_partida = COALESCE(v_sum_recurso,0);
                v_resp_mayor_partida_mt = COALESCE(v_sum_recurso_mt,0);
+         ELSE
+            raise exception 'tipo de saldo  no considerado %', p_tipo_saldo;
                
          END IF; 
           
@@ -198,16 +215,20 @@ BEGIN
           v_resp_final[2] = v_resp_mayor_mt;
           v_resp_final[3] = v_resp_mayor_partida;
           v_resp_final[4] = v_resp_mayor_partida_mt;
-          --retornamos debe
-          v_resp_final[5] = COALESCE(v_sum_debe,0);
-          v_resp_final[6] = COALESCE(v_sum_debe_mt,0);
-          v_resp_final[7] = COALESCE(v_sum_gasto,0);
-          v_resp_final[8] = COALESCE(v_sum_gasto_mt,0);
-          --retornamos haber
-          v_resp_final[9] = COALESCE(v_sum_haber,0);
-          v_resp_final[10] = COALESCE(v_sum_haber_mt,0);
-          v_resp_final[11] = COALESCE(v_sum_recurso,0);
-          v_resp_final[12] = COALESCE(v_sum_recurso_mt,0);
+          
+           --retornamos debe
+           v_resp_final[5] = COALESCE(v_sum_debe,0);
+           v_resp_final[6] = COALESCE(v_sum_debe_mt,0);
+           v_resp_final[7] = COALESCE(v_sum_gasto,0);
+           v_resp_final[8] = COALESCE(v_sum_gasto_mt,0);
+           --retornamos haber
+           v_resp_final[9] = COALESCE(v_sum_haber,0);
+           v_resp_final[10] = COALESCE(v_sum_haber_mt,0);
+           v_resp_final[11] = COALESCE(v_sum_recurso,0);
+           v_resp_final[12] = COALESCE(v_sum_recurso_mt,0);
+               
+               
+         
           
           raise notice '##################  RESULTADO BASICO %',v_resp_mayor;
         
@@ -231,12 +252,29 @@ BEGIN
                                                  p_incluir_apertura,
                                                  p_incluir_aitb, 
                                                  p_signo_balance, 
-                                                 p_tipo_saldo);
+                                                 p_tipo_saldo,
+                                                 p_id_auxiliar,
+                                                 p_id_centro_costo);
+                                                 
+                                               
          
                v_resp_mayor = v_resp_mayor + v_resp_aux[1];               
                v_resp_mayor_mt = v_resp_mayor_mt + v_resp_aux[2];               
                v_resp_mayor_partida = v_resp_mayor_partida + v_resp_aux[3];               
                v_resp_mayor_partida_mt= v_resp_mayor_partida_mt + v_resp_aux[4];
+               
+                --retornamos debe
+              v_resp_final[5] =  v_resp_final[5] +v_resp_aux[5];
+              v_resp_final[6] = v_resp_final[6] + v_resp_aux[6];
+              v_resp_final[7] = v_resp_final[7] + v_resp_aux[7];
+              v_resp_final[8] =  v_resp_final[8] +v_resp_aux[8];
+              --retornamos haber
+              v_resp_final[9] = v_resp_final[9] + v_resp_aux[9];
+              v_resp_final[10] = v_resp_final[10] +v_resp_aux[10];
+              v_resp_final[11] = v_resp_final[11] + v_resp_aux[11];
+              v_resp_final[12] = v_resp_final[12] +v_resp_aux[12];
+               
+              
                
          END LOOP;
          
@@ -244,15 +282,25 @@ BEGIN
          v_resp_final[2] = v_resp_mayor_mt;
          v_resp_final[3] = v_resp_mayor_partida;
          v_resp_final[4] = v_resp_mayor_partida_mt;
+         
+         
+         --retornamos debe
+  		v_resp_final[5] =  v_resp_final[5] + COALESCE(v_sum_debe,0);
+		v_resp_final[6] = v_resp_final[6] + COALESCE(v_sum_debe_mt,0);
+        v_resp_final[7] = v_resp_final[7] + COALESCE(v_sum_gasto,0);
+        v_resp_final[8] =  v_resp_final[8] + COALESCE(v_sum_gasto_mt,0);
+        --retornamos haber
+        v_resp_final[9] = v_resp_final[9] + COALESCE(v_sum_haber,0);
+        v_resp_final[10] = v_resp_final[10] + COALESCE(v_sum_haber_mt,0);
+        v_resp_final[11] = v_resp_final[11] + COALESCE(v_sum_recurso,0);
+        v_resp_final[12] = v_resp_final[12] + COALESCE(v_sum_recurso_mt,0);
         
          return v_resp_final;
          
      END IF;     
           
-     v_resp_final[1] = 0;
-     v_resp_final[2] = 0;
-     v_resp_final[3] = 0;
-     v_resp_final[4] = 0; 
+    
+      
      
      raise notice 'f_maryo_orden %',v_resp_final;    
      

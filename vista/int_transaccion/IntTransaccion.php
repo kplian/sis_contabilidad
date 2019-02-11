@@ -23,68 +23,52 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		this.init();
 		
 		this.obtenerVariableGlobal('conta_partidas');
-		
-		 this.Cmp.importe_gasto.on('change',function(cmp,value){
+		this.Cmp.importe_gasto.on('change',function(cmp,value){
 			this.Cmp.importe_haber.suspendEvents();
 			this.Cmp.importe_haber.setValue(0);			
-			this.Cmp.importe_haber.resumeEvents();
-			
+			this.Cmp.importe_haber.resumeEvents();			
 			this.Cmp.importe_recurso.suspendEvents();
 			this.Cmp.importe_recurso.setValue(0);			
-			this.Cmp.importe_recurso.resumeEvents();
-			
+			this.Cmp.importe_recurso.resumeEvents();			
 			this.Cmp.importe_debe.suspendEvents();
 			this.Cmp.importe_debe.setValue(value);				
 			this.Cmp.importe_debe.resumeEvents();
-			
-			
 		},this);  
 		
 		this.Cmp.importe_recurso.on('change',
 		    function(cmp,value){
 			    this.Cmp.importe_debe.suspendEvents();
 				this.Cmp.importe_debe.setValue(0);				
-				this.Cmp.importe_debe.resumeEvents();
-				
+				this.Cmp.importe_debe.resumeEvents();				
 				this.Cmp.importe_haber.suspendEvents();
 			    this.Cmp.importe_haber.setValue(value);			
-			    this.Cmp.importe_haber.resumeEvents();
-				
+			    this.Cmp.importe_haber.resumeEvents();				
 				this.Cmp.importe_gasto.suspendEvents();
 				this.Cmp.importe_gasto.setValue(0);				
 				this.Cmp.importe_gasto.resumeEvents();
-				
-				
-			
-		   },this);
+		 },this);
 		   
 		
 		this.Cmp.importe_debe.on('change',function(cmp){
 			this.Cmp.importe_haber.suspendEvents();
 			this.Cmp.importe_haber.setValue(0);			
-			this.Cmp.importe_haber.resumeEvents();
-			
+			this.Cmp.importe_haber.resumeEvents();			
 			this.Cmp.importe_recurso.suspendEvents();
 			this.Cmp.importe_recurso.setValue(0);			
 			this.Cmp.importe_recurso.resumeEvents();
-			
-			
 		},this);
 		
 		this.Cmp.importe_haber.on('change',
 		    function(cmp){
 			    this.Cmp.importe_debe.suspendEvents();
 				this.Cmp.importe_debe.setValue(0);				
-				this.Cmp.importe_debe.resumeEvents();
-				
+				this.Cmp.importe_debe.resumeEvents();				
 				this.Cmp.importe_gasto.suspendEvents();
 				this.Cmp.importe_gasto.setValue(0);				
 				this.Cmp.importe_gasto.resumeEvents();
 		   },this);
 		   
 		   
-		
-		
 		this.addButton('btnBanco',
             {
                 text: 'Detalle Pago',
@@ -94,10 +78,29 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Detalle del Pago</b><br/>Si la transaccion afecta bancos esta opción permite regitrar datos relacioandos (forma de pago, etc) '
             }
         );
+        this.addButton('btnTransaccionesUpload',
+	            {
+	                text: 'Subir Trans.',	                
+	                iconCls: 'bchecklist',
+	                disabled: true,
+	                handler: this.SubirArchivo,
+	                tooltip: '<b>Subir Transacciones</b><br/>desde Excel (xlsx).'
+	            }
+	        );
         
-       
-		
 	},
+	SubirArchivo : function(rec)
+    {                   
+        
+    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/SubirArchivoTran.php',
+        'Subir Transacciones desde Excel',
+        {
+            modal:true,
+            width:450,
+            height:150
+        },this.maestro,this.idContenedor,'SubirArchivoTran');
+	   
+    },
 		
 	Atributos:[
 		{
@@ -120,6 +123,79 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
 		{
+			config:{
+				name: 'id_centro_costo',
+				fieldLabel: 'Centro Costo',
+				allowBlank: false,
+				tinit:false,
+				origen:'CENTROCOSTO',
+				url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
+				gdisplayField: 'desc_centro_costo',
+				width: 380,
+				listWidth: 380,
+				gwidth:600,
+				baseParams:{tipo_pres:"gasto,administrativo,recurso,ingreso_egreso",operativos_todos:"si"},					
+   				renderer:function (value, p, record){
+	   			    var color = 'green';
+	   			    if(record.data["tipo_reg"] != 'summary'){
+		   			    if(record.data["tipo_partida"] == 'flujo'){
+		   			        color = 'red';
+		   			    }
+		   			    
+		   				var retorno =  String.format('<b>CC:</b> {0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo'], record.data['desc_cuenta']);	
+		   					if(record.data['desc_auxiliar']){
+			   					retorno = retorno + String.format('<b>Aux.:</b> {0}</br>', record.data['desc_auxiliar']);
+			   				}
+		   					if(record.data['desc_partida']){
+			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
+			   				}
+		   					if(record.data['desc_orden']){			   					
+			   					retorno = retorno + String.format('<b>Ord.:</b> <font> {0} {1}</font><br>', record.data['codigo_ot'], record.data['desc_orden']);
+			   				}	
+			   				if(record.data['desc_suborden']){
+			   					retorno = retorno + '<b>Sub.:</b> '+record.data['desc_suborden'];
+			   				}
+		   				return String.format('<div class="gridmultiline">{0}</div>',retorno);
+	   			    }
+	   			    else{
+	   			    	return '<b><p align="right">Total: &nbsp;&nbsp; </p></b>';
+	   			    }
+	   			    
+	   			}
+			},
+			type:'ComboRec',
+			filters:{
+				    pfiltro:'cue.nombre_cuenta#cue.nro_cuenta#cc.codigo_cc#cue.nro_cuenta#cue.nombre_cuenta#aux.codigo_auxiliar#aux.nombre_auxiliar#par.codigo#par.nombre_partida#ot.desc_orden#suo.codigo#suo.nombre#ot.codigo',
+				    type:'string'},
+			id_grupo:1,
+			grid:true,
+			bottom_filter: true,
+			form:true
+		},
+		{
+   			config:{
+   				sysorigen:'sis_presupuestos',
+       		    name:'id_partida',
+   				origen:'PARTIDA',
+   				allowBlank:false,
+   				fieldLabel:'Partida',
+   				gdisplayField:'desc_partida',//mapea al store del grid
+   				gwidth:200,
+   				width: 380,
+   				listWidth: 380
+       	     },
+   			type:'ComboRec',
+   			id_grupo:0,
+   			filters:{	
+		        pfiltro: 'par.codigo_partida#par.nombre_partida',
+				type: 'string'
+			},
+   		   
+   			grid:true,
+   			
+   			form:true
+	   	},
+		{
    			config:{
    				sysorigen:'sis_contabilidad',
        		    name:'id_cuenta',
@@ -129,51 +205,18 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
    				gdisplayField:'desc_cuenta',//mapea al store del grid
    				gwidth:600,
    				width: 380,
-   				listWidth: 380,
-   				
-	   			renderer:function (value, p, record){
-	   			    var color = 'green';
-	   			    if(record.data["tipo_reg"] != 'summary'){
-		   			    if(record.data["tipo_partida"] == 'flujo'){
-		   			        color = 'red';
-		   			    }
-		   			    
-		   					
-		   				var retorno =  String.format('<b>CC:</b>{0}, <br><b>Cta.:</b>{1}<br>',record.data['desc_centro_costo'], record.data['desc_cuenta']);	
-		   					
-		   					if(record.data['desc_auxiliar']){
-			   					retorno = retorno + String.format('<b>Aux.:</b>{0}</br>', record.data['desc_auxiliar']);
-			   				}
-		   					
-		   					if(record.data['desc_partida']){
-			   					retorno = retorno + String.format('<b>Ptda.:</b> <font color="{0}">{1}</font><br>',color, record.data['desc_partida']);
-			   				}
-		   					
-			   				if(record.data['desc_orden']){			   					
-			   					retorno = retorno + String.format('<b>Ord.:</b> <font>{0} {1}</font><br>', record.data['codigo_ot'], record.data['desc_orden']);
-			   				}	
-			   				if(record.data['desc_suborden']){
-			   					retorno = retorno + '<b>Sub.:</b> '+record.data['desc_suborden'];
-			   				}
-		   				return String.format('<div class="gridmultiline">{0}</div>',retorno);
-	   			    	
-	   			    }
-	   			    else{
-	   			    	return '<b><p align="right">Total: &nbsp;&nbsp; </p></b>';
-	   			    }
-	   			    
-	   			}
+   				listWidth: 380
        	     },
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro:'cue.nombre_cuenta#cue.nro_cuenta#cc.codigo_cc#cue.nro_cuenta#cue.nombre_cuenta#aux.codigo_auxiliar#aux.nombre_auxiliar#par.codigo#par.nombre_partida#ot.desc_orden#suo.codigo#suo.nombre#ot.codigo',
+		        pfiltro:'cue.nombre_cuenta#cue.nro_cuenta',
 				type:'string'
 			},
    			grid:true,
    			form:true
 	   	},
-	   	{
+		{
    			config:{
    				sysorigen:'sis_contabilidad',
        		    name:'id_auxiliar',
@@ -194,51 +237,11 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				type:'string'
 			},
    		   
-   			grid:false,
+   			grid:true,
    			form:true
 	   	},
-	   	{
-   			config:{
-   				sysorigen:'sis_presupuestos',
-       		    name:'id_partida',
-   				origen:'PARTIDA',
-   				allowBlank:false,
-   				fieldLabel:'Partida',
-   				gdisplayField:'desc_partida',//mapea al store del grid
-   				gwidth:200,
-   				width: 380,
-   				listWidth: 380
-       	     },
-   			type:'ComboRec',
-   			id_grupo:0,
-   			filters:{	
-		        pfiltro: 'par.codigo_partida#par.nombre_partida',
-				type: 'string'
-			},
-   		   
-   			grid:false,
-   			
-   			form:true
-	   	},
-	   	{
-            config:{
-                name: 'id_centro_costo',
-                fieldLabel: 'Centro Costo',
-                allowBlank: false,
-                tinit:false,
-                origen:'CENTROCOSTO',
-                gdisplayField: 'desc_centro_costo',
-                width: 380,
-   				listWidth: 380,
-                gwidth: 300
-            },
-            type:'ComboRec',
-            filters:{pfiltro:'cc.codigo_cc',type:'string'},
-            id_grupo:1,
-            grid:false,
-            bottom_filter: true,
-            form:true
-        },
+		
+	   	
         {
             config:{
                     name:'id_orden_trabajo',
@@ -477,6 +480,55 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		},
 		
 		{
+			config: {
+				name: 'importe_debe_ma',
+				fieldLabel: 'Debe MA',
+				allowBlank: true,
+				width: 380,
+				gwidth: 100,
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_debe_ma', type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			form: false
+		},
+		{
+			config: {
+				name: 'importe_haber_ma',
+				fieldLabel: 'Haber MA',
+				allowBlank: true,
+				width: 380,
+				gwidth: 100,
+				galign: 'right ',
+				maxLength: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+			},
+			type: 'NumberField',
+			filters: {pfiltro: 'transa.importe_haber_ma',type: 'numeric'},
+			id_grupo: 1,
+			grid: true,
+			form: false
+		},
+		
+		{
 			config : {
 				name : 'tipo_cambio',
 				fieldLabel : 'TC 1',
@@ -509,6 +561,25 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			type : 'NumberField',
 			filters : {
 				pfiltro : 'incbte.tipo_cambio_2',
+				type : 'numeric'
+			},
+			id_grupo : 2,
+			grid : true,
+			form : true
+		}, {
+			config : {
+				name : 'tipo_cambio_3',
+				fieldLabel : 'TC 3',
+				allowBlank : false,
+				width: 380,
+				galign: 'right ',
+				gwidth : 70,
+				maxLength : 20,
+				decimalPrecision : 6
+			},
+			type : 'NumberField',
+			filters : {
+				pfiltro : 'incbte.tipo_cambio_3',
 				type : 'numeric'
 			},
 			id_grupo : 2,
@@ -651,9 +722,50 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		{name:'desc_centro_costo', type: 'string'},'tipo_partida','id_orden_trabajo','desc_orden','tipo_reg',
 		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque',
 		'importe_debe_mt',	'importe_haber_mt','importe_gasto_mt','importe_recurso_mt',
-		'id_moneda_tri','id_moneda', 'tipo_cambio','tipo_cambio_2','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot'
+		'importe_debe_ma',	'importe_haber_ma','importe_gasto_ma','importe_recurso_ma',
+		'id_moneda_tri','id_moneda_act','id_moneda', 'tipo_cambio','tipo_cambio_2','tipo_cambio_3','codigo_categoria','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot'
 		
 	],
+	
+	pdfOrientacion: 'L',
+	title2:'Transacciones del Comprobante',
+	
+	ExtraColumExportDet:[{ 
+		   	    label:'Partida',
+				name:'desc_partida',
+				width:'200',
+				type:'string',
+				gdisplayField:'desc_partida',
+				value:'desc_partida'
+			},
+			{ 
+		   	    label:'Cuenta',
+				name:'desc_cuenta',
+				width:'200',
+				type:'string',
+				gdisplayField:'desc_cuenta',
+				value:'desc_cuenta'
+			},
+			{ 
+		   	    label:'Orden',
+				name:'codigo_ot',
+				width:'200',
+				type:'string',
+				gdisplayField:'codigo_ot',
+				value:'codigo_ot'
+			},
+			{ 
+		   	    label:'Categoria',
+				name:'codigo_categoria',
+				width:'200',
+				type:'string',
+				gdisplayField:'codigo_categoria',
+				value:'codigo_categoria'
+			},
+			
+			
+			
+			],
 	
 	loadBanco:function() {
             var rec=this.sm.getSelected();
@@ -675,7 +787,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	        )
     }),
     
-    arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','glosa','estado_reg','fecha_reg'],
+    arrayDefaultColumHidden:['id_cuenta','id_partida','fecha_mod','usr_reg','usr_mod','glosa','estado_reg','fecha_reg','id_auxiliar'],
 
 
 
@@ -687,12 +799,17 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	bsave: false,
 	loadValoresIniciales:function(){
 		Phx.vista.IntTransaccion.superclass.loadValoresIniciales.call(this);
-		this.getComponente('id_int_comprobante').setValue(this.maestro.id_int_comprobante);		
+
+		this.Cmp.id_int_comprobante.setValue(this.maestro.id_int_comprobante);	
+			
+
 	},
 	onReloadPage:function(m){
 		this.maestro=m;						
 		this.store.baseParams={id_int_comprobante:this.maestro.id_int_comprobante, id_moneda:this.maestro.id_moneda};
+		this.Cmp.id_centro_costo.store.baseParams.id_depto = this.maestro.id_depto;	
 		this.load({params:{start:0, limit:this.tam_pag}});
+		this.Cmp.id_centro_costo.store.baseParams.id_depto = this.maestro.id_depto;	
 		
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var fecha=new Date(this.maestro.fecha);
@@ -714,7 +831,20 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		 	this.mostrarColumnaByName('importe_haber_mb');
 		 }
 		 
+		 if(this.maestro.id_moneda_act == this.maestro.id_moneda  ||this.maestro.id_moneda_act == this.maestro.id_moneda_tri){
+		 	this.ocultarColumnaByName('importe_debe_ma');
+		 	this.ocultarColumnaByName('importe_haber_ma');
+		 }
+		 else{
+		 	this.mostrarColumnaByName('importe_debe_ma');
+		 	this.mostrarColumnaByName('importe_haber_ma');
+		 }
+		 
+		 console.log('mostrarColumnaByName')
+		 
 		 this.getConfigCambiaria();
+		 
+		 console.log('getConfigCambiaria')
 		 
 		 
 	},
@@ -731,9 +861,13 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			
 		}
 		else{
+			if (tb && this.bedit) {
 			 this.getBoton('edit').disable();
-			 this.getBoton('del').disable();
-			 this.getBoton('btnBanco').disable();
+			}
+			if (tb && this.bdel) {
+				 this.getBoton('del').disable();
+			}
+			this.getBoton('btnBanco').disable();
 		}
 		
 		if(rec.data.actualizacion == 'si'){
@@ -743,11 +877,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		
 		
 		if(this.maestro.sw_editable == 'no'){
-			this.getBoton('edit').disable();
-			this.getBoton('edit').disable();
-			this.getBoton('del').disable();
+			if (tb && this.bedit) {
+               this.getBoton('edit').disable();
+            }
+            if (tb && this.bdel) {
+            	this.getBoton('del').disable();
+            }
+			if (tb && this.bnew) {
+			    this.getBoton('new').disable();
+			}
 			this.getBoton('btnBanco').disable();
-			this.getBoton('new').disable();
 		}
 		
 		
@@ -759,7 +898,10 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		this.getBoton('btnBanco').setDisabled(true);
 		
 		if(this.maestro.sw_editable == 'no'){
-			this.getBoton('new').disable();
+			if (tb && this.bnew) {
+               this.getBoton('new').disable();
+            }
+			
 		}
 	},
 	
@@ -833,6 +975,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 
 			var localidad = this.maestro.localidad;
 			
+			
 			Phx.CP.loadingShow();
 				Ext.Ajax.request({
 				url:'../../sis_contabilidad/control/ConfigCambiaria/getConfigCambiaria',
@@ -844,36 +987,35 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 					forma_cambio: 'Oficial'
 				}, success: function(resp) {
 					
+					
+					
 					Phx.CP.loadingHide();
 					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 					if (reg.ROOT.error) {
 						Ext.Msg.alert('Error', 'Validación no realizada: ' + reg.ROOT.error)
-					} else {
-						
+					} else {						
 						//cambia labels
 						this.labeTc1 = reg.ROOT.datos.v_tc1 +' (tc)';
 						this.labeTc2 = reg.ROOT.datos.v_tc2 +' (tc)';
-						
+						this.labeTc3 = reg.ROOT.datos.v_tc3 +' (tc)';	
+											
 						this.setColumnHeader('tipo_cambio', this.labeTc1);
 		                this.setColumnHeader('tipo_cambio_2', this.labeTc2);
-						
+		                this.setColumnHeader('tipo_cambio_3', this.labeTc3);
+		               
 					}
-					
-
 				}, failure: function(a,b,c,d){
 					this.conexionFailure(a,b,c,d)
 				},
 				timeout: this.timeout,
 				scope:this
 				});
-			
-
 		},
 		
 		setLabelsTc: function(){
 			this.Cmp.tipo_cambio.label.update(this.labeTc1);
 			this.Cmp.tipo_cambio_2.label.update(this.labeTc2);
-						
+			this.Cmp.tipo_cambio_3.label.update(this.labeTc3);							
 		},
 		
 		onButtonEdit:function(){
@@ -882,7 +1024,6 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	         Phx.vista.IntTransaccion.superclass.onButtonEdit.call(this); 
 	         this.setModificadoCombos();
 	         this.setLabelsTc();
-	       
        },
        
        onButtonNew: function(){
@@ -892,10 +1033,10 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
           this.setModificadoCombos()
           this.Cmp.tipo_cambio.setValue(this.maestro.tipo_cambio);
           this.Cmp.tipo_cambio_2.setValue(this.maestro.tipo_cambio_2);
+          this.Cmp.tipo_cambio_3.setValue(this.maestro.tipo_cambio_3);
           this.setLabelsTc();
           
-       }
+       },
+       
 })
-</script>
-		
-		
+</script>	

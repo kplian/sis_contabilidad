@@ -68,7 +68,9 @@ BEGIN
               id_clase_comprobante,
               glosa,
               id_tipo_relacion_comprobante,
-              relacion_unica
+              relacion_unica,
+              nombre_func,
+              visible
           	) values(
               v_parametros.codigo,
               'activo',
@@ -87,7 +89,9 @@ BEGIN
               v_parametros.id_clase_comprobante,
               v_parametros.glosa,
               v_parametros.id_tipo_relacion_comprobante,
-              v_parametros.relacion_unica
+              v_parametros.relacion_unica,
+              v_parametros.nombre_func,
+              v_parametros.visible
 							
 			
 			
@@ -128,7 +132,9 @@ BEGIN
               id_clase_comprobante = v_parametros.id_clase_comprobante,
               glosa = v_parametros.glosa,
               id_tipo_relacion_comprobante = v_parametros.id_tipo_relacion_comprobante,
-              relacion_unica = v_parametros.relacion_unica
+              relacion_unica = v_parametros.relacion_unica,
+              nombre_func = v_parametros.nombre_func,
+              visible =  v_parametros.visible
 			where id_resultado_plantilla = v_parametros.id_resultado_plantilla;
                
 			--Definicion de la respuesta
@@ -185,7 +191,8 @@ BEGIN
              rp.tipo,
              rp.periodo_calculo,
              rp.id_tipo_relacion_comprobante,
-             rp.relacion_unica
+             rp.relacion_unica,
+             rp.nombre_func
             into
               v_registros 
             from conta.tresultado_plantilla rp 
@@ -205,7 +212,8 @@ BEGIN
                   tipo,
                   periodo_calculo,
                   id_tipo_relacion_comprobante,
-                  relacion_unica
+                  relacion_unica,
+                  nombre_func 
                 )
                 VALUES (
                    p_id_usuario,
@@ -220,7 +228,8 @@ BEGIN
                    v_registros.tipo,
                    v_registros.periodo_calculo,
               	   v_registros.id_tipo_relacion_comprobante,
-             	   v_registros.relacion_unica
+             	   v_registros.relacion_unica,
+                   v_registros.nombre_func
                 )  RETURNING id_resultado_plantilla into v_id_resultado_plantilla;
             
             ----------------------------------------------

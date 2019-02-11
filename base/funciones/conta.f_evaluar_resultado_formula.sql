@@ -7,6 +7,13 @@ CREATE OR REPLACE FUNCTION conta.f_evaluar_resultado_formula (
 )
 RETURNS numeric [] AS
 $body$
+/***************************************************************************
+ HISTORIAL DE MODIFICACIONES:
+ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+  #27 		 24/01/2109		  Manuel Guerra	  Se corrigio un error de duplicidad de signos
+
+***************************************************************************/
+
 DECLARE
 
 
@@ -38,6 +45,7 @@ v_monto_retorno					numeric[];
 
 BEGIN
 
+   
    v_nombre_funcion = 'conta.f_evaluar_resultado_formula';
    v_tmp_formula = p_formula;
    v_formula_evaluado = p_formula;
@@ -83,7 +91,9 @@ BEGIN
        END IF;             
        
        v_k = array_upper(v_columna_nueva, 1);
-       raise notice 'antes del for al evaluar formula ... %',v_k;          
+       raise notice 'antes del for al evaluar formula ... %',v_k;
+      
+                 
        FOR v_i IN 1.. COALESCE(v_k,0)  LOOP
              
              --------------------------------------------------
@@ -119,12 +129,22 @@ BEGIN
              --------------------------------------------
              --  REMPLAZA VALROES DE LAS VARIABLES
              --------------------------------------------
-             v_formula_evaluado = replace(v_formula_evaluado, '{'||v_columna_nueva[v_i]||'}', v_monto::varchar);
-             v_formula_evaluado_partida = replace(v_formula_evaluado_partida, '{'||v_columna_nueva[v_i]||'}', v_monto_partida::varchar);
+             --#27
+             v_formula_evaluado = replace(v_formula_evaluado, '{'||v_columna_nueva[v_i]||'}', '('||v_monto||')'::varchar);
+             v_formula_evaluado_partida = replace(v_formula_evaluado_partida, '{'||v_columna_nueva[v_i]||'}', COALESCE(v_monto_partida::varchar,'0'));
                                 
        END LOOP;
        
+       /*
+        IF p_formula  = '{EPYG.UPNT}' THEN
+         raise exception  '%, % ,%  --> %', p_destino, p_formula, p_plantilla, v_formula_evaluado;
+       END IF;
+       */
        raise notice '*********************************  FORMULA % ',v_formula_evaluado;
+       
+       IF v_formula_evaluado is null  THEN
+         raise exception  'La formula esta mal planteada %, tiene resultado nulo', p_formula;
+       END IF;
        
        ---------------------
        --  EVALUA FORMULA

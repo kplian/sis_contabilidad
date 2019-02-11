@@ -5,7 +5,13 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-02-2013 15:04:03
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+ 	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
+   	#  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
+	# 16	ENDETRASM	 09/01/2018			Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
+	#  28	     	17/12/2018			MMV							Reporte cuadro de actualización
+   #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
+
+ */
 
 class MODCuenta extends MODbase{
 	
@@ -19,7 +25,11 @@ class MODCuenta extends MODbase{
 		$this->transaccion='CONTA_CTA_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
-		$this->setParametro('filtro_ges','filtro_ges','varchar'); 
+		$this->setParametro('filtro_ges','filtro_ges','varchar');
+		$this->setParametro('id_centro_costo','id_centro_costo','int4');
+		$this->setParametro('id_gestion','id_gestion','int4');
+		
+		 
 		//Definicion de la lista del resultado del query
 		$this->captura('id_cuenta','int4');
 		$this->captura('id_usuario_reg','int4');
@@ -45,6 +55,8 @@ class MODCuenta extends MODbase{
         $this->captura('desc_moneda','varchar');
         $this->captura('gestion','int4');
 		$this->captura('sw_control_efectivo','varchar');
+		$this->captura('tipo_act','varchar');
+		$this->captura('ex_auxiliar','varchar');/// #  1 17/12/2018	EGS	
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -83,7 +95,11 @@ class MODCuenta extends MODbase{
 			 $this->captura('valor_incremento','varchar');
 			 $this->captura('eeff','varchar');
 			 $this->captura('sw_control_efectivo','varchar');
-			 
+			 $this->captura('id_config_subtipo_cuenta','int4');
+			 $this->captura('desc_csc','varchar');
+			 $this->captura('tipo_act','varchar');
+			 $this->captura('ex_auxiliar','varchar');/// #  1 17/12/2018	EGS				
+			 $this->captura('cuenta_actualizacion','varchar');/// # 16
 		     //Ejecuta la instruccion
 		     $this->armarConsulta();
 			 $this->ejecutarConsulta();
@@ -111,7 +127,10 @@ class MODCuenta extends MODbase{
 		$this->setParametro('eeff','eeff','varchar');
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
-		
+		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
+		$this->setParametro('tipo_act','tipo_act','varchar');
+		$this->setParametro('ex_auxiliar','ex_auxiliar','varchar');/// #  1 17/12/2018	EGS
+        $this->setParametro('cuenta_actualizacion','cuenta_actualizacion','varchar'); //#16
 		
 
 		//Ejecuta la instruccion
@@ -143,8 +162,13 @@ class MODCuenta extends MODbase{
 		$this->setParametro('eeff','eeff','varchar');
 		$this->setParametro('valor_incremento','valor_incremento','varchar');
 		$this->setParametro('sw_control_efectivo','sw_control_efectivo','varchar');
-		
-		//Ejecuta la instruccion
+		$this->setParametro('id_config_subtipo_cuenta','id_config_subtipo_cuenta','int4');
+		$this->setParametro('tipo_act','tipo_act','varchar');
+		$this->setParametro('ex_auxiliar','ex_auxiliar','varchar');/// #  1 17/12/2018	EGS	
+        $this->setParametro('cuenta_actualizacion','cuenta_actualizacion','varchar'); //#16
+
+
+        //Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 
@@ -206,9 +230,9 @@ class MODCuenta extends MODbase{
 		$this->setParametro('tipo_cuenta','tipo_cuenta','varchar'); 
 		$this->setParametro('incluir_cierre','incluir_cierre','varchar');  
 		$this->setParametro('tipo_balance','tipo_balance','varchar'); 
-		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');      
-	            
-	    //Definicion de la lista del resultado del query
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');
+        $this->setParametro('tipo_moneda','tipo_moneda','varchar'); //#33
+       //Definicion de la lista del resultado del query
 	     $this->captura('id_cuenta','int4');     
 		 $this->captura('nro_cuenta','varchar');
 		 $this->captura('nombre_cuenta','varchar');
@@ -257,19 +281,19 @@ class MODCuenta extends MODbase{
         $this->captura('montopos','int4'); 
         $this->captura('monto','numeric'); 
         $this->captura('id_resultado_det_plantilla','int4'); 
-        $this->captura('id_cuenta_raiz','int4'); 
-		
+        $this->captura('id_cuenta_raiz','int4');		
 		$this->captura('visible','varchar'); 
 		$this->captura('incluir_cierre','varchar'); 
-		$this->captura('incluir_apertura','varchar'); 
-		
+		$this->captura('incluir_apertura','varchar'); 		
 		$this->captura('negrita','varchar'); 
 		$this->captura('cursiva','varchar'); 
-		$this->captura('espacio_previo','int4'); 
-		
+		$this->captura('espacio_previo','int4'); 		
 		$this->captura('id','int4');
 		$this->captura('plantilla','varchar');
-		$this->captura('nombre_columna','varchar');
+		$this->captura('nombre_columna','varchar');		
+		$this->captura('salta_hoja','varchar');
+		
+		
 		
 		
 
@@ -334,9 +358,7 @@ class MODCuenta extends MODbase{
 		 $this->captura('tipo','varchar');
 		 $this->captura('movimiento','varchar');
 		 
-		
-          
-		  
+ 
 		 
 		//Ejecuta la instruccion
 	    $this->armarConsulta();
@@ -346,6 +368,111 @@ class MODCuenta extends MODbase{
 	    
 	    return $this->respuesta;       
  }
+
+  function listarBalanceTipoCC(){
+	    //Definicion de variables para ejecucion del procedimientp
+	    $this->procedimiento='conta.f_balance_tcc';
+	    $this-> setCount(false);
+		$this->setTipoRetorno('record');
+	    $this->transaccion='CONTA_BALTCC_SEL';
+	    $this->tipo_procedimiento='SEL';//tipo de transaccion
+	    
+	    $this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('nivel','nivel','integer');
+		$this->setParametro('id_deptos','id_deptos','varchar');
+		$this->setParametro('id_tipo_ccs','id_tipo_ccs','varchar'); 		
+		$this->setParametro('tipo','tipo','varchar'); 
+		$this->setParametro('incluir_cierre','incluir_cierre','varchar');  
+		$this->setParametro('tipo_balance','tipo_balance','varchar'); 
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar'); 
+		
+		$this->setParametro('incluir_adm','incluir_adm','varchar'); 
+		$this->setParametro('importe','importe','varchar');
+		$this->setParametro('moneda','moneda','varchar');
+		     
+	            
+	    //Definicion de la lista del resultado del query
+	     $this->captura('id_tipo_cc','int4');     
+		 $this->captura('codigo','varchar');
+		 $this->captura('descripcion','varchar');
+		 $this->captura('id_tipo_cc_fk','int4');
+		 $this->captura('monto','numeric');
+		 $this->captura('monto_mt','numeric');
+		 $this->captura('monto_debe','numeric');
+		 $this->captura('monto_mt_debe','numeric');
+		 $this->captura('monto_haber','numeric');
+		 $this->captura('monto_mt_haber','numeric');
+		 $this->captura('nivel','int4');
+		 $this->captura('tipo','varchar');
+		 $this->captura('movimiento','varchar');
+		 
+
+		//Ejecuta la instruccion
+	    $this->armarConsulta();
+		//echo $this->getConsulta();
+		//exit;
+	    $this->ejecutarConsulta();
+	    
+	    return $this->respuesta;       
+	}
+
+	function listarCuentaTCC(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.f_cuenta_sel';
+		$this->transaccion='CONTA_CTATCC_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+		//Definicion de la lista del resultado del query
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	/***************-#28-*************/
+    /*function listarCuadroActualizacion(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.f_cuadro_actualizacion';
+        $this-> setCount(false);
+        $this->setTipoRetorno('record');
+        $this->transaccion='CONTA_RUA_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        $this->setParametro('desde','desde','date');
+        $this->setParametro('hasta','hasta','date');
+        $this->setParametro('nivel','nivel','integer');
+        $this->setParametro('tipo_cuenta','tipo_cuenta','varchar');
+        $this->setParametro('tipo_balance','tipo_balance','varchar');
+        $this->setParametro('incluir_sinmov','incluir_sinmov','varchar');
+        $this->setParametro('fecha_moneda','fecha_moneda','date');
+        $this->setParametro('tipo_moneda','tipo_moneda','varchar');
+        //Definicion de la lista del resultado del query
+        $this->captura('id_cuenta','int4');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('id_cuenta_padre','int4');
+        $this->captura('debe_ma','numeric');
+        $this->captura('haber_ma','numeric');
+        $this->captura('saldo_ma','numeric');
+        $this->captura('importe_mb','numeric');
+        $this->captura('saldo_mayor','numeric');
+        $this->captura('saldo_actulizacion','numeric');
+        $this->captura('nivel','int4');
+        $this->captura('tipo_cuenta','varchar');
+        $this->captura('movimiento','varchar');
+        $this->captura('tipo_cambio','numeric');
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+       
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }*/
+    /***************-#28-*************/
 
 			
 }

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_balance (
   p_administrador integer,
   p_id_usuario integer,
@@ -8,8 +6,23 @@ CREATE OR REPLACE FUNCTION conta.f_balance (
 )
 RETURNS SETOF record AS
 $body$
-DECLARE
+/**************************************************************************
+ SISTEMA:		Sistema de Contabilidad
+ FUNCION: 		conta.f_balance
+ DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tcuenta'
+ AUTOR: 		ADMIN
+ FECHA:	        21-02-2013 15:04:03
+ COMENTARIOS:
+***************************************************************************
+ HISTORIAL DE MODIFICACIONES:
+ HISTORIAL DE MODIFICACIONES:
+	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
+   #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
 
+***************************************************************************/
+
+
+DECLARE
 
 v_parametros  		record;
 v_nombre_funcion   	text;
@@ -29,15 +42,15 @@ v_total 			numeric;
 v_tipo_cuenta		varchar;
 v_incluir_cierre	varchar;
 v_incluir_sinmov	varchar;
- 
+
 
 BEGIN
-     
+
      v_nombre_funcion = 'conta.f_balance';
      v_parametros = pxp.f_get_record(p_tabla);
-    
-    
-    /*********************************   
+
+
+    /*********************************
      #TRANSACCION:    'CONTA_BALANCE_SEL'
      #DESCRIPCION:     Listado para el reporte del balance general
      #AUTOR:           rensi arteaga copari  kplian
@@ -45,23 +58,23 @@ BEGIN
     ***********************************/
 
 	IF(p_transaccion='CONTA_BALANCE_SEL')then
-    
+
         if pxp.f_existe_parametro(p_tabla,'tipo_cuenta') then
           v_tipo_cuenta = v_parametros.tipo_cuenta;
         end if;
-        
+
         if pxp.f_existe_parametro(p_tabla,'incluir_cierre') then
           v_incluir_cierre = v_parametros.incluir_cierre;
         end if;
-        
-        
+
+
         v_incluir_sinmov = 'no';
         if pxp.f_existe_parametro(p_tabla,'incluir_sinmov') then
           v_incluir_sinmov = v_parametros.incluir_sinmov;
         end if;
-        
-        
-        -- 1) Crea una tabla temporal con los datos que se utilizaran 
+
+
+        -- 1) Crea una tabla temporal con los datos que se utilizaran
 
         CREATE TEMPORARY TABLE temp_balancef (
                                 id_cuenta integer,
@@ -73,23 +86,25 @@ BEGIN
                                 tipo_cuenta varchar,
                                 movimiento	varchar
                                      ) ON COMMIT DROP;
-    
-          
+
+
       --llamada recusiva para llenar la tabla
       v_nivel_inicial = 1;
-      
-  
-      v_total =  conta.f_balance_recursivo(v_parametros.desde, 
-                                          v_parametros.hasta, 
-                                          v_parametros.id_deptos, 
-                                          1, 
+
+
+      v_total =  conta.f_balance_recursivo(v_parametros.desde,
+                                          v_parametros.hasta,
+                                          v_parametros.id_deptos,
+                                          1,
                                           v_parametros.nivel,
                                           NULL::integer,
                                           v_tipo_cuenta,
                                           v_incluir_cierre,
-                                          v_parametros.tipo_balance);
+                                          v_parametros.tipo_balance,
+                                          v_parametros.tipo_moneda		--#33
+                                          );
        
-      raise notice '------------------------------------------------> total %', v_total;
+     
       
       
       
@@ -106,7 +121,9 @@ BEGIN
                         
                         
        IF v_incluir_sinmov != 'no' THEN                          
-          v_consulta = v_consulta|| ' WHERE monto != 0 ' ;
+          v_consulta = v_consulta|| ' WHERE monto != 0 and nivel <= '||v_parametros.nivel::varchar||' ';
+       ELSE
+        v_consulta = v_consulta|| ' WHERE nivel <= '||v_parametros.nivel::varchar||' ' ;
        END IF; 
        
        IF v_parametros.tipo_balance = 'resultado' THEN 
@@ -114,6 +131,9 @@ BEGIN
        ELSE
            v_consulta = v_consulta|| ' order by  nro_cuenta';                  
        END IF;
+       
+        raise notice '------------------------------------------------> total %', v_total;
+         raise notice '------------------------------------------------>  %', v_consulta;
        
        FOR v_registros in EXECUTE(v_consulta) LOOP
                    RETURN NEXT v_registros;

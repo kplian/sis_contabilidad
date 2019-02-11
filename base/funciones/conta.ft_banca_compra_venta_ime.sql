@@ -112,8 +112,8 @@ BEGIN
        where bancaper.id_periodo = v_parametros.id_periodo;
 
 
-      IF v_estado_gestion = 'Bloqueado' THEN
-        RAISE EXCEPTION '%','PERIODO BLOQUEADO';
+       IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
       END IF;
 
 
@@ -300,9 +300,9 @@ BEGIN
       from conta.tbancarizacion_periodo bancaper
        where bancaper.id_periodo = v_id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+        IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
         ----------------------------
 
 
@@ -411,9 +411,9 @@ BEGIN
         where bancaper.id_periodo = v_rec.id_periodo;
 
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
 
@@ -458,9 +458,9 @@ BEGIN
         where bancaper.id_periodo = v_parametros.id_periodo;
 
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+        IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
 
@@ -561,9 +561,9 @@ BEGIN
           from conta.tbancarizacion_periodo bancaper
           where bancaper.id_periodo = v_rec.po_id_periodo;
 
-          IF v_estado_gestion = 'Bloqueado' THEN
-            RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-          END IF;
+          IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
           --solo va para un registro de un excel despues comentar
@@ -677,9 +677,9 @@ BEGIN
         from conta.tbancarizacion_periodo bancaper
         where bancaper.id_periodo = v_parametros.id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
 
@@ -837,7 +837,13 @@ where pg_pagado.estado=''pagado'' and pg_devengado.estado = ''devengado''
 and (libro.tipo=''cheque'' or  pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago = ''cheque'')
 and ( pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago=''cheque'')
 -- and plantilla.tipo_informe in (''lcv'',''retenciones'')
-and (libro.estado in (''cobrado'',''entregado'',''anulado'') or libro.estado is null )
+
+and (
+        libro.estado in (''cobrado'',''entregado'',''anulado'')
+        or libro.estado is null
+        or (pg_pagado.forma_pago = ''transferencia'' and libro.estado in(''cobrado'',''entregado'',''anulado'',''borrador'') )
+      )
+
 and ((doc.fecha_documento >= ''' || v_periodo.fecha_ini || '''::date and doc.fecha_documento <=''' ||
                      v_periodo.fecha_fin || '''::date)
 or (libro.fecha >= ''' || v_periodo.fecha_ini || '''::date and libro.fecha <=''' || v_periodo.fecha_fin || '''::date)
@@ -1016,9 +1022,7 @@ and (
               v_retencion_cuota =
               (v_record_plan_pago_pxp.importe_total * v_porciento_en_relacion_a_monto_total_plan_pago) / 100;
 
-              --obtenemos el porcentaje correspondiente de multa
-              v_multa_porcentaje = (v_record_plan_pago_pxp.otros_descuentos * 100) / v_record_plan_pago_pxp.monto_pago;
-              v_multa_cuota = (v_record_plan_pago_pxp.importe_total * v_multa_porcentaje) / 100;
+
 
               --obtenemos el porcentaje correspondiente para el intercambio de servicios
               v_intercambio_de_servicio_porcentaje = (v_record_plan_pago_pxp.descuento_inter_serv * 100) /
@@ -1037,6 +1041,21 @@ and (
 
 
               --v_monto_pagado_para_acumular = v_monto_pagado;
+
+
+              --sacamos la multa mas
+            v_multa_cuota = 0;
+
+               --obtenemos el porcentaje correspondiente de MULTAS
+               IF v_record_plan_pago_pxp.otros_descuentos > 0 THEN
+                 v_multa_porcentaje = (v_record_plan_pago_pxp.otros_descuentos * 100) / v_record_plan_pago_pxp.monto_pago;
+                 v_multa_cuota = (v_record_plan_pago_pxp.importe_total * v_multa_porcentaje) / 100;
+
+                 v_monto_pagado = v_monto_pagado - v_multa_cuota;
+
+               END IF;
+
+
 
               IF (v_record_plan_pago_pxp.id_documento = 245471)
               THEN
@@ -1138,6 +1157,16 @@ and (
 
               IF (v_record_plan_pago_pxp.importe_total != v_record_plan_pago_pxp.descuento_inter_serv)
               THEN
+
+                IF v_record_plan_pago_pxp.nro_autorizacion is null or v_record_plan_pago_pxp.nro_autorizacion = '' THEN
+                  v_record_plan_pago_pxp.nro_autorizacion = 0;
+                END IF;
+
+
+                IF v_record_plan_pago_pxp.nro_nit is null or v_record_plan_pago_pxp.nro_nit = '' THEN
+                  v_record_plan_pago_pxp.nro_nit = 0;
+                END IF;
+
 
 
                 --Sentencia de la insercion
@@ -1271,9 +1300,9 @@ and (
         from conta.tbancarizacion_periodo bancaper
         where bancaper.id_periodo = v_parametros.id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
         SELECT * INTO v_banca from conta.tbanca_compra_venta
@@ -1328,11 +1357,11 @@ and (
         from conta.tbancarizacion_periodo bancaper
         where bancaper.id_periodo = v_parametros.id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
-        
+
         SELECT
           per.fecha_ini,
           per.fecha_fin,
@@ -1467,7 +1496,12 @@ where pg_pagado.estado=''pagado'' and pg_devengado.estado = ''devengado''
 and (libro.tipo=''cheque'' or  pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago = ''cheque'')
 and ( pg_pagado.forma_pago = ''transferencia'' or pg_pagado.forma_pago=''cheque'')
  and plantilla.tipo_informe in (''lcv'',''retenciones'')
-and (libro.estado in (''cobrado'',''entregado'',''anulado'') or libro.estado is null )
+
+and (
+        libro.estado in (''cobrado'',''entregado'',''anulado'')
+        or libro.estado is null
+        or (pg_pagado.forma_pago = ''transferencia'' and libro.estado in(''cobrado'',''entregado'',''anulado'',''borrador'') )
+      )
 
 and (
 (doc.importe_total >= 50000)
@@ -1697,6 +1731,16 @@ and (
               THEN
 
 
+
+                IF v_record_plan_pago_pxp.nro_autorizacion is null or v_record_plan_pago_pxp.nro_autorizacion = '' THEN
+                  v_record_plan_pago_pxp.nro_autorizacion = 0;
+                END IF;
+
+
+                IF v_record_plan_pago_pxp.nro_nit is null or v_record_plan_pago_pxp.nro_nit = '' THEN
+                  v_record_plan_pago_pxp.nro_nit = 0;
+                END IF;
+
                 --Sentencia de la insercion
                 INSERT INTO conta.tbanca_compra_venta (
                   num_cuenta_pago,
@@ -1842,9 +1886,9 @@ and (
         from conta.tbancarizacion_periodo bancaper
         where bancaper.id_periodo = v_banca.id_periodo;
 
-        IF v_estado_gestion = 'Bloqueado' THEN
-          RAISE EXCEPTION '%','PERIODO BLOQUEADO';
-        END IF;
+         IF v_estado_gestion = 'cerrado' THEN
+        RAISE EXCEPTION '%','PERIODO CERRADO';
+      END IF;
 
 
 

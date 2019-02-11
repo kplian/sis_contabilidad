@@ -6,6 +6,7 @@ CREATE OR REPLACE FUNCTION conta.f_evaluar_resultado_detalle_formula (
   p_destino varchar,
   p_columnas_formula varchar [],
   p_codigo_cuenta varchar,
+  p_id_int_comprobante integer = NULL::integer,
   out po_columnas_formula varchar [],
   out po_monto numeric,
   out po_monto_partida numeric

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_calculo_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,13 +12,11 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tplantilla_calculo'
  AUTOR: 		 (admin)
  FECHA:	        28-08-2013 19:01:20
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
- HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+HISTORIAL DE MODIFICACIONES:
+ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+  #13        03/01/2019    Miguel Mamani     		Sirve para facturas  que necesitan lelvar ejejcucion a otro centro de costo
 ***************************************************************************/
 
 DECLARE
@@ -29,41 +25,45 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_plantilla_calculo_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PLACAL_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		28-08-2013 19:01:20
 	***********************************/
 
 	if(p_transaccion='CONTA_PLACAL_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						placal.id_plantilla_calculo,
-						placal.prioridad,
-						placal.debe_haber,
-						placal.tipo_importe,
-						placal.id_plantilla,
-						placal.codigo_tipo_relacion,
-						placal.importe,
-						placal.descripcion,
-						placal.estado_reg,
-						placal.id_usuario_reg,
-						placal.fecha_reg,
-						placal.fecha_mod,
-						placal.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-						placal.importe_presupuesto,
-						placal.descuento	
+                            placal.id_plantilla_calculo,
+                            placal.prioridad,
+                            placal.debe_haber,
+                            placal.tipo_importe,
+                            placal.id_plantilla,
+                            placal.codigo_tipo_relacion,
+                            placal.importe,
+                            placal.descripcion,
+                            placal.estado_reg,
+                            placal.id_usuario_reg,
+                            placal.fecha_reg,
+                            placal.fecha_mod,
+                            placal.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            placal.importe_presupuesto,
+                            placal.descuento,
+                            placal.usar_cc_original,
+                            placal.imputar_excento,
+                            placal.sw_registro,
+                            placal.reset_partida_eje ---#13
 						from conta.tplantilla_calculo placal
 						inner join segu.tusuario usu1 on usu1.id_usuario = placal.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = placal.id_usuario_mod
@@ -178,7 +178,9 @@ BEGIN
                             usu2.cuenta as usr_mod,
                             placal.importe_presupuesto,
                             placal.descuento,
-                            plt.desc_plantilla	
+                            plt.desc_plantilla,
+                            placal.usar_cc_original,
+                            placal.imputar_excento		
 						from conta.tplantilla_calculo placal
                         inner join param.tplantilla plt on plt.id_plantilla = placal.id_plantilla
 						inner join segu.tusuario usu1 on usu1.id_usuario = placal.id_usuario_reg

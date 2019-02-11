@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,13 +12,12 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tplantilla_comprobante'
  AUTOR: 		 (admin)
  FECHA:	        10-06-2013 14:40:00
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+ # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+ #31  EndeETR       06/02/2019          EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
 ***************************************************************************/
 
 DECLARE
@@ -29,21 +26,21 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_plantilla_comprobante_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_CMPB_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		10-06-2013 14:40:00
 	***********************************/
 
 	if(p_transaccion='CONTA_CMPB_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -86,25 +83,30 @@ BEGIN
                           cmpb.funcion_comprobante_editado,
                           cmpb.funcion_comprobante_prevalidado,
                           cmpb.funcion_comprobante_validado_eliminado,
-                          cmpb.desc_plantilla::varchar
+                          cmpb.desc_plantilla::varchar,
+                          cmpb.campo_cbte_relacionado,
+                          cmpb.codigo_tipo_relacion,
+                          cmpb.campo_tipo_cambio_2,
+                          cmpb.campo_tipo_cambio_3,
+                          cmpb.campo_id_config_cambiaria
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod
 				        where  ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
             raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_CMPB_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		10-06-2013 14:40:00
 	***********************************/
 
@@ -117,24 +119,24 @@ BEGIN
 					    inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod
 					    where ';
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-        
-    /*********************************    
+
+    /*********************************
  	#TRANSACCION:  'CONTA_EXPPC_SEL'
  	#DESCRIPCION:	exportar plantilla de comprobante
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		11-02-2015 14:40:00
-	***********************************/     
-	
+	***********************************/
+
     elsif(p_transaccion='CONTA_EXPPC_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -176,25 +178,30 @@ BEGIN
                           campo_fecha_costo_ini,
                           campo_fecha_costo_fin,
                           cmpb.funcion_comprobante_editado,
-                          cmpb.desc_plantilla
+                          cmpb.desc_plantilla,
+                          cmpb.campo_cbte_relacionado,
+                          cmpb.codigo_tipo_relacion,
+                          cmpb.campo_tipo_cambio_2,
+                          cmpb.campo_tipo_cambio_3,
+                          cmpb.campo_id_config_cambiaria
                         from conta.tplantilla_comprobante cmpb
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpb.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpb.id_usuario_mod
 				        where  cmpb.id_plantilla_comprobante =   '||v_parametros.id_plantilla_comprobante;
-			
+
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
-     /*********************************    
+     /*********************************
  	#TRANSACCION:  'CONTA_EXPPCD_SEL'
  	#DESCRIPCION:	exportar plantilla de comprobante detalle
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		11-02-2015 14:40:00
-	***********************************/     
-	
+	***********************************/
+
     elsif(p_transaccion='CONTA_EXPPCD_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -223,17 +230,17 @@ BEGIN
                             cmpbdet.id_usuario_mod,
                             usu1.cuenta as usr_reg,
                             usu2.cuenta as usr_mod	,
-                            cmpbdet.primaria, 
-                            cmpbdet.otros_campos, 
-                            cmpbdet.nom_fk_tabla_maestro, 
-                            cmpbdet.campo_partida_ejecucion , 
-                            cmpbdet.descripcion , 
-                            cmpbdet.campo_monto_pres , 
-                            cmpbdet.id_detalle_plantilla_fk , 
-                            cmpbdet.forma_calculo_monto, 
-                            cmpbdet.func_act_transaccion, 
-                            cmpbdet.campo_id_tabla_detalle, 
-                            cmpbdet.rel_dev_pago, 
+                            cmpbdet.primaria,
+                            cmpbdet.otros_campos,
+                            cmpbdet.nom_fk_tabla_maestro,
+                            cmpbdet.campo_partida_ejecucion ,
+                            cmpbdet.descripcion ,
+                            cmpbdet.campo_monto_pres ,
+                            cmpbdet.id_detalle_plantilla_fk ,
+                            cmpbdet.forma_calculo_monto,
+                            cmpbdet.func_act_transaccion,
+                            cmpbdet.campo_id_tabla_detalle,
+                            cmpbdet.rel_dev_pago,
                             cmpbdet.campo_trasaccion_dev ,
                             cmpbdetb.descripcion as descripcion_base,
                             cmpbdet.campo_id_cuenta_bancaria,
@@ -248,11 +255,12 @@ BEGIN
                             cmpb.codigo as codigo_plantilla,
                             cmpbdet.codigo,
                             cmpbdet2.codigo as codigo_fk,
-                            
+
                             cmpbdet.tipo_relacion_contable_cc,
                             cmpbdet.campo_relacion_contable_cc,
-                            cmpbdet.campo_suborden
-                            
+                            cmpbdet.campo_suborden,
+                            cmpbdet.incluir_desc_doc, --#21
+                            cmpbdet.campo_codigo_aplicacion_rc --#31
 						from conta.tdetalle_plantilla_comprobante cmpbdet
                         inner join conta.tplantilla_comprobante cmpb on cmpb.id_plantilla_comprobante = cmpbdet.id_plantilla_comprobante
 						left join  conta.tdetalle_plantilla_comprobante cmpbdet2 on cmpbdet2.id_detalle_plantilla_comprobante  = cmpbdet.id_detalle_plantilla_fk

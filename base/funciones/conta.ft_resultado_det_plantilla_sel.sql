@@ -104,14 +104,17 @@ BEGIN
                           resdet.destino,
                           resdet.orden_cbte,
                           aux.nombre_auxiliar as desc_auxiliar,
-                          par.nombre_partida as desc_partida
+                          par.nombre_partida as desc_partida,
+                          resdet.salta_hoja,
+                          tcc.id_tipo_cc,
+                          (tcc.codigo||'' ''||tcc.descripcion)::varchar as desc_tipo_cc
                           from conta.tresultado_det_plantilla resdet
                           inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
                           left  join conta.tauxiliar aux on aux.id_auxiliar = resdet.id_auxiliar
                           left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||' 
                           left join pre.tpartida par on par.estado_reg = ''activo'' and par.codigo = resdet.codigo_partida and par.id_gestion = '||v_id_gestion::varchar||' 
-                          
                           left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
+                          left join param.ttipo_cc tcc on tcc.id_tipo_cc = resdet.id_tipo_cc
 				        where  ';
                         
              

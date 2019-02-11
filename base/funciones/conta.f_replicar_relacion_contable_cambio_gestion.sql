@@ -19,12 +19,14 @@ para replicacion de parametrizacion de las relaciones contable
 3.asegurarse de la migracion de cuenta_ids, partida_ids y presupuestos_ids
 4.ejecutar replicacion
 --------------------------
-MODIFICACIONES
 
-Autor: RAC  - KPLIAN
-Fecha: 2/12/2014
-Descripción: Se reformula la logica del algoritmo , para no tener errores, ahrao la funcion se llala desde la interfaces de relacion contable
-
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+ #0       		 09/12/2013     RCM  -  KPLIAN    creación
+ #0       		 2/12/2014      RAC KPLIAN        Se reformula la logica del algoritmo , para no tener errores, ahrao la funcion se llala desde la interfaces de relacion contable
+ #1111           19/11/2018     RAC KPLIAN        Se añade la logica para migrar aplicaciones, moenda y tipo de presupuesto,  
+                                                  Se considera caso especial migrar concepto de gasto de una version a otra (conciderar uan variable global apra cambio por version o no)
 */
 
 DECLARE
@@ -46,13 +48,15 @@ DECLARE
     v_registros_ges        	record;
     v_retorno				varchar[];
     v_check 				boolean;
+    v_migrar_cig_version    varchar;  -- #1111
+    v_id_concepto_ingas     integer;
 
 BEGIN
 
 	v_nombre_funcion = 'conta.f_replicar_relacion_contable_cambio_gestion';
     v_cont=0;
     v_cant_total=0;
-    
+    v_migrar_cig_version = pxp.f_get_variable_global('conta_migrar_rc_concepto_version');  --#1111
     
     --  p_id_relacion_contable
     
@@ -182,7 +186,35 @@ BEGIN
 			 
             
                v_check = true;
-              -- validar que la relacion contable no se duplique en el destino
+             
+            
+               v_rec.id_gestion = v_id_gestion_destino;
+               v_rec.id_cuenta = v_id_cuenta;
+               v_rec.id_partida = v_id_partida;
+               v_rec.id_centro_costo = v_id_presupuesto;
+               
+               --# 1111  analizar si es para conceptos de gastos
+               --         si es de conceptos de gastos segun configuracion cambiamos o no los onceptos de gasto v_migrar_cig_version
+               IF  v_registros_rc.tabla  = 'tconcepto_ingas'  and v_migrar_cig_version = 'si' THEN
+                    
+                    v_id_concepto_ingas = NULL;
+                    
+                    select  ci.id_concepto_ingas_dos into v_id_concepto_ingas
+                    from param.tconcepto_ingas_ids ci 
+                    where ci.id_concepto_ingas_uno = v_rec.id_tabla;
+                    
+                    IF v_id_concepto_ingas is null THEN
+                        v_obs = v_obs || '\n- NO se encontro el concepto V2 para: '||coalesce(v_rec.id_tabla::varchar,'S/C');
+                        v_check = FALSE;
+                    ELSE
+                      v_rec.id_tabla = v_id_concepto_ingas; 
+                    END IF;
+                    
+                  
+                 
+               END IF;
+               
+                -- validar que la relacion contable no se duplique en el destino
               if exists (  select 1
                             from conta.trelacion_contable rc
                             where 
@@ -194,15 +226,13 @@ BEGIN
                                   id_gestion = v_id_gestion_destino  and
                                   (id_tabla = v_rec.id_tabla  or (id_tabla is null and v_rec.id_tabla is null)) and
                                   defecto =  v_rec.defecto  and
+                                  (id_tipo_presupuesto =  v_rec.id_tipo_presupuesto or (id_tipo_presupuesto is null and v_rec.id_tipo_presupuesto is null))  and --#1111 add
+                                  (codigo_aplicacion =  v_rec.codigo_aplicacion or (codigo_aplicacion is null and v_rec.codigo_aplicacion is null))  and  --#1111 add
+                                  (id_moneda =  v_rec.id_moneda or (id_moneda is null and v_rec.id_moneda is null))  and  --#1111 add
                                   estado_reg = 'activo' ) then
               
                 v_check = FALSE;
               end if;
-            
-               v_rec.id_gestion = v_id_gestion_destino;
-               v_rec.id_cuenta = v_id_cuenta;
-               v_rec.id_partida = v_id_partida;
-               v_rec.id_centro_costo = v_id_presupuesto;
             
               if v_check then
                  --si la relacion no exite la insertamos

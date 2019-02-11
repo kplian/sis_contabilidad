@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_inserta_relacion_contable (
   p_hstore_transaccion public.hstore,
   p_id_usuario integer
@@ -14,9 +16,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:	 Se agegan nuevos parametros para clonar a la siguiente gestion
+ AUTOR:		     RAC	
+ FECHA:		     26/09/2017
 ***************************************************************************/
 
 DECLARE
@@ -47,7 +49,11 @@ BEGIN
             id_partida,
             id_gestion,
             id_tabla,
-            defecto
+            defecto,
+            id_moneda,
+            id_tipo_presupuesto,
+            codigo_aplicacion
+            
           )
           VALUES (
              p_id_usuario,          
@@ -60,7 +66,10 @@ BEGIN
             (p_hstore_transaccion->'id_partida')::integer,
             (p_hstore_transaccion->'id_gestion')::integer,
             (p_hstore_transaccion->'id_tabla')::integer,
-            (p_hstore_transaccion->'defecto')::varchar
+            (p_hstore_transaccion->'defecto')::varchar,
+            (p_hstore_transaccion->'id_moneda')::integer,
+            (p_hstore_transaccion->'id_tipo_presupuesto')::integer,
+            (p_hstore_transaccion->'codigo_aplicacion')::varchar
           )  RETURNING id_relacion_contable into v_id_relacion_contable;
 			
 		   v_retorno[1] = 'exito';

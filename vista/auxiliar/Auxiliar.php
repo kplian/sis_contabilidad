@@ -5,6 +5,9 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-02-2013 20:44:52
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ *  ISUUE			FECHA			AUTHOR 		DESCRIPCION				
+ * 	1A			30/08/2018			EGS		 se aumento el campo aplicacion
+ * 
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -28,6 +31,7 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
             tooltip: '<b>Permite replicar un auxiliar recien registrado en la BD Ingresos</b>',
             scope:this
         });
+        this.momento = undefined;
 	},
 
 	Atributos:[
@@ -138,6 +142,33 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 	       		grid:true,
 	       		form:true
 	     },
+	     
+	     	     //////EGS-I-30/08/2018--  1A
+	    {
+			config: {
+				name: 'aplicacion',
+				fieldLabel: 'Aplicacion',
+				anchor: '95%',
+				tinit: false,
+				allowBlank: true,
+				origen: 'CATALOGO',
+				gdisplayField: 'aplicacion',
+				hiddenName: 'aplicacion',
+				gwidth: 55,
+				baseParams:{
+					cod_subsistema:'CONTA',
+					catalogo_tipo:'tauxiliar'
+				},
+				valueField: 'codigo',
+				hidden: false
+			},
+			type: 'ComboRec',
+			id_grupo: 0,
+			grid: true,
+			form: true
+		},
+		
+		//////EGS-F-30/08/2018--  1A
 		{
 			config:{
 				name: 'estado_reg',
@@ -234,8 +265,9 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'corriente'
-		
+		{name:'usr_mod', type: 'string'},
+		{name:'aplicacion', type: 'string'},
+		'corriente'
 	],
 	sortInfo:{
 		field: 'id_auxiliar',
@@ -257,10 +289,46 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 			timeout:this.timeout,
 			scope:this
 		});
-	}
+	},
 
-	}
-)
+    onButtonNew : function () {
+        Phx.vista.Auxiliar.superclass.onButtonNew.call(this);
+        this.momento = true;
+    },
+
+    onButtonEdit : function () {
+        Phx.vista.Auxiliar.superclass.onButtonEdit.call(this);
+        this.momento = false;
+    },
+
+    onSubmit: function (o,x, force) {
+
+        if(this.momento) {
+            Ext.Ajax.request({
+                url: '../../sis_contabilidad/control/Auxiliar/validarAuxiliar',
+                params: {
+                    codigo_auxiliar: this.Cmp.codigo_auxiliar.getValue(),
+                    nombre_auxiliar: this.Cmp.nombre_auxiliar.getValue(),
+                    corriente: this.Cmp.corriente.getValue()
+                },
+                success: function (resp) {
+                    var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
+                    if (reg.ROOT.datos.v_valid == 'true')
+                        Ext.Msg.alert('Alerta','Estimado usuario la Cuenta Auxiliar con codigo (<b>'+ this.Cmp.codigo_auxiliar.getValue()+'</b>)-nombre <b>'+ this.Cmp.nombre_auxiliar.getValue()+'</b> que intenta crear, ya se encuentra registrado en el sistema ERP. Por esta razon no es posible crearlo.');
+                    else
+                        Phx.vista.Auxiliar.superclass.onSubmit.call(this, o);
+
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        }else{
+            Phx.vista.Auxiliar.superclass.onSubmit.call(this, o);
+        }
+    }
+
+})
 </script>
 		
 		

@@ -66,19 +66,22 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel:'Tipo de Reporte',
 				typeAhead: true,
 				allowBlank:false,
-	    		triggerAction: 'all',
-	    		emptyText:'Tipo...',
-	    		selectOnFocus:true,
+				triggerAction: 'all',
+				emptyText:'Tipo...',
+				selectOnFocus:true,
 				mode:'local',
 				store:new Ext.data.ArrayStore({
-	        	fields: ['ID', 'valor'],
-	        	data :	[
-						['endesis_erp','Libro de Compras Estandar'],
-	        	        ['lcv_compras','Libro de Compras Estandar (nueva versión)'],
-	        	        ['lcv_ventas','Libro de Ventas Estandar'],	
-						['LCNCD','Libro de Compras NCD']					
-						]	        				
-	    		}),
+				fields: ['ID', 'valor'],
+				data :	
+				[
+					//['endesis_erp','Libro de Compras Estandar'],
+					['lcv_compras','Libro de Compras Estandar (nueva versión)'],
+					['lcv_ventas','Libro de Ventas Estandar'],		
+					['lbcd','LIBRO DE COMPRAS PARA NOTAS DE CREDITO/DEBITO '],
+					['lbcc','LIBRO DE VENTAS PARA NOTAS DE CREDITO / DEBITO '],	
+					//['LCNCD','Libro de Compras NCD']					
+				]					
+				}),
 				valueField:'ID',
 				displayField:'valor',
 				width:250,			
@@ -301,11 +304,105 @@ header("content-type: text/javascript; charset=UTF-8");
 			type:'ComboBox',
 			id_grupo:1,
 			form:true
-		}],
+		},
+		/*{
+			config:{
+				name:'datos',
+				fieldLabel:'Datos',
+				typeAhead: true,
+				allowBlank:false,
+	    		triggerAction: 'all',
+	    		emptyText:'seleccionar...',
+	    		selectOnFocus:true,
+				mode:'local',
+				store:new Ext.data.ArrayStore({
+	        	fields: ['ID', 'valor'],
+	        	data :	[['contabilizado','Contabilizado'],
+                        ['no_contabilizado','No contabilizado']]
+	    		}),
+				valueField:'ID',
+				displayField:'valor',
+				width:250,			
+				
+			},
+			type:'ComboBox',
+			id_grupo:1,
+			form:true
+		},*/
+        {
+            config: {
+                name: 'nro_comprobante',
+                fieldLabel: 'Numero de comprobante',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 150,
+                maxLength: 150
+            },
+            type: 'TextField',
+            filters: {pfiltro: 'nro_comprobante', type: 'string'},
+            id_grupo: 1,
+            grid: true,
+            form: true
+        },
+        {
+            config: {
+                name: 'nro_nit',
+                fieldLabel: 'Numero de Nit',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 150,
+                maxLength: 150
+            },
+            type: 'TextField',
+            filters: {pfiltro: 'nro_nit', type: 'string'},
+            id_grupo: 1,
+            grid: true,
+            form: true
+        },
+        {
+            config: {
+                name: 'nro_autorizacion',
+                fieldLabel: 'Numero de autorización',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 150,
+                maxLength: 150
+            },
+            type: 'TextField',
+            filters: {pfiltro: 'nro_autorizacion', type: 'string'},
+            id_grupo: 1,
+            grid: true,
+            form: true
+        },
+	    {
+	        config: {
+	            labelSeparator: '',
+	            inputType: 'hidden',
+	            name: 'datos'
+	        },
+	        type: 'Field',
+	        form: true
+	    },
+        /*{
+            config:{
+                name:'id_moneda',
+                origen:'MONEDA',
+                allowBlank:false,
+                baseParams: {id_moneda_defecto: 0},
+                fieldLabel:'Moneda',
+                gdisplayField:'desc_moneda',
+                gwidth:100,
+                width:180
+            },
+            type:'ComboRec',
+            id_grupo:0,
+            form:true
+        },*/
+		],
 		
 		
-		title : 'Reporte Libro Compras Ventas IVA',		
-		ActSave : '../../sis_contabilidad/control/TsLibroBancos/reporteLibroBancos',
+		//title : 'Reporte Libro Compras Ventas IVA',		
+		//ActSave : '../../sis_contabilidad/control/TsLibroBancos/reporteLibroBancos',
 		
 		topBar : true,
 		botones : false,
@@ -322,6 +419,9 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.ocultarComponente(this.Cmp.id_periodo);
 						
 			this.iniciarEventos();
+			
+			//this.Cmp.datos.setValue('No contabilizado');
+			this.Cmp.datos.setValue('contabilizado');
 		},
 		
 		iniciarEventos:function(){        
@@ -376,13 +476,13 @@ header("content-type: text/javascript; charset=UTF-8");
 	ActSave:'../../sis_contabilidad/control/DocCompraVentaForm/reporteLCV',
 	
     successSave :function(resp){
+   
        Phx.CP.loadingHide();
        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-        if (reg.ROOT.error) {
+       if (reg.ROOT.error) {
             alert('error al procesar');
             return
        } 
-       
        var nomRep = reg.ROOT.detalle.archivo_generado;
         if(Phx.CP.config_ini.x==1){  			
         	nomRep = Phx.CP.CRIPT.Encriptar(nomRep);
@@ -394,7 +494,6 @@ header("content-type: text/javascript; charset=UTF-8");
         else{
         	window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
         }
-       
 	}
 })
 </script>

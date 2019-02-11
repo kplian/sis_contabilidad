@@ -18,9 +18,10 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:
- AUTOR:
- FECHA:
+ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:  
+#1			20/08/2018						EGS					En la transaccion CONTA_DCVCBR_SEL se modifico consulta para cobros y saldos separados entre cobro comun y retencion de garantias  
+#2			13/08/2018						EGS					en la transaccion CONTA_DCVCBR_SEL se modifico consulta para cobros y saldos separados de anticipos  
+
 ***************************************************************************/
 
 DECLARE
@@ -38,7 +39,19 @@ DECLARE
     v_tipo   			varchar;
     v_sincronizar		varchar;
     v_gestion			integer;
+    v_filtro_ext		varchar;    
+    V_filtroLCV         varchar;
+    v_id_auxiliar  		integer;
+    v_id_auxiliar_2  	integer;
+    v_consulta1         varchar;
 
+    
+   v_bandera						varchar;
+   v_bandera_rg 					varchar;
+   v_bandera_ant					varchar;
+   v_bandera_regularizacion			varchar;
+   v_bandera_regularizacion_rg			varchar;
+    v_bandera_regularizacion_ant		varchar;
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_doc_compra_venta_sel';
@@ -54,6 +67,20 @@ BEGIN
 	if(p_transaccion='CONTA_DCV_SEL')then
 
     	begin
+            
+            v_filtro_ext = ' 0 = 0 and ';
+            
+            IF  pxp.f_existe_parametro(p_tabla, 'nombre_vista') THEN
+                IF v_parametros.nombre_vista = 'DocCompraPS' THEN
+                   v_filtro_ext = '  dcv.sw_pgs = ''reg''   and   ';
+                   
+                   IF  p_administrador != 1 THEN
+                      v_filtro_ext = v_filtro_ext || ' dcv.id_usuario_reg = '||p_id_usuario|| ' and ';
+                   END IF;
+                   
+                END IF;
+            END IF;
+        
     		--Sentencia de la consulta
 			v_consulta:='select
                             dcv.id_doc_compra_venta,
@@ -96,7 +123,7 @@ BEGIN
                             dcv.id_moneda,
                             mon.codigo as desc_moneda,
                             dcv.id_int_comprobante,
-                            ic.nro_tramite,
+                            COALESCE(dcv.nro_tramite,''''),
                             COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
                             COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
                             COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
@@ -107,8 +134,15 @@ BEGIN
                             aux.nombre_auxiliar,
                             dcv.id_tipo_doc_compra_venta,
                             (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta,
-                            (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto
-                            
+                            (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto,
+                            fun.id_funcionario,
+                            fun.desc_funcionario2::varchar,
+                            ic.fecha as fecha_cbte,
+                            ic.estado_reg as estado_cbte,
+                            COALESCE(dcv.codigo_aplicacion,'''') as  codigo_aplicacion,
+                            pla.tipo_informe,
+                            dcv.id_doc_compra_venta_fk
+                             
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
@@ -118,12 +152,12 @@ BEGIN
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
-				        where  ';
-
+                          left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+				        where  '||v_filtro_ext;
+            
 			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||v_parametros.filtro;            
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -138,6 +172,19 @@ BEGIN
 	elsif(p_transaccion='CONTA_DCV_CONT')then
 
 		begin
+        
+            v_filtro_ext = ' 0 = 0 and ';
+            
+            IF  pxp.f_existe_parametro(p_tabla,'nombre_vista') THEN
+              IF v_parametros.nombre_vista = 'DocCompraPS' THEN
+                 v_filtro_ext = '  dcv.sw_pgs = ''reg''   and   ';                 
+                 IF  p_administrador != 1 THEN
+                    v_filtro_ext = v_filtro_ext || ' dcv.id_usuario_reg = '||p_id_usuario|| ' and ';
+                 END IF;                 
+              END IF;
+            END IF;
+            
+            
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select
                               count(dcv.id_doc_compra_venta),
@@ -154,8 +201,7 @@ BEGIN
                               COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
                               COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
                               COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
-
-					   from conta.tdoc_compra_venta dcv
+						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
                           inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
@@ -164,7 +210,8 @@ BEGIN
                           left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
                           left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                           left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
-				        where  ';
+                          left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+				        where  '||v_filtro_ext;
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -227,7 +274,7 @@ BEGIN
                             dcv.id_moneda,
                             mon.codigo as desc_moneda,
                             dcv.id_int_comprobante,
-                            ic.nro_tramite,
+                            dcv.nro_tramite,
                             COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
                             COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
                             COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
@@ -325,7 +372,7 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-                          DISTINCT(dcv.nro_autorizacion)::numeric,
+                          DISTINCT(dcv.nro_autorizacion)::varchar,
                           dcv.nit,
                           dcv.razon_social
                           from conta.tdoc_compra_venta dcv
@@ -377,7 +424,8 @@ BEGIN
                            DISTINCT(dcv.nit)::bigint,
                            dcv.razon_social
                           from conta.tdoc_compra_venta dcv
-                        where dcv.nit != '''' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                        where dcv.nit != '''' and pla.tipo_informe = ''lcv'' and dcv.nit like '''||COALESCE(v_parametros.nit,'-')||'%''';
 
 
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -476,7 +524,9 @@ BEGIN
                               subtotal_venta,
                               sujeto_df,
                               importe_ice,
-                              importe_excento
+                              importe_excento,
+                              lcv.nro_cbte,
+                              lcv.tipo_cambio
                         FROM
                           conta.vlcv lcv
                         where      lcv.tipo = '''||v_parametros.tipo||'''
@@ -485,6 +535,7 @@ BEGIN
                         order by fecha, id_doc_compra_venta';
 
 			raise notice '%', v_consulta;
+            
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -494,14 +545,13 @@ BEGIN
     /*********************************
  	#TRANSACCION:  'CONTA_REPLCV_FRM'
  	#DESCRIPCION:	listado para reporte de libro de compras y ventas  desde formualrio, incialmente usar datos de endesis
- 	#AUTOR:		admin
+ 	#AUTOR:		Juan
  	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
 	ELSEIF(p_transaccion='CONTA_REPLCV_FRM')then
 
     	begin
-
 
            v_sincronizar = pxp.f_get_variable_global('sincronizar');
 
@@ -516,21 +566,37 @@ BEGIN
            END IF;
 
            IF v_parametros.filtro_sql = 'periodo'  THEN
-               v_filtro =  ' (lcv.id_periodo = '||v_parametros.id_periodo||')  ';
+               v_filtro =  ' (lcv.id_periodo = '||v_parametros.id_periodo||')  ';            
            ELSE
                v_filtro =  ' (lcv.fecha::Date between '''||v_parametros.fecha_ini||'''::Date  and '''||v_parametros.fecha_fin||'''::date)  ';
            END IF;
 
-
+          --------------------filtro comprobante , nro nit y nro autorizacion para compras y ventas 
+          V_filtroLCV :='';
+          if v_parametros.nro_comprobante !='' then
+              V_filtroLCV :=  ' and  (lcv.nro_cbte like ''%'||v_parametros.nro_comprobante||'%'' or lcv.id_int_comprobante::varchar = '' '||v_parametros.nro_comprobante||' '' '||')'; 
+          end if;
+          if v_parametros.nro_nit !='' then
+              V_filtroLCV := ' and  lcv.nit like ''%'||v_parametros.nro_nit||'%'' '; 
+          end if;
+          if v_parametros.nro_autorizacion !='' then
+              V_filtroLCV := ' and  lcv.nro_autorizacion like ''%'||v_parametros.nro_autorizacion||'%'' '; 
+          end if;
+          ----------------------fin filtro ---------------------------------
           IF v_parametros.tipo_lcv = 'lcv_compras'  THEN
               v_tipo = 'compra';
+              V_filtroLCV := V_filtroLCV ||'and lcv.nro_cbte is not null  order by fecha asc';         
           ELSE
               v_tipo = 'venta';
+              V_filtroLCV := V_filtroLCV ||'and (lcv.nro_cbte is not null or lcv.nombre=''ANULADA'')  order by nro_documento,fecha asc';   
+               
           END IF;
+
+          v_filtro :=v_filtro||' and lcv.tipo_informe=''lcv'' ';
 
           --Sentencia de la consulta
 		  v_consulta:='SELECT id_doc_compra_venta::BIGINT,
-                               tipo::Varchar,
+                               lcv.tipo::Varchar,
                                fecha::date,
                                nit::varchar,
                                razon_social::Varchar,
@@ -557,15 +623,23 @@ BEGIN
                                subtotal_venta::numeric,
                                sujeto_df::numeric,
                                importe_ice::numeric,
-                               importe_excento::numeric
+                               importe_excento::numeric,
+                               lcv.nro_cbte,
+                               lcv.tipo_cambio, 
+                               lcv.id_int_comprobante,
+                               (SELECT usu1.cuenta FROM segu.tusuario usu1 WHERE usu1.id_usuario=LCV.id_usuario_comprobante) cuenta
                         FROM '||v_tabla_origen||' lcv
+                        join segu.tusuario usu on usu.id_usuario=lcv.id_usuario_reg
                         where  lcv.tipo = '''||v_tipo||'''
-                               and id_moneda = '||param.f_get_moneda_base()||'
-                               and '||v_filtro||'
-                        order by fecha, id_doc_compra_venta';
-
+                               
+                               and '||v_filtro||V_filtroLCV;
+                        
+                       
 			raise notice '%', v_consulta;
+            --RAISE EXCEPTION 'iii %',v_consulta;
 			--Devuelve la respuesta
+            --RAISE EXCEPTION 'Error j %',v_filtro||V_filtroLCV;
+            --RAISE EXCEPTION 'Error j %',v_consulta;
 			return v_consulta;
 
 		end;
@@ -667,12 +741,537 @@ BEGIN
                                and '||v_filtro||'
                         order by fecha, id_doc_compra_venta';
 
+			raise notice 'edison = %', v_consulta;
+           
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;        
+    
+     /*********************************
+ 	#TRANSACCION:  'COMP_DIARIO_MAYOR'
+ 	#DESCRIPCION:	Comparacion de 
+ 	#AUTOR:		admin
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	ELSEIF(p_transaccion='COMP_DIARIO_MAYOR')then
+
+    	begin
+        
+        v_consulta1 ='';
+        v_consulta1 = 'create temp table vlibro_compras_temporal(
+                       -- id_libro_compra_temporal serial,
+                        nro_cbte varchar,
+                        credito_fiscal NUMERIC,
+                        id_int_comprobante integer
+                        ) on commit drop';           
+        execute(v_consulta1); 
+            
+        v_consulta1 ='';
+        v_consulta1 = 'create temp table vlibro_mayor_iva_credito_fiscal(
+                        --id_libro_mayor_iva_credito_temporal serial,
+                        nro_cbte varchar,
+                        importe_debe_mb NUMERIC,
+                        id_int_comprobante integer
+                        ) on commit drop';           
+        execute(v_consulta1); 
+        
+        v_consulta1 ='';
+        v_consulta1 ='INSERT INTO vlibro_compras_temporal 
+                      (SELECT 
+                      COALESCE(lcv.nro_cbte,'''')::VARCHAR as nro_cbte,
+                      COALESCE(lcv.credito_fiscal,0)::NUMERIC as credito_fiscal,
+                      lcv.id_int_comprobante::integer
+                      FROM conta.vlibro_compras lcv where  lcv.id_periodo ='||v_parametros.id_periodo||' AND lcv.nro_cbte is not null)';
+        execute(v_consulta1);
+                
+        v_consulta1 ='';
+        v_consulta1 ='INSERT INTO vlibro_mayor_iva_credito_fiscal 
+                       (SELECT 
+                        transa.nro_cbte::VARCHAR as nro_cbte_mayor,
+                        COALESCE(transa.importe_debe_mb,0)::NUMERIC as importe_debe_mb,
+                        transa.id_int_comprobante 
+                        FROM  conta.vlibro_mayor_iva_credito_fiscal transa  
+                        WHERE  transa.id_cuenta in (1864)  
+                        AND transa.id_periodo = '||v_parametros.id_periodo||'
+                        AND transa.glosa1::text NOT LIKE
+                       ''%ACTUALIZACIÓN DEL SALDO%''::text)';  
+        execute(v_consulta1);                    
+        
+        v_consulta = 'select
+                        transa.nro_cbte::VARCHAR as nro_cbte_mayor,
+                        COALESCE(transa.importe_debe_mb,0)::NUMERIC as importe_debe_mb_mayor,
+                        (round(COALESCE(lcv.credito_fiscal,0),2)-round(COALESCE(transa.importe_debe_mb,0),2))::NUMERIC  as diferencia,
+                        COALESCE(lcv.nro_cbte,'''')::VARCHAR as nro_cbte_compras,
+                        COALESCE(lcv.credito_fiscal,0)::NUMERIC as tota_credito_fiscal_compras,
+                        transa.id_int_comprobante
+                        FROM vlibro_compras_temporal lcv 
+                        FULL JOIN 
+                        vlibro_mayor_iva_credito_fiscal transa on transa.id_int_comprobante = lcv.id_int_comprobante';
+        
+			return v_consulta;
+
+		end;  
+        
+      /*********************************
+ 	#TRANSACCION:  'CONTA_DCVCBR_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		Rensi Arteaga Copari
+ 	#FECHA:		04-04-2018 15:57:09
+	***********************************/
+
+	elseif(p_transaccion='CONTA_DCVCBR_SEL')then
+
+    	begin
+            
+            v_filtro_ext = ' 0 = 0 and ';
+            
+            --recuperar el auxiliardel proveedor
+            
+            
+            IF v_parametros.id_proveedor is null  THEN
+               raise exception 'necesitamos indicar el Proveedor ';
+            END IF;
+            
+            
+            select 
+               pr.id_auxiliar as id_auxiliar,
+               aux.id_auxiliar as id_auxiliar_2
+            into
+               v_id_auxiliar,
+               v_id_auxiliar_2             
+            from param.tproveedor pr 
+            inner join conta.tauxiliar aux on aux.codigo_auxiliar = pr.codigo
+            where pr.id_proveedor = v_parametros.id_proveedor;
+            
+            
+            IF v_id_auxiliar is null THEN
+               raise exception 'No se encontro auxiliar para el proveedor especificado';
+            END IF; 
+            
+            
+            IF v_id_auxiliar != v_id_auxiliar_2 THEN
+               raise exception 'Conflicto de auxliares para el proveedor, revise la  parametrización';
+            END IF;
+            
+            
+            v_filtro_ext = '  dcv.id_auxiliar = '||v_id_auxiliar::varchar||' and ';
+            
+            
+            v_bandera = split_part(pxp.f_get_variable_global('v_cobro_comun'), ',', 1);
+             v_bandera_rg = split_part(pxp.f_get_variable_global('v_cobro_retencion_garantia'), ',', 1);
+			 v_bandera_regularizacion = split_part(pxp.f_get_variable_global('v_cobro_comun'), ',', 2);
+             v_bandera_regularizacion_rg = split_part(pxp.f_get_variable_global('v_cobro_retencion_garantia'), ',', 2);
+             v_bandera_ant = split_part(pxp.f_get_variable_global('v_cobro_anticipo'), ',', 1);
+             v_bandera_regularizacion_ant = split_part(pxp.f_get_variable_global('v_cobro_anticipo'), ',', 2);
+             --raise exception 'bandera %',  v_bandera;
+
+            --solo listasmos docuemntos relacioandos al auxiliar del proveedor
+        
+    		--Sentencia de la consulta
+           
+			v_consulta:='
+ WITH  doc_cobrado(
+                                    id_doc_compra_venta,                                  
+                                    importe_mb,
+                                    importe_mt
+                                            ) 
+                            
+                           as (
+                                    select 
+                                       dcv.id_doc_compra_venta,                                      
+                                       sum(COALESCE(csd.importe_mb,0)) as importe_mb,
+                                       sum(COALESCE(csd.importe_mt,0)) as importe_mt
+                                                                              
+                                    from conta.tdoc_compra_venta dcv 
+                                    inner join cbr.tcobro_simple_det csd on csd.id_doc_compra_venta = dcv.id_doc_compra_venta
+                                   inner join cbr.tcobro_simple cs on cs.id_cobro_simple = csd.id_cobro_simple
+                                    inner join cbr.ttipo_cobro_simple tcs on tcs.id_tipo_cobro_simple = cs.id_tipo_cobro_simple
+                                    WHERE tcs.codigo in ('''||v_bandera||''','''|| v_bandera_regularizacion||''')
+                                    group by dcv.id_doc_compra_venta
+                           ),
+ doc_cobrado_retgar(
+                                    id_doc_compra_venta,                                  
+                                    importe_mb,
+                                    importe_mt
+                                            ) 
+                            
+                           as (
+                                    select 
+                                       dcv.id_doc_compra_venta,                                      
+                                       sum(csd.importe_mb) as importe_mb,
+                                       sum(csd.importe_mt) as importe_mt
+                                                                              
+                                    from conta.tdoc_compra_venta dcv 
+                                    inner join cbr.tcobro_simple_det csd on csd.id_doc_compra_venta = dcv.id_doc_compra_venta
+                                    left join cbr.tcobro_simple cs on cs.id_cobro_simple = csd.id_cobro_simple
+                                    left join cbr.ttipo_cobro_simple tcs on tcs.id_tipo_cobro_simple = cs.id_tipo_cobro_simple
+                                    WHERE tcs.codigo in ('''||v_bandera_rg||''','''||v_bandera_regularizacion_rg||''')
+                                    group by dcv.id_doc_compra_venta
+                           )
+                           ,
+ doc_cobrado_anticipo(
+                                    id_doc_compra_venta,                                  
+                                    importe_mb,
+                                    importe_mt
+                                            ) 
+                            
+                           as (
+                                    select 
+                                       dcv.id_doc_compra_venta,                                      
+                                       sum(csd.importe_mb) as importe_mb,
+                                       sum(csd.importe_mt) as importe_mt
+                                                                              
+                                    from conta.tdoc_compra_venta dcv 
+                                    inner join cbr.tcobro_simple_det csd on csd.id_doc_compra_venta = dcv.id_doc_compra_venta
+                                    left join cbr.tcobro_simple cs on cs.id_cobro_simple = csd.id_cobro_simple
+                                    left join cbr.ttipo_cobro_simple tcs on tcs.id_tipo_cobro_simple = cs.id_tipo_cobro_simple
+                                    WHERE tcs.codigo in ('''||v_bandera_ant||''','''||v_bandera_regularizacion_ant||''')
+                                    group by dcv.id_doc_compra_venta
+                           )
+            
+            select
+                            dcv.id_doc_compra_venta,
+                            dcv.revisado,
+                            dcv.movil,
+                            dcv.tipo,
+                            COALESCE(dcv.importe_excento,0)::numeric as importe_excento,
+                            dcv.id_plantilla,
+                            dcv.fecha,
+                            dcv.nro_documento,
+                            dcv.nit,
+                            COALESCE(dcv.importe_ice,0)::numeric as importe_ice,
+                            dcv.nro_autorizacion,
+                            COALESCE(dcv.importe_iva,0)::numeric as importe_iva,
+                            COALESCE(dcv.importe_descuento,0)::numeric as importe_descuento,
+                            COALESCE(dcv.importe_doc,0)::numeric as importe_doc,
+                            dcv.sw_contabilizar,
+                            COALESCE(dcv.tabla_origen,''ninguno'') as tabla_origen,
+                            dcv.estado,
+                            dcv.id_depto_conta,
+                            dcv.id_origen,
+                            dcv.obs,
+                            dcv.estado_reg,
+                            dcv.codigo_control,
+                            COALESCE(dcv.importe_it,0)::numeric as importe_it,
+                            dcv.razon_social,
+                            dcv.id_usuario_ai,
+                            dcv.id_usuario_reg,
+                            dcv.fecha_reg,
+                            dcv.usuario_ai,
+                            dcv.id_usuario_mod,
+                            dcv.fecha_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            dep.nombre as desc_depto,
+                            pla.desc_plantilla,
+                            COALESCE(dcv.importe_descuento_ley,0)::numeric as importe_descuento_ley,
+                            COALESCE(dcv.importe_pago_liquido,0)::numeric as importe_pago_liquido,
+                            dcv.nro_dui,
+                            dcv.id_moneda,
+                            mon.codigo as desc_moneda,
+                            dcv.id_int_comprobante,
+                            COALESCE(dcv.nro_tramite,''''),
+                            COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
+                            COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
+                            COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
+                            COALESCE(dcv.importe_retgar,0)::numeric as importe_retgar,
+                            COALESCE(dcv.importe_neto,0)::numeric as importe_neto,
+                            aux.id_auxiliar,
+                            aux.codigo_auxiliar,
+                            aux.nombre_auxiliar,
+                            dcv.id_tipo_doc_compra_venta,
+                            (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta,
+                            (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto,
+                            fun.id_funcionario,
+                            fun.desc_funcionario2::varchar,
+                            ic.fecha as fecha_cbte,
+                            ic.estado_reg as estado_cbte,
+                            COALESCE(doc.importe_mb,0) as importe_cobrado_mb,
+                            COALESCE(doc.importe_mt,0) as importe_cobrado_mt,
+                            COALESCE(docrg.importe_mb,0) as importe_cobrado_retgar_mb,
+                            COALESCE(docrg.importe_mt,0) as importe_cobrado_retgar_mt,
+ 							COALESCE(docanti.importe_mb,0) as importe_cobrado_ant_mb,
+                            COALESCE(docanti.importe_mt,0) as importe_cobrado_ant_mt,
+                            case
+                              when dcv.id_moneda  = 1  then
+                                 dcv.importe_pendiente - COALESCE(doc.importe_mb,0)
+                              when  dcv.id_moneda  = 2 then
+                                 dcv.importe_pendiente  - COALESCE(doc.importe_mt,0)
+                              else  
+                                 0 
+                            end as saldo_por_cobrar_pendiente, 
+                            case
+                              when dcv.id_moneda  = 1  then
+                                dcv.importe_retgar - COALESCE(docrg.importe_mb,0)
+                              when  dcv.id_moneda  = 2 then
+                                  dcv.importe_retgar  - COALESCE(docrg.importe_mt,0)
+                              else  
+                                 0 
+                            end as saldo_por_cobrar_retgar, 
+                            case
+                              when dcv.id_moneda  = 1  then
+                                dcv.importe_anticipo - COALESCE(docanti.importe_mb,0)
+                              when  dcv.id_moneda  = 2 then
+                                  dcv.importe_anticipo  - COALESCE(docanti.importe_mt,0)
+                              else  
+                                 0 
+                            end as saldo_por_cobrar_anticipo
+                            
+						from conta.tdoc_compra_venta dcv
+                          inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                          inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                          left join doc_cobrado doc on doc.id_doc_compra_venta = dcv.id_doc_compra_venta
+                          left join doc_cobrado_retgar docrg on docrg.id_doc_compra_venta = dcv.id_doc_compra_venta
+                          left join doc_cobrado_anticipo docanti on docanti.id_doc_compra_venta = dcv.id_doc_compra_venta
+                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
+                          left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                          left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
+                          left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+				        where  pla.tipo_plantilla = ''venta'' and '||v_filtro_ext;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
 			raise notice '%', v_consulta;
+            
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
+     /*********************************
+ 	#TRANSACCION:  'CONTA_DCVCBR_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		rensi
+ 	#FECHA:		04-04-2018 15:57:09
+	***********************************/
 
+	elsif(p_transaccion='CONTA_DCVCBR_CONT')then
+
+		begin
+        
+            
+            v_filtro_ext = ' 0 = 0 and ';
+            
+            --recuperar el auxiliardel proveedor
+            
+            
+            IF v_parametros.id_proveedor is null  THEN
+               raise exception 'necesitamos indicar el Proveedor ';
+            END IF;
+            
+            
+            select 
+               pr.id_auxiliar as id_auxiliar,
+               aux.id_auxiliar as id_auxiliar_2
+            into
+               v_id_auxiliar,
+               v_id_auxiliar_2             
+            from param.tproveedor pr 
+            inner join conta.tauxiliar aux on aux.codigo_auxiliar = pr.codigo
+            where pr.id_proveedor = v_parametros.id_proveedor;
+            
+            
+            IF v_id_auxiliar is null THEN
+               raise exception 'No se encontro auxiliar para el proveedor especificado';
+            END IF; 
+            
+            
+            IF v_id_auxiliar != v_id_auxiliar_2 THEN
+               raise exception 'Conflicto de auxliares para el proveedor, revise la  parametrización';
+            END IF;
+            
+            
+            v_filtro_ext = '  dcv.id_auxiliar = '||v_id_auxiliar::varchar||' and ';
+            
+            
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select
+                              count(dcv.id_doc_compra_venta),
+                              COALESCE(sum(dcv.importe_ice),0)::numeric  as total_importe_ice,
+                              COALESCE(sum(dcv.importe_excento),0)::numeric  as total_importe_excento,
+                              COALESCE(sum(dcv.importe_it),0)::numeric  as total_importe_it,
+                              COALESCE(sum(dcv.importe_iva),0)::numeric  as total_importe_iva,
+                              COALESCE(sum(dcv.importe_descuento),0)::numeric  as total_importe_descuento,
+                              COALESCE(sum(dcv.importe_doc),0)::numeric  as total_importe_doc,
+                              COALESCE(sum(dcv.importe_retgar),0)::numeric  as total_importe_retgar,
+                              COALESCE(sum(dcv.importe_anticipo),0)::numeric  as total_importe_anticipo,
+                              COALESCE(sum(dcv.importe_pendiente),0)::numeric  as tota_importe_pendiente,
+                              COALESCE(sum(dcv.importe_neto),0)::numeric  as total_importe_neto,
+                              COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
+                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
+                              COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
+						from conta.tdoc_compra_venta dcv
+                          inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                          inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                          left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
+                          left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                          left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
+                          left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+				        where   pla.tipo_plantilla = ''venta''  and '||v_filtro_ext;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+            --raise notice '%', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end; 
+     /*********************************
+ 	#TRANSACCION:  'CONTA_CFD_SEL'
+ 	#DESCRIPCION:	Contrato Factura
+ 	#AUTOR:		MMV
+ 	#FECHA:		21-09-2018
+	***********************************/
+     
+     elsif(p_transaccion='CONTA_CFD_SEL')then
+
+            begin
+            v_consulta:='select   dcv.id_contrato,
+                                  dcv.id_doc_compra_venta,
+                                  dcv.id_moneda,
+                                  dcv.fecha,
+                                  dcv.nro_documento,
+                                  dcv.nit,
+                                  dcv.nro_autorizacion,
+                                  dcv.razon_social,
+                                  pla.desc_plantilla,
+                                  dcv.nro_dui,
+                                  mon.codigo as desc_moneda,
+                                  au.codigo_auxiliar,
+                                  COALESCE(dcv.nro_tramite,'''')as nro_tramite,
+                                  COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
+                                  COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
+                                  COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
+                                  COALESCE(dcv.importe_retgar,0)::numeric as importe_retgar,
+                                  COALESCE(dcv.importe_neto,0)::numeric as importe_neto,
+                                  (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)) as importe_aux_neto,
+                                  COALESCE(dcv.importe_iva,0)::numeric as importe_iva,
+                                  COALESCE(dcv.importe_descuento,0)::numeric as importe_descuento,
+                                  COALESCE(dcv.importe_doc,0)::numeric as importe_doc,
+                                  COALESCE(dcv.importe_it,0)::numeric as importe_it,
+                                  COALESCE(dcv.importe_descuento_ley,0)::numeric as importe_descuento_ley,
+                                  COALESCE(dcv.importe_pago_liquido,0)::numeric as importe_pago_liquido
+                                  from conta.tdoc_compra_venta dcv
+                                  inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                                  inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                                  inner join conta.tauxiliar au on au.id_auxiliar = dcv.id_auxiliar
+                                  left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
+                                  where ';
+            
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			
+            raise notice '%',v_consulta;
+			
+			--Devuelve la respuesta
+			return v_consulta;
+
+                 
+     end;
+       /*********************************
+ 	#TRANSACCION:  'CONTA_CFD_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		MMV
+ 	#FECHA:		21-09-2018
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CFD_CONT')then
+
+		begin
+        
+			v_consulta:='select
+                              count(dcv.id_doc_compra_venta),
+                              COALESCE(sum(dcv.importe_ice),0)::numeric  as total_importe_ice,
+                              COALESCE(sum(dcv.importe_excento),0)::numeric  as total_importe_excento,
+                              COALESCE(sum(dcv.importe_it),0)::numeric  as total_importe_it,
+                              COALESCE(sum(dcv.importe_iva),0)::numeric  as total_importe_iva,
+                              COALESCE(sum(dcv.importe_descuento),0)::numeric  as total_importe_descuento,
+                              COALESCE(sum(dcv.importe_doc),0)::numeric  as total_importe_doc,
+                              COALESCE(sum(dcv.importe_retgar),0)::numeric  as total_importe_retgar,
+                              COALESCE(sum(dcv.importe_anticipo),0)::numeric  as total_importe_anticipo,
+                              COALESCE(sum(dcv.importe_pendiente),0)::numeric  as tota_importe_pendiente,
+                              COALESCE(sum(dcv.importe_neto),0)::numeric  as total_importe_neto,
+                              COALESCE(sum(dcv.importe_descuento_ley),0)::numeric  as total_importe_descuento_ley,
+                              COALESCE(sum(dcv.importe_pago_liquido),0)::numeric  as total_importe_pago_liquido,
+                              COALESCE(sum(dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0)),0) as total_importe_aux_neto
+						from conta.tdoc_compra_venta dcv
+                          inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                          inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                          inner join conta.tauxiliar au on au.id_auxiliar = dcv.id_auxiliar
+                          left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante                         
+                          left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                          left join segu.tusuario usu2 on usu2.id_usuario = dcv.id_usuario_mod
+                          where ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+            raise notice '%', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;  
+      /*********************************    
+    #TRANSACCION:  'CONTA_CFA_SEL'
+    #DESCRIPCION:	Comoobox para filtar factura por codigo de proveedor
+    #AUTOR:		MMV
+    #FECHA:		19-09-2018 13:16:55
+    ***********************************/
+    elsif(p_transaccion='CONTA_CFA_SEL')then
+    
+    begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select  dc.id_doc_compra_venta, 
+            					 au.codigo_auxiliar,
+                        		 dc.nit,
+                        		 dc.razon_social,
+                                 dc.nro_autorizacion
+                                 from conta.tdoc_compra_venta dc
+                                 inner join conta.tauxiliar au on au.id_auxiliar = dc.id_auxiliar
+                                 where dc.tipo = ''venta'' and dc.id_contrato is null and';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end; 
+        
+       /*********************************
+ 	#TRANSACCION:  'CONTA_CFA_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		MMV
+ 	#FECHA:		21-09-2018
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CFA_CONT')then
+
+		begin
+        
+			v_consulta:='select  count(dc.id_doc_compra_venta)
+                                 from conta.tdoc_compra_venta dc
+                                 inner join conta.tauxiliar au on au.id_auxiliar = dc.id_auxiliar
+                                 where dc.tipo = ''venta'' and ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+           
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;  
 
     else
 

@@ -13,14 +13,14 @@ CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
 RETURNS integer AS
 $body$
 /*
-Autor inicial GAYRRINCHA ARTEAGA COPARI (No sabe porner comentarios)
-Fecha 28/06/2013
-Descripcion: nose por que el gayrrincha no puso comentarios
+Autor inicial GAIME RIVERA ROJAS (No sabe porner comentarios)
+Fecha 28/02/2013
+Descripcion: nose por que el guy no puso comentarios
 
 
 Autor:  Rensi Arteaga Copari
 Fecha 21/08/2013
-Descripcion:   Esta funciona inicia la generacion de comprobantes contables,  
+Descripcion:   Esta funcion inicia la generacion de comprobantes contables,  
                apartir de una plantilla predefinida
 
 
@@ -89,6 +89,8 @@ DECLARE
     v_clcbt_desc  				varchar;
     v_gestion_fecha				integer;
     v_gestion_aux				integer;
+    v_id_tipo_relacion_comprobante	integer;
+    v_forma_cambio                  varchar;
   
 BEGIN
 
@@ -124,7 +126,12 @@ BEGIN
                         'campo_tipo_cambio',
                         'campo_depto_libro',
                         'campo_fecha_costo_ini',
-                        'campo_fecha_costo_fin'];
+                        'campo_fecha_costo_fin',
+                        'campo_cbte_relacionado',
+                        'clase_comprobante',     --19/12/2017  adciona clase de comprobante
+                        'campo_tipo_cambio_2',   
+                        'campo_tipo_cambio_3',
+                        'campo_id_config_cambiaria'];  
     
     v_tamano:=array_upper(v_def_campos,1);
     
@@ -158,7 +165,7 @@ BEGIN
             ||v_plantilla.tabla_origen||'.'||v_plantilla.id_tabla||'='||p_id_tabla_valor||'' into v_tabla;
             
             
-          
+      
    
     ----------------------------------------------------------
     --  OBTIENE LOS VALORES,  THIS   (tipo de dato agrupador)     
@@ -244,7 +251,10 @@ BEGIN
         										v_plantilla.campo_fecha_costo_fin::text, 
                                                 hstore(v_this), 
                                                 hstore(v_tabla));   
-	end if; 
+	end if;
+    
+ 
+    
     
     
     
@@ -310,7 +320,48 @@ BEGIN
                                                                   hstore(v_this), 
                                                                   hstore(v_tabla))::numeric;
 	end if;
-
+    
+     --RAC: guardar campo_tipo_cambio_2
+    if ( v_plantilla.campo_tipo_cambio_2 != ''  AND  v_plantilla.campo_tipo_cambio_2 is not null ) then
+        v_this.columna_tipo_cambio_2 = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_tipo_cambio_2::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla))::numeric;
+	end if;
+    
+     --RAC: guardar campo_tipo_cambio_3
+    if ( v_plantilla.campo_tipo_cambio_3 != ''  AND  v_plantilla.campo_tipo_cambio_3 is not null ) then
+        v_this.columna_tipo_cambio_3 = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_tipo_cambio_3::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla))::numeric;
+	end if;
+    
+     --RAC: guardar campo_tipo_cambio_3
+    if ( v_plantilla.campo_id_config_cambiaria != ''  AND  v_plantilla.campo_id_config_cambiaria is not null ) then
+        v_this.columna_id_config_cambiaria = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_id_config_cambiaria::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla))::numeric;
+	end if;
+    
+    
+    
+    --RAC: guardar id_cuenta_bancaria_mov
+    if ( v_plantilla.campo_cbte_relacionado != ''  AND  v_plantilla.campo_cbte_relacionado is not null ) then
+        v_this.columna_cbte_relacionado = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.campo_cbte_relacionado::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla))::Varchar;
+	end if;
+    
+    --RAC 19/12/2017:  la case del comprobante,    tiene que salir de al configuracion de tabla 
+     if ( v_plantilla.clase_comprobante != ''  AND  v_plantilla.clase_comprobante is not null ) then
+          v_this.columna_clase_comprobante = conta.f_get_columna('maestro', 
+                                                                  v_plantilla.clase_comprobante::text, 
+                                                                  hstore(v_this), 
+                                                                  hstore(v_tabla))::Varchar;
+     end if;
     v_resp:=v_this;
     
     -- RAC 23/23/2016 
@@ -347,15 +398,14 @@ BEGIN
          where sub.estado_reg = 'activo' 
             and sub.codigo =  v_this.columna_subsistema;
             
-          IF v_id_subsistema is null THEN
-          
-               raise exception 'No existe un subsistema con el codigo %',v_this.columna_subsistema;   
-          
-          END IF;  
-    
-    --  obtener id clase comprobante
-    
+         IF v_id_subsistema is null THEN          
+               raise exception 'No existe un subsistema con el codigo %',v_this.columna_subsistema;
+         END IF; 
   
+         IF v_this.columna_clase_comprobante is null  OR v_this.columna_clase_comprobante ='' THEN
+            raise exception 'No fue definida una codigo apra la clase de cbte';
+         END IF;
+       
     
          Select  
            cl.id_clase_comprobante ,
@@ -365,23 +415,14 @@ BEGIN
            v_clcbt_desc
          from  conta.tclase_comprobante cl 
          where cl.estado_reg = 'activo' 
-            and cl.codigo =  v_plantilla.clase_comprobante::varchar;
+            and cl.codigo =  v_this.columna_clase_comprobante::varchar;-- v_plantilla.clase_comprobante::varchar;
             
-          IF v_id_clase_comprobante is null THEN
-          
-               raise exception 'No existe un comprobante de la clase codigo : %',v_plantilla.clase_comprobante;   
-          
-          END IF;
+         IF v_id_clase_comprobante is null THEN
+          raise exception 'No existe un comprobante de la clase codigo : %',v_this.columna_clase_comprobante;   
+         END IF;
     
     
     
-    
-    --calcular el tipo de cambio segun fecha y moneda del comprobante
-    IF v_this.columna_tipo_cambio is NULL THEN
-        v_tipo_cambio =   param.f_get_tipo_cambio( v_this.columna_moneda::integer, v_this.columna_fecha::date, 'O');
-    ELSE
-        v_tipo_cambio = v_this.columna_tipo_cambio;
-    END IF;
     
     --deterinar si es temporal
     v_temporal = 'no';
@@ -500,6 +541,53 @@ BEGIN
       raise exception 'Todo comprobante tiene que tener un proceso wf';
     END IF;
     
+    
+    --recupera el tipo de relacion si es que existe
+    IF v_plantilla.codigo_tipo_relacion is not null and  v_plantilla.codigo_tipo_relacion != ''   THEN
+       
+       select 
+          c.id_tipo_relacion_comprobante
+       into
+          v_id_tipo_relacion_comprobante         
+       from conta.ttipo_relacion_comprobante c
+       where upper(c.codigo) = upper(v_plantilla.codigo_tipo_relacion); 
+       
+       IF v_id_tipo_relacion_comprobante is null THEN
+         raise exception 'Revise sus plantilla el codigo de relación cbte % no existe', upper(v_plantilla.codigo_tipo_relacion) ;
+       END IF;
+       
+    END IF;
+    
+    
+    --si se tiene tipo de cambio vallidar
+    
+    v_forma_cambio = 'oficial';
+    
+    --calcular el tipo de cambio segun fecha y moneda del comprobante
+    IF v_this.columna_tipo_cambio is NULL THEN
+        v_tipo_cambio =   param.f_get_tipo_cambio( v_this.columna_moneda::integer, v_this.columna_fecha::date, 'O');
+    ELSE
+        
+        v_forma_cambio = 'convenido';
+        v_tipo_cambio = v_this.columna_tipo_cambio;
+        
+        --cuando el tipo de cambio es conveido tenemso que validar tener todos los tipos y la configuracion cambiaria
+        
+        IF  v_this.columna_tipo_cambio_2 is null
+            or v_this.columna_tipo_cambio_3 is null
+            or v_this.columna_id_config_cambiaria is null THEN
+        
+           raise exception 'la plantilla esta mal configurada, necsita definir todos los tipo de cambio ';
+        
+        END IF;
+        
+        
+        
+    END IF;
+    
+    
+    
+    
    INSERT INTO 
       conta.tint_comprobante
     (
@@ -519,7 +607,14 @@ BEGIN
       id_plantilla_comprobante,
       glosa1,
       beneficiario,
+      
+      forma_cambio,
       tipo_cambio,
+      tipo_cambio_2,
+      tipo_cambio_3,
+      id_config_cambiaria,
+      
+      
       fecha,
       funcion_comprobante_validado,
       funcion_comprobante_eliminado,
@@ -536,7 +631,9 @@ BEGIN
       localidad,
       sw_editable,
       id_proceso_wf,
-      id_estado_wf
+      id_estado_wf,
+      id_int_comprobante_fks,
+      id_tipo_relacion_comprobante
              
     ) 
     VALUES (
@@ -556,7 +653,13 @@ BEGIN
       v_plantilla.id_plantilla_comprobante,
       v_this.columna_descripcion,
       v_this.columna_acreedor,
-      v_tipo_cambio,
+      
+      v_forma_cambio,
+      v_tipo_cambio,      
+      v_this.columna_tipo_cambio_2,
+      v_this.columna_tipo_cambio_3,
+      v_this.columna_id_config_cambiaria,
+      
       v_this.columna_fecha,
       v_plantilla.funcion_comprobante_validado,
       v_plantilla.funcion_comprobante_eliminado,
@@ -573,7 +676,9 @@ BEGIN
       v_localidad,
       'no',
       v_id_proceso_wf,
-      v_id_estado_wf
+      v_id_estado_wf,
+      (string_to_array(v_this.columna_cbte_relacionado,','))::integer[],
+      v_id_tipo_relacion_comprobante
       
     )RETURNING id_int_comprobante into v_id_int_comprobante;
     
@@ -596,8 +701,6 @@ BEGIN
                            );
     
     
-    
-    
     -- procesar las trasaaciones (con diversos propositos, ejm validar  cuentas bancarias)
     IF not conta.f_int_trans_procesar(v_id_int_comprobante) THEN
       raise exception 'Error al procesar transacciones';
@@ -612,12 +715,10 @@ BEGIN
          END IF;
      END IF;
      
-     
     ----------------------------------------------------------------------
     --   Si la gestion de la fecha no correponde con la gestion del pago
     --   se tiene que actualizar las cuentas, centros de costos y partidas
-    -----------------------------------------------------------------------
-    
+    -----------------------------------------------------------------------    
    
      IF v_this.columna_gestion !=  v_rec_periodo.po_id_gestion THEN
          

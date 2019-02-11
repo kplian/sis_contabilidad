@@ -15,6 +15,16 @@ $body$
     Descripción: 
      Nueva funcion para gestion de presupuesto simplicada, toma ventaja de que el presupuesto se ejecuta 
      directamente en pxp y no depende del deblink
+     
+   ISSUE            FECHA:		           AUTOR                 DESCRIPCION
+ #31, ETR       27/12/2017              RAC KPLIAN           que considere los monto noejectuados, registrados por cada transaccion
+ #32, ETR       06/02/2018              RAC KPLIAN           mandar glosa, datos de anticipo, descuento y iva revertido al ejecutar presupesuto 
+ #88, ETR       25/02/2018              RAC KPLIAN           Hscer opcional la reversion del IVA comprometido 
+ #0 , ETR       29/03/2018              RAC KPLIAN           mejorar mensaje de error de presupeusto
+ #13, ETR       03/01/2019              RAC KPLIAN           Se considera la opcion de forzar comprometido 
+ 
+          
+     
 */
 DECLARE
   
@@ -56,6 +66,16 @@ DECLARE
   v_importe_recurso_mb 				numeric;
   v_reg_par_eje						record;
   
+ v_monto_cmp_aux 				numeric;
+ v_monto_cmp_mb_aux				numeric;
+ v_glosa						varchar;
+ 
+ v_monto_anticipo		    numeric;
+ v_monto_desc_anticipo		numeric;
+ v_monto_iva_revertido		numeric;
+ v_conta_revertir_iva_comprometido   varchar; --#88 ++
+ v_comprometer                       varchar; --#13 ++
+  
     
 BEGIN
    
@@ -64,6 +84,14 @@ BEGIN
     v_retorno = 'exito';
     v_sw_error = false; --iniciamos sin errores
     v_mensaje_error = '';
+    
+    v_glosa = '';    --#32
+    v_monto_anticipo  = 0;  --#32
+    v_monto_desc_anticipo  = 0; --#32
+    v_monto_iva_revertido  = 0; --#32
+    
+    
+    v_conta_revertir_iva_comprometido =  pxp.f_get_variable_global('conta_revertir_iva_comprometido');--#88 ++
     
    
     -- recupera datos del comprobante
@@ -139,8 +167,6 @@ BEGIN
                     raise exception 'Combinacion de momentos no contemplada';  
              END IF;
              
-             
-           
            
             --listado de las transacciones con partidas presupuestaria
             FOR v_registros in (
@@ -165,7 +191,10 @@ BEGIN
                                      it.importe_reversion,
                                      it.factor_reversion,
                                      par.codigo as codigo_partida,
-                                     it.actualizacion
+                                     it.actualizacion,
+                                     it.monto_no_ejecutado_mb,
+                                     it.monto_no_ejecutado,
+                                     it.forzar_comprometer      --#13
                                   from conta.tint_transaccion it
                                   inner join pre.tpartida par on par.id_partida = it.id_partida
                                   inner join pre.tpresupuesto pr on pr.id_centro_costo = 
@@ -193,15 +222,18 @@ BEGIN
                           
                                 -- si solo ejecutamos el presupuesto 
                                 --  o (compromentemos y ejecutamos) 
-                                --  o (compromentemos, ejecutamos y pagamos)     
+                                --  o (compromentemos, ejecutamos y pagamos) 
                                 
-                                -- si tiene partida ejecucionde comprometido y nose correponde con la gestion
-                                --  lo ponemos en null para que comprometa
+                                    
+                                -----------------------------------------------------------------------------------------
+                                -- si tiene partida ejecucion de comprometido y nose corresponde con la gestion
+                                --  lo ponemos en null para que comprometa                                
+                                --  es para devegar planes de pago que quedaron pendientes de una  gestion anterior
+                                -----------------------------------------------------------------------------------------
                                 
                                 IF v_registros.id_partida_ejecucion is not NULL THEN 
                                 
-                                                                      
-                                   
+                                      
                                    select
                                        par.id_gestion
                                    into
@@ -230,8 +262,6 @@ BEGIN
                                 END IF; --IF comprometido 
                                 
                                 
-                                
-                                
                                 -- solo procesamos si es una partida presupuestaria y no de flujo
                                 IF v_registros.sw_movimiento = 'presupuestaria' THEN
                                        
@@ -239,41 +269,76 @@ BEGIN
                                          
                                          ---  revisar si esto esta bien
                                          IF v_registros_comprobante.momento_comprometido = 'no' THEN
-                                                -- solo permite comprometer partidas de actulizacion (transaccion que igualan el comprobante)
-                                               IF v_registros.id_partida_ejecucion is null  and v_registros.actualizacion = 'no'  THEN                                       
+                                                -- solo permite comprometer partidas de actulizacion (transaccion que igualan el comprobante) 
+                                                --#13  y que no esten marcadas para forzar el compromiso, forzar_comprometer = 'si'
+                                               IF v_registros.id_partida_ejecucion is null  and v_registros.actualizacion = 'no' AND  v_registros.forzar_comprometer = 'no' THEN                                       
                                                    raise exception 'El comprobante  no esta marcado para comprometer, y no tiene un origen comprometido';
                                                 END IF; 
                                          END IF;
                                          
-                                         
+                                       
                                          
                                          IF v_registros.tipo = 'gasto'  THEN
                                              -- importe debe ejecucion
                                              IF v_importe_gasto > 0  or v_importe_gasto_mb > 0 THEN
-                                                 v_monto_cmp  = v_importe_gasto;
+                                                 v_monto_cmp  = v_importe_gasto ;
                                                  v_monto_cmp_mb = v_importe_gasto_mb;                                                                                           
                                              END IF;
                                              --importe haber es reversion, multiplicar por -1
-                                             IF v_importe_recurso > 0 or v_importe_recurso_mb > 0THEN
+                                             IF v_importe_recurso > 0 or v_importe_recurso_mb > 0 THEN
                                                  v_monto_cmp  = v_importe_recurso * (-1);
                                                  v_monto_cmp_mb = v_importe_recurso_mb * (-1);
                                              END IF;
                                             
                                          ELSE
-                                             IF v_importe_recurso > 0 or v_importe_recurso_mb THEN
+                                             IF v_importe_recurso > 0 or v_importe_recurso_mb > 0 THEN
                                                v_monto_cmp  = v_importe_recurso;
                                                v_monto_cmp_mb = v_importe_recurso_mb;                                           
                                              END IF;
+                                             
                                              --importe debe es reversion, multiplicar por -1
-                                             IF v_importe_gasto > 0 or v_importe_gasto_mb THEN
+                                             
+                                             IF v_importe_gasto > 0 or v_importe_gasto_mb > 0 THEN
                                                  v_monto_cmp  = v_importe_gasto * (-1);
-                                                 v_monto_cmp_mb = v_importe_gasto_mb(-1);                                              
+                                                 v_monto_cmp_mb = v_importe_gasto_mb * (-1);                                              
                                              END IF;
                                          END IF;
-                                         
-                                       -- raise exception 'entra.. % --  %',v_monto_cmp, v_monto_cmp_mb;
-                                
-                              
+                                           
+                                       
+                                        IF  v_monto_cmp  > 0 THEN
+                                            --si es ejecucion restamos el monto a no ejecutar
+                                            v_monto_cmp_aux   = 	v_monto_cmp	 - 	v_registros.monto_no_ejecutado;
+                                            v_monto_cmp_mb_aux	 = 	v_monto_cmp_mb - 	v_registros.monto_no_ejecutado_mb;
+                                        ELSEIF v_monto_cmp < 0 THEN
+                                           --si es reversion sumammos el monto a ejecutar
+                                            v_monto_cmp_aux  = 	v_monto_cmp	 + 	v_registros.monto_no_ejecutado;
+                                            v_monto_cmp_mb_aux	 = 	v_monto_cmp_mb + 	v_registros.monto_no_ejecutado_mb;
+                                        ELSE                                           
+                                           raise exception 'monto no contemplado';
+                                        END IF;
+                                        
+                                        
+                                        
+                                       
+                                        
+                                        --#32 monto que no ejecuta presupeusto retencion de antiicpo
+                                        v_monto_desc_anticipo = v_registros.monto_no_ejecutado;                                         
+                                        v_monto_iva_revertido = 0;
+                                        v_monto_anticipo  = 0;  --#32
+                                        IF v_monto_desc_anticipo > 0 THEN
+                                           v_glosa = 'Monto o ejecutor (Ejm Retenciones de anticipo, otros)';
+                                        ELSE
+                                            v_glosa = '';
+                                        END IF;
+                                        
+                                        --#13 considera si necesario forzar el comprometido
+                                        v_comprometer = v_registros_comprobante.momento_comprometido;
+                                        IF  v_registros.forzar_comprometer = 'si' THEN
+                                           v_comprometer = 'si';
+                                        END IF;
+                                        
+                                        
+                                        
                                         -- llamamos a la funcion de ejecucion
                                         v_resp_ges = pre.f_gestionar_presupuesto_v2(
                                                                                     p_id_usuario, 
@@ -281,8 +346,8 @@ BEGIN
                                                                                     v_registros.id_presupuesto, 
                                                                                     v_registros.id_partida, 
                                                                                     v_id_moneda, 
-                                                                                    v_monto_cmp,
-                                                                                    v_monto_cmp_mb, 
+                                                                                    v_monto_cmp_aux,
+                                                                                    v_monto_cmp_mb_aux, 
                                                                                     p_fecha_ejecucion, 
                                                                                     v_momento_presupeustario, 
                                                                                     v_registros.id_partida_ejecucion, 
@@ -290,9 +355,16 @@ BEGIN
                                                                                     v_registros.id_int_transaccion,--p_fk_llave, 
                                                                                     v_registros_comprobante.nro_tramite, 
                                                                                     p_id_int_comprobante, 
-                                                                                    v_registros_comprobante.momento_comprometido, 
+                                                                                    v_comprometer,   --#13 
                                                                                     v_registros_comprobante.momento_ejecutado, 
-                                                                                    v_registros_comprobante.momento_pagado);
+                                                                                    v_registros_comprobante.momento_pagado,
+                                                                                    v_glosa,
+                                                                                    v_monto_anticipo,
+                                                                                    v_monto_desc_anticipo,
+                                                                                    v_monto_iva_revertido);
+                                                                                    
+                                                                                    
+                                                                                         
                                                             
                                          ------------------------------------
                                          --  ACUMULAR ERRORES
@@ -308,7 +380,7 @@ BEGIN
                                                                                                v_id_moneda, 
                                                                                                v_id_moneda_base, 
                                                                                                v_momento_presupeustario, 
-                                                                                               v_monto_cmp_mb);
+                                                                                               v_monto_cmp_mb_aux);
                                                  v_sw_error = true;
                                                  
                                           ELSE
@@ -329,13 +401,14 @@ BEGIN
                                                    END IF; 
                                                   
                                           END IF; --fin id de error
-                                       
-                                       
+                                          
+                                         
+                                         
                                          -------------------------------------------------------------------------------------  
                                          --   si existe un factor a revertir y tenememos el id_partida_ejecucion, revertimos
                                          -------------------------------------------------------------------------------------
                                          
-                                         IF  v_registros.factor_reversion > 0 and v_registros.id_partida_ejecucion is not null THEN
+                                         IF  v_registros.factor_reversion > 0 and v_registros.id_partida_ejecucion is not null and v_conta_revertir_iva_comprometido = 'si' THEN --#88 considera variable de configuracion apra revertir IVA
                                          
                                                    /*  regla de 3 para calcular  el monto a revertir en moneda base
                                                     *      200 -> 0.87
@@ -357,7 +430,16 @@ BEGIN
                                                         v_monto_cmp_mb = (v_monto_cmp_mb * v_registros.factor_reversion)/(1 - v_registros.factor_reversion);
                                                   END IF;
                                                   
-                                                   -- llamar a la funcion para revertir el comprometido
+                                                  --#32 monto de presupeusto revertido
+                                                  v_monto_iva_revertido = v_monto_cmp;
+                                                  v_glosa = 'Reversión presupuestaria del comprometido correspondiente al IVA';
+                                                  v_monto_anticipo  = 0;  --#32
+                                                  v_monto_desc_anticipo  = 0; --#32
+                                                  
+                                                  
+                                                   --  considerar ei el monto ejecutado no consumio todo
+                                                  
+                                                   --  llamar a la funcion para revertir el comprometido
                                                  
                                                    v_resp_ges = pre.f_gestionar_presupuesto_v2(
                                                                                             p_id_usuario, 
@@ -376,7 +458,11 @@ BEGIN
                                                                                             p_id_int_comprobante, 
                                                                                             v_registros_comprobante.momento_comprometido, 
                                                                                             v_registros_comprobante.momento_ejecutado, 
-                                                                                            v_registros_comprobante.momento_pagado);
+                                                                                            v_registros_comprobante.momento_pagado,
+                                                                                            v_glosa,
+                                                                                            v_monto_anticipo,
+                                                                                            v_monto_desc_anticipo,
+                                                                                            v_monto_iva_revertido);
                                                                                             
                                                                                             
                                                      --  analizamos respuesta y retornamos error
@@ -401,12 +487,17 @@ BEGIN
                                                       where it.id_int_transaccion  =   v_registros.id_int_transaccion;
                                                      
                                                   
-                                                  END IF; --fin id de error                                        
-                                         
+                                                  END IF; --fin id de error  
+                                                  
+                                                  
+                                                                                     
+                                                                                     
                                        END IF; --if la transacion tiene reversion
-                                
-                                
+                                       
+                                        
                                  END IF;  --fin if es partida presupuestaria
+                                 
+                            
                                  
                           
                           ELSIF  v_momento_aux='solo pagar'  THEN

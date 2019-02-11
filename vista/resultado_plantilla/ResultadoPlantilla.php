@@ -5,6 +5,9 @@
 *@author  (admin)
 *@date 08-07-2015 13:12:43
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#10        02/01/2019    	  Miguel Mamani          Solo permitir 31 caracteres en nombre de la plantilla
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -98,7 +101,7 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:300
+				maxLength:31 //#10 
 			},
 				type:'TextField',
 				filters:{pfiltro:'resplan.nombre',type:'string'},
@@ -257,6 +260,55 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
+		{
+			config:{
+				name: 'nombre_func',
+				fieldLabel: 'Función',
+				qtip: 'Nombre de la función que ejecuta la lógica, si no tiene ninguna se ejecuta segun la configuración del detalle',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 100,
+				maxLength:1500
+			},
+			type:'TextArea',
+			filters: { pfiltro:'resplan.nombre_func', type:'string' },
+			id_grupo: 0,
+			grid: true,
+			form: true
+		},
+		
+			/////EGS///
+		 {
+	       		config:{
+	       			name:'visible',
+	       			fieldLabel:'visible',
+	       			allowBlank:false,
+	       			emptyText:'visible...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',	       		    
+	       		    gwidth: 100,
+	       		    store:new Ext.data.ArrayStore({
+		        	fields: ['ID', 'valor'],
+		        	data :	[['si','si'],	
+		        			['no','no']]
+		        				
+		    		}),
+					valueField:'ID',
+					value:'si',
+					displayField:'valor',
+					//renderer:function (value, p, record){if (value == 1) {return 'si'} else {return 'no'}}
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,	       		
+	       		grid:true,
+	       		form:true
+	       },
+	       ///////////////EGS///
+		
+		
+		
 		
 		{
 			config : {
@@ -465,6 +517,7 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		{name:'visible', type: 'string'},///EGS//
 		'tipo',
         'cbte_aitb',
         'cbte_apertura',
@@ -475,7 +528,8 @@ Phx.vista.ResultadoPlantilla=Ext.extend(Phx.gridInterfaz,{
         'desc_clase_comprobante',
         'relacion_unica',
         'id_tipo_relacion_comprobante',
-        'desc_tipo_relacion_comprobante'
+        'desc_tipo_relacion_comprobante',
+        'nombre_func'
 		
 	],
 	sortInfo:{

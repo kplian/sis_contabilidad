@@ -548,6 +548,29 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			egrid: true,
 			form:true
 		},
+		
+		{
+			config:{
+				name: 'salta_hoja',
+				fieldLabel: 'Salto de Pagina',
+				qtip: 'Si esta activado esta variable se colocara en la siguiente página',
+				allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                store:['no' ,'si' ]
+            },
+            type:'ComboBox',
+			filters:{pfiltro:'resdet.salta_hoja',type:'string'},
+			valorInicial: 'no',
+			id_grupo:1,
+			grid:true,
+			egrid: true,
+			form:true
+		},
 		{
 			config:{
 				name: 'signo',
@@ -696,6 +719,27 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
             grid: true,
             form: true
         },
+        
+        {
+	   		config:{
+	   				name:'id_tipo_cc',
+	   				qtip: 'Tipo de centro de costos, cada tipo solo puede tener un centro por gestión',	   				
+	   				origen:'TIPOCC',
+	   				fieldLabel:'Tipo Centro',
+	   				gdisplayField: 'desc_tipo_cc',
+	   				url:  '../../sis_parametros/control/TipoCc/listarTipoCcAll',
+	   				baseParams: {movimiento:''},	   				
+	   				allowBlank:true,
+	   				width: 150 
+	   				
+	      		},
+   			type:'ComboRec',
+   			id_grupo:0,
+   			filters:{pfiltro:'vcc.codigo_tcc#vcc.descripcion_tcc',type:'string'},
+   		    grid:true,
+   			form:true
+	    },
+        
 		{
 			config:{
 				name: 'estado_reg',
@@ -838,7 +882,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
         'codigo_partida',
         'id_auxiliar','desc_auxiliar',
         'destino',
-        'orden_cbte','desc_partida'
+        'orden_cbte','desc_partida','salta_hoja','id_tipo_cc','desc_tipo_cc'
 		
 	],
 	sortInfo:{

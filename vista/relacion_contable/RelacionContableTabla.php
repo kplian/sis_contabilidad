@@ -17,8 +17,12 @@ Phx.vista.RelacionContableTabla = {
 	tiene_partida:'no',
 	tiene_auxiliar:'no',
 	filtro_partida:'no',
+	tiene_moneda:'no',
+	tiene_tipo_centro:'no',
+	tiene_aplicacion:'no',
 	constructor:function(config){
 		this.maestro=config.maestro;
+		
 		this.Atributos.splice(4, 0, {
 			config:{
 				name: 'id_tipo_relacion_contable',
@@ -36,7 +40,7 @@ Phx.vista.RelacionContableTabla = {
 	    					},
 	    					totalProperty: 'total',
 	    					fields: ['id_tipo_relacion_contable','codigo_tipo_relacion','nombre_tipo_relacion',
-	    							'tiene_centro_costo','tiene_partida','tiene_auxiliar','partida_tipo','partida_rubro'],
+	    							'tiene_centro_costo','tiene_partida','tiene_auxiliar','partida_tipo','partida_rubro','tiene_moneda','tiene_tipo_centro','tiene_aplicacion','codigo_aplicacion_catalogo'],
 	    					// turn on remote sorting
 	    					remoteSort: true,
 	    					baseParams:{par_filtro:'codigo_tipo_relacion#nombre_tipo_relacion'}
@@ -53,7 +57,8 @@ Phx.vista.RelacionContableTabla = {
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 150,
-				mode: 'remote'				
+				mode: 'remote',
+				tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{codigo_tipo_relacion}</b></p><p>{nombre_tipo_relacion}</p></div></tpl>'
 			},
 	           			
 			type:'ComboBox',
@@ -136,7 +141,25 @@ Phx.vista.RelacionContableTabla = {
             
         }, this);
         
-        this.Cmp.id_centro_costo.on('select', function (c,r,i) {           
+        
+        this.Cmp.id_centro_costo.on('change', function (c,newValue, oldValue) { 
+        	
+        	console.log('newValue...',newValue, 'oldValue', oldValue)
+        	
+        	if(newValue){
+        		this.Cmp.id_tipo_presupuesto.reset();
+        	    this.Cmp.id_tipo_presupuesto.disable()
+        	}
+        	else{
+        		this.Cmp.id_tipo_presupuesto.reset();
+        	    this.Cmp.id_tipo_presupuesto.enable()
+        	}
+        	
+         }, this);	
+        
+        this.Cmp.id_centro_costo.on('select', function (c,r,i) { 
+        	
+        	
             //if (this.filtro_partida == 'no') {
 	          //  this.Cmp.id_partida.store.setBaseParam('id_centro_costo',r.data.id_centro_costo);
 	            //this.Cmp.id_partida.modificado = true;
@@ -207,7 +230,9 @@ Phx.vista.RelacionContableTabla = {
 				    			//si se selecciona automaticamente la partida ya no se filtrara por cuenta ni por centro de costo
 				    			this.filtro_partida = 'si';
 				    			//si selecciona automaticamante la partida es necesario aplicar nuevo filtro al centro de costos
-				    			this.Cmp.id_centro_costo.store.setBaseParam('id_partida',r[0].data.id_partida);
+				    			
+				    			//RAC ,17/01/2018,  se comenta el filtro de aprtida sobre el presupeusto para que la parametrizacion sea mas facil
+				    			//this.Cmp.id_centro_costo.store.setBaseParam('id_partida',r[0].data.id_partida);
 				    		}			    			    		
 				    	}, scope : this
 				    });
@@ -237,7 +262,60 @@ Phx.vista.RelacionContableTabla = {
 				this.setAllowBlank(this.Cmp.id_auxiliar, true);
 			}
 			
+			//moneda
+			if (r.data.tiene_moneda == 'si') {
+				this.tiene_moneda = 'si';
+				this.mostrarComponente(this.Cmp.id_moneda);
+				this.setAllowBlank(this.Cmp.id_moneda, false);
+				this.Cmp.id_moneda.enable();
+				
+				
+			} else {
+				this.tiene_moneda = 'no';
+				this.Cmp.id_moneda.reset();
+				this.ocultarComponente(this.Cmp.id_moneda);
+				this.setAllowBlank(this.Cmp.id_moneda, true);
+			}
+			
+			//tiene_tipo_centro
+			if (r.data.tiene_tipo_centro == 'si') {
+				this.tiene_tipo_centro = 'si';
+				this.mostrarComponente(this.Cmp.id_tipo_presupuesto);
+				this.setAllowBlank(this.Cmp.id_tipo_presupuesto, true);
+				this.Cmp.id_tipo_presupuesto.enable();
+				
+				
+			} else {
+				this.tiene_tipo_centro = 'no';
+				this.Cmp.id_tipo_presupuesto.reset();
+				this.ocultarComponente(this.Cmp.id_tipo_presupuesto);
+				this.setAllowBlank(this.Cmp.id_tipo_presupuesto, true);
+			}
+			
+		
+			//tiene_aplicacion
+			if (r.data.tiene_aplicacion == 'si') {
+				this.tiene_aplicacion = 'si';
+				this.Cmp.codigo_aplicacion.reset();
+				this.mostrarComponente(this.Cmp.codigo_aplicacion);
+				this.setAllowBlank(this.Cmp.codigo_aplicacion, true);
+				this.Cmp.codigo_aplicacion.enable();
+				this.Cmp.codigo_aplicacion.store.baseParams.catalogo_tipo = r.data.codigo_aplicacion_catalogo ;
+				this.Cmp.codigo_aplicacion.modificado = true;
+				
+				
+				
+			} else {
+				this.tiene_aplicacion = 'no';
+				this.Cmp.codigo_aplicacion.reset();
+				this.ocultarComponente(this.Cmp.codigo_aplicacion);
+				this.setAllowBlank(this.Cmp.codigo_aplicacion, true);
+			}
+			
+			
 		}, this);
+		
+		
 	},
 	onButtonNew : function () {
 		Phx.vista.RelacionContableTabla.superclass.onButtonNew.call(this);	
@@ -249,6 +327,12 @@ Phx.vista.RelacionContableTabla = {
 		this.Cmp.id_cuenta.disable();  
 		this.Cmp.id_auxiliar.disable(); 
 		this.Cmp.id_partida.disable();
+		this.Cmp.id_moneda.disable();
+		this.Cmp.codigo_aplicacion.disable();
+		this.Cmp.id_tipo_presupuesto.disable();
+		
+		
+		
 		this.Cmp.id_gestion.store.load({params:{start:0,limit:this.tam_pag}, 
 	       callback : function (r) {
 	       		if (r.length > 0 ) {	       				       				
@@ -259,8 +343,28 @@ Phx.vista.RelacionContableTabla = {
 	    			    		
 	    	}, scope : this
 	    });
+	    
+	    console.log('compronete....', this.Cmp.codigo_aplicacion)
 	       
 	} ,
+	
+	onButtonEdit : function () {		
+		Phx.vista.RelacionContableTabla.superclass.onButtonEdit.call(this);
+		var selected = this.sm.getSelected().data;	
+		Phx.CP.loadingShow();
+		this.Cmp.id_tipo_relacion_contable.store.load({params:{start:0,limit:this.tam_pag, id_tipo_relacion_contable: this.Cmp.id_tipo_relacion_contable.getValue()}, 
+	       callback : function (r) {
+	       		if (r.length > 0 ) { 
+	    			this.Cmp.id_tipo_relacion_contable.fireEvent('select',this.Cmp.id_tipo_relacion_contable, r[0]);	    			 
+	    		}	    		 
+	    		this.form.getForm().isValid() 
+	    		Phx.CP.loadingHide();  
+	    			    		
+	    	}, scope : this
+	    });
+	    
+	},
+	/*
 	onButtonEdit : function () {
 	   
 		Phx.vista.RelacionContableTabla.superclass.onButtonEdit.call(this);
@@ -308,6 +412,51 @@ Phx.vista.RelacionContableTabla = {
 			this.tiene_auxiliar = 'no';
 		}
 		
+		//moneda
+		if (selected.tiene_moneda == 'si') {			
+			this.mostrarComponente(this.Cmp.id_moneda);
+			this.setAllowBlank(this.Cmp.id_moneda, false);
+			this.tiene_moneda = 'si';
+		} else {
+			this.Cmp.id_moneda.reset();
+			this.ocultarComponente(this.Cmp.id_moneda);
+			this.setAllowBlank(this.Cmp.id_moneda, true);
+			this.tiene_moneda = 'no';
+		}
+		//tiene_tipo_centro
+		
+		if (selected.tiene_tipo_centro == 'si') {
+			this.tiene_tipo_centro = 'si';
+			this.mostrarComponente(this.Cmp.id_tipo_presupuesto);
+			this.setAllowBlank(this.Cmp.id_tipo_presupuesto, true);
+			
+		} else {
+			this.tiene_tipo_centro = 'no';
+			this.Cmp.id_tipo_presupuesto.reset();
+			this.ocultarComponente(this.Cmp.id_tipo_presupuesto);
+			this.setAllowBlank(this.Cmp.id_tipo_presupuesto, true);
+		}
+		
+		//tiene_aplicacion
+		if (selected.tiene_aplicacion == 'si') {
+			this.tiene_aplicacion = 'si';			
+			this.mostrarComponente(this.Cmp.codigo_aplicacion);
+			this.setAllowBlank(this.Cmp.codigo_aplicacion, true);
+			this.Cmp.codigo_aplicacion.enable();
+			this.Cmp.codigo_aplicacion.store.baseParams.catalogo_tipo = selected.codigo_aplicacion_catalogo ;
+			this.Cmp.codigo_aplicacion.modificado = true;
+			
+			
+			
+		} else {
+			this.tiene_aplicacion = 'no';
+			this.Cmp.codigo_aplicacion.reset();
+			this.ocultarComponente(this.Cmp.codigo_aplicacion);
+			this.setAllowBlank(this.Cmp.codigo_aplicacion, true);
+		}
+		
+		
+		
 		this.Cmp.id_tabla.setValue(this.maestro[this.tabla_id]);
 		
 		this.Cmp.id_centro_costo.store.setBaseParam('id_gestion',selected.id_gestion);
@@ -323,13 +472,21 @@ Phx.vista.RelacionContableTabla = {
 		this.Cmp.id_cuenta.enable();  
 		this.Cmp.id_auxiliar.enable(); 
 		this.Cmp.id_partida.enable();
+		this.Cmp.codigo_aplicacion.enable();
+		this.Cmp.id_tipo_presupuesto.enable();
+		this.Cmp.id_moneda.enable();
 		
 		this.Cmp.id_centro_costo.modificado = true;
 		this.Cmp.id_cuenta.modificado = true;
 		this.Cmp.id_auxiliar.modificado = true;
 		this.Cmp.id_partida.modificado = true;
 		
-	}, 
+		this.Cmp.codigo_aplicacion.modificado = true;
+		this.Cmp.id_tipo_presupuesto.modificado = true;
+		this.Cmp.id_moneda.modificado = true;
+		
+		
+	}, */
 	loadValoresIniciales:function()  
     {
     	this.Cmp.defecto.setValue('no');

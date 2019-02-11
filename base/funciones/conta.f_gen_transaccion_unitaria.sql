@@ -17,6 +17,19 @@ Fecha 27/08/2013
 Descripcion:    
    Esta funcion evalua un detalle de trasaccion especifico e inserta 
    las trasacciones generadas en int_trasaccion
+   
+
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		27/08/2013       Rensi Arteaga Copari      Esta funcion evalua un detalle de trasaccion especifico e inserta 
+                                                           las trasacciones generadas en int_trasaccion
+ 
+ #0        		17/11/2017        Rensi Arteaga Copari   
+ 
+ #0        		09/05/2018        Rensi Arteaga Copari   Adiciona campo para el codigo de aplicacin en relaciones contables     
+   
 
 
 
@@ -93,7 +106,10 @@ BEGIN
                         'campo_nro_cuenta_bancaria_trans',
                         'campo_porc_monto_excento_var',
                         'campo_nombre_cheque_trans',
-                        'campo_forma_pago'];
+                        'campo_forma_pago',
+                        'campo_codigo_aplicacion_rc'];
+                        
+                        
     v_tamano:=array_upper(v_def_campos,1);
          
   

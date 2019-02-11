@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_tabla_relacion_contable_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -17,10 +15,8 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ISSUE			FECHA				AUTHOR 			DESCRIPCION
+ #14				04/01/2019			EGS				se la creo la transsaccion CONTA_EXPTRC_SEL para el exportador de configuracion 	
 ***************************************************************************/
 
 DECLARE
@@ -48,6 +44,7 @@ BEGIN
     		--Sentencia de la consulta
 			v_consulta:='select
 						tabrecon.id_tabla_relacion_contable,
+                        tabrecon.codigo,
 						tabrecon.estado_reg,
 						tabrecon.tabla,
 						tabrecon.esquema,
@@ -61,8 +58,8 @@ BEGIN
 						tabrecon.tabla_id_fk,
 						tabrecon.recorrido_arbol,
                         tabrecon.tabla_codigo_auxiliar,
-                        tabrecon.tabla_id_auxiliar
-                        	
+                        tabrecon.tabla_id_auxiliar,
+                        tabrecon.tabla_codigo_aplicacion
 						from conta.ttabla_relacion_contable tabrecon
 						inner join segu.tusuario usu1 on usu1.id_usuario = tabrecon.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = tabrecon.id_usuario_mod
@@ -101,6 +98,48 @@ BEGIN
 			return v_consulta;
 
 		end;
+       /*********************************    
+      #TRANSACCION:  'CONTA_EXPTRC_SEL'
+      #DESCRIPCION:	exportar plantilla de tabla relacion contable
+      #AUTOR:			EGS
+      #FECHA:		04/01/2019
+      #ISSUE:		#14
+      ***********************************/     
+  	
+      elsif(p_transaccion='CONTA_EXPTRC_SEL')then
+       				
+          begin
+              --Sentencia de la consulta
+              v_consulta:='        
+              		select
+                        ''maestro''::varchar as tipo_reg,
+     					tabrecon.id_tabla_relacion_contable,
+                        tabrecon.codigo,
+						tabrecon.estado_reg,
+						tabrecon.tabla,
+						tabrecon.esquema,
+                        tabrecon.tabla_id,
+						tabrecon.fecha_reg,
+						tabrecon.id_usuario_reg,
+						tabrecon.fecha_mod,
+						tabrecon.id_usuario_mod,
+						usu1.cuenta as usr_reg,
+						usu2.cuenta as usr_mod,
+						tabrecon.tabla_id_fk,
+						tabrecon.recorrido_arbol,
+                        tabrecon.tabla_codigo_auxiliar,
+                        tabrecon.tabla_id_auxiliar,
+                        tabrecon.tabla_codigo_aplicacion
+						from conta.ttabla_relacion_contable tabrecon
+						inner join segu.tusuario usu1 on usu1.id_usuario = tabrecon.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = tabrecon.id_usuario_mod
+                        where tabrecon.id_tabla_relacion_contable ='||v_parametros.id_tabla_relacion_contable;
+  			
+              --Devuelve la respuesta
+              return v_consulta;
+  						
+          end;
+   
 					
 	else
 					     

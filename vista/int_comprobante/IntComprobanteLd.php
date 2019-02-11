@@ -6,7 +6,13 @@
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite 
 *dar el visto a solicitudes de compra
-*
+
+ * 
+ *  ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #1        		20-09-2011       RCM KPLIAN        CREACION
+ #2             27-08-2018       RAC KPLIAN        adciona edicion de glosa
+ * 
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -14,26 +20,20 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.IntComprobanteLd = {
     bedit: false,
     bnew: false,
-    bsave: false,
+    bsave: true,
     bdel: true,
 	require: '../../../sis_contabilidad/vista/int_comprobante/IntComprobante.php',
 	requireclase: 'Phx.vista.IntComprobante',
 	title: 'Libro Diario',
 	nombreVista: 'IntComprobanteLd',
-	
+	ActSave : '../../sis_contabilidad/control/IntComprobante/modificarFechasCostosCbte',
 	constructor: function(config) {
 	    Phx.vista.IntComprobanteLd.superclass.constructor.call(this,config);
 	    
 	    this.addBotonesVolcar();
 		this.addBotonesClonar();
 		
-		this.addButton('chkdep',{	text:'Dependencias',
-				iconCls: 'blist',
-				disabled: true,
-				handler: this.checkDependencias,
-				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
-			});
-			
+		
 		this.addButton('btnWizard', {
 					text : 'Plantilla',
 					iconCls : 'bgear',
@@ -42,6 +42,18 @@ Phx.vista.IntComprobanteLd = {
 					scope:this,
 					tooltip : '<b>Plantilla de Comprobantes</b><br/>Seleccione una plantilla y genere comprobantes preconfigurados'
 			});	
+			
+		this.addButton('btnWizardGlosa', {
+					text : 'Glosa',
+					iconCls : 'bgear',
+					disabled : true,
+					handler : this.loadWizardGlosa,
+					scope:this,
+					tooltip : '<b>Cambio de Glosa</b> Permite editar la glosa del cbte, queda un BK en el log de seguridad'
+			});		
+			
+			
+			
 		
 		
 	   
@@ -122,7 +134,7 @@ Phx.vista.IntComprobanteLd = {
 			var rec = this.sm.getSelected();
 			this.getBoton('btnImprimir').enable();
 			this.getBoton('btnRelDev').enable();
-			this.getBoton('btnDocCmpVnt').enable();
+			//this.getBoton('btnDocCmpVnt').enable();
 			this.getBoton('chkpresupuesto').enable();
 			this.getBoton('btnVolcar').enable();
 			this.getBoton('btnClonar').enable();
@@ -130,7 +142,16 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
             this.getBoton('btnObs').enable();
-            this.getBoton('btnWizard').enable()  
+            this.getBoton('btnWizard').enable();
+            this.getBoton('btnWizardGlosa').enable();
+            
+            
+			
+			if(rec.data.momento =='presupuestario'||rec.data.momento =='contable'){  //OGO ANALIZAR MEJOR  registor de documentos en cbte contable
+				this.getBoton('btnDocCmpVnt').enable();
+			}else{
+				this.getBoton('btnDocCmpVnt').disable();
+			}
             
 			
 			return tb;
@@ -146,25 +167,13 @@ Phx.vista.IntComprobanteLd = {
 			this.getBoton('chkdep').disable();
 			this.getBoton('btnChequeoDocumentosWf').disable();
             this.getBoton('diagrama_gantt').disable();
-            this.getBoton('btnObs').disable()
-            this.getBoton('btnWizard').disable()  
+            this.getBoton('btnObs').disable();
+            this.getBoton('btnWizard').disable() ;
+            this.getBoton('btnWizardGlosa').disable(); 
            
 			
 	},
-	checkDependencias: function(){                   
-			  var rec=this.sm.getSelected();
-			  var configExtra = [];
-			  this.objChkPres = Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/CbteDependencias.php',
-										'Dependencias',
-										{
-											modal:true,
-											width: '80%',
-											height: '80%'
-										}, 
-										  rec.data, 
-										  this.idContenedor,
-										 'CbteDependencias');			   
-	},
+	
 	addBotonesClonar: function() {
         this.menuClonar = new Ext.Toolbar.SplitButton({
             id: 'b-btnClonar-' + this.idContenedor,
@@ -231,5 +240,19 @@ Phx.vista.IntComprobanteLd = {
 				'id_depto': this.cmbDepto.getValue()
 			   }, this.idContenedor, 'WizardCbteDiario')
 		},
+		
+	loadWizardGlosa : function() {
+			
+			var rec = this.sm.getSelected();			
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardGlosaCbte.php', 'Cambiar glosa ...', {
+				width : '40%',
+				height : 300
+			}, {
+				'id_int_comprobante': rec.data.id_int_comprobante,
+				'glosa1': rec.data.glosa1
+			   }, this.idContenedor, 'WizardGlosaCbte')
+		},	
+		
+		
 };
 </script>

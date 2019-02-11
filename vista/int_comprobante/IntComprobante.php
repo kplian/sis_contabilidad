@@ -1,15 +1,20 @@
 <?php
 /**
- *@package pXP
- *@file gen-IntComprobante.php
- *@author  (admin)
- *@date 29-08-2013 00:28:30
- *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
- */
+ 
+HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE        FORK			FECHA:		      AUTOR                 DESCRIPCION
+ #7			endeetr		27/12/2018		manuel guerra				crearon listado de tramites, y la modifiacion del nrotramite_aux
+#32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
+*/
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-	Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
+var id_depto=null;
+var id_gestion=null;
+var tipo_filtro=null;
+
+Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		fheight : '90%',
 		fwidth : '90%',
 		nombreVista : 'IntComprobante',
@@ -37,7 +42,15 @@ header("content-type: text/javascript; charset=UTF-8");
 				handler : this.loadDocCmpVnt,
 				tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
 			});
-
+			
+			this.addButton('btnLidDia',{
+				text: 'Lista Cbtes',
+				iconCls: 'bprint',
+				disabled: false	,
+				handler: this.ListCbts,
+				tooltip: '<b>Lista de comprobantes</b>'
+			});
+			
 			this.addButton('btnAIRBP',
 					{
 						text: 'Subir AIRBP',
@@ -47,6 +60,14 @@ header("content-type: text/javascript; charset=UTF-8");
 						tooltip: 'Subir archivo facturas AIRBP'
 					}
 			);
+			
+			this.addButton('chkdep',{	text:'Dependencias',
+				iconCls: 'blist',
+				disabled: true,
+				handler: this.checkDependencias,
+				tooltip: '<b>Revisar Dependencias </b><p>Revisar dependencias del comprobante</p>'
+			});
+			
 
 			this.addButton('btnRelDev', {
 				text : 'Rel Dev',
@@ -56,12 +77,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				tooltip : '<b>Relación con el devengado</b><br/>Solo para comprobantes de pago presupuestario'
 			});
 			
-			this.addButton('chkpresupuesto',{text:'Chk Presupuesto',
-				iconCls: 'blist',
-				disabled: true,
-				handler: this.checkPresupuesto,
-				tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>'
-			});
+			this.addBotonesPresupuesto()
+			
 			
 			this.addBotonesGantt();
 	        this.addButton('btnChequeoDocumentosWf',
@@ -83,8 +100,15 @@ header("content-type: text/javascript; charset=UTF-8");
 	                    handler : this.onOpenObs,
 	                    tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
 	         });
+	         
 
-			
+			this.addButton('btnNroTramite', {
+				text : 'Editar Nro Tramite',
+				iconCls : 'balert',
+				disabled : true,
+				handler : this.loadWizardTramite,
+				tooltip : '<b>Hacer editable Nro Tramite</b>'
+			});
 
 			this.bloquearOrdenamientoGrid();
 
@@ -120,10 +144,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			     }
 			},this); 
 			
-			
-			
-
 			this.iniciarEventos();
+			this.addBotonesLibroDiario();
 		},
 
 		capturaFiltros : function(combo, record, index) {
@@ -168,9 +190,21 @@ header("content-type: text/javascript; charset=UTF-8");
 											}, this);
 											
 											
-			this.Cmp.fecha.on('select', function(){ this.getConfigCambiaria('si') }, this);
+			this.Cmp.fecha.on('select', function(value, date){
+				this.getConfigCambiaria('si') ;
+
+				var anio = date.getFullYear();
+
+				var fecha_inicio = new Date(anio+'/01/1');
+				var fecha_fin = new Date(anio+'/12/31');
+				//control de fechas de inicio y fin de costos
+				this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+				this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+			}, this);
 			this.Cmp.forma_cambio.on('select', function(){ this.getConfigCambiaria('si') }, this);
 			this.Cmp.id_clase_comprobante.on('select', this.habilitaMomentos, this);
+
+
 
 			this.Cmp.id_tipo_relacion_comprobante.on('valid', function() {
 				if (this.Cmp.id_tipo_relacion_comprobante.getValue()) {
@@ -305,7 +339,6 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel : 'Fecha',
 				allowBlank : false,
 				anchor : '80%',
-				maxValue : new Date(),
 				gwidth : 100,
 				format : 'd/m/Y',
 				renderer : function(value, p, record) {
@@ -634,9 +667,6 @@ header("content-type: text/javascript; charset=UTF-8");
 			grid : true,
 			form : true
 		}, 
-		
-		
-		
 		{
 			config : {
 				name : 'tipo_cambio_2',
@@ -656,7 +686,29 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 2,
 			grid : true,
 			form : true
-		}, {
+		}, 
+		{
+			config : {
+				name : 'tipo_cambio_3',
+				fieldLabel : '(TC)',
+				allowBlank : false,
+				readOnly : true,
+				anchor : '80%',
+				gwidth : 70,
+				maxLength : 20,
+				decimalPrecision : 6
+			},
+			type : 'NumberField',
+			filters : {
+				pfiltro : 'incbte.tipo_cambio_3',
+				type : 'numeric'
+			},
+			id_grupo : 2,
+			grid : true,
+			form : true
+		},
+		
+		{
 			config : {
 				name : 'nro_tramite',
 				gwidth : 150,
@@ -875,7 +927,35 @@ header("content-type: text/javascript; charset=UTF-8");
 			grid : true,
 			egrid : true,
 			form : true
-		}, {
+		},
+            ////#32
+            {
+                config : {
+                    name : 'documento_iva',
+                    qtip : 'Documento Iva',
+                    fieldLabel : 'Validar Documento Iva',
+                    allowBlank : false,
+                    gwidth : 80,
+                    width : 80,
+                    typeAhead : true,
+                    triggerAction : 'all',
+                    lazyRender : true,
+                    mode : 'local',
+                    store : ['no', 'si']
+                },
+                type : 'ComboBox',
+                filters : {
+                    pfiltro : 'incbte.documento_iva',
+                    type : 'string'
+                },
+                valorInicial : 'no',
+                id_grupo : 0,
+                grid : true,
+                egrid : true,
+                form : true
+            },
+            ////#32
+            {
 			config : {
 				name : 'fecha_costo_ini',
 				fieldLabel : 'Fecha Inicial',
@@ -893,6 +973,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				type : 'date'
 			},
 			id_grupo : 3,
+			egrid : true,
 			grid : true,
 			form : true
 		}, {
@@ -913,6 +994,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				type : 'date'
 			},
 			id_grupo : 3,
+			egrid : true,
 			grid : true,
 			form : true
 		}, {
@@ -1002,7 +1084,25 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 0,
 			grid : true,
 			form : false
-		}],
+		},{
+			config : {
+				name : 'nro_tramite_aux',
+				gwidth : 150,
+				fieldLabel : 'Nro. Trámite Aux',
+			},
+			type : 'Field',
+			id_grupo : 0,
+			/*filters : {
+				pfiltro : 'incbte.nro_tramite',
+				type : 'string'
+			},*/
+			grid : true,
+			///bottom_filter : true,
+			form : false,
+		}
+		
+		
+		],
 
 		Grupos : [{
 			layout : 'column',
@@ -1168,9 +1268,12 @@ header("content-type: text/javascript; charset=UTF-8");
 		}, 'momento_comprometido', 'momento_ejecutado', 'id_moneda_base','id_proceso_wf','id_estado_wf',
 		'cbte_cierre', 'cbte_apertura', 'cbte_aitb', 'momento_pagado', 'manual', 
 		'desc_tipo_relacion_comprobante', 'id_int_comprobante_fks', 'manual', 
-		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 
-		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 
-		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio'],
+		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 'tipo_cambio_3', 'id_moneda_act',
+		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 'ope_3',
+		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio',
+		'nro_tramite_aux',
+            'documento_iva'//#32
+        ],
 
 		rowExpander : new Ext.ux.grid.RowExpander({
 			tpl : new Ext.Template('<br>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Clase cbte:&nbsp;&nbsp;</b> {desc_clase_comprobante}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Origen:&nbsp;&nbsp;</b> {desc_subsistema}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Beneficiario:&nbsp;&nbsp;</b> {beneficiario}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Glosa:&nbsp;&nbsp;</b> {glosa1} {glosa2}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Frima 1:&nbsp;&nbsp;</b> {desc_firma1} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 2:&nbsp;&nbsp;</b> {desc_firma2} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Firma 3:&nbsp;&nbsp;</b> {desc_firma3} </p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>', '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>')
@@ -1232,6 +1335,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				allowBlank: false,
 				blankText:'... ?',
 				emptyText:'Gestion...',
+				name:'id_gestion',
 				store:new Ext.data.JsonStore(
 				{
 					url: '../../sis_parametros/control/Gestion/listarGestion',
@@ -1288,10 +1392,10 @@ header("content-type: text/javascript; charset=UTF-8");
 			}),		
 			
 		south : {
-			url : '../../../sis_contabilidad/vista/int_transaccion/IntTransaccion.php',
+			url : '../../../sis_contabilidad/vista/int_transaccion/IntTransaccionAux.php',
 			title : 'Transacciones',
 			height : '50%', //altura de la ventana hijo
-			cls : 'IntTransaccion'
+			cls : 'IntTransaccionAux'
 		},
 		
 
@@ -1388,30 +1492,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				height : '80%'
 			}, rec.data, this.idContenedor, 'IntRelDevengado');
 		},
-	   checkPresupuesto:function(){                   
-			  var rec=this.sm.getSelected();
-			  var configExtra = [];
-			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
-										'Estado del Presupuesto',
-										{
-											modal:true,
-											width:700,
-											height:450
-										}, {
-											data:{
-											   nro_tramite: rec.data.nro_tramite								  
-											}}, this.idContenedor,'ChkPresupuesto',
-										{
-											config:[{
-													  event:'onclose',
-													  delegate: this.onCloseChk												  
-													}],
-											
-											scope:this
-										 });
-			   
-	 },
-	 
+	  
 	 addBotonesGantt: function() {
         this.menuAdqGantt = new Ext.Toolbar.SplitButton({
             id: 'b-diagrama_gantt-' + this.idContenedor,
@@ -1494,14 +1575,13 @@ header("content-type: text/javascript; charset=UTF-8");
 	}, 
 	
 	sigEstado:function(){                   
-      	var rec=this.sm.getSelected();
-      	
-      	this.mostrarWizard(rec);
+      	var rec=this.sm.getSelected();      	
+      	this.mostrarWizard(rec, true);
       	
                
      },
      
-    mostrarWizard : function(rec) {
+    mostrarWizard : function(rec, validar_doc) {
      	var configExtra = [],
      		obsValorInicial;
      	   
@@ -1543,6 +1623,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         });        
      },
     onSaveWizard:function(wizard,resp){
+        this.mandarDatosWizard(wizard, resp, true);
+    },
+    mandarDatosWizard:function(wizard,resp, validar_doc){
         Phx.CP.loadingShow();
         Ext.Ajax.request({
             url:'../../sis_contabilidad/control/IntComprobante/siguienteEstado',
@@ -1555,37 +1638,141 @@ header("content-type: text/javascript; charset=UTF-8");
 	                id_depto_wf:        resp.id_depto_wf,
 	                obs:                resp.obs,
 	                instruc_rpc:		resp.instruc_rpc,
-	                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+	                json_procesos:      Ext.util.JSON.encode(resp.procesos),
+	                validar_doc:		validar_doc
 	                
                 },
             success: this.successWizard,
             failure: this.conexionFailure, 
-            argument: { wizard:wizard , id_proceso_wf : resp.id_proceso_wf_act},
+            argument: { wizard:wizard , id_proceso_wf : resp.id_proceso_wf_act, resp : resp},
             timeout: this.timeout,
             scope: this
         });
+        
+        
+        
     },
     successWizard: function(resp){
+		var rec=this.sm.getSelected();
         Phx.CP.loadingHide();
-        resp.argument.wizard.panel.destroy()
-        this.reload();
+       
+        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+
+        if(reg.ROOT.datos.operacion == 'falla'){
+
+			
+				reg.ROOT.datos.desc_falla
+				if (confirm(reg.ROOT.datos.desc_falla + "\n¿Desea continuar de todas formas?")) {
+					this.mandarDatosWizard(resp.argument.wizard, resp.argument.resp, false);
+				}
+				else {
+					resp.argument.wizard.panel.destroy()
+					this.reload();
+				}
+			
+        }
+        else{
+	        resp.argument.wizard.panel.destroy()
+	        this.reload();
+	        
+	        if (resp.argument.id_proceso_wf) {
+					Phx.CP.loadingShow();
+					Ext.Ajax.request({
+						url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
+						params : {
+							'id_proceso_wf' : resp.argument.id_proceso_wf
+						},
+						success : this.successExport,
+						failure : this.conexionFailure,
+						timeout : this.timeout,
+						scope : this
+					});
+				}	
+        }
         
-        if (resp.argument.id_proceso_wf) {
-				Phx.CP.loadingShow();
-				Ext.Ajax.request({
-					url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
-					params : {
-						'id_proceso_wf' : resp.argument.id_proceso_wf
-					},
-					success : this.successExport,
-					failure : this.conexionFailure,
-					timeout : this.timeout,
-					scope : this
-				});
-			}
+        
         
         
     },
+    addBotonesPresupuesto: function() {
+    	
+        this.menuPre = new Ext.Toolbar.SplitButton({
+            id: 'b-chkpresupuesto-' + this.idContenedor,
+            text: 'Presupuestos.',
+            grupo:[0,1,2],
+            disabled: true,
+            iconCls : 'blist',
+            handler:this.checkPresupuesto,
+            scope: this,
+            menu:{
+            items: [{
+                id:'btn-chkpresupuesto-' + this.idContenedor,
+                text: 'Revisar Presupuesto Comprometido/Ejecutado',
+                tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para este  tramite</p>',
+                handler:this.checkPresupuesto,               
+                scope: this
+            }, {
+                id:'b-btnRepOC-' + this.idContenedor,
+                text: 'Verificar presupuesto disponible (Formulado)',
+                tooltip: '<b>Verificar presupuesto disponible (Formulado)</b>',
+                handler:this.checkVerPresupuesto,
+                scope: this
+            }
+        ]}});
+		this.tbar.add(this.menuPre);
+    },
+    
+     checkPresupuesto:function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
+										'Estado del Presupuesto',
+										{
+											modal:true,
+											width:700,
+											height:450
+										}, {
+											data:{
+											   nro_tramite: rec.data.nro_tramite								  
+											}}, this.idContenedor,'ChkPresupuesto');
+			   
+	 },
+	 
+	  checkVerPresupuesto:function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/verificacion_presup/VerificacionPresup.php',
+										'Verificación de disponibilidad del Presupuesto',
+										{
+											modal: true,
+											width: 700,
+											height: 450
+										}, {
+											  tabla_id: rec.data.id_int_comprobante,
+											  tabla: 'conta.tint_comprobante'								  
+											}, this.idContenedor,'VerificacionPresup');
+											
+											
+										
+			   
+	 },
+	 
+	 checkDependencias: function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/CbteDependencias.php',
+										'Dependencias',
+										{
+											modal:true,
+											width: '80%',
+											height: '80%'
+										}, 
+										  rec.data, 
+										  this.idContenedor,
+										 'CbteDependencias');			   
+	},
+    
+    
 
 	onButtonAIRBP : function() {
 		var rec=this.sm.getSelected();
@@ -1596,7 +1783,287 @@ header("content-type: text/javascript; charset=UTF-8");
 			width:450,
 			height:200
 		},rec.data,this.idContenedor,'FormArchivoAIRBP')
-	}
+	},
+	//
+	postReloadPage:function(data){	
+		console.log('---->'+data);			
+		//id_depto=data.id_depto;
+		//id_gestion=data.id_gestion;
+		tipo_filtro=data.tipo_filtro;	
+	},
+	//
+	addBotonesLibroDiario: function() {
+		this.menuLibroDiario = new Ext.Toolbar.SplitButton({
+			id: 'b-libro_diario-' + this.idContenedor,
+			text: 'Libro Diario',
+			disabled: false,
+			grupo:[0,1],
+			iconCls : 'bprint',
+			handler:this.formfiltroDiario,
+			scope: this,
+			menu:{
+				items: [{
+					id:'b-ins-diario-pdf-' + this.idContenedor,
+					text: 'Filtrar',
+					tooltip: '<b>Filtro de parametros a visualizar</b>',
+					handler:this.formfiltroDiario,
+					scope: this
+				}
+			]}
+		});
+		this.tbar.add(this.menuLibroDiario);
+	},
+	//
+	formfiltroDiario:function(){	
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/FormFiltroDiario.php',
+			'Formulario',
+			{
+				modal:true,
+				width:400,
+				height:370
+			}, 
+			{
+			}, 
+			this.idContenedor,'FormFiltroDiario',
+			{
+				config:[{
+					event:'beforesave',
+					delegate: this.addLibroDiario,
+				}],
+				scope:this
+			}
+		)
+	} ,
+	
+	getConfigCambiaria : function(sw_valores) {
+
+			var localidad = 'nacional';
+			
+			if (this.swButton == 'EDIT') {
+				var rec = this.sm.getSelected();
+				localidad = rec.data.localidad;
+				
+			}
+
+			//Verifica que la fecha y la moneda hayan sido elegidos
+			if (this.Cmp.fecha.getValue() && this.Cmp.id_moneda.getValue() && this.Cmp.forma_cambio.getValue()) {
+				Phx.CP.loadingShow();
+				var forma_cambio = this.Cmp.forma_cambio.getValue();
+				if(forma_cambio=='convenido'){
+					this.Cmp.tipo_cambio.setReadOnly(false);
+					this.Cmp.tipo_cambio_2.setReadOnly(false);
+					this.Cmp.tipo_cambio_3.setReadOnly(false);
+				}
+				else{
+					this.Cmp.tipo_cambio.setReadOnly(true);
+					this.Cmp.tipo_cambio_2.setReadOnly(true);
+					this.Cmp.tipo_cambio_3.setReadOnly(true);
+				}
+				
+				
+				
+				Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/ConfigCambiaria/getConfigCambiaria',
+				params:{
+					fecha: this.Cmp.fecha.getValue(),
+					id_moneda: this.Cmp.id_moneda.getValue(),
+					localidad: localidad,
+					sw_valores: sw_valores,
+					forma_cambio: forma_cambio
+				}, success: function(resp) {
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					if (reg.ROOT.error) {
+						this.Cmp.tipo_cambio.reset();
+						this.Cmp.tipo_cambio_2.reset();
+						this.Cmp.tipo_cambio_3.reset();
+						Ext.Msg.alert('Error', 'Validación no realizada: ' + reg.ROOT.error)
+					} else {
+						
+						//cambia labels
+						
+						this.Cmp.tipo_cambio.label.update(reg.ROOT.datos.v_tc1 +' (tc)');
+						this.Cmp.tipo_cambio_2.label.update(reg.ROOT.datos.v_tc2 +' (tc)');
+						this.Cmp.tipo_cambio_3.label.update(reg.ROOT.datos.v_tc3 +' (tc)');
+						if (sw_valores == 'si'){
+						    //poner valores por defecto
+						 	this.Cmp.tipo_cambio.setValue(reg.ROOT.datos.v_valor_tc1);
+						    this.Cmp.tipo_cambio_2.setValue(reg.ROOT.datos.v_valor_tc2);
+						    this.Cmp.tipo_cambio_3.setValue(reg.ROOT.datos.v_valor_tc3);
+						}
+						
+					   
+					   this.Cmp.id_config_cambiaria.setValue(reg.ROOT.datos.id_config_cambiaria);
+					}
+					
+
+				}, failure: function(a,b,c,d){
+					this.Cmp.tipo_cambio.reset();
+					this.Cmp.tipo_cambio_2.reset();
+					this.Cmp.tipo_cambio_3.reset();
+					this.conexionFailure(a,b,c,d)
+				},
+				timeout: this.timeout,
+				scope:this
+				});
+			}
+
+		},	
+	//
+	addLibroDiario : function (wizard,resp){		
+		var dpto=this.cmbDepto.getRawValue();
+		var gest=this.cmbGestion.getRawValue();		
+		var id_dpto=this.cmbDepto.getValue();
+		var id_gestion=this.cmbGestion.getValue();		
+		var nombreVista=this.nombreVista;		
+		Phx.CP.loadingShow();		
+		Ext.Ajax.request({
+			url:'../../sis_contabilidad/control/IntComprobante/impReporteDiario',
+			params:
+			{	
+				'gestion':gest,
+				'depto':dpto,
+				'id_gestion':id_gestion,
+				'id_dpto':id_dpto,
+				'nombreVista':nombreVista,
+				//tipo de formato pdf o xls
+				'tipo_filtro':tipo_filtro,
+				//parametros q se mostraran, si son tickeados
+				'tipo_moneda':resp.tipo_moneda,
+				'beneficiario':resp.beneficiario,
+				//'partida':resp.partida,
+				'fecha':resp.fecha,
+				'nro_comprobante':resp.nro_comprobante,
+				'nro_tramite':resp.nro_tramite,
+				//'desc_tipo_relacion_comprobante':resp.desc_tipo_relacion_comprobante,
+				'tipo_formato':resp.tipo_formato,
+				'fecIni':resp.fecIni,
+				'fecFin':resp.fecFin,
+				'cc':resp.cc			
+			},
+			success: this.successExport,		
+			failure: this.conexionFailure,
+			timeout:3.6e+6,
+			scope:this
+		});
+   },
+    
+    igualarCbte: function() {
+			   
+			    var rec = this.sm.getSelected().data;
+			    Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_contabilidad/control/IntComprobante/igualarComprobante',
+					params : {
+						id_int_comprobante : rec.id_int_comprobante
+					},
+					success : function(resp) {
+						Phx.CP.loadingHide();
+						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+						if (reg.ROOT.error) {
+							Ext.Msg.alert('Error', 'No se pudo igualar el cbte: ' + reg.ROOT.error)
+						} else {
+							this.reload();
+						}
+					},
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			
+
+		},
+		
+		
+		swEditable: function() {
+			var rec = this.sm.getSelected().data;
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url : '../../sis_contabilidad/control/IntComprobante/swEditable',
+				params : {
+					id_int_comprobante : rec.id_int_comprobante
+				},
+				success : function(resp) {
+					Phx.CP.loadingHide();
+					var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					if (reg.ROOT.error) {
+						Ext.Msg.alert('Error', 'Al  cambiar el modo de edición: ' + reg.ROOT.error)
+					} else {
+						this.reload();
+					}
+				},
+				failure : this.conexionFailure,
+				timeout : this.timeout,
+				scope : this
+			});
+		},
+		//manu
+		ListCbts : function(rec)
+		{
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/ListaCbtes.php',
+				'Lista de comprobantes',
+				{
+					modal:true,
+					width:450,
+					height:200
+				},
+				this.maestro,
+				this.idContenedor,
+				'ListaCbtes',
+				{
+					config:[{
+						event:'beforesave',
+						delegate: this.datos,
+					}],
+					scope:this
+				}
+			);
+		},
+		
+		datos : function (wizard,resp){	
+			Phx.CP.loadingShow();	
+			Ext.Ajax.request({
+				url:'../../sis_contabilidad/control/IntComprobante/ListadoCbte',
+				params:
+				{		
+					'id_usuario':resp.id_usuario,
+					'fecha_ini':resp.fecha_ini,			
+					'fecha_fin':resp.fecha_fin			
+				},
+				success: this.successExport,		
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});
+		},
+		preparaMenu : function(n) {
+			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
+			var rec = this.sm.getSelected();
+			this.getBoton('btnNroTramite').enable();			
+			return tb;
+		},
+		//
+		liberaMenu : function() {
+			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
+			this.getBoton('btnNroTramite').disable(); 
+		},
+		//#7
+		loadWizardTramite : function() {			
+			var rec = this.sm.getSelected();			
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardTramiteCbte.php', 
+			'Cambiar nro tramite ...', {
+				width : 400,
+				height : 150
+			}, {
+				'id_int_comprobante': rec.data.id_int_comprobante,
+				'nro_tramite_aux': rec.data.nro_tramite_aux
+			}, 
+			this.idContenedor, 'WizardTramiteCbte')
+		},	
+		
+		
+		
+		
 })
 </script>
 

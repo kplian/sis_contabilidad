@@ -4,8 +4,11 @@
 *@file gen-ACTPlantillaComprobante.php
 *@author  (admin)
 *@date 10-06-2013 14:40:00
-*@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
-*/
+*@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo,
+ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+# 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+#31  EndeETR       06/02/2019           EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
+ */
 
 class ACTPlantillaComprobante extends ACTbase{    
 			
@@ -125,7 +128,13 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['campo_fecha_costo_ini'])?'NULL':"'".$row['campo_fecha_costo_ini']."'") ."," .							 
 							 (is_null($row['campo_fecha_costo_fin'])?'NULL':"'".$row['campo_fecha_costo_fin']."'")."," .
 							 (is_null($row['funcion_comprobante_editado'])?'NULL':"'".$row['funcion_comprobante_editado']."'")."," .
-							 (is_null($row['desc_plantilla'])?'NULL':"'".$row['desc_plantilla']."'").");\r\n");				
+							 (is_null($row['desc_plantilla'])?'NULL':"'".$row['desc_plantilla']."'")."," .
+							 (is_null($row['campo_cbte_relacionado'])?'NULL':"'".$row['campo_cbte_relacionado']."'")."," .
+							 (is_null($row['codigo_tipo_relacion'])?'NULL':"'".$row['codigo_tipo_relacion']."'")."," .	
+							 
+							 (is_null($row['campo_tipo_cambio_2'])?'NULL':"'".$row['campo_tipo_cambio_2']."'") ."," .	
+							 (is_null($row['campo_tipo_cambio_3'])?'NULL':"'".$row['campo_tipo_cambio_3']."'") ."," .	
+							 (is_null($row['campo_id_config_cambiaria'])?'NULL':"'".$row['campo_id_config_cambiaria']."'") .");\r\n");						
 							 
 							 	
 				}
@@ -142,7 +151,8 @@ class ACTPlantillaComprobante extends ACTbase{
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);\r\n");	
+							NULL,NULL,NULL,NULL,NULL,
+							NULL,NULL,NULL,NULL,NULL,NULL,NULL);\r\n");	
 	
 			} else {
 					
@@ -190,8 +200,12 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['campo_forma_pago'])?'NULL':"'".$row['campo_forma_pago']."'")."," .	
 							 
 							 (is_null($row['tipo_relacion_contable_cc'])?'NULL':"'".$row['tipo_relacion_contable_cc']."'")."," .
-							 (is_null($row['campo_relacion_contable_cc'])?'NULL':"'".$row['campo_relacion_contable_cc']."'")."," .	
-							 (is_null($row['campo_suborden'])?'NULL':"'".$row['campo_suborden']."'") .");\r\n");
+							 (is_null($row['campo_relacion_contable_cc'])?'NULL':"'".$row['campo_relacion_contable_cc']."'")."," .
+							 (is_null($row['campo_suborden'])?'NULL':"'".$row['campo_suborden']."'") ."," .
+                             (is_null($row['incluir_desc_doc'])?'NULL':"'".$row['incluir_desc_doc']."'") ."," .  //#21
+                             (is_null($row['campo_codigo_aplicacion_rc'])?'NULL':"'".$row['campo_codigo_aplicacion_rc']."'") .  //#31
+                             
+                                ");\r\n");
 							 
 							 						
 				}

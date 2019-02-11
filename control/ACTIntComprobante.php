@@ -5,6 +5,13 @@
 *@author  (admin)
 *@date 29-08-2013 00:28:30
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ISSUE     FORK          FECHA:		       AUTOR                 DESCRIPCION
+   
+ #0        		     29-08-2013        RCM KPLIAN        CREACION
+ #2                  27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
+ #7      ENDEERT		27-12-2018     MANUEL GUERRA     crearon listado de tramites, y la modifiacion del nrotramite_aux
+ #15     ENDEERT		04-01-2019     Miguel Mamani     corrección filtro por gestión interfaz visto bueno comprobantes
+ * 1A			21/08/2018		EGS					se creo la funcion listarIntComprobanteCombo
 */
 //require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
 // convert to PDF
@@ -12,6 +19,12 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/PlantillasHTML.php');
 require_once(dirname(__FILE__).'/../../lib/lib_reporte/smarty/ksmarty.php');
 require_once(dirname(__FILE__).'/../reportes/RIntCbte.php');
+
+require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario.php');
+require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario_cuad.php');
+require_once(dirname(__FILE__).'/../reportes/RComprobanteDiarioXls.php');
+require_once(dirname(__FILE__).'/../reportes/RCbteXls.php');
+//
 class ACTIntComprobante extends ACTbase{
 	
 	private $objPlantHtml;
@@ -30,7 +43,7 @@ class ACTIntComprobante extends ACTbase{
         }
 		
 		if($this->objParam->getParametro('id_clase_comprobante')!=''){
-            $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");    
+            $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");
         }
 		
 		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'  || $this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
@@ -47,6 +60,16 @@ class ACTIntComprobante extends ACTbase{
 		if($this->objParam->getParametro('momento')!= ''){
 			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
 		}
+
+		//RCM 01/09/2017
+		
+		if($this->objParam->getParametro('estado_reg_estado')!= ''){
+			$this->objParam->addFiltro("incbte.estado_reg = ''".$this->objParam->getParametro('estado_reg_estado')."''");    
+		}
+		
+		if($this->objParam->getParametro('id_int_comprobante')!= ''){
+			$this->objParam->addFiltro("incbte.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));    
+		}
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
@@ -62,6 +85,8 @@ class ACTIntComprobante extends ACTbase{
 	}
 
 
+
+
    function listarIntComprobanteWF(){
 		$this->objParam->defecto('ordenacion','id_int_comprobante');
 		$this->objParam->defecto('dir_ordenacion','asc');
@@ -70,8 +95,14 @@ class ACTIntComprobante extends ACTbase{
 		if($this->objParam->getParametro('id_deptos')!=''){
             $this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
         }
-		
-		
+        ////MMV-- #15  --///////
+       if($this->objParam->getParametro('id_clase_comprobante')!=''){
+           $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");
+       }
+       if($this->objParam->getParametro('id_gestion')!=''){
+           $this->objParam->addFiltro("incbte.id_gestion in (".$this->objParam->getParametro('id_gestion').")");
+       }
+       ////MMV-- #15 --///////
 		if($this->objParam->getParametro('momento')!= ''){
 			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
 		}
@@ -572,8 +603,232 @@ class ACTIntComprobante extends ACTbase{
 		$this->res=$this->objFunc->clonarCbte($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+   
+   function modificarFechasCostosCbte(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->modificarFechasCostosCbte($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+   
+   
+
+   function listarVerPresCbte(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarVerPresCbte');
+		} else{
+			$this->objFunc=$this->create('MODIntComprobante');
+			
+			$this->res=$this->objFunc->listarVerPresCbte($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	//
+	function listarRepIntComprobante(){
+
+		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    		
+		if($this->objParam->getParametro('id_deptos')!=''){
+			$this->objParam->addFiltro("incbte.id_depto in (".$this->objParam->getParametro('id_deptos').")");    
+		}		
+		if($this->objParam->getParametro('id_gestion')!=''){
+			$this->objParam->addFiltro("incbte.id_gestion in (".$this->objParam->getParametro('id_gestion').")");    
+		}		
+		if($this->objParam->getParametro('id_clase_comprobante')!=''){
+		    $this->objParam->addFiltro("incbte.id_clase_comprobante in (".$this->objParam->getParametro('id_clase_comprobante').")");    
+		}		
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'  || $this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
+			$this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
+		}
+		else{
+			$this->objParam->addFiltro("incbte.estado_reg in (''borrador'', ''edicion'')");
+		}		
+		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
+			$this->objParam->addFiltro(" (incbte.c31 = '''' or incbte.c31 is null )" );      
+		}		
+		if($this->objParam->getParametro('momento')!= ''){
+			$this->objParam->addFiltro("incbte.momento = ''".$this->objParam->getParametro('momento')."''");    
+		}
+		if($this->objParam->getParametro('id_int_comprobante')!= ''){
+			$this->objParam->addFiltro("incbte.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));    
+		}
+
+		$this->objFunc=$this->create('MODIntComprobante');		
+		$cbteHeader = $this->objFunc->listarRepIntComprobanteDiario($this->objParam);			
+		if($cbteHeader->getTipo() == 'EXITO'){										
+			return $cbteHeader;			
+		}
+		else{
+			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}			
+	}
+	//mp
+	function impReporteDiario() {
+		if($this->objParam->getParametro('tipo_formato')=='pdf') {
+			$nombreArchivo = uniqid(md5(session_id()).'LibroDiario').'.pdf';			
+			$dataSource = $this->listarRepIntComprobante();	
+			$dataEntidad = "";
+			$dataPeriodo = "";	
+			$orientacion = 'P';		
+			$tamano = 'LETTER';
+			$titulo = 'Consolidado';
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);	
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$reporte = new RComprobanteDiario($this->objParam);  
+			$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
+		}
+		if($this->objParam->getParametro('tipo_formato')=='pdf_c') {
+			$nombreArchivo = uniqid(md5(session_id()).'LibroDiario').'.pdf';			
+			$dataSource = $this->listarRepIntComprobante();	
+			$dataEntidad = "";
+			$dataPeriodo = "";	
+			$orientacion = 'P';		
+			$tamano = 'LETTER';
+			$titulo = 'Consolidado';
+			$this->objParam->addParametro('orientacion',$orientacion);
+			$this->objParam->addParametro('tamano',$tamano);		
+			$this->objParam->addParametro('titulo_archivo',$titulo);	
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$reporte = new RComprobanteDiario_cuad($this->objParam);  
+			$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
+			$reporte->generarReporte();
+			$reporte->output($reporte->url_archivo,'F');
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());		
+		}
+		if($this->objParam->getParametro('tipo_formato')=='xls') {			
+			$this->objFun=$this->create('MODIntComprobante');	
+			$this->res = $this->objFun->listarRepIntComprobanteDiario();
+			if($this->res->getTipo()=='ERROR'){
+				$this->res->imprimirRespuesta($this->res->generarJson());
+				exit;
+			}
+			$titulo ='Diario';
+			$nombreArchivo=uniqid(md5(session_id()).$titulo);
+			$nombreArchivo.='.xls';
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$this->objParam->addParametro('datos',$this->res->datos);			
+			$this->objReporteFormato=new RComprobanteDiarioXls($this->objParam);
+			$this->objReporteFormato->generarDatos();
+			$this->objReporteFormato->generarReporte();
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		}				
+	}
+
+	function listarIntComprobanteTCCCuenta(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if($this->objParam->getParametro('id_tipo_cc')!=''){
+            $this->objParam->addFiltro("cc.id_tipo_cc =".$this->objParam->getParametro('id_tipo_cc'));    
+        }
+
+        if($this->objParam->getParametro('nro_cuenta')!=''){
+            $this->objParam->addFiltro("cue.nro_cuenta = ''".$this->objParam->getParametro('nro_cuenta')."''");
+        }
+		
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODIntComprobante','listarIntComprobanteTCCCuenta');
+		} else{
+			$this->objFunc=$this->create('MODIntComprobante');
+			
+			$this->res=$this->objFunc->listarIntComprobanteTCCCuenta($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	//#2 RAC, 27-08-2018  se añade trasaccion para modificar glosa de comprobantes validados
+	function modificarGlosaIntComprobante(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->modificarGlosaIntComprobante($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	
+		////////////EGS-F-21/08/2018///    1A	
+	function listarIntComprobanteCombo(){
+		$this->objParam->defecto('ordenacion','id_int_comprobante');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+	
+		if($this->objParam->getParametro('estado_reg')!= ''){
+			$this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
+		}
+		/*
+		if($this->objParam->getParametro('clase_comprobante')!= ''){
+			$this->objParam->addFiltro("clc.movimiento = ''".$this->objParam->getParametro('clase_comprobante')."''");    
+		}*/
+		
+		if($this->objParam->getParametro('clase_comprobante')!= ''){
+			$this->objParam->addFiltro("clc.movimiento in(''".$this->objParam->getParametro('clase_comprobante')."'',''".$this->objParam->getParametro('clase_comprobante1')."'')");  
+		}
+	
+		$this->objFunc=$this->create('MODIntComprobante');
+			
+		$this->res=$this->objFunc->listarIntComprobanteCombo($this->objParam);
 		
 		
+		
+		//echo dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php';exit;
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}	
+	
+	////////////EGS-F-21/08/2018///    1A	
+	
+	//mp
+	function ListadoCbte() {						
+		$this->objFun=$this->create('MODIntComprobante');	
+		$this->res = $this->objFun->listadoCbtes();
+		if($this->res->getTipo()=='ERROR'){
+			$this->res->imprimirRespuesta($this->res->generarJson());
+			exit;
+		}
+		$titulo ='Cbtes';
+		$nombreArchivo=uniqid(md5(session_id()).$titulo);
+		$nombreArchivo.='.xls';
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		$this->objParam->addParametro('datos',$this->res->datos);			
+		$this->objReporteFormato=new RCbteXls($this->objParam);
+		$this->objReporteFormato->generarDatos();
+		$this->objReporteFormato->generarReporte();
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());				
+	}
+	//#7
+	function modificarTramiIntCbte(){
+		$this->objFunc=$this->create('MODIntComprobante');	
+		$this->res=$this->objFunc->modificarTramiIntCbte($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	//#7
+	function listadoTramites(){
+		$this->objParam->defecto('ordenacion','nro_tramite');
+		$this->objParam->defecto('dir_ordenacion','asc');
+		$this->objFunc=$this->create('MODIntComprobante');			
+		$this->res=$this->objFunc->listadoTramites($this->objParam);		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
 }
 
 ?>

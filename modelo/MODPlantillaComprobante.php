@@ -5,7 +5,11 @@
 *@author  (admin)
 *@date 10-06-2013 14:40:00
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+# 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+#31  EndeETR       06/02/2019           EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
+
+ */
 
 class MODPlantillaComprobante extends MODbase{
 	
@@ -60,6 +64,15 @@ class MODPlantillaComprobante extends MODbase{
 		$this->captura('funcion_comprobante_prevalidado','text');
 		$this->captura('funcion_comprobante_validado_eliminado','text');
 		$this->captura('desc_plantilla','varchar');
+		$this->captura('campo_cbte_relacionado','varchar');
+		$this->captura('codigo_tipo_relacion','varchar');
+		
+		$this->captura('campo_tipo_cambio_2','varchar');		
+		$this->captura('campo_tipo_cambio_3','varchar');
+	    $this->captura('campo_id_config_cambiaria','varchar');
+		
+		
+		
 		
 		
         //Ejecuta la instruccion
@@ -114,6 +127,14 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('funcion_comprobante_validado_eliminado','funcion_comprobante_validado_eliminado','text');
 		
 		$this->setParametro('desc_plantilla','desc_plantilla','varchar');
+		$this->setParametro('campo_cbte_relacionado','campo_cbte_relacionado','varchar');
+		$this->setParametro('codigo_tipo_relacion','codigo_tipo_relacion','varchar');
+		
+		
+		$this->setParametro('campo_tipo_cambio_2','campo_tipo_cambio_2','varchar');
+		$this->setParametro('campo_tipo_cambio_3','campo_tipo_cambio_3','varchar');
+		$this->setParametro('campo_id_config_cambiaria','campo_id_config_cambiaria','varchar');
+		
 		
 		
 		
@@ -171,6 +192,14 @@ class MODPlantillaComprobante extends MODbase{
 		$this->setParametro('funcion_comprobante_prevalidado','funcion_comprobante_prevalidado','text');
 		$this->setParametro('funcion_comprobante_validado_eliminado','funcion_comprobante_validado_eliminado','text');
 		$this->setParametro('desc_plantilla','desc_plantilla','varchar');
+		$this->setParametro('campo_cbte_relacionado','campo_cbte_relacionado','varchar');
+		$this->setParametro('codigo_tipo_relacion','codigo_tipo_relacion','varchar');
+		
+		
+		$this->setParametro('campo_tipo_cambio_2','campo_tipo_cambio_2','varchar');
+		$this->setParametro('campo_tipo_cambio_3','campo_tipo_cambio_3','varchar');
+		$this->setParametro('campo_id_config_cambiaria','campo_id_config_cambiaria','varchar');
+		
 		
 		
         
@@ -248,6 +277,12 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('campo_fecha_costo_fin','text');
 			$this->captura('funcion_comprobante_editado','text');
 			$this->captura('desc_plantilla','varchar');
+			$this->captura('campo_cbte_relacionado','varchar');
+		    $this->captura('codigo_tipo_relacion','varchar');
+			
+			$this->captura('campo_tipo_cambio_2','varchar');		
+		    $this->captura('campo_tipo_cambio_3','varchar');
+	        $this->captura('campo_id_config_cambiaria','varchar');
 			
 		
 		$this->armarConsulta();	
@@ -325,8 +360,8 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('tipo_relacion_contable_cc','varchar');
 		    $this->captura('campo_relacion_contable_cc','text');
 			$this->captura('campo_suborden','varchar');
-			
-		
+            $this->captura('incluir_desc_doc','varchar');//#21
+            $this->captura('campo_codigo_aplicacion_rc','varchar');//#31           		
 			
 			$this->armarConsulta();
 			$consulta=$this->getConsulta();			

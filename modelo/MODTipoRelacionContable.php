@@ -5,8 +5,9 @@
 *@author  (admin)
 *@date 16-05-2013 21:51:43
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
-
+	ISSUE			FECHA				AUTHOR 			DESCRIPCION
+ 	#14	endeEtr 	04/01/2019			EGS				se agrego las funciones exportarDatos() para la exportacion de configuracion	
+ */
 class MODTipoRelacionContable extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -36,6 +37,11 @@ class MODTipoRelacionContable extends MODbase{
 		$this->captura('tiene_auxiliar','varchar');
 		$this->captura('partida_tipo','varchar');
 		$this->captura('partida_rubro','varchar');
+		$this->captura('tiene_aplicacion','varchar');
+		$this->captura('tiene_moneda','varchar');
+		$this->captura('tiene_tipo_centro','varchar');
+		$this->captura('codigo_aplicacion_catalogo','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -61,6 +67,11 @@ class MODTipoRelacionContable extends MODbase{
 		$this->setParametro('tiene_auxiliar','tiene_auxiliar','varchar');
 		$this->setParametro('partida_tipo','partida_tipo','varchar');
 		$this->setParametro('partida_rubro','partida_rubro','varchar');
+		$this->setParametro('tiene_aplicacion','tiene_aplicacion','varchar');
+		$this->setParametro('tiene_moneda','tiene_moneda','varchar');
+		$this->setParametro('tiene_tipo_centro','tiene_tipo_centro','varchar');
+		$this->setParametro('codigo_aplicacion_catalogo','codigo_aplicacion_catalogo','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -87,6 +98,10 @@ class MODTipoRelacionContable extends MODbase{
 		$this->setParametro('tiene_auxiliar','tiene_auxiliar','varchar');
 		$this->setParametro('partida_tipo','partida_tipo','varchar');
 		$this->setParametro('partida_rubro','partida_rubro','varchar');
+		$this->setParametro('tiene_aplicacion','tiene_aplicacion','varchar');
+		$this->setParametro('tiene_moneda','tiene_moneda','varchar');
+		$this->setParametro('tiene_tipo_centro','tiene_tipo_centro','varchar');
+		$this->setParametro('codigo_aplicacion_catalogo','codigo_aplicacion_catalogo','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -111,6 +126,52 @@ class MODTipoRelacionContable extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+		 function exportarDatos() {//#14	04/01/2019	EGS	
+
+				    $this->procedimiento = 'conta.ft_tipo_relacion_contable_sel';
+					$this->transaccion = 'CONTA_EXPTIC_SEL';
+					$this->tipo_procedimiento = 'SEL';
+					$this->setCount(false);
+					$this->resetCaptura();
+					$this->addConsulta();						
+					
+					$this->captura('tipo_reg','varchar');					
+					$this->captura('id_tipo_relacion_contable','int4');
+					$this->captura('codigo_tabla','varchar');
+					$this->captura('estado_reg','varchar');
+					$this->captura('nombre_tipo_relacion','varchar');
+					$this->captura('tiene_centro_costo','varchar');
+					$this->captura('codigo_tipo_relacion','varchar');
+					$this->captura('id_tabla_relacion_contable','int4');
+					$this->captura('fecha_reg','timestamp');
+					$this->captura('id_usuario_reg','int4');
+					$this->captura('fecha_mod','timestamp');
+					$this->captura('id_usuario_mod','int4');
+					$this->captura('usr_reg','varchar');
+					$this->captura('usr_mod','varchar');
+					$this->captura('tiene_partida','varchar');
+					$this->captura('tiene_auxiliar','varchar');
+					$this->captura('partida_tipo','varchar');
+					$this->captura('partida_rubro','varchar');
+					$this->captura('tiene_aplicacion','varchar');
+					$this->captura('tiene_moneda','varchar');
+					$this->captura('tiene_tipo_centro','varchar');
+					$this->captura('codigo_aplicacion_catalogo','varchar');
+				
+					
+					$this->armarConsulta();
+					$consulta=$this->getConsulta();			
+			  
+					$this->ejecutarConsulta($this->respuesta);
+				
+					if($this->respuesta->getTipo() == 'ERROR'){
+						return $this->respuesta;
+					}
+		       return $this->respuesta;		
+			
+			}
+		
 			
 }
 ?>

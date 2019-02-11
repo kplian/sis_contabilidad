@@ -5,7 +5,9 @@
 *@author  (admin)
 *@date 16-05-2013 21:51:43
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
-*/
+ ISSUE			FECHA				AUTHOR 			DESCRIPCION
+ #14	endeEtr 	04/01/2019			EGS				se agrego el boton para la exportacion de configuracion	
+ */
 
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -17,8 +19,35 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.TipoRelacionContable.superclass.constructor.call(this,config);
 		this.init();		
 		this.iniciarEventos();
+		 //#14	04/01/2019	EGS	
+		this.addButton('btnWizard',
+            {
+                text: 'Exportar Plantilla',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expProceso,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo SQL la plantilla'
+            }
+        ); //#14	04/01/2019	EGS	
 			
 	},
+	 //#14	04/01/2019	EGS	
+	expProceso : function(resp){
+			var data=this.sm.getSelected().data;
+			console.log('data',data);
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url: '../../sis_contabilidad/control/TipoRelacionContable/exportarDatos',
+				params: { 'id_tipo_relacion_contable' : data.id_tipo_relacion_contable },
+				success: this.successExport,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});
+			
+	}, //#14	04/01/2019	EGS	
+	
+	
 	tam_pag:50,
 			
 	Atributos:[
@@ -263,7 +292,111 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 	       		id_grupo:0,
 	       		grid:true,
 	       		form:true
-	       	}
+	       	},
+	      {
+	       		config:{
+	       			name:'tiene_moneda',
+	       			fieldLabel:'Considerar Moneda',
+	       			qtip: ' (SI o NO) en función de la moenda del cbte podemos escoger una relacion contable u otra (Ejm  proveedores por pagar)',
+	       			allowBlank:false,
+	       			emptyText:'Tiene...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['si','no']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		grid:true,
+	       		form:true
+	       	},
+	      {
+	       		config:{
+	       			name:'tiene_tipo_centro',
+	       			fieldLabel:'Cinsiderar el Tipo de presupuesto',
+	       			qtip: ' (SI o NO) condeirara el tipod e presupeusto: gasto, inversion, recurso etc. (Por ejemplo un concepto de gasto  no usara la misma relacion contable para un proyecto de inversión que para un gasto general) ',
+	       			allowBlank:false,
+	       			emptyText:'Tiene...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['si','no']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		grid:true,
+	       		form:true
+	       	},
+	        {
+	       		config:{
+	       			name:'tiene_aplicacion',
+	       			fieldLabel:'Considerar aplicación',
+	       			qtip: ' (SI o NO) La aplicaciones son criterios variables configurables en un catalo para la selacion de relaciones contables, si el valor es si configure tambien la relacion contable a utilizar',
+	       			allowBlank:false,
+	       			emptyText:'Tiene...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['si','no']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		grid:true,
+	       		form:true
+	       	},
+	       	{
+				config: {
+					typeAhead: false,
+					forceSelection: false,
+					name: 'codigo_aplicacion_catalogo',
+					fieldLabel: 'Tipo Catálogo',
+					allowBlank: true,
+					emptyText: 'Tipo Catálogo',
+					store: new Ext.data.JsonStore({
+						url: '../../sis_parametros/control/CatalogoTipo/listarCatalogoTipo',
+						id: 'id_catalogo_tipo',
+						root: 'datos',
+						sortInfo: {
+							field: 'nombre',
+							direction: 'ASC'
+						},
+						totalProperty: 'total',
+						fields: ['id_catalogo_tipo', 'nombre'],
+						// turn on remote sorting
+						remoteSort: true,
+						baseParams: {
+							par_filtro: 'pacati.nombre' //#12
+						}
+					}),
+					valueField: 'nombre',
+					displayField: 'nombre',
+					gdisplayField: 'desc_catalogo_tipo',
+					triggerAction: 'all',
+					lazyRender: true,
+					mode: 'remote',
+					pageSize: 10,
+					queryDelay: 200,
+					width: 250,
+					minChars: 2,
+					tpl: '<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p></div></tpl>',
+					renderer:function(value, p, record){return String.format('{0}', record.data['codigo_aplicacion_catalogo']);},
+					gwidth:130
+				},
+				type: 'ComboBox',
+				id_grupo: 0,
+				filters: {
+					pfiltro: 'codigo_aplicacion_catalogo',
+					type: 'string'
+				},
+				grid: true,
+				form: true
+			}
 	],
 	
 	title:'Tipo Relacion Contable',
@@ -287,7 +420,7 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		{name:'partida_tipo', type: 'string'},
-		{name:'partida_rubro', type: 'string'}
+		{name:'partida_rubro', type: 'string'},  'tiene_aplicacion', 'tiene_moneda', 'tiene_tipo_centro','codigo_aplicacion_catalogo'
 	],
 	sortInfo:{
 		field: 'id_tipo_relacion_contable',
@@ -341,7 +474,28 @@ Phx.vista.TipoRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			}
 
 		},this);
-	}	
+	},
+	 //#14	04/01/2019	EGS	  
+   	preparaMenu: function(n) {
+
+		var data = this.getSelectedData();
+		var tb = this.tbar;
+		Phx.vista.TipoRelacionContable.superclass.preparaMenu.call(this, n);
+        
+		this.getBoton('btnWizard').enable();
+
+		return tb
+	},
+	
+	liberaMenu: function() {
+		var tb = Phx.vista.TipoRelacionContable.superclass.liberaMenu.call(this);
+		if (tb) {
+			this.getBoton('btnWizard').disable();
+			           
+           
+		}
+		return tb
+	},	//#14	04/01/2019	EGS	
 })
 </script>
 		

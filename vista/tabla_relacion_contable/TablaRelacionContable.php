@@ -5,8 +5,9 @@
 *@author  (admin)
 *@date 16-05-2013 21:05:26
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ISSUE			FECHA				AUTHOR 			DESCRIPCION
+ #14	endeEtr 	04/01/2019			EGS				se agrego el campo de codigo y boton para la exportacion de configuracion	
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -18,8 +19,36 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.TablaRelacionContable.superclass.constructor.call(this,config);
 		this.init();
 		this.iniciarEventos();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.load({params:{start:0, limit:this.tam_pag}});
+		 //#14	04/01/2019	EGS	
+		this.addButton('btnWizard',
+            {
+                text: 'Exportar Plantilla',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.expProceso,
+                tooltip: '<b>Exportar</b><br/>Exporta a archivo SQL la plantilla'
+            }
+        );
+        //#14	04/01/2019	EGS	 
 	},
+	 //#14	04/01/2019	EGS	
+	expProceso : function(resp){
+			var data=this.sm.getSelected().data;
+			console.log('data',data);
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url: '../../sis_contabilidad/control/TablaRelacionContable/exportarDatos',
+				params: { 'id_tabla_relacion_contable' : data.id_tabla_relacion_contable },
+				success: this.successExport,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});
+			
+	},
+	 //#14	04/01/2019	EGS	
+	
 	tam_pag:50,
 		
 	Atributos:[
@@ -32,8 +61,24 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'Field',
 			form:true 
+		},	
+		 //#14	04/01/2019	EGS		
+		{
+			config:{
+				name: 'codigo',
+				fieldLabel: 'Codigo',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 150,
+				maxLength:200
+			},
+			type:'TextField',
+			filters:{pfiltro:'tabrecon.tabla_id',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
 		},
-		
+		 //#14	04/01/2019	EGS	
 		{
 			config:{
 				name: 'esquema',
@@ -102,7 +147,7 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 	},
-	{
+		{
 			config:{
 				name: 'tabla_id',
 				fieldLabel: 'Id de la Tabla',
@@ -183,11 +228,30 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
                 maxLength:200
             },
             type:'TextField',
-            filters:{pfiltro:'tabrecon.tabla_id',type:'string'},
+            filters:{pfiltro:'tabrecon.tabla_codigo_auxiliar',type:'string'},
             id_grupo:1,
             grid:true,
             form:true
         },
+        
+        {
+            config:{
+                name: 'tabla_codigo_aplicacion',
+                fieldLabel: 'Codigo Aplicación',
+                qtip:'hace referencia al nombre de campo que contiene codigo de la aplicacion. (Este código puede servir como criterio para escoger una relación contable u otra), si se configura tiene que configurar  un catalogo',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:200
+            },
+            type:'TextField',
+            filters:{pfiltro:'tabrecon.tabla_codigo_aplicacion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        
+        
 		{
 			config:{
 				name: 'estado_reg',
@@ -286,7 +350,10 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		{name:'recorrido_arbol', type: 'string'},
 		'tabla_codigo_auxiliar',
-        'tabla_id_auxiliar'
+        'tabla_id_auxiliar',
+        {name:'tabla_id_fk', type: 'string'},'tabla_codigo_aplicacion',
+     	{name:'codigo', type: 'string'}, //#14	04/01/2019	EGS	
+
 	],
 	sortInfo:{
 		field: 'id_tabla_relacion_contable',
@@ -309,7 +376,29 @@ Phx.vista.TablaRelacionContable=Ext.extend(Phx.gridInterfaz,{
           title:'Tipo Relacion Contable', 
           width:'60%',
           cls:'TipoRelacionContableTabla'
-         }
+         },
+    //#14	04/01/2019	EGS	
+   	preparaMenu: function(n) {
+
+		var data = this.getSelectedData();
+		var tb = this.tbar;
+		Phx.vista.TablaRelacionContable.superclass.preparaMenu.call(this, n);
+        
+		this.getBoton('btnWizard').enable();
+
+		return tb
+	},
+	
+	liberaMenu: function() {
+		var tb = Phx.vista.TablaRelacionContable.superclass.liberaMenu.call(this);
+		if (tb) {
+			this.getBoton('btnWizard').disable();
+			           
+           
+		}
+		return tb
+	},
+	 //#14	04/01/2019	EGS	
 })
 </script>
 		

@@ -5,7 +5,9 @@
 *@author  (admin)
 *@date 15-09-2015 13:09:45
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+	ISSUE				FECHA				AUTHOR				DESCRIPCION				
+ * #12					24/10/2018			EGS					Se aumento el parametro id_plantilla en la verificacion de concepto de gasto
+ */
 
 class MODDocConcepto extends MODbase{
 	
@@ -138,7 +140,8 @@ class MODDocConcepto extends MODbase{
 		$this->setParametro('relacion','relacion','varchar');
 		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
-
+		$this->setParametro('id_plantilla','id_plantilla','int4'); //#12					24/10/2018			EGS	
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

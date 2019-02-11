@@ -14,8 +14,8 @@ Phx.vista.PlantillaConta = {
 	requireclase:'Phx.vista.Plantilla',
 	title:'Plantilla',
 	bedit: true,
-	bdel:(Phx.CP.config_ini.sis_integracion=='ENDESIS')?false:true,
-    bnew:(Phx.CP.config_ini.sis_integracion=='ENDESIS')?false:true,
+	//bdel:(Phx.CP.config_ini.sis_integracion=='ENDESIS')?false:true,
+    //bnew:(Phx.CP.config_ini.sis_integracion=='ENDESIS')?false:true,
     
 	constructor: function(config) {
        	Phx.vista.PlantillaConta.superclass.constructor.call(this,config);

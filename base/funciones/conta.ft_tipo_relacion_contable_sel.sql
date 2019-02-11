@@ -1,7 +1,11 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_tipo_relacion_contable_sel"(	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+CREATE OR REPLACE FUNCTION conta.ft_tipo_relacion_contable_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_tipo_relacion_contable_sel
@@ -11,10 +15,8 @@ $BODY$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ISSUE			FECHA				AUTHOR 			DESCRIPCION
+ #14	endeETR	    04/01/2019			EGS				se creo transsaccion CONTA_EXPTIC_SEL para el exportador de configuracion 	
 ***************************************************************************/
 
 DECLARE
@@ -41,23 +43,29 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						tiprelco.id_tipo_relacion_contable,
-						tiprelco.estado_reg,
-						tiprelco.nombre_tipo_relacion,
-						tiprelco.tiene_centro_costo,
-						tiprelco.codigo_tipo_relacion,
-						tiprelco.id_tabla_relacion_contable,
-						tiprelco.fecha_reg,
-						tiprelco.id_usuario_reg,
-						tiprelco.fecha_mod,
-						tiprelco.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-						tiprelco.tiene_partida,
-						tiprelco.tiene_auxiliar,
-						tiprelco.partida_tipo,
-						tiprelco.partida_rubro
-						from conta.ttipo_relacion_contable tiprelco
+                            tiprelco.id_tipo_relacion_contable,
+                            tiprelco.estado_reg,
+                            tiprelco.nombre_tipo_relacion,
+                            tiprelco.tiene_centro_costo,
+                            tiprelco.codigo_tipo_relacion,
+                            tiprelco.id_tabla_relacion_contable,
+                            tiprelco.fecha_reg,
+                            tiprelco.id_usuario_reg,
+                            tiprelco.fecha_mod,
+                            tiprelco.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            tiprelco.tiene_partida,
+                            tiprelco.tiene_auxiliar,
+                            tiprelco.partida_tipo,
+                            tiprelco.partida_rubro,
+                            
+                            tiprelco.tiene_aplicacion,
+                            tiprelco.tiene_moneda,
+                            tiprelco.tiene_tipo_centro,
+                            tiprelco.codigo_aplicacion_catalogo
+						
+                        from conta.ttipo_relacion_contable tiprelco
 						left join conta.ttabla_relacion_contable tabrelco
 							on tabrelco.id_tabla_relacion_contable = tiprelco.id_tabla_relacion_contable
 						inner join segu.tusuario usu1 on usu1.id_usuario = tiprelco.id_usuario_reg
@@ -99,6 +107,53 @@ BEGIN
 			return v_consulta;
 
 		end;
+      /*********************************    
+      #TRANSACCION:  'CONTA_EXPTIC_SEL'
+      #DESCRIPCION:	exporta configuracion del tipo de relacion contable
+      #AUTOR:		EGS
+      #FECHA:		04/01/2019	
+      #ISSUE        #14
+      ***********************************/     
+  	
+      elsif(p_transaccion='CONTA_EXPTIC_SEL')then
+       				
+          begin
+              --Sentencia de la consulta
+              v_consulta:='
+                         select
+                         	''tipo_relacion''::varchar as tipo_reg,
+                            tiprelco.id_tipo_relacion_contable,
+                            tabrelco.codigo as codigo_tabla,
+                            tiprelco.estado_reg,
+                            tiprelco.nombre_tipo_relacion,
+                            tiprelco.tiene_centro_costo,
+                            tiprelco.codigo_tipo_relacion,
+                            tiprelco.id_tabla_relacion_contable,
+                            tiprelco.fecha_reg,
+                            tiprelco.id_usuario_reg,
+                            tiprelco.fecha_mod,
+                            tiprelco.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            tiprelco.tiene_partida,
+                            tiprelco.tiene_auxiliar,
+                            tiprelco.partida_tipo,
+                            tiprelco.partida_rubro,                            
+                            tiprelco.tiene_aplicacion,
+                            tiprelco.tiene_moneda,
+                            tiprelco.tiene_tipo_centro,
+                            tiprelco.codigo_aplicacion_catalogo						
+                        from conta.ttipo_relacion_contable tiprelco
+						left join conta.ttabla_relacion_contable tabrelco
+							on tabrelco.id_tabla_relacion_contable = tiprelco.id_tabla_relacion_contable
+						inner join segu.tusuario usu1 on usu1.id_usuario = tiprelco.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = tiprelco.id_usuario_mod
+				        where '||v_parametros.filtro;
+  			
+              --Devuelve la respuesta
+              return v_consulta;
+  						
+          end;
 					
 	else
 					     
@@ -115,7 +170,9 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_tipo_relacion_contable_sel"(integer, integer, character varying, character varying) OWNER TO postgres;

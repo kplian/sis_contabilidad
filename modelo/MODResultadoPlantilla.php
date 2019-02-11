@@ -45,6 +45,10 @@ class MODResultadoPlantilla extends MODbase{
 		$this->captura('id_tipo_relacion_comprobante','int4');
 		$this->captura('relacion_unica','varchar');
 		$this->captura('desc_tipo_relacion_comprobante','varchar');
+		$this->captura('nombre_func','varchar');
+		$this->captura('visible','varchar');///EGS////
+		
+		
 		
 		
 		
@@ -76,6 +80,8 @@ class MODResultadoPlantilla extends MODbase{
         $this->setParametro('glosa','glosa','varchar');
 		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
 		$this->setParametro('relacion_unica','relacion_unica','varchar');
+		$this->setParametro('nombre_func','nombre_func','varchar');
+		$this->setParametro('visible','visible','varchar');////EGS////
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -105,6 +111,9 @@ class MODResultadoPlantilla extends MODbase{
         $this->setParametro('glosa','glosa','varchar');
 		$this->setParametro('id_tipo_relacion_comprobante','id_tipo_relacion_comprobante','int4');
 		$this->setParametro('relacion_unica','relacion_unica','varchar');
+		$this->setParametro('nombre_func','nombre_func','varchar');
+		$this->setParametro('visible','visible','varchar');////EGS////
+		
 		
 
 		//Ejecuta la instruccion
@@ -183,6 +192,7 @@ class MODResultadoPlantilla extends MODbase{
 			$this->captura('id_tipo_relacion_comprobante','int4');
 		    $this->captura('relacion_unica','varchar');
 		    $this->captura('codigo_tipo_relacion_comprobante','varchar');
+			$this->captura('nombre_func','varchar');
 		
 		$this->armarConsulta();	
 		

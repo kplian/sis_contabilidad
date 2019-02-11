@@ -119,3 +119,37 @@ ALTER TYPE conta.maestro_comprobante
   ADD ATTRIBUTE columna_fecha_costo_fin DATE;
   
 /***********************************F-TYP-RAC-CONTA-0-14/10/2015****************************************/
+
+
+
+/***********************************I-TYP-RAC-CONTA-0-09/06/2017****************************************/
+
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_cbte_relacionado VARCHAR;
+
+/***********************************F-TYP-RAC-CONTA-0-09/06/2017****************************************/
+
+
+
+
+/***********************************I-TYP-RAC-CONTA-0-19/12/2017****************************************/
+
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_clase_comprobante VARCHAR(200);  
+
+/***********************************F-TYP-RAC-CONTA-0-19/12/2017****************************************/
+
+
+
+/***********************************I-TYP-RAC-CONTA-1-19/12/2017****************************************/
+
+  
+  --------------- SQL ---------------
+
+ALTER TYPE conta.maestro_comprobante
+  ADD ATTRIBUTE columna_tipo_cambio_2 NUMERIC,
+  ADD ATTRIBUTE columna_tipo_cambio_3 NUMERIC,
+  ADD ATTRIBUTE columna_id_config_cambiaria INTEGER;
+
+/***********************************F-TYP-RAC-CONTA-1-19/12/2017****************************************/
+

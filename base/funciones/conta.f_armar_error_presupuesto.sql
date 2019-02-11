@@ -15,6 +15,15 @@ $body$
 	Autor: RAC (KPLIAN)
     Fecha: 06-04-2016
     Descripción: funcion que formatea el errores de la gestion de presupuesto en contabilidad
+     ***************************************************************************************************   
+    
+
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		29-03-2018        RAC KPLIAN        Mejora los mensajes derror dejandolos mas claros
+
 */
 
 DECLARE
@@ -39,15 +48,15 @@ BEGIN
             
                                          
              IF p_resp_ges[4] is not null and  p_resp_ges[4] = 1  THEN
-                  v_tmp = format('el presupuesto no alcanza por diferencia cambiaria, en moneda base tenemos:   %s y se requiere %s ', p_resp_ges[3]::varchar, p_monto_cmp_mb::varchar);
+                  v_tmp = format('el presupuesto no alcanza por diferencia cambiaria, en moneda base tenemos:   %s y se requiere %s ', round(p_resp_ges[3],2)::varchar,  round(p_monto_cmp_mb,2)::varchar);
              ELSE
              
              
               
                   IF p_id_moneda_base = p_id_moneda THEN
-                      v_tmp = format('solo se tiene disponible un monto en moneda base de:  %s y se requiere; %s', p_resp_ges[3]::varchar, p_monto_cmp_mb::varchar);    
+                      v_tmp = format('solo se tiene disponible un monto en moneda base de:  %s y se requiere; %s (Falta . %s)', round(p_resp_ges[3],2)::varchar, round(p_monto_cmp_mb,2)::varchar,  round(p_resp_ges[3] -p_monto_cmp_mb,2)::varchar);    
                   ELSE
-                      v_tmp =  format('solo se tiene disponible un monto de:  %s y se requiere  %s', p_resp_ges[3]::varchar, p_monto_cmp_mb::varchar);
+                      v_tmp =  format('solo se tiene disponible un monto de:  %s y se requiere  %s. (Falta . %s)', round(p_resp_ges[3],2)::varchar, round(p_monto_cmp_mb,2)::varchar,  round(p_resp_ges[3] - p_monto_cmp_mb,2)::varchar);
                   END IF;
                                             
              END IF;

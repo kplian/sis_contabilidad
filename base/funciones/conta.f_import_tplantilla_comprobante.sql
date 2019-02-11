@@ -1,40 +1,5 @@
---------------- SQL ---------------
-
-CREATE OR REPLACE FUNCTION conta.f_import_tplantilla_comprobante (
-  p_accion varchar,
-  p_codigo varchar,
-  p_funcion_comprobante_eliminado varchar,
-  p_id_tabla varchar,
-  p_campo_subsistema varchar,
-  p_campo_descripcion varchar,
-  p_funcion_comprobante_validado varchar,
-  p_campo_fecha varchar,
-  p_estado_reg varchar,
-  p_campo_acreedor varchar,
-  p_campo_depto varchar,
-  p_momento_presupuestario varchar,
-  p_campo_fk_comprobante varchar,
-  p_tabla_origen varchar,
-  p_clase_comprobante varchar,
-  p_campo_moneda varchar,
-  p_campo_gestion_relacion varchar,
-  p_otros_campos varchar,
-  p_momento_comprometido varchar,
-  p_momento_ejecutado varchar,
-  p_momento_pagado varchar,
-  p_campo_id_cuenta_bancaria varchar,
-  p_campo_id_cuenta_bancaria_mov varchar,
-  p_campo_nro_cheque varchar,
-  p_campo_nro_cuenta_bancaria_trans varchar,
-  p_campo_nro_tramite varchar,
-  p_campo_tipo_cambio varchar,
-  p_campo_depto_libro varchar,
-  p_campo_fecha_costo_ini varchar,
-  p_campo_fecha_costo_fin varchar,
-  p_funcion_comprobante_editado varchar,
-  p_desc_plantilla varchar = ''::character varying
-)
-RETURNS varchar AS
+CREATE OR REPLACE FUNCTION conta.f_import_tplantilla_comprobante(p_accion character varying, p_codigo character varying, p_funcion_comprobante_eliminado character varying, p_id_tabla character varying, p_campo_subsistema character varying, p_campo_descripcion character varying, p_funcion_comprobante_validado character varying, p_campo_fecha character varying, p_estado_reg character varying, p_campo_acreedor character varying, p_campo_depto character varying, p_momento_presupuestario character varying, p_campo_fk_comprobante character varying, p_tabla_origen character varying, p_clase_comprobante character varying, p_campo_moneda character varying, p_campo_gestion_relacion character varying, p_otros_campos character varying, p_momento_comprometido character varying, p_momento_ejecutado character varying, p_momento_pagado character varying, p_campo_id_cuenta_bancaria character varying, p_campo_id_cuenta_bancaria_mov character varying, p_campo_nro_cheque character varying, p_campo_nro_cuenta_bancaria_trans character varying, p_campo_nro_tramite character varying, p_campo_tipo_cambio character varying, p_campo_depto_libro character varying, p_campo_fecha_costo_ini character varying, p_campo_fecha_costo_fin character varying, p_funcion_comprobante_editado character varying, p_desc_plantilla character varying DEFAULT ''::character varying, p_campo_cbte_relacionado character varying DEFAULT ''::character varying, p_codigo_tipo_relacion character varying DEFAULT ''::character varying, p_campo_tipo_cambio_2 character varying DEFAULT ''::character varying, p_campo_tipo_cambio_3 character varying DEFAULT ''::character varying, p_campo_id_config_cambiaria character varying DEFAULT ''::character varying)
+ RETURNS varchar AS
 $body$
 DECLARE
 	v_id_plantilla_comprobante		integer;
@@ -89,7 +54,12 @@ BEGIN
                 campo_fecha_costo_ini,
                 campo_fecha_costo_fin,
                 funcion_comprobante_editado,
-                desc_plantilla
+                desc_plantilla,
+            	campo_cbte_relacionado,
+                codigo_tipo_relacion,
+                campo_tipo_cambio_2,
+                campo_tipo_cambio_3,
+                campo_id_config_cambiaria
              
           	) values(
                 p_codigo,
@@ -126,7 +96,12 @@ BEGIN
                 p_campo_fecha_costo_ini,
                 p_campo_fecha_costo_fin,
                 p_funcion_comprobante_editado,
-                p_desc_plantilla
+                p_desc_plantilla,
+            	p_campo_cbte_relacionado,
+                p_codigo_tipo_relacion,
+                p_campo_tipo_cambio_2,
+                p_campo_tipo_cambio_3,
+                p_campo_id_config_cambiaria
 							
 			);
               
@@ -163,7 +138,12 @@ BEGIN
                 campo_fecha_costo_ini = p_campo_fecha_costo_ini,
                 campo_fecha_costo_fin = p_campo_fecha_costo_fin,
                 funcion_comprobante_editado = p_funcion_comprobante_editado,
-                desc_plantilla = p_desc_plantilla
+                desc_plantilla = p_desc_plantilla,
+            	campo_cbte_relacionado = p_campo_cbte_relacionado,
+                codigo_tipo_relacion = p_codigo_tipo_relacion,
+                campo_tipo_cambio_2 = p_campo_tipo_cambio_2,
+                campo_tipo_cambio_3 = p_campo_tipo_cambio_3,
+                campo_id_config_cambiaria = p_campo_id_config_cambiaria
 			where id_plantilla_comprobante  = v_id_plantilla_comprobante;      	
         end if;
     

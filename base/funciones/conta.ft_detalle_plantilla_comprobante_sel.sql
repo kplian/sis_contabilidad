@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_detalle_plantilla_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,13 +12,12 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tdetalle_plantilla_comprobante'
  AUTOR: 		 (admin)
  FECHA:	        10-06-2013 14:51:03
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
+ ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
+ # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
 ***************************************************************************/
 
 DECLARE
@@ -29,21 +26,21 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_detalle_plantilla_comprobante_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_CMPBDET_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		10-06-2013 14:51:03
 	***********************************/
 
 	if(p_transaccion='CONTA_CMPBDET_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -71,17 +68,17 @@ BEGIN
                             cmpbdet.id_usuario_mod,
                             usu1.cuenta as usr_reg,
                             usu2.cuenta as usr_mod	,
-                            cmpbdet.primaria, 
-                            cmpbdet.otros_campos, 
-                            cmpbdet.nom_fk_tabla_maestro, 
-                            cmpbdet.campo_partida_ejecucion , 
-                            cmpbdet.descripcion , 
-                            cmpbdet.campo_monto_pres , 
-                            cmpbdet.id_detalle_plantilla_fk , 
-                            cmpbdet.forma_calculo_monto, 
-                            cmpbdet.func_act_transaccion, 
-                            cmpbdet.campo_id_tabla_detalle, 
-                            cmpbdet.rel_dev_pago, 
+                            cmpbdet.primaria,
+                            cmpbdet.otros_campos,
+                            cmpbdet.nom_fk_tabla_maestro,
+                            cmpbdet.campo_partida_ejecucion ,
+                            cmpbdet.descripcion ,
+                            cmpbdet.campo_monto_pres ,
+                            cmpbdet.id_detalle_plantilla_fk ,
+                            cmpbdet.forma_calculo_monto,
+                            cmpbdet.func_act_transaccion,
+                            cmpbdet.campo_id_tabla_detalle,
+                            cmpbdet.rel_dev_pago,
                             cmpbdet.campo_trasaccion_dev ,
                             cmpbdetb.descripcion as descripcion_base,
                             cmpbdet.campo_id_cuenta_bancaria,
@@ -96,8 +93,9 @@ BEGIN
                             cmpbdet.codigo,
                             cmpbdet.tipo_relacion_contable_cc,
                             cmpbdet.campo_relacion_contable_cc,
-                            cmpbdet.campo_suborden
-                            
+                            cmpbdet.campo_suborden,
+                            cmpbdet.campo_codigo_aplicacion_rc,
+                            cmpbdet.incluir_desc_doc --#21
                         
 						from conta.tdetalle_plantilla_comprobante cmpbdet
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg

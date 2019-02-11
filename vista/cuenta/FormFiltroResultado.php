@@ -13,7 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
     constructor:function(config)
     {   
-    	this.panelResumen = new Ext.Panel({html:'Hola Prueba'});
+    	this.panelResumen = new Ext.Panel({html:''});
     	this.Grupos = [{
 
 	                    xtype: 'fieldset',
@@ -68,7 +68,7 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 						fields: ['id_resultado_plantilla','nombre','codigo', 'periodo_calculo'],
 						// turn on remote sorting
 						remoteSort: true,
-						baseParams: { par_filtro:'resplan.nombre#resplan.codigo',tipo: 'reporte'}
+						baseParams: { par_filtro:'resplan.nombre#resplan.codigo',tipo: 'reporte', solo_visible:'si'}
 	                }),
 	                valueField: 'id_resultado_plantilla',
 	   				displayField: 'nombre',

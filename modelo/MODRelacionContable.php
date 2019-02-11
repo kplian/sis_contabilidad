@@ -51,7 +51,23 @@ class MODRelacionContable extends MODbase{
 		$this->captura('codigo_cc','text');
 		$this->captura('defecto','varchar');
 		$this->captura('partida_tipo','varchar');
-		$this->captura('partida_rubro','varchar');
+		$this->captura('partida_rubro','varchar');		
+		
+		$this->captura('tiene_moneda','varchar');
+        $this->captura('tiene_tipo_centro','varchar');
+        $this->captura('tiene_aplicacion','varchar');
+        $this->captura('codigo_aplicacion_catalogo','varchar');
+        $this->captura('desc_tipo_presupuesto','varchar');
+		
+		$this->captura('codigo_aplicacion','varchar');
+		$this->captura('moneda','varchar');
+		$this->captura('id_tipo_presupuesto','int4');
+		$this->captura('id_moneda','int4');
+		
+		
+		
+		
+		
 		
 		
 		//Ejecuta la instruccion
@@ -78,6 +94,12 @@ class MODRelacionContable extends MODbase{
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_tabla','id_tabla','int4');
 		$this->setParametro('defecto','defecto','varchar');
+		
+		$this->setParametro('codigo_aplicacion','codigo_aplicacion','varchar');
+		$this->setParametro('id_tipo_presupuesto','id_tipo_presupuesto','int4');
+		$this->setParametro('id_moneda','id_moneda','int4');
+		
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -104,6 +126,11 @@ class MODRelacionContable extends MODbase{
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_tabla','id_tabla','int4');
 		$this->setParametro('defecto','defecto','varchar');
+		
+		$this->setParametro('codigo_aplicacion','codigo_aplicacion','varchar');
+		$this->setParametro('id_tipo_presupuesto','id_tipo_presupuesto','int4');
+		$this->setParametro('id_moneda','id_moneda','int4');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

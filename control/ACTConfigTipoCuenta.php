@@ -26,7 +26,7 @@ class ACTConfigTipoCuenta extends ACTbase{
 				
 	function insertarConfigTipoCuenta(){
 		$this->objFunc=$this->create('MODConfigTipoCuenta');	
-		if($this->objParam->insertar('id_cofig_tipo_cuenta')){
+		if($this->objParam->insertar('id_config_tipo_cuenta')){
 			$this->res=$this->objFunc->insertarConfigTipoCuenta($this->objParam);			
 		} else{			
 			$this->res=$this->objFunc->modificarConfigTipoCuenta($this->objParam);

@@ -108,6 +108,8 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
+           raise notice  '%', v_consulta;
+
 			--Devuelve la respuesta
 			return v_consulta;
 						

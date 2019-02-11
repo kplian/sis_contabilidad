@@ -39,8 +39,9 @@ Phx.vista.WizardAgrupador=Ext.extend(Phx.frmInterfaz,{
         this.Cmp.fecha_cbte.setMaxValue(d2);
         this.Cmp.fecha_ini.setMinValue(d1);
 		this.Cmp.fecha_fin.setMinValue(d1);
-        
-        
+		this.Cmp.sw_ncd. setValue(this.sw_ncd);
+		
+		
         this.iniciarEventos();   
        
         
@@ -57,14 +58,23 @@ Phx.vista.WizardAgrupador=Ext.extend(Phx.frmInterfaz,{
 			},
 			type:'Field',
 			form:true 
-		  },
-        
+		  },        
          {
 			//configuracion del componente
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
 					name: 'id_depto_conta'
+			},
+			type:'Field',
+			form:true 
+		 },        
+         {
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'sw_ncd'
 			},
 			type:'Field',
 			form:true 

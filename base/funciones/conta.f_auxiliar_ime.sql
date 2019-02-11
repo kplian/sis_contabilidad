@@ -17,6 +17,9 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
+ ISUUE			FECHA			 AUTHOR 		 DESCRIPCION				
+ * 	1A			30/08/2018			EGS		 se aumento el campo aplicacion en las transcacciones  CONTA_AUXCTA_INS,  CONTA_AUXCTA_MOD ,CONTA_COD_AUX_GET
+ 
 
  DESCRIPCION:	
  AUTOR:			
@@ -31,7 +34,11 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_auxiliar	integer;
+	v_id_auxiliar	        integer;
+	--variables para control de codigo y nombre de auxiliar duplicado
+    v_contador				integer;
+	v_valid					varchar;
+    v_registros				record;
 			    
 BEGIN
 
@@ -58,7 +65,8 @@ BEGIN
 			id_usuario_reg,
 			id_usuario_mod,
 			fecha_mod,
-            corriente
+            corriente,
+            aplicacion
           	) values(
 			--v_parametros.id_empresa,
 			'activo',
@@ -68,7 +76,8 @@ BEGIN
 			p_id_usuario,
 			null,
 			null,
-            v_parametros.corriente
+            v_parametros.corriente,
+            v_parametros.aplicacion
 							
 			)RETURNING id_auxiliar into v_id_auxiliar;
 			
@@ -98,7 +107,8 @@ BEGIN
 			nombre_auxiliar = v_parametros.nombre_auxiliar,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
-            corriente = v_parametros.corriente
+            corriente = v_parametros.corriente,
+            aplicacion=v_parametros.aplicacion
 			where id_auxiliar=v_parametros.id_auxiliar;
                
 			--Definicion de la respuesta
@@ -132,6 +142,61 @@ BEGIN
             return v_resp;
 
 		end;
+	/*********************************
+ 	#TRANSACCION:  'CONTA_COD_AUX_VAL'
+ 	#DESCRIPCION:	Control para que no se repita el codigo auxiliar y nombre auxiliar
+ 	#AUTOR:		Franklin Espinoza
+ 	#FECHA:		13-06-2017 10:44:52
+	***********************************/
+
+	elsif(p_transaccion='CONTA_COD_AUX_VAL')then
+
+		begin
+			select count(taux.id_auxiliar)
+            INTO v_contador
+            from conta.tauxiliar taux
+            where    taux.codigo_auxiliar = trim(both ' ' from v_parametros.codigo_auxiliar) 
+            
+                 AND taux.nombre_auxiliar = trim(both ' ' from v_parametros.nombre_auxiliar) ;
+
+            IF(v_contador>=1)THEN
+        		v_valid = 'true';
+            ELSE
+            	v_valid = 'false';
+			END IF;
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Existe el Reclamo');
+            v_resp = pxp.f_agrega_clave(v_resp,'v_valid',v_valid);
+            --Devuelve la respuesta
+            return v_resp;
+		end;
+        
+        
+     /*********************************    
+    #TRANSACCION:  'CONTA_COD_AUX_GET'
+    #DESCRIPCION:   Recupera los datos de la auxiliar 
+    #AUTOR:     manu    
+    #FECHA:     10-10-2017 16:03:19
+    ***********************************/
+
+    elsif(p_transaccion='CONTA_COD_AUX_GET')then
+        begin
+            --Sentencia de la eliminacion           
+            select a.id_auxiliar,a.id_empresa,a.nombre_auxiliar,a.codigo_auxiliar,a.corriente 
+            into v_registros                 
+            from conta.tauxiliar a                  
+            where a.estado_reg='activo' and a.id_auxiliar= v_parametros.id_auxiliar;
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Empresa recuperada(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_auxiliar',v_registros.id_auxiliar::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_empresa',v_registros.id_empresa::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'nombre_auxiliar',v_registros.nombre_auxiliar::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'codigo_auxiliar',v_registros.codigo_auxiliar::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'corriente',v_registros.corriente::varchar);                        
+            --Devuelve la respuesta
+            return v_resp;
+        end;      
+ 
          
 	else
      

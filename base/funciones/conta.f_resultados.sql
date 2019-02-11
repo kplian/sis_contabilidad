@@ -122,7 +122,8 @@ BEGIN
                                     orden_cbte numeric,
                                     nombre_columna varchar,
                                     prioridad numeric,
-                                    monto_partida numeric
+                                    monto_partida numeric,
+                                    salta_hoja    varchar
                                     ) ON COMMIT DROP;
              
          
@@ -194,7 +195,8 @@ BEGIN
                                         espacio_previo,
                                         id,
                                         plantilla,
-                                        nombre_columna
+                                        nombre_columna,
+                                        salta_hoja
                                     FROM temp_balancef 
                                     WHERE 
                                        case  when v_incluir_sinmov = 'no' then 
@@ -203,7 +205,8 @@ BEGIN
                                               (monto != 0 or origen = 'titulo')
                                             end
                                        
-                                       order by prioridad asc , orden asc,   codigo_cuenta asc) LOOP
+                                      --order by orden_cbte asc,  orden  asc ,  codigo_cuenta asc) LOOP
+                                      order by prioridad asc , orden_cbte asc, orden asc,   codigo_cuenta asc) LOOP
                        RETURN NEXT v_registros;
            END LOOP; 
       

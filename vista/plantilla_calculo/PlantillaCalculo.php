@@ -5,6 +5,9 @@
 *@author  rcm
 *@date 30-08-2013 19:01:20
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#13        03/01/2019    Miguel Mamani     		Sirve para facturas  que necesitan lelvar ejejcucion a otro centro de costo
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -240,6 +243,108 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
+                name: 'usar_cc_original',
+                fieldLabel: 'Usar CC Original',
+                qtip: 'permite configurar si usar el centro de costo original , en caso contrario permite usar el adminsitrativo',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{   pfiltro:'usar_cc_original',
+                        type: 'list',
+                         options: ['si','no']  
+                    },
+            valorInicial: 'no',        
+            grid:true,
+            egrid: true,
+            form:true
+       },
+       {
+            config:{
+                name: 'imputar_excento',
+                fieldLabel: 'Imputar Excento',
+                qtip: 'si es prioridad 1 y si,  suma el monto excento, prioridad 1 y no, resta  el monto excento, 1 y nada respeta el porcentaje. <br> Si es prioriad 2 e monto es el excento',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['si','no','nada']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{   pfiltro:'imputar_excento',
+                        type: 'list',
+                         options: ['si','no','nada']  
+                    },
+            valorInicial: 'no',        
+            grid:true,
+            egrid: true,
+            form:true
+       },
+       
+       {
+            config:{
+                name: 'sw_registro',
+                fieldLabel: 'Registrar Trasaccion',
+                qtip: 'Si, registra la trasaccion en el cbte si es distinto de cero, en caso cotnrario solo se utiliza como calculo auxiliar',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{   pfiltro:'imputar_excento',
+                        type: 'list',
+                         options: ['si','no']  
+                    },
+            valorInicial: 'no',        
+            grid:true,
+            egrid: true,
+            form:true
+       },
+        ///#13
+        {
+            config:{
+                name: 'reset_partida_eje',
+                fieldLabel: 'Reset Partida',
+                allowBlank: false,
+                anchor: '40%',
+                gwidth: 80,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                store: ['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{   pfiltro:'imputar_excento',
+                type: 'list',
+                options: ['si','no']
+            },
+            valorInicial: 'no',
+            grid:true,
+            egrid: true,
+            form:true
+        },
+        ///#13
+        {
+            config:{
                 name: 'estado_reg',
                 fieldLabel: 'Estado Reg.',
                 allowBlank: true,
@@ -339,7 +444,11 @@ Phx.vista.PlantillaCalculo=Ext.extend(Phx.gridInterfaz,{
         {name:'usr_reg', type: 'string'},
         {name:'usr_mod', type: 'string'},
         {name:'importe_presupuesto', type: 'numeric'},
-        {name:'descuento', type: 'string'}
+        {name:'descuento', type: 'string'},        
+        'usar_cc_original',
+        'imputar_excento',
+        'sw_registro',
+        'reset_partida_eje'  // #13
         
     ],
     sortInfo:{

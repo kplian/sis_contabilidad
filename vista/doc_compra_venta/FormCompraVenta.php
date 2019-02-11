@@ -5,7 +5,16 @@
  *@author  Rensi Arteaga Copari
  *@date    30-01-2014
  *@description permites subir archivos a la tabla de documento_sol
- */
+ * **    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		  20-09-2011        RAC KPLIAN              creacion
+ #0999 ETR        20/08/2018        RAC KPLIAN              agrega filtro por defecto para tipo de documento segun informe lcv, retenciones, ncd, todos
+  #9999           19/06/2018               RAC              Se incorpra el calculo inverso para DUI IVA -> Importe Doc
+ #12	endeetr	  24/10/2018			EGS					Se aumento el parametro id_plantilla en la verificacion de concepto de gasto y se añadio que  baseParams de idConcepto_ingas  sea deacuerdo a ncd tambien que los centros de costo sean deacuerdo a ncd
+ ***************************************************************************/
+
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -17,6 +26,7 @@ header("content-type: text/javascript; charset=UTF-8");
         mostrarFormaPago : true,
         mostrarPartidas: false,
         regitrarDetalle: 'si',
+        mostrarFuncionario: false,
         id_moneda_defecto: 0,  // 0 quiere decir todas las monedas
         //layoutType: 'wizard',
         layout: 'fit',
@@ -28,6 +38,10 @@ header("content-type: text/javascript; charset=UTF-8");
         parFilConcepto:'desc_ingas#par.codigo',
         tipo_pres_gasto: 'gasto',
         tipo_pres_recurso: 'recurso',
+        tipo_informe:'todos',  //#0999 filtro por defecto para tipo de plantilla
+        excluir_tipo_informe:'ninguno',  //#0999 filtro por defecto para tipo de plantilla
+        plantillaProrrateo: [], //07/12/2017 , RAc adcionar plantilal de prorrateo
+        sw_nro_dui: 'no',
         constructor:function(config)
         {
             this.addEvents('beforesave');
@@ -49,15 +63,19 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
             this.buildGrupos();
-
-
+            //rac, 07/12/2017 si existe plantilla se crea un formulario
+            this.buildFormPlantilla()
             Phx.vista.FormCompraVenta.superclass.constructor.call(this,config);
-
+            
+            if(this.mostrarFuncionario){
+            	 this.mostrarComponente(this.Cmp.id_funcionario);
+            }
+            else{
+            	 this.ocultarComponente(this.Cmp.id_funcionario);
+            }
+            
             this.init();
-
-
             this.iniciarEventos();
-
             if(this.regitrarDetalle == 'si'){
                 this.iniciarEventosDetalle();
             }
@@ -77,12 +95,20 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
                 this.megrid.getTopToolbar().disable();
             }
-            this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, {tipo_plantilla:this.Cmp.tipo.getValue()});
+            
+            this.Cmp.id_plantilla.store.baseParams = Ext.apply(this.Cmp.id_plantilla.store.baseParams, 
+            	                                              {
+            	                                              	tipo_plantilla:this.Cmp.tipo.getValue(),
+            	                                              	tipo_informe: this.data.tipo_informe?this.data.tipo_informe:'todos',
+            	                                              	excluir_tipo_informe: this.data.excluir_tipo_informe?this.data.excluir_tipo_informe:'ninguno'
+            	                                              });
 
         },
+        
         buildComponentesDetalle: function(){
             var me = this,
                 bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto', autorizacion: me.autorizacion, autorizacion_nulos: me.autorizacion_nulos }:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
+                
             me.detCmp = {
                 'id_concepto_ingas': new Ext.form.ComboBox({
                     name: 'id_concepto_ingas',
@@ -145,7 +171,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
                     emptyText : 'Centro Costo...',
                     allowBlank: false,
-                    baseParams: (me.data.tipoDoc == 'compra')?{tipo_pres:me.tipo_pres_gasto, filtrar:'grupo_ep'}:{tipo_pres: me.tipo_pres_recurso, filtrar:'grupo_ep'}
+                     //#12 EGS	
+                    baseParams: (me.data.tipo_informe=='ncd')?(me.data.tipoDoc != 'compra')?{tipo_pres:me.tipo_pres_gasto, filtrar:'grupo_ep'}:{tipo_pres: me.tipo_pres_recurso, filtrar:'grupo_ep'}:(me.data.tipoDoc == 'compra')?{tipo_pres:me.tipo_pres_gasto, filtrar:'grupo_ep'}:{tipo_pres: me.tipo_pres_recurso, filtrar:'grupo_ep'}
                 }),
 
                 'id_orden_trabajo': new Ext.form.ComboRec({
@@ -229,12 +256,10 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             this.detCmp.id_concepto_ingas.on('change',function( cmb, rec, ind){
-                console.log('concepto_gasto ' + rec);
                 this.detCmp.id_orden_trabajo.reset();
             },this);
 
             this.detCmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
-                console.log('concepto_gasto ' + rec);
                 this.detCmp.id_orden_trabajo.store.baseParams = {
                     filtro_ot:rec.data.filtro_ot,
                     requiere_ot:rec.data.requiere_ot,
@@ -340,7 +365,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         cargarDatosMaestro: function(){
-
+			console.log('this.data.tipo_informe',this.data.tipo_informe);
             this.detCmp.id_orden_trabajo.store.baseParams.fecha_solicitud = this.Cmp.fecha.getValue().dateFormat('d/m/Y');
             this.detCmp.id_orden_trabajo.modificado = true;
 
@@ -353,7 +378,13 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             this.detCmp.id_centro_costo.modificado = true;
             //cuando esta el la inteface de presupeustos no filtra por bienes o servicios
-            this.detCmp.id_concepto_ingas.store.baseParams.movimiento=(this.Cmp.tipo.getValue()=='compra')?'gasto':'recurso';
+            //#12 EGS		
+            if (this.data.tipo_informe=='ncd') {          	
+              this.detCmp.id_concepto_ingas.store.baseParams.movimiento=(this.Cmp.tipo.getValue()=='compra')?'recurso':'gasto';
+            } else{
+              this.detCmp.id_concepto_ingas.store.baseParams.movimiento=(this.Cmp.tipo.getValue()=='compra')?'gasto':'recurso';	
+            };
+            //#12 EGS	
             this.detCmp.id_concepto_ingas.store.baseParams.id_gestion=this.Cmp.id_gestion.getValue();
             this.detCmp.id_concepto_ingas.modificado = true;
 
@@ -369,7 +400,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
         buildDetailGrid: function(){
-
+            var me = this;
             //cantidad,detalle,peso,totalo
             var Items = Ext.data.Record.create([{
                 name: 'cantidad_sol',
@@ -395,8 +426,17 @@ header("content-type: text/javascript; charset=UTF-8");
             },{
                 name: 'precio_total_final',
                 type: 'float'
+            },{
+                name: 'desc_centro_costo',
+                type: 'string'
+            },{
+                name: 'desc_concepto_ingas',
+                type: 'string'
             }
+            
             ]);
+            
+            this.itemsRecordDet = Items;
 
             this.mestore = new Ext.data.JsonStore({
                 url: '../../sis_contabilidad/control/DocConcepto/listarDocConcepto',
@@ -561,9 +601,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
                             this.bloqueaRequisitos(true);
                         }
-                        else{
-                            //alert('Verifique los requisitos');
-                        }
 
                     }
                 },{
@@ -591,6 +628,25 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 columns: this.columnasDet
             });
+            
+          
+            if(me.plantillaProrrateo.length > 0){
+            	this.megrid.getTopToolbar().add({	                   
+	                    text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar desde Plantilla',
+	                    scope: this,
+	                    width: '100',
+	                    handler: function(){
+	                        if(this.evaluaRequistos() === true){
+	                           this.bloqueaRequisitos(true);
+	                           this.wPlantilla.show();
+	                           
+	                        }
+	                   }
+	
+	           }) ;
+            }
+            
+           
         },
         buildGrupos: function(){
             var me = this;
@@ -762,11 +818,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         loadValoresIniciales:function()
         {
-
             Phx.vista.FormCompraVenta.superclass.loadValoresIniciales.call(this);
-
-
-
         },
 
 
@@ -1084,8 +1136,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'nit',
-                        fieldLabel: 'NIT',
-                        qtip: 'Número de indentificación del proveedor',
+                        fieldLabel: 'NIT/CI',
+                        qtip: 'Número de indentificación del proveedor - o CI en caso de retenciones',
                         allowBlank: false,
                         emptyText:'nit ...',
                         store:new Ext.data.JsonStore(
@@ -1129,7 +1181,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'razon_social',
-                        fieldLabel: 'Razón Social',
+                        fieldLabel: 'Razón Social / Nombre',
                         allowBlank: false,
                         maskRe: /[A-Za-z0-9 &-. ñ Ñ]/,
                         fieldStyle: 'text-transform:uppercase',
@@ -1155,13 +1207,13 @@ header("content-type: text/javascript; charset=UTF-8");
                         allowBlank: false,
                         anchor: '80%',
                         allowDecimals: false,
-                        maxLength:100,
+                        maxLength:100/*,  RAC  29/12/2017 comentado para recibos pueden tener numeros alfanumericos
                         maskRe: /[0-9/-]+/i,
-                        regex: /[0-9/-]+/i
+                        regex: /[0-9/-]+/i*/
 
 
                     },
-                    type:'NumberField',
+                    type:'Field',
                     id_grupo:1,
                     form:true
                 },
@@ -1173,7 +1225,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         anchor: '80%',
                         gwidth: 100,
                         maxLength :16,
-                        minLength:16,
+                        minLength:9,
                         listeners:{
                             'change': function(field, newValue, oldValue){
 
@@ -1509,7 +1561,24 @@ header("content-type: text/javascript; charset=UTF-8");
                     type:'NumberField',
                     id_grupo:2,
                     form: true
-                }
+                },
+                
+               
+                {
+		   			config:{
+		       		    name:'id_funcionario',
+		       		    hiddenName: 'id_funcionario',
+		   				origen:'FUNCIONARIO',
+		   				fieldLabel:'Funcionario',
+		   				allowBlank: true,
+		                valueField: 'id_funcionario',
+		   			    gdisplayField: 'desc_funcionario2',
+		   			    baseParams: { fecha: new Date()}
+		       	     },
+		   			type:'ComboRec',
+		   			id_grupo:2,
+		   			form:true
+				}
 
             ];
 
@@ -1567,9 +1636,6 @@ header("content-type: text/javascript; charset=UTF-8");
             } ,this);
 
 
-
-
-            //this.Cmp.nro_autorizacion .on('blur',this.cargarRazonSocial,this);
             this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
                 console.log('id_plantilla ' + rec);
                 this.esconderImportes();
@@ -1658,12 +1724,23 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.mostrarComponente(this.Cmp.nro_dui);
                     this.Cmp.nro_documento.setValue(0);
                     this.Cmp.nro_documento.setReadOnly(true);
+                    this.sw_nro_dui =  'si';
+                    //#9999  mostrar iva, monto only read  documento DUI  
+                     this.Cmp.importe_iva.setReadOnly(false);
+                     this.Cmp.importe_doc.setReadOnly(true);
+                     this.Cmp.importe_iva.allowBlank = true;
+                     this.Cmp.importe_doc.allowBlank = false;
 
                 }
                 else{
                     this.Cmp.nro_dui.allowBlank = true;
                     this.ocultarComponente(this.Cmp.nro_dui);
                     this.Cmp.nro_documento.setReadOnly(false);
+                    //#9999  documento normal
+                     this.Cmp.importe_iva.setReadOnly(true);
+                     this.Cmp.importe_doc.setReadOnly(false);
+                     this.Cmp.importe_iva.allowBlank = false;
+                     this.Cmp.importe_doc.allowBlank = true;
                 }
                 if(rec.data.sw_estacion == 'si'){
                     this.mostrarComponente(this.Cmp.estacion);//en
@@ -1692,14 +1769,15 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.importe_excento.on('change',this.calculaMontoPago,this);
             this.Cmp.importe_descuento.on('change',this.calculaMontoPago,this);
             this.Cmp.importe_descuento_ley.on('change',this.calculaMontoPago,this);
-
             this.Cmp.importe_pendiente.on('change',this.calculaMontoPago,this);
             this.Cmp.importe_anticipo.on('change',this.calculaMontoPago,this);
             this.Cmp.importe_retgar.on('change',this.calculaMontoPago,this);
+            
+            this.Cmp.importe_iva.on('change',this.calculaMontoPagoDui,this);
 
 
             this.Cmp.nro_autorizacion.on('change',function(fild, newValue, oldValue){
-                if (newValue[3] == '4' || newValue[3] == '8'|| newValue[3] == '6'){
+                if (newValue[3] == '4' || newValue[3] == '8'|| newValue[3] == '6'|| newValue[3] == '7'){
                     this.mostrarComponente(this.Cmp.codigo_control);
                     this.Cmp.codigo_control.allowBlank = false;
                 }
@@ -1733,80 +1811,56 @@ header("content-type: text/javascript; charset=UTF-8");
                    var res = cmb.getValue().split("|"),
                        plt = this.plantilla_qr.split("|");
 
-                   console.log('........', res, plt);
-
-                 //if(res.length == 12) {
-
-                     for (var i = 0; i < plt.length; i++) {
+                   for (var i = 0; i < plt.length; i++) {
 
                          if (this.Cmp[plt[i]]) {
 
-                             if (plt[i] == 'importe_excento') {
-                                 var aux = 0;
-                                 if (this.Cmp[plt[i]].getValue()) {
-                                     aux = this.Cmp[plt[i]].getValue();
-                                 }
-                                 this.Cmp[plt[i]].setValue(res[i] + aux);
-                                 console.log(res[i], aux)
-                             }
-                             else {
-                                 this.Cmp[plt[i]].setValue(res[i]);
-                             }
-
-                             if (plt[i] == 'nit') {
-                                 this.cargarRazonSocial();
-                             }
-                             if (plt[i]=='nro_documento'){
-                                 var nro_doc = Math.floor(res[1]);
-                                 this.getComponente('nro_documento').setValue(nro_doc);
-                             }
-                             if(plt[i]=='importe_doc'){
-
-                                 var importe = this.controlMiles(res[4]);
-                                 this.getComponente('importe_doc').setValue(importe);
-
-                             }
-                             if(plt[i]=='fecha'){
-
-                                 var mesPeriodo = this.data.tmpPeriodo > 9 ? this.data.tmpPeriodo : '0' + this.data.tmpPeriodo;
-                                 var fechaInt = this.data.tmpGestion + '-' + mesPeriodo + '-' + '30';
-                                 var mesPer = new Date(fechaInt).getMonth();
-                                 var mesFactura = res[3].split("/");
-                                 var fechaFac = mesFactura[2] + '-' + mesFactura[1] + '-' + mesFactura[0];
-                                 var mesFac = new Date(fechaFac).getMonth();
-                                 var monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Mayo",
-                                     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-                                 ];
-                                 var literalFactura = monthNames[mesFac];
-                                 var literalPeriodo = monthNames[mesPer];
-                                 if (mesFactura[1] != mesPeriodo) {
-                                     this.mensaje_('ALERTA', 'Actualmente se encuentra en el periodo: ' + literalPeriodo + ', la factura corresponde al periodo de: ' + literalFactura, 'ERROR');
-                                 }
-
-                             }
-
-                         }
-                         console.log(plt[i]);
-                     }
-                // }
-                   }
-                    // else{
-                    // 	alert('la plantilla de array no se corresponde con el QR');
-                    //  }
-
-                    this.calculaMontoPago();
-
-
-                //}
-
+	                             if (plt[i] == 'importe_excento') {
+	                                 var aux = 0;
+	                                 if (this.Cmp[plt[i]].getValue()) {
+	                                     aux = this.Cmp[plt[i]].getValue();
+	                                 }
+	                                 this.Cmp[plt[i]].setValue(res[i] + aux);
+	                             }
+	                             else {
+	                                 this.Cmp[plt[i]].setValue(res[i]);
+	                             }
+	
+	                            if (plt[i]=='nro_documento'){
+	                                 var nro_doc = Math.floor(res[1]);
+	                                 this.getComponente('nro_documento').setValue(nro_doc);
+	                             }
+	                             if(plt[i]=='importe_doc'){
+	                                 var importe = this.controlMiles(res[4]);
+	                                 this.getComponente('importe_doc').setValue(importe);
+	                             }
+	                             if(plt[i]=='fecha'){          	
+	                             	if(this.data.tmpPeriodo){ //si existe un periodo de referencia
+		                             	   var mesPeriodo = this.data.tmpPeriodo > 9 ? this.data.tmpPeriodo : '0' + this.data.tmpPeriodo,
+		                                     fechaInt = this.data.tmpGestion + '-' + mesPeriodo + '-' + '30',
+		                                     mesPer = new Date(fechaInt).getMonth(),
+		                                     mesFactura = res[3].split("/"),
+		                                     fechaFac = mesFactura[2] + '-' + mesFactura[1] + '-' + mesFactura[0],
+		                                     mesFac = new Date(fechaFac).getMonth(),
+		                                     monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Mayo","Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+		                                     literalFactura = monthNames[mesFac],
+		                                     literalPeriodo = monthNames[mesPer];
+		                                     
+		                                 if (mesFactura[1] != mesPeriodo) {
+		                                     this.mensaje_('ALERTA', 'Actualmente se encuentra en el periodo: ' + literalPeriodo + ', la factura corresponde al periodo de: ' + literalFactura, 'ERROR');
+		                                 }	
+	                             	}
+	                             }
+	                            
+                         }                        
+                     } 
+                      this.cargarRazonSocialGestionMoneda();  
+                                   
+                }
+               
+                this.calculaMontoPago();
 
             },this);
-
-
-
-
-
-
         },
 
         resetearMontos: function(){
@@ -1815,11 +1869,32 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.importe_pago_liquido.setValue(0);
             this.iniciarImportes();
         },
+        
+        //#9999  adciona funcion que inicia el calculo de DUI
+        calculaMontoPagoDui: function(){
+        	
+        	console.log('calculaMontoPagoDui',this.sw_nro_dui)
+        	
+        	if(this.sw_nro_dui=='si'){
+        	   this.calculaMontoPago();	
+        	}
+        }, 
 
         calculaMontoPago:function(){
-
             var me = this,
                 descuento_ley = 0.00;
+                
+             //#9999, define el total del documento   
+             if(this.sw_nro_dui=='si'){
+                if(this.Cmp.porc_iva_cf.getValue() <= 0){
+                   alert('La plantilla de DUI no tiene definido  el porcentaje de IVA');
+                   return;
+                }
+                else{
+                	console.log('....monto....', (this.Cmp.importe_iva.getValue()/this.Cmp.porc_iva_cf.getValue()),  this.Cmp.porc_iva_cf.getValue(), this.Cmp.importe_iva.getValue() )
+                    this.Cmp.importe_doc.setValue(this.Cmp.importe_iva.getValue() / this.Cmp.porc_iva_cf.getValue());	
+                }
+             }    
 
             if(this.Cmp.importe_descuento.getValue() > 0 ){
                 if( this.Cmp.importe_descuento.getValue() > this.Cmp.importe_doc.getValue()){
@@ -1829,15 +1904,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
                 this.Cmp.importe_neto.setValue(this.Cmp.importe_doc.getValue() -  this.Cmp.importe_descuento.getValue());
                 this.Cmp.porc_descuento.setValue(this.Cmp.importe_descuento.getValue()/this.Cmp.importe_doc.getValue());
-
-
             }else{
                 this.Cmp.importe_neto.setValue(this.Cmp.importe_doc.getValue());
                 this.Cmp.porc_descuento.setValue(0);
             }
 
             var porc_descuento = this.Cmp.porc_descuento.getValue();
-
             if(this.regitrarDetalle == 'si'){
                 for (i = 0; i < me.megrid.store.getCount(); i++) {
                     record = me.megrid.store.getAt(i);
@@ -1845,8 +1917,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             }
 
-            if(this.tmp_porc_monto_excento_var){
-                alert('ENTRA ...')
+            if(this.tmp_porc_monto_excento_var){               
                 this.Cmp.importe_excento.setValue(this.Cmp.importe_neto.getValue()*this.tmp_porc_monto_excento_var)
             }
 
@@ -1857,7 +1928,6 @@ header("content-type: text/javascript; charset=UTF-8");
             if(this.Cmp.tipo_excento.getValue() == 'porcentual' ){
                 this.Cmp.importe_excento.setValue(this.Cmp.importe_neto.getValue()*this.Cmp.valor_excento.getValue())
             }
-
 
 
             if(this.Cmp.importe_excento.getValue() == 0){
@@ -1874,22 +1944,28 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.importe_it.setValue(this.Cmp.porc_it.getValue()*this.Cmp.importe_neto.getValue())
             }
 
-            //calculo iva cf
-            if(this.Cmp.porc_iva_cf.getValue() >= 0 || this.Cmp.porc_iva_df.getValue() > 0){
-
-                var excento = 0.00;
-
-                if(this.Cmp.importe_excento.getValue() > 0){
-                    excento = this.Cmp.importe_excento.getValue();
-                }
-                if(this.Cmp.porc_iva_cf.getValue() >= 0){
-
-                    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
-                }
-                else {
-                    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
-                }
-            }
+            // #9999  calculo iva cf
+            if(this.sw_nro_dui=='no'){
+	            if(this.Cmp.porc_iva_cf.getValue() > 0 || this.Cmp.porc_iva_df.getValue() > 0){
+	
+	                var excento = 0.00;
+	
+	                if(this.Cmp.importe_excento.getValue() > 0){
+	                    excento = this.Cmp.importe_excento.getValue();
+	                }
+	                if(this.Cmp.porc_iva_cf.getValue() > 0){
+	
+	                    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_cf.getValue()*(this.Cmp.importe_neto.getValue() - excento));
+	                }
+	                else {
+	                    this.Cmp.importe_iva.setValue(this.Cmp.porc_iva_df.getValue()*(this.Cmp.importe_neto.getValue() - excento));
+	                }
+	            }
+	            else{
+	            	 this.Cmp.importe_iva.setValue(0);
+				}
+			}
+            
             if(this.mostrarFormaPago){
                 if(this.Cmp.importe_retgar.getValue() > 0 || this.Cmp.importe_anticipo.getValue() > 0 ||  this.Cmp.importe_pendiente.getValue() > 0){
                     this.Cmp.id_auxiliar.allowBlank = false;
@@ -1902,9 +1978,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
                 this.Cmp.id_auxiliar.validate();
             }
-
-            var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
-            this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+            
+            if( this.sw_nro_dui ==  'si'){
+            	//#9999 se agregas las restas por anticipo, cuentas por cobrar y retenciones de garantia
+            	var liquido =  this.Cmp.importe_iva.getValue() -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
+                this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+            }
+            else{
+            	var liquido =  this.Cmp.importe_neto.getValue()   -  this.Cmp.importe_retgar.getValue() -  this.Cmp.importe_anticipo.getValue() -  this.Cmp.importe_pendiente.getValue()  -  this.Cmp.importe_descuento_ley.getValue();
+                this.Cmp.importe_pago_liquido.setValue(liquido>0?liquido:0);
+            }
+            
 
 
 
@@ -1915,7 +1999,6 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.CP.loadingShow();
 
             Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
                 url:'../../sis_contabilidad/control/PlantillaCalculo/recuperarDetallePlantillaCalculo',
                 params:{id_plantilla:id_plantilla},
                 success:this.successAplicarDesc,
@@ -1967,6 +2050,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarComponente(this.Cmp.estacion);
             this.ocultarComponente(this.Cmp.id_punto_venta);
             this.ocultarComponente(this.Cmp.id_agencia);
+           
+            
+            
         },
         iniciarImportes:function(){
             this.Cmp.importe_excento.setValue(0);
@@ -2019,6 +2105,8 @@ header("content-type: text/javascript; charset=UTF-8");
             if(this.data.datosOriginales){
                 this.loadForm(this.data.datosOriginales);
             }
+            
+            console.log('datosOriginales', this.data.datosOriginales)
 
 
             this.esconderImportes();
@@ -2028,10 +2116,12 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.id_depto_conta.setValue(this.data.id_depto);
             this.Cmp.id_gestion.setValue(this.data.id_gestion);
             this.Cmp.tipo.setValue(this.data.tipoDoc);
-
-            this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
+            
+            
+           
             //load detalle de conceptos
             if(this.regitrarDetalle == 'si'){
+            	this.detCmp.id_centro_costo.store.baseParams.id_depto = this.data.id_depto;
                 this.mestore.baseParams.id_doc_compra_venta = this.Cmp.id_doc_compra_venta.getValue();
                 this.mestore.load()
             }
@@ -2113,6 +2203,8 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         checkRelacionConcepto: function(cfg){
+        	//console.log('data',this.Cmp.id_plantilla.getValue());
+        	
             var me = this;
             Phx.CP.loadingShow();
             Ext.Ajax.request({
@@ -2121,7 +2213,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_centro_costo: cfg.id_centro_costo,
                     id_gestion: cfg.id_gestion,
                     id_concepto_ingas: cfg.id_concepto_ingas,
-                    relacion: me.data.tipoDoc
+                    relacion: me.data.tipoDoc,
+                    id_plantilla:this.Cmp.id_plantilla.getValue() //#12					24/10/2018			EGS	
                 },
                 success: function(resp){
                     Phx.CP.loadingHide();
@@ -2200,20 +2293,21 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
 
-        cargarRazonSocial: function(nit){
+        cargarRazonSocialGestionMoneda: function(nit){
             //Busca en la base de datos la razon social en función del NIT digitado. Si Razon social no esta vacío, entonces no hace nada
-            if(this.getComponente('razon_social').getValue()==''){
-                Phx.CP.loadingShow();
+            if(this.getComponente('razon_social').getValue()=='' && this.Cmp.nit.isValid()){
+                Phx.CP.loadingShow();                
                 Ext.Ajax.request({
                     url:'../../sis_contabilidad/control/DocCompraVenta/obtenerRazonSocialxNIT',
-                    params:{ 'nit': this.Cmp.nit.getValue()},
+                    params:{ 'nit': this.Cmp.nit.getValue() , fecha: this.Cmp.fecha.getValue().dateFormat('d/m/Y')},
                     success: function(resp){
                         Phx.CP.loadingHide();
-                        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                        var razonSocial=objRes.ROOT.datos.razon_social;
+                        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText)),
+                            razonSocial=objRes.ROOT.datos.razon_social;
                         this.getComponente('razon_social').setValue(razonSocial);
                         this.getComponente('id_moneda').setValue(1);
-                        this.getComponente('id_moneda').setRawValue('Bolivianos');
+                        this.getComponente('id_moneda').setRawValue('Bolivianos');                        
+                        this.Cmp.id_gestion.setValue(objRes.ROOT.datos.id_gestion);
 
                     },
                     failure: this.conexionFailure,
@@ -2235,15 +2329,163 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
         controlMiles:function (value) {
-            return value
-                .replace(/\D/g, "")
-                .replace(/([0-9])([0-9]{2})$/, '$1.$2')
-                .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, "")
-                ;
+            return value    .replace(',', "")
+                            //.replace(/([0-9])([0-9]{2})$/, '$1.$2')
+                            //.replace(/\B(?=(\d{3})+(?!\d)\.?)/g, "");
+        },
+        
+        //RAC 07122017, crea formulario para plantilla de prorrateo
+        buildFormPlantilla: function(){
+        	var me = this, 
+        	    bpar = (me.data.tipoDoc=='compra')?{par_filtro: me.parFilConcepto, movimiento: 'gasto', autorizacion: me.autorizacion, autorizacion_nulos: me.autorizacion_nulos }:{par_filtro: me.parFilConcepto, movimiento: 'recurso'};
+         	if(me.plantillaProrrateo.length > 0){
+        		 this.formPlantilla = new Ext.form.FormPanel({
+							            baseCls: 'x-plain',
+							            autoDestroy: true,							           
+							            border: false,
+							            layout: 'form',
+							            autoHeight: true,
+							            items: [new Ext.form.ComboBox({
+								                    name: 'id_concepto_ingas',
+								                    msgTarget: 'title',
+								                    fieldLabel: 'Concepto',
+								                    allowBlank: false,
+								                    emptyText : 'Concepto...',
+								                    store : new Ext.data.JsonStore({
+								                        url: me.listadoConcepto,
+								                        id : 'id_concepto_ingas',
+								                        root: 'datos',
+								                        sortInfo:{
+								                            field: 'desc_ingas',
+								                            direction: 'ASC'
+								                        },
+								                        totalProperty: 'total',
+								                        fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+								                        remoteSort: true,
+								                        baseParams: bpar
+								                    }),
+								                    valueField: 'id_concepto_ingas',
+								                    displayField: 'desc_ingas',
+								                    hiddenName: 'id_concepto_ingas',
+								                    forceSelection: true,
+								                    typeAhead: false,
+								                    triggerAction: 'all',
+								                    listWidth: 500,
+								                    resizable: true,
+								                    lazyRender: true,
+								                    mode: 'remote',
+								                    pageSize: 10,
+								                    queryDelay: 1000,
+								                    minChars: 2,
+								                    qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
+								                    tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
+								                }),
+								                
+								                new Ext.form.NumberField({
+								                    name: 'precio_det',
+								                    msgTarget: 'title',
+								                    currencyChar:' ',
+								                    fieldLabel: 'Prec. Unit.',
+								                    minValue: 0.0001,
+								                    allowBlank: false,
+								                    allowDecimals: true,
+								                    allowNegative:false,
+								                    decimalPrecision:2
+								                }),
+								                
+								                new Ext.form.TextArea({
+								                    name: 'descripcion',
+								                    msgTarget: 'title',
+								                    fieldLabel: 'Descripcion',
+								                    allowBlank: false,
+								                    anchor: '80%',
+								                    maxLength:1200
+								                })
+																               
+								            ]
+							        });
+							        
+									
+									
+									me.wPlantilla = new Ext.Window({
+							            title: 'Plantilla de Prorrateo',
+							            collapsible: true,
+							            maximizable: true,
+							            autoDestroy: true,
+							            width: 380,
+							            height: 170,
+							            layout: 'fit',
+							            plain: true,
+							            bodyStyle: 'padding:5px;',
+							            buttonAlign: 'center',
+							            items: this.formPlantilla,
+							            modal:true,
+							             closeAction: 'hide',
+							            buttons: [{
+							                text: 'Guardar',
+							                handler: this.addPltProc,
+							                scope: this
+							                
+							            },
+							             {
+							                text: 'Cancelar',
+							                handler: function(){ me.wPlantilla.hide() },
+							                scope: this
+							            }]
+							        });
+							        
+						
+        		
+        	}
+        	
+        },
+        addPltProc: function(){
+        	var acumulado = 0,
+        	    aux = 0,
+        	    pTot = 0
+        	    idConceptoGasto = this.formPlantilla.getForm().findField('id_concepto_ingas').getValue(),
+        	    descConceptoGasto = this.formPlantilla.getForm().findField('id_concepto_ingas').getRawValue(),
+                precioDet = this.formPlantilla.getForm().findField('precio_det').getValue(),
+                descripcion = this.formPlantilla.getForm().findField('descripcion').getValue();
+
+                
+           this.plantillaProrrateo.forEach(function callback(element, index, array) {
+		        this.editorDetail.stopEditing();
+
+		        if(index == (me.plantillaProrrateo.length - 1) ){
+		        	 aux = (precioDet - acumulado).toFixed(2);
+		        }
+		        else{
+		        	aux = (precioDet * element.factor).toFixed(2);
+		        }
+		         
+		        acumulado = aux*1 + acumulado;
+		        pTot = aux - (aux * this.Cmp.porc_descuento.getValue())
+		        
+		        var e = new this.itemsRecordDet({
+                                id_concepto_ingas: idConceptoGasto,
+                                desc_concepto_ingas: descConceptoGasto,
+                                cantidad_sol: 1,
+                                id_centro_costo: element.id_centro_costo,
+                                id_orden_trabajo:'', 
+                                desc_centro_costo: element.desc_cc,
+                                descripcion: descripcion,
+                                precio_total: aux,
+                                precio_total_final: pTot,
+                                precio_unitario: aux
+                            });
+              
+                this.mestore.insert(0, e);
+               
+                
+                
+		    }, this);
+		    
+		    this.megrid.getView().refresh();
+		    this.wPlantilla.hide();
+        	
+        	
         }
-
-
-
 
 
 

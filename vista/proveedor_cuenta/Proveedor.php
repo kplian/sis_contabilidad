@@ -10,8 +10,8 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.ProveedorCuenta = {
-	require:'../../../sis_adquisiciones/vista/proveedor/Proveedor.php',
-	requireclase:'Phx.vista.Proveedor',
+	require:'../../../sis_parametros/vista/proveedor/Proveedor.php',
+	requireclase:'Phx.vista.proveedor',
 	title:'Proveedor',
 	constructor: function(config) {
     	Phx.vista.ProveedorCuenta.superclass.constructor.call(this,config);    	

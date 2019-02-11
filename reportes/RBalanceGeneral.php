@@ -1,5 +1,14 @@
 <?php
+/**
+ *@package pXP
+ *@file RBalanceGeneral.php
+ *@author  Admin
+ *@date 21-02-2013 15:04:03
+ *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ISSUE			FECHA 				AUTHOR 						DESCRIPCION
+#33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
 
+ */
 // Extend the TCPDF class to create custom MultiRow
 class RBalanceGeneral extends  ReportePDF {
 	var $datos_titulo;
@@ -20,8 +29,17 @@ class RBalanceGeneral extends  ReportePDF {
 	var $total_egreso;
 	var $tipo_balance;
 	var $incluir_cierre;
-	
-	function datosHeader ( $detalle, $nivel, $desde, $hasta, $codigos, $tipo_balance, $incluir_cierre) {
+    var $tipo_moneda; //#33
+	var $moneda; //#33
+	function datosHeader ( $detalle,
+						   $nivel,
+						   $desde,
+						   $hasta,
+						   $codigos,
+						   $tipo_balance,
+						   $incluir_cierre,
+						   $tipo_moneda   //#33
+										) {
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
 		$this->nivel = $nivel;
@@ -30,6 +48,7 @@ class RBalanceGeneral extends  ReportePDF {
 		$this->codigos = $codigos;
 		$this->incluir_cierre = $incluir_cierre;
 		$this->tipo_balance = $tipo_balance;
+		$this->tipo_moneda = $tipo_moneda; //#33
 		//$this->SetMargins(5, 22.5, 5);
 		$this->SetMargins(5,40);
 	}
@@ -39,11 +58,20 @@ class RBalanceGeneral extends  ReportePDF {
 		$this->Image(dirname(__FILE__).'/../../lib'.$_SESSION['_DIR_LOGO'], $this->ancho_hoja, 5, 30, 10);
 		$this->ln(5);
 		$this->SetFont('','BU',12);
+		//#33
+		if($this->tipo_moneda == 'MB'){
+			$this->moneda = 'BS';
+		}elseif ($this->tipo_moneda == 'MT'){
+            $this->moneda = '$us';
+		}elseif ($this->tipo_moneda == 'MA'){
+            $this->moneda = 'UFV';
+        }
+ 		//#33
 		if($this->tipo_balance == 'resultado'){
-			$this->Cell(0,5,'ESTADO DE RESULTADOS (BS)',0,1,'C');
+			$this->Cell(0,5,'ESTADO DE RESULTADOS ('.$this->moneda.')',0,1,'C');  //#33
 		}
 		else{
-			$this->Cell(0,5,'BALANCE GENERAL (BS)',0,1,'C');
+			$this->Cell(0,5,'BALANCE GENERAL ('.$this->moneda.')',0,1,'C'); //#33
 		}
 		
 		$this->SetFont('','BU',11);
@@ -51,8 +79,8 @@ class RBalanceGeneral extends  ReportePDF {
 		$this->SetFont('','BU',10);		
 		$this->Cell(0,5,'Del '.$this->desde.' al '.$this->hasta,0,1,'C');
 		$this->SetFont('','BU',8);		
-		$this->Cell(0,5,'Incluye Cierres: '.$this->incluir_cierre,0,1,'C');
-		
+		$this->Cell(0,5,'Incluye Cierres: '.$this->incluir_cierre.' '.'Tipo Moneda: '.$this->tipo_moneda,0,1,'C'); //#33
+
 		
 		$this->Ln(3);
 		$this->SetFont('','B',10);
@@ -61,7 +89,7 @@ class RBalanceGeneral extends  ReportePDF {
 		if($this->nivel == 1 || $this->nivel > 3 ){
 			//Titulos de columnas superiores
 			$this->Cell(160,3.5,'Nombre Cuenta','',0,'C');
-			$this->Cell(40,3.5,'Montos (Bs)','',0,'C');
+			$this->Cell(40,3.5,'Montos ('.$this->moneda.')','',0,'C'); //#33
 			$this->ln();	
 		}
 		//reporte de dos columnas de montos
@@ -69,7 +97,7 @@ class RBalanceGeneral extends  ReportePDF {
 			//Titulos de columnas superiores
 			$this->Cell(154,3.5,'Cuentas','',0,'C');
 			$this->Cell(23,3.5,'Mon','',0,'R');
-			$this->Cell(23,3.5,'tos (Bs)','',0,'L');
+			$this->Cell(23,3.5,'tos ('.$this->moneda.')','',0,'L'); //#33
 			$this->ln();	
 			
 		}
@@ -78,7 +106,7 @@ class RBalanceGeneral extends  ReportePDF {
 			//Titulos de columnas superiores
 			$this->Cell(131,3.5,'Cuentas','',0,'C');
 			$this->Cell(23,3.5,'','',0,'R');
-			$this->Cell(23,3.5,'Montos (Bs)','',0,'C');
+			$this->Cell(23,3.5,'Montos ('.$this->moneda.')','',0,'C'); //#33
 			$this->Cell(23,3.5,'','',0,'L');
 			$this->ln();
 			
@@ -116,6 +144,9 @@ class RBalanceGeneral extends  ReportePDF {
 		$resultado = $this->total_ingreso - $this->total_egreso;
 		$resultado = number_format( $resultado , 2 , '.' , ',' );
 		 $sw_dif = 0;
+
+		 //COMENTADO TEMPORALEMTEN, debe ser configurable desde el formulario
+
 		if($this->tipo_balance == 'general'){
 			$formula = "ACTIVO =  PASIVO + PATRIMONIO";
 			$this->Write(0, $formula, '', 0, 'C', true, 0, false, false, 0);

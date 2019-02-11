@@ -20,9 +20,19 @@ Fecha 27/08/2013
 Descripcion:    
    Esta funcion evalua un detalle de trasaccion especifico e inserta 
    las trasacciones generadas en int_trasaccion y hace una llamada recursiva para procesar transacciones secundarias asociadas
+   
+   
+   
 
-
-
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+ #0        		27/08/2013      Rensi Arteaga Copari       Esta funcion evalua un detalle de trasaccion especifico e inserta 
+   												           las trasacciones generadas en int_trasaccion y hace una llamada recursiva para procesar transacciones secundarias asociadas
+ #0       		17/11/2017      Rensi Arteaga Copari       BUG, En calculo por diferencia se considera lso montos de gastos y recurso
+ #123           27/09/2018      Rarteaga                   Se adiciona el dato de tabla origien la guardar la trasaccion para rastreo
+ #21            10/01/2019      RArteaga                   añade parametro a la llamda de generar desde plantilla, para considerar descuentos
 */
 
 
@@ -64,6 +74,10 @@ DECLARE
      v_descuento_haber  			numeric;
      v_id_int_transaccion_pagado  	integer;
      v_conta_partidas				varchar;
+     v_sum_gasto					numeric;
+     v_sum_recurso					numeric;
+     v_descuento_gasto				    numeric;
+     v_descuento_recurso				numeric;
 BEGIN
 	
     v_nombre_funcion:='conta.f_gen_transaccion_from_plantilla';
@@ -74,6 +88,9 @@ BEGIN
      --      obtener la definicion de las variablles y los valores segun la plantilla del detalle
      *********************************************************************************************/      
              v_this_hstore = hstore(v_this);
+             
+             
+             
              
              FOR v_i in 1..(p_tamano) loop
              
@@ -99,7 +116,9 @@ BEGIN
            
              END LOOP;
              
-          
+          IF p_id_usuario = 429 THEN
+              -- raise exception 'llega...xx   %', v_this_hstore ;
+             END IF;
      /********************************************************
      *  Si la plantilla es del tipo relacion devengado pago
      * 
@@ -165,9 +184,6 @@ BEGIN
       ELSE
       -- si no es una relacion devengado pago procesa la plantilla normalmente
            
-      
-           
-      
            --si el monto es cero saltamos el proceso, ya que no se generan transacciones
            
            IF COALESCE((v_this_hstore -> 'campo_monto')::numeric,0) > 0 or (p_reg_det_plantilla->'forma_calculo_monto') = 'diferencia' THEN
@@ -195,7 +211,13 @@ BEGIN
                                      FROM conta.f_get_config_relacion_contable('CCDEPCON', -- relacion contable que almacena los centros de costo por departamento
                                                                          (p_super->'columna_gestion')::integer,  
                                                                          (p_super->'columna_depto')::integer,--p_id_depto_conta 
-                                                                         NULL);  --id_dento_costo
+                                                                         NULL, --centrode costo
+                                                                         NULL, -- mensaje de error
+                                                                         (p_super->'columna_moneda')::integer,
+                                                                         (v_this_hstore->'campo_codigo_aplicacion_rc')
+                                                                         
+                                                                         );  
+                                  
                                                                              
                                      v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
                                 
@@ -211,7 +233,11 @@ BEGIN
                                      FROM conta.f_get_config_relacion_contable((p_reg_det_plantilla->'tipo_relacion_contable_cc')::varchar, -- relacion contable que almacena los centros de costo por departamento
                                                                          (p_super->'columna_gestion')::integer,  
                                                                          (v_this_hstore->'campo_relacion_contable_cc')::integer, 
-                                                                         NULL);  --id_dento_costo
+                                                                         NULL, --centrode costo
+                                                                         NULL, -- mensaje de error
+                                                                         (p_super->'columna_moneda')::integer,
+                                                                         (v_this_hstore->'campo_codigo_aplicacion_rc')  
+                                                                      );  --id_moneda
                                                                              
                                      v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
                                 
@@ -240,7 +266,12 @@ BEGIN
                                  FROM conta.f_get_config_relacion_contable((p_reg_det_plantilla->'tipo_relacion_contable')::varchar, 
                                                                           (p_super->'columna_gestion')::integer, 
                                                                           (v_this_hstore->'campo_relacion_contable')::integer, 
-                                                                          (v_this_hstore->'campo_centro_costo')::integer);
+                                                                          (v_this_hstore->'campo_centro_costo')::integer,
+                                                                           NULL, -- mensaje de error
+                                                                           (p_super->'columna_moneda')::integer,
+                                                                           (v_this_hstore->'campo_codigo_aplicacion_rc')
+                                                                           
+                                                                           );  --id_moneda
                                                                               
                                 -- utiliza la relacion contable solo si no remplaza los valores de los campos del detalle de plantilla 
                                 
@@ -322,8 +353,10 @@ BEGIN
                       v_record_int_tran.porc_monto_excento_var = (v_this_hstore->'campo_porc_monto_excento_var')::varchar;
                       v_record_int_tran.nombre_cheque_trans = (v_this_hstore->'campo_nombre_cheque_trans')::varchar;
                       v_record_int_tran.forma_pago = (v_this_hstore->'campo_forma_pago')::varchar;
+                      v_record_int_tran.id_origen = (v_this_hstore->'campo_id_tabla_detalle')::integer; --#123 17/09/2018 se acicion el id de la tabla origen para rastreo
+
                       
-                     raise notice '>>>>>>>>>>>>>>>>>>   glosa %',(v_this_hstore->'campo_concepto_transaccion');
+                    -- raise notice '>>>>>>>>>>>>>>>>>>   glosa %',(v_this_hstore->'campo_concepto_transaccion');
                       
                       /****************************************************************
                       --Proceso el monto y lo ubica en el debe o haber, gasto o recurso
@@ -343,7 +376,7 @@ BEGIN
                               
                                  v_record_int_tran.importe_debe = (v_this_hstore->'campo_monto')::numeric;
                                  v_record_int_tran.importe_gasto = (v_this_hstore->'campo_monto_pres')::numeric;
-                                  v_record_int_tran.importe_haber = 0::numeric;
+                                 v_record_int_tran.importe_haber = 0::numeric;
                                  v_record_int_tran.importe_recurso = 0::numeric;
                               
                               ELSE
@@ -364,14 +397,18 @@ BEGIN
                            
                               IF (p_reg_det_plantilla->'id_detalle_plantilla_fk') is NULL  THEN
                               
-                               
-                                
                                      -- analizar la forma de calculo de los montos
                               
                                     Select  
-                                      sum(COALESCE(it.importe_debe,0)),sum(COALESCE(it.importe_haber,0))
+                                      sum(COALESCE(it.importe_debe,0)),
+                                      sum(COALESCE(it.importe_haber,0)),
+                                      sum(COALESCE(it.importe_gasto,0)),
+                                      sum(COALESCE(it.importe_recurso,0))
                                     into
-                                      v_sum_debe, v_sum_haber
+                                      v_sum_debe, 
+                                      v_sum_haber,
+                                      v_sum_gasto,
+                                      v_sum_recurso
                                     from conta.tint_transaccion  it 
                                      where it.id_int_comprobante = p_id_int_comprobante;
                               
@@ -381,32 +418,34 @@ BEGIN
                                    -- analizar la forma de calculo de los montos
                                   
                                   Select  
-                                    sum(COALESCE(it.importe_debe,0)),sum(COALESCE(it.importe_haber,0))
+                                    sum(COALESCE(it.importe_debe,0)),
+                                    sum(COALESCE(it.importe_haber,0)),
+                                    sum(COALESCE(it.importe_gasto,0)),
+                                    sum(COALESCE(it.importe_recurso,0))
                                   into
-                                    v_sum_debe, v_sum_haber
+                                    v_sum_debe, 
+                                    v_sum_haber,
+                                    v_sum_gasto,
+                                    v_sum_recurso
                                   from conta.tint_transaccion  it 
                                    where it.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_fk')::integer
                                          and it.id_int_comprobante = p_id_int_comprobante;
                               
                               END IF;
                            
-                              
-                             
-                                         
-                                
                                          
                               IF  (p_reg_det_plantilla->'debe_haber') = 'haber'  THEN
                               
                                    v_record_int_tran.importe_debe = 0;
                                    v_record_int_tran.importe_gasto = 0;
                                    v_record_int_tran.importe_haber =   v_sum_debe - v_sum_haber;
-                                   v_record_int_tran.importe_recurso =  v_sum_debe - v_sum_haber;
+                                   v_record_int_tran.importe_recurso =  v_sum_gasto - v_sum_recurso;
                                 
                               
                               ELSE
                                   
                                   v_record_int_tran.importe_debe =  v_sum_haber - v_sum_debe;
-                                  v_record_int_tran.importe_gasto = v_sum_haber - v_sum_debe;
+                                  v_record_int_tran.importe_gasto = v_sum_recurso - v_sum_gasto;
                                   v_record_int_tran.importe_haber =  0;
                                   v_record_int_tran.importe_recurso = 0;
                               
@@ -423,21 +462,23 @@ BEGIN
                            --------------------------
                            
                            IF (p_reg_det_plantilla->'id_detalle_plantilla_fk') is NULL  THEN
+                               raise exception 'Es tipo de calculo "descuento" necesita una columna base de referencia';
+                           END IF;
                               
-                                raise exception 'Es tipo de calculo "descuento" necesita una columna base de referencia';
-                              
-                              END IF;
-                              
-                            
-                           
                            --el decuento solo se aplica si el monto a descontar es mayor a cero
                            
                            IF   COALESCE((v_this_hstore->'campo_monto')::numeric , 0) > 0 THEN 
                           
                                  Select  
-                                  sum(COALESCE(it.importe_debe,0)),sum(COALESCE(it.importe_haber,0))
+                                  sum(COALESCE(it.importe_debe,0)),
+                                  sum(COALESCE(it.importe_haber,0)),
+                                  sum(COALESCE(it.importe_gasto,0)),
+                                  sum(COALESCE(it.importe_recurso,0))
                                 into
-                                  v_sum_debe, v_sum_haber
+                                  v_sum_debe, 
+                                  v_sum_haber,
+                                  v_sum_gasto,
+                                  v_sum_recurso
                                 from conta.tint_transaccion  it 
                                  where it.id_detalle_plantilla_comprobante = (p_reg_det_plantilla->'id_detalle_plantilla_fk')::integer
                                        and it.id_int_comprobante = p_id_int_comprobante;
@@ -445,16 +486,16 @@ BEGIN
                                 
                                 --validamos que el decuento solo se aplique al dbe o al haber
                                 
-                                IF v_sum_debe > 0 and v_sum_haber > 0   THEN
-                                
-                                   raise exception 'La plantilla de "%" solo puede afectar a debe o al haber pero no ambos',(p_reg_det_plantilla->'forma_calculo_monto');
-                                
+                                IF v_sum_debe > 0 and v_sum_haber > 0   THEN                                
+                                   raise exception 'La plantilla de "%" solo puede afectar a debe o al haber pero no ambos',(p_reg_det_plantilla->'forma_calculo_monto');                                
                                 END IF;
                                 
                                 v_consulta_aux =  'Select  
                                                       it.id_int_transaccion,
                                                       it.importe_debe,
-                                                      it.importe_haber
+                                                      it.importe_haber,
+                                                      it.importe_gasto,
+                                                      it.importe_recurso
                                                  
                                                   from conta.tint_transaccion  it 
                                                    where it.id_detalle_plantilla_comprobante ='|| (p_reg_det_plantilla->'id_detalle_plantilla_fk')||'
@@ -463,14 +504,10 @@ BEGIN
                                 
                                 --calcula el factor de prorrateo del decuento
                                 
-                                IF  v_sum_debe > 0 THEN
-                                   
-                                   v_factor_aux =  (v_this_hstore->'campo_monto')::numeric  / v_sum_debe;
-                                
-                                ELSE
-                                
-                                   v_factor_aux =  (v_this_hstore->'campo_monto')::numeric  / v_sum_haber;
-                                
+                                IF  v_sum_debe > 0 THEN                                   
+                                   v_factor_aux =  (v_this_hstore->'campo_monto')::numeric  / v_sum_debe;                                
+                                ELSE                                
+                                   v_factor_aux =  (v_this_hstore->'campo_monto')::numeric  / v_sum_haber;                                
                                 END IF;
                                 
                                 
@@ -481,14 +518,16 @@ BEGIN
                                     --calcula descuento
                                     v_descuento_debe = COALESCE(v_registros_aux.importe_debe,0) * v_factor_aux;
                                     v_descuento_haber = COALESCE(v_registros_aux.importe_haber,0) * v_factor_aux;
+                                    v_descuento_gasto = COALESCE(v_registros_aux.importe_gasto,0) * v_factor_aux;
+                                    v_descuento_recurso = COALESCE(v_registros_aux.importe_recurso,0) * v_factor_aux;
                                     
                                     
                                     IF (p_reg_det_plantilla->'forma_calculo_monto') = 'descuento' THEN
                                     --
                                         update   conta.tint_transaccion it  set
-                                           importe_gasto = importe_debe - v_descuento_debe,
+                                           importe_gasto = importe_gasto - v_descuento_gasto,
                                            importe_debe = importe_debe - v_descuento_debe,
-                                           importe_recurso = importe_haber - v_descuento_haber,
+                                           importe_recurso = importe_recurso - v_descuento_recurso,
                                            importe_haber = importe_haber - v_descuento_haber 
                                         where it.id_int_transaccion = v_registros_aux.id_int_transaccion;
                                         
@@ -496,9 +535,9 @@ BEGIN
                                    ELSEIF (p_reg_det_plantilla->'forma_calculo_monto') = 'incremento' THEN
                                    
                                        update   conta.tint_transaccion it  set
-                                           importe_gasto = importe_debe + v_descuento_debe,
+                                           importe_gasto = importe_gasto + v_descuento_gasto,
                                            importe_debe = importe_debe + v_descuento_debe,
-                                           importe_recurso = importe_haber + v_descuento_haber,
+                                           importe_recurso = importe_recurso + v_descuento_recurso,
                                            importe_haber = importe_haber + v_descuento_haber 
                                         where it.id_int_transaccion = v_registros_aux.id_int_transaccion;
                                    
@@ -568,7 +607,8 @@ BEGIN
                                                             (v_this_hstore->'campo_monto')::numeric, 
                                                             p_id_usuario,
                                                             (p_super->'columna_depto')::integer,--p_id_depto_conta 
-                                                            (p_super->'columna_gestion')::integer, 
+                                                            (p_super->'columna_gestion')::integer,
+                                                            (p_reg_det_plantilla->'incluir_desc_doc')::varchar, --#21
                                                             (p_reg_det_plantilla->'prioridad_documento')::integer,
                                                             'no',
                                                             (v_this_hstore->'campo_porc_monto_excento_var')::numeric 
@@ -590,7 +630,7 @@ BEGIN
                                         
                                         END IF;
                                         
-                                        raise notice  ' >>> actualiza transaccion .. %,%',(p_reg_det_plantilla->'func_act_transaccion'),(v_this_hstore->'campo_id_tabla_detalle');
+                                        --raise notice  ' >>> actualiza transaccion .. %,%',(p_reg_det_plantilla->'func_act_transaccion'),(v_this_hstore->'campo_id_tabla_detalle');
                                
                                         
                                         EXECUTE ( 'select ' || (p_reg_det_plantilla->'func_act_transaccion')  ||'('||v_resp_doc[1]::varchar||' ,'||(v_this_hstore->'campo_id_tabla_detalle') ||' )');

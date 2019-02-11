@@ -28,14 +28,17 @@ Phx.vista.IntTransaccionLd = {
     preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
-		Phx.vista.IntTransaccion.superclass.preparaMenu.call(this);
-		this.getBoton('btnBanco').disable();
+		Phx.vista.IntTransaccionLd.superclass.preparaMenu.call(this);
+		if(this.getBoton('btnBanco')){
+			this.getBoton('btnBanco').disable();
+		}		
 	},
 	
 	liberaMenu: function() {
-		var tb = Phx.vista.IntTransaccion.superclass.liberaMenu.call(this);
-		this.getBoton('btnBanco').setDisabled(true);
-		
+		var tb = Phx.vista.IntTransaccionLd.superclass.liberaMenu.call(this);
+		if(this.getBoton('btnBanco')){
+			this.getBoton('btnBanco').setDisabled(true);
+		}		
 	}
 	
 };

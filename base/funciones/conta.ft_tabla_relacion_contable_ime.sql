@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_tabla_relacion_contable_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -17,10 +15,8 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ ISSUE			FECHA				AUTHOR 			DESCRIPCION
+ #14	endeETR			04/01/2019			EGS				se aumento el campo codigo para el exportador de configuracion y validacion para que el codigo sea unico		
 ***************************************************************************/
 
 DECLARE
@@ -32,7 +28,8 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_tabla_relacion_contable	integer;
-			    
+    v_codigo				VARCHAR;
+	v_string				varchar;		    
 BEGIN
 
     v_nombre_funcion = 'conta.ft_tabla_relacion_contable_ime';
@@ -48,7 +45,20 @@ BEGIN
 	if(p_transaccion='CONTA_TABRECON_INS')then
 					
         begin
-        	--Sentencia de la insercion
+        ---#14	04/01/2019	EGS	
+        --validamos si el codigo existe 
+        	v_string=REPLACE(v_parametros.codigo,' ', '');
+        	Select
+            trec.codigo
+            INTO
+            v_codigo
+            FROM  conta.ttabla_relacion_contable trec
+            Where TRIM(lower(trec.codigo))=TRIM(lower(v_string));
+        	IF v_codigo is not null THEN
+            	raise exception 'El codigo (%) ya Existe ',upper(v_string);
+            END IF;
+           
+         --Sentencia de la insercion
         	insert into conta.ttabla_relacion_contable(
 			estado_reg,
 			tabla,
@@ -61,8 +71,9 @@ BEGIN
 			tabla_id_fk,
 			recorrido_arbol,
             tabla_codigo_auxiliar,
-            tabla_id_auxiliar
-            
+            tabla_id_auxiliar,
+            tabla_codigo_aplicacion,
+            codigo			---#14	04/01/2019	EGS	
             
           	) values(
 			'activo',
@@ -76,7 +87,9 @@ BEGIN
 			v_parametros.tabla_id_fk,
 			v_parametros.recorrido_arbol,
             v_parametros.tabla_codigo_auxiliar,
-            v_parametros.tabla_id_auxiliar			
+            v_parametros.tabla_id_auxiliar	,
+            v_parametros.tabla_codigo_aplicacion,
+            upper(v_string)				---#14	04/01/2019	EGS	
 			)RETURNING id_tabla_relacion_contable into v_id_tabla_relacion_contable;
 			
 			--Definicion de la respuesta
@@ -98,6 +111,19 @@ BEGIN
 	elsif(p_transaccion='CONTA_TABRECON_MOD')then
 
 		begin
+            ---#14	04/01/2019	EGS	
+        	--validamos si el codigo existe 
+                v_string=REPLACE(v_parametros.codigo,' ', '');
+                Select
+                trec.codigo
+                INTO
+                v_codigo
+                FROM  conta.ttabla_relacion_contable trec
+                Where TRIM(lower(trec.codigo))=TRIM(lower(v_string));
+                IF v_codigo is not null THEN
+                    raise exception 'El codigo (%) ya Existe ',upper(v_string);
+                END IF;
+        	
 			--Sentencia de la modificacion
 			update conta.ttabla_relacion_contable set
               tabla = v_parametros.tabla,
@@ -108,8 +134,9 @@ BEGIN
               tabla_id_fk = v_parametros.tabla_id_fk,
               recorrido_arbol = v_parametros.recorrido_arbol,
               tabla_codigo_auxiliar=v_parametros.tabla_codigo_auxiliar,
-              tabla_id_auxiliar=v_parametros.tabla_id_auxiliar
-            
+              tabla_id_auxiliar=v_parametros.tabla_id_auxiliar,
+              tabla_codigo_aplicacion=  v_parametros.tabla_codigo_aplicacion,
+              codigo =  upper(v_string)  ---#14	04/01/2019	EGS	      
 			where id_tabla_relacion_contable=v_parametros.id_tabla_relacion_contable;
                
 			--Definicion de la respuesta

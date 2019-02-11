@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel (
   p_id_cuenta integer,
   p_nivel_ini integer,
@@ -14,7 +12,8 @@ CREATE OR REPLACE FUNCTION conta.f_recuperar_cuentas_nivel (
   p_signo_balance varchar,
   p_tipo_balance varchar,
   p_origen varchar,
-  p_int_comprobante integer
+  p_int_comprobante integer,
+  p_id_tipo_cc integer
 )
 RETURNS boolean AS
 $body$
@@ -52,7 +51,7 @@ BEGIN
                      where cue.id_cuenta_padre = p_id_cuenta and cue.estado_reg = 'activo') LOOP
                      
                   --calculamos el balance de la cuenta para las fechas indicadas
-                   va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
+                   va_mayor = conta.f_mayor_cuenta_tipo_cc(v_registros.id_cuenta, 
                   								 p_desde, 
                                                  p_hasta, 
                                                  p_id_deptos, 
@@ -62,7 +61,9 @@ BEGIN
                                                  p_signo_balance,
                                                  p_tipo_balance,
                                                  NULL,
-                                                 p_int_comprobante);
+                                                 p_int_comprobante,
+                                                 NULL,
+                                                 p_id_tipo_cc); 
                  		
                   v_monto  =  va_mayor[1];
                   v_monto_partida  =  va_mayor[3];
@@ -105,7 +106,7 @@ BEGIN
               
                      IF  v_registros.sw_transaccional = 'movimiento'  THEN
                          
-                          va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, 
+                          va_mayor = conta.f_mayor_cuenta_tipo_cc(v_registros.id_cuenta, 
                   								 p_desde, 
                                                  p_hasta, 
                                                  p_id_deptos, 
@@ -115,7 +116,9 @@ BEGIN
                                                  p_signo_balance,
                                                  p_tipo_balance,
                                                  NULL,
-                                                 p_int_comprobante);
+                                                 p_int_comprobante,
+                                                 NULL,
+                                                 p_id_tipo_cc);
                                                  
                           v_monto =  va_mayor[1];
                           v_monto_partida  =  va_mayor[3];
@@ -154,7 +157,8 @@ BEGIN
                                                     p_signo_balance,
                                                     p_tipo_balance,
                                                     p_origen,
-                                                    p_int_comprobante) ) THEN     
+                                                    p_int_comprobante,
+                                                    p_id_tipo_cc) ) THEN     
                                 raise exception 'Error al calcular balance del detalle en el nivel %', p_nivel_ini;
                           END IF;
                      
@@ -185,3 +189,4 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
