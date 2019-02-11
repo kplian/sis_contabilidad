@@ -98,14 +98,17 @@ class RIntCbte extends  ReportePDF {
 		$this->writeHTML($content.$content2, false, false, true, false, '');
 		$this->SetFont ('helvetica', '', 5 , '', 'default', true );
 		//$this->Ln(2);
+
 		foreach($this->detalleCbte as $key=>$val){
 		   	
 		   $sw = 1;	
-		   if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&  $val['importe_debe'] == 0 && $val['importe_haber'] == 0){
-				$sw = 0;	
+		   if ( $this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&
+                $val['importe_debe'] == 0 && $val['importe_haber'] == 0 &&
+                $val['importe_debe_mt'] == 0 && $val['importe_haber_mt'] == 0){
+
+				$sw = 0;
 		   }
-		   
-		   
+
 		   if ($sw == 1){ 		
 		    	ob_start();
 			    include(dirname(__FILE__).'/../reportes/tpl/transaccion.php');
