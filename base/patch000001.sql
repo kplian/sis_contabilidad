@@ -3749,4 +3749,25 @@ CREATE TABLE conta.tbancarizacion_periodo(
 /***********************************F-SCP-FFP-CONTA-0-24/05/2017****************************************/
 
 
+/***********************************I-SCP-JRR-CONTA-0-24/01/2019****************************************/
+
+
+CREATE TABLE conta.tmigra_cuenta(
+  nro_cuenta VARCHAR(20),   
+  nombre_cuenta VARCHAR(200), 
+  id_moneda int4,
+  tipo_cuenta VARCHAR(30), 
+  sw_transaccional VARCHAR(10),   
+  sw_auxiliar VARCHAR(2), 
+  valor_incremento VARCHAR(10)
+   );
+   
+ CREATE TABLE conta.tmigra_auxiliar(
+  codigo_auxiliar VARCHAR(20),   
+  nombre_auxiliar VARCHAR(200)
+   );
+
+/***********************************F-SCP-JRR-CONTA-0-24/01/2019****************************************/
+
+
 
