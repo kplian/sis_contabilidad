@@ -4,6 +4,7 @@
  #24       ENDEETR  	18/01/2019        manuel guerra            agrega las columnas dolares y Ufvs, incluyendo totales
  #25       ENDEETR  	18/01/2019        manuel guerra            agrega la columna id_cbte, al reporte excel
  #29       ENDEETR  	29/01/2019        manuel guerra            agregar la columna: glosa de la transaccion
+ #35	   ENDEETR  	11/02/2019        manuel guerra            bug de sumatoria de reporte (xls)
 */
 
 
@@ -561,9 +562,10 @@ class RMayorXls
 				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+8,$fila+1,'=SUM('.$this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila-1).')');
 				
-				$deb = 'SUM('.$this->equivalencias[$max+7].'6:'.$this->equivalencias[$max+8].($fila-1).')';					
+				$deb = 'SUM('.$this->equivalencias[$max+7].'6:'.$this->equivalencias[$max+7].($fila-1).')';					
 				$hab = 'SUM('.$this->equivalencias[$max+8].'6:'.$this->equivalencias[$max+8].($fila-1).')';	
 				$vari = '=+'.$deb.'-'.$hab;
+				#35
 				$this->docexcel->getActiveSheet()->getStyle($this->equivalencias[$max+9].'6:'.$this->equivalencias[$max+9].($fila+1))->getNumberFormat()->setFormatCode('#,##0.00');
 				$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($max+9,$fila+1,$vari);
 				//ufv
