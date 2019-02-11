@@ -27,15 +27,16 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			this.bbar.add(this.cmbTipoCbte);
 			
 			//Botón para Imprimir el Comprobante
-			this.addButton('btnImprimir', {
+			/*this.addButton('btnImprimir', {
 				text : 'Imprimir',
 				iconCls : 'bprint',
 				disabled : true,
 				handler : this.imprimirCbte,
 				tooltip : '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
-			});
-			
-			this.addButton('btnDocCmpVnt', {
+			});*/
+			this.imprimirBoton();
+
+            this.addButton('btnDocCmpVnt', {
 				text : 'Doc Cmp/Vnt',
 				iconCls : 'brenew',
 				disabled : true,
@@ -1467,7 +1468,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				Ext.Ajax.request({
 					url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
 					params : {
-						'id_proceso_wf' : data.id_proceso_wf
+						'id_proceso_wf' : data.id_proceso_wf,
+                        'tipo':'oficial'
 					},
 					success : this.successExport,
 					failure : this.conexionFailure,
@@ -1477,6 +1479,25 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			}
 
 		},
+        imprimirCbteBaseIntercambio : function() {
+            var rec = this.sm.getSelected();
+            var data = rec.data;
+            if (data) {
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url : '../../sis_contabilidad/control/IntComprobante/reporteCbte',
+                    params : {
+                        'id_proceso_wf' : data.id_proceso_wf,
+                        'tipo':'intercambio'
+                    },
+                    success : this.successExport,
+                    failure : this.conexionFailure,
+                    timeout : this.timeout,
+                    scope : this
+                });
+            }
+
+        },
 		loadDocCmpVnt : function() {
 			var rec = this.sm.getSelected();
 			Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCbte.php', 'Documentos del Cbte', {
@@ -1492,7 +1513,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				height : '80%'
 			}, rec.data, this.idContenedor, 'IntRelDevengado');
 		},
-	  
+
 	 addBotonesGantt: function() {
         this.menuAdqGantt = new Ext.Toolbar.SplitButton({
             id: 'b-diagrama_gantt-' + this.idContenedor,
@@ -1709,7 +1730,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
                 id:'btn-chkpresupuesto-' + this.idContenedor,
                 text: 'Revisar Presupuesto Comprometido/Ejecutado',
                 tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para este  tramite</p>',
-                handler:this.checkPresupuesto,               
+                handler:this.checkPresupuesto,
                 scope: this
             }, {
                 id:'b-btnRepOC-' + this.idContenedor,
@@ -1721,7 +1742,34 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
         ]}});
 		this.tbar.add(this.menuPre);
     },
-    
+    imprimirBoton:function () {
+        this.imprimirBtn = new Ext.Toolbar.SplitButton({
+            id: 'b-btnImprimir-' + this.idContenedor,
+            text: 'Imprimir.',
+            grupo:[0,1,2],
+            disabled: true,
+            iconCls : 'bprint',
+            handler:this.imprimirCbte,
+            scope: this,
+            menu:{
+                items: [{
+                    id:'btn-btnImprimir-' + this.idContenedor,
+                    text: 'Imprime formato oficial',
+                    tooltip : '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial',
+                    iconCls : 'bprint',
+                    handler:this.imprimirCbte,
+                    scope: this
+                }, {
+                    id:'b-btnTwoMoneda-' + this.idContenedor,
+                    text: 'Imprime formato moneda Base y Intercambio',
+                    tooltip : '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato Moneda Base y Moneda Intercambio',
+                    iconCls : 'bprint',
+                    handler:this.imprimirCbteBaseIntercambio,
+                    scope: this
+                }
+                ]}});
+        this.tbar.add(this.imprimirBtn);
+    },
      checkPresupuesto:function(){                   
 			  var rec=this.sm.getSelected();
 			  var configExtra = [];
