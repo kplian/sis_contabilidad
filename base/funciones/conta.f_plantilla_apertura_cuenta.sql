@@ -63,8 +63,9 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
       where id_int_comprobante = p_id_int_comprobante;
 
 
-      FOR v_record_mov in ( with basica as (select 	t.id_centro_costo,
+      FOR v_record_mov in (with basica as (select  t.id_centro_costo,
                                                     t.id_cuenta,
+                                                    cu.nro_cuenta,
                                                     COALESCE(t.id_auxiliar,0) as id_auxiliar,
                                                     case
                                                        when  par.sw_movimiento = 'presupuestaria' then
@@ -90,6 +91,7 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                                               cb.cbte_cierre <> 'balance'
                                               )select t.id_centro_costo,
                                                       t.id_cuenta,
+                                                      t.nro_cuenta,
                                                       t.id_auxiliar,
                                                       t.id_partida,
                                                       sum(COALESCE(t.importe_debe_mb,0)) as deudor,
@@ -103,7 +105,9 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                                                             t.id_centro_costo,
                                                             t.id_cuenta,
                                                             t.id_auxiliar,
-                                                            t.id_partida)LOOP
+                                                            t.nro_cuenta,
+                                                            t.id_partida
+                                                      order by t.nro_cuenta)LOOP
 
 
                     v_sw_actualiza = false;
