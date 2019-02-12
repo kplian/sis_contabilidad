@@ -1,11 +1,18 @@
 <?php
 /**
 *@package pXP
-*@file gen-IntTransaccion.php
+*@file gen-IntTransaccion.php 
 *@author  (admin)
 *@date 01-09-2013 18:10:12
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
-*/
+ **************************************************************************
+ HISTORIAL DE MODIFICACIONES:
+ HISTORIAL DE MODIFICACIONES:
+	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
+  #1			     01-09-2013			RAC							creacion 
+  #37   ENDETR       12/02/2019         RAC KPLIAN                  que no filtre centros de costo por aprobados, adicion de aprametros           
+ * 
+ *  ***************************************************************************/
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -134,7 +141,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 				width: 380,
 				listWidth: 380,
 				gwidth:600,
-				baseParams:{tipo_pres:"gasto,administrativo,recurso,ingreso_egreso",operativos_todos:"si"},					
+				baseParams:{tipo_pres:"gasto,administrativo,recurso,ingreso_egreso",operativos_todos:"si", aprobado:"no"},	//#37 auqe no filtre solo los parobados				
    				renderer:function (value, p, record){
 	   			    var color = 'green';
 	   			    if(record.data["tipo_reg"] != 'summary'){
