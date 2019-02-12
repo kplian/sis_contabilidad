@@ -1749,7 +1749,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
             grupo:[0,1,2],
             disabled: true,
             iconCls : 'bprint',
-            handler:this.imprimirCbte,
+            handler:this.imprimirCbteBaseIntercambio,
             scope: this,
             menu:{
                 items: [{
