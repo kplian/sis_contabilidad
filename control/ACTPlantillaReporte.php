@@ -11,8 +11,12 @@ class ACTPlantillaReporte extends ACTbase{
 
     function listarPlantillaReporte(){
         $this->objParam->defecto('ordenacion','id_plantilla_reporte');
-
         $this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('visible') != ''){
+            $this->objParam->addFiltro("per.visible= ''".$this->objParam->getParametro('visible')."''");
+        }
+
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);
             $this->res = $this->objReporte->generarReporteListado('MODPlantillaReporte','listarPlantillaReporte');
@@ -37,6 +41,11 @@ class ACTPlantillaReporte extends ACTbase{
     function eliminarPlantillaReporte(){
         $this->objFunc=$this->create('MODPlantillaReporte');
         $this->res=$this->objFunc->eliminarPlantillaReporte($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function listarReportes(){
+        $this->objFunc=$this->create('MODPlantillaReporte');
+        $this->res=$this->objFunc->listarReportes($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 

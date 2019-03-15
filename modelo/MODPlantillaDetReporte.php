@@ -45,12 +45,10 @@ class MODPlantillaDetReporte extends MODbase{
         $this->captura('formulario','varchar');
         $this->captura('codigo_formulario','text');
         $this->captura('saldo_anterior','varchar');
-        $this->captura('calculo','varchar');
-        $this->captura('concepto2','text');
-        $this->captura('partida2','text');
         $this->captura('operacion','varchar');
-        $this->captura('periodo','varchar');
-        $this->captura('origen2','varchar');
+        $this->captura('apertura_cb','varchar');
+        $this->captura('cierre_cb','varchar');
+        $this->captura('tipo_periodo','varchar');
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -80,12 +78,10 @@ class MODPlantillaDetReporte extends MODbase{
         $this->setParametro('formulario','formulario','varchar');
         $this->setParametro('codigo_formulario','codigo_formulario','text');
         $this->setParametro('saldo_anterior','saldo_anterior','varchar');
-        $this->setParametro('calculo','calculo','varchar');
-        $this->setParametro('concepto2','concepto2','text');
-        $this->setParametro('partida2','partida2','text');
         $this->setParametro('operacion','operacion','varchar');
-        $this->setParametro('periodo','periodo','varchar');
-        $this->setParametro('origen2','origen2','varchar');
+        $this->setParametro('apertura_cb','apertura_cb','varchar');
+        $this->setParametro('cierre_cb','cierre_cb','varchar');
+        $this->setParametro('tipo_periodo','tipo_periodo','varchar');
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -116,13 +112,10 @@ class MODPlantillaDetReporte extends MODbase{
         $this->setParametro('formulario','formulario','varchar');
         $this->setParametro('codigo_formulario','codigo_formulario','text');
         $this->setParametro('saldo_anterior','saldo_anterior','varchar');
-        $this->setParametro('calculo','calculo','varchar');
-        $this->setParametro('concepto2','concepto2','text');
-        $this->setParametro('partida2','partida2','text');
         $this->setParametro('operacion','operacion','varchar');
-        $this->setParametro('periodo','periodo','varchar');
-        $this->setParametro('origen2','origen2','varchar');
-
+        $this->setParametro('apertura_cb','apertura_cb','varchar');
+        $this->setParametro('cierre_cb','cierre_cb','varchar');
+        $this->setParametro('tipo_periodo','tipo_periodo','varchar');
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();

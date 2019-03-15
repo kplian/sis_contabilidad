@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_det_reporte_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tplantilla_det_reporte'
  AUTOR: 		 (m.mamani)
  FECHA:	        06-09-2018 20:33:59
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				06-09-2018 20:33:59								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tplantilla_det_reporte'	
+ #0				06-09-2018 20:33:59								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tplantilla_det_reporte'
  #
  ***************************************************************************/
 
@@ -30,30 +28,30 @@ DECLARE
 	v_resp				varchar;
     v_gestion 			varchar;
     v_id_gestion		integer;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_plantilla_det_reporte_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PDR_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		m.mamani	
+ 	#AUTOR:		m.mamani
  	#FECHA:		06-09-2018 20:33:59
 	***********************************/
 
 	if(p_transaccion='CONTA_PDR_SEL')then
-     				
+
     	begin
         v_gestion =  (EXTRACT(YEAR FROM  now()))::varchar;
-              select 
+              select
                ges.id_gestion
               into
                v_id_gestion
-              from param.tgestion ges 
+              from param.tgestion ges
               where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
-                
+
               IF v_id_gestion is null THEN
                  raise exception 'No se encontro gestion para la fecha %', now()::Date;
               END IF;
@@ -84,12 +82,10 @@ BEGIN
                         pdr.formulario,
                         pdr.codigo_formulario,
                         pdr.saldo_anterior,
-                        pdr.calculo,
-                        pdr.concepto2,
-                        pdr.partida2,
                         pdr.operacion,
-                        pdr.periodo,
-                        pdr.origen2
+                        pdr.apertura_cb,
+                        pdr.cierre_cb,
+                        pdr.tipo_periodo
 						from conta.tplantilla_det_reporte pdr
 						inner join segu.tusuario usu1 on usu1.id_usuario = pdr.id_usuario_reg
                         left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = pdr.concepto and cue.id_gestion = '||v_id_gestion::varchar||' 
