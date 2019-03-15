@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_det_reporte_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_det_reporte'
  AUTOR: 		 (m.mamani)
  FECHA:	        06-09-2018 20:33:59
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				06-09-2018 20:33:59								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_det_reporte'	
+ #0				06-09-2018 20:33:59								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_det_reporte'
  #
  ***************************************************************************/
 
@@ -37,15 +35,15 @@ BEGIN
     v_nombre_funcion = 'conta.ft_plantilla_det_reporte_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PDR_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		m.mamani	
+ 	#AUTOR:		m.mamani
  	#FECHA:		06-09-2018 20:33:59
 	***********************************/
 
 	if(p_transaccion='CONTA_PDR_INS')then
-					
+
         begin
         	--Sentencia de la insercion
         	insert into conta.tplantilla_det_reporte(
@@ -69,12 +67,10 @@ BEGIN
                                     formulario,
                                     codigo_formulario,
                                     saldo_anterior,
-                                    calculo,
-                                    concepto2,
-                                    partida2,
                                     operacion,
-                                    periodo,
-                                    origen2
+                                    apertura_cb,
+                                    cierre_cb,
+                                    tipo_periodo
                                     ) values(
                                     v_parametros.origen,
                                     'activo',
@@ -96,16 +92,14 @@ BEGIN
                                     v_parametros.formulario,
                                     v_parametros.codigo_formulario,
                                     v_parametros.saldo_anterior,
-                                    v_parametros.calculo,
-                                    v_parametros.concepto2,
-                                    v_parametros.partida2,
                                     v_parametros.operacion,
-                                    v_parametros.periodo,
-                                    v_parametros.origen2						
+                                    v_parametros.apertura_cb,
+                                    v_parametros.cierre_cb,
+                                    v_parametros.tipo_periodo
 			)RETURNING id_plantilla_det_reporte into v_id_plantilla_det_reporte;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla detalle reporte almacenado(a) con exito (id_plantilla_det_reporte'||v_id_plantilla_det_reporte||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plantilla detalle reporte almacenado(a) con exito (id_plantilla_det_reporte'||v_id_plantilla_det_reporte||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla_det_reporte',v_id_plantilla_det_reporte::varchar);
 
             --Devuelve la respuesta
@@ -113,10 +107,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PDR_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		m.mamani	
+ 	#AUTOR:		m.mamani
  	#FECHA:		06-09-2018 20:33:59
 	***********************************/
 
@@ -142,12 +136,10 @@ BEGIN
             formulario = v_parametros.formulario,
         	codigo_formulario = v_parametros.codigo_formulario,
             saldo_anterior = v_parametros.saldo_anterior,
-         	calculo = v_parametros.calculo,
-            concepto2 = v_parametros.concepto2,
-        	partida2 = v_parametros.partida2,
         	operacion = v_parametros.operacion,
-            periodo= v_parametros.periodo,
-            origen2 = v_parametros.origen2
+            apertura_cb = v_parametros.apertura_cb,
+            cierre_cb = v_parametros.cierre_cb,
+            tipo_periodo = v_parametros.tipo_periodo
 			where id_plantilla_det_reporte=v_parametros.id_plantilla_det_reporte;
                
 			--Definicion de la respuesta
