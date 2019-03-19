@@ -160,7 +160,75 @@ BEGIN
             end if;
 
 
-           for v_record in ( with basico as (  select  	t.id_cuenta,
+   		if p_nro_cuenta = '2.1.2.01.099.001' then
+        for v_record in (with  desepenio as (
+                                                        select		per.id_periodo,
+                                                        sum(COALESCE(transa.importe_debe_mb,0))::numeric as monto
+                                                        from conta.tint_transaccion transa
+                                                        inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
+                                                        inner join param.tperiodo per on per.id_periodo = icbte.id_periodo
+                                                        where icbte.estado_reg = 'validado'
+                                                              and  transa.id_cuenta in (1881)
+                                                              and  per.id_gestion = 2
+                                                              and transa.cerrado in ('si','no')
+                                                        group by per.id_periodo
+                                                        order by id_periodo asc ),
+                                             aportes as ( select per.id_periodo,
+                                                                sum(COALESCE(transa.importe_debe_mb,0))::numeric as monto
+                                                                from conta.tint_transaccion transa
+                                                                inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
+                                                                inner join param.tperiodo per on per.id_periodo = icbte.id_periodo
+                                                                where icbte.estado_reg = 'validado'
+                                                                      and  transa.id_cuenta in (1881)
+                                                                      and  per.id_gestion = 2
+                                                                      and transa.cerrado in ('si','no')
+                                                                      and (icbte.glosa1::varchar ILIKE '%APORTES%'  or icbte.glosa1::varchar ILIKE '%REVERSION%')
+                                                                group by per.id_periodo
+                                                                order by id_periodo asc )
+                                            select 	p.periodo,
+                                                    en.monto - COALESCE( ap.monto,0) as saldo_mb
+                                            from desepenio en
+                                            inner join param.tperiodo p on p.id_periodo = en.id_periodo
+                                            left join aportes ap on ap.id_periodo = en.id_periodo)loop
+
+
+                                        insert into temp_reporte(   id_plantilla_reporte,
+                                                                    codigo,
+                                                                    columna,
+                                                                    titulo_columna,
+                                                                    gestion,
+                                                                    periodo,
+                                                                    importe,
+                                                                    orden
+                                                                    )values (
+                                                                    p_id_planilla,
+                                                                    p_codigo_columna,
+                                                                    p_columna,
+                                                                    p_nombre_columna,
+                                                                    2018,
+                                                                    v_record.periodo,
+                                                                    case
+                                                                    when p_tipo = 'debe' then
+                                                                    v_record.saldo_mb
+                                                                    when  p_tipo = 'haber' then
+                                                                    v_record.saldo_mb
+                                                                    when p_tipo = 'saldo' then
+                                                                    	case
+                                                                        	when v_record.saldo_mb < 0 then
+                                                                    			-1*v_record.saldo_mb
+                                                                            else
+                                                                            	v_record.saldo_mb
+                                                                            end
+                                                                    end ,
+                                                                    v_columnas
+                                                                    );
+
+                                              v_rasultado = true;
+
+
+           end loop;
+        else
+        	for v_record in ( with basico as (  select  	t.id_cuenta,
                                                         cu.nro_cuenta,
                                                         pe.periodo,
                                                         t.importe_debe_mb,
@@ -227,6 +295,8 @@ BEGIN
 
 
            end loop;
+        end if;
+
   	end if;
 
 		RETURN v_rasultado;
