@@ -43,6 +43,85 @@ class MODAnexos extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+    function listarAnexosAux(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.f_plantilla_reporte_generar';
+        $this->transaccion='CONTA_ANZ_SEL';
+        $this->tipo_procedimiento='SEL';
+        $this->setCount(false);
+        $this->setTipoRetorno('record');
+        //paramtros
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('id_plantilla_reporte','id_plantilla_reporte','int');
+        //gestion
+        $this->captura('codigo_columna','varchar');
+        $this->captura('ordern','integer');
+        $this->captura('columna','varchar');
+        $this->captura('titulo','varchar');
+
+        $this->captura('monto_a','numeric');
+        $this->captura('monto_b','numeric');
+        $this->captura('monto_c','numeric');
+        $this->captura('monto_d','numeric');
+        $this->captura('monto_e ','numeric');
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        /*echo $this->getConsulta();
+        exit;*/
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function listarAnexos8(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.f_plantilla_reporte_generar';
+        $this->transaccion='CONTA_ANOC_SEL';
+        $this->tipo_procedimiento='SEL';
+        $this->setCount(false);
+        $this->setTipoRetorno('record');
+        //paramtros
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('id_plantilla_reporte','id_plantilla_reporte','int');
+
+        $this->captura('titulo','varchar');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('motivo','varchar');
+        $this->captura('normativa','varchar');
+        $this->captura('importe','numeric');
+        $this->captura('ordenar','integer');
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //var_dump($this->respuesta);exit;
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function listarAnexos9(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.f_plantilla_reporte_generar';
+        $this->transaccion='CONTA_NINE_SEL';
+        $this->tipo_procedimiento='SEL';
+        $this->setCount(false);
+        $this->setTipoRetorno('record');
+        //paramtros
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('id_plantilla_reporte','id_plantilla_reporte','int');
+
+        $this->captura('titulo','varchar');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('motivo','varchar');
+        $this->captura('normativa','varchar');
+        $this->captura('importe','numeric');
+        $this->captura('ordenar','integer');
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //var_dump($this->respuesta);exit;
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 }
 ?>
 
