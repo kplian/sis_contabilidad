@@ -94,7 +94,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo : 0,
                 collapsible : true
             }]
-        }]
+        }],
+        agregarArgsExtraSubmit: function() {
+            this.argumentExtraSubmit.plantilla_reporte = this.Cmp.id_plantilla_reporte.getRawValue();
+
+
+        }
 
 
     })
