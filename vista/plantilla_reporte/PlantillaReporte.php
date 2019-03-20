@@ -14,7 +14,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
             constructor:function(config){
                 this.maestro=config.maestro;
-                //llama al constructor de la clase padre
                 Phx.vista.PlantillaReporte.superclass.constructor.call(this,config);
                 this.init();
                 this.load({params:{start:0, limit:this.tam_pag}})
@@ -33,36 +32,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 {
                     config:{
-                        name:'tipo',
-                        fieldLabel:'Tipo Reporte',
-                        typeAhead: true,
-                        allowBlank:true,
-                        triggerAction: 'all',
-                        emptyText:'Tipo...',
-                        selectOnFocus:true,
-                        mode:'local',
-                        store:new Ext.data.ArrayStore({
-                            fields: ['valor', 'ID'],
-                            data :	[
-                                ['Formato xls','xls'],
-                                ['Formato pdf','pdf']
-                            ]
-                        }),
-                        valueField:'ID',
-                        displayField:'valor',
-                        anchor: '50%',
-                        gwidth:100
-                    },
-                    type:'ComboBox',
-                    id_grupo:1,
-                    grid:false,
-                    form:false
-                },
-                {
-                    config:{
-                        name: 'nombre',
-                        fieldLabel: 'Nombre Reporte',
-                        allowBlank: true,
+                        name: 'codigo',
+                        fieldLabel: 'Codigo',
+                        allowBlank: false,
                         anchor: '80%',
                         gwidth: 100,
                         maxLength:100
@@ -75,42 +47,91 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 {
                     config:{
-                        name:'modalidad',
-                        fieldLabel:'Modalidad',
-                        typeAhead: true,
-                        allowBlank:true,
-                        triggerAction: 'all',
-                        emptyText:'Tipo...',
-                        selectOnFocus:true,
-                        mode:'local',
-                        store:new Ext.data.ArrayStore({
-                            fields: ['valor', 'ID'],
-                            data :	[
-                                ['Anual','anual'],
-                                ['Periodo','periodo']
-                            ]
-                        }),
-                        valueField:'ID',
-                        displayField:'valor',
-                        anchor: '50%',
-                        gwidth:100
+                        name: 'nombre',
+                        fieldLabel: 'Nombre',
+                        allowBlank: false,
+                        anchor: '80%',
+                        gwidth: 200,
+                        maxLength:500
                     },
-                    type:'ComboBox',
+                    type:'TextField',
+                    filters:{pfiltro:'per.nombre',type:'string'},
                     id_grupo:1,
                     grid:true,
                     form:true
+                },
+                {
+                    config: {
+                        name: 'modalidad',
+                        fieldLabel: 'Modalidad',
+                        allowBlank: false,
+                        anchor: '40%',
+                        gwidth: 80,
+                        typeAhead: true,
+                        triggerAction: 'all',
+                        lazyRender:true,
+                        mode: 'local',
+                        store: ['gestion' ,'periodo','rango']
+                    },
+                    type:'ComboBox',
+                    valorInicial: 'rango',
+                    id_grupo: 1,
+                    grid: true,
+                    form: true
                 },
                 {
                     config:{
                         name: 'glosa',
                         fieldLabel: 'Glosa',
                         allowBlank: true,
-                        anchor: '80%',
-                        gwidth: 100
+                        anchor: '100%',
+                        gwidth: 200,
+                        maxLength:1500
                     },
-                    type:'TextField',
-                    filters:{pfiltro:'per.glosa',type:'string'},
-                    id_grupo:1,
+                    type:'TextArea',
+                    filters: { pfiltro:'per.glosa', type:'string' },
+                    id_grupo: 0,
+                    grid: true,
+                    form: true
+                },
+                {
+                    config:{
+                        name: 'nombre_func',
+                        fieldLabel: 'Función',
+                        allowBlank: true,
+                        anchor: '100%',
+                        gwidth: 100,
+                        maxLength:1500
+                    },
+                    type:'TextArea',
+                    filters: { pfiltro:'per.nombre_func', type:'string' },
+                    id_grupo: 0,
+                    grid: true,
+                    form: true
+                },
+                {
+                    config:{
+                        name:'visible',
+                        fieldLabel:'Visible',
+                        allowBlank:false,
+                        emptyText:'visible...',
+                        typeAhead: true,
+                        triggerAction: 'all',
+                        lazyRender:true,
+                        mode: 'local',
+                        gwidth: 100,
+                        store:new Ext.data.ArrayStore({
+                            fields: ['ID', 'valor'],
+                            data :	[['si','si'],
+                                ['no','no']]
+
+                        }),
+                        valueField:'ID',
+                        value:'si',
+                        displayField:'valor'
+                    },
+                    type:'ComboBox',
+                    id_grupo:0,
                     grid:true,
                     form:true
                 },
@@ -243,7 +264,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 {name:'id_usuario_mod', type: 'numeric'},
                 {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
                 {name:'usr_reg', type: 'string'},
-                {name:'usr_mod', type: 'string'}
+                {name:'usr_mod', type: 'string'},
+                {name:'codigo', type: 'string'},
+                {name:'nombre_func', type: 'string'},
+                {name:'visible', type: 'string'}
 
             ],
             sortInfo:{
@@ -259,13 +283,13 @@ header("content-type: text/javascript; charset=UTF-8");
                     title : 'Detalle del Reporte',
                     width:'70%',
                     cls : 'PlantillaDetReporte'
-                },
+                }/*,
                 {
                     url : '../../../sis_contabilidad/vista/detalle_det_reporte_aux/DetalleDetReporteAux.php',
                     title : 'Detalle del Reporte Aux',
                     width:'70%',
                     cls : 'DetalleDetReporteAux'
-                }
+                }*/
             ]
         }
     )

@@ -25,7 +25,6 @@ class MODPlantillaReporte extends MODbase{
         $this->captura('glosa','text');
         $this->captura('modalidad','varchar');
         $this->captura('estado_reg','varchar');
-        $this->captura('tipo','varchar');
         $this->captura('id_usuario_ai','int4');
         $this->captura('id_usuario_reg','int4');
         $this->captura('usuario_ai','varchar');
@@ -34,6 +33,9 @@ class MODPlantillaReporte extends MODbase{
         $this->captura('fecha_mod','timestamp');
         $this->captura('usr_reg','varchar');
         $this->captura('usr_mod','varchar');
+        $this->captura('codigo','varchar');
+        $this->captura('nombre_func','text');
+        $this->captura('visible','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -54,7 +56,9 @@ class MODPlantillaReporte extends MODbase{
         $this->setParametro('glosa','glosa','text');
         $this->setParametro('modalidad','modalidad','varchar');
         $this->setParametro('estado_reg','estado_reg','varchar');
-        $this->setParametro('tipo','tipo','varchar');
+        $this->setParametro('codigo','codigo','varchar');
+        $this->setParametro('nombre_func','nombre_func','text');
+        $this->setParametro('visible','visible','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -76,7 +80,10 @@ class MODPlantillaReporte extends MODbase{
         $this->setParametro('glosa','glosa','text');
         $this->setParametro('modalidad','modalidad','varchar');
         $this->setParametro('estado_reg','estado_reg','varchar');
-        $this->setParametro('tipo','tipo','varchar');
+        $this->setParametro('codigo','codigo','varchar');
+        $this->setParametro('nombre_func','nombre_func','text');
+        $this->setParametro('visible','visible','varchar');
+
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -99,6 +106,20 @@ class MODPlantillaReporte extends MODbase{
         $this->armarConsulta();
         $this->ejecutarConsulta();
 
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function listarReportes (){
+        $this->procedimiento='conta.ft_plantilla_reporte_sel';
+        $this->transaccion='CONTA_REFI_SEL';
+        $this->tipo_procedimiento='SEL';
+
+        $this->captura('id_plantilla_reporte','int4');
+        $this->captura('glosa','text');
+        $this->captura('nombre','varchar');
+
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
         //Devuelve la respuesta
         return $this->respuesta;
     }

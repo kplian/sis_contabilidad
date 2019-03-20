@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_reporte_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_reporte'
  AUTOR: 		 (m.mamani)
  FECHA:	        06-09-2018 19:52:00
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				06-09-2018 19:52:00								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_reporte'	
+ #0				06-09-2018 19:52:00								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tplantilla_reporte'
  #
  ***************************************************************************/
 
@@ -31,21 +29,21 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_plantilla_reporte	integer;
-			    
+
 BEGIN
 
     v_nombre_funcion = 'conta.ft_plantilla_reporte_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PER_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		m.mamani	
+ 	#AUTOR:		m.mamani
  	#FECHA:		06-09-2018 19:52:00
 	***********************************/
 
 	if(p_transaccion='CONTA_PER_INS')then
-					
+
         begin
         	--Sentencia de la insercion
         	insert into conta.tplantilla_reporte(
@@ -59,7 +57,10 @@ BEGIN
 			usuario_ai,
 			fecha_reg,
 			id_usuario_mod,
-			fecha_mod
+			fecha_mod,
+            codigo,
+            nombre_func,
+            visible
           	) values(
 			v_parametros.nombre,
 			v_parametros.glosa,
@@ -71,14 +72,14 @@ BEGIN
 			v_parametros._nombre_usuario_ai,
 			now(),
 			null,
-			null
-							
-			
-			
+			null,
+			v_parametros.codigo,
+            v_parametros.nombre_func,
+            v_parametros.visible
 			)RETURNING id_plantilla_reporte into v_id_plantilla_reporte;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','plantilla reporte almacenado(a) con exito (id_plantilla_reporte'||v_id_plantilla_reporte||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','plantilla reporte almacenado(a) con exito (id_plantilla_reporte'||v_id_plantilla_reporte||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_plantilla_reporte',v_id_plantilla_reporte::varchar);
 
             --Devuelve la respuesta
@@ -86,10 +87,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PER_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		m.mamani	
+ 	#AUTOR:		m.mamani
  	#FECHA:		06-09-2018 19:52:00
 	***********************************/
 
@@ -105,7 +106,10 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+			usuario_ai = v_parametros._nombre_usuario_ai,
+            codigo = v_parametros.codigo,
+            nombre_func = v_parametros.nombre_func,
+            visible = v_parametros.visible
 			where id_plantilla_reporte=v_parametros.id_plantilla_reporte;
                
 			--Definicion de la respuesta

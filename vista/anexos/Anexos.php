@@ -15,7 +15,6 @@ header("content-type: text/javascript; charset=UTF-8");
         constructor:function(config){
             Phx.vista.Anexos.superclass.constructor.call(this,config);
             this.init();
-            this.iniciarEventos();
         },
 
         Atributos:[
@@ -31,42 +30,49 @@ header("content-type: text/javascript; charset=UTF-8");
                 type : 'ComboRec',
                 id_grupo : 0,
                 form : true
-            },{
-                config:{
-                    name:'tipo_anexo',
-                    fieldLabel:'Reporte',
-                    allowBlank:false,
-                    emptyText:'Tipo...',
-                    typeAhead: true,
-                    triggerAction: 'all',
-                    lazyRender:true,
-                    mode: 'local',
-                    valueField: 'tipo_reporte',
-                    gwidth: 100,
-                    store:new Ext.data.ArrayStore({
-                        fields: ['variable', 'valor'],
-                        data : [
-                            ['ane_1','ANEXO 1'],
-                            ['ane_2','ANEXO 2'],
-                            ['ane_4','ANEXO 4'],
-                            ['ane_5','ANEXO 5'],
-                            ['ane_6','ANEXO 6'],
-                            ['ane_7','ANEXO 7'],
-                            ['ane_7_1','ANEXO 7.1'],
-                            ['ane_8','ANEXO 8'],
-                            ['ane_9','ANEXO 9'],
-                            ['ane_10','ANEXO 10'],
-                            ['ane_11','ANEXO 11']
-                        ]
+            },
+            {
+                config: {
+                    name: 'id_plantilla_reporte',
+                    fieldLabel: 'Reporte',
+                    allowBlank: true,
+                    emptyText: 'Elija una opción...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_contabilidad/control/PlantillaReporte/listarPlantillaReporte',
+                        id: 'id_plantilla_reporte',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'nombre',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_plantilla_reporte','nombre','glosa','visible'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'per.nombre',visible:'si'}
                     }),
-                    valueField: 'variable',
-                    displayField: 'valor'
+                    valueField: 'id_plantilla_reporte',
+                    displayField: 'nombre',
+                    gdisplayField: 'nombre',
+                    hiddenName: 'id_plantilla_reporte',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 15,
+                    queryDelay: 1000,
+                    anchor: '100%',
+                    gwidth: 300,
+                    minChars: 2,
+                    renderer : function(value, p, record) {
+                        return String.format('{0}', record.data['nombre']);
+                    }
                 },
-                type:'ComboBox',
-                form:true
+                type: 'ComboBox',
+                id_grupo: 0,
+                form: true
             }
         ],
-
         title : 'Reporte de Anexos',
         topBar : true,
         botones : false,
@@ -88,6 +94,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo : 0,
                 collapsible : true
             }]
-        }]
+        }],
+        agregarArgsExtraSubmit: function() {
+            this.argumentExtraSubmit.plantilla_reporte = this.Cmp.id_plantilla_reporte.getRawValue();
+
+
+        }
+
+
     })
 </script>

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_plantilla_reporte_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tplantilla_reporte'
  AUTOR: 		 (m.mamani)
  FECHA:	        06-09-2018 19:52:00
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				06-09-2018 19:52:00								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tplantilla_reporte'	
+ #0				06-09-2018 19:52:00								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tplantilla_reporte'
  #
  ***************************************************************************/
 
@@ -28,21 +26,21 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_plantilla_reporte_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_PER_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		m.mamani	
+ 	#AUTOR:		m.mamani
  	#FECHA:		06-09-2018 19:52:00
 	***********************************/
 
 	if(p_transaccion='CONTA_PER_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -51,7 +49,6 @@ BEGIN
 						per.glosa,
 						per.modalidad,
 						per.estado_reg,
-						per.tipo,
 						per.id_usuario_ai,
 						per.id_usuario_reg,
 						per.usuario_ai,
@@ -59,7 +56,10 @@ BEGIN
 						per.id_usuario_mod,
 						per.fecha_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	
+						usu2.cuenta as usr_mod,
+                        per.codigo,
+                        per.nombre_func,
+                        per.visible
 						from conta.tplantilla_reporte per
 						inner join segu.tusuario usu1 on usu1.id_usuario = per.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = per.id_usuario_mod

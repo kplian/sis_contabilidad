@@ -70,15 +70,18 @@ class RIntCbte extends  ReportePDF {
   
 	
 	 function generarReporte() {
-	 	
 		$this->AddPage();
 		
 		$dataSource = $this->datos_detalle; 
 		$tot_debe = 0;
 		$tot_haber = 0;
 		if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base']){
-		    //$this->with_col = '55%'; Para monstar en moneda Base moneda Dolar
-            $this->with_col = '45%';  //#33
+		    if ($this->objParam->getParametro('tipo') == 'oficial'){
+                $this->with_col = '55%';
+            }else{
+		        $this->with_col = '45%';  //#33
+            }
+
 	    }
 	    else{
 		   $this->with_col = '45%';
@@ -101,14 +104,18 @@ class RIntCbte extends  ReportePDF {
 
 		foreach($this->detalleCbte as $key=>$val){
 		   	
-		   $sw = 1;	
-		   if ( $this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&
-                $val['importe_debe'] == 0 && $val['importe_haber'] == 0 &&
-                $val['importe_debe_mt'] == 0 && $val['importe_haber_mt'] == 0){
-
-				$sw = 0;
-		   }
-
+		   $sw = 1;
+		   if($this->objParam->getParametro('tipo') == 'oficial'){
+               if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&  $val['importe_debe'] == 0 && $val['importe_haber'] == 0){
+                   $sw = 0;
+               }
+           }else {
+               if ($this->cabecera[0]['id_moneda'] == $this->cabecera[0]['id_moneda_base'] &&
+                   $val['importe_debe'] == 0 && $val['importe_haber'] == 0 &&
+                   $val['importe_debe_mt'] == 0 && $val['importe_haber_mt'] == 0) {
+                   $sw = 0;
+               }
+           }
 		   if ($sw == 1){ 		
 		    	ob_start();
 			    include(dirname(__FILE__).'/../reportes/tpl/transaccion.php');

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_plantilla_apertura_cuenta (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -51,6 +49,7 @@ DECLARE
     v_id_cuenta_sg						integer;
     v_id_partida_sg						integer;
     v_id_centro_costo_sg				integer;
+    v_saldo_aux                         numeric;
 
 BEGIN
 
@@ -63,8 +62,9 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
       where id_int_comprobante = p_id_int_comprobante;
 
 
-      FOR v_record_mov in ( with basica as (select 	t.id_centro_costo,
+      FOR v_record_mov in (with basica as (select  t.id_centro_costo,
                                                     t.id_cuenta,
+                                                    cu.nro_cuenta,
                                                     COALESCE(t.id_auxiliar,0) as id_auxiliar,
                                                     case
                                                        when  par.sw_movimiento = 'presupuestaria' then
@@ -90,6 +90,7 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                                               cb.cbte_cierre <> 'balance'
                                               )select t.id_centro_costo,
                                                       t.id_cuenta,
+                                                      t.nro_cuenta,
                                                       t.id_auxiliar,
                                                       t.id_partida,
                                                       sum(COALESCE(t.importe_debe_mb,0)) as deudor,
@@ -103,7 +104,9 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                                                             t.id_centro_costo,
                                                             t.id_cuenta,
                                                             t.id_auxiliar,
-                                                            t.id_partida)LOOP
+                                                            t.nro_cuenta,
+                                                            t.id_partida
+                                                      order by t.nro_cuenta)LOOP
 
 
                     v_sw_actualiza = false;
@@ -151,14 +154,15 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                      ELSE
                          v_sw_actualiza = false;
                      END IF;*/
-                     
-                     IF ( v_record_mov.deudor = v_record_mov.acreedor ) 
-                       AND  ( v_record_mov.importe_debe_mt =  v_record_mov.importe_haber_mt)  
-                         AND ( v_record_mov.importe_debe_ma = v_record_mov.importe_haber_ma)  
-                         
-                         THEN          
-                            
-                            v_sw_actualiza = false;  --SALDO ES IGUAL A CERO 
+
+
+                     IF (       v_record_mov.deudor = v_record_mov.acreedor )
+                          AND  ( v_record_mov.importe_debe_mt =  v_record_mov.importe_haber_mt)
+                          AND (COALESCE(v_record_mov.importe_debe_ma,0) =  COALESCE(v_record_mov.importe_haber_ma,0))
+
+                         THEN
+                          --  raise exception 'entra laguna vez ...false';
+                            v_sw_actualiza = false;  --SALDO ES IGUAL A CERO
 
                       ELSEIF(v_record_mov.deudor < v_record_mov.acreedor  )    THEN
 
@@ -168,7 +172,7 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                                   v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
                                   v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
 
-                     ELSE 
+                     ELSE
 
                                  v_sw_saldo_acredor = true;
                                  v_sw_actualiza = true;
@@ -176,7 +180,7 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                                  v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
                                  v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
 
-                     
+
                      END IF;
 
 
@@ -185,12 +189,12 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
 
                    IF v_sw_actualiza THEN
 
-                        v_importe_debe = 0;
-                        v_importe_haber = 0;
-                        v_importe_debe_ma= 0;
-                        v_importe_haber_ma = 0;
-                        v_importe_debe_mt = 0;
-                        v_importe_haber_mt = 0;
+                            v_importe_debe = 0;
+                            v_importe_haber = 0;
+                            v_importe_debe_ma= 0;
+                            v_importe_haber_ma = 0;
+                            v_importe_debe_mt = 0;
+                            v_importe_haber_mt = 0;
 
                             IF v_sw_saldo_acredor THEN
 
@@ -274,17 +278,17 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
 
                                    END IF;
                                END IF;
-                               
-                              
-                               
+
+
+
                               IF  v_record_mov.id_partida = 0 THEN
-                               
+
                                     IF v_sw_saldo_acredor THEN
 
                                           select  ps_id_partida
                                               into
                                               v_id_partida
-                                            from conta.f_get_config_relacion_contable( 'CIER-DEBE',
+                                            from conta.f_get_config_relacion_contable( 'APER-DEBE',
                                                                                          p_id_gestion_cbte,
                                                                                          null,  --campo_relacion_contable
                                                                                          null);
@@ -293,13 +297,13 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
                                          select  ps_id_partida
                                               into
                                               v_id_partida
-                                              from conta.f_get_config_relacion_contable( 'CIER-HABER',
+                                              from conta.f_get_config_relacion_contable( 'APER-HABER',
                                                                                          p_id_gestion_cbte,
                                                                                          NULL,  --campo_relacion_contable
                                                                                          NULL);
                                       END IF;
-                                      
-                                       
+
+
                                END IF;
 
 
@@ -308,6 +312,7 @@ v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta';
 
 
                      IF v_saldo_mb != 0  or  v_saldo_ma != 0 or v_saldo_mt != 0 THEN
+
 
                             insert into conta.tint_transaccion(
                                         id_partida,
