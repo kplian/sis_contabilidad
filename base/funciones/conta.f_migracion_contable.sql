@@ -51,6 +51,7 @@ BEGIN
 	truncate table conta.tcuenta CASCADE;
 	truncate table conta.tauxiliar CASCADE;
 	truncate table conta.tcuenta_auxiliar CASCADE; 
+    truncate table conta.tint_comprobante CASCADE; 
 	truncate table pre.tpartida CASCADE;
     truncate table pre.tpresupuesto CASCADE;
     truncate table param.tcentro_costo CASCADE;
@@ -130,18 +131,19 @@ BEGIN
 	end if;
     
     delete from conta.tclase_comprobante;
+    raise notice '%',v_id_subsistema;
     delete from param.tdocumento where id_subsistema = v_id_subsistema;    
     
     /* Data for the 'param.tdocumento' table  (Records 1 - 4) */
 
     INSERT INTO param.tdocumento ("id_usuario_reg", "id_subsistema", "codigo", "descripcion", "periodo_gestion", "tipo", "tipo_numeracion", "formato", "ruta_plantilla")
-    VALUES (1,12, E'CDIR', E'Comprobante de Diario', E'periodo', NULL, E'depto', NULL, NULL) returning id_documento into v_id_documento;
+    VALUES (1,v_id_subsistema, E'CDIR', E'Comprobante de Diario', E'periodo', NULL, E'depto', NULL, NULL) returning id_documento into v_id_documento;
 
     INSERT INTO conta.tclase_comprobante ("id_usuario_reg",  "id_documento", "descripcion", "tipo_comprobante", "codigo", "momento_comprometido", "momento_ejecutado", "momento_pagado", "tiene_apertura", "movimiento")
-    VALUES (1,  17, E'Comprobante de Diario Presupuestario', E'presupuestario', E'DIARIO', E'opcional', E'opcional', E'opcional', E'si', E'diario');
+    VALUES (1,  v_id_documento, E'Comprobante de Diario Presupuestario', E'presupuestario', E'DIARIO', E'opcional', E'opcional', E'opcional', E'si', E'diario');
 
     INSERT INTO conta.tclase_comprobante ("id_usuario_reg",  "id_documento", "descripcion", "tipo_comprobante", "codigo", "momento_comprometido", "momento_ejecutado", "momento_pagado", "tiene_apertura", "movimiento")
-    VALUES (1, 17, E'Comprobante de Diario Contable', E'contable', E'DIARIOCON', E'no_permitido', E'no_permitido', E'no_permitido', E'si', E'diario');
+    VALUES (1, v_id_documento, E'Comprobante de Diario Contable', E'contable', E'DIARIOCON', E'no_permitido', E'no_permitido', E'no_permitido', E'si', E'diario');
 
 
 
@@ -439,6 +441,14 @@ BEGIN
           'ENCOR'
         )returning id_uo into v_id_uo;
     end if;
+    
+    
+    if not EXISTS(select 1 from param.tdepto_uo_ep ) then
+    	
+      INSERT INTO param.tdepto_uo_ep ("id_usuario_reg", "id_depto", "id_ep", "id_uo")
+      VALUES (1,  v_id_depto, v_id_ep, v_id_uo);
+
+    end if;
 	
 	for v_registros in (select * from conta.tmigra_cuenta) loop
 		v_cuenta_padre = trim(trailing '0' from v_registros.nro_cuenta);
@@ -491,7 +501,8 @@ BEGIN
                 id_usuario_reg,
                 fecha_mod,
                 id_usuario_mod,                
-                valor_incremento
+                valor_incremento,
+                id_config_subtipo_cuenta
           	) values(
                 v_id_cuenta_padre,
                 v_registros.nombre_cuenta,
@@ -509,7 +520,8 @@ BEGIN
                 1,
                 null,
                 null,                
-                v_registros.valor_incremento
+                v_registros.valor_incremento,
+                v_registros.sub_tipo_cuenta
 							
 			)RETURNING id_cuenta into v_id_cuenta;
 		
