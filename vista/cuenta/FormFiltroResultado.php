@@ -5,6 +5,9 @@
 *@author  Rensi Arteaga Copari 
 *@date    30-01-2014
 *@description permites subir archivos a la tabla de documento_sol
+ * 
+ * 
+#39    ETR     27/03/2019		  Manuel Guerra	  agregar el filtro incluir cierre a estados financieross
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -191,6 +194,27 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 	       		valorInicial: 'pdf',
 	       		form:true
 	     },
+	     //#39
+	     {
+	       		config:{
+	       			name: 'incluir_cierre',
+	       			qtip : 'Incluir los comprobantes de cierre en el balance',
+	       			fieldLabel: 'Incluir cierre',
+	       			allowBlank: false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['no','balance','resultado','todos']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		valorInicial: 'no',
+	       		grid:true,
+	       		form:true
+	      },
 	      {
 	       		config:{
 	       			name: 'incluir_sinmov',
