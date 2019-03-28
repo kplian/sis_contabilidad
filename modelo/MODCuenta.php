@@ -10,7 +10,6 @@
 	# 16	ENDETRASM	 09/01/2018			Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
 	#  28	     	17/12/2018			MMV							Reporte cuadro de actualización
    #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
-   #39    ETR     27/03/2019		  Manuel Guerra	  agregar el filtro incluir cierre a estados financieross
 
  */
 
@@ -253,7 +252,7 @@ class MODCuenta extends MODbase{
  }
 
    function listarDetResultados(){
-   		//#39
+   		
 	    //Definicion de variables para ejecucion del procedimientp
 	    $this->procedimiento='conta.f_resultados';
 	    $this-> setCount(false);
@@ -266,8 +265,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('id_resultado_plantilla','id_resultado_plantilla','integer');
 		$this->setParametro('id_deptos','id_deptos','varchar'); 
 		$this->setParametro('extendido','extendido','varchar');
-		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar'); 		       
-	    $this->setParametro('incluir_cierre','incluir_cierre','varchar');          
+		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar'); 	        
 	    //Definicion de la lista del resultado del query
 	    $this->captura('subrayar','varchar'); 
         $this->captura('font_size','varchar'); 
