@@ -22,7 +22,6 @@ v_count integer;
 v_consulta varchar;
 v_registros  record;  -- PARA ALMACENAR EL CONJUNTO DE DATOS RESULTADO DEL SELECT
 
-
 v_i 				integer;
 v_nivel_inicial		integer;
 v_total 			numeric;

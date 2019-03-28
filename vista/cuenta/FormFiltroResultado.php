@@ -7,7 +7,6 @@
 *@description permites subir archivos a la tabla de documento_sol
  * 
  * 
-
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
