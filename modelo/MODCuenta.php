@@ -251,8 +251,7 @@ class MODCuenta extends MODbase{
 	    return $this->respuesta;       
  }
 
-   function listarDetResultados(){
-   		
+   function listarDetResultados(){   		
 	    //Definicion de variables para ejecucion del procedimientp
 	    $this->procedimiento='conta.f_resultados';
 	    $this-> setCount(false);
