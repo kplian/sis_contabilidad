@@ -5095,3 +5095,13 @@ ALTER TABLE conta.tint_comprobante
 ALTER TABLE conta.tint_comprobante
   ALTER COLUMN documento_iva SET DEFAULT 'si';
 /***********************************F-SCP-MMV-CONTA-33-08/02/2019****************************************/
+
+/***********************************I-SCP-EGS-CONTA-09-28/03/2019****************************************/
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ALTER COLUMN incluir_desc_doc TYPE VARCHAR(15) COLLATE pg_catalog."default";
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ALTER COLUMN incluir_desc_doc SET DEFAULT 'todos'::character varying;
+ /***********************************F-SCP-MMV-CONTA-09-28/03/2019****************************************/
+
