@@ -6,7 +6,7 @@
 *@date 21-02-2013 15:04:03
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 ISSUE			FECHA 				AUTHOR 						DESCRIPCION
-#28	     	17/12/2018			    MMV							Reporte cuadro de actualización
+#28	     	17/12/2018			   kplian MMV							Reporte cuadro de actualización
 #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
 
  */
@@ -19,7 +19,7 @@ require_once(dirname(__FILE__).'/../reportes/RResultadosXls.php');
 require_once(dirname(__FILE__).'/../reportes/RBalanceOrdenes.php');
 require_once(dirname(__FILE__).'/../reportes/RBalanceTipoCC.php');
 require_once(dirname(__FILE__).'/../reportes/RBalanceTipoCcXls.php');
-//require_once(dirname(__FILE__).'/../reportes/RCuadroActualizacion.php'); //#28
+require_once(dirname(__FILE__).'/../reportes/RCuadroActualizacion.php'); //#28
 
 class ACTCuenta extends ACTbase{    
 			
@@ -617,7 +617,7 @@ class ACTCuenta extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
     /***************-#28-*************/
-    /*function reporteCuadroActualizacion(){
+    function reporteCuadroActualizacion(){
         $this->objFunc = $this->create('MODCuenta');
         $this->res = $this->objFunc->listarCuadroActualizacion($this->objParam);
         $titulo = 'Cuadro Actualizacion';
@@ -634,7 +634,7 @@ class ACTCuenta extends ACTbase{
         $this->mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado','Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
-    }*/
+    }
     /***************-#28-*************/
 }
 

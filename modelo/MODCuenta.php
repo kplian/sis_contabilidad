@@ -8,7 +8,7 @@
  	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
    	#  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
 	# 16	ENDETRASM	 09/01/2018			Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
-	#  28	     	17/12/2018			MMV							Reporte cuadro de actualización
+	#  28	     	17/12/2018		kplian	MMV							Reporte cuadro de actualización
    #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
 
  */
@@ -434,7 +434,7 @@ class MODCuenta extends MODbase{
 		return $this->respuesta;
 	}
 	/***************-#28-*************/
-    /*function listarCuadroActualizacion(){
+    function listarCuadroActualizacion(){
         //Definicion de variables para ejecucion del procedimientp
         $this->procedimiento='conta.f_cuadro_actualizacion';
         $this-> setCount(false);
@@ -444,10 +444,7 @@ class MODCuenta extends MODbase{
 
         $this->setParametro('desde','desde','date');
         $this->setParametro('hasta','hasta','date');
-        $this->setParametro('nivel','nivel','integer');
         $this->setParametro('tipo_cuenta','tipo_cuenta','varchar');
-        $this->setParametro('tipo_balance','tipo_balance','varchar');
-        $this->setParametro('incluir_sinmov','incluir_sinmov','varchar');
         $this->setParametro('fecha_moneda','fecha_moneda','date');
         $this->setParametro('tipo_moneda','tipo_moneda','varchar');
         //Definicion de la lista del resultado del query
@@ -467,10 +464,11 @@ class MODCuenta extends MODbase{
         $this->captura('tipo_cambio','numeric');
         //Ejecuta la instruccion
         $this->armarConsulta();
-       
+       /* echo $this->getConsulta();
+        exit;*/
         $this->ejecutarConsulta();
         return $this->respuesta;
-    }*/
+    }
     /***************-#28-*************/
 
 			
