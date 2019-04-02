@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
   p_hstore_transaccion public.hstore,
   p_id_plantilla integer,
@@ -10,7 +8,8 @@ CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
   p_incluir_desc_doc varchar,
   p_prioridad_documento integer = 2,
   p_proc_terci varchar = 'no'::character varying,
-  p_porc_monto_excento_var numeric = 0
+  p_porc_monto_excento_var numeric = 0,
+  p_procesar_prioridad_principal varchar = 'si'::character varying
 )
 RETURNS integer [] AS
 $body$
@@ -37,6 +36,7 @@ $body$
  #13            03/01/2018      RAC KPLIAN                 PRocesa la opcion resetear partida ejecucion de las plantillas de calculo
  #21            10/01/2019      RArteaga                   Considerar configuracion apra aplicacar o no descuentos,  incluir_desc_doc 
  #30  ETR       05/02/2019      RArtega                    Se adciona campo para almacenar los centro de costo original en plantillas secundaias para facilitar reportes
+ --#42  ETR       01/04/2019      calvarez                    correción de gerenación de comprobantes
 ***************************************************************************/
 
 DECLARE
@@ -132,8 +132,9 @@ BEGIN
               IF  p_proc_terci = 'si' or (v_registros.prioridad <= p_prioridad_documento )   THEN  -- p_prioridad_documento  por defecto tiene el valor de dos
               
                      -- #21 revisar configuracion de descuentos      
+                     --  AND p_procesar_prioridad_principal = 'si'
                      IF     p_incluir_desc_doc = 'todos' 
-                        OR  v_registros.prioridad = 1
+                        OR  (v_registros.prioridad = 1)
                         OR  (p_incluir_desc_doc = 'descuento'  AND  v_registros.descuento = 'si' )
                         OR  (p_incluir_desc_doc = 'no_descuento' AND v_registros.descuento = 'no' )        THEN    
                            
@@ -191,10 +192,13 @@ BEGIN
                                  END IF; 
                                  
                                               
-                             
-                                v_monto_x_aplicar = (p_monto * v_porc_importe)::numeric;
-                                v_monto_x_aplicar_pre = (p_monto * v_porc_importe_presupuesto)::numeric;
-                                
+                                if v_registros.prioridad > 1 or (v_registros.prioridad = 1 and p_procesar_prioridad_principal = 'si') then
+                                  v_monto_x_aplicar = (p_monto * v_porc_importe)::numeric;
+                                  v_monto_x_aplicar_pre = (p_monto * v_porc_importe_presupuesto)::numeric;
+                                else
+                                  v_monto_x_aplicar = (p_monto)::numeric;
+                                  v_monto_x_aplicar_pre = (p_monto)::numeric;
+                                end if;
                                 v_monto_revertir = p_monto - v_monto_x_aplicar_pre;
                                 v_factor_reversion  = 1 - v_porc_importe_presupuesto; 
                                 

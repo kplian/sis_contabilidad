@@ -43,7 +43,8 @@ CREATE OR REPLACE FUNCTION conta.f_import_tdetalle_plantilla_comprobante (
   p_campo_relacion_contable_cc varchar = ''::character varying,
   p_campo_suborden varchar = ''::character varying,
   p_incluir_desc_doc varchar = ''::character varying,
-  p_campo_codigo_aplicacion_rc varchar = ''::character varying
+  p_campo_codigo_aplicacion_rc varchar = ''::character varying,
+  p_procesar_prioridad_principal varchar = ''::character varying
 )
 RETURNS varchar AS
 $body$
@@ -59,6 +60,8 @@ $body$
  ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
  # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
  #31  EndeETR       06/02/2019          EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
+ #42  EndeETR       02/04/2019           EGS                    Se agrega el campo procesar_prioridad_principal en el exportador de plantilla
+
 ***************************************************************************/
 
 DECLARE
@@ -147,7 +150,8 @@ BEGIN
                 campo_relacion_contable_cc,
                 campo_suborden,
                 incluir_desc_doc, --/#21
-                campo_codigo_aplicacion_rc --#31
+                campo_codigo_aplicacion_rc, --#31
+                procesar_prioridad_principal --#42
           	) values(
                 v_id_plantilla_comprobante,
                 p_debe_haber,
@@ -197,7 +201,8 @@ BEGIN
                 p_campo_relacion_contable_cc,
                 p_campo_suborden,
                 p_incluir_desc_doc, --#21
-                p_campo_codigo_aplicacion_rc  --#31
+                p_campo_codigo_aplicacion_rc,  --#31
+                p_procesar_prioridad_principal --#42
 			);
 
 
@@ -247,7 +252,8 @@ BEGIN
               campo_relacion_contable_cc = p_campo_relacion_contable_cc,
               campo_suborden = p_campo_suborden,
               incluir_desc_doc = p_incluir_desc_doc, --#21
-              campo_codigo_aplicacion_rc = p_campo_codigo_aplicacion_rc --#21
+              campo_codigo_aplicacion_rc = p_campo_codigo_aplicacion_rc, --#21
+              procesar_prioridad_principal = p_procesar_prioridad_principal --#42
 			where id_detalle_plantilla_comprobante=v_id_detalle_plantilla_comprobante;
              
               

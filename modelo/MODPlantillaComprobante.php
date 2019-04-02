@@ -8,7 +8,8 @@
 ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
 #31  EndeETR       06/02/2019           EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
-
+#42  EndeETR       02/04/2019           EGS                     Se agrega el campo procesar_prioridad_principal en el exportador de plantilla
+ * 
  */
 
 class MODPlantillaComprobante extends MODbase{
@@ -362,7 +363,8 @@ class MODPlantillaComprobante extends MODbase{
 			$this->captura('campo_suborden','varchar');
             $this->captura('incluir_desc_doc','varchar');//#21
             $this->captura('campo_codigo_aplicacion_rc','varchar');//#31           		
-			
+            $this->captura('procesar_prioridad_principal','varchar');//#42           		
+            			
 			$this->armarConsulta();
 			$consulta=$this->getConsulta();			
 	  

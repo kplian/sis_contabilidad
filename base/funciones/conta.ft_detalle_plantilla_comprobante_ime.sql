@@ -17,6 +17,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
  # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+ #42	EndeEtr	    02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
 
 ***************************************************************************/
 
@@ -108,7 +109,8 @@ BEGIN
                 campo_relacion_contable_cc,
                 campo_suborden,
                 campo_codigo_aplicacion_rc,
-                incluir_desc_doc --#21
+                incluir_desc_doc, --#21
+                procesar_prioridad_principal  --#42
           	) values(
                 v_parametros.id_plantilla_comprobante,
                 v_parametros.debe_haber,
@@ -157,7 +159,8 @@ BEGIN
                 v_parametros.campo_relacion_contable_cc,
                 v_parametros.campo_suborden,
                 v_parametros.campo_codigo_aplicacion_rc,
-                v_parametros.incluir_desc_doc --#21
+                v_parametros.incluir_desc_doc, --#21
+                v_parametros.procesar_prioridad_principal --#42
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 
 			--Definicion de la respuesta
@@ -240,7 +243,8 @@ BEGIN
                 campo_relacion_contable_cc = v_parametros.campo_relacion_contable_cc,
                 campo_suborden = v_parametros.campo_suborden,
                 campo_codigo_aplicacion_rc = v_parametros.campo_codigo_aplicacion_rc,
-                incluir_desc_doc = v_parametros.incluir_desc_doc --#21
+                incluir_desc_doc = v_parametros.incluir_desc_doc, --#21
+                procesar_prioridad_principal = v_parametros.procesar_prioridad_principal --#42
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta
