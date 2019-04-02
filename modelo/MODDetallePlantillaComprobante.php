@@ -7,6 +7,8 @@
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+ #42	EndeEtr			02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
+ * 
 
  */
 
@@ -81,6 +83,8 @@ class MODDetallePlantillaComprobante extends MODbase{
 		
 		$this->captura('campo_codigo_aplicacion_rc','varchar');
 		$this->captura('incluir_desc_doc','varchar'); //#21
+		$this->captura('procesar_prioridad_principal','varchar'); //#42
+		
 		
 		
 		
@@ -152,7 +156,8 @@ class MODDetallePlantillaComprobante extends MODbase{
 		
 		$this->setParametro('campo_codigo_aplicacion_rc','campo_codigo_aplicacion_rc','varchar');
 		$this->setParametro('incluir_desc_doc','incluir_desc_doc','varchar'); //#21
-		
+		$this->setParametro('procesar_prioridad_principal','procesar_prioridad_principal','varchar'); //#42
+				
 		
 		
 		
@@ -223,7 +228,8 @@ class MODDetallePlantillaComprobante extends MODbase{
 		
 		$this->setParametro('campo_codigo_aplicacion_rc','campo_codigo_aplicacion_rc','varchar');
         $this->setParametro('incluir_desc_doc','incluir_desc_doc','varchar'); //#21
-
+		$this->setParametro('procesar_prioridad_principal','procesar_prioridad_principal','varchar'); //#42
+        
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

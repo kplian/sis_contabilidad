@@ -5107,6 +5107,15 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
   ALTER COLUMN incluir_desc_doc SET DEFAULT 'todos'::character varying;
  /***********************************F-SCP-MMV-CONTA-09-28/03/2019****************************************/
 
+
+ /***********************************I-SCP-EGS-CONTA-10-02/04/2019****************************************/
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN procesar_prioridad_principal VARCHAR(2) DEFAULT 'si'::character varying NOT NULL;
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.procesar_prioridad_principal
+IS 'Evalua el la plantilla de documento con priridad 1. valores:si/no';
+ /***********************************F-SCP-EGS-CONTA-10-02/04/2019****************************************/
+
 /***********************************I-SCP-JRR-CONTA-0-24/01/2019****************************************/
 
 

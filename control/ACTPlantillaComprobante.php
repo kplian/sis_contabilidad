@@ -8,6 +8,8 @@
 ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
 #31  EndeETR       06/02/2019           EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
+#42  EndeETR       02/04/2019           EGS                     Se agrega el campo procesar_prioridad_principal en el exportador de plantilla
+ * 
  */
 
 class ACTPlantillaComprobante extends ACTbase{    
@@ -152,7 +154,7 @@ class ACTPlantillaComprobante extends ACTbase{
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,NULL,NULL);\r\n");	
+							NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);\r\n");	
 	
 			} else {
 					
@@ -203,8 +205,8 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['campo_relacion_contable_cc'])?'NULL':"'".$row['campo_relacion_contable_cc']."'")."," .
 							 (is_null($row['campo_suborden'])?'NULL':"'".$row['campo_suborden']."'") ."," .
                              (is_null($row['incluir_desc_doc'])?'NULL':"'".$row['incluir_desc_doc']."'") ."," .  //#21
-                             (is_null($row['campo_codigo_aplicacion_rc'])?'NULL':"'".$row['campo_codigo_aplicacion_rc']."'") .  //#31
-                             
+                             (is_null($row['campo_codigo_aplicacion_rc'])?'NULL':"'".$row['campo_codigo_aplicacion_rc']."'") ."," .  //#31
+                             (is_null($row['procesar_prioridad_principal'])?'NULL':"'".$row['procesar_prioridad_principal']."'") .  //#42
                                 ");\r\n");
 							 
 							 						

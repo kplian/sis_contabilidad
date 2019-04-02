@@ -7,7 +7,7 @@
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
-
+#42	EndeEtr			02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
  */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -161,6 +161,33 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+        { //#42
+	       		config:{
+	       			name:'procesar_prioridad_principal',
+	       			fieldLabel:'Procesar Prioridad Principal',
+	       			allowBlank:false,
+	       			emptyText:'...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',	       		    
+	       		    gwidth: 100,
+	       		    store:new Ext.data.ArrayStore({
+		        	fields: ['ID', 'valor'],
+		        	data :	[['si','si'],	
+		        			['no','no']]
+		        				
+		    		}),
+					valueField:'ID',
+					displayField:'valor',
+	       		},
+	       		type:'ComboBox',
+	       		valorInicial: 'si',
+	       		id_grupo:0,	       		
+	       		grid:true,
+	       		form:true
+	       },
+        
           
         {
            config:{
@@ -962,7 +989,9 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_orden_trabajo','campo_forma_pago','codigo',
         'tipo_relacion_contable_cc','campo_relacion_contable_cc','campo_suborden',
         'campo_codigo_aplicacion_rc',
-        'incluir_desc_doc'//#21
+        'incluir_desc_doc',//#21
+   	    {name:'procesar_prioridad_principal', type: 'string'},//#42
+
 		
 	],
 	sortInfo:{

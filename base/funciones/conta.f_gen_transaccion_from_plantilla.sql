@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla (
   p_super public.hstore,
   p_tabla_padre public.hstore,
@@ -33,6 +31,7 @@ Descripcion:
  #0       		17/11/2017      Rensi Arteaga Copari       BUG, En calculo por diferencia se considera lso montos de gastos y recurso
  #123           27/09/2018      Rarteaga                   Se adiciona el dato de tabla origien la guardar la trasaccion para rastreo
  #21            10/01/2019      RArteaga                   añade parametro a la llamda de generar desde plantilla, para considerar descuentos
+ --#42  ETR       01/04/2019      calvarez                    correción de gerenación de comprobantes
 */
 
 
@@ -599,8 +598,6 @@ BEGIN
                            --inserta las trasaccion asociadas al documento
                            IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN
                                
-                           
-                         
                                  v_resp_doc =  conta.f_gen_proc_plantilla_calculo(
                                                             hstore(v_record_int_tran), 
                                                             (v_this_hstore->'campo_documento')::integer,--p_id_plantilla, 
@@ -611,7 +608,8 @@ BEGIN
                                                             (p_reg_det_plantilla->'incluir_desc_doc')::varchar, --#21
                                                             (p_reg_det_plantilla->'prioridad_documento')::integer,
                                                             'no',
-                                                            (v_this_hstore->'campo_porc_monto_excento_var')::numeric 
+                                                            (v_this_hstore->'campo_porc_monto_excento_var')::numeric,
+                                                            (p_reg_det_plantilla->'procesar_prioridad_principal')::varchar --#42
                                                             );
                                  
                              	 IF(v_resp_doc is null)THEN

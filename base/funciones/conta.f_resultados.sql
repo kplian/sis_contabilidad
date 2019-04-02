@@ -8,16 +8,6 @@ CREATE OR REPLACE FUNCTION conta.f_resultados (
 )
 RETURNS SETOF record AS
 $body$
-/**************************************************************************
- SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.f_resultados
- 
-***************************************************************************
- HISTORIAL DE MODIFICACIONES:
- ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
- #39    ETR   27/03/2019	 Manuel Guerra	     agregar el filtro incluir cierre a estados financieross
-***************************************************************************/
-
 DECLARE
 
 
@@ -32,7 +22,6 @@ v_count integer;
 v_consulta varchar;
 v_registros  record;  -- PARA ALMACENAR EL CONJUNTO DE DATOS RESULTADO DEL SELECT
 
-
 v_i 				integer;
 v_nivel_inicial		integer;
 v_total 			numeric;
@@ -46,8 +35,7 @@ v_multiple_col 			boolean;
 v_forzar_visible		boolean;
 v_prioridad				integer;
 v_incluir_sinmov    	varchar;
-v_incluir_cierre		varchar;
-i		integer;
+ 
 
 BEGIN
      
@@ -72,7 +60,7 @@ BEGIN
     
     
          --  0) recuperamos la gestion segun fecha inicial   
-
+         
           v_gestion =  EXTRACT(YEAR FROM  v_parametros.desde::Date)::varchar;
             
           select 
@@ -89,10 +77,6 @@ BEGIN
           v_incluir_sinmov = 'no';
           if pxp.f_existe_parametro(p_tabla,'incluir_sinmov') then
             v_incluir_sinmov = v_parametros.incluir_sinmov;
-          end if;
-    
-          if pxp.f_existe_parametro(p_tabla,'incluir_cierre') then
-            v_incluir_cierre = v_parametros.incluir_cierre;
           end if;
           
           select 
@@ -184,7 +168,8 @@ BEGIN
            
          
          raise notice 'INICIA CONSULTA....';
-
+         
+       
           FOR v_registros in (SELECT                                   
                                         subrayar,
                                         font_size,
@@ -213,25 +198,18 @@ BEGIN
                                         salta_hoja
                                     FROM temp_balancef 
                                     WHERE 
-                                                                          
-                                       case  
-                                          when v_incluir_sinmov = 'no' then 
-                                              0 = 0
-                                          else 
+                                       case  when v_incluir_sinmov = 'no' then 
+                                                  0 = 0
+                                             else 
                                               (monto != 0 or origen = 'titulo')
-                                       end
-                                                                              
-                                       AND                                     
+                                            end
                                        
-                                       incluir_cierre=v_incluir_cierre
-                                     
                                       --order by orden_cbte asc,  orden  asc ,  codigo_cuenta asc) LOOP
                                       order by prioridad asc , orden_cbte asc, orden asc,   codigo_cuenta asc) LOOP
-	                       RETURN NEXT v_registros;
-                    
+                       RETURN NEXT v_registros;
            END LOOP; 
-
-                              
+      
+       
   END IF;
 
 EXCEPTION
