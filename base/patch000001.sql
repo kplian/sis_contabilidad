@@ -1,3 +1,4 @@
+
 /***********************************I-SCP-RAC-CONTA-1-04/02/2013****************************************/
 CREATE TABLE conta.tconfig_tipo_cuenta(
     id_cofig_tipo_cuenta SERIAL NOT NULL,
@@ -5096,6 +5097,7 @@ ALTER TABLE conta.tint_comprobante
   ALTER COLUMN documento_iva SET DEFAULT 'si';
 /***********************************F-SCP-MMV-CONTA-33-08/02/2019****************************************/
 
+
 /***********************************I-SCP-EGS-CONTA-09-28/03/2019****************************************/
 
 ALTER TABLE conta.tdetalle_plantilla_comprobante
@@ -5105,6 +5107,7 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
   ALTER COLUMN incluir_desc_doc SET DEFAULT 'todos'::character varying;
  /***********************************F-SCP-MMV-CONTA-09-28/03/2019****************************************/
 
+
  /***********************************I-SCP-EGS-CONTA-10-02/04/2019****************************************/
 ALTER TABLE conta.tdetalle_plantilla_comprobante
   ADD COLUMN procesar_prioridad_principal VARCHAR(2) DEFAULT 'si'::character varying NOT NULL;
@@ -5112,4 +5115,32 @@ ALTER TABLE conta.tdetalle_plantilla_comprobante
 COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.procesar_prioridad_principal
 IS 'Evalua el la plantilla de documento con priridad 1. valores:si/no';
  /***********************************F-SCP-EGS-CONTA-10-02/04/2019****************************************/
+
+/***********************************I-SCP-JRR-CONTA-0-24/01/2019****************************************/
+
+
+CREATE TABLE conta.tmigra_cuenta(
+  nro_cuenta VARCHAR(20),   
+  nombre_cuenta VARCHAR(200), 
+  id_moneda int4,
+  tipo_cuenta VARCHAR(30), 
+  sw_transaccional VARCHAR(10),   
+  sw_auxiliar VARCHAR(2), 
+  valor_incremento VARCHAR(10)
+   );
+   
+ CREATE TABLE conta.tmigra_auxiliar(
+  codigo_auxiliar VARCHAR(20),   
+  nombre_auxiliar VARCHAR(200)
+   );
+
+/***********************************F-SCP-JRR-CONTA-0-24/01/2019****************************************/
+/***********************************I-SCP-JRR-CONTA-0-20/03/2019****************************************/
+
+ALTER TABLE conta.tmigra_cuenta
+  ADD COLUMN sub_tipo_cuenta INTEGER;
+
+/***********************************F-SCP-JRR-CONTA-0-20/03/2019****************************************/
+
+
 
