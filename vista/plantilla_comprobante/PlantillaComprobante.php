@@ -6,6 +6,10 @@
 *@date 10-06-2013 14:40:00
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
+/***************************************************************************
+ ISSUE  SIS       EMPRESA       FECHA       AUTOR       DESCRIPCION
+ #44    CONTA     ETR           13/05/2019  RCM         Inclusión de filtro rápido
+***************************************************************************/
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -15,7 +19,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.PlantillaComprobante.superclass.constructor.call(this,config);
-		
+
 		this.addButton('btnWizard',
             {
                 text: 'Exportar Plantilla',
@@ -25,11 +29,11 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Exportar</b><br/>Exporta a archivo SQL la plantilla'
             }
         );
-		
+
 		this.init();
 		this.load({params:{start:0, limit:this.tam_pag}});
 	},
-	
+
 	expProceso : function(resp){
 			var data=this.sm.getSelected().data;
 			Phx.CP.loadingShow();
@@ -41,11 +45,11 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				timeout: this.timeout,
 				scope: this
 			});
-			
+
 	},
-	
+
 	tam_pag:50,
-			
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -55,7 +59,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_plantilla_comprobante'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			config:{
@@ -63,16 +67,17 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Codigo',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 150,
 				maxLength:255
 			},
 			type:'TextField',
 			filters:{pfiltro:'cmpb.codigo',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:true,
+			bottom_filter: true //#44
 		},
-		
+
 		{
 			config:{
 				name: 'desc_plantilla',
@@ -80,16 +85,17 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				qtip:'Describe la utilidad de esta plantilla de comprobante, (no influye en el contenido del comprobante)',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 250,
 				maxLength:200
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cmpb.desc_plantilla',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:true,
+			bottom_filter: true //#44
 		},
-		
+
 		{
            config:{
                 name:'momento_presupuestario',
@@ -106,7 +112,8 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            filters:{pfiltro:'cmpb.momento_presupuestario',type:'string'},
            id_grupo:0,
            grid:true,
-           form:true
+           form:true,
+		   bottom_filter: true //#44
           },
          {
            config:{
@@ -164,7 +171,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
            id_grupo:0,
            grid:true,
            form:true
-          }, 
+          },
 		{
 			config:{
 				name: 'clase_comprobante',
@@ -179,7 +186,8 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			filters:{pfiltro:'cmpb.clase_comprobante',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:true,
+			bottom_filter: true //#44
 		},
 		{
 			config:{
@@ -320,7 +328,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
-		}, 
+		},
 		{
 			config : {
 				name : 'codigo_tipo_relacion',
@@ -367,7 +375,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid : true,
 			form : true
 		},
-		
+
 		{
 			config:{
 				name: 'campo_moneda',
@@ -429,7 +437,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:true
-        },				
+        },
 		{
 			config:{
 				name: 'funcion_comprobante_validado',
@@ -445,7 +453,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
-		},				
+		},
 		{
 			config:{
 				name: 'funcion_comprobante_eliminado',
@@ -461,7 +469,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
-		},				
+		},
 		{
 			config:{
 				name: 'funcion_comprobante_editado',
@@ -510,7 +518,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
-		
+
 		{
 			config:{
 				name: 'campo_id_cuenta_bancaria',
@@ -587,7 +595,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        
+
          {
             config: {
                 name: 'campo_tipo_cambio_2',
@@ -604,8 +612,8 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        
-        
+
+
          {
             config: {
                 name: 'campo_tipo_cambio_3',
@@ -622,7 +630,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        
+
          {
             config: {
                 name: 'campo_id_config_cambiaria',
@@ -639,8 +647,8 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        
-        
+
+
         {
             config: {
                 name: 'campo_depto_libro',
@@ -726,7 +734,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-						format: 'd/m/Y', 
+						format: 'd/m/Y',
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 			type:'DateField',
@@ -757,7 +765,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-						format: 'd/m/Y', 
+						format: 'd/m/Y',
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 			type:'DateField',
@@ -767,7 +775,7 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			form:false
 		}
 	],
-	
+
 	title:'Comprobante',
 	ActSave:'../../sis_contabilidad/control/PlantillaComprobante/insertarPlantillaComprobante',
 	ActDel:'../../sis_contabilidad/control/PlantillaComprobante/eliminarPlantillaComprobante',
@@ -812,25 +820,24 @@ Phx.vista.PlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 	    'funcion_comprobante_validado_eliminado','desc_plantilla',
 	    'campo_cbte_relacionado','codigo_tipo_relacion',
 	    'campo_tipo_cambio_2','campo_tipo_cambio_3','campo_id_config_cambiaria'
-        
-		
+
+
 	],
 	sortInfo:{
 		field: 'id_plantilla_comprobante',
 		direction: 'ASC'
 	},
-	
+
 	south : {
 			url : '../../../sis_contabilidad/vista/detalle_plantilla_comprobante/DetallePlantillaComprobante.php',
 			title : 'Detalle de Comprobante',
 			height : '50%',
 			cls : 'DetallePlantillaComprobante'
 		},
-		
+
 	bdel:true,
 	bsave:true
 	}
 )
 </script>
-		
-		
+
