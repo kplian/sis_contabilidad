@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -20,7 +22,7 @@ ISSUE	FORK		 FECHA:				 AUTOR:				DESCRIPCION:
  #7		endeETR		27/12/2018			manuel guerra		agrega columna nro_tramite_aux, y listado de tramites
  #32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
  #33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
-
+ #45	 ETR		15/05/2019			manuel guerra		cambiar la fecha de filtrado del reporte
  DESCRIPCION:
  AUTOR:
  FECHA:
@@ -1032,7 +1034,7 @@ BEGIN
 	 /*********************************    
  	#TRANSACCION:  'CONTA_REPCBT_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		mp	
+ 	#AUTOR:		mp	   
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
     elsif(p_transaccion='CONTA_REPCBT_SEL') then
@@ -1043,16 +1045,17 @@ BEGIN
             	v_func = 'incbte.id_usuario_reg ='||v_parametros.id_usuario||' ';  
             ELSE
 				v_func = '0=0';     
-            END IF;            
+            END IF;   
+            --#45     
             --v_desde =  'incbte.fecha_reg >= '''||v_parametros.fecha_ini||''' and incbte.fecha_reg <='''||v_parametros.fecha_fin||''' ';                                     
 			IF v_parametros.fecha_ini is not null THEN
-            	v_desde =  'incbte.fecha_mod::date >= '''||v_parametros.fecha_ini||'''::date ';  
+            	v_desde =  'incbte.fecha::date >= '''||v_parametros.fecha_ini||'''::date ';  
             ELSE
             	v_desde = '0=0';    
             END IF;
             
             IF v_parametros.fecha_fin is not null THEN
-            	v_hasta =  'incbte.fecha_mod::date <='''||v_parametros.fecha_fin||'''::date ';      
+            	v_hasta =  'incbte.fecha::date <='''||v_parametros.fecha_fin||'''::date ';      
             ELSE
             	v_hasta = '0=0';    
             END IF;
@@ -1087,7 +1090,6 @@ BEGIN
                           AND';
                v_consulta:=v_consulta||v_parametros.filtro;                          
                v_consulta:=v_consulta||'order by CAST(left(SUBSTRING(incbte.nro_cbte, strpos(incbte.nro_cbte, ''/'')+1), strpos(SUBSTRING(incbte.nro_cbte, strpos(incbte.nro_cbte, ''/'')+1), ''-'') - 1) as INTEGER) asc';
-	
 			return v_consulta;
 
 		end;				
