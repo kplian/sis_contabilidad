@@ -21,6 +21,7 @@ $body$
   #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares 'CONTA_MROMAYOR_SEL','CONTA_MROMAYOR_CONT','CONTA_AUXRE_SEL'
   #5		 24/12/2108		  Manuel Guerra	  Correcion de sumas en axuiliares 'CONTA_TOTAUX_CONT'	
   #10        02/01/2019    	  Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
+  #48		 16/05/2019		  Manuel Guerra	  agregar columna tipo de presupuesto	
 ***************************************************************************/
 
 DECLARE
@@ -2109,7 +2110,7 @@ BEGIN
                               '' ''::varchar as glosa_transaccion ';
                v_join := '';
             END IF;       
-              
+            --#48  
 			v_consulta:='select
                           itr.id_int_transaccion ,
                           icbt.id_int_comprobante , icbt.fecha_reg , icbt.fecha , icbt.nro_cbte , icbt.nro_tramite , 
@@ -2156,13 +2157,16 @@ BEGIN
                           param.f_get_periodo_literal(per.id_periodo)::varchar as periodo,
                           to_char(itr.fecha_reg, ''HH12:MI:SS'')::varchar as hora,
                           itr.fecha_reg::timestamp as fecha_reg_transaccion
-                          '||v_atributos||'
+                          '||v_atributos||',
+						  tpp.nombre 
                           from conta.tint_comprobante icbt
                           join param.tperiodo per on per.id_periodo = icbt.id_periodo
                           join conta.tint_transaccion itr on itr.id_int_comprobante = icbt.id_int_comprobante
                           join conta.tcuenta cue on cue.id_cuenta = itr.id_cuenta
                           join pre.tpartida par on par.id_partida = itr.id_partida
                           join param.tcentro_costo cc on cc.id_centro_costo=itr.id_centro_costo
+                          join pre.tpresupuesto pre on pre.id_centro_costo=cc.id_centro_costo
+						  join pre.ttipo_presupuesto tpp on pre.tipo_pres::integer=tpp.id_tipo_presupuesto
                           left join param.ttipo_cc tcc on tcc.id_tipo_cc=cc.id_tipo_cc
                           left join param.vtipo_cc_techo tcct on tcc.id_tipo_cc =any (tcct.ids)
                           left join conta.tauxiliar aux on aux.id_auxiliar = itr.id_auxiliar
@@ -2173,8 +2177,8 @@ BEGIN
 
 			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
             --IF p_id_usuario = 433 THEN
-               --raise notice 'NOTICESS %', v_consulta;
-               --raise exception 'excep %', v_consulta;
+        --       raise notice 'NOTICESS %', v_consulta;
+        --       raise exception 'excep %', v_consulta;
             --END IF;
 			return v_consulta;
 						
