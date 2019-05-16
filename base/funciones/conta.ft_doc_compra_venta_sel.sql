@@ -793,7 +793,7 @@ BEGIN
                         COALESCE(transa.importe_debe_mb,0)::NUMERIC as importe_debe_mb,
                         transa.id_int_comprobante 
                         FROM  conta.vlibro_mayor_iva_credito_fiscal transa  
-                        WHERE  --transa.id_cuenta in (1864)  AND  -- #46 endetr Juan el filtro ya esta definido en la vista (conta.vlibro_mayor_iva_credito_fiscal) 16/05/2019 
+                        WHERE  --transa.id_cuenta in (1864)  AND -- #46 endetr Juan el filtro ya esta aplicado en la vista (conta.vlibro_mayor_iva_credito_fiscal) 16/05/2019 
                         transa.id_periodo = '||v_parametros.id_periodo||'
                         AND transa.glosa1::text NOT LIKE
                        ''%ACTUALIZACIÓN DEL SALDO%''::text)';  
