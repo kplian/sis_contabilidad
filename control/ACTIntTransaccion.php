@@ -857,7 +857,7 @@ class ACTIntTransaccion extends ACTbase{
 				"centro_costo" . $separador . 
 				"aux_codigo" . $separador . 
 				"aux_nombre" . $separador . 
-                //"beneficiario" . $separador . 
+                "nombre" . $separador . 
 				"\r\n"
 				
 				);
@@ -976,7 +976,7 @@ class ACTIntTransaccion extends ACTbase{
 									$val['centro_costo'].$separador.
 									$val['aux_codigo'].$separador.
 									$val['aux_nombre'].$separador.
-                                    //$val['beneficiario'].$separador.
+                                    $val['nombre'].$separador.
                                     
 
 								

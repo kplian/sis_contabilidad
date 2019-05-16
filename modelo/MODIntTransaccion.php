@@ -870,6 +870,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('usuario_reg_transaccion','varchar');
 		$this->captura('nro_documento','varchar');
 		$this->captura('glosa_transaccion','varchar');
+		$this->captura('nombre','varchar');
 		//$this->captura('beneficiario','varchar');
 
 		
