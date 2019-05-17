@@ -4,6 +4,12 @@
 *@file    ListaCbtes.php
 *@author  Manuel Guerra
 *@description generar cbtes diarios
+
+ 
+HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE        FORK			FECHA:		      AUTOR                 DESCRIPCION
+#50	    ETR		17/05/2019			manuel guerra		    agregar filtro depto
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -67,6 +73,35 @@ Phx.vista.ListaCbtes=Ext.extend(Phx.frmInterfaz,{
 		},
 		{
 			config : {
+				name : 'id_depto',
+				hiddenName : 'id_depto',
+				url : '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
+				origen : 'DEPTO',
+				allowBlank : false,
+				fieldLabel : 'Depto',
+				gdisplayField : 'desc_depto', //dibuja el campo extra de la consulta al hacer un inner join con orra tabla
+				width : 250,
+				gwidth : 180,
+				baseParams : {
+					estado : 'activo',
+					codigo_subsistema : 'CONTA'
+				}, //parametros adicionales que se le pasan al store
+				renderer : function(value, p, record) {
+					return String.format('{0}', record.data['desc_depto']);
+				}
+			},
+			//type:'TrigguerCombo',
+			type : 'ComboRec',
+			id_grupo : 0,
+			filters : {
+				pfiltro : 'incbte.desc_depto',
+				type : 'string'
+			},
+			grid : false,
+			form : true
+		}, 
+		{
+			config : {
 				name : 'fecha_ini',
 				fieldLabel : 'Fecha Inicial',
 				allowBlank : true,
@@ -108,7 +143,8 @@ Phx.vista.ListaCbtes=Ext.extend(Phx.frmInterfaz,{
 	},
 	getValues:function(){			
 		var resp = {	
-			id_usuario:this.Cmp.id_usuario.getValue(),		
+			id_usuario:this.Cmp.id_usuario.getValue(),
+			id_depto:this.Cmp.id_depto.getValue(),			
 			fecha_ini:this.Cmp.fecha_ini.getValue(),
 			fecha_fin:this.Cmp.fecha_fin.getValue(),			
 		}

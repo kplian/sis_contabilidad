@@ -16,6 +16,7 @@
  #7			endeetr		27/12/2018		manuel guerra				crearon listado de tramites, y la modifiacion del nrotramite_aux
 #32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
 #33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
+#50	 ETR		17/05/2019			manuel guerra		agregar filtro depto
 */
 class MODIntComprobante extends MODbase{
 	
@@ -102,13 +103,13 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_moneda_act','int4');
 		$this->captura('nro_tramite_aux','varchar');
 		$this->captura('documento_iva','varchar'); //#32
-		
+		$this->captura('id_int_comprobante_migrado','integer');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		//echo $this->getConsulta();exit;
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
@@ -895,7 +896,7 @@ class MODIntComprobante extends MODbase{
 
 	////////////EGS-F-21/08/2018///    1A	
 	
-	//
+	//#50
 	function listadoCbtes(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_int_comprobante_sel';
@@ -903,7 +904,8 @@ class MODIntComprobante extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);	
 		//
-		$this->setParametro('id_usuario','id_usuario','int4');		
+		$this->setParametro('id_usuario','id_usuario','int4');
+		$this->setParametro('id_depto','id_depto','int4');		
 		$this->setParametro('fecha_ini','fecha_ini','date');		
 		$this->setParametro('fecha_fin','fecha_fin','date');				
 		//Definicion de la lista del resultado del query
