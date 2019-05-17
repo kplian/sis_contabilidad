@@ -23,6 +23,7 @@ ISSUE	FORK		 FECHA:				 AUTOR:				DESCRIPCION:
  #32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
  #33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
  #45	 ETR		15/05/2019			manuel guerra		cambiar la fecha de filtrado del reporte
+ #50	 ETR		17/05/2019			manuel guerra		agregar filtro depto
  DESCRIPCION:
  AUTOR:
  FECHA:
@@ -45,6 +46,7 @@ DECLARE
     v_func				varchar;
     v_id_moneda			integer;	 --#33
     v_id_monedar_mt		integer;     --#33
+    v_depto     		varchar;     
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_int_comprobante_sel';
@@ -156,7 +158,8 @@ BEGIN
                               incbte.tipo_cambio_3,
                               incbte.id_moneda_act,
                               incbte.nro_tramite_aux,
-                              incbte.documento_iva -- #32
+                              incbte.documento_iva, -- #32
+                              incbte.id_int_comprobante_migrado
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
@@ -1045,6 +1048,12 @@ BEGIN
             	v_func = 'incbte.id_usuario_reg ='||v_parametros.id_usuario||' ';  
             ELSE
 				v_func = '0=0';     
+            END IF;  
+            --#50
+            IF v_parametros.id_depto is not NULL  THEN
+            	v_depto = 'incbte.id_depto in ('||v_parametros.id_depto||')';  
+            ELSE
+				v_depto = '0=0';     
             END IF;   
             --#45     
             --v_desde =  'incbte.fecha_reg >= '''||v_parametros.fecha_ini||''' and incbte.fecha_reg <='''||v_parametros.fecha_fin||''' ';                                     
@@ -1085,6 +1094,7 @@ BEGIN
                           where incbte.estado_reg in (''validado'')
                           AND (incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))
                           AND '||v_func||' 
+                          AND '||v_depto||' 
                           AND '||v_desde||' 
                           AND '||v_hasta||' 
                           AND';
