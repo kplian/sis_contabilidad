@@ -17,6 +17,7 @@
 #32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
 #33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
 #50	 ETR		17/05/2019			manuel guerra		agregar filtro depto
+#51		ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado
 */
 class MODIntComprobante extends MODbase{
 	
@@ -103,7 +104,7 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_moneda_act','int4');
 		$this->captura('nro_tramite_aux','varchar');
 		$this->captura('documento_iva','varchar'); //#32
-		$this->captura('id_int_comprobante_migrado','integer');
+		$this->captura('id_int_comprobante_migrado','integer');//#51	
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
