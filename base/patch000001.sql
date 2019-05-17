@@ -5141,6 +5141,11 @@ ALTER TABLE conta.tmigra_cuenta
   ADD COLUMN sub_tipo_cuenta INTEGER;
 
 /***********************************F-SCP-JRR-CONTA-0-20/03/2019****************************************/
+/***********************************I-SCP-EGS-CONTA-0-17/05/2019****************************************/
+ALTER TABLE conta.tint_comprobante
+  ADD COLUMN id_int_comprobante_migrado INTEGER;
 
-
+COMMENT ON COLUMN conta.tint_comprobante.id_int_comprobante_migrado
+IS 'El nuevo id el cual se genero al hacer la migracion a la nueva Bd(etasa)';
+/***********************************F-SCP-EGS-CONTA-0-17/05/2019****************************************/
 
