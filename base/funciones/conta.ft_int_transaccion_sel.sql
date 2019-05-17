@@ -22,6 +22,7 @@ $body$
   #5		 24/12/2108		  Manuel Guerra	  Correcion de sumas en axuiliares 'CONTA_TOTAUX_CONT'	
   #10        02/01/2019    	  Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
   #48		 16/05/2019		  Manuel Guerra	  agregar columna tipo de presupuesto	
+  #49		 17/05/2019		  Manuel Guerra	  correcion de join en reporte de cbte-transaccion
 ***************************************************************************/
 
 DECLARE
@@ -2111,6 +2112,7 @@ BEGIN
                v_join := '';
             END IF;       
             --#48  
+            --#49
 			v_consulta:='select
                           itr.id_int_transaccion ,
                           icbt.id_int_comprobante , icbt.fecha_reg , icbt.fecha , icbt.nro_cbte , icbt.nro_tramite , 
@@ -2166,7 +2168,7 @@ BEGIN
                           join pre.tpartida par on par.id_partida = itr.id_partida
                           join param.tcentro_costo cc on cc.id_centro_costo=itr.id_centro_costo
                           join pre.tpresupuesto pre on pre.id_centro_costo=cc.id_centro_costo
-						  join pre.ttipo_presupuesto tpp on pre.tipo_pres::integer=tpp.id_tipo_presupuesto
+						  join pre.ttipo_presupuesto tpp on pre.tipo_pres=tpp.codigo
                           left join param.ttipo_cc tcc on tcc.id_tipo_cc=cc.id_tipo_cc
                           left join param.vtipo_cc_techo tcct on tcc.id_tipo_cc =any (tcct.ids)
                           left join conta.tauxiliar aux on aux.id_auxiliar = itr.id_auxiliar
@@ -2177,8 +2179,8 @@ BEGIN
 
 			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
             --IF p_id_usuario = 433 THEN
-        --       raise notice 'NOTICESS %', v_consulta;
-        --       raise exception 'excep %', v_consulta;
+           --   raise notice 'NOTICESS %', v_consulta;
+       --       raise exception 'excep %', v_consulta;
             --END IF;
 			return v_consulta;
 						
