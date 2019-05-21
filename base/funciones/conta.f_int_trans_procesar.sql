@@ -5,6 +5,13 @@ CREATE OR REPLACE FUNCTION conta.f_int_trans_procesar (
 )
 RETURNS boolean AS
 $body$
+/*
+    HISTORIAL DE MODIFICACIONES:       
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+   
+ #0                ???               ????              creación
+ #53 ETR           25/05/2019        RAC KPLIAN        Configrable al generacion de cbte de pago de planilla
+*/
 DECLARE
 
 
@@ -26,11 +33,14 @@ v_k					integer;
 va_variables		varchar[];
 v_registros_cbte	record;
 v_id_cuenta_bancaria	integer;
+v_generar_pago_planilla varchar;   
  
 
 BEGIN
 
    v_nombre_funcion = 'conta.f_int_trans_procesar';
+   
+   v_generar_pago_planilla  = pxp.f_get_variable_global('conta_generar_pago_planilla'); --#53  SI o NO
    
    -- recuepra datos basicos del comprobante
    select 
@@ -67,7 +77,9 @@ BEGIN
                 
           --si es un cbte de pago
            
-          IF upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') and v_registros_cbte.codigo_sistema  != 'PLANI'  THEN  
+          IF      upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') 
+             and (   (v_generar_pago_planilla = 'NO' AND v_registros_cbte.codigo_sistema != 'PLANI')
+                  OR (v_generar_pago_planilla = 'SI' AND v_registros_cbte.codigo_sistema = 'PLANI'))  THEN    --#53  cambia validacion para incluir o no pago de planilla
              
              
             
