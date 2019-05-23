@@ -1652,3 +1652,8 @@ select conta.f_import_tdetalle_plantilla_comprobante ('insert','PAGTESPROV','CXP
 select conta.f_import_tdetalle_plantilla_comprobante ('insert','PAGTESPROV','REGAR','haber','si','si','','','CUENRETGARPRO','','{$tabla_padre.monto_retgar_mo}','{$tabla_padre.id_proveedor}','','no','','','','si','','','','retencion de garantia','{$tabla_padre.monto_retgar_mo}',NULL,'simple','','','no','','','','','','','','2','','',NULL,'','','','','todos','','si');
 /***********************************F-DAT-EGS-CONTA-4-28/03/2019****************************************/
 
+/***********************************I-DAT-RAC-CONTA-53-20/05/2019****************************************/
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_generar_pago_planilla', E'SI', E'habilitar pagos de planilla, por ejemplo No cuando se paga por la CUT');
+/***********************************F-DAT-RAC-CONTA-53-20/05/2019****************************************/
