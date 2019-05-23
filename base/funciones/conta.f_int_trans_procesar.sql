@@ -78,7 +78,7 @@ BEGIN
           --si es un cbte de pago
            
           IF      upper(trim(v_registros_cbte.codigo)) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') 
-             and (   (v_generar_pago_planilla = 'NO' AND v_registros_cbte.codigo_sistema != 'PLANI')
+             and (    v_registros_cbte.codigo_sistema != 'PLANI'
                   OR (v_generar_pago_planilla = 'SI' AND v_registros_cbte.codigo_sistema = 'PLANI'))  THEN    --#53  cambia validacion para incluir o no pago de planilla
              
              
