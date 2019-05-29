@@ -1657,3 +1657,9 @@ INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
 VALUES 
   (E'conta_generar_pago_planilla', E'SI', E'habilitar pagos de planilla, por ejemplo No cuando se paga por la CUT');
 /***********************************F-DAT-RAC-CONTA-53-20/05/2019****************************************/
+
+/***********************************I-DAT-EGS-CONTA-4-29/05/2019****************************************/
+select pxp.f_insert_tgui ('Configuración Tipo Presup ETASA', 'Configuración Tipo Presup ETASA', 'CTP', 'si', 22, '/sis_contabilidad/vista/config_tpre/ConfigTpre.php', 4, '', 'ConfigTpre', 'CONTA');
+select pxp.f_insert_testructura_gui ('CTP', 'CONF');
+/***********************************F-DAT-EGS-CONTA-4-29/05/2019****************************************/
+
