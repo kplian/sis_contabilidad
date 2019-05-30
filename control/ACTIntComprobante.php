@@ -12,7 +12,9 @@ ISSUE     FORK          FECHA:		       AUTOR                 DESCRIPCION
  #7      ENDEERT		27-12-2018     MANUEL GUERRA     crearon listado de tramites, y la modifiacion del nrotramite_aux
  #15     ENDEERT		04-01-2019     Miguel Mamani     corrección filtro por gestión interfaz visto bueno comprobantes
  * 1A			21/08/2018		EGS					se creo la funcion listarIntComprobanteCombo
-*/
+ #55 	ETR			30/05/2019			EGS				 Se agrega funcion par poder migrar comprobantes
+ 
+ */
 //require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
 // convert to PDF
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
@@ -826,6 +828,13 @@ class ACTIntComprobante extends ACTbase{
 		$this->objParam->defecto('dir_ordenacion','asc');
 		$this->objFunc=$this->create('MODIntComprobante');			
 		$this->res=$this->objFunc->listadoTramites($this->objParam);		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	function migrarComprobante(){//#55
+
+		$this->objFunc=$this->create('MODIntComprobante');			
+		$this->res=$this->objFunc->migrarComprobante($this->objParam);		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 	

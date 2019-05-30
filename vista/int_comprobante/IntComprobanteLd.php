@@ -12,7 +12,8 @@
    
  #1        		20-09-2011       RCM KPLIAN        CREACION
  #2             27-08-2018       RAC KPLIAN        adciona edicion de glosa
- * 
+ #55			30/05/2019		 EGS			   Se cre boton para poder migrar comprobantes a otra bd de pxp 
+
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -51,12 +52,14 @@ Phx.vista.IntComprobanteLd = {
 					scope:this,
 					tooltip : '<b>Cambio de Glosa</b> Permite editar la glosa del cbte, queda un BK en el log de seguridad'
 			});		
+		this.addButton('btnmigraCbte', {//#55
+				text : 'Migracion Comprobante',
+				iconCls : 'badjunto',
+				disabled : true,
+				handler : this.migraCbte,
+				tooltip : '<b>Migra Comprobante</b><br/>'
+			});		
 			
-			
-			
-		
-		
-	   
 	   this.init();	 
 	},
     
@@ -144,6 +147,7 @@ Phx.vista.IntComprobanteLd = {
             this.getBoton('btnObs').enable();
             this.getBoton('btnWizard').enable();
             this.getBoton('btnWizardGlosa').enable();
+            this.getBoton('btnmigraCbte').enable();  //#55
             
             
 			
@@ -170,7 +174,8 @@ Phx.vista.IntComprobanteLd = {
             this.getBoton('btnObs').disable();
             this.getBoton('btnWizard').disable() ;
             this.getBoton('btnWizardGlosa').disable(); 
-           
+            this.getBoton('btnmigraCbte').enable();	//#55
+          
 			
 	},
 	
@@ -251,7 +256,83 @@ Phx.vista.IntComprobanteLd = {
 				'id_int_comprobante': rec.data.id_int_comprobante,
 				'glosa1': rec.data.glosa1
 			   }, this.idContenedor, 'WizardGlosaCbte')
-		},	
+		},
+		
+		migraCbte: function () { //#55
+			   var migrar_todo;
+			   var filas = this.sm.getSelections();
+	                var data = [], aux = {};
+	                //arma una matriz de los identificadores de registros que se van a eliminar
+	                this.agregarArgsExtraSubmit();
+	                var rr = {};
+	                for (var i = 0; i < this.sm.getCount(); i++) {
+	                    aux = {};
+	                    aux[this.id_store] = filas[i].data[this.id_store];
+	                    aux.id_int_comprobante = filas[i].data.id_int_comprobante;
+	                    data.push(aux);
+	                }
+	     		var rec = {maestro: this.sm.getSelected().data, id_int_comprobante: Ext.util.JSON.encode(data)}
+				console.log("ver ooo ",rec);
+	
+			    var opcion = confirm('Seguro que quiere migrar los comprobantes con :'+rec.id_int_comprobante+' ');
+			    if (opcion == true) {
+			    				 Ext.Msg.confirm('Confirmación', 'Desea migrar los comprobantes que comparten el mismo numero de tramite (si/no)', function(btn) {
+								if (btn == "yes") {
+									migrar_todo = 'si';
+					               Phx.CP.loadingShow();
+										Ext.Ajax.request({
+											url : '../../sis_contabilidad/control/IntComprobante/migrarComprobante',
+											params : {
+												'id_int_comprobante' : rec.id_int_comprobante,
+												'todo':migrar_todo
+											},
+											success : function(resp){
+				                    				Ext.Msg.alert('mensaje', 'Comprobantes Migrados');
+													 Phx.CP.loadingHide();//para ocultar el loading al cargar el sucess
+				                   					 
+				               				 },
+											failure: function(resp){
+				                	 				Phx.CP.loadingHide();
+				                    					 var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+												     if (reg.ROOT.error) {
+												     	 Ext.Msg.alert('Error',reg.ROOT.detalle.mensaje)
+				                   					 }
+				               				 },
+										    timeout: this.timeout,
+										   scope: this
+										})
+								}
+								else{
+									migrar_todo = 'no';
+									Phx.CP.loadingShow();
+										Ext.Ajax.request({
+											url : '../../sis_contabilidad/control/IntComprobante/migrarComprobante',
+											params : {
+												'id_int_comprobante' : rec.id_int_comprobante,
+												'todo':migrar_todo
+											},
+											success : function(resp){
+				                	 				Ext.Msg.alert('mensaje', 'Comprobantes Migrados');
+													 Phx.CP.loadingHide();//para ocultar el loading al cargar el sucess
+				               				 },
+											failure: function(resp){
+				                	 				Phx.CP.loadingHide();
+				                    					 var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+												     if (reg.ROOT.error) {
+												     	 Ext.Msg.alert('Error',reg.ROOT.detalle.mensaje)
+				                   					 }
+				               				 },
+										    timeout: this.timeout,
+										   scope: this
+										})
+					               
+								}
+			 			});
+			    	
+				};
+			 
+
+	       },	
 		
 		
 };

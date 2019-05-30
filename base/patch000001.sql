@@ -5149,3 +5149,18 @@ COMMENT ON COLUMN conta.tint_comprobante.id_int_comprobante_migrado
 IS 'El nuevo id el cual se genero al hacer la migracion a la nueva Bd(etasa)';
 /***********************************F-SCP-EGS-CONTA-0-17/05/2019****************************************/
 
+/***********************************I-SCP-EGS-CONTA-11-29/05/2019****************************************/
+CREATE TABLE conta.tconfig_tpre (
+  id_conf_pre SERIAL,
+  id_tipo_cc INTEGER,
+  obs VARCHAR(100),
+  CONSTRAINT tconfig_tpre_id_tcc_key UNIQUE(id_tipo_cc),
+  CONSTRAINT tconfig_tpre_pkey PRIMARY KEY(id_conf_pre)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+/***********************************F-SCP-EGS-CONTA-11-29/05/2019****************************************/
+
+
+
+
