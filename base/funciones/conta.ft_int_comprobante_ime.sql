@@ -27,7 +27,8 @@ $body$
  #8 ETR         27-12-2018        RAC KPLIAN        se invierte valifacion de gestion y proceso de trasacciones, al editar comprobante
  #13 ETR        03-01-2019        RAC KPLIAN        se considera en reversion si la trasaccion fue forzada a comprometer (trabaja de manera similar a las actulizaciones)
  #32  ETR	    08/01/2019		  MMV			    Nuevo campo documento iva  si o no validar documentacion de via
-
+ #55 ETR        29/05/2019        EGS               Se agrega la logica para q migre comprobantes a otra bd pxp cuando el comprobante pase a validado y
+                                                    cuando se necesite exportar un comprobante validado
 ***************************************************************************/
 
 DECLARE
@@ -107,6 +108,15 @@ DECLARE
     v_gestion_fecha				    integer; --#3
     v_fecha_cbte_tmp                date;    --#3
     v_nro_tramite_aux               varchar;    --#7
+    
+    
+    v_migra_cbte                    varchar; --#55
+    j_comprobante                   JSON; --#55
+  	j_id_int_comprobante            JSON; --#55
+    v_id                            integer; --#55
+    v_migrados                      varchar; --#55
+    v_id_int_comprobante_migrado    integer; --#55
+    v_bandera_cbte                  boolean; --#55 
 
 
 BEGIN
@@ -1462,6 +1472,13 @@ BEGIN
                  		v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado del cuenta documentada id='||v_parametros.id_int_comprobante); 
           				v_resp = pxp.f_agrega_clave(v_resp,'operacion','falla');
                         v_resp = pxp.f_agrega_clave(v_resp,'desc_falla',v_result);
+                 
+                 --#55 Migra Comprobante a otra bd pxp cuando el comprobante pasa a validado       
+                 ELSIF v_result = 'Comprobante validado' THEN
+                        v_migra_cbte = (pxp.f_get_variable_global('conta_migrar_comprobante'))::varchar;      
+                        IF v_migra_cbte = 'true' THEN
+                         v_resp = conta.f_migrar_validar_centro_costo(v_parametros.id_int_comprobante,p_id_usuario);
+                        END IF;
                  END IF;
                  
                  
@@ -2122,7 +2139,61 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
             
-		end;       
+		end;
+                 /*********************************    
+      #TRANSACCION:  'CONTA_MIGCBTE_IME'
+      #DESCRIPCION:	permite migrar comprobantes a una bd separada
+      #AUTOR:		   EGS
+      #FECHA:		    17/05/2019
+      #ISSUE      #55
+      ***********************************/
+
+      elsif(p_transaccion='CONTA_MIGCBTE_IME')then
+
+          begin
+              j_id_int_comprobante := v_parametros.id_int_comprobante;
+              v_bandera_cbte = false;
+              v_migrados = ' ';
+              FOR j_comprobante IN (SELECT *
+                               FROM json_array_elements(j_id_int_comprobante)) LOOP
+                  	
+                  SELECT  
+                      cbte.id_int_comprobante_migrado
+                  INTO
+                      v_id_int_comprobante_migrado  
+                  FROM conta.tint_comprobante  cbte                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+                  WHERE cbte.id_int_comprobante = (j_comprobante ->> 'id_int_comprobante')::integer;
+                  
+                  IF v_id_int_comprobante_migrado is not null THEN
+                      v_bandera_cbte = true;
+                      v_migrados = v_migrados||(j_comprobante ->> 'id_int_comprobante')::varchar||',';
+                  END IF;
+                  
+              END LOOP;
+              IF v_bandera_cbte = true THEN
+                  v_migrados = SUBSTRING (v_migrados,1,length(v_migrados) - 1);
+                  v_migrados = 'Los Comprobantes con Id '||v_migrados||' Ya fueron migrados .Quitelos de la seleccion y pruebe de nuevo';
+                  RAISE EXCEPTION '%',v_migrados; 
+              
+              ELSE 
+            
+                  FOR j_comprobante IN (SELECT *
+                                   FROM json_array_elements(j_id_int_comprobante)) LOOP
+                                       
+                      v_id = (j_comprobante ->> 'id_int_comprobante'):: INTEGER;
+
+                      v_migra_cbte = (pxp.f_get_variable_global('conta_migrar_comprobante'))::varchar;      
+                      
+                      IF v_migra_cbte = 'true' THEN
+                          v_resp = conta.f_migrar_armar_int_comprobante(NULL,v_id,v_parametros.todo,null);
+                      ELSE 
+                          raise exception 'No esta Habilitado la Migracion de Comprobantes';    
+                      END IF;
+                  END LOOP;
+            END IF;
+
+          RETURN v_resp;          
+		end;         
     
     else
      

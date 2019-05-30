@@ -1663,3 +1663,15 @@ select pxp.f_insert_tgui ('Configuración Tipo Presup ETASA', 'Configuración Ti
 select pxp.f_insert_testructura_gui ('CTP', 'CONF');
 /***********************************F-DAT-EGS-CONTA-4-29/05/2019****************************************/
 
+/***********************************I-DAT-EGS-CONTA-05-29/05/2019****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_host_migracion', E'hostaddr=172.18.79.XXXX port=5432 dbname=db user=dbamigracion password=dbamigracion', E'configuracion para la conexion para migrar el comprobante al host mencionado'),
+  (E'conta_migrar_comprobante', E'false', E'habilita migracion de comprobantes validados a centro de costo seleccionados');
+
+/***********************************F-DAT-EGS-CONTA-05-29/05/2019****************************************/
+
+
+
+

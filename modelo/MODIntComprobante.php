@@ -18,7 +18,8 @@
 #33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
 #50	 ETR		17/05/2019			manuel guerra		agregar filtro depto
 #51		ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado
-*/
+#55 	ETR		30/05/2019			EGS								Se agrega funcion par poder migrar comprobantes
+ */
 class MODIntComprobante extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -961,6 +962,21 @@ class MODIntComprobante extends MODbase{
 		$this->ejecutarConsulta();
 		//Devuelve la respuesta
 		return $this->respuesta;
-	}		
+	}
+	
+	function migrarComprobante(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_comprobante_ime';
+		$this->transaccion='CONTA_MIGCBTE_IME';
+		$this->tipo_procedimiento='IME';
+		//Definicion de la lista del resultado del query		
+		$this->setParametro('id_int_comprobante','id_int_comprobante','json_text');
+		$this->setParametro('todo','todo','varchar');
+							
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}				
 }
 ?>
