@@ -5161,6 +5161,22 @@ CREATE TABLE conta.tconfig_tpre (
 WITH (oids = false);
 /***********************************F-SCP-EGS-CONTA-11-29/05/2019****************************************/
 
+/***********************************I-SCP-EGS-CONTA-12-05/06/2019****************************************/
+CREATE TABLE conta.tconfig_auxiliar (
+  id_config_auxiliar SERIAL,
+  id_auxiliar INTEGER,
+  descripcion VARCHAR,
+  CONSTRAINT tconfig_auxiliar_id_auxiliar_key UNIQUE(id_auxiliar),
+  CONSTRAINT tconfig_auxiliar_pkey PRIMARY KEY(id_config_auxiliar),
+  CONSTRAINT tconfig_auxiliar_fk FOREIGN KEY (id_auxiliar)
+    REFERENCES conta.tauxiliar(id_auxiliar)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE
+) INHERITS (pxp.tbase)
 
+WITH (oids = false);
+
+/***********************************F-SCP-EGS-CONTA-12-05/06/2019****************************************/
 
 

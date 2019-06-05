@@ -7,18 +7,18 @@ $body$
 /**************************************************************************
  SISTEMA:       Sistema de Contabilidad
  FUNCION:       conta.f_validar_centro_costo
- DESCRIPCION:   Verifica si un comprobante tiene por lo menos un centro de costo asociado a un tipo cc
-                registrado en la tabla conta.tconfig_tpre . si tiene registrado un centro de costo 
-                el comprobante es migrado junto a todos los comprobantes _relacionados por numero de tramite.                
+ DESCRIPCION:   Verifica si un comprobante tiene por lo menos un centro de costo
+                registrado en la tabla conta.tconfig_tpre o un auxiliar valido de la tabla conta.tconfig_auxiliar . si tiene registrado un centro de costo 
+                el comprobante es migrado junto a todos los comprobantes _relacionados.                
  AUTOR:         (EGS)  EndeETR
- FECHA:         29/05/2019           
+ FECHA:         18/03/2019            
  COMENTARIOS:    
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- ISSUE      FECHA:         AUTOR:            DESCRIPCION:    
- #55        29/05/2019      EGS              Creacion            
-         
+ISSUE:          FECHA:      AUTOR:   DESCRIPCION:    
+#57 endeEtr     05/06/2016  EGS      Se agrega la logica que verifique que tenga auxiliares validos      
+      
 ***************************************************************************/
 
 DECLARE
@@ -28,7 +28,8 @@ DECLARE
     v_consulta                              varchar;
     v_centros_costo_valido                  record;
     v_existe                                BOOLEAN;
-    v_int_trassaccion                       record;    
+    v_int_trassaccion                       record;
+    v_auxiliar_valido                       record;    
 BEGIN
 
   v_nombre_funcion = 'conta.f_migrar_validar_centro_costo_migracion';
@@ -56,7 +57,28 @@ BEGIN
                                 v_existe = true; 
                             END IF;                                                     
                     END LOOP;
-         END LOOP; 
+        END LOOP;
+        --si no existe centro de costo valido se verifica si existe un auxiliar de etasa valido
+        IF v_existe = false THEN  --#57
+             FOR    v_int_trassaccion IN (
+             --recuperamos los centros de costo de las transacciones del comprobante
+                SELECT  
+                    intra.id_auxiliar
+                FROM  conta.tint_transaccion intra  
+                WHERE intra.id_int_comprobante = p_id_int_comprobante
+             )LOOP                 
+                       FOR  v_auxiliar_valido in  (
+                            --recuperamos los centros de costos validos en la configuracion
+                                    SELECT 
+                                        cfgaux.id_auxiliar
+                                    FROM conta.tconfig_auxiliar cfgaux )LOOP
+                                    --comparamos los centro de costo del comprobante contra los validos
+                                    IF v_int_trassaccion.id_auxiliar = v_auxiliar_valido.id_auxiliar  THEN
+                                        v_existe = true; 
+                                    END IF;                                                     
+                        END LOOP;
+                END LOOP;
+        END IF;
             --si existe un centro de costo valido en el comprobante se migra junto a todos los comprobantes
             -- con el mismo numero de tramite   
             IF v_existe = true THEN
