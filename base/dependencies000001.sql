@@ -5750,3 +5750,10 @@ AS
        LEFT JOIN conta.ttipo_relacion_comprobante trc ON
          trc.id_tipo_relacion_comprobante = incbte.id_tipo_relacion_comprobante;
 /**********************************F-DEP-EGS-CONTA-01-17/05/2019****************************************/
+/**********************************I-DEP-EGS-CONTA-02-05/06/2019****************************************/
+select pxp.f_insert_testructura_gui ('CFGETASA', 'CONF');
+select pxp.f_insert_testructura_gui ('CTP', 'CFGETASA');
+select pxp.f_insert_testructura_gui ('CFGAUX', 'CFGETASA');
+
+/**********************************F-DEP-EGS-CONTA-02-05/06/2019****************************************/
+

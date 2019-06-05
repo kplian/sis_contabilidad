@@ -1672,6 +1672,10 @@ VALUES
 
 /***********************************F-DAT-EGS-CONTA-05-29/05/2019****************************************/
 
-
+/***********************************I-DAT-EGS-CONTA-06-05/06/2019****************************************/
+select pxp.f_insert_tgui ('Configuraciones Etasa', 'configuraciones e etasa', 'CFGETASA', 'si', 22, '', 3, '', '', 'CONTA');
+select pxp.f_insert_tgui ('Configuración Tipo Presup ETASA', 'Configuración Tipo Presup ETASA', 'CTP', 'si', 1, '/sis_contabilidad/vista/config_tpre/ConfigTpre.php', 4, '', 'ConfigTpre', 'CONTA');
+select pxp.f_insert_tgui ('Configuracion Auxiliar Etasa', 'Configuracion Auxiliar Etasa', 'CFGAUX', 'si', 2, 'sis_contabilidad/vista/config_auxiliar/ConfigAuxiliar.php', 4, '', 'ConfigAuxiliar', 'CONTA');
+/***********************************F-DAT-EGS-CONTA-06-05/06/2019****************************************/
 
 
