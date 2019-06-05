@@ -16,7 +16,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
-ISSUE:          FECHA:      AUTOR:   DESCRIPCION:    
+ISSUE:          FECHA:      AUTOR:   DESCRIPCION: 
+ ISSUE      FECHA:         AUTOR:            DESCRIPCION:    
+#55        29/05/2019      EGS              Creacion         
 #57 endeEtr     05/06/2016  EGS      Se agrega la logica que verifique que tenga auxiliares validos      
       
 ***************************************************************************/
