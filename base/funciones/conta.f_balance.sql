@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_balance (
   p_administrador integer,
   p_id_usuario integer,
@@ -18,6 +20,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
    #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
+   #60    ETR     10/06/2019		  Miguel Mamani	  Parámetro orden de trabajo
 
 ***************************************************************************/
 
@@ -42,6 +45,7 @@ v_total 			numeric;
 v_tipo_cuenta		varchar;
 v_incluir_cierre	varchar;
 v_incluir_sinmov	varchar;
+va_id_orden 		integer[]; --#60
 
 
 BEGIN
@@ -72,6 +76,11 @@ BEGIN
         if pxp.f_existe_parametro(p_tabla,'incluir_sinmov') then
           v_incluir_sinmov = v_parametros.incluir_sinmov;
         end if;
+        
+        --#60 crear un array con las ot separadas por comas
+        IF  v_parametros.id_ordenes_trabajos  is not null and v_parametros.id_ordenes_trabajos != '' THEN
+          va_id_orden = string_to_array(v_parametros.id_ordenes_trabajos,',')::integer[]; 
+        END IF;
 
 
         -- 1) Crea una tabla temporal con los datos que se utilizaran
@@ -101,7 +110,8 @@ BEGIN
                                           v_tipo_cuenta,
                                           v_incluir_cierre,
                                           v_parametros.tipo_balance,
-                                          v_parametros.tipo_moneda		--#33
+                                          v_parametros.tipo_moneda,		    --#33
+                                          va_id_orden	--#60
                                           );
        
      

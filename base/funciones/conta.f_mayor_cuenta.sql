@@ -13,7 +13,8 @@ CREATE OR REPLACE FUNCTION conta.f_mayor_cuenta (
   p_id_auxiliar integer = NULL::integer,
   p_id_int_comprobante_ori integer = NULL::integer,
   p_id_ot integer = NULL::integer,
-  p_id_centro_costo integer = NULL::integer
+  p_id_centro_costo integer = NULL::integer,
+  p_id_ordenes integer [] = NULL::integer[]
 )
 RETURNS numeric [] AS
 $body$
@@ -43,7 +44,7 @@ v_resp_aux = conta.f_mayor_cuenta(v_registros.id_cuenta,
  ISSUE            FECHA:		      AUTOR                 DESCRIPCION
  ---------------------------------------------------------------------------------------------   
  #00  ETR       07/03/2018        RAC KPLIAN        si el depto de manda null el mayor se hace dobre todos los departamentos
-
+ #60  ETR       10/06/2019        RAC KPLIAN        añade array de ordenes de trabajo opcionalmente     
 */
 
 
@@ -235,7 +236,15 @@ BEGIN
                          0=0 
                     ELSE
                        t.id_centro_costo = p_id_centro_costo 
-                    END);
+                    END) AND
+              (CASE WHEN p_id_ordenes is NULL  THEN  
+                         0=0 
+                    ELSE
+                       t.id_orden_trabajo = ANY(p_id_ordenes)  
+                    END);  --#60 añade filtro de array de ordenes de trabajo
+                    
+                    
+                    
                     
        
           
@@ -343,7 +352,8 @@ BEGIN
                                                  p_tipo_saldo,
                                                  p_id_int_comprobante_ori,
                                                  p_id_ot,
-                                                 p_id_centro_costo);
+                                                 p_id_centro_costo,
+                                                 p_id_ordenes); --#60 añade recursivamente array de ordenes de trabajo
  
                
                --raise notice '>>>>>>> % regresa maryo = %',v_registros.id_cuenta, v_resp_mayor;

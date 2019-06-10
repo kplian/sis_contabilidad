@@ -8,6 +8,7 @@
 HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #33         10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
+#60         10/06/2019        RAC             parametros  orden de trabajo reporte de balance OT
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -254,7 +255,53 @@ Phx.vista.FormFiltroBalanceCuentas=Ext.extend(Phx.frmInterfaz,{
             },
             type:'ComboBox',
             form:true
-        } // #33
+        }, // #33
+        
+        { //#60 bigin
+          config:{			
+			 name: 'id_ordenes_trabajos',
+             fieldLabel: 'Orden de Costo',
+             allowBlank: true,
+			 tip:'Puede escoger uan rama especifica para reportar',
+			 tinit:false,
+			 tasignacion:true,
+			 resizable:true,            
+             emptyText : 'Ordenes...',            
+             tpl: '<tpl for="."><div class="x-combo-list-item" ><div class="awesomecombo-item {checked}">{codigo}-{desc_orden}</div><p style="padding-left: 20px;">Tipo:{tipo}</p> </div></tpl>',
+             store : new Ext.data.JsonStore({
+                            url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajoAll',
+                            id : 'id_orden_trabajo',
+                            root: 'datos',
+                            sortInfo:{
+                                    field: 'motivo_orden',
+                                    direction: 'ASC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden','codigo','tipo'],
+                            remoteSort: true,
+                            baseParams:{par_filtro:'desc_orden#motivo_orden'}
+                    }),
+               valueField: 'id_orden_trabajo',
+               displayField: 'desc_orden',
+               gdisplayField: 'desc_orden',
+               hiddenName: 'id_ordenes_trabajos',
+               forceSelection:true,
+               typeAhead: false,
+               triggerAction: 'all',
+                listWidth:350,
+               lazyRender:true,
+               mode:'remote',
+               pageSize:10,
+               queryDelay:1000,
+               width:350,
+               listWidth:'280',               
+               enableMultiSelect: true,
+               minChars:2
+            },   			
+   			type:'AwesomeCombo',
+   			id_grupo:0,
+   			form:true
+         } //#60 end
     ],
     labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
     title: 'Filtro de mayores',

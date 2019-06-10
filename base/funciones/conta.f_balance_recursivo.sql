@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_balance_recursivo (
   p_desde date,
   p_hasta date,
@@ -8,7 +10,8 @@ CREATE OR REPLACE FUNCTION conta.f_balance_recursivo (
   p_tipo_cuenta varchar,
   p_incluir_cierre varchar = 'no'::character varying,
   p_tipo_balance varchar = 'general'::character varying,
-  p_tipo_moneda varchar = 'MB'::character varying
+  p_tipo_moneda varchar = 'MB'::character varying,
+  p_id_ordenes integer [] = NULL::integer[]
 )
 RETURNS numeric AS
 $body$
@@ -24,6 +27,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
    #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
+   #60    ETR     10/06/2019		  Miguel Mamani	  Parámetro orden de trabajo, p_id_ordenes
 
 ***************************************************************************/
 DECLARE
@@ -62,9 +66,9 @@ BEGIN
 
 
      -- incremetmaos el nivel
-    v_nivel = p_nivel_ini +1;
+     v_nivel = p_nivel_ini +1;
 
-    -- obtiene la gestion de la fecha inicial
+     -- obtiene la gestion de la fecha inicial
 
      select
              ges.id_gestion
@@ -106,7 +110,25 @@ BEGIN
 
 
                    IF v_registros.sw_transaccional = 'movimiento' THEN
-                       va_mayor = conta.f_mayor_cuenta(v_registros.id_cuenta, p_desde, p_hasta, p_id_deptos, p_incluir_cierre);
+                       
+                       --#60 agrega parametros de para array de ordenes de trabajo, los demas valores adicionados son los que la funcion recibe por defecto
+                       va_mayor = conta.f_mayor_cuenta( v_registros.id_cuenta, 
+                                                        p_desde, 
+                                                        p_hasta, 
+                                                        p_id_deptos, 
+                                                        p_incluir_cierre,
+                                                        'todos', --p_incluir_apertura
+                                                        'todos', --p_incluir_aitb
+                                                        'defecto_cuenta', --p_signo_balance
+                                                        'balance', --p_tipo_saldo
+                                                        NULL, --p_id_auxiliar
+                                                        NULL, --p_id_int_comprobante_ori
+                                                        NULL, --p_id_ot
+                                                        NULL, --p_id_centro_costo
+                                                        p_id_ordenes --#60 array de ordenes de trabajo
+                                                        );
+                       
+                       
                        if (p_tipo_moneda = 'MB')then --#33
                        		v_mayor = va_mayor[1];
                        elsif(p_tipo_moneda = 'MT')then
@@ -127,7 +149,8 @@ BEGIN
                                                p_tipo_cuenta,
                                                p_incluir_cierre,
                                                p_tipo_balance,
-                                               p_tipo_moneda);
+                                               p_tipo_moneda,
+                                               p_id_ordenes);  --#60 añade aprametro recursivo
                    END IF;              
                                    
                 

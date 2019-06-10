@@ -6,10 +6,11 @@
 *@date 21-02-2013 15:04:03
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
  	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
-   	#  1			     17/12/2018			EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
-	# 16	ENDETRASM	 09/01/2018			Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
-	#  28	     	17/12/2018		kplian	MMV							Reporte cuadro de actualización
-   #33    ETR     10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
+   	#  1			     17/12/2018	  EGS							Se aumento el campo ex_auxiliar este campo exige auxiliar a la cuenta
+	# 16	ENDETRASM	 09/01/2018	  Miguel Mamani					Asignar Cuenta para actualizare en las cuentas de gasto
+	#  28	     	17/12/2018		  kplian	MMV					reporte cuadro de actualización
+    #33    ETR     10/02/2019		  Miguel Mamani	                Parámetro tipo de moneda reporte balance de cuentas
+    #60    ETR     10/06/2019		  RAC KPLIAN                    Parámetro orden de trabajo
 
  */
 
@@ -232,6 +233,7 @@ class MODCuenta extends MODbase{
 		$this->setParametro('tipo_balance','tipo_balance','varchar'); 
 		$this->setParametro('incluir_sinmov','incluir_sinmov','varchar');
         $this->setParametro('tipo_moneda','tipo_moneda','varchar'); //#33
+        $this->setParametro('id_ordenes_trabajos','id_ordenes_trabajos','varchar'); //#60  
        //Definicion de la lista del resultado del query
 	     $this->captura('id_cuenta','int4');     
 		 $this->captura('nro_cuenta','varchar');
