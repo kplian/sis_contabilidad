@@ -27,7 +27,7 @@ class MODRango extends MODbase{
 		$this->capturaCount('comprometido','numeric');
 		$this->capturaCount('ejecutado','numeric');
 		$this->capturaCount('balance_mb','numeric');
-		
+		$this->capturaCount('disponible_mb','numeric');
 		
 		$this->setParametro('desde','desde','date');
 		$this->setParametro('hasta','hasta','date');
@@ -59,6 +59,7 @@ class MODRango extends MODbase{
 		$this->captura('comprometido','numeric');
 		$this->captura('ejecutado','numeric');
 		$this->captura('balance_mb','numeric');
+		$this->captura('disponible_mb','numeric');
 		$this->captura('id_gestion','int4');
 		
 		

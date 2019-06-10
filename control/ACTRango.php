@@ -10,8 +10,9 @@
 class ACTRango extends ACTbase{    
 			
 	function listarRango(){
-		$this->objParam->defecto('ordenacion','id_gestion desc, id_periodo');
-
+		//$this->objParam->defecto('ordenacion','id_gestion desc, id_periodo');  ran.id_periodo ASC
+		$this->objParam->defecto('ordenacion','');
+		
 		$this->objParam->defecto('dir_ordenacion','asc');
 		if($this->objParam->getParametro('id_tipo_cc')!=''){
             $this->objParam->addFiltro("ran.id_tipo_cc = ''".$this->objParam->getParametro('id_tipo_cc')."''");    
@@ -36,7 +37,7 @@ class ACTRango extends ACTbase{
 		$temp['comprometido'] = $this->res->extraData['comprometido'];
 		$temp['ejecutado'] = $this->res->extraData['ejecutado'];
 		$temp['balance_mb'] = $this->res->extraData['balance_mb'];	
-		
+		$temp['disponible_mb'] = $this->res->extraData['disponible_mb'];	
 				
 							
 				

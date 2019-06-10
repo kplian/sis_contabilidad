@@ -318,6 +318,28 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
+		},
+		{
+			config:{
+				name: 'disponible_mb',
+				fieldLabel: 'Disponible MB',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+					}
+			},
+				type:'NumberField',
+				filters:{pfiltro:'ran.disponible_mb',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:false
 		}
 	],
 	tam_pag:50,	
@@ -343,12 +365,13 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'periodo','gestion','tipo_reg','desc_tipo_cc',
-		'memoria','formulado','comprometido','ejecutado','balance_mb','id_gestion'
+		'memoria','formulado','comprometido','ejecutado','balance_mb','disponible_mb','id_gestion'
 		
 		
 	],
 	sortInfo:{
-		field: 'per.periodo',
+		//field: 'per.periodo',
+		field: 'id_periodo',
 		direction: 'ASC'
 	},
 	bdel:false,
@@ -396,7 +419,8 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                       	        'hasta': record.data.fecha_fin,
                       	        'id_tipo_cc': record.data.id_tipo_cc,
                       	        'desc_tipo_cc': record.data.desc_tipo_cc,
-                      	        'id_gestion': record.data.id_gestion
+                      	        'id_gestion': record.data.id_gestion,
+                      	        'cbte_cierre':'no'
                       	      }
                       
                      },
@@ -420,7 +444,7 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                       	        'fecha_fin': record.data.fecha_fin,
                       	        'id_tipo_cc': record.data.id_tipo_cc,
                       	        'desc_tipo_cc': record.data.desc_tipo_cc,
-                      	        'id_gestion': record.data.id_gestion
+                      	        'id_gestion': record.data.id_gestion,
                       	      }
                       
                      },
