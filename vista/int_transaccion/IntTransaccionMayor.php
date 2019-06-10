@@ -36,6 +36,7 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
     title:'Mayor',
 	constructor:function(config){		
 		var me = this;
+		console.log('?',me);
 		this.maestro=config.maestro;
 		 //Agrega combo de moneda
 		
