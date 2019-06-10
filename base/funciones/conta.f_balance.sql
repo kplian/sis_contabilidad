@@ -77,8 +77,8 @@ BEGIN
           v_incluir_sinmov = v_parametros.incluir_sinmov;
         end if;
         
-        --#60 crear un array con las ot separadas por comas
-        IF  v_parametros.id_ordenes_trabajos  is not null and v_parametros.id_ordenes_trabajos != '' THEN
+        --#60 crear un array con las ot separadas por comas       
+        IF  pxp.f_existe_parametro(p_tabla,'id_ordenes_trabajos') AND v_parametros.id_ordenes_trabajos  is not null AND  v_parametros.id_ordenes_trabajos != '' THEN
           va_id_orden = string_to_array(v_parametros.id_ordenes_trabajos,',')::integer[]; 
         END IF;
 
