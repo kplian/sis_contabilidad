@@ -1678,4 +1678,7 @@ select pxp.f_insert_tgui ('Configuración Tipo Presup ETASA', 'Configuración Ti
 select pxp.f_insert_tgui ('Configuracion Auxiliar Etasa', 'Configuracion Auxiliar Etasa', 'CFGAUX', 'si', 2, 'sis_contabilidad/vista/config_auxiliar/ConfigAuxiliar.php', 4, '', 'ConfigAuxiliar', 'CONTA');
 /***********************************F-DAT-EGS-CONTA-06-05/06/2019****************************************/
 
+/***********************************I-DAT-EGS-CONTA-07-11/06/2019****************************************/
+select pxp.f_insert_tgui ('Configuracion Marca Cbte', 'Configuracion de la marca de comprobante', 'cbtemarca', 'si', 20, 'sis_contabilidad/vista/marca/Marca.php', 3, '', 'Marca', 'CONTA');
+/***********************************F-DAT-EGS-CONTA-07-11/06/2019****************************************/
 

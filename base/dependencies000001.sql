@@ -5756,4 +5756,8 @@ select pxp.f_insert_testructura_gui ('CTP', 'CFGETASA');
 select pxp.f_insert_testructura_gui ('CFGAUX', 'CFGETASA');
 
 /**********************************F-DEP-EGS-CONTA-02-05/06/2019****************************************/
+/**********************************I-DEP-EGS-CONTA-03-11/06/2019****************************************/
+select pxp.f_insert_testructura_gui ('cbtemarca', 'CONF');
+/**********************************F-DEP-EGS-CONTA-03-11/06/2019****************************************/
+
 
