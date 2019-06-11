@@ -3,8 +3,8 @@
  * 
  ISSUE     FORK          FECHA:		       AUTOR                 DESCRIPCION
    
- #7        ENDEERT		27-12-2018        MANUEL GUERRA            CREACION
-*/
+ #61        ENDEERT		11/06/2019       	EGS            CREACION y permite blanco en id_marca
+ */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 
@@ -51,7 +51,7 @@ Phx.vista.WizardMarcaCbte = Ext.extend(Phx.frmInterfaz,{
             config:{
                 name: 'id_marca',
                 fieldLabel: 'Marc. Cbte',
-                allowBlank: false,
+                allowBlank: true,//#61
                 emptyText: 'Elegir ...',
                 tinit:false,
                 resizable:true,
