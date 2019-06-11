@@ -5184,3 +5184,46 @@ ALTER TABLE conta.tplantilla_comprobante
   ADD UNIQUE (codigo);
 
 /***********************************F-SCP-EGS-CONTA-13-06/06/2019****************************************/
+
+/***********************************I-SCP-EGS-CONTA-14-11/06/2019****************************************/
+CREATE TABLE conta.tmarca (
+  id_marca SERIAL,
+  descripcion VARCHAR,
+  codigo VARCHAR,
+  CONSTRAINT tconfig_marca_codigo_key UNIQUE(codigo),
+  CONSTRAINT tmarca_pkey PRIMARY KEY(id_marca)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+CREATE TABLE conta.tcbte_marca (
+  id_cbte_marca SERIAL,
+  id_int_comprobante INTEGER,
+  id_marca INTEGER,
+  CONSTRAINT tcbte_marca_pkey PRIMARY KEY(id_cbte_marca),
+  CONSTRAINT fk_tcbte_marca__id_int_comprobante FOREIGN KEY (id_int_comprobante)
+    REFERENCES conta.tint_comprobante(id_int_comprobante)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE,
+  CONSTRAINT fk_tcbte_marca__id_marca FOREIGN KEY (id_marca)
+    REFERENCES conta.tmarca(id_marca)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+ALTER TABLE conta.tcbte_marca
+  ALTER COLUMN id_cbte_marca SET STATISTICS 0;
+
+ALTER TABLE conta.tcbte_marca
+  ALTER COLUMN id_int_comprobante SET STATISTICS 0;
+
+ALTER TABLE conta.tcbte_marca
+  ALTER COLUMN id_marca SET STATISTICS 0;
+/***********************************F-SCP-EGS-CONTA-14-11/06/2019****************************************/
+
+
+

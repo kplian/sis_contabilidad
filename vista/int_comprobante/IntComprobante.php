@@ -8,7 +8,8 @@ HISTORIAL DE MODIFICACIONES:
 #32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
 #50	    ETR		17/05/2019			manuel guerra		    agregar filtro depto
 #51		ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado 
-*/
+#61		ETR		11/06/2019			EGS						Se creo el campo Marca en el comprobante
+ */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -111,6 +112,14 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				disabled : true,
 				handler : this.loadWizardTramite,
 				tooltip : '<b>Hacer editable Nro Tramite</b>'
+			});
+			
+			this.addButton('btnMarca', {///#61
+				text : 'Editar Mar.Cbte',
+				iconCls : 'balert',
+				disabled : true,
+				handler : this.cfgMarca,
+				tooltip : '<b>Marca el Comprobante</b>'
 			});
 
 			this.bloquearOrdenamientoGrid();
@@ -2109,13 +2118,17 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		preparaMenu : function(n) {
 			var tb = Phx.vista.IntComprobante.superclass.preparaMenu.call(this);
 			var rec = this.sm.getSelected();
-			this.getBoton('btnNroTramite').enable();			
+			this.getBoton('btnNroTramite').enable();
+			this.getBoton('btnMarca').enable();	//#61		
+			
 			return tb;
 		},
 		//
 		liberaMenu : function() {
 			var tb = Phx.vista.IntComprobante.superclass.liberaMenu.call(this);
-			this.getBoton('btnNroTramite').disable(); 
+			this.getBoton('btnNroTramite').disable();
+			this.getBoton('btnMarca').disable(); //#61
+ 
 		},
 		//#7
 		loadWizardTramite : function() {			
@@ -2129,6 +2142,18 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				'nro_tramite_aux': rec.data.nro_tramite_aux
 			}, 
 			this.idContenedor, 'WizardTramiteCbte')
+		},	
+		
+		cfgMarca : function() {	//#61		
+			var rec = this.sm.getSelected();			
+			Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_comprobante/WizardMarcaCbte.php', 
+			'Cfg Marca  ...', {
+				width : 400,
+				height : 150
+			}, {
+				'id_int_comprobante': rec.data.id_int_comprobante,
+			}, 
+			this.idContenedor, 'WizardMarcaCbte')
 		},	
 		
 		
