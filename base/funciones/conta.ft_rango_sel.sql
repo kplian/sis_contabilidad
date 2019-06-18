@@ -16,11 +16,11 @@ $body$
  FECHA:	        22-06-2017 21:30:05
  COMENTARIOS:	
 ***************************************************************************
- HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ HISTORIAL DE MODIFICACIONES:
+ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+  #62 		 18/06/2019		  Manuel Guerra  corrección bug, agregación de campo sumatoria
+  
 ***************************************************************************/
 
 DECLARE
@@ -42,16 +42,16 @@ BEGIN
 	/*********************************    
  	#TRANSACCION:  'CONTA_RAN_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		rac	
+ 	#AUTOR:		rac	 #62
  	#FECHA:		22-06-2017 21:30:05
 	***********************************/
 
 	if(p_transaccion='CONTA_RAN_SEL')then
      				
     	begin
-        
+        	
              v_filtro = ' 0=0 ';
-              
+            -- raise exception '%',v_parametros; 
              --si tengo fechas obtenemos los periodos correpondinetes
              if pxp.f_existe_parametro(p_tabla,'desde') and pxp.f_existe_parametro(p_tabla,'hasta') then
                 
@@ -62,12 +62,9 @@ BEGIN
                   from param.tperiodo per
                   where   v_parametros.desde BETWEEN per.fecha_ini and per.fecha_fin 
                       OR v_parametros.hasta BETWEEN per.fecha_ini and per.fecha_fin
-                      OR per.fecha_fin BETWEEN v_parametros.desde and v_parametros.hasta;
-                      
-                  v_filtro = ' ran.id_periodo in ('||COALESCE(v_periodo,'0')||')';
-                    
-            end if;
-        
+                      OR per.fecha_fin BETWEEN v_parametros.desde and v_parametros.hasta;                      
+                  v_filtro = ' ran.id_periodo in ('||COALESCE(v_periodo,'0')||')';            
+            end if;          
     		--Sentencia de la consulta
 			v_consulta:='select
 						ran.id_rango,
@@ -96,6 +93,7 @@ BEGIN
   						ran.comprometido,
   						ran.ejecutado,
                         (ran.debe_mb - ran.haber_mb) as balance_mb,
+                        (ran.formulado-ran.comprometido) as disponible_mb,
                         ges.id_gestion
                 from conta.trango ran
                      inner join param.ttipo_cc tcc on tcc.id_tipo_cc = ran.id_tipo_cc
@@ -108,7 +106,8 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+--raise notice '%',v_consulta;
+--raise exception '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -117,7 +116,7 @@ BEGIN
 	/*********************************    
  	#TRANSACCION:  'CONTA_RAN_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		rac	
+ 	#AUTOR:		rac	#62
  	#FECHA:		22-06-2017 21:30:05
 	***********************************/
 
@@ -151,8 +150,9 @@ BEGIN
                                  sum(memoria) as memoria,
                                  sum(formulado) as formulado,
                                  sum(comprometido) as comprometido,
-                                 sum(ejecutado) as ejecutado,
-                                 sum(ran.debe_mb -  ran.haber_mb) as balance_mb
+                                 sum(ejecutado) as ejecutado,                                 
+                                 sum(ran.debe_mb -  ran.haber_mb) as balance_mb,
+                                 sum(ran.formulado - ran.comprometido) as disponible_mb
 					    from conta.trango ran
                              inner join param.ttipo_cc tcc on tcc.id_tipo_cc = ran.id_tipo_cc
                              inner join param.tperiodo per on per.id_periodo = ran.id_periodo
