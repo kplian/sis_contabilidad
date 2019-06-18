@@ -7,17 +7,17 @@ CREATE OR REPLACE FUNCTION conta.ft_cbte_marca_ime (
 RETURNS varchar AS
 $body$
 /**************************************************************************
- SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.ft_cbte_marca_ime
+ SISTEMA:        Sistema de Contabilidad
+ FUNCION:         conta.ft_cbte_marca_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tcbte_marca'
- AUTOR: 		 (egutierrez)
- FECHA:	        10-06-2019 20:02:44
- COMENTARIOS:	
+ AUTOR:          (egutierrez)
+ FECHA:            10-06-2019 20:02:44
+ COMENTARIOS:    
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-#ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				10-06-2019 20:02:44								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tcbte_marca'    
- #
+#ISSUE                FECHA                AUTOR                DESCRIPCION
+ #0                10-06-2019 20:02:44                                Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'conta.tcbte_marca'    
+ #61               11/06/2019              EGS                        Elimina si no existe ni una marca
  ***************************************************************************/
 
 DECLARE
@@ -173,8 +173,12 @@ BEGIN
                   p_id_usuario);                 
                 
                 END IF; 
-            END LOOP;  
+            END LOOP; 
+            IF v_parametros.id_marca <> '' THEN 
             v_consulta = 'DELETE FROM conta.tcbte_marca WHERE id_int_comprobante = '||v_parametros.id_int_comprobante||' and id_marca not in ('||v_parametros.id_marca||')';  
+            ELSE
+            v_consulta = 'DELETE FROM conta.tcbte_marca WHERE id_int_comprobante = '||v_parametros.id_int_comprobante;  --#61
+            END IF;
             --raise exception 'v_consulta %',v_consulta;
             EXECUTE (v_consulta);
             
