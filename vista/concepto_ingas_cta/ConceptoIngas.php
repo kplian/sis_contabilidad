@@ -30,9 +30,9 @@ Phx.vista.ConceptoIngasCuenta = {
 		  height:'50%',
 		  cls:'ConceptoPartida'
 		 }],
-   bedit:true,
-   bnew:true,
-   bdel:true,
+   bedit:false,
+   bnew:false,
+   bdel:false,
    bsave:false,
    EnableSelect : function (n, extra) {
    		var selected = this.sm.getSelected().data;
