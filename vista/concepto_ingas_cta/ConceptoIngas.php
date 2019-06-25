@@ -30,10 +30,10 @@ Phx.vista.ConceptoIngasCuenta = {
 		  height:'50%',
 		  cls:'ConceptoPartida'
 		 }],
-   bedit:false,
-   bnew:false,
-   bdel:false,
-   bsave:false,
+   bedit:false, 
+   bnew:false, 
+   bdel:false, 
+   bsave:false, 
    EnableSelect : function (n, extra) {
    		var selected = this.sm.getSelected().data;
    		var miExtra = {codigos_tipo_relacion:'', filtro_partida : {propiedad: 'id_concepto_ingas', valor : selected.id_concepto_ingas,tipo:'CUECOMP'}};
