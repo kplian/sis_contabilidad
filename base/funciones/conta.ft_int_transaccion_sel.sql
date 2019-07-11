@@ -23,6 +23,8 @@ $body$
   #10        02/01/2019    	  Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
   #48		 16/05/2019		  Manuel Guerra	  agregar columna tipo de presupuesto	
   #49		 17/05/2019		  Manuel Guerra	  correcion de join en reporte de cbte-transaccion
+  #65        11/07/2019       EGS             Se agrega filtro para el parametro tipo en las trnsacciones  CONTA_AUXMAY_SEL,CONTA_AUXMAY_CONT,
+                                              CONTA_TOTAUX_SEL,CONTA_TOTAUX_CONT
 ***************************************************************************/
 
 DECLARE
@@ -53,6 +55,7 @@ DECLARE
     v_join    		    varchar;
     v_atributos    		varchar;
     v_filto_nro			varchar; -- MMV #10
+    v_filtro_internacional varchar;--#65
 			    
 BEGIN
 
@@ -546,7 +549,11 @@ BEGIN
                                       order by orden
                                       limit '||v_parametros.cantidad||' 
                                       offset '||v_parametros.puntero;                                                       
-			        
+			                    
+             IF p_id_usuario = 428 THEN
+              raise notice '%', v_consulta;
+             -- raise exception '%', v_consulta;
+			END IF; 
                     
 			return v_consulta;						
 		end;
@@ -1045,8 +1052,8 @@ BEGIN
             v_consulta:=v_consulta||'ORDER BY fecha,id_int_comprobante';
             
             IF p_id_usuario = 428 THEN
-              --raise notice '%', v_consulta;
-              --raise exception '%', v_consulta;
+             -- raise notice '%', v_consulta;
+            --  raise exception '%', v_consulta;
 			END IF; 
 			return v_consulta;						
 		end;
@@ -1357,8 +1364,7 @@ BEGIN
             RAISE NOTICE '%',v_consulta; 
            -- RAISE EXCEPTION '%', v_consulta;     
             v_consulta:=v_consulta||'ORDER BY fecha,id_int_comprobante';
-            
-          
+
             
 			return v_consulta;						
 		end;
@@ -1593,22 +1599,39 @@ BEGIN
                 v_filtro_tipo = ' csc.id_config_subtipo_cuenta in ('||v_parametros.id_config_subtipo_cuenta::varchar||') ';
              END IF;            
            END IF;
+           --#65 se agrega filtro segun el tipo que se elija
+           IF  pxp.f_existe_parametro(p_tabla,'tipo')  THEN
+                IF v_parametros.tipo is not NULL THEN
+                    IF v_parametros.tipo = 'internacional' THEN
+                        v_filtro_internacional = ' pro.internacional = ''si'' ';
+                    ELSIF v_parametros.tipo = 'nacional' THEN
+                        v_filtro_internacional = ' pro.internacional = ''no'' ';
+                    ELSIF v_parametros.tipo = 'interno' THEN
+                        v_filtro_internacional = '(Q.codigo_auxiliar like ''FUN%'' or Q.codigo_auxiliar like ''ODT%'' ) ';
+                    ELSE
+                        v_filtro_internacional = '0=0';               
+                    END IF;
+                ELSE 
+                    v_filtro_internacional = '0=0';
+                END IF;            
+           END IF;
         
     		--Sentencia de la consulta
 			v_consulta:='select
-                            id_auxiliar,
-                            codigo_auxiliar,
-                            nombre_auxiliar,
-                            id_cuenta,
-                            nro_cuenta,
-                            nombre_cuenta,
-                            tipo_cuenta,
-                            sub_tipo_cuenta,
-                            desc_sub_tipo_cuenta,
-                            id_config_subtipo_cuenta, 
-                            importe_debe_mb,
-                            importe_haber_mb,
-                            saldo
+                            Q.id_auxiliar,
+                            Q.codigo_auxiliar,
+                            Q.nombre_auxiliar,
+                            Q.id_cuenta,
+                            Q.nro_cuenta,
+                            Q.nombre_cuenta,
+                            Q.tipo_cuenta,
+                            Q.sub_tipo_cuenta,
+                            Q.desc_sub_tipo_cuenta,
+                            Q.id_config_subtipo_cuenta, 
+                            Q.importe_debe_mb,
+                            Q.importe_haber_mb,
+                            Q.saldo,
+                            pro.internacional
                        from 
                        (select
                         aux.id_auxiliar,
@@ -1648,7 +1671,9 @@ BEGIN
                                           csc.codigo,
                                           csc.descripcion '; 			
 			--Definicion de la respuesta
-			v_consulta:=v_consulta||' ) Q where ';
+			v_consulta:=v_consulta||' ) Q    --#65
+            left join param.tproveedor pro on pro.id_auxiliar = Q.id_auxiliar   --#65
+            where '||v_filtro_internacional||' and ';  --#65
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||v_aux;
             v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;                
@@ -1717,6 +1742,22 @@ BEGIN
              END IF;
             
             END IF;
+            --#65 se agrega filtro segun el tipo que se elija
+            IF  pxp.f_existe_parametro(p_tabla,'tipo')  THEN
+                IF v_parametros.tipo is not NULL THEN
+                    IF v_parametros.tipo = 'internacional' THEN
+                        v_filtro_internacional = ' pro.internacional = ''si'' ';
+                    ELSIF v_parametros.tipo = 'nacional' THEN
+                        v_filtro_internacional = ' pro.internacional = ''no'' ';
+                    ELSIF v_parametros.tipo = 'interno' THEN
+                        v_filtro_internacional = '(det.codigo_auxiliar like ''FUN%'' or det.codigo_auxiliar like ''ODT%'' ) ';
+                    ELSE
+                        v_filtro_internacional = '0=0';               
+                    END IF;
+                ELSE 
+                    v_filtro_internacional = '0=0';
+                END IF;            
+           END IF;
             
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select
@@ -1770,8 +1811,9 @@ BEGIN
                                                                     csc.id_config_subtipo_cuenta, 
                                                                     csc.descripcion 
                                                                     
-                                                                    ) det  WHERE ';
-                                                                    
+                                                                    ) det   
+                          left join param.tproveedor pro on pro.id_auxiliar = det.id_auxiliar --#65
+                          where '||v_filtro_internacional||' and '; --#65
             --raise exception '------>   %',p_transaccion;
 			
             
@@ -1846,22 +1888,39 @@ BEGIN
 			ELSE
                 v_auxiliar_c = '0';                	
                 v_auxiliar_d = 'aux.aplicacion';                    
-            END IF;         
+            END IF;
+           --#65 se agrega filtro segun el tipo que se elija
+           IF  pxp.f_existe_parametro(p_tabla,'tipo')  THEN
+                IF v_parametros.tipo is not NULL THEN
+                    IF v_parametros.tipo = 'internacional' THEN
+                        v_filtro_internacional = ' pro.internacional = ''si'' ';
+                    ELSIF v_parametros.tipo = 'nacional' THEN
+                        v_filtro_internacional = ' pro.internacional = ''no'' ';
+                    ELSIF v_parametros.tipo = 'interno' THEN
+                        v_filtro_internacional = '(Q.codigo_auxiliar like ''FUN%'' or Q.codigo_auxiliar like ''ODT%'' ) ';
+                    ELSE
+                        v_filtro_internacional = '0=0';               
+                    END IF;
+                ELSE 
+                    v_filtro_internacional = '0=0';
+                END IF;            
+           END IF;         
     		--Sentencia de la consulta
 			v_consulta:='select
-                            id_auxiliar,
-                            codigo_auxiliar,
-                            nombre_auxiliar,
-                            id_cuenta,
-                            nro_cuenta,
-                            nombre_cuenta,
-                            tipo_cuenta,
-                            sub_tipo_cuenta,
-                            desc_sub_tipo_cuenta,
-                            id_config_subtipo_cuenta, 
-                            importe_debe_mb,
-                            importe_haber_mb,
-                            saldo
+                            Q.id_auxiliar,
+                            Q.codigo_auxiliar,
+                            Q.nombre_auxiliar,
+                            Q.id_cuenta,
+                            Q.nro_cuenta,
+                            Q.nombre_cuenta,
+                            Q.tipo_cuenta,
+                            Q.sub_tipo_cuenta,
+                            Q.desc_sub_tipo_cuenta,
+                            Q.id_config_subtipo_cuenta, 
+                            Q.importe_debe_mb,
+                            Q.importe_haber_mb,
+                            Q.saldo,
+                            pro.internacional  --#65
                        from 
                        (            
              			  select
@@ -1903,7 +1962,9 @@ BEGIN
                                     ORDER BY 
                                     aux.codigo_auxiliar
                                     ';
-        	v_consulta:=v_consulta||' ) Q where ';
+        	v_consulta:=v_consulta||' ) Q 
+            left join param.tproveedor pro on pro.id_auxiliar = Q.id_auxiliar      --#65
+            where '||v_filtro_internacional||' and '; --#65
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||v_aux;
              v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;                
@@ -1974,7 +2035,24 @@ BEGIN
 			ELSE
                 v_auxiliar_c = '0';                	
                 v_auxiliar_d = 'aux.aplicacion';                    
-            END IF;        
+            END IF;
+           --#65 se agrega filtro segun el tipo que se elija
+           IF  pxp.f_existe_parametro(p_tabla,'tipo')  THEN
+                IF v_parametros.tipo is not NULL THEN
+                    IF v_parametros.tipo = 'internacional' THEN
+                        v_filtro_internacional = ' pro.internacional = ''si'' ';
+                    ELSIF v_parametros.tipo = 'nacional' THEN
+                        v_filtro_internacional = ' pro.internacional = ''no'' ';
+                    ELSIF v_parametros.tipo = 'interno' THEN
+                        v_filtro_internacional = '(Q.codigo_auxiliar like ''FUN%'' or Q.codigo_auxiliar like ''ODT%'' ) ';
+                    ELSE
+                        v_filtro_internacional = '0=0';               
+                    END IF;
+                ELSE 
+                    v_filtro_internacional = '0=0';
+                END IF;            
+           END IF;
+                    
 			--Sentencia de la consulta de conteo de registros            	                                    
             v_consulta:='select
                             count (*),
@@ -2022,7 +2100,9 @@ BEGIN
                                     ORDER BY 
                                     aux.codigo_auxiliar
                                     ';
-        	v_consulta:=v_consulta||' ) Q where ';
+        	v_consulta:=v_consulta||' ) Q 
+            left join param.tproveedor pro on pro.id_auxiliar = Q.id_auxiliar   --#65
+            where '||v_filtro_internacional||' and ';     --#65
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||v_aux;
                                                  
@@ -2179,8 +2259,8 @@ BEGIN
 
 			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
             --IF p_id_usuario = 433 THEN
-           --   raise notice 'NOTICESS %', v_consulta;
-       --       raise exception 'excep %', v_consulta;
+              raise notice 'NOTICESS %', v_consulta;
+          raise exception 'excep %', v_consulta;
             --END IF;
 			return v_consulta;
 						
