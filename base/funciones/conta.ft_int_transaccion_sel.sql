@@ -2258,10 +2258,7 @@ BEGIN
             
 
 			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-            --IF p_id_usuario = 433 THEN
-              raise notice 'NOTICESS %', v_consulta;
-          raise exception 'excep %', v_consulta;
-            --END IF;
+
 			return v_consulta;
 						
 		end;  
