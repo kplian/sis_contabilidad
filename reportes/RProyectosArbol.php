@@ -82,6 +82,7 @@ class RProyectosArbol
         $sheet->getColumnDimension($this->equivalencias[9])->setWidth(2);
         $sheet->getColumnDimension($this->equivalencias[10])->setWidth(45);
         $sheet->getColumnDimension($this->equivalencias[11])->setWidth(45);
+        $sheet->getColumnDimension($this->equivalencias[12])->setWidth(45);
 
         $sheet->getStyle('A2')->getFont()->applyFromArray(array('bold'=>true,
             'size'=>12,
@@ -128,6 +129,10 @@ class RProyectosArbol
         $sheet->setCellValueByColumnAndRow(11,$fila,'Monto');
         $sheet->getStyle(($this->equivalencias[11]).$fila)->getAlignment()->setHorizontal('center');
         $sheet->getStyle(($this->equivalencias[11]).$fila)->getFont()->applyFromArray($estilo);
+
+        $sheet->setCellValueByColumnAndRow(12,$fila,'Monto Formulado');
+        $sheet->getStyle(($this->equivalencias[12]).$fila)->getAlignment()->setHorizontal('center');
+        $sheet->getStyle(($this->equivalencias[12]).$fila)->getFont()->applyFromArray($estilo);
     }
 
 
@@ -141,6 +146,7 @@ class RProyectosArbol
         foreach($datos as $val) {
             $fila = $this->imprimirLinea($sheet,$fila, $val);
             $this->agregarMes($sheet,$fila-1,$val);
+
         }
     }
     function imprimirLinea($sheet, $fila, $val){
@@ -178,8 +184,10 @@ class RProyectosArbol
     function agregarMes($sheet, $fila, $val){
 
         $col_ini_montos = 11;
+        $col_ini_formulado = 12;
         $columnaVal = $col_ini_montos;
         $monto_str =  $val['saldo_mb'];
+        $monto_for =  $val['importe_formulado'];
         $sw_movimiento = $val['sw_tipo'];
         //si el monto es menor a cero color rojo codigo CMYK
         if($monto_str*1 < 0){
@@ -202,7 +210,21 @@ class RProyectosArbol
 
         $sheet->getStyle(($this->equivalencias[$columnaVal]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2);
         $sheet->setCellValueByColumnAndRow($columnaVal,$fila,$monto_str);
+
         $sheet->getStyle(($this->equivalencias[$columnaVal]).$fila)
+              ->getAlignment()
+              ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+
+
+        $sheet->getStyle(($this->equivalencias[$col_ini_formulado]).$fila)->getFont()->applyFromArray(array(  'bold'=>$negrilla,
+            'size'=>10,
+            'name'=>'Arial',
+            'color'=>$color));
+
+        $sheet->getStyle(($this->equivalencias[$col_ini_formulado]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2);
+        $sheet->setCellValueByColumnAndRow($col_ini_formulado,$fila,$monto_for);
+
+        $sheet->getStyle(($this->equivalencias[$col_ini_formulado]).$fila)
             ->getAlignment()
             ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
     }
