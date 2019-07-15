@@ -18,6 +18,7 @@ $body$
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
   #2        20/12/2018    Miguel Mamani     		Reporte Proyectos
   #10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
+  #64  ETR  15/07/2019          MMV                 Incluir importe formulado reporte proyectos
 
 ***************************************************************************/
 
@@ -31,6 +32,8 @@ v_tipo_cc			varchar;
 v_registros			record;
 v_nivel				integer;
 v_cuentas			varchar;
+v_id_moneda_base	integer;
+v_id_moneda_act		integer;
 BEGIN
 
      v_nombre_funcion = 'conta.f_reporte_centro_costo';
@@ -45,6 +48,9 @@ BEGIN
 	***********************************/
    IF(p_transaccion='CONTA_CCR_SEL')then
    	BEGIN
+    v_id_moneda_base = param.f_get_moneda_base();
+	v_id_moneda_act  = param.f_get_moneda_actualizacion();
+
      CREATE TEMPORARY TABLE tmp_prog (   id_tipo_cc integer,
                                          id_tipo_cc_fk integer,
                                          codigo_tcc varchar,
@@ -52,14 +58,16 @@ BEGIN
                                          importe_debe_mb numeric,
                                          importe_haber_mb numeric,
                                          saldo_mb numeric,
-                                         importe_debe_mt numeric, --#10 
-                                         importe_haber_mt numeric, --#10 
-                                         saldo_mt numeric, --#10 
-                                         importe_debe_ma numeric, --#10 
-                                         importe_haber_ma numeric, --#10 
-                                         saldo_ma numeric, --#10 
+                                         importe_debe_mt numeric, --#10
+                                         importe_haber_mt numeric, --#10
+                                         saldo_mt numeric, --#10
+                                         importe_debe_ma numeric, --#10
+                                         importe_haber_ma numeric, --#10
+                                         saldo_ma numeric, --#10
                                          nivel integer,
-                                         sw_tipo varchar )ON COMMIT DROP;
+                                         sw_tipo varchar,
+                                         importe_formulado numeric --#64
+                                         )ON COMMIT DROP;
        --raise EXCEPTION 'v_parametros.id_cuenta %',v_parametros.id_cuenta;
 
     WITH RECURSIVE tipo_cc_rec (id_tipo_cc, id_tipo_cc_fk) AS (
@@ -91,16 +99,17 @@ BEGIN
                           v_cuentas
                           from cuenta_rec;
 
-          FOR v_record in (with partida as (select   pa.id_partida as id_tipo_cc,
+          FOR v_record in (with partida as (select  pa.id_partida as id_tipo_cc,
                                                       cc.id_tipo_cc as id_tipo_cc_fk,
                                                       cc.codigo_cc as codigo,
                                                       pa.codigo||' '|| pa.nombre_partida as codigo_tcc,
                                                       t.importe_debe_mb,
                                                       t.importe_haber_mb,
-                                                      t.importe_debe_mt, --#10 
-                                                      t.importe_haber_mt, --#10 
-                                                      t.importe_debe_ma, --#10 
-                                                      t.importe_haber_ma --#10 
+                                                      t.importe_debe_mt, --#10
+                                                      t.importe_haber_mt, --#10
+                                                      t.importe_debe_ma, --#10
+                                                      t.importe_haber_ma, --#10
+                                                      0::numeric as importe_formulado  --#64
                                                       from conta.tint_transaccion t
                                                       inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
                                                       inner join pre.tpartida pa on pa.id_partida = t.id_partida
@@ -132,7 +141,28 @@ BEGIN
                                                                     else
                                                                     cc.id_centro_costo = v_parametros.id_centro_costo
                                                                     end)
-                                                                )
+        union all  --#64
+
+        select   pa.id_partida as id_tipo_cc,
+    			 cc.id_tipo_cc as id_tipo_cc_fk,
+                 cc.codigo_cc as codigo,
+                 pa.codigo||' '|| pa.nombre_partida as codigo_tcc,
+        		 0::numeric as importe_debe_mb,
+                 0::numeric as importe_haber_mb,
+                 0::numeric as importe_debe_mt,
+                 0::numeric as importe_haber_mt,
+                 0::numeric as importe_debe_ma,
+                 0::numeric as importe_haber_ma,
+                 prpa.importe_aprobado as importe_formulado
+                 from pre.tpresup_partida prpa
+                 inner join param.vcentro_costo cc on cc.id_centro_costo = prpa.id_centro_costo
+                 inner join pre.tpartida pa on pa.id_partida = prpa.id_partida
+                 where (case
+                      when  v_parametros.id_centro_costo is null then
+                      0 = 0
+                      else
+                      prpa.id_centro_costo = v_parametros.id_centro_costo
+                      end) and pa.id_gestion = v_parametros.id_gestion and cc.id_tipo_cc::text = ANY (string_to_array(v_tipo_cc,',')))
                                                     select p.id_tipo_cc,
                                                            p.id_tipo_cc_fk,
                                                            p.codigo_tcc,
@@ -140,17 +170,18 @@ BEGIN
                                                           sum(p.importe_debe_mb) as importe_debe_mb,
                                                           sum(p.importe_haber_mb) as importe_haber_mb,
                                                           sum(p.importe_debe_mb) - sum(p.importe_haber_mb) as saldo_mb,
-                                                          sum(COALESCE(p.importe_debe_mt,0)) as importe_debe_mt, --#10 
-                                                          sum(COALESCE(p.importe_haber_mt,0)) as importe_haber_mt, --#10 
-                                                          sum(COALESCE(p.importe_debe_mt,0)) - sum(COALESCE(p.importe_haber_mt,0)) as saldo_mt, --#10 
-                                                          sum(COALESCE(p.importe_debe_ma,0)) as importe_debe_ma, --#10 
-                                                          sum(COALESCE(p.importe_haber_ma,0)) as importe_haber_ma, --#10 
-                                                          sum(COALESCE(p.importe_debe_ma,0)) - sum(COALESCE(p.importe_haber_ma,0)) as saldo_ma    --#10 
+                                                          sum(COALESCE(p.importe_debe_mt,0)) as importe_debe_mt, --#10
+                                                          sum(COALESCE(p.importe_haber_mt,0)) as importe_haber_mt, --#10
+                                                          sum(COALESCE(p.importe_debe_mt,0)) - sum(COALESCE(p.importe_haber_mt,0)) as saldo_mt, --#10
+                                                          sum(COALESCE(p.importe_debe_ma,0)) as importe_debe_ma, --#10
+                                                          sum(COALESCE(p.importe_haber_ma,0)) as importe_haber_ma, --#10
+                                                          sum(COALESCE(p.importe_debe_ma,0)) - sum(COALESCE(p.importe_haber_ma,0)) as saldo_ma,    --#10
+                                                          sum(COALESCE(p.importe_formulado,0)) as importe_formulado
                                                     from partida p
                                                     group by p.id_tipo_cc,
                                                              p.id_tipo_cc_fk,
                                                              p.codigo_tcc,
-                                                             p.codigo)LOOP
+                                                             p.codigo)LOOP --#64
 
     		insert into tmp_prog ( id_tipo_cc,
                                    id_tipo_cc_fk,
@@ -159,14 +190,15 @@ BEGIN
                                    importe_debe_mb,
                                    importe_haber_mb,
                                    saldo_mb,
-                                   importe_debe_mt, --#10 
-                                   importe_haber_mt, --#10 
-                                   saldo_mt, --#10 
-                                   importe_debe_ma, --#10 
-                                   importe_haber_ma, --#10 
-                                   saldo_ma, --#10 
-                                   nivel, 
-                                   sw_tipo
+                                   importe_debe_mt, --#10
+                                   importe_haber_mt, --#10
+                                   saldo_mt, --#10
+                                   importe_debe_ma, --#10
+                                   importe_haber_ma, --#10
+                                   saldo_ma, --#10
+                                   nivel,
+                                   sw_tipo,
+                                   importe_formulado --#64
                                   )
                                   values(
                                    null,
@@ -176,14 +208,15 @@ BEGIN
                                    v_record.importe_debe_mb,
                                    v_record.importe_haber_mb,
                                    v_record.saldo_mb,
-                                   v_record.importe_debe_mt, --#10 
-                                   v_record.importe_haber_mt, --#10 
-                                   v_record.saldo_mt, --#10 
-                                   v_record.importe_debe_ma, --#10 
-                                   v_record.importe_haber_ma, --#10 
-                                   v_record.saldo_ma, --#10 
+                                   v_record.importe_debe_mt, --#10
+                                   v_record.importe_haber_mt, --#10
+                                   v_record.saldo_mt, --#10
+                                   v_record.importe_debe_ma, --#10
+                                   v_record.importe_haber_ma, --#10
+                                   v_record.saldo_ma, --#10
                                    4,
-                                   'movimiento'
+                                   'movimiento',
+                                   v_record.importe_formulado --#64
                                   );
 
           END LOOP;
@@ -199,13 +232,13 @@ BEGIN
                                         tm.id_tipo_cc_fk,
                                         tm.codigo_tcc,
                                         case
-                                             when v_parametros.tipo_moneda = 'MB' then 
+                                             when v_parametros.tipo_moneda = 'MB' then
                                                     sum(tm.importe_debe_mb)
-                                             when v_parametros.tipo_moneda = 'MT' then 
+                                             when v_parametros.tipo_moneda = 'MT' then
                                                     sum(tm.importe_debe_mt)
                                              when v_parametros.tipo_moneda = 'MA' then
                                                     sum(tm.importe_debe_ma)
-                                         end as importe_debe_mb, --#10 
+                                         end as importe_debe_mb, --#10
           								case
                                              when v_parametros.tipo_moneda = 'MB' then
                                                     sum(tm.importe_haber_mb)
@@ -213,7 +246,7 @@ BEGIN
                                                     sum(tm.importe_haber_mt)
                                              when v_parametros.tipo_moneda = 'MA' then
                                                     sum(tm.importe_haber_mt)
-                                         end as importe_haber_mb, --#10   
+                                         end as importe_haber_mb, --#10
                                          case
                                              when v_parametros.tipo_moneda = 'MB' then
                                                     sum(tm.saldo_mb)
@@ -221,10 +254,26 @@ BEGIN
                                                     sum(tm.saldo_mt)
                                              when v_parametros.tipo_moneda = 'MA' then
                                                     sum(tm.saldo_ma)
-                                         end as saldo_mb, --#10 
+                                         end as saldo_mb, --#10
                                         tm.nivel,
                                         tm.sw_tipo,
-                                        tm.codigo
+                                        tm.codigo,
+                                        case--#64
+                                             when v_parametros.tipo_moneda = 'MB' then
+                                        			sum(tm.importe_formulado)
+                                             when v_parametros.tipo_moneda = 'MT' then
+
+                                                  param.f_convertir_moneda (v_id_moneda_base,
+                                                                            2 ,
+                                                                             sum(tm.importe_formulado),
+                                                                             now()::date, 'O',2, 1, 'no')
+                                             when v_parametros.tipo_moneda = 'MA' then
+                                            -- 1
+                                                  param.f_convertir_moneda ( v_id_moneda_base,
+                                                                             v_id_moneda_act,
+                                                                             sum(tm.importe_formulado),
+                                                                             now()::date, 'O',2, 1, 'no')
+                                         end as importe_formulado--#64
                            from tmp_prog tm
                            group by tm.id_tipo_cc,
                                     tm.id_tipo_cc_fk,
@@ -258,6 +307,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100 ROWS 1000;
-
-ALTER FUNCTION conta.f_reporte_centro_costo (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;

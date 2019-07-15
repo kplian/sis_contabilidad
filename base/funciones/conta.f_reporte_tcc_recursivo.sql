@@ -15,6 +15,7 @@ $body$
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
  #2        20/12/2018    Miguel Mamani     		Reporte Proyectos
  #10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
+ #64  ETR  15/07/2019          MMV                 Incluir importe formulado reporte proyectos
 
 ***************************************************************************/
 DECLARE
@@ -44,7 +45,9 @@ BEGIN
                                  (sum(tm.importe_debe_mt) - sum(tm.importe_haber_mt)) as saldo_mt, -- #10
                                  sum(tm.importe_debe_ma)  as importe_debe_ma, -- #10
                                  sum(tm.importe_haber_ma) as importe_haber_ma, -- #10
-                                 (sum(tm.importe_debe_ma) - sum(tm.importe_haber_ma)) as saldo_ma -- #10
+                                 (sum(tm.importe_debe_ma) - sum(tm.importe_haber_ma)) as saldo_ma, -- #10
+                                 sum(COALESCE(tm.importe_formulado,0)) as importe_formulado --#64
+
                          from tmp_prog tm
                          inner join  param.ttipo_cc tcc on tcc.id_tipo_cc = tm.id_tipo_cc_fk
                          where case
@@ -74,7 +77,8 @@ BEGIN
                            importe_haber_ma,
                            saldo_ma,
                            nivel,
-                           sw_tipo
+                           sw_tipo,
+                           importe_formulado --#64
                            )
                            values (
                            v_registros.id_tipo_cc_fk,
@@ -91,7 +95,8 @@ BEGIN
                            v_registros.importe_haber_ma, -- #10
                            v_registros.saldo_ma, -- #10
                            p_nivel,
-                           'titulo'
+                           'titulo',
+                           v_registros.importe_formulado --#64
                            );
       v_sw_force = true;
 
