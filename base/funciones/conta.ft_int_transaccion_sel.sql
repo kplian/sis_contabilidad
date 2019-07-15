@@ -550,10 +550,6 @@ BEGIN
                                       limit '||v_parametros.cantidad||' 
                                       offset '||v_parametros.puntero;                                                       
 			                    
-             IF p_id_usuario = 428 THEN
-              raise notice '%', v_consulta;
-             -- raise exception '%', v_consulta;
-			END IF; 
                     
 			return v_consulta;						
 		end;
@@ -1050,11 +1046,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;            
             v_consulta:=v_consulta||'ORDER BY fecha,id_int_comprobante';
-            
-            IF p_id_usuario = 428 THEN
-             -- raise notice '%', v_consulta;
-            --  raise exception '%', v_consulta;
-			END IF; 
+
 			return v_consulta;						
 		end;
 
