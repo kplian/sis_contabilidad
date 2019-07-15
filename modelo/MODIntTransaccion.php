@@ -14,6 +14,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #6 			27/12/2108		  	Manuel Guerra	  	agrego el filtro de cbtes de cierre
 #10       	02/01/2019    		Miguel Mamani     	Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
 #65        	11/07/2019       	EGS             	Se agrega cmp internacional
+#64  ETR    15/07/2019          MMV                 Incluir importe formulado reporte proyectos
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -1000,7 +1001,7 @@ class MODIntTransaccion extends MODbase{
         $this->captura('nivel','int4');
         $this->captura('sw_tipo','varchar');
         $this->captura('codigo','varchar');
-        $this->captura('importe_formulado','numeric');
+        $this->captura('importe_formulado','numeric'); //#64
         $this->armarConsulta();
         /*echo $this->getConsulta();
         exit;*/
