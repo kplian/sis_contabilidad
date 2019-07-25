@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
   p_hstore_transaccion public.hstore,
   p_id_plantilla integer,
@@ -9,14 +11,15 @@ CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
   p_prioridad_documento integer = 2,
   p_proc_terci varchar = 'no'::character varying,
   p_porc_monto_excento_var numeric = 0,
-  p_procesar_prioridad_principal varchar = 'si'::character varying
+  p_procesar_prioridad_principal varchar = 'si'::character varying,
+  p_id_taza_impuesto integer = NULL::integer
 )
 RETURNS integer [] AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.f_gen_proc_plantilla_calculo
- DESCRIPCION:   esta funcion procesa la plantilla de calculo e insertar las transacciones necesarias  
+ DESCRIPCION:   aplica la logica de plantilla de calculo al detalle las trasaccion contables de la plantilla de cbte segun configuracion  
  AUTOR: 		 RAC KPLIAN
  FECHA:	        04-09-2013 03:51:00
  COMENTARIOS:	
@@ -30,14 +33,15 @@ $body$
  HISTORIAL DE MODIFICACIONES:
    	
  ISSUE            FECHA:		      AUTOR                 DESCRIPCION
-   
+ #0             04/09/2013      RAC                        Creación  
  #0        		05/01/2018      Rensi Arteaga Copari       Ajuste par aconsiderar nuevas variables usar_cc_original, imputar_excento
  #98       		20/08/2018      Rensi Arteaga Copari       Feu adicionado un nnuevo tipo de aplicacion de excento para permitir la facturas de combustible
  #13            03/01/2018      RAC KPLIAN                 PRocesa la opcion resetear partida ejecucion de las plantillas de calculo
  #21            10/01/2019      RArteaga                   Considerar configuracion apra aplicacar o no descuentos,  incluir_desc_doc 
  #30  ETR       05/02/2019      RArtega                    Se adciona campo para almacenar los centro de costo original en plantillas secundaias para facilitar reportes
- --#42  ETR       01/04/2019      calvarez                    correción de gerenación de comprobantes
-***************************************************************************/
+ #42  ETR       01/04/2019      calvarez                   correción de gerenación de comprobantes
+ #66  ETR       24/07/2019      RArteaga                   adicionar el campo p_id_taza_impuesto
+*************************************************************************************************************************************************/
 
 DECLARE
 
@@ -65,9 +69,14 @@ DECLARE
     v_sw_calcular_excento boolean;
     v_porc_monto_imponible numeric;
     v_porc_importe numeric;
-    v_porc_importe_presupuesto numeric;
-     v_conta_partidas				varchar;
-     v_registros_rest    record;
+    v_porc_importe_presupuesto      numeric;
+    v_conta_partidas				varchar;
+    v_registros_rest                record;
+    v_reg_taza_imp                 record;  -- #66
+    v_porc_prin                     numeric; -- #66
+    v_porc_secu                     numeric; -- #66
+    v_porc_prin_pre                 numeric; -- #66
+    v_porc_secu_pre                 numeric; -- #66      
 			    
 BEGIN
 
@@ -149,7 +158,7 @@ BEGIN
                                     
                                     
                                       -- si se considera el porcentaje de monto imponible 
-                                      --multiplicamos los factores para obtener un nuevo valor
+                                      -- multiplicamos los factores para obtener un nuevo valor
                                       v_porc_importe = v_porc_monto_imponible * v_registros.importe; 
                                       v_porc_importe_presupuesto = v_porc_monto_imponible * v_registros.importe_presupuesto;
                                       
@@ -184,6 +193,7 @@ BEGIN
                                      --FIN RAC 05/01/2017
                                      
                                     
+                                 
                                  ELSE
                                  
                                    v_porc_importe = v_registros.importe; 
@@ -199,22 +209,68 @@ BEGIN
                                   v_monto_x_aplicar = (p_monto)::numeric;
                                   v_monto_x_aplicar_pre = (p_monto)::numeric;
                                 end if;
+                                
                                 v_monto_revertir = p_monto - v_monto_x_aplicar_pre;
                                 v_factor_reversion  = 1 - v_porc_importe_presupuesto; 
-                                
                              
-                             ELSE
+                             
+                             ELSEIF v_registros.tipo_importe = 'taza' THEN  -- #66  considera montos calculado por taza
+                             
+                                   IF p_id_taza_impuesto is NULL THEN
+                                      raise exception 'el documento esta configurado para usar taza pero  no se obtuvo ningun resultado del detalle plantilla de cbte';
+                                   END IF;
+                                   
+                                   --recuperar configuracion de taza
+                                   SELECT ti.factor_impuesto, ti.tipo, ti.factor_impuesto_pre
+                                   INTO
+                                   v_reg_taza_imp
+                                   FROM param.ttaza_impuesto ti
+                                   WHERE ti.id_taza_impuesto = p_id_taza_impuesto;
+                                   
+                                   IF v_reg_taza_imp.tipo = 'nominal' THEN  --taza nominal es la forma de calculo de impuesto de Bolivia                                     
+                                       --definir los porcentajes para contabilidad
+                                       v_porc_secu = v_reg_taza_imp.factor_impuesto;
+                                       v_porc_prin = 1 - v_reg_taza_imp.factor_impuesto;
+                                       --definir los porcetajes para presupuestos
+                                       v_porc_secu_pre = v_reg_taza_imp.factor_impuesto_pre;
+                                       v_porc_prin_pre = 1 - v_reg_taza_imp.factor_impuesto_pre;
+                                       
+                                   
+                                   ELSE  --  taza efectiva es la forma de calculo de impuesto de argetina                                       
+                                       v_porc_secu =  v_reg_taza_imp.factor_impuesto / (1 + v_reg_taza_imp.factor_impuesto);                                       
+                                       v_porc_prin = 1  - v_porc_secu;                                       
+                                       v_porc_secu_pre =  v_reg_taza_imp.factor_impuesto_pre / (1 + v_reg_taza_imp.factor_impuesto_pre);                                       
+                                       v_porc_prin_pre = 1  - v_porc_secu_pre;
+                                   
+                                   END IF;
+                                   
+                                   
+                                   IF v_registros.prioridad = 1 THEN
+                                   
+                                      IF p_procesar_prioridad_principal = 'si' THEN
+                                        v_monto_x_aplicar = (p_monto * v_porc_prin)::numeric;
+                                        v_monto_x_aplicar_pre = (p_monto * v_porc_prin_pre)::numeric;
+                                      ELSE
+                                        v_monto_x_aplicar = (p_monto)::numeric;
+                                        v_monto_x_aplicar_pre = (p_monto)::numeric;
+                                      END IF;
+                                         
+                                   ELSE
+                                       v_monto_x_aplicar = (p_monto * v_porc_secu)::numeric;
+                                       v_monto_x_aplicar_pre = (p_monto * v_porc_secu_pre)::numeric;
+                                   END IF;
+                                   
+                                   
+                                  v_monto_revertir = p_monto - v_monto_x_aplicar_pre;
+                                  v_factor_reversion  = 1 - v_porc_importe_presupuesto; 
+                             
+                             ELSE --#66 fin
                              
                                 v_monto_x_aplicar = v_registros.importe::numeric;
                                 v_monto_x_aplicar_pre = v_registros.importe_presupuesto::numeric;
                              END IF;
                              
-                             
-                            --  IF  p_id_plantilla =  25  THEN
-                            --      raise exception '% ,  %    ', v_monto_x_aplicar, v_monto_revertir;
-                            -- END IF; 
-                            
-                            
+                                                         
                               IF v_registros.sw_registro = 'si'  THEN
                              
                                    -- si es prorirdad 1 y tiene alguna trasaccion de mauor priodidad del tipo restar
@@ -281,9 +337,7 @@ BEGIN
                              --  TODO , obtener replicar el centro de costo ???
                                 
                                 v_record_int_tran.glosa = v_registros.descripcion;
-                                
-                                --raise notice ')))))))))))))) p_id_gestion = %, p_id_depto_conta = % ',p_id_gestion,p_id_depto_conta ;
-                                
+                                                                
                                 SELECT 
                                     ps_id_centro_costo 
                                    into 
@@ -336,8 +390,45 @@ BEGIN
                                    v_record_int_tran.id_cuenta = v_record_rel_con.ps_id_cuenta;
                                    v_record_int_tran.id_partida = v_record_rel_con.ps_id_partida;
                                    v_record_int_tran.id_auxiliar = v_record_rel_con.ps_id_auxiliar;
-                                  
                              
+
+                             ELSEIF v_registros.prioridad > 1 AND v_registros.tipo_importe = 'taza' AND p_id_taza_impuesto IS NOT NULL THEN  
+                               -- #66 si es prioridad > 1 y si no existe codigo de relacion contable pero tenemos taza tratamos de recuperar el codigo de relacion contable para la taza     
+                                  SELECT 
+                                    * 
+                                  INTO 
+                                    v_record_rel_con 
+                                  FROM conta.f_get_config_relacion_contable('TAZAIMP', 
+                                                                          p_id_gestion, 
+                                                                          p_id_taza_impuesto, --id_tabla
+                                                                          v_record_int_tran.id_centro_costo);  --id_dento_costo
+                                
+                                  -- si la relacion contable tiene centro de costo unico, .... 
+                                  -- OJO podria tener algun BUG
+                                  IF v_record_rel_con.ps_id_centro_costo is not null THEN
+                                     v_record_int_tran.id_centro_costo = v_record_rel_con.ps_id_centro_costo;
+                                  END IF;
+                                  
+                                  
+                                  IF(v_record_rel_con.ps_id_cuenta is NULL) THEN
+                                     raise exception 'Revisar la configuracion de cuenta de la relacion contable TAZAIMP del tipo de taza impuesto   ID(%)',p_id_taza_impuesto ;
+                                  END IF;
+                                  
+                                  v_conta_partidas = pxp.f_get_variable_global('conta_partidas');
+                                  
+                                  IF v_conta_partidas = 'si' THEN                    
+                                    IF(v_record_rel_con.ps_id_partida is NULL) THEN
+                                      raise exception 'Revisar la configuracion de partida de la relacion contable TAZAIMP del tipo de taza impuesto   ID(%)',p_id_taza_impuesto ;
+                                    END IF;
+                                  END IF;
+                                  
+                                  
+                                  --replanza las cuenta, partida y auxiliar obtenidos 
+                               
+                                  v_record_int_tran.id_cuenta = v_record_rel_con.ps_id_cuenta;
+                                  v_record_int_tran.id_partida = v_record_rel_con.ps_id_partida;
+                                  v_record_int_tran.id_auxiliar = v_record_rel_con.ps_id_auxiliar;
+                                                              
                              END IF;
                              
                              IF v_registros.sw_registro = 'si'  THEN
@@ -370,10 +461,12 @@ BEGIN
 		   
         
         END LOOP;    
-            return v_int_resp;
+        
+        
+	   --Devuelve la respuesta    
+       return v_int_resp;
 
 	
-	 --Devuelve la respuesta
 
 EXCEPTION
 				

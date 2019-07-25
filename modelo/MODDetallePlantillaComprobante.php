@@ -7,7 +7,8 @@
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
- #42	EndeEtr			02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
+ #42	EndeEtr		02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
+ #66    ETR         24/07/2019          RAC                     Adicionar campo para id_tazas_impuesto
  * 
 
  */
@@ -85,6 +86,10 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('incluir_desc_doc','varchar'); //#21
 		$this->captura('procesar_prioridad_principal','varchar'); //#42
 		
+		$this->captura('campo_id_taza_impuesto','varchar'); //#66
+		
+		
+		
 		
 		
 		
@@ -157,6 +162,7 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_codigo_aplicacion_rc','campo_codigo_aplicacion_rc','varchar');
 		$this->setParametro('incluir_desc_doc','incluir_desc_doc','varchar'); //#21
 		$this->setParametro('procesar_prioridad_principal','procesar_prioridad_principal','varchar'); //#42
+		$this->setParametro('campo_id_taza_impuesto','campo_id_taza_impuesto','varchar'); //#66
 				
 		
 		
@@ -219,16 +225,14 @@ class MODDetallePlantillaComprobante extends MODbase{
         $this->setParametro('prioridad_documento','prioridad_documento','integer');
 		$this->setParametro('campo_orden_trabajo','campo_orden_trabajo','varchar');
         $this->setParametro('campo_forma_pago','campo_forma_pago','varchar');
-		$this->setParametro('codigo','codigo','varchar');
-		
+		$this->setParametro('codigo','codigo','varchar');		
 		$this->setParametro('tipo_relacion_contable_cc','tipo_relacion_contable_cc','varchar');
-		$this->setParametro('campo_relacion_contable_cc','campo_relacion_contable_cc','varchar');
-		
-		$this->setParametro('campo_suborden','campo_suborden','varchar');
-		
+		$this->setParametro('campo_relacion_contable_cc','campo_relacion_contable_cc','varchar');		
+		$this->setParametro('campo_suborden','campo_suborden','varchar');		
 		$this->setParametro('campo_codigo_aplicacion_rc','campo_codigo_aplicacion_rc','varchar');
         $this->setParametro('incluir_desc_doc','incluir_desc_doc','varchar'); //#21
 		$this->setParametro('procesar_prioridad_principal','procesar_prioridad_principal','varchar'); //#42
+		$this->setParametro('campo_id_taza_impuesto','campo_id_taza_impuesto','varchar'); //#66
         
 		//Ejecuta la instruccion
 		$this->armarConsulta();

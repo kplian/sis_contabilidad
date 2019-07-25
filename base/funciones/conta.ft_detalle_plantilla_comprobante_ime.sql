@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_detalle_plantilla_comprobante_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -15,10 +17,11 @@ $body$
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
- ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
- # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
+ ISSUE 		  		 FECHA   			  AUTOR				       DESCRIPCION:
+ #0  KPLIAN         10-06-2013          RAC                     Creación
+ #21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
  #42	EndeEtr	    02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
-
+ #66    ETR         24/07/2019          RAC                     Adicionar campo id_taza_impuesto
 ***************************************************************************/
 
 DECLARE
@@ -110,7 +113,8 @@ BEGIN
                 campo_suborden,
                 campo_codigo_aplicacion_rc,
                 incluir_desc_doc, --#21
-                procesar_prioridad_principal  --#42
+                procesar_prioridad_principal,  --#42
+                campo_id_taza_impuesto  --#66
           	) values(
                 v_parametros.id_plantilla_comprobante,
                 v_parametros.debe_haber,
@@ -160,7 +164,8 @@ BEGIN
                 v_parametros.campo_suborden,
                 v_parametros.campo_codigo_aplicacion_rc,
                 v_parametros.incluir_desc_doc, --#21
-                v_parametros.procesar_prioridad_principal --#42
+                v_parametros.procesar_prioridad_principal, --#42
+                v_parametros.campo_id_taza_impuesto --#66
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 
 			--Definicion de la respuesta
@@ -244,7 +249,8 @@ BEGIN
                 campo_suborden = v_parametros.campo_suborden,
                 campo_codigo_aplicacion_rc = v_parametros.campo_codigo_aplicacion_rc,
                 incluir_desc_doc = v_parametros.incluir_desc_doc, --#21
-                procesar_prioridad_principal = v_parametros.procesar_prioridad_principal --#42
+                procesar_prioridad_principal = v_parametros.procesar_prioridad_principal, --#42
+                campo_id_taza_impuesto = v_parametros.campo_id_taza_impuesto --#66
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta
