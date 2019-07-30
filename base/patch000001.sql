@@ -5227,3 +5227,19 @@ ALTER TABLE conta.tcbte_marca
 
 
 
+
+/***********************************I-SCP-RAC-CONTA-66-24/07/2019****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_id_taza_impuesto VARCHAR(350);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_id_taza_impuesto
+IS 'define el campo id_taza_impuesto para documentos con impuestos variable. (caso facturas de argentina)';
+
+
+/***********************************F-SCP-RAC-CONTA-66-24/07/2019****************************************/
+
+
+

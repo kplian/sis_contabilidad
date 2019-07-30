@@ -8,6 +8,7 @@
 ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
 #42	EndeEtr			02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
+#66 ETR             24/07/2019          RAC                     se adiciona el campo_id_taza_impuesto para permitir documentos con taza varaible
  */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -852,6 +853,22 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+        { //#66
+            config:{
+                name: 'campo_id_taza_impuesto',
+                fieldLabel: 'Campo ID tazas',
+                qtip:'Alguno documentos necesitan aplicar una taza varaible (facturas de argentia) aca se configura la columna que apunta a id_taza_impuesto',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:100
+            },
+            type:'TextArea',
+            filters:{pfiltro:'cmpbdet.campo_id_taza_impuesto',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -991,8 +1008,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_codigo_aplicacion_rc',
         'incluir_desc_doc',//#21
    	    {name:'procesar_prioridad_principal', type: 'string'},//#42
-
-		
+   	    'campo_id_taza_impuesto' //#66
 	],
 	sortInfo:{
 		field: 'id_detalle_plantilla_comprobante',

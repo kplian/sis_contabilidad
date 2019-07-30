@@ -28,7 +28,9 @@ Descripcion:
  
  #0        		17/11/2017        Rensi Arteaga Copari   
  
- #0        		09/05/2018        Rensi Arteaga Copari   Adiciona campo para el codigo de aplicacin en relaciones contables     
+ #0        		09/05/2018        Rensi Arteaga Copari   Adiciona campo para el codigo de aplicacin en relaciones contables
+ 
+ #66            24/07/2019        RAC                    Adcionar campo id_tazas_impuesto     
    
 
 
@@ -85,29 +87,31 @@ BEGIN
     
    
     v_def_campos = ARRAY['campo_monto',
-    					'campo_cuenta',
-                        'campo_auxiliar',
-                        'campo_partida',
-                        'campo_centro_costo',
-                        'campo_orden_trabajo',
-                        'campo_suborden',
-                        'campo_partida_ejecucion',
-                        'campo_relacion_contable',
-                        'campo_relacion_contable_cc',
-                        'campo_documento',
-                        'otros_campos',
-                        'campo_monto_pres',
-                        'campo_id_tabla_detalle',
-                        'campo_trasaccion_dev',
-                        'campo_concepto_transaccion',
-                        'campo_id_cuenta_bancaria',
-                        'campo_id_cuenta_bancaria_mov',
-                        'campo_nro_cheque',
-                        'campo_nro_cuenta_bancaria_trans',
-                        'campo_porc_monto_excento_var',
-                        'campo_nombre_cheque_trans',
-                        'campo_forma_pago',
-                        'campo_codigo_aplicacion_rc'];
+    					 'campo_cuenta',
+                         'campo_auxiliar',
+                         'campo_partida',
+                         'campo_centro_costo',
+                         'campo_orden_trabajo',
+                         'campo_suborden',
+                         'campo_partida_ejecucion',
+                         'campo_relacion_contable',
+                         'campo_relacion_contable_cc',
+                         'campo_documento',
+                         'otros_campos',
+                         'campo_monto_pres',
+                         'campo_id_tabla_detalle',
+                         'campo_trasaccion_dev',
+                         'campo_concepto_transaccion',
+                         'campo_id_cuenta_bancaria',
+                         'campo_id_cuenta_bancaria_mov',
+                         'campo_nro_cheque',
+                         'campo_nro_cuenta_bancaria_trans',
+                         'campo_porc_monto_excento_var',
+                         'campo_nombre_cheque_trans',
+                         'campo_forma_pago',
+                         'campo_codigo_aplicacion_rc',
+                         'campo_id_taza_impuesto'      --#66
+                        ];
                         
                         
     v_tamano:=array_upper(v_def_campos,1);
@@ -158,7 +162,7 @@ BEGIN
                                               p_id_tabla_padre_valor,
                                               p_id_int_comprobante,
                                               p_id_usuario,
-                                              hstore(v_tabla),
+                                              hstore(v_tabla),  -- variable con los valores configurados en el detalle de la planitlla de cbte
                                               v_def_campos,
                                               v_tamano
                                               );

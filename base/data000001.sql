@@ -1682,3 +1682,14 @@ select pxp.f_insert_tgui ('Configuracion Auxiliar Etasa', 'Configuracion Auxilia
 select pxp.f_insert_tgui ('Configuracion Marca Cbte', 'Configuracion de la marca de comprobante', 'cbtemarca', 'si', 20, 'sis_contabilidad/vista/marca/Marca.php', 3, '', 'Marca', 'CONTA');
 /***********************************F-DAT-EGS-CONTA-07-11/06/2019****************************************/
 
+
+/***********************************I-DAT-RAC-CONTA-66-25/07/2019****************************************/
+
+select conta.f_import_ttabla_relacion_contable ('insert','TZIMP','activo','ttaza_impuesto','PARAM','id_taza_impuesto','','','','','');
+select conta.f_import_ttipo_relacion_contable ('insert','TAZAIMP','TZIMP','Taza Impuesto','activo','si-general','si','no','flujo_presupuestaria','recurso_gasto','no','no','no','');
+
+--inserta menu
+select pxp.f_insert_tgui ('Taza Impuesto', 'Taza Impuesto', 'TAZAIMP', 'si', 10, 'sis_contabilidad/vista/relacion_contable/TazaImpuestoCuenta.php', 3, '', 'TazaImpuestoCuenta', 'CONTA');
+select pxp.f_insert_testructura_gui ('TAZAIMP', 'RELACON');
+
+/***********************************F-DAT-RAC-CONTA-66-25/07/2019****************************************/

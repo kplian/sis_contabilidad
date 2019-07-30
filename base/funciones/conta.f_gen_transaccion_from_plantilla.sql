@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla (
   p_super public.hstore,
   p_tabla_padre public.hstore,
@@ -31,7 +33,8 @@ Descripcion:
  #0       		17/11/2017      Rensi Arteaga Copari       BUG, En calculo por diferencia se considera lso montos de gastos y recurso
  #123           27/09/2018      Rarteaga                   Se adiciona el dato de tabla origien la guardar la trasaccion para rastreo
  #21            10/01/2019      RArteaga                   añade parametro a la llamda de generar desde plantilla, para considerar descuentos
- --#42  ETR       01/04/2019      calvarez                    correción de gerenación de comprobantes
+ #42  ETR       01/04/2019      calvarez                   correción de gerenación de comprobantes
+ #66 ETR        24/07/2019      RArteaga                   considerar documentos configurados con tazas variable (para manejar facturas de Argentina)
 */
 
 
@@ -115,9 +118,7 @@ BEGIN
            
              END LOOP;
              
-          IF p_id_usuario = 429 THEN
-              -- raise exception 'llega...xx   %', v_this_hstore ;
-             END IF;
+        
      /********************************************************
      *  Si la plantilla es del tipo relacion devengado pago
      * 
@@ -127,11 +128,7 @@ BEGIN
       IF (p_reg_det_plantilla->'rel_dev_pago') = 'si'  THEN
       
                IF COALESCE((v_this_hstore -> 'campo_monto')::numeric,0) > 0  THEN
-                  -- raise exception '>>  %, %, % >>',p_reg_det_plantilla->'id_detalle_plantilla_fk',p_id_int_comprobante,v_this_hstore ->'campo_trasaccion_dev';
-                 
                      --obtener trasaccion pagado  (Puede ser uno mismo pago para varios devengados)
-                     
-                     --raise exception 'DTI PRUEBA ... >> %', p_reg_det_plantilla->'id_detalle_plantilla_fk';
                      
                      select  
                        t.id_int_transaccion
@@ -223,8 +220,6 @@ BEGIN
                                 
                                 ELSE
                                 
-                                    --raise exception '%, %,%',(v_this_hstore->'campo_relacion_contable_cc'),(p_super->'columna_gestion'),(p_reg_det_plantilla->'tipo_relacion_contable_cc');
-                               
                                      SELECT 
                                         ps_id_centro_costo 
                                      into 
@@ -240,16 +235,8 @@ BEGIN
                                                                              
                                      v_this_hstore = v_this_hstore || hstore('campo_centro_costo', v_id_centro_costo_depto::varchar);
                                 
-                                
-                                
-                                
                                 END IF; 
                                 
-                                
-                               
-                               
-                              
-                          
                           END IF;
                        
                         
@@ -294,8 +281,6 @@ BEGIN
                             
                       END IF;
                       
-                     
-                    
                       
                       /********************************
                       --Validaciones de cuenta y partida 
@@ -307,8 +292,6 @@ BEGIN
                               raise exception 'No se encontro una cuenta contable para la transaccion: %', (p_reg_det_plantilla->'descripcion');
                                 
                         END IF;
-                        
-                        
                         
                         
                         v_conta_partidas = pxp.f_get_variable_global('conta_partidas');
@@ -323,12 +306,6 @@ BEGIN
                       /************************************************  
                       --tranforma el hstore a record de int_transaccion
                       *************************************************/
-                      
-                     --  IF v_this_hstore ->'campo_orden_trabajo' != '' THEN
-                     --     raise exception  ',xx %', v_this_hstore ->'campo_orden_trabajo';
-                     --  END IF;
-                      
-                      
                       
                       v_record_int_tran.id_cuenta =   (v_this_hstore->'campo_cuenta')::integer;
                       v_record_int_tran.id_partida =   (v_this_hstore->'campo_partida')::integer;
@@ -354,8 +331,6 @@ BEGIN
                       v_record_int_tran.forma_pago = (v_this_hstore->'campo_forma_pago')::varchar;
                       v_record_int_tran.id_origen = (v_this_hstore->'campo_id_tabla_detalle')::integer; --#123 17/09/2018 se acicion el id de la tabla origen para rastreo
 
-                      
-                    -- raise notice '>>>>>>>>>>>>>>>>>>   glosa %',(v_this_hstore->'campo_concepto_transaccion');
                       
                       /****************************************************************
                       --Proceso el monto y lo ubica en el debe o haber, gasto o recurso
@@ -569,10 +544,6 @@ BEGIN
                               
                               END IF; 
                        
-                 
-                       
-                      
-                       
                     
                   ELSE
                       
@@ -581,10 +552,6 @@ BEGIN
                   END IF;  --FIN FOMRA DE CALCULO DEL MONTO
                   
                 
-              
-              --  raise exception '%...%', v_record_int_tran.importe_debe,v_record_int_tran.importe_haber;
-                
-                     
                       /**********************************************
                       -- IF , se  aplica el documento si esta activo --
                      *************************************************/
@@ -597,7 +564,7 @@ BEGIN
                          
                            --inserta las trasaccion asociadas al documento
                            IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN
-                               
+                           
                                  v_resp_doc =  conta.f_gen_proc_plantilla_calculo(
                                                             hstore(v_record_int_tran), 
                                                             (v_this_hstore->'campo_documento')::integer,--p_id_plantilla, 
@@ -609,7 +576,8 @@ BEGIN
                                                             (p_reg_det_plantilla->'prioridad_documento')::integer,
                                                             'no',
                                                             (v_this_hstore->'campo_porc_monto_excento_var')::numeric,
-                                                            (p_reg_det_plantilla->'procesar_prioridad_principal')::varchar --#42
+                                                            (p_reg_det_plantilla->'procesar_prioridad_principal')::varchar, --#42
+                                                            (v_this_hstore->'campo_id_taza_impuesto')::integer --#66
                                                             );
                                  
                              	 IF(v_resp_doc is null)THEN
@@ -628,32 +596,20 @@ BEGIN
                                         
                                         END IF;
                                         
-                                        --raise notice  ' >>> actualiza transaccion .. %,%',(p_reg_det_plantilla->'func_act_transaccion'),(v_this_hstore->'campo_id_tabla_detalle');
-                               
                                         
                                         EXECUTE ( 'select ' || (p_reg_det_plantilla->'func_act_transaccion')  ||'('||v_resp_doc[1]::varchar||' ,'||(v_this_hstore->'campo_id_tabla_detalle') ||' )');
                                      
                                   END If;
                                   
-                                   
-                           
-                           
-                           
                            END IF;
                        ELSE
                        
-                      
-                            
                            --inserta transaccion en tabla solo si tiene un monto maor a cero y dintinto de NULL
                            
                               IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN
-                             		raise notice  ' >>> gen inserta transaccion ..';
-                      		 
-                                   
-                              
+                             		
                                      v_reg_id_int_transaccion = conta.f_gen_inser_transaccion(hstore(v_record_int_tran), p_id_usuario);
                                 
-                                  
                                     --si tiene funcion de actualizacion,  envia el id de la trasaccion generada para que se almacene 
                                       IF (p_reg_det_plantilla->'func_act_transaccion') <> '' and  (p_reg_det_plantilla->'func_act_transaccion') is not null  THEN
                                     	 IF ((v_this_hstore->'campo_id_tabla_detalle') is NULL) or (v_this_hstore->'campo_id_tabla_detalle')= ''   THEN
@@ -662,16 +618,10 @@ BEGIN
                                          EXECUTE  'select ' || (p_reg_det_plantilla->'func_act_transaccion')  ||'('||v_reg_id_int_transaccion::varchar||' ,'||(v_this_hstore->'campo_id_tabla_detalle') ||' )';
                                     
                                      END If;
-                                    
-                                 
-                              
+                                
                               END IF;
                             
-                            
-                            
                        END IF;--FIN  APLICA DOCUMENTOS
-              
-             
               
               END IF; -- FIN MONTO CERO
            
