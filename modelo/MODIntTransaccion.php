@@ -15,6 +15,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #10       	02/01/2019    		Miguel Mamani     	Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
 #65        	11/07/2019       	EGS             	Se agrega cmp internacional
 #64  ETR    15/07/2019          MMV                 Incluir importe formulado reporte proyectos
+#69  ETR    01/08/2019          SAZ                 Mejoras al reporte Comprobante transacciones
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -514,14 +515,7 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('desde','desde','date');
 		
 		$this->setParametro('datos','datos','varchar');
-		//captura parametros adicionales para el count
-	/*	$this->capturaCount('total_debe','numeric');
-		$this->capturaCount('total_haber','numeric');
-		$this->capturaCount('total_debe_mt','numeric');
-		$this->capturaCount('total_haber_mt','numeric');
-		$this->capturaCount('total_debe_ma','numeric');
-		$this->capturaCount('total_haber_ma','numeric');	*/
-		//Definicion de la lista del resultado del query
+
 		$this->captura('id_int_transaccion','int4');
 		$this->captura('id_partida','int4');
 		$this->captura('id_centro_costo','int4');
@@ -675,14 +669,7 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('desde','desde','date');
 		
 		$this->setParametro('datos','datos','varchar');
-		//captura parametros adicionales para el count
-	/*	$this->capturaCount('total_debe','numeric');
-		$this->capturaCount('total_haber','numeric');
-		$this->capturaCount('total_debe_mt','numeric');
-		$this->capturaCount('total_haber_mt','numeric');
-		$this->capturaCount('total_debe_ma','numeric');
-		$this->capturaCount('total_haber_ma','numeric');	*/
-		//Definicion de la lista del resultado del query
+
 		$this->captura('id_int_transaccion','int4');
 		$this->captura('id_partida','int4');
 		$this->captura('id_centro_costo','int4');
@@ -826,29 +813,23 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('nro_cbte','varchar');
 		$this->captura('nro_tramite','varchar');
 		$this->captura('glosa1','varchar');
-		
 		$this->captura('debe_mb','numeric');
 		$this->captura('haber_mb','numeric');
 		$this->captura('saldo_debehaber_mb','numeric');
-		$this->captura('gasto_mb','numeric');
-		$this->captura('recurso_mb','numeric');
-		
-		$this->captura('saldo_gastorecurso_mb','numeric');
+
+		// #69
+
 		$this->captura('debe_mt','numeric');
 		$this->captura('haber_mt','numeric');
 		$this->captura('saldo_debehaber_mt','numeric');
-		$this->captura('gasto_mt','numeric');
-		$this->captura('recurso_mt','numeric');
-		
-		
-		
-		$this->captura('saldo_gastorecurso_mt','numeric');
+
+        // #69
+
 		$this->captura('debe_ma','numeric');
 		$this->captura('haber_ma','numeric');
 		$this->captura('saldo_debehaber_ma','numeric');
-		$this->captura('gasto_ma','numeric');
-		$this->captura('recurso_ma','numeric');
-		$this->captura('saldo_gastorecurso_ma','numeric');
+
+        // #69
 		
 		$this->captura('tc_ufv','numeric');
 		$this->captura('tipo_cuenta','varchar');
@@ -875,6 +856,16 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('nro_documento','varchar');
 		$this->captura('glosa_transaccion','varchar');
 		$this->captura('nombre','varchar');
+
+        // #69
+        $this->captura('beneficiario','varchar');
+        $this->captura('tipo_cbte','varchar');
+        $this->captura('glosa','varchar');
+        $this->captura('persona_create','text');
+        $this->captura('persona_mod','text');
+        $this->captura('nro_tramite_aux','varchar');
+
+
 		//$this->captura('beneficiario','varchar');
 
 		
