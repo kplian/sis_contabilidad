@@ -23,6 +23,7 @@ $body$
   #49		 17/05/2019		  Manuel Guerra	  correcion de join en reporte de cbte-transaccion
   #65        11/07/2019       EGS             Se agrega filtro para el parametro tipo en las trnsacciones  CONTA_AUXMAY_SEL,CONTA_AUXMAY_CONT,
                                               CONTA_TOTAUX_SEL,CONTA_TOTAUX_CONT
+  #69        01/08/2019       Saul Zambrana	  Se han eliminado 9 columnas y añadido 6 a la transaccion CONTA_LDCTRANS_SEL para el reporte:Detalle comprobante-transacciones
 ***************************************************************************/
 
 DECLARE
@@ -2183,6 +2184,7 @@ BEGIN
             END IF;
             --#48
             --#49
+            --#69
 			v_consulta:='select
                           itr.id_int_transaccion ,
                           icbt.id_int_comprobante , icbt.fecha_reg , icbt.fecha , icbt.nro_cbte , icbt.nro_tramite ,
@@ -2191,32 +2193,17 @@ BEGIN
                           coalesce(itr.importe_haber_mb,0) as haber_mb ,
                           (coalesce(itr.importe_debe_mb,0) - coalesce(itr.importe_haber_mb,0)) as saldo_debehaber_mb,
 
-            			--- 1ROS CAMPOS ELIMINADOS DEL REPORTE
-						 /*coalesce(itr.importe_gasto_mb,0) as gasto_mb,
-                          coalesce(itr.importe_recurso_mb,0) as recurso_mb ,
-                          (coalesce(itr.importe_gasto_mb,0) - coalesce(itr.importe_recurso_mb,0)) as saldo_gastorecurso_mb,*/
-                        ---1ROS HASTA AQUI
-
+						--#69 SE HAN ELIMINADO 3 COLUMNAS
                           coalesce(itr.importe_debe_mt,0) as debe_mt,
                           coalesce(itr.importe_haber_mt,0) as haber_mt,
                           (coalesce(itr.importe_debe_mt,0) - coalesce(itr.importe_haber_mt,0)) as saldo_debehaber_mt,
 
-                        --- 2DOS CAMPOS ELIMINADOS DEL REPORTE
-                         /* coalesce(itr.importe_gasto_mt,0) as gasto_mt,
-                          coalesce(itr.importe_recurso_mt,0) as recurso_mt ,
-                          (coalesce(itr.importe_gasto_mt,0) - coalesce(itr.importe_recurso_mt,0)) as saldo_gastorecurso_mt,*/
-            			--- 2DOS HASTA AQUI
-
+						--#69 SE HAN ELIMINADO 3 COLUMNAS
                           coalesce(itr.importe_debe_ma,0) as debe_ma,
                           coalesce(itr.importe_haber_ma,0) as haber_ma,
                           (coalesce(itr.importe_debe_ma,0) - coalesce(itr.importe_haber_ma,0)) as saldo_debehaber_ma,
 
-        				--- 3ROS CAMPOS ELIMINADOS DEL REPORTE
-                          /*coalesce(itr.importe_gasto_ma,0) as gasto_ma,
-                          coalesce(itr.importe_recurso_ma,0) as recurso_ma,
-                          (coalesce(itr.importe_gasto_ma,0) - coalesce(itr.importe_recurso_ma,0)) as saldo_gastorecurso_ma ,*/
-            			--- 3ROS HASTA AQUI
-
+                       --#69 SE HAN ELIMINADO 3 COLUMNAS
                           icbt.tipo_cambio_3 as tc_ufv,
                           cue.tipo_cuenta ,
                           cue.nro_cuenta as cuenta_nro,
@@ -2239,14 +2226,14 @@ BEGIN
                           '||v_atributos||',
 						  tpp.nombre,
 
-                          --- NUEVOS CAMPOS ADICIONADOS
-                          vc.beneficiario, --- medlo nuevo
+                          --#69 SE ADICIONAN 6 NUEVAS COLUMNAS
+                          regexp_replace(regexp_replace(vc.beneficiario,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as beneficiario,
                           vc.desc_clase_comprobante as tipo_cbte,
-                          vc.glosa1 as glosa,
+                          regexp_replace(regexp_replace(vc.glosa1,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa,
                           us.desc_persona as persona_create,
                           um.desc_persona as persona_mod,
                           vc.nro_tramite_aux
-                          --- NUEVOS HASTA AQUI
+                          --- HASTA AQUI
 
                           from conta.tint_comprobante icbt
                           join param.tperiodo per on per.id_periodo = icbt.id_periodo
