@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_migrar_int_comprobante (
   p_administrador integer,
   p_comprobante json,
@@ -10,17 +12,16 @@ $body$
  SISTEMA:        Sistema
  FUNCION:         conta.f_migrar_int_comprobante
  DESCRIPCION:   Funcion que recibe los json cuando e migra de pxp a pxp
- AUTOR:         EGS
- FECHA:            11/03/2019
- COMENTARIOS:    
+ISSUE           FECHA         AUTHOR         DESCRIPCION
+#70 ENDEETR     12/08/2019    EGS            La transacion migrada se vuelve editable etasa
 ***************************************************************************/
 
 
 
 DECLARE
-  
+
     v_nombre_funcion                           text;
-    v_resp                                  varchar; 
+    v_resp                                  varchar;
     v_nombre_conexion                       varchar;
     v_consulta                              varchar;
     v_nombre_con                            varchar;
@@ -28,7 +29,7 @@ DECLARE
     v_int_comprobante                       record;
     v_record_per_ges                        record;
     v_id_int_comprobante                    integer;
-    
+
     --proceso wf
     v_id_proceso_macro                        integer;
     v_codigo_proceso_macro                     varchar;
@@ -37,7 +38,7 @@ DECLARE
     v_id_estado_wf                            integer;
     v_num_tramite                           varchar;
     v_codigo_estado                            varchar;
-    record_wf                               record; 
+    record_wf                               record;
     v_tamano                                integer;
     v_id_int_comprobante_temp               record;
     v_id_int_comprobante_m                  integer;
@@ -47,26 +48,27 @@ DECLARE
     beneficiario                           varchar;
     v_string                                  varchar;
     v_count                                 integer;
-    
+
     v_id_int_comprobante_fks                integer[];
     v_id_int_comprobante_new                integer;
     j_int_transacciones                      json;
-    j_int_transaccion                       json;  
+    j_int_transaccion                       json;
+    v_sw_editable                           varchar;
 BEGIN
 
     v_nombre_funcion = 'conta.f_migrar_int_comprobante';
 
-    --Creando tablas Temporales 
+    --Creando tablas Temporales
    CREATE TEMPORARY TABLE temp_tint_comprobante (
                    id serial,
                    id_int_comprobante_old integer,
                    id_int_comprobante_new integer
                   ) ON COMMIT DROP;
-    
-   
-    
-    
-    j_comprobantes = p_comprobante; 
+
+
+    --Variable que habilida la edicion en las trnasacciones
+    v_sw_editable = 'si';--#70
+    j_comprobantes = p_comprobante;
     FOR j_comprobante IN (SELECT *
                          FROM json_array_elements(j_comprobantes)) LOOP
 
@@ -195,7 +197,8 @@ BEGIN
                       (j_comprobante ->> 'sw_tipo_cambio')::VARCHAR,
                       (j_comprobante ->> 'id_config_cambiaria')::INTEGER,
                       (j_comprobante ->> 'localidad')::VARCHAR,
-                      (j_comprobante ->> 'sw_editable')::VARCHAR,
+                      --(j_comprobante ->> 'sw_editable')::VARCHAR,
+                      v_sw_editable,--#70
                       (j_comprobante ->> 'id_int_comprobante_bk')::INTEGER,
                       (j_comprobante ->> 'id_ajuste')::INTEGER,
                       (j_comprobante ->> 'volcado')::VARCHAR,
