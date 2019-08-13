@@ -825,23 +825,23 @@ class ACTIntTransaccion extends ACTbase{
 				"debe_mb" . $separador .
 				"haber_mb" . $separador .
 				"saldo_debehaber_mb" . $separador .
-				"gasto_mb" . $separador .
-				"recurso_mb" . $separador .
+				//"gasto_mb" . $separador .
+				//"recurso_mb" . $separador .
 
-				"saldo_gastorecurso_mb" . $separador .
+				//"saldo_gastorecurso_mb" . $separador .
 				"debe_mt" . $separador .
 				"haber_mt" . $separador .
 				"saldo_debehaber_mt" . $separador .
-				"gasto_mt" . $separador .
-				"recurso_mt" . $separador .
+				//"gasto_mt" . $separador .
+				//"recurso_mt" . $separador .
 
-				"saldo_gastorecurso_mt" . $separador .
+				//"saldo_gastorecurso_mt" . $separador .
 				"debe_ma" . $separador .
 				"haber_ma" . $separador .
 				"saldo_debehaber_ma" . $separador .
-				"gasto_ma" . $separador .
-				"recurso_ma" . $separador .
-				"saldo_gastorecurso_ma" . $separador .
+				//"gasto_ma" . $separador .
+				//"recurso_ma" . $separador .
+			    //"saldo_gastorecurso_ma" . $separador .
 
 				"tc_ufv" . $separador .
 				"tipo_cuenta" . $separador .
@@ -858,6 +858,14 @@ class ACTIntTransaccion extends ACTbase{
 				"aux_codigo" . $separador .
 				"aux_nombre" . $separador .
                 "nombre" . $separador .
+                //************************
+                //******NUEVOS************
+                "beneficiario" . $separador .
+                "tipo_cbte" . $separador .
+                "glosa" . $separador .
+                "persona_create" . $separador .
+                "persona_mod" . $separador .
+                "nro_tramite_aux" . $separador .
 				"\r\n"
 
 				);
@@ -876,23 +884,23 @@ class ACTIntTransaccion extends ACTbase{
 				"debe_mb" . $separador .
 				"haber_mb" . $separador .
 				"saldo_debehaber_mb" . $separador .
-				"gasto_mb" . $separador .
-				"recurso_mb" . $separador .
+				//"gasto_mb" . $separador .
+				//"recurso_mb" . $separador .
 
-				"saldo_gastorecurso_mb" . $separador .
+				//"saldo_gastorecurso_mb" . $separador .
 				"debe_mt" . $separador .
 				"haber_mt" . $separador .
 				"saldo_debehaber_mt" . $separador .
-				"gasto_mt" . $separador .
-				"recurso_mt" . $separador .
+				//"gasto_mt" . $separador .
+				//"recurso_mt" . $separador .
 
-				"saldo_gastorecurso_mt" . $separador .
+				//"saldo_gastorecurso_mt" . $separador .
 				"debe_ma" . $separador .
 				"haber_ma" . $separador .
 				"saldo_debehaber_ma" . $separador .
-				"gasto_ma" . $separador .
-				"recurso_ma" . $separador .
-				"saldo_gastorecurso_ma" . $separador .
+				//"gasto_ma" . $separador .
+				//"recurso_ma" . $separador .
+				//"saldo_gastorecurso_ma" . $separador .
 
 				"tc_ufv" . $separador .
 				"tipo_cuenta" . $separador .
@@ -908,7 +916,7 @@ class ACTIntTransaccion extends ACTbase{
 				"centro_costo" . $separador .
 				"aux_codigo" . $separador .
 				"aux_nombre" . $separador .
-                //"beneficiario" . $separador .
+
 				"tipo_transaccion" . $separador .
 				"periodo" . $separador .
 				"hora" . $separador .
@@ -916,6 +924,14 @@ class ACTIntTransaccion extends ACTbase{
 				"usuario_reg_transaccion" . $separador .
 				"nro_documento" . $separador .
 				"glosa_transaccion" . $separador .
+                //************************
+                //******NUEVOS************
+                "beneficiario" . $separador .
+                "tipo_cbte" . $separador .
+                "glosa" . $separador .
+                "persona_create" . $separador .
+                "persona_mod" . $separador .
+                "nro_tramite_aux" . $separador .
 
 				"\r\n"
 
@@ -944,23 +960,23 @@ class ACTIntTransaccion extends ACTbase{
 			                        $val['debe_mb'].$separador.
 			                        $val['haber_mb'].$separador.
 									$val['saldo_debehaber_mb'].$separador.
-									$val['gasto_mb'].$separador.
-									$val['recurso_mb'].$separador.
+									//$val['gasto_mb'].$separador.
+									//$val['recurso_mb'].$separador.
 
-									$val['saldo_gastorecurso_mb'].$separador.
+									//$val['saldo_gastorecurso_mb'].$separador.
 			                        $val['debe_mt'].$separador.
 			                        $val['haber_mt'].$separador.
 									$val['saldo_debehaber_mt'].$separador.
-									$val['gasto_mt'].$separador.
-									$val['recurso_mt'].$separador.
+									//$val['gasto_mt'].$separador.
+									//$val['recurso_mt'].$separador.
 
-									$val['saldo_gastorecurso_mt'].$separador.
+									//$val['saldo_gastorecurso_mt'].$separador.
 			                        $val['debe_ma'].$separador.
 			                        $val['haber_ma'].$separador.
 									$val['saldo_debehaber_ma'].$separador.
-									$val['gasto_ma'].$separador.
-									$val['recurso_ma'].$separador.
-									$val['saldo_gastorecurso_ma'].$separador.
+									//$val['gasto_ma'].$separador.
+									//$val['recurso_ma'].$separador.
+									//$val['saldo_gastorecurso_ma'].$separador.
 
 									$val['tc_ufv'].$separador.
 									$val['tipo_cuenta'].$separador.
@@ -977,9 +993,14 @@ class ACTIntTransaccion extends ACTbase{
 									$val['aux_codigo'].$separador.
 									$val['aux_nombre'].$separador.
                                     $val['nombre'].$separador.
-
-
-
+                                    //************************
+                                    //******NUEVOS************
+                                    $val['beneficiario'].$separador.
+                                    $val['tipo_cbte'].$separador.
+                                    $val['glosa'].$separador.
+                                    $val['persona_create'].$separador.
+                                    $val['persona_mod'].$separador.
+                                    $val['nro_tramite_aux'].$separador.
 			                        "\r\n"
 									);
 			 }
@@ -1030,7 +1051,15 @@ class ACTIntTransaccion extends ACTbase{
 									$val['centro_costo'].$separador.
 									$val['aux_codigo'].$separador.
 									$val['aux_nombre'].$separador.
-                                    //$val['beneficiario'].$separador.
+                                    //************************
+                                    //******NUEVOS************
+                                    $val['beneficiario'].$separador.
+                                    $val['tipo_cbte'].$separador.
+                                    $val['glosa'].$separador.
+                                    $val['persona_create'].$separador.
+                                    $val['persona_mod'].$separador.
+                                    $val['nro_tramite_aux'].$separador.
+                                    //******************************
                                     $val['tipo_transaccion'].$separador.
 								    $val['periodo'].$separador.
 								    $val['hora'].$separador.

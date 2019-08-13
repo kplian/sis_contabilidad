@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -25,6 +23,8 @@ $body$
   #49		 17/05/2019		  Manuel Guerra	  correcion de join en reporte de cbte-transaccion
   #65        11/07/2019       EGS             Se agrega filtro para el parametro tipo en las trnsacciones  CONTA_AUXMAY_SEL,CONTA_AUXMAY_CONT,
                                               CONTA_TOTAUX_SEL,CONTA_TOTAUX_CONT
+  #69        01/08/2019       Saul Zambrana	  Se han eliminado 9 columnas y añadido 6 a la transaccion CONTA_LDCTRANS_SEL para el reporte:Detalle comprobante-transacciones
+  											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de  
 ***************************************************************************/
 
 DECLARE
@@ -2185,6 +2185,7 @@ BEGIN
             END IF;       
             --#48  
             --#49
+            --#69
 			v_consulta:='select
                           itr.id_int_transaccion ,
                           icbt.id_int_comprobante , icbt.fecha_reg , icbt.fecha , icbt.nro_cbte , icbt.nro_tramite , 
@@ -2192,27 +2193,19 @@ BEGIN
                           coalesce(itr.importe_debe_mb,0) as debe_mb ,
                           coalesce(itr.importe_haber_mb,0) as haber_mb ,
                           (coalesce(itr.importe_debe_mb,0) - coalesce(itr.importe_haber_mb,0)) as saldo_debehaber_mb,
-                          coalesce(itr.importe_gasto_mb,0) as gasto_mb,
-                          coalesce(itr.importe_recurso_mb,0) as recurso_mb ,
                           
-                          (coalesce(itr.importe_gasto_mb,0) - coalesce(itr.importe_recurso_mb,0)) as saldo_gastorecurso_mb,
+						--#69 SE HAN ELIMINADO 3 COLUMNAS                         
                           coalesce(itr.importe_debe_mt,0) as debe_mt,
                           coalesce(itr.importe_haber_mt,0) as haber_mt,
                           (coalesce(itr.importe_debe_mt,0) - coalesce(itr.importe_haber_mt,0)) as saldo_debehaber_mt,
-                          coalesce(itr.importe_gasto_mt,0) as gasto_mt,
-                          coalesce(itr.importe_recurso_mt,0) as recurso_mt ,
                           
-                          (coalesce(itr.importe_gasto_mt,0) - coalesce(itr.importe_recurso_mt,0)) as saldo_gastorecurso_mt,
+						--#69 SE HAN ELIMINADO 3 COLUMNAS
                           coalesce(itr.importe_debe_ma,0) as debe_ma,
                           coalesce(itr.importe_haber_ma,0) as haber_ma,
                           (coalesce(itr.importe_debe_ma,0) - coalesce(itr.importe_haber_ma,0)) as saldo_debehaber_ma,
-                          coalesce(itr.importe_gasto_ma,0) as gasto_ma,
-                          coalesce(itr.importe_recurso_ma,0) as recurso_ma,
-                          (coalesce(itr.importe_gasto_ma,0) - coalesce(itr.importe_recurso_ma,0)) as saldo_gastorecurso_ma ,
                           
-
+                       --#69 SE HAN ELIMINADO 3 COLUMNAS   
                           icbt.tipo_cambio_3 as tc_ufv,
-
                           cue.tipo_cuenta ,
                           cue.nro_cuenta as cuenta_nro,
                           cue.nombre_cuenta as cuenta ,
@@ -2220,19 +2213,30 @@ BEGIN
                           par.sw_movimiento as partida_tipo,
                           par.codigo as partida_codigo,
                           par.nombre_partida as partida ,
-                          regexp_replace(regexp_replace(tcct.codigo_techo,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo_techo_codigo,
-                          regexp_replace(regexp_replace(tcct.descripcion_techo,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo_techo,
-                          regexp_replace(regexp_replace(tcc.codigo,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo_codigo,
-                          regexp_replace(regexp_replace(tcc.descripcion,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo ,
-                          regexp_replace(regexp_replace(aux.codigo_auxiliar,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as aux_codigo,
-                          regexp_replace(regexp_replace(aux.nombre_auxiliar,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as aux_nombre,
+                          regexp_replace(regexp_replace(tcct.codigo_techo,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo_techo_codigo,
+                          regexp_replace(regexp_replace(tcct.descripcion_techo,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo_techo,
+                          regexp_replace(regexp_replace(tcc.codigo,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo_codigo,
+                          regexp_replace(regexp_replace(tcc.descripcion,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo ,
+                          regexp_replace(regexp_replace(aux.codigo_auxiliar,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as aux_codigo,
+                          regexp_replace(regexp_replace(aux.nombre_auxiliar,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as aux_nombre,
                           
                           (case when icbt.manual=''no'' then ''automática'' else ''manual'' end)::varchar as tipo_transaccion,
                           param.f_get_periodo_literal(per.id_periodo)::varchar as periodo,
                           to_char(itr.fecha_reg, ''HH12:MI:SS'')::varchar as hora,
                           itr.fecha_reg::timestamp as fecha_reg_transaccion
                           '||v_atributos||',
-						  tpp.nombre 
+						  tpp.nombre,
+                          
+                          --#69 SE ADICIONAN 6 NUEVAS COLUMNAS
+                          --#69 SE MODIFICA LA EMPRESION REGULAR [\n\t] por [\n\t\r ]
+                          regexp_replace(regexp_replace(vc.beneficiario,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as beneficiario,
+                          vc.desc_clase_comprobante as tipo_cbte,
+                          regexp_replace(regexp_replace(vc.glosa1,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa,                          
+                          us.desc_persona as persona_create,
+                          um.desc_persona as persona_mod,
+                          vc.nro_tramite_aux 
+                          --- HASTA AQUI
+                          
                           from conta.tint_comprobante icbt
                           join param.tperiodo per on per.id_periodo = icbt.id_periodo
                           join conta.tint_transaccion itr on itr.id_int_comprobante = icbt.id_int_comprobante
@@ -2241,16 +2245,17 @@ BEGIN
                           join param.tcentro_costo cc on cc.id_centro_costo=itr.id_centro_costo
                           join pre.tpresupuesto pre on pre.id_centro_costo=cc.id_centro_costo
 						  join pre.ttipo_presupuesto tpp on pre.tipo_pres=tpp.codigo
+                          inner join conta.vint_comprobante vc on vc.id_int_comprobante = icbt.id_int_comprobante  --NUEVO
+                          inner join segu.vusuario us on us.id_usuario = vc.id_usuario_reg
+                          left join segu.vusuario um on um.id_usuario = vc.id_usuario_mod       --NUEVO
                           left join param.ttipo_cc tcc on tcc.id_tipo_cc=cc.id_tipo_cc
                           left join param.vtipo_cc_techo tcct on tcc.id_tipo_cc =any (tcct.ids)
                           left join conta.tauxiliar aux on aux.id_auxiliar = itr.id_auxiliar
                           '||v_join||'
-                          where icbt.estado_reg = ''validado'' and  ';
+                          where icbt.estado_reg = ''validado''  and ';
+
 			v_consulta:=v_consulta||v_parametros.filtro;
-            
-
-			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+		 
 			return v_consulta;
 						
 		end;  
