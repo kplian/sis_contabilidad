@@ -2,7 +2,12 @@
 //incluimos la libreria
 //echo dirname(__FILE__);
 //include_once(dirname(__FILE__).'/../PHPExcel/Classes/PHPExcel.php');
-
+/*
+**************************************************************************
+ ISSUE  SIS       EMPRESA       FECHA       AUTOR       DESCRIPCION
+ #154    CONTA     ETR           01/08/2019  RCM         Corrección por actualización de PHP 7. Se cambia el string Arial por cadena 'Arial'
+***************************************************************************
+*/
 class RBalanceGeneralXls
 {
 	private $docexcel;
@@ -12,12 +17,12 @@ class RBalanceGeneralXls
 	private $columnas=array();
 	private $fila;
 	private $equivalencias=array();
-	
+
 	private $indice, $m_fila, $titulo;
 	private $swEncabezado=0; //variable que define si ya se imprimi� el encabezado
 	private $objParam;
-	public  $url_archivo;	
-	
+	public  $url_archivo;
+
 	function __construct(CTParametro $objParam){
 		$this->objParam = $objParam;
 		$this->url_archivo = "../../../reportes_generados/".$this->objParam->getParametro('nombre_archivo');
@@ -27,8 +32,8 @@ class RBalanceGeneralXls
 		$cacheSettings = array('memoryCacheSize'  => '10MB');
 		PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
 		PHPExcel_Shared_Font::setAutoSizeMethod(PHPExcel_Shared_Font::AUTOSIZE_METHOD_EXACT);
-		
-		
+
+
 		$this->docexcel = new PHPExcel();
 		$this->docexcel->getProperties()->setCreator("PXP")
 							 ->setLastModifiedBy("PXP")
@@ -49,127 +54,127 @@ class RBalanceGeneralXls
 								52=>'BA',53=>'BB',54=>'BC',55=>'BD',56=>'BE',57=>'BF',58=>'BG',59=>'BH',
 								60=>'BI',61=>'BJ',62=>'BK',63=>'BL',64=>'BM',65=>'BN',66=>'BO',67=>'BP',
 								68=>'BQ',69=>'BR',70=>'BS',71=>'BT',72=>'BU',73=>'BV',74=>'BW',75=>'BX',
-								76=>'BY',77=>'BZ');		
-									
-	}  
-	
-	
+								76=>'BY',77=>'BZ');
+
+	}
+
+
 	function imprimeTitulo($sheet){
 		$titulo = $this->objParam->getParametro('titulo_rep');
 		$codigos = $this->objParam->getParametro('codigos');
 		$fechas = 'Del '.$this->objParam->getParametro('desde').' al '.$this->objParam->getParametro('hasta');
-		
+
 		//TODO imprimir titulo
-		
+
 		$sheet->getColumnDimension($this->equivalencias[0])->setWidth(20);
 		$sheet->getColumnDimension($this->equivalencias[1])->setWidth(45);
 		$sheet->getColumnDimension($this->equivalencias[2])->setWidth(20);
 		$sheet->getColumnDimension($this->equivalencias[3])->setWidth(25);
-		
+
 		//$sheet->setCellValueByColumnAndRow(0,1,$this->objParam->getParametro('titulo_rep'));
 		$sheet->getStyle('A1')->getFont()->applyFromArray(array('bold'=>true,
 															    'size'=>12,
-															    'name'=>Arial));
-																
+															    'name'=>'Arial'));//#154
+
 		$sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$sheet->setCellValueByColumnAndRow(0,1,strtoupper($titulo));		
+		$sheet->setCellValueByColumnAndRow(0,1,strtoupper($titulo));
 		$sheet->mergeCells('A1:D1');
-		
+
 		//DEPTOS TITLE
 		$sheet->getStyle('A2')->getFont()->applyFromArray(array(
 															    'bold'=>true,
 															    'size'=>10,
-															    'name'=>Arial));	
-																															
+															    'name'=>'Arial'));	//#154
+
 		$sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$sheet->setCellValueByColumnAndRow(0,2,strtoupper('DEPTOS: '.$codigos));		
+		$sheet->setCellValueByColumnAndRow(0,2,strtoupper('DEPTOS: '.$codigos));
 		$sheet->mergeCells('A2:D2');
 		//FECHAS
 		$sheet->getStyle('A3')->getFont()->applyFromArray(array(
 															    'bold'=>true,
 															    'size'=>10,
-															    'name'=>Arial));	
-																															
+															    'name'=>'Arial'));	//#154
+
 		$sheet->getStyle('A3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		$sheet->setCellValueByColumnAndRow(0,3,$fechas);		
+		$sheet->setCellValueByColumnAndRow(0,3,$fechas);
 		$sheet->mergeCells('A3:D3');
-		
+
 	}
-			
+
 	function imprimeDatos(){
 		$datos = $this->objParam->getParametro('datos');
 		$sheet = $this->docexcel->getActiveSheet();
 		//Cabecera
-		$this->imprimeTitulo($sheet);	
-		
-		
+		$this->imprimeTitulo($sheet);
+
+
 		$fila = 4;
 		$columnas = 0;
-		
-		
-		
+
+
+
 		/////////////////////***********************************Detalle***********************************************
-		foreach($datos as $val) {			
-			
-				
+		foreach($datos as $val) {
+
+
 				//necesita espacios
 					$sw_espacio = 1;
 					$sw_detalle = 0; //deshabilita los espacion para el siguiente detalle
 					$tabs = "\t\t";
-				   
-		        	//signo	
-		        	$signo = '';	
-					//alineacion del texto	
-		        	$posicion = PHPExcel_Style_Alignment::HORIZONTAL_LEFT;	
+
+		        	//signo
+		        	$signo = '';
+					//alineacion del texto
+		        	$posicion = PHPExcel_Style_Alignment::HORIZONTAL_LEFT;
 		        	$underline = false;
 					$bold = false;
 					$italic = false;
-					
-				
-		        	
-				
+
+
+
+
 				//////////////////
 				//Coloca el texto
 				///////////////////////
-				
+
 				//var_dump($val);
 				//exit;
-				
-				// Formateo el texto		       
+
+				// Formateo el texto
 				$texto = trim($tabs.$val['nombre_cuenta']);
-				
-				
-				
-				
+
+
+
+
 				$sheet->getStyle(($this->equivalencias[0]).$fila)->getFont()->applyFromArray(array(
 																	    'bold'=>$bold,
 																	    'italic'=>$italic,
 																	    'underline'=>$underline,
 																	    'size'=>$val['font_size'],
-																	    'name'=>Arial));
-																		
-				$sheet->getStyle(($this->equivalencias[0]).$fila)->getAlignment()->setHorizontal($posicion);	
-																		
+																	    'name'=>'Arial'));//#154
+
+				$sheet->getStyle(($this->equivalencias[0]).$fila)->getAlignment()->setHorizontal($posicion);
+
 				$sheet->setCellValueByColumnAndRow(0,$fila,substr($val['nro_cuenta'], 0, 40));  //ojo revisar es apra mostrar menos caracteres
-				
-				
-						
+
+
+
 				$sheet->getStyle(($this->equivalencias[1]).$fila)->getFont()->applyFromArray(array(
 																	    'bold'=>$bold,
 																	    'italic'=>$italic,
 																	    'underline'=>$underline,
 																	    'size'=>$val['font_size'],
-																	    'name'=>Arial));
-																		
-				$sheet->getStyle(($this->equivalencias[1]).$fila)->getAlignment()->setHorizontal($posicion);															
+																	    'name'=>'Arial'));//#154
+
+				$sheet->getStyle(($this->equivalencias[1]).$fila)->getAlignment()->setHorizontal($posicion);
 				$sheet->setCellValueByColumnAndRow(1,$fila,substr($texto, 0, 40));  //ojo revisar es apra mostrar menos caracteres
-				
-				
+
+
 				//////////////////////
 				//coloca los montos
 				/////////////////////
-				
-				
+
+
 				//si el monto es menor a cero color rojo codigo CMYK
 				if($val['monto']*1 < 0){
 					$color = array('rgb'=>'FF0000');
@@ -178,70 +183,70 @@ class RBalanceGeneralXls
 					$color = array('rgb'=>'000000');
 				}
 				$monto_str =  $val['monto'];
-				
-				
+
+
 			  $sheet->getStyle(($this->equivalencias[3]).$fila)->getFont()->applyFromArray(array(
 															    'bold'=>true,
 															    'size'=>10,
-															    'name'=>Arial,
+															    'name'=>'Arial',//#154
 															    'color'=>$color));
-																
-																
-			   $sheet->getStyle(($this->equivalencias[3]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2); 
-			   
+
+
+			   $sheet->getStyle(($this->equivalencias[3]).$fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2);
+
 			   //$sheet->setCellValueByColumnAndRow(1,$fila,'');
 		       //$sheet->setCellValueByColumnAndRow(2,$fila,'');
 		       $sheet->setCellValueByColumnAndRow(3,$fila,$monto_str);
-		
-				
+
+
 				$fila++;
-			
+
 		}
 		//************************************************Fin Detalle***********************************************
-		
+
 	}
-   
+
 
 	function formatearTextoDetalle($texto){
-		$tex=  ucwords(strtolower($texto));	
+		$tex=  ucwords(strtolower($texto));
 		$tex = str_replace("Y", "y", $tex);
 		$tex = str_replace("De", "de", $tex);
 		$tex = str_replace("En", "en", $tex);
 		$tex = str_replace("Del", "del", $tex);
-		
+
 		return trim($tex);
 	}
-	
+
 	function generarReporte(){
 		//echo $this->nombre_archivo; exit;
 		// Set active sheet index to the first sheet, so Excel opens this as the first sheet
 		$this->docexcel->setActiveSheetIndex(0);
 		$this->objWriter = PHPExcel_IOFactory::createWriter($this->docexcel, 'Excel5');
-		$this->objWriter->save($this->url_archivo);	
-		
-	}	
-	
+		$this->objWriter->save($this->url_archivo);
+
+	}
+
 	function getLlaveFila($val){
-		
-		if(isset($val['codigo_cuenta']) && $val['codigo_cuenta'] != '' ){			
+
+		if(isset($val['codigo_cuenta']) && $val['codigo_cuenta'] != '' ){
 			return  $val['codigo_cuenta'];
 		}
-		
+
 		//registra una nueva fila
 		if(isset($val['nombre_variable']) && $val['nombre_variable'] != ''){
 			return $val['nombre_variable'];
-					   
+
 		}
 		else{
 			return  $val['desc_cuenta'];
-			
+
 		}
-		
-		
+
+
 	}
-	
-	
-	
+
+
+
 
 }
 
