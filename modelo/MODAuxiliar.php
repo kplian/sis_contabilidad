@@ -28,8 +28,8 @@ class MODAuxiliar extends MODbase{
 		
 		$this->setParametro('id_cuenta','id_cuenta','int4');	
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
-        $this->setParametro('no_es_proveedor','no_es_proveedor','varchar');// #47
-        $this->setParametro('es_funcionario','es_funcionario','varchar');// #47
+        $this->setParametro('no_es_proveedor','no_es_proveedor','varchar');// #71
+        $this->setParametro('es_funcionario','es_funcionario','varchar');// #71
 
 		
 		//Definicion de la lista del resultado del query
