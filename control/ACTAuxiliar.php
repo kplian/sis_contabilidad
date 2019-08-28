@@ -7,7 +7,7 @@
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 *  	ISUUE			FECHA			AUTHOR 		DESCRIPCION
 *   #23           27/12/2018    Miguel Mamani   Reporte Detalle Auxiliares por Cuenta
-*
+*   #71           28/08/2019        EGS         e agrega filtro por id de auxiliar
 *
 *
 */
@@ -22,7 +22,9 @@ class ACTAuxiliar extends ACTbase{
             $this->objParam->addFiltro("auxcta.id_auxiliar IN (select id_auxiliar 
             							from conta.tcuenta_auxiliar where estado_reg = ''activo'' and id_cuenta = ".$this->objParam->getParametro('id_cuenta') . ") ");    
         }
-		
+        if($this->objParam->getParametro('id_auxiliar')!=''){//#71
+            $this->objParam->addFiltro("auxcta.id_auxiliar =".$this->objParam->getParametro('id_auxiliar'));
+        }
 		if($this->objParam->getParametro('corriente')!=''){
             $this->objParam->addFiltro("auxcta.corriente = ''".$this->objParam->getParametro('corriente')."''");    
         }
