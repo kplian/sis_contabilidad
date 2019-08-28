@@ -9,8 +9,8 @@
  * 		1A			30/08/2018			EGS		 se aumento el campo aplicacion
  *      #23        27/12/2018    Miguel Mamani     		Reporte Detalle Auxiliares por Cuenta
  *      #10        02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
- * 
-*/
+ *     #71             13/08/2019      EGS              Se aumentan banderas para filtra los auxiliares que no tengan proveedores y que sean funcionarios
+ */
 
 
 class MODAuxiliar extends MODbase{
@@ -28,7 +28,9 @@ class MODAuxiliar extends MODbase{
 		
 		$this->setParametro('id_cuenta','id_cuenta','int4');	
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
-		
+        $this->setParametro('no_es_proveedor','no_es_proveedor','varchar');// #47
+        $this->setParametro('es_funcionario','es_funcionario','varchar');// #47
+
 		
 		//Definicion de la lista del resultado del query
 		$this->captura('id_auxiliar','int4');
