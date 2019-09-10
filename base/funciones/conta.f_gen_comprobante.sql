@@ -8,7 +8,8 @@ CREATE OR REPLACE FUNCTION conta.f_gen_comprobante (
   p_id_usuario_ai integer = NULL::integer,
   p_usuario_ai varchar = NULL::character varying,
   p_conexion varchar = NULL::character varying,
-  p_sincronizar_internacional boolean = false
+  p_sincronizar_internacional boolean = false,
+  p_num_tramite_custom varchar = NULL::character varying
 )
 RETURNS integer AS
 $body$
@@ -26,6 +27,12 @@ Descripcion:   Esta funcion inicia la generacion de comprobantes contables,
 
 
 
+ HISTORIAL DE MODIFICACIONES:
+       
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+    
+ #72             10-09-2019        Rarteaga KPLIAN       número de tramite customizable
+
 
 */
 
@@ -41,10 +48,8 @@ DECLARE
     v_posicion				integer;
     v_columnas				varchar;
     v_columna_requerida		varchar;
-   -- r 						record;  --  esta variable no se usa
     v_registros_config      record;
     v_valor					varchar;
-    
     v_id_int_comprobante    integer;
     resp_det varchar;
     
@@ -493,7 +498,9 @@ BEGIN
                        null,--v_parametros.id_funcionario,
                        v_this.columna_depto::integer,
                        'Registro de Cbte Automático',
-                       '' );        
+                       '',
+                       p_num_tramite_custom  --#72
+                       );        
                
                
                     IF  v_codigo_estado != 'borrador' THEN
