@@ -448,8 +448,8 @@ BEGIN
     IF p_id_estado_wf is null THEN
     
     
-                    IF  v_this.columna_nro_tramite is not NULL and  v_this.columna_nro_tramite != '' THEN
-                       raise exception 'Si viene de untra mite necesita especifica el id_proceso_wf en la función  generación del cbte';
+                    IF  v_this.columna_nro_tramite is not NULL and  v_this.columna_nro_tramite != '' and p_num_tramite_custom is NULL THEN --#72    
+                       raise exception 'Si viene de un tramite necesita especifica el id_proceso_wf en la función  generación del cbte (%)', v_this.columna_nro_tramite;
                     END IF;
     
                     --  inicia tramite nuevo 
