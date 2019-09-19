@@ -23,7 +23,7 @@ $body$
  ISSUE            FECHA:		      AUTOR                 DESCRIPCION
    
  #0        		29-03-2018        RAC KPLIAN        Mejora los mensajes derror dejandolos mas claros
-
+#73             19/09/2019            EGS                   Se modifica mensaje de error al aprobar ajuste
 */
 
 DECLARE
@@ -54,7 +54,7 @@ BEGIN
              
               
                   IF p_id_moneda_base = p_id_moneda THEN
-                      v_tmp = format('solo se tiene disponible un monto en moneda base de:  %s y se requiere; %s (Falta . %s)', round(p_resp_ges[3],2)::varchar, round(p_monto_cmp_mb,2)::varchar,  round(p_resp_ges[3] -p_monto_cmp_mb,2)::varchar);    
+                      v_tmp = format('solo se tiene disponible un monto en moneda base de:  %s y se requiere; %s (Falta . %s)', round(p_resp_ges[3],2)::varchar, round(p_monto_cmp_mb,2)::varchar,  round(p_resp_ges[3] -abs(p_monto_cmp_mb),2)::varchar);    --#73
                   ELSE
                       v_tmp =  format('solo se tiene disponible un monto de:  %s y se requiere  %s. (Falta . %s)', round(p_resp_ges[3],2)::varchar, round(p_monto_cmp_mb,2)::varchar,  round(p_resp_ges[3] - p_monto_cmp_mb,2)::varchar);
                   END IF;
