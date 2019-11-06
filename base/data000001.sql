@@ -1693,3 +1693,12 @@ select pxp.f_insert_tgui ('Taza Impuesto', 'Taza Impuesto', 'TAZAIMP', 'si', 10,
 select pxp.f_insert_testructura_gui ('TAZAIMP', 'RELACON');
 
 /***********************************F-DAT-RAC-CONTA-66-25/07/2019****************************************/
+
+
+
+/***********************************I-DAT-MANU-CONTA-1-30/10/2019****************************************/
+
+select pxp.f_insert_tgui ('VoBo Verificacion', 'VoBo Verificacion', 'VBVER', 'si', 50, 'sis_contabilidad/vista/int_comprobante/IntComprobanteVeri.php', 3, '', 'IntComprobanteVeri', 'CONTA');
+
+/***********************************F-DAT-MANU-CONTA-1-30/10/2019****************************************/
+
