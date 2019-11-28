@@ -1130,7 +1130,7 @@ class ACTIntTransaccion extends ACTbase{
     {
         $this->objFunc = $this->create('MODIntTransaccion');
         $this->res = $this->objFunc->reporteProyecto($this->objParam);
-        var_dump($this->res);exit;
+        //var_dump($this->res);exit;
         $titulo = 'Proyectos';
         $nombreArchivo = uniqid(md5(session_id()) . $titulo);
         $nombreArchivo .= '.xls';
