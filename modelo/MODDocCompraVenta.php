@@ -12,7 +12,8 @@
  #0        		  18-08-2015          N/N               creacion
  #1999  ETR       19/07/2018        RAC KPLIAN        Relacionar facturas NCD
  #2000 ETR        20/08/2018        EGS               se aumento campos de importes de retencion de garantias en listarDocCompraVentaCobro
- #2001 ETR        12/09/2018        EGS 			 se aumento los saldos separados para cobros de anticipos y rega 
+ #2001 ETR        12/09/2018        EGS 			 se aumento los saldos separados para cobros de anticipos y rega
+ #76              28/11/2019        EGS              Se filtra por tipo de cobro
 */
 class MODDocCompraVenta extends MODbase{
 	
@@ -152,7 +153,7 @@ class MODDocCompraVenta extends MODbase{
 		
 		$this->setParametro('nombre_vista','nombre_vista','varchar');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
-		
+        $this->setParametro('tipo_cobro','tipo_cobro','varchar');
 		
 				
 		//Definicion de la lista del resultado del query
@@ -226,7 +227,9 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('saldo_por_cobrar_pendiente','numeric');//#2001 ETR        12/09/2018        EGS 
 		$this->captura('saldo_por_cobrar_retgar','numeric');//#2001 ETR        12/09/2018        EGS 
 		$this->captura('saldo_por_cobrar_anticipo','numeric');//#2001 ETR        12/09/2018        EGS 
-		
+        $this->captura('cobrado_pendiente','varchar');//#76
+        $this->captura('cobrado_retgar','varchar');//#76
+        $this->captura('cobrado_anticipo','varchar');//#76
 
 		
 
