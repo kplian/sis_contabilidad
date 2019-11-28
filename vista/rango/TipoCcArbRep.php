@@ -1,10 +1,6 @@
 <?php
-/**
-*@package pXP
-*@file TipoCcArbRep.php
-*@author  Gonzalo Sarmiento Sejas
-*@date 21-02-2013 15:04:03
-*@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+/*
+#75 		28/11/2019		  Manuel Guerra	  controlling
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -17,26 +13,23 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		Phx.vista.TipoCcArbRep.superclass.constructor.call(this,config);
 		
 		this.campo_fecha_desde = new Ext.form.DateField({
-	            name: 'desde',
-	            fieldLabel: 'Desde',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				format: 'd/m/Y'
+            name: 'desde',
+            fieldLabel: 'Desde',
+            allowBlank: true,
+            anchor: '80%',
+            gwidth: 100,
+            format: 'd/m/Y'
 	    });
 			
 		this.campo_fecha_hasta = new Ext.form.DateField({
-	            name: 'hasta',
-	            fieldLabel: 'Hasta',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				format: 'd/m/Y'
+            name: 'hasta',
+            fieldLabel: 'Hasta',
+            allowBlank: true,
+            anchor: '80%',
+            gwidth: 100,
+            format: 'd/m/Y'
 	    });
-	    
-	   
-	    
-	    
+
 		this.tbar.addField('Desde:');
 		this.tbar.addField(this.campo_fecha_desde);
 		this.tbar.addField('Hasta:');		
@@ -44,39 +37,34 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		this.campo_fecha_desde.setValue();
 		this.campo_fecha_hasta.setValue();
 		
-		
 		//Botón para Imprimir el Comprobante
 		this.addButton('btnSincronizar', {
-				text : 'Sincronizar',
-				iconCls : 'bexecdb',
-				disabled : false,
-				handler : this.sincronizarRangos,
-				tooltip : '<b>Actuliza los valores de costos desde los comrpbantes aprobados  entre los  periodos de fechas seleccioandas</b>'
-			});
+            text : 'Sincronizar',
+            iconCls : 'bexecdb',
+            disabled : false,
+            handler : this.sincronizarRangos,
+            tooltip : '<b>Actuliza los valores de costos desde los comrpbantes aprobados  entre los  periodos de fechas seleccioandas</b>'
+        });
 			
 		this.addButton('btnReporte', {
-				text : 'Reporte',
-				iconCls : 'bprint',
-				disabled : false,
-				handler : this.formularioReporte,
-				tooltip : '<b>Formulario para genererar reporte</b>'
-			});	
-		
-    			
+            text : 'Reporte',
+            iconCls : 'bprint',
+            disabled : false,
+            handler : this.formularioReporte,
+            tooltip : '<b>Formulario para genererar reporte</b>'
+        });
+
 		this.init();
-		
 		this.iniciarEventos();
-		
-		
 	},
 	
 	Atributos:[
 		{
 			//configuracion del componente
 			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_tipo_cc'
+                labelSeparator:'',
+                inputType:'hidden',
+                name: 'id_tipo_cc'
 			},
 			type:'Field',
 			form:true 
@@ -84,9 +72,9 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		{
 			//configuracion del componente
 			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'id_tipo_cc_fk'
+                labelSeparator:'',
+                inputType:'hidden',
+                name: 'id_tipo_cc_fk'
 			},
 			type:'Field',
 			form:true 
@@ -104,12 +92,11 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 					console.log(this, arguments)
 						return  String.format('<b>{0}<b> {1} [{2}] MB',this.codigo, this.descripcion, Ext.util.Format.number(this.balance_mb,'0,000.00'));
 				}*/
-				
 			},
-				type:'TextField',
-				id_grupo:1,
-				grid:true,
-				form:true
+            type:'TextField',
+            id_grupo:1,
+            grid:true,
+            form:true
 		},
 		
 		{
@@ -121,10 +108,10 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 				gwidth: 300,
 				maxLength:400
 			},
-				type:'TextArea',
-				id_grupo:1,
-				grid:true,
-				form:true
+            type:'TextArea',
+            id_grupo:1,
+            grid:true,
+            form:true
 		},
 		{
 			config:{
@@ -133,7 +120,7 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 				gwidth: 159,
        		    galign: 'right',
        		    gtpl: function (){
-					console.log('....oooo', arguments)
+					//console.log('....oooo', arguments)
 						return  String.format('<b>{0}<b>',Ext.util.Format.number(this.balance_mb,'0,000.00'));
 				}
 			},
@@ -206,12 +193,10 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 			grid:true
 		}
 	],
-	
 
 	title:'Ordenes',	
 	ActList:'../../sis_contabilidad/control/Rango/listarTipoCcArbRep',
 	id_store:'id_tipo_cc',
-	
 	textRoot:'Ordenes de Costo',
     id_nodo:'id_tipo_cc',
     id_nodo_p:'id_tipo_cc_fk',
@@ -241,7 +226,6 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'usr_mod', type: 'string'},'id_ep','debe_mb','haber_mb',
 		'debe_mt','haber_mt','balance_mb','balance_mb',
 		'memoria','formulado','comprometido','ejecutado'
-		
 	],
 	
 	sortInfo:{
@@ -261,58 +245,44 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 		} else {
 			return false;
 		}
-		
 	},
 	onButtonAct : function() {
-		
-			if (!this.validarFiltros()) {
-				alert('Especifique los filtros antes')
-			}
-			else{
-				 this.capturaFiltros();
-			}
-			
+        if (!this.validarFiltros()) {
+            alert('Especifique los filtros antes')
+        }
+        else{
+             this.capturaFiltros();
+        }
 	},
 	capturaFiltros : function(combo, record, index) {
-		
-		
-		  var desde = this.campo_fecha_desde.getValue(),
-		      hasta = this.campo_fecha_hasta.getValue();
-		
-		
-		    if(desde && hasta){
-		    	this.loaderTree.baseParams={ 
-			                         desde: desde.dateFormat('d/m/Y'), 
-			                         hasta: hasta.dateFormat('d/m/Y')};
+        var desde = this.campo_fecha_desde.getValue(),
+		hasta = this.campo_fecha_hasta.getValue();
+		if(desde && hasta){
+		    this.loaderTree.baseParams={
+		        desde: desde.dateFormat('d/m/Y'),
+                hasta: hasta.dateFormat('d/m/Y')};
 		    }
-			
-			                         
-			
-			this.root.reload();
-			
+        this.root.reload();
 	},
 	
-	sincronizarRangos: function(){
-		
-		
-		var desde = this.campo_fecha_desde.getValue(),
+	sincronizarRangos: function(){			
+	    var desde = this.campo_fecha_desde.getValue(),
 		    hasta = this.campo_fecha_hasta.getValue();
-		 if(desde && hasta){
+        if(desde && hasta){
 		 	Phx.CP.loadingShow();
 			Ext.Ajax.request({
-					url:'../../sis_contabilidad/control/Rango/sincronizarRangos',
-					params:{ desde: desde.dateFormat('d/m/Y'), 
-				             hasta: hasta.dateFormat('d/m/Y')},
-					success: this.successRango,
-					failure: this.conexionFailure,
-					timeout: this.timeout,
-					scope: this
-				});
-		 }
-		 else{
-		 	alert('Especifique el rango de fecha que queire sincronizar');
-		 }
-			
+                url:'../../sis_contabilidad/control/Rango/sincronizarRangos',
+                params:{ desde: desde.dateFormat('d/m/Y'),
+                         hasta: hasta.dateFormat('d/m/Y')},
+                success: this.successRango,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        }
+        else{
+		    alert('Especifique el rango de fecha que queire sincronizar');
+        }
 	},
 	
 	successRango: function(){
@@ -322,30 +292,27 @@ Phx.vista.TipoCcArbRep=Ext.extend(Phx.arbGridInterfaz,{
 	
 	formularioReporte: function(){
 		Phx.CP.loadWindows('../../../sis_contabilidad/vista/cuenta/FormFiltroBalanceTipoCC.php', 'Formulario de Reporte', {
-				width : '40%',
-				height : '80%'
-			}, {}, this.idContenedor, 'FormFiltroBalanceTipoCC');
-		
-		
+            width : '40%',
+            height : '80%'
+        },
+        {},
+        this.idContenedor, 'FormFiltroBalanceTipoCC');
 	},
-	
-	 
+		 
 	tabeast:[
-		  {
-    		  url:'../../../sis_contabilidad/vista/rango/Rango.php',
-    		  title:'Detalle', 
-    		  width:'50%',
-    		  cls:'Rango'
-			},
-			{
-	          url:'../../../sis_contabilidad/vista/rango/RangoTorta2.php',
-	          title:'Gráficos', 
-	          cls:'RangoTorta2'
-         }]
-	
-	
-	
-	
+		{
+			url:'../../../sis_contabilidad/vista/rango/Rango.php',
+			title:'Detalle', 
+			width:'50%',
+			cls:'Rango'
+		},
+		/*sss{
+			url:'../../../sis_contabilidad/vista/rango/RangoTorta2.php',
+			title:'Gráficos', 
+			cls:'RangoTorta2'
+		}*/
+    ]
+
    
 })
 </script>

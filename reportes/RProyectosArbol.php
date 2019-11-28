@@ -2,8 +2,8 @@
 /**
 HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
-#2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
-#10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
+
+#75 		28/11/2019		  Manuel Guerra	  controlling
  */
 class RProyectosArbol
 {

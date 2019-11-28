@@ -14,6 +14,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #5			24/12/2108		  Manuel Guerra	  Correcion de sumas en auxiliares
 #6			27/12/2108		  Manuel Guerra	  Agregar filtro de cbtes de cierre
 #17 		09/01/2019		  Manuel Guerra	  agrego el filtro de nro_tramite_aux
+#75 		28/11/2019		  Manuel Guerra	  controlling
  */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayorSaldo.php');
@@ -1129,7 +1130,7 @@ class ACTIntTransaccion extends ACTbase{
     {
         $this->objFunc = $this->create('MODIntTransaccion');
         $this->res = $this->objFunc->reporteProyecto($this->objParam);
-        //var_dump($this->res);exit;
+        var_dump($this->res);exit;
         $titulo = 'Proyectos';
         $nombreArchivo = uniqid(md5(session_id()) . $titulo);
         $nombreArchivo .= '.xls';
@@ -1250,7 +1251,470 @@ class ACTIntTransaccion extends ACTbase{
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
     }
+	//
+    function listarMayorCtrl(){
+        $this->objParam->defecto('ordenacion','id_int_transaccion');
+        $this->objParam->defecto('dir_ordenacion','asc');
+
+		/*if($this->objParam->getParametro('tipo')!=''){
+            $this->objParam->addFiltro("tipo = ".$this->objParam->getParametro('tipo'));
+        }*/
+		if($this->objParam->getParametro('id_tipo_cc')!=''){
+
+			 $this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('tipo')."%''");
+			 //$this->objParam->addFiltro("sub.codigo ilike ''%".$this->objParam->getParametro('tipo')."%''");
+			 //$this->objParam->addFiltro("sub.codigo = ".$this->objParam->getParametro('tipo'));
+        }
+        if($this->objParam->getParametro('tipo')==''){
+            $this->objParam->addFiltro("icbte.nro_tramite like ''%".$this->objParam->getParametro('nro_tramite')."%''");
+        }
 		
+		
+        if($this->objParam->getParametro('id_int_comprobante')!=''){
+            $this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));
+        }
+
+        if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+        }
+
+        if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+            $this->objParam->addFiltro("ctc.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));
+        }
+
+        if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+            $this->objParam->addFiltro("csc.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));
+        }
+
+        if($this->objParam->getParametro('id_depto')!=''){
+            $this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));
+        }
+
+        if($this->objParam->getParametro('cbte_cierre')=='todos'){
+            $this->objParam->addFiltro("icbte.cbte_cierre in (''no'',''balance'',''resultado'')");
+        }else{
+            if($this->objParam->getParametro('cbte_cierre')=='balance'){
+                $this->objParam->addFiltro("icbte.cbte_cierre in (''balance'')");
+            }else{
+                if($this->objParam->getParametro('cbte_cierre')=='resultado'){
+                    $this->objParam->addFiltro("icbte.cbte_cierre in (''resultado'')");
+                }else{
+                    if($this->objParam->getParametro('cbte_cierre')=='no'){
+                        $this->objParam->addFiltro("icbte.cbte_cierre in (''no'')");
+                    }
+                }
+            }
+        }
+
+        if($this->objParam->getParametro('id_partida')!=''){
+            $this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));
+        }
+
+        if($this->objParam->getParametro('id_suborden')!=''){
+            $this->objParam->addFiltro("transa.id_subordeno = ".$this->objParam->getParametro('id_suborden'));
+        }
+
+        if($this->objParam->getParametro('id_auxiliar')!=''){
+            $this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));
+        }
+
+        if($this->objParam->getParametro('id_centro_costo')!=''){
+            $this->objParam->addFiltro("transa.id_centro_costo = ".$this->objParam->getParametro('id_centro_costo'));
+        }
+       /* if($this->objParam->getParametro('nro_tramite')!=''){
+            $this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");
+        }*/
+
+        if($this->objParam->getParametro('nro_tramite_aux')!=''){
+            $this->objParam->addFiltro("icbte.nro_tramite_aux ilike ''%".$this->objParam->getParametro('nro_tramite_aux')."%''");
+        }
+
+        if($this->objParam->getParametro('cerrado')=='si'){
+            $this->objParam->addFiltro("transa.cerrado in (''no'')");
+        }else{
+            $this->objParam->addFiltro("transa.cerrado in (''si'',''no'')");
+        }
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("(icbte.fecha::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')==''){
+            $this->objParam->addFiltro("(icbte.fecha::date  >= ''%".$this->objParam->getParametro('desde')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarMayorCtrl');
+        } else{
+            $this->objFunc=$this->create('MODIntTransaccion');
+
+            $this->res=$this->objFunc->listarMayorCtrl($this->objParam);
+        }
+        //adicionar una fila al resultado con el summario
+        $temp = Array();
+        $temp['importe_debe_mb'] = $this->res->extraData['total_debe'];
+        $temp['importe_haber_mb'] = $this->res->extraData['total_haber'];
+        $temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
+        $temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
+        $temp['importe_debe_ma'] = $this->res->extraData['total_debe_ma'];
+        $temp['importe_haber_ma'] = $this->res->extraData['total_haber_ma'];
+
+        $temp['saldo_mb'] = $this->res->extraData['total_saldo_mb'];
+        $temp['saldo_mt'] = $this->res->extraData['total_saldo_mt'];
+        $temp['dif'] = $this->res->extraData['dif'];
+
+        $temp['tipo_reg'] = 'summary';
+        $temp['id_int_transaccion'] = 0;
+
+        $this->res->total++;
+
+        $this->res->addLastRecDatos($temp);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+	//
+	//#75
+    function listarAgrupacion(){
+        $this->objParam->defecto('ordenacion','tipo');
+        $this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('id_int_comprobante')!=''){
+            $this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));
+        }
+
+        if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+        }
+
+        if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+            $this->objParam->addFiltro("ctc.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));
+        }
+
+        if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+            $this->objParam->addFiltro("csc.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));
+        }
+
+        if($this->objParam->getParametro('id_depto')!=''){
+            $this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));
+        }
+
+        if($this->objParam->getParametro('cbte_cierre')=='todos'){
+            $this->objParam->addFiltro("icbte.cbte_cierre in (''no'',''balance'',''resultado'')");
+        }else{
+            if($this->objParam->getParametro('cbte_cierre')=='balance'){
+                $this->objParam->addFiltro("icbte.cbte_cierre in (''balance'')");
+            }else{
+                if($this->objParam->getParametro('cbte_cierre')=='resultado'){
+                    $this->objParam->addFiltro("icbte.cbte_cierre in (''resultado'')");
+                }else{
+                    if($this->objParam->getParametro('cbte_cierre')=='no'){
+                        $this->objParam->addFiltro("icbte.cbte_cierre in (''no'')");
+                    }
+                }
+            }
+        }
+
+        if($this->objParam->getParametro('id_partida')!=''){
+            $this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));
+        }
+
+        if($this->objParam->getParametro('id_suborden')!=''){
+            $this->objParam->addFiltro("transa.id_subordeno = ".$this->objParam->getParametro('id_suborden'));
+        }
+
+        if($this->objParam->getParametro('id_auxiliar')!=''){
+            $this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));
+        }
+
+        if($this->objParam->getParametro('id_centro_costo')!=''){
+            $this->objParam->addFiltro("transa.id_centro_costo = ".$this->objParam->getParametro('id_centro_costo'));
+        }
+
+        if($this->objParam->getParametro('nro_tramite')!=''){
+            $this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");
+        }
+
+        if($this->objParam->getParametro('nro_tramite_aux')!=''){
+            $this->objParam->addFiltro("icbte.nro_tramite_aux ilike ''%".$this->objParam->getParametro('nro_tramite_aux')."%''");
+        }
+
+        if($this->objParam->getParametro('cerrado')=='si'){
+            $this->objParam->addFiltro("transa.cerrado in (''no'')");
+        }else{
+            $this->objParam->addFiltro("transa.cerrado in (''si'',''no'')");
+        }
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("(icbte.fecha::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')==''){
+            $this->objParam->addFiltro("(icbte.fecha::date  >= ''%".$this->objParam->getParametro('desde')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarMayorCtrl');
+        } else{
+            $this->objFunc=$this->create('MODIntTransaccion');
+
+            $this->res=$this->objFunc->listarAgrupacion($this->objParam);
+        }
+        //adicionar una fila al resultado con el summario
+        $temp = Array();
+        $temp['importe_debe_mb'] = $this->res->extraData['total_debe_mb'];
+        $temp['importe_haber_mb'] = $this->res->extraData['total_haber_mb'];
+        $temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
+        $temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
+
+        $temp['monto_mb'] = $this->res->extraData['monto_mb_total'];
+		$temp['compro'] = $this->res->extraData['compro_total'];
+        $temp['ejec'] = $this->res->extraData['ejec_total'];
+        $temp['formu'] = $this->res->extraData['formu_total'];
+		
+        $temp['saldo_mb'] = $this->res->extraData['total_saldo_mb'];
+        $temp['saldo_mt'] = $this->res->extraData['total_saldo_mt'];
+        $temp['dif'] = $this->res->extraData['dif'];
+
+        $temp['tipo_reg'] = 'summary';
+        $temp['id_int_transaccion'] = 0;
+
+        $this->res->total++;
+        $this->res->addLastRecDatos($temp);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    //#75
+    function ListarProcesos(){
+        $this->objParam->defecto('ordenacion','nro_tramite');
+        $this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('id_int_comprobante')!=''){
+            $this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));
+        }
+
+        if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+        }
+
+        if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+            $this->objParam->addFiltro("ctc.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));
+        }
+
+        if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+            $this->objParam->addFiltro("csc.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));
+        }
+
+        if($this->objParam->getParametro('id_depto')!=''){
+            $this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));
+        }
+
+        if($this->objParam->getParametro('cbte_cierre')=='todos'){
+            $this->objParam->addFiltro("icbte.cbte_cierre in (''no'',''balance'',''resultado'')");
+        }else{
+            if($this->objParam->getParametro('cbte_cierre')=='balance'){
+                $this->objParam->addFiltro("icbte.cbte_cierre in (''balance'')");
+            }else{
+                if($this->objParam->getParametro('cbte_cierre')=='resultado'){
+                    $this->objParam->addFiltro("icbte.cbte_cierre in (''resultado'')");
+                }else{
+                    if($this->objParam->getParametro('cbte_cierre')=='no'){
+                        $this->objParam->addFiltro("icbte.cbte_cierre in (''no'')");
+                    }
+                }
+            }
+        }
+
+        if($this->objParam->getParametro('id_partida')!=''){
+            $this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));
+        }
+
+        if($this->objParam->getParametro('id_suborden')!=''){
+            $this->objParam->addFiltro("transa.id_subordeno = ".$this->objParam->getParametro('id_suborden'));
+        }
+
+        if($this->objParam->getParametro('id_auxiliar')!=''){
+            $this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));
+        }
+
+        if($this->objParam->getParametro('id_centro_costo')!=''){
+            $this->objParam->addFiltro("transa.id_centro_costo = ".$this->objParam->getParametro('id_centro_costo'));
+        }
+
+        if($this->objParam->getParametro('nro_tramite')!=''){
+            $this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");
+        }
+
+        if($this->objParam->getParametro('nro_tramite_aux')!=''){
+            $this->objParam->addFiltro("icbte.nro_tramite_aux ilike ''%".$this->objParam->getParametro('nro_tramite_aux')."%''");
+        }
+
+        if($this->objParam->getParametro('cerrado')=='si'){
+            $this->objParam->addFiltro("transa.cerrado in (''no'')");
+        }else{
+            $this->objParam->addFiltro("transa.cerrado in (''si'',''no'')");
+        }
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("(icbte.fecha::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')==''){
+            $this->objParam->addFiltro("(icbte.fecha::date  >= ''%".$this->objParam->getParametro('desde')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','ListarProcesos');
+        } else{
+            $this->objFunc=$this->create('MODIntTransaccion');
+            $this->res=$this->objFunc->ListarProcesos($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    //
+    //#75
+    function listarTransArbol(){
+
+        //$this->objParam->defecto('ordenacion','nro_tramite');
+        //$this->objParam->defecto('dir_ordenacion','asc');
+        if($this->objParam->getParametro('tipo')==''){
+            $this->objParam->addFiltro("icbte.nro_tramite like ''%".$this->objParam->getParametro('nro_tramite')."%''");
+        }
+
+        if($this->objParam->getParametro('id_int_comprobante')!=''){
+            $this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));
+        }
+
+        if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("per.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+        }
+
+        if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
+            $this->objParam->addFiltro("ctc.id_config_tipo_cuenta = ".$this->objParam->getParametro('id_config_tipo_cuenta'));
+        }
+
+        if($this->objParam->getParametro('id_config_subtipo_cuenta')!=''){
+            $this->objParam->addFiltro("csc.id_config_subtipo_cuenta = ".$this->objParam->getParametro('id_config_subtipo_cuenta'));
+        }
+
+        if($this->objParam->getParametro('id_depto')!=''){
+            $this->objParam->addFiltro("icbte.id_depto = ".$this->objParam->getParametro('id_depto'));
+        }
+
+        if($this->objParam->getParametro('cbte_cierre')=='todos'){
+            $this->objParam->addFiltro("icbte.cbte_cierre in (''no'',''balance'',''resultado'')");
+        }else{
+            if($this->objParam->getParametro('cbte_cierre')=='balance'){
+                $this->objParam->addFiltro("icbte.cbte_cierre in (''balance'')");
+            }else{
+                if($this->objParam->getParametro('cbte_cierre')=='resultado'){
+                    $this->objParam->addFiltro("icbte.cbte_cierre in (''resultado'')");
+                }else{
+                    if($this->objParam->getParametro('cbte_cierre')=='no'){
+                        $this->objParam->addFiltro("icbte.cbte_cierre in (''no'')");
+                    }
+                }
+            }
+        }
+
+        if($this->objParam->getParametro('id_partida')!=''){
+            $this->objParam->addFiltro("transa.id_partida = ".$this->objParam->getParametro('id_partida'));
+        }
+
+        if($this->objParam->getParametro('id_suborden')!=''){
+            $this->objParam->addFiltro("transa.id_subordeno = ".$this->objParam->getParametro('id_suborden'));
+        }
+
+        if($this->objParam->getParametro('id_auxiliar')!=''){
+            $this->objParam->addFiltro("transa.id_auxiliar = ".$this->objParam->getParametro('id_auxiliar'));
+        }
+
+        if($this->objParam->getParametro('id_centro_costo')!=''){
+            $this->objParam->addFiltro("transa.id_centro_costo = ".$this->objParam->getParametro('id_centro_costo'));
+        }
+
+        if($this->objParam->getParametro('nro_tramite')!=''){
+            $this->objParam->addFiltro("icbte.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");
+        }
+
+        if($this->objParam->getParametro('nro_tramite_aux')!=''){
+            $this->objParam->addFiltro("icbte.nro_tramite_aux ilike ''%".$this->objParam->getParametro('nro_tramite_aux')."%''");
+        }
+
+        if($this->objParam->getParametro('cerrado')=='si'){
+            $this->objParam->addFiltro("transa.cerrado in (''no'')");
+        }else{
+            $this->objParam->addFiltro("transa.cerrado in (''si'',''no'')");
+        }
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("(icbte.fecha::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')==''){
+            $this->objParam->addFiltro("(icbte.fecha::date  >= ''%".$this->objParam->getParametro('desde')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("(icbte.fecha::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+        $node=$this->objParam->getParametro('node');
+        $tipo_nodo=$this->objParam->getParametro('tipo_nodo');
+        if($node=='id'){
+            $this->objParam->addParametro('id_padre','%');
+        } else {
+            $this->objParam->addParametro('id_padre',$id_fase);
+        }
+
+        $this->objFunc=$this->create('MODIntTransaccion');
+        $this->res=$this->objFunc->listarTransArbol($this->objParam);
+
+        $this->res->setTipoRespuestaArbol();
+        $arreglo=array();
+
+        array_push($arreglo,array('nombre'=>'id','valor'=>'id'));
+        array_push($arreglo,array('nombre'=>'id_p','valor'=>'nro_tramite_fk'));
+
+        //array_push($arreglo,array('nombre'=>'text','valores'=>'<b> #codigo# - #nombre#</b>'));
+        //array_push($arreglo,array('nombre'=>'cls','valor'=>'descripcion'));
+        //array_push($arreglo,array('nombre'=>'qtip','valores'=>'<b> #codigo#</b><br/><br> #descripcion#'));
+
+        $this->res->addNivelArbol('tipo_nodo','raiz',array('leaf'=>false,
+                                    'allowDelete'=>true,
+                                    'allowEdit'=>true,
+                                    'cls'=>'folder',
+                                    'tipo_nodo'=>'raiz',
+                                    'icon'=>'../../../lib/imagenes/a_form.png'),
+                                    $arreglo);
+
+        $this->res->addNivelArbol('tipo_nodo','hijo',array(
+                                'leaf'=>false,
+                                'allowDelete'=>true,
+                                'allowEdit'=>true,
+                                'tipo_nodo'=>'hijo',
+                                'icon'=>'../../../lib/imagenes/a_form.png'),
+                                $arreglo);
+
+        $this->res->addNivelArbol('tipo_nodo','hoja',array(
+                                'leaf'=>true,
+                                'allowDelete'=>false,
+                                'allowEdit'=>false,
+                                'tipo_nodo'=>'hoja',
+                                'icon'=>'../../../lib/imagenes/a_table_gear.png'),
+                                $arreglo);
+
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

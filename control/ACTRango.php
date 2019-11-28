@@ -6,18 +6,27 @@
 *@date 22-06-2017 21:30:05
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
+/*
+#75 		28/11/2019		  Manuel Guerra	  controlling
+*/
+require_once(dirname(__FILE__).'/../reportes/RReporteTIpoCc.php');//#2
+require_once(dirname(__FILE__).'/../reportes/RProyectosArbol.php');//#2SS
 
 class ACTRango extends ACTbase{    
 			
 	function listarRango(){
 		//$this->objParam->defecto('ordenacion','id_gestion desc, id_periodo');  ran.id_periodo ASC
-		$this->objParam->defecto('ordenacion','');
-		
+		$this->objParam->defecto('ordenacion','');	
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
 		if($this->objParam->getParametro('id_tipo_cc')!=''){
             $this->objParam->addFiltro("ran.id_tipo_cc = ''".$this->objParam->getParametro('id_tipo_cc')."''");    
         }
 		
+		/*if($this->objParam->getParametro('categoria')!=''){
+            $this->objParam->addFiltro("categoria = ''".$this->objParam->getParametro('categoria')."''");    
+        }*/
+			
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODRango','listarRango');
@@ -139,13 +148,50 @@ class ACTRango extends ACTbase{
 
    }
 
-   function sincronizarRangos(){
-     	$this->objFunc=$this->create('MODRango');	
+	function sincronizarRangos(){
+		$this->objFunc=$this->create('MODRango');	
 		$this->res=$this->objFunc->sincronizarRangos($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
-	
-   }
-			
+	}
+    //manu #75
+	function ReporteTcc()
+	{
+		$this->objFunc = $this->create('MODRango');		
+		$this->res = $this->objFunc->ReporteTcc($this->objParam);
+		$titulo = 'TCC';
+		$nombreArchivo = uniqid(md5(session_id()) . $titulo);
+		$nombreArchivo .= '.xls';
+		$this->objParam->addParametro('nombre_archivo', $nombreArchivo);
+		$this->objParam->addParametro('datos', $this->res->datos);
+		
+		$this->objReporteFormato = new RReporteTIpoCc($this->objParam);
+		$this->objReporteFormato->imprimirDatos();
+		$this->objReporteFormato->generarReporte();
+		$this->mensajeExito = new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado', 'Se genero con éxito el reporte: ' . $nombreArchivo, 'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+	}
+	//#75
+    function reporteProyecto()
+    {
+        $this->objFunc = $this->create('MODRango');
+        $this->res = $this->objFunc->reporteProyecto($this->objParam);
+        //var_dump($this->res);exit;
+        $titulo = 'Proyectos';
+        $nombreArchivo = uniqid(md5(session_id()) . $titulo);
+        $nombreArchivo .= '.xls';
+        $this->objParam->addParametro('nombre_archivo', $nombreArchivo);
+        $this->objParam->addParametro('datos', $this->res->datos);
+
+        $this->objReporteFormato = new RProyectosArbol($this->objParam);
+        $this->objReporteFormato->imprimirDatos();
+        $this->objReporteFormato->generarReporte();
+        $this->mensajeExito = new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado', 'Se genero con éxito el reporte: ' . $nombreArchivo, 'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
 }
 
 ?>

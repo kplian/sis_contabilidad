@@ -6,7 +6,9 @@
 *@date 22-06-2017 21:30:05
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
-
+/*
+#75 		28/11/2019		  Manuel Guerra	  controlling
+*/
 class MODRango extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -31,16 +33,19 @@ class MODRango extends MODbase{
 		
 		$this->setParametro('desde','desde','date');
 		$this->setParametro('hasta','hasta','date');
-				
+		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+		$this->setParametro('categoria','categoria','varchar');
+			
 		//Definicion de la lista del resultado del query
 		$this->captura('id_rango','int4');
 		$this->captura('id_periodo','int4');
-		$this->captura('haber_mb','numeric');
 		$this->captura('debe_mb','numeric');
+		$this->captura('haber_mb','numeric');		
 		$this->captura('debe_mt','numeric');
+		$this->captura('haber_mt','numeric');
 		$this->captura('estado_reg','varchar');
 		$this->captura('id_tipo_cc','int4');
-		$this->captura('haber_mt','numeric');
+		
 		$this->captura('id_usuario_ai','int4');
 		$this->captura('usuario_ai','varchar');
 		$this->captura('fecha_reg','timestamp');
@@ -204,9 +209,64 @@ class MODRango extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	//#75
+	function ReporteTcc(){
+        $this->procedimiento='conta.f_tcc';
+        $this->transaccion='CONTA_TCC_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this-> setCount(false);
+        $this->setTipoRetorno('record');
+        $this->setParametro('id','id','int4');
 
-			
+        $this->captura('id_tipo_cc','int4');
+        $this->captura('id_tipo_cc_fk','int4');
+        $this->captura('codigo_tcc','varchar');
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('saldo_mb','numeric');
+        $this->captura('nivel','int4');
+        $this->captura('sw_tipo','varchar');
+        $this->captura('codigo','varchar');
+        $this->captura('importe_formulado','numeric');
+        $this->armarConsulta();
+        /*echo $this->getConsulta();
+        exit;*/
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }
+    //
+    function reporteProyecto(){
+        $this->procedimiento='conta.f_reporte_centro_costo';
+        $this->transaccion='CONTA_CCR_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this-> setCount(false);
+        $this->setTipoRetorno('record');
 
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('desde','desde','date');
+        $this->setParametro('hasta','hasta','date');
+        $this->setParametro('id_cuenta','id_cuenta','int4');
+        $this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+        $this->setParametro('id_centro_costo','id_centro_costo','int4');
+        $this->setParametro('cbte_cierre','cbte_cierre','varchar');
+        $this->setParametro('tipo_moneda','tipo_moneda','varchar'); //#10
+
+        $this->captura('id_tipo_cc','int4');
+        $this->captura('id_tipo_cc_fk','int4');
+        $this->captura('codigo_tcc','varchar');
+        $this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_haber_mb','numeric');
+        $this->captura('saldo_mb','numeric');
+        $this->captura('nivel','int4');
+        $this->captura('sw_tipo','varchar');
+        $this->captura('codigo','varchar');
+        $this->captura('importe_formulado','numeric'); //#64
+        $this->armarConsulta();
+        /*echo $this->getConsulta();
+        exit;*/
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }
 
 			
 }
