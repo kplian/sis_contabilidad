@@ -1698,10 +1698,6 @@ class ACTIntTransaccion extends ACTbase{
         array_push($arreglo,array('nombre'=>'id','valor'=>'id'));
         array_push($arreglo,array('nombre'=>'id_p','valor'=>'nro_tramite_fk'));
 
-        //array_push($arreglo,array('nombre'=>'text','valores'=>'<b> #codigo# - #nombre#</b>'));
-        //array_push($arreglo,array('nombre'=>'cls','valor'=>'descripcion'));
-        //array_push($arreglo,array('nombre'=>'qtip','valores'=>'<b> #codigo#</b><br/><br> #descripcion#'));
-
         $this->res->addNivelArbol('tipo_nodo','raiz',array('leaf'=>false,
                                     'allowDelete'=>true,
                                     'allowEdit'=>true,
