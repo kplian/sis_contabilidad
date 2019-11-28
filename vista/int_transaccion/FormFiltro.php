@@ -17,23 +17,24 @@ header("content-type: text/javascript; charset=UTF-8");
 
 <script>
 Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
+	
     constructor:function(config)
     {   
-    	
-    	console.log('configuracion.... ',config)
     	this.panelResumen = new Ext.Panel({html:''});
-    	this.Grupos = [{
-
-	                    xtype: 'fieldset',
-	                    border: false,
-	                    autoScroll: true,
-	                    layout: 'form',
-	                    items: [],
-	                    id_grupo: 0
-				               
-				    },
-				     this.panelResumen
-				    ];
+    	this.Grupos = 
+    	[
+            {
+                xtype: 'fieldset',
+                border: true,
+                autoScroll: true,
+                layout: 'form',
+                items:
+                [
+                ],
+                id_grupo: 0
+            },
+            this.panelResumen
+	    ];
 				    
         Phx.vista.FormFiltro.superclass.constructor.call(this,config);
         this.init(); 
@@ -393,6 +394,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
 		cls: 'IntTransaccionMayor'
 	},
 	title: 'Filtro de mayores',
+	autoScroll: true,
 	// Funcion guardar del formulario
 	//#6  #17
 	onSubmit: function(o) {    	

@@ -5,8 +5,10 @@ ISSUE  SIS       EMPRESA       FECHA        AUTOR           DESCRIPCION
 #2     CONTA     ETR           19/12/2108   Miguel Mamani	reporte proyectos excel
 #10    CONTA     ETR           02/01/2019   Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
 #154    CONTA     ETR           01/08/2019   RCM             Corrección por actualización de PHP 7. Se cambia el string Arial por cadena 'Arial'
+ #75 		28/11/2019		  Manuel Guerra	  controlling
 **************************************************************************
 */
+
 class RProyectosArbol
 {
     private $docexcel;
