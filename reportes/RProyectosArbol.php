@@ -1,10 +1,14 @@
 <?php
 /**
-HISTORIAL DE MODIFICACIONES:
-ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+**************************************************************************
+ISSUE  SIS       EMPRESA       FECHA        AUTOR           DESCRIPCION
+#2     CONTA     ETR           19/12/2108   Miguel Mamani	reporte proyectos excel
+#10    CONTA     ETR           02/01/2019   Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
+#154    CONTA     ETR           01/08/2019   RCM             Corrección por actualización de PHP 7. Se cambia el string Arial por cadena 'Arial'
+ #75 		28/11/2019		  Manuel Guerra	  controlling
+**************************************************************************
+*/
 
-#75 		28/11/2019		  Manuel Guerra	  controlling
- */
 class RProyectosArbol
 {
     private $docexcel;
@@ -86,7 +90,7 @@ class RProyectosArbol
 
         $sheet->getStyle('A2')->getFont()->applyFromArray(array('bold'=>true,
             'size'=>12,
-            'name'=>Arial));
+            'name'=>'Arial')); //#154
 
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValueByColumnAndRow(0,2,$titulo);
@@ -96,7 +100,7 @@ class RProyectosArbol
         $sheet->getStyle('A3')->getFont()->applyFromArray(array(
             'bold'=>true,
             'size'=>10,
-            'name'=>Arial));
+            'name'=>'Arial')); //#154
 
         $sheet->getStyle('A3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValueByColumnAndRow(0,3,$fechas);
@@ -104,7 +108,7 @@ class RProyectosArbol
         $sheet->getStyle('A4')->getFont()->applyFromArray(array(
             'bold'=>true,
             'size'=>10,
-            'name'=>Arial));
+            'name'=>'Arial')); //#154
 
         $sheet->getStyle('A4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValueByColumnAndRow(0,4,$moneda);
@@ -269,6 +273,7 @@ class RProyectosArbol
     function generarReporte(){
         $this->docexcel->setActiveSheetIndex(0);
         $this->objWriter = PHPExcel_IOFactory::createWriter($this->docexcel, 'Excel5');
+        //var_dump($this->objWriter);exit;
         $this->objWriter->save($this->url_archivo);
     }
 }
