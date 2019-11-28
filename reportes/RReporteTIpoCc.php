@@ -2,7 +2,7 @@
 /**
  * HISTORIAL DE MODIFICACIONES:
  * ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
- * #2         19/12/2108		  Miguel Mamani	  reporte proyectos excel
+ *  75           28/11/2019     manuel guerra   controlling reporting
  **/
 class RReporteTIpoCc
 {
