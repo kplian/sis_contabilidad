@@ -21,7 +21,7 @@ $body$
 ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:
 #1			20/08/2018						EGS					En la transaccion CONTA_DCVCBR_SEL se modifico consulta para cobros y saldos separados entre cobro comun y retencion de garantias
 #2			13/08/2018						EGS					en la transaccion CONTA_DCVCBR_SEL se modifico consulta para cobros y saldos separados de anticipos
-
+#76         28/11/2019                      EGS                 Se agrega filtro de tipo de cobro
 ***************************************************************************/
 
 DECLARE
@@ -867,12 +867,12 @@ BEGIN
              v_bandera_regularizacion_ant = split_part(pxp.f_get_variable_global('v_cobro_anticipo'), ',', 2);
              --raise exception 'bandera %',  v_bandera;
 
-            --solo lista las facturas q faltan cobrar segun tipo de cobro
-            IF v_bandera = v_parametros.tipo_cobro or v_bandera_regularizacion = v_parametros.tipo_cobro  THEN
+            --solo lista las facturas q faltan cobrar segun tipo de cobro #76
+            IF v_bandera = v_parametros.tipo_cobro or v_bandera_regularizacion = v_parametros.tipo_cobro  THEN --#76
                 v_filtro_ext = v_filtro_ext || '  escbr.cobrado_pendiente = ''no'' and ';
-            ELSIF v_bandera_rg = v_parametros.tipo_cobro or v_bandera_regularizacion_rg = v_parametros.tipo_cobro THEN
+            ELSIF v_bandera_rg = v_parametros.tipo_cobro or v_bandera_regularizacion_rg = v_parametros.tipo_cobro THEN --#76
                  v_filtro_ext = v_filtro_ext || ' escbr.cobrado_retgar = ''no'' and ';
-            ELSEIF v_bandera_ant = v_parametros.tipo_cobro or v_bandera_regularizacion_ant = v_parametros.tipo_cobro THEN
+            ELSEIF v_bandera_ant = v_parametros.tipo_cobro or v_bandera_regularizacion_ant = v_parametros.tipo_cobro THEN --#76
                  v_filtro_ext = v_filtro_ext || ' escbr.cobrado_anticipo = ''no'' and ';
             END IF;
 
@@ -1145,11 +1145,11 @@ BEGIN
              --raise exception 'bandera %',  v_bandera;
 
             --solo lista las facturas q faltan cobrar segun tipo de cobro
-            IF v_bandera = v_parametros.tipo_cobro or v_bandera_regularizacion = v_parametros.tipo_cobro  THEN
+            IF v_bandera = v_parametros.tipo_cobro or v_bandera_regularizacion = v_parametros.tipo_cobro  THEN --#76
                 v_filtro_ext = v_filtro_ext || '  escbr.cobrado_pendiente = ''no'' and ';
-            ELSIF v_bandera_rg = v_parametros.tipo_cobro or v_bandera_regularizacion_rg = v_parametros.tipo_cobro THEN
+            ELSIF v_bandera_rg = v_parametros.tipo_cobro or v_bandera_regularizacion_rg = v_parametros.tipo_cobro THEN --#76
                  v_filtro_ext = v_filtro_ext || ' escbr.cobrado_retgar = ''no'' and ';
-            ELSEIF v_bandera_ant = v_parametros.tipo_cobro or v_bandera_regularizacion_ant = v_parametros.tipo_cobro THEN
+            ELSEIF v_bandera_ant = v_parametros.tipo_cobro or v_bandera_regularizacion_ant = v_parametros.tipo_cobro THEN --#76
                  v_filtro_ext = v_filtro_ext || ' escbr.cobrado_anticipo = ''no'' and ';
             END IF;
 
