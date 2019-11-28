@@ -13,12 +13,8 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
     	this.initButtons = [this.cmbCategoria];
 		Phx.vista.Rango.superclass.constructor.call(this,config);
 		this.init();
-		//this.grid.addListener('celldblclick', this.oncelldblclick, this);
         this.grid.addListener('cellclick', this.oncellclick,this);        
-		//		
-		/*this.cmbTipo.on('select',this.capturaFiltros,this);
-        this.iniciarEventos();
-        this.cmbTipo.fireEvent('select');*/
+		//
 		this.cmbCategoria.on('select', function(){
     		if(this.validarFiltros()){
           		this.capturaFiltros();
@@ -583,9 +579,8 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 	},
 	//
 	reporteArbol:function(){
-	    //console.log(this.maestro);
 		var aux=this.maestro.id_tipo_cc;
-		//Phx.CP.loadingShow();
+        Phx.CP.loadingShow();
 		Ext.Ajax.request({
 			//url:'../../sis_contabilidad/control/Rango/ReporteTcc',
             //url:'../../sis_contabilidad/control/IntTransaccion/reporteProyecto',
@@ -600,7 +595,6 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                 'id_centro_costo':'',
                 'cbte_cierre':'no',
                 'tipo_moneda':'MB',
-
                 "id_gestions":"2019",
                 "moneda":"Moneda Base",
                 "tipo_costo":this.maestro.codigo,
@@ -613,6 +607,7 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 			timeout:this.timeout,
 			scope:this
 		});
+
 	},
     //#75
     reportePentaho:function(){
