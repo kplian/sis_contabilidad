@@ -1609,7 +1609,7 @@ BEGIN
 			--Definicion de la respuesta
             end if;
             RAISE notice '%',v_consulta;
-          --  RAISE exception '%',v_consulta;
+          	--  RAISE exception '%',v_consulta;
 			return v_consulta;
 		end;
 
