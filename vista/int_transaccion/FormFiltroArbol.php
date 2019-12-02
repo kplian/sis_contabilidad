@@ -51,8 +51,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.loadForm({data: config.detalle});
                 var me = this;         
                 var monto_for=this.Cmp.formulado.getValue();
-                var monto_eje=this.Cmp.ejecutado.getValue();    
-                this.Cmp.porc_eje.setValue((monto_eje*100)/monto_for);
+                var monto_eje=this.Cmp.ejecutado.getValue();
+                if(monto_eje==0){
+                    this.Cmp.porc_eje.setValue(0);
+                }else{
+                    this.Cmp.porc_eje.setValue((monto_eje*100)/monto_for);
+                }
+
                 setTimeout(function(){
                     me.onSubmit()
                 }, 1500);
@@ -93,6 +98,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo : 0,
                 form : true
             },
+
             {
                 config:{
                     name: 'desde',
@@ -497,7 +503,33 @@ header("content-type: text/javascript; charset=UTF-8");
 	            type : 'NumberField',
 	            id_grupo: 1,
 	            form:true
-            }
+            },
+            {
+                config:{
+                    name : 'id_gestion1',
+                    origen : 'GESTION',
+                    fieldLabel : 'Gestion',
+                    gdisplayField: 'desc_gestion',
+                    readOnly: true,
+                    width: 150
+                },
+                type : 'ComboRec',
+                id_grupo : 1,
+                form : true
+            },
+            {
+                config:{
+                    name : 'id_periodo',
+                    origen : 'PERIODO',
+                    fieldLabel : 'Periodo',
+                    gdisplayField: 'Periodo',
+                    readOnly: true,
+                    width: 150
+                },
+                type : 'ComboRec',
+                id_grupo : 1,
+                form : true
+            },
         ],
         labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
         bedit: false,

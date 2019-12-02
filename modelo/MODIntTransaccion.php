@@ -1109,6 +1109,9 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('cerrado','cerrado','varchar');
         $this->setParametro('cbte_cierre','cbte_cierre','varchar');
         $this->setParametro('numero','numero','integer');
+
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('id_periodo','id_periodo','int4');
         //captura parametros adicionales para el count
         $this->capturaCount('total_debe_mb','numeric');
 		$this->capturaCount('total_haber_mb','numeric');
@@ -1132,7 +1135,9 @@ class MODIntTransaccion extends MODbase{
        // $this->captura('id','integer');
 		$this->captura('ejecutado','numeric');
 		//$this->captura('formulado','numeric');
-		
+
+        $this->captura('id_gestion','int4');
+        $this->captura('id_periodo','int4');
 		$this->captura('importe_debe_mb','numeric');
         $this->captura('importe_haber_mb','numeric');
 		$this->captura('importe_debe_mt','numeric');
@@ -1142,6 +1147,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('compro','numeric');
 		$this->captura('ejec','numeric');
         $this->captura('formu','numeric');
+
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -1202,6 +1208,9 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('desc_centro_costo','desc_centro_costo','varchar');
         $this->setParametro('desc_partida','desc_partida','varchar');
         $this->setParametro('tramite','tramite','varchar');
+
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('id_periodo','id_periodo','int4');
         /// ////////////////
         //defino varialbes que se captran como retornod e la funcion
         //$this->captura('id_int_transaccion','integer');

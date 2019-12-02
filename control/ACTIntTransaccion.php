@@ -1395,6 +1395,9 @@ class ACTIntTransaccion extends ACTbase{
         $this->objParam->defecto('ordenacion','tipo');
         $this->objParam->defecto('dir_ordenacion','asc');
 
+        $this->objParam->addParametro('id_gestion',$this->objParam->getParametro('id_gestion'));
+        $this->objParam->addParametro('id_periodo',$this->objParam->getParametro('id_periodo'));
+
         if($this->objParam->getParametro('id_int_comprobante')!=''){
             $this->objParam->addFiltro("transa.id_int_comprobante = ".$this->objParam->getParametro('id_int_comprobante'));
         }
@@ -1600,6 +1603,9 @@ class ACTIntTransaccion extends ACTbase{
 
         //$this->objParam->defecto('ordenacion','nro_tramite');
         //$this->objParam->defecto('dir_ordenacion','asc');
+        $this->objParam->addParametro('id_gestion',$this->objParam->getParametro('id_gestion'));
+        $this->objParam->addParametro('id_periodo',$this->objParam->getParametro('id_periodo'));
+
         if($this->objParam->getParametro('tipo')==''){
             $this->objParam->addFiltro("icbte.nro_tramite like ''%".$this->objParam->getParametro('nro_tramite')."%''");
         }
