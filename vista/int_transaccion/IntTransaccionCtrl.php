@@ -31,7 +31,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 handler : this.loadInformacion,
                 tooltip : '<b>Informacion del registro</b>'
             });
-
+           // this.loaderTree.on('beforeload', this.onBeforeLoad, this);
             this.loaderTree.baseParams = {id: 0};
             this.init();
             this.iniciarEventos();
@@ -91,11 +91,11 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'desc_centro_costo',
                     maxLength:170,
                     //anchor: '80%',
-                    /*gtpl:function (p){
+                    gtpl:function (p){
                         if(this.desc_centro_costo !=null){
-                            return String.format(this.desc_centro_costo);
+                            return String.format('<b><p size=2 style="color:#ff0005";>'+this.desc_centro_costo+'</p><b>');
                         }
-                    }*/
+                    }
                 },
                 type:'TextArea',
                 id_grupo:1,
@@ -340,6 +340,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     desde: this.maestro.desde,
                     hasta: this.maestro.hasta,
                     tipo: this.maestro.tipo,
+                    id_gestion:this.maestro.id_gestion,
+                    id_periodo:this.maestro.id_periodo,
                     desc_centro_costo:'',
                     desc_partida:'',
                    // tramite:'',
@@ -352,7 +354,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.datoFiltroTcc.on('select', function(combo, record, index){
                 this.onButtonAct();
             },this);
-
+           // Phx.CP.loadingHide();
             /*this.datoFiltroCc.on('specialkey',function(field, e){
                 if (e.getKey() == e.ENTER) {
                     this.onButtonAct();
@@ -376,6 +378,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         desde: this.maestro.desde,
                         hasta: this.maestro.hasta,
                         tipo: this.maestro.tipo,
+                        id_gestion:this.maestro.id_gestion,
+                        id_periodo:this.maestro.id_periodo,
                         desc_centro_costo:cc,
                         desc_partida:'',
                        // tramite:tra,
@@ -388,11 +392,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     desde: this.maestro.desde,
                     hasta: this.maestro.hasta,
                     tipo: this.maestro.tipo,
+                    id_gestion:this.maestro.id_gestion,
+                    id_periodo:this.maestro.id_periodo,
                     desc_centro_costo:'',
                     desc_partida:'',
                     //tramite:'',
                 };
             }
+            this.sm.clearSelections();
             this.root.reload();
         },
 

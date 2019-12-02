@@ -83,7 +83,6 @@ BEGIN
             v_filtro_ordenes = '0=0';
             v_filtro_tipo_cc = '0=0';
     		v_aux = REPLACE(v_parametros.filtro, '(icbte.fecha','0=0 --(icbte.fecha');
-
             IF (v_parametros.hasta IS NULL) AND (v_parametros.desde IS NULL) THEN
             	v_desde = '0=0';
             ELSE
@@ -156,8 +155,7 @@ BEGIN
             END IF;
 			v_fecha_d=to_char(v_parametros.desde, 'DD-MM-YYYY');--v_parametros.desde;
             v_fecha_h=to_char(v_parametros.hasta, 'DD-MM-YYYY');--v_parametros.hasta;
-			--raise exception '%,%,%',v_filtro_tipo_cc_pre,v_parametros.desde,v_parametros.hasta;
-            --raise exception '%,%',v_fecha_h,v_fecha_d;
+
             v_consulta:='WITH tab AS(
             			WITH data AS(
             				SELECT
@@ -202,6 +200,7 @@ BEGIN
                            -- 0::integer as id_subsistema
                             FROM pre.vpartida_ejecucion vpe
                             WHERE (vpe.fecha::date BETWEEN '''||v_parametros.desde||''' AND '''||v_parametros.hasta||''')
+                            and vpe.id_gestion = '||v_parametros.id_gestion||'
                             AND '||v_filtro_tipo_cc_pre||' ';
             	v_consulta:=v_consulta||'
             				UNION
@@ -248,7 +247,7 @@ BEGIN
                               and ';
 
                 v_consulta:=v_consulta|| v_parametros.filtro;
-                --raise exception '%,%',v_fecha_desde,v_fecha_hasta;
+                --raise exception '%,%',v_parametros.id_gestion,v_parametros.filtro;
                 v_consulta:=v_consulta||'
                 		)
                         SELECT
@@ -308,6 +307,8 @@ BEGIN
                         ta.id_tipo_cc,
                         '||v_parametros.numero||'::integer as numero,
                         ta.ejecutado,
+                        '||v_parametros.id_gestion||'::integer as id_gestion,
+                        '||v_parametros.id_periodo||'::integer as id_periodo,
 
                         ta.importe_debe_mb,
                         ta.importe_haber_mb,
@@ -318,8 +319,7 @@ BEGIN
                         ta.compro,
                         ta.ejec,
                         ta.formu
-                        from tab ta
-                        ';
+                        from tab ta ';
 
 			--Definicion de la respuesta
             RAISE notice '%',v_consulta;
@@ -1385,42 +1385,61 @@ BEGIN
                 END IF;
             END IF;
 
-            if(coalesce(v_parametros.node,'id') = 'id') then
-                v_where = 't.nro_tramite_fk is null ';
-                v_where2 = '0=0 ';
-                v_where3 = '0=0 ';
-            else
-                v_where = ' t.tipo_nodo =''hijo'' ';
-            end if;
+            if(v_parametros.id = 0) then
+            	v_consulta:='SELECT
+                            0::integer as ids,
+                            0::integer as id_int_comprobante,
+                            0::integer as id_int_transaccion,
+                            ''-''::varchar as nro_tramite,
+                            ''-''::varchar as nro_tramite_fk,
+                            ''-''::varchar as desc_cuenta,
+                            ''-''::varchar as desc_auxiliar,
+                            ''-''::varchar as desc_centro_costo,
+                            ''-''::varchar as desc_partida,
+                            ''-''::varchar as tipo_nodo,
 
-            if v_parametros.desc_centro_costo is not null then
-                v_where2 = 't.desc_centro_costo like ''%'||v_parametros.desc_centro_costo||'%'' ';
-            else
-            	v_where2 = '0=0 ';
-            end if;
+                            0::numeric as importe_debe_mb,
+                            0::numeric as importe_haber_mb,
+                            0::numeric as importe_debe_mt,
+                            0::numeric as importe_haber_mt
+                            ';
+           	else
+                if(coalesce(v_parametros.node,'id') = 'id') then
+                    v_where = 't.nro_tramite_fk is null ';
+                    v_where2 = '0=0 ';
+                    v_where3 = '0=0 ';
+                else
+                    v_where = ' t.tipo_nodo =''hijo'' ';
+                end if;
 
-            if v_parametros.desc_partida is not null then
+                if v_parametros.desc_centro_costo is not null then
+                    v_where2 = 't.desc_centro_costo like ''%'||v_parametros.desc_centro_costo||'%'' ';
+                else
+                    v_where2 = '0=0 ';
+                end if;
 
-                v_where3 = 't.desc_partida like ''%'||v_parametros.desc_partida||'%'' ';
-            else
-            	v_where3 = '0=0 ';
-            end if;
-            --raise exception '--%',v_parametros.tramite;
-            /*
-            if v_parametros.tramite is null or  v_parametros.tramite = '' then
-            	v_where4 = '0=0 ';
-            else
-                v_where4 = 't.nro_tramite like ''%'||v_parametros.tramite||'%'' ';
-            end if;
-            */
-            /*
-             if(coalesce(v_parametros.node,'id') = 'id') then
-               v_where = 't.nro_tramite_fk is null ';
-                v_where2 = 't.nro_tramite is null ';
-            else
-                v_where = ' t.nro_tramite_fk = '||v_parametros.node;
-                v_where2 = ' t.nro_tramite = '||v_parametros.node;
-            end if;*/
+                if v_parametros.desc_partida is not null then
+
+                    v_where3 = 't.desc_partida like ''%'||v_parametros.desc_partida||'%'' ';
+                else
+                    v_where3 = '0=0 ';
+                end if;
+                --raise exception '--%',v_parametros.tramite;
+                /*
+                if v_parametros.tramite is null or  v_parametros.tramite = '' then
+                    v_where4 = '0=0 ';
+                else
+                    v_where4 = 't.nro_tramite like ''%'||v_parametros.tramite||'%'' ';
+                end if;
+                */
+                /*
+                 if(coalesce(v_parametros.node,'id') = 'id') then
+                   v_where = 't.nro_tramite_fk is null ';
+                    v_where2 = 't.nro_tramite is null ';
+                else
+                    v_where = ' t.nro_tramite_fk = '||v_parametros.node;
+                    v_where2 = ' t.nro_tramite = '||v_parametros.node;
+                end if;*/
 
             v_consulta:='with tabla AS(
             				WITH data as (
@@ -1492,8 +1511,8 @@ BEGIN
                                        select
                                        transa.id_int_transaccion::integer,
                                        transa.id_int_comprobante::integer,
-                                       null::varchar as nro_tramite,
-                                       --icbte.nro_tramite::varchar as nro_tramite,
+                                       --null::varchar as nro_tramite,
+                                       icbte.nro_tramite::varchar as nro_tramite,
                                        icbte.nro_tramite::varchar as nro_tramite_fk,
                                        cc.codigo_cc::varchar as desc_centro_costo,
                                        CASE par.sw_movimiento
@@ -1588,6 +1607,7 @@ BEGIN
                                       t.tipo_nodo
                                       ORDER BY  t.nro_tramite,t.nro_tramite_fk,t.desc_centro_costo,t.desc_partida';
 			--Definicion de la respuesta
+            end if;
             RAISE notice '%',v_consulta;
           --  RAISE exception '%',v_consulta;
 			return v_consulta;

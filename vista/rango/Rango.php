@@ -430,6 +430,8 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                         'id_tipo_cc': record.data.id_tipo_cc,
                         'desc_tipo_cc': record.data.desc_tipo_cc,
                         'id_gestion': record.data.id_gestion,
+                        'id_gestion1': record.data.id_gestion,
+                        'id_periodo': record.data.id_periodo,
                         'cbte_cierre':'no',
                         'balance_mb': record.data.balance_mb,
                         'memoria': record.data.memoria,

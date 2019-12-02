@@ -312,6 +312,20 @@ header("content-type: text/javascript; charset=UTF-8");
                     type:'Field',
                     id_grupo:1,
                     grid:false
+                },{
+                    config:{
+                        name:'id_gestion',
+                    },
+                    type:'Field',
+                    id_grupo:2,
+                    grid:false
+                },{
+                    config:{
+                        name:'id_periodo',
+                    },
+                    type:'Field',
+                    id_grupo:2,
+                    grid:false
                 },
             ];
             Phx.vista.IntTransaccionAgru.superclass.constructor.call(this,config);
@@ -340,7 +354,9 @@ header("content-type: text/javascript; charset=UTF-8");
             { name:'compro', type: 'numeric'},
             { name:'ejec', type: 'numeric'},
             { name:'formu', type: 'numeric'},
-         'numero',
+            'numero',
+            { name:'id_gestion', type: 'integer'},
+            { name:'id_periodo', type: 'integer'},
         ],
         sortInfo:{
             field: 'tipo',
@@ -358,12 +374,16 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         initFiltro: function(param){
             console.log('param',param);
+           // Phx.CP.loadingShow();
             this.store.baseParams={
                 id_tipo_cc:param.id_tipo_cc,
                 numero:param.id_tipo_cc,
                 desde: param.desde,
                 hasta: param.hasta,
                 ejecutado: param.ejecutado,
+                id_gestion: param.id_gestion1,
+                id_periodo: param.id_periodo,
+
             };
            // this.store.baseParams=param;
             this.load({ params: { start:0, limit: this.tam_pag } });
