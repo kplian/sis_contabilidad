@@ -1553,8 +1553,8 @@ BEGIN
               v_consulta:=v_consulta|| ')
                                       SELECT
                                       '||v_parametros.id||' as ids,
-                                      t.id_int_comprobante,
                                       t.id_int_transaccion,
+                                      t.id_int_comprobante,
                                       t.nro_tramite,
                                       t.nro_tramite_fk,
                                       CASE t.tipo_nodo
