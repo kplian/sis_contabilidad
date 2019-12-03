@@ -21,8 +21,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.tbar.add('Partida:');
             this.tbar.add(this.datoFiltroPar);*/
 
-            this.tbar.add('Tcc:');
-            this.tbar.add(this.datoFiltroTcc);
+           // this.tbar.add('Tcc:');
+           // this.tbar.add(this.datoFiltroTcc);
 
             this.addButton('btnInfo', {
                 text : 'Informacion',
@@ -203,12 +203,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 type:'Field',
                 id_grupo:0,
                 grid:true,
-            },
-            {
+            },{
                 config:{
                     labelSeparator:'',
                     inputType:'hidden',
-                    name: 'id_int_transaccion'
+                    name: 'id_int_comprobante'
                 },
                 type:'Field',
                 form:true,
@@ -217,7 +216,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config:{
                     labelSeparator:'',
                     inputType:'hidden',
-                    name: 'id_int_comprobante'
+                    name: 'id_int_transaccion'
                 },
                 type:'Field',
                 form:true,
@@ -351,9 +350,9 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         iniciarEventos:function(){
-            this.datoFiltroTcc.on('select', function(combo, record, index){
+            /*this.datoFiltroTcc.on('select', function(combo, record, index){
                 this.onButtonAct();
-            },this);
+            },this);*/
            // Phx.CP.loadingHide();
             /*this.datoFiltroCc.on('specialkey',function(field, e){
                 if (e.getKey() == e.ENTER) {
@@ -369,7 +368,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         onButtonAct:function(){
             this.sm.clearSelections();
-            var cc = this.datoFiltroTcc.lastSelectionText;
+           // var cc = this.datoFiltroTcc.lastSelectionText;
 
             if((cc && cc!='')){
                 this.loaderTree.baseParams={
@@ -380,7 +379,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         tipo: this.maestro.tipo,
                         id_gestion:this.maestro.id_gestion,
                         id_periodo:this.maestro.id_periodo,
-                        desc_centro_costo:cc,
+                        //desc_centro_costo:cc,
+                        desc_centro_costo:'',
                         desc_partida:'',
                        // tramite:tra,
                     };
@@ -405,14 +405,16 @@ header("content-type: text/javascript; charset=UTF-8");
 
         loadInformacion : function() {
             var nodo = this.sm.getSelectedNode();
-            console.log('**',nodo.attributes);
-            Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/Informacion.php', 'Informacion del Registro', {
-                width : '70%',
-                height : '60%'
-            },
-            nodo.attributes,
-            this.idContenedor,
-            'Informacion');
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/Informacion.php',
+                'Informacion del Registro',
+                {
+                    width : '70%',
+                    height : '60%'
+                },
+                nodo.attributes,
+                this.idContenedor,
+                'Informacion'
+            );
         },
     }
 )
