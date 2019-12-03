@@ -249,6 +249,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 height : '80%'
             }, rec.data, this.idContenedor, 'DocCompraVentaCbte');
             */
+
             console.log('master',this);
             Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCtrl.php',
                 'Documentos',
