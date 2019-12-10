@@ -35,7 +35,8 @@ $body$
  #87  ETR       01/09/2018        RAC KPLIAN        Se agrega la verificaicon para cierre de transacciones con saldo cero para cuentas de pasivo y activo 
  #88  ETR       29/11/2018        RAC KPLIAN        Se actualiza el nro de tramite en la transaccion al validar el cbte 
  #7   ETR       27/12/2018        RAC KPLIAN        Se adiciona nro de tramite auxiliar 
- #9   ETR       02/01/2019        RAC KPLIAN        Validacion de nro de comprobantes de cbte de apertura en deptos regionales     
+ #9   ETR       02/01/2019        RAC KPLIAN        Validacion de nro de comprobantes de cbte de apertura en deptos regionales    
+ #77  ETR       12/10/2019        RAC KPLIAN        Se incluye moneda de actulizacion en la validacion de cuadre 
 
 
 */
@@ -71,8 +72,11 @@ DECLARE
     v_haber_mb						numeric;
     v_debe_mt						numeric;
     v_haber_mt						numeric;
+    v_debe_ma						numeric; --#77
+    v_haber_ma						numeric; --#77
     v_variacion_mb					numeric;
     v_variacion_mt					numeric;
+    v_variacion_ma					numeric; --#77
     v_sw_rel						boolean;
     v_id_tipo_estado				integer;
     v_id_estado_actual 				integer;
@@ -84,10 +88,13 @@ DECLARE
     v_recurso_mb 					numeric;
     v_gasto_mt						numeric; 
     v_recurso_mt 					numeric;
+    v_gasto_ma						numeric; --#77
+    v_recurso_ma 					numeric; --#77
     v_resp_val_doc					varchar[];
     v_tes_integrar_lb_pagado		varchar;
     v_conta_forzar_validacion_documentos	varchar;
-    v_retorno           boolean; --#87
+    v_retorno                               boolean; --#87
+    v_conta_error_limite_redondeo           numeric; --#77
      
 
 BEGIN
@@ -252,12 +259,16 @@ BEGIN
          sum(tra.importe_haber_mb),
          sum(tra.importe_debe_mt), 
          sum(tra.importe_haber_mt),
+         sum(tra.importe_debe_ma),  --#77
+         sum(tra.importe_haber_ma), --#77
          sum(tra.importe_gasto), 
          sum(tra.importe_recurso),
          sum(tra.importe_gasto_mb), 
          sum(tra.importe_recurso_mb),
          sum(tra.importe_gasto_mt), 
-         sum(tra.importe_recurso_mt)
+         sum(tra.importe_recurso_mt),
+         sum(tra.importe_gasto_ma),  --#77
+         sum(tra.importe_recurso_ma) --#77
     into 
        v_debe, 
        v_haber,
@@ -265,12 +276,16 @@ BEGIN
        v_haber_mb,
        v_debe_mt, 
        v_haber_mt,
+       v_debe_ma,  --#77
+       v_haber_ma, --#77
        v_gasto, 
        v_recurso,
        v_gasto_mb, 
        v_recurso_mb,
        v_gasto_mt, 
-       v_recurso_mt
+       v_recurso_mt,
+       v_gasto_ma,  --#77
+       v_recurso_ma --#77
     from conta.tint_transaccion tra
     where tra.id_int_comprobante = p_id_int_comprobante;
     
@@ -287,11 +302,20 @@ BEGIN
        v_variacion_mb =  v_debe_mb - v_haber_mb;
     end if;
     
-     if v_debe_mt < v_haber_mt then
+    if v_debe_mt < v_haber_mt then
        v_variacion_mt = v_haber_mt - v_debe_mt;
     elsif v_debe_mt > v_haber_mt then
        v_variacion_mt = v_debe_mt -  v_haber_mt;
     end if;
+    
+    --#77 validacion de moneda de actulizacion
+    if v_debe_ma < v_haber_ma then
+       v_variacion_ma = v_haber_ma - v_debe_ma;
+    elsif v_debe_ma > v_haber_ma then
+       v_variacion_ma = v_debe_ma -  v_haber_ma;
+    end if;
+    
+    
     
     
     if  v_variacion != 0  then
@@ -305,6 +329,14 @@ BEGIN
     if  v_variacion_mt != 0  then
         v_errores = 'El comprobante no iguala en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
     end if;
+    
+    --#77    
+    v_conta_error_limite_redondeo  = pxp.f_get_variable_global('conta_error_limite_redondeo')::numeric;               
+    IF v_conta_error_limite_redondeo < v_variacion_ma  or v_conta_error_limite_redondeo < v_variacion_ma THEN
+       v_errores = 'La diferencia   en moneda de actualizacion, ('||v_variacion_ma::varchar||'),  excede el margen establecido de ('||v_conta_error_limite_redondeo::varchar||'),  igualé  manualmente, ';
+    END IF;
+                        
+    
     
     --verifica los monstos presupuestarios
     
@@ -320,13 +352,13 @@ BEGIN
        v_variacion_mb =  v_gasto_mb - v_recurso_mb;
     end if;
     
-     if v_gasto_mt < v_recurso_mt then
+    if v_gasto_mt < v_recurso_mt then
        v_variacion_mt = v_recurso_mt - v_gasto_mt;
     elsif v_gasto_mt > v_recurso_mt then
        v_variacion_mt = v_gasto_mt -  v_recurso_mt;
     end if;
     
-    
+   
     if  v_variacion != 0  then
          v_errores = 'El comprobante no iguala presupuestariamente: Diferencia '||v_variacion::varchar;
     end if;
@@ -338,6 +370,7 @@ BEGIN
     if  v_variacion_mt != 0  then
         v_errores = 'El comprobante no iguala presupuestariamente en moneda de triangulación: Diferencia  '||v_variacion_mt::varchar;
     end if;
+  
                   
     
     ---------------------------------------------------------------------------------------------------------
