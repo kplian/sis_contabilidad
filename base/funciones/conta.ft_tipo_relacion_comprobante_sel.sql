@@ -1,7 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_tipo_relacion_comprobante_sel"(	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
+
+CREATE OR REPLACE FUNCTION conta.ft_tipo_relacion_comprobante_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_tipo_relacion_comprobante_sel
@@ -15,6 +21,13 @@ $BODY$
  DESCRIPCION:	
  AUTOR:			
  FECHA:		
+ 
+    HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+
+ #0             17-12-2014        RAC KPLIAN         CREACION
+ #78            11-12-2019        RAC KPLIAN         sw para filtrar moneda en cbtes relacionados
 ***************************************************************************/
 
 DECLARE
@@ -52,7 +65,8 @@ BEGIN
 						trc.id_usuario_mod,
 						trc.fecha_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	
+						usu2.cuenta as usr_mod	,
+                        trc.filtrar_moneda  --#78
 						from conta.ttipo_relacion_comprobante trc
 						inner join segu.tusuario usu1 on usu1.id_usuario = trc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = trc.id_usuario_mod
@@ -107,7 +121,9 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_tipo_relacion_comprobante_sel"(integer, integer, character varying, character varying) OWNER TO postgres;

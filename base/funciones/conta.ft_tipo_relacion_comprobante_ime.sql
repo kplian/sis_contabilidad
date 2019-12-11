@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "conta"."ft_tipo_relacion_comprobante_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION conta.ft_tipo_relacion_comprobante_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_tipo_relacion_comprobante_ime
@@ -16,6 +21,13 @@ $BODY$
  DESCRIPCION:	
  AUTOR:			
  FECHA:		
+ 
+    HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+
+ #0             17-12-2014        RAC KPLIAN         CREACION
+ #78            11-12-2019        RAC KPLIAN         sw para filtrar moneda en cbtes relacionados
 ***************************************************************************/
 
 DECLARE
@@ -45,28 +57,27 @@ BEGIN
         begin
         	--Sentencia de la insercion
         	insert into conta.ttipo_relacion_comprobante(
-			estado_reg,
-			nombre,
-			codigo,
-			id_usuario_reg,
-			fecha_reg,
-			usuario_ai,
-			id_usuario_ai,
-			id_usuario_mod,
-			fecha_mod
+              estado_reg,
+              nombre,
+              codigo,
+              id_usuario_reg,
+              fecha_reg,
+              usuario_ai,
+              id_usuario_ai,
+              id_usuario_mod,
+              fecha_mod,
+              filtrar_moneda    --#78
           	) values(
-			'activo',
-			v_parametros.nombre,
-			v_parametros.codigo,
-			p_id_usuario,
-			now(),
-			v_parametros._nombre_usuario_ai,
-			v_parametros._id_usuario_ai,
-			null,
-			null
-							
-			
-			
+              'activo',
+              v_parametros.nombre,
+              v_parametros.codigo,
+              p_id_usuario,
+              now(),
+              v_parametros._nombre_usuario_ai,
+              v_parametros._id_usuario_ai,
+              null,
+              null,
+              v_parametros.filtrar_moneda  --#78			
 			)RETURNING id_tipo_relacion_comprobante into v_id_tipo_relacion_comprobante;
 			
 			--Definicion de la respuesta
@@ -90,12 +101,13 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update conta.ttipo_relacion_comprobante set
-			nombre = v_parametros.nombre,
-			codigo = v_parametros.codigo,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+              nombre = v_parametros.nombre,
+              codigo = v_parametros.codigo,
+              id_usuario_mod = p_id_usuario,
+              fecha_mod = now(),
+              id_usuario_ai = v_parametros._id_usuario_ai,
+              usuario_ai = v_parametros._nombre_usuario_ai,
+              filtrar_moneda = v_parametros.filtrar_moneda  --#78
 			where id_tipo_relacion_comprobante=v_parametros.id_tipo_relacion_comprobante;
                
 			--Definicion de la respuesta
@@ -146,7 +158,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "conta"."ft_tipo_relacion_comprobante_ime"(integer, integer, character varying, character varying) OWNER TO postgres;
