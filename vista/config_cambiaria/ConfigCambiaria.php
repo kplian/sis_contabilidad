@@ -5,6 +5,13 @@
 *@author  (admin)
 *@date 04-11-2015 12:39:12
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ 
+ HISTORIAL DE MODIFICACIONES:
+
+ #ISSUE         FECHA        AUTOR        DESCRIPCION
+ 
+ #79           11/12/2019   JUAN         Agregado de combo múltiple de moneda en configuración cambiaría
+
 */
 
 header("content-type: text/javascript; charset=UTF-8");
