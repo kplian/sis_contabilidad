@@ -300,7 +300,65 @@ Phx.vista.ConfigCambiaria=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-		}
+		},
+        {
+            config: {
+                name: 'id_monedas',
+                fieldLabel: 'Tipo moneda ',//#79
+                allowBlank: false,
+                emptyText: 'Monedas...',
+                blankText: 'Debe seleccionar una moneda',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_parametros/control/Moneda/listarMoneda',
+                    id: 'id_moneda',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'moneda.id_moneda,moneda.codigo',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_moneda', 'codigo'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'codigo'}
+                }),
+                valueField: 'id_moneda',
+                displayField: 'codigo_monedas',
+                tpl: '<tpl for=".">  <div class="x-combo-list-item" >  <div class="awesomecombo-item {checked}"> <p>{codigo} </p> </div>  </div> </tpl>',
+                gdisplayField: 'codigo_monedas',
+                hiddenName: 'id_monedas',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 300,
+                queryDelay: 1000,
+                anchor: '80%',
+                gwidth: 150,
+                minChars: 2,
+                enableMultiSelect: true,
+            },
+            type: 'AwesomeCombo',
+            id_grupo: 0,
+            filters: {pfiltro: 'codigo_monedas', type: 'string'},
+            grid: true,
+            form: true
+        },
+		{
+			config:{
+				name: 'codigo_monedas',//#79
+				fieldLabel: 'Codigo moneda',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:4
+			},
+				type:'Field',
+				filters:{pfiltro:'codigo_monedas',type:'string'},
+				id_grupo:1,
+				grid:false,
+				form:false
+		},
 	],
 	tam_pag:50,	
 	title:'Configuración Cambiaria',
@@ -324,7 +382,10 @@ Phx.vista.ConfigCambiaria=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'ope_3'
+		{name:'usr_mod', type: 'string'},'ope_3',
+
+		{name:'id_monedas', type: 'string'},//#79
+		{name:'codigo_monedas', type: 'string'} //#79
 		
 	],
 	sortInfo:{

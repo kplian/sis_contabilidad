@@ -37,6 +37,9 @@ class MODConfigCambiaria extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('ope_3','varchar');
+
+		$this->captura('id_monedas','varchar');//#79
+		$this->captura('codigo_monedas','varchar');//#79
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -62,6 +65,7 @@ class MODConfigCambiaria extends MODbase{
 		$this->setParametro('obs','obs','varchar');
 		$this->setParametro('ope_3','ope_3','varchar');
 		
+		$this->setParametro('id_monedas','id_monedas','integer[]');//#79
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -88,7 +92,7 @@ class MODConfigCambiaria extends MODbase{
 		$this->setParametro('obs','obs','varchar');
 		$this->setParametro('ope_3','ope_3','varchar');
 		
-
+		$this->setParametro('id_monedas','id_monedas','integer[]');//#79
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

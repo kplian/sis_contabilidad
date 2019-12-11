@@ -5241,5 +5241,7 @@ IS 'define el campo id_taza_impuesto para documentos con impuestos variable. (ca
 
 /***********************************F-SCP-RAC-CONTA-66-24/07/2019****************************************/
 
-
-
+/***********************************I-SCP-JUAN-CONTA-0-11/12/2019****************************************/
+ALTER TABLE conta.tconfig_cambiaria
+  ADD COLUMN id_monedas INTEGER [];
+/***********************************F-SCP-JUAN-CONTA-0-11/12/2019****************************************/
