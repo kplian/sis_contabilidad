@@ -5,6 +5,13 @@
 *@author  (admin)
 *@date 04-11-2015 12:39:12
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+
+ HISTORIAL DE MODIFICACIONES:
+
+ #ISSUE         FECHA        AUTOR        DESCRIPCION
+ 
+ #79           11/12/2019   JUAN         Agregado de combo múltiple de moneda en configuración cambiaría
+
 */
 
 class MODConfigCambiaria extends MODbase{
