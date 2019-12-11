@@ -5245,3 +5245,14 @@ IS 'define el campo id_taza_impuesto para documentos con impuestos variable. (ca
 ALTER TABLE conta.tconfig_cambiaria
   ADD COLUMN id_monedas INTEGER [];
 /***********************************F-SCP-JUAN-CONTA-0-11/12/2019****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-78-11/12/2019****************************************/
+ALTER TABLE conta.ttipo_relacion_comprobante
+  ADD COLUMN filtrar_moneda VARCHAR(2) DEFAULT 'si' NOT NULL;
+
+COMMENT ON COLUMN conta.ttipo_relacion_comprobante.filtrar_moneda
+IS 'si o no, permite filtar el los comprobnates relacion con la misma moneda';
+/***********************************F-SCP-RAC-CONTA-78-11/12/2019****************************************/
+

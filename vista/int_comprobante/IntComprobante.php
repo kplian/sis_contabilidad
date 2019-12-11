@@ -9,6 +9,7 @@ HISTORIAL DE MODIFICACIONES:
 #50	    ETR		17/05/2019			manuel guerra		    agregar filtro depto
 #51		ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado 
 #61		ETR		11/06/2019			EGS						Se creo el campo Marca en el comprobante
+#78		ETR		11/12/2019			RAC						Se agrego configuracion de filtro moenda segun tipo_relacion_comprobante
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -176,7 +177,6 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		},
 
 		validarFiltros : function() {
-			console.log('values....', this.cmbDepto.getValue())
 			if (this.cmbDepto.getValue() != '' && this.cmbGestion.validate() ) {
 			
 				return true;
@@ -222,22 +222,32 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				if (this.Cmp.id_tipo_relacion_comprobante.getValue()) {
 					this.Cmp.id_int_comprobante_fks.allowBlank = false;
 					this.Cmp.id_int_comprobante_fks.enable();
+					this.Cmp.id_int_comprobante_fks.modificado = true;
+					this.Cmp.id_int_comprobante_fks.reset();
 				} else {
 					this.Cmp.id_int_comprobante_fks.allowBlank = true;
 					this.Cmp.id_int_comprobante_fks.reset();
 					this.Cmp.id_int_comprobante_fks.disable();
 				}
-
+				
+				
 			}, this);
 			
 			this.Cmp.id_int_comprobante_fks.on('beforequery',function( queryEvent ){
 				 var id_m = this.Cmp.id_moneda.getValue(),
 				     id_g = this.cmbGestion.getValue();
 				if(id_m && id_g){
-					this.Cmp.id_int_comprobante_fks.store.baseParams.id_moneda  = id_m;
+					var id_trc = this.Cmp.id_tipo_relacion_comprobante.getValue();  //#78
+					var rec_trc = this.Cmp.id_tipo_relacion_comprobante.store.getById(id_trc);  //#78
+					if(rec_trc.data.filtrar_moneda === 'si') {
+						this.Cmp.id_int_comprobante_fks.store.baseParams.id_moneda  = id_m;
+					} else {
+						this.Cmp.id_int_comprobante_fks.store.baseParams.id_moneda  = undefined;
+					}
+					
 					//RAC 29/!2/2016 comentado por que hay pagos de 2017 que necesitan relacion con cbte 2016
 					//this.Cmp.id_int_comprobante_fks.store.baseParams.id_gestion = id_g;
-					this.Cmp.id_int_comprobante_fks.store.modificado = true;				
+					this.Cmp.id_int_comprobante_fks.modificado = true;				
 				} 
 				else{
 					queryEvent.cancel = true;
@@ -526,7 +536,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 						direction : 'ASC'
 					},
 					totalProperty : 'total',
-					fields : ['id_tipo_relacion_comprobante', 'codigo', 'nombre'],
+					fields : ['id_tipo_relacion_comprobante', 'codigo', 'nombre','filtrar_moneda'],
 					remoteSort : true,
 					baseParams : {
 						par_filtro : 'tiprelco.nombre#tiprelco.codigo'
@@ -1863,8 +1873,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		},rec.data,this.idContenedor,'FormArchivoAIRBP')
 	},
 	//
-	postReloadPage:function(data){	
-		console.log('---->'+data);			
+	postReloadPage:function(data){		
 		//id_depto=data.id_depto;
 		//id_gestion=data.id_gestion;
 		tipo_filtro=data.tipo_filtro;	

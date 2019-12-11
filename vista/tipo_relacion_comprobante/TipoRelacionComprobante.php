@@ -5,6 +5,13 @@
 *@author  (admin)
 *@date 17-12-2014 19:29:44
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * 
+    HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+
+ #0             17-12-2014       RAC KPLIAN         CREACION
+ #78            7-12-2014        RAC KPLIAN         sw para filtrar moneda en cbtes relacionados
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -63,6 +70,32 @@ Phx.vista.TipoRelacionComprobante=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+		{
+            config:{
+                name:'filtrar_moneda',
+                fieldLabel:'Filtro Moneda',
+                qtip: 'activa o desactiva la posibilidad relacionar cbte solo de la misma  moneda',
+                allowBlank: false,
+                anchor: '80%',
+                emptyText:'filtro...',                   
+                typeAhead:true,
+                triggerAction:'all',
+                lazyRender:true,
+                mode:'local',
+                valueField:'inicio',                   
+                store:['si','no']
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            filters:{type: 'list',
+                     pfiltro:'trc.filtrar_moneda',
+                     options: ['si','no']
+                    },
+            grid:true,
+            form:true
+       },
+		
+		
 		{
 			config:{
 				name: 'estado_reg',
@@ -174,7 +207,7 @@ Phx.vista.TipoRelacionComprobante=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'filtrar_moneda'
 		
 	],
 	sortInfo:{

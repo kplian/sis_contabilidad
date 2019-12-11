@@ -29,6 +29,14 @@ $body$
  DESCRIPCION:	Se agrega una tercera moenda para configuracion cambiara de moneda de actualizacion
  AUTOR:		    RAC	(KPLIAN)
  FECHA:		    11/07/2017
+ 
+ 
+    HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+
+ #0             10-11-2015        RAC KPLIAN         CREACION
+ #78            11-12-2019        RAC KPLIAN        considerar moneda origen para devolver la configuracion adecuada
 ***************************************************************************/
 
 DECLARE
@@ -71,13 +79,15 @@ BEGIN
              v_registros_cc
             from conta.tconfig_cambiaria cc
             where cc.origen = p_localidad 
-            and cc.habilitado = 'si' and cc.estado_reg = 'activo';
+              and cc.habilitado = 'si' and cc.estado_reg = 'activo'
+              and p_id_moneda = ANY(cc.id_monedas); --#78
             
             po_id_config_cambiaria = v_registros_cc.id_config_cambiaria;
             
             IF v_registros_cc is NULL THEN
               raise exception 'No se encontro una configuracion cambiaria activa';
             END IF;
+           
             
         ----------------------
         -- remplazar labels

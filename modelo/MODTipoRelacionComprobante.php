@@ -5,6 +5,13 @@
 *@author  (admin)
 *@date 17-12-2014 19:29:44
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+ 
+ *  HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+
+ #0             17-12-2014        RAC KPLIAN         CREACION
+ #78            11-12-2019        RAC KPLIAN         sw para filtrar moneda en cbtes relacionados
 */
 
 class MODTipoRelacionComprobante extends MODbase{
@@ -32,6 +39,7 @@ class MODTipoRelacionComprobante extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('filtrar_moneda','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -51,6 +59,7 @@ class MODTipoRelacionComprobante extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('nombre','nombre','varchar');
 		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('filtrar_moneda','filtrar_moneda','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -71,6 +80,7 @@ class MODTipoRelacionComprobante extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('nombre','nombre','varchar');
 		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('filtrar_moneda','filtrar_moneda','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
