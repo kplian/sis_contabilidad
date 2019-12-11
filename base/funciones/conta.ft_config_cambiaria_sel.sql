@@ -18,9 +18,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ #ISSUE         FECHA        AUTOR        DESCRIPCION
+ 
+ #79           11/12/2019   JUAN         Agregado de combo múltiple de moneda en configuración cambiaría	
 ***************************************************************************/
 
 DECLARE
@@ -63,7 +63,13 @@ BEGIN
                                 cnfc.id_usuario_mod,
                                 usu1.cuenta as usr_reg,
                                 usu2.cuenta as usr_mod,
-                                cnfc.ope_3	
+                                cnfc.ope_3,
+                                (SELECT array_to_string(array_agg(m.id_moneda),'','')
+                                FROM param.tmoneda m
+                                WHERE m.id_moneda = ANY ( cnfc.id_monedas))::varchar as id_monedas, --#79 
+                                (SELECT array_to_string(array_agg(m.codigo),'','')
+                               FROM param.tmoneda m
+                               WHERE m.id_moneda = ANY ( cnfc.id_monedas))::varchar as codigo_monedas --#79 
 						from conta.tconfig_cambiaria cnfc
 						inner join segu.tusuario usu1 on usu1.id_usuario = cnfc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cnfc.id_usuario_mod
