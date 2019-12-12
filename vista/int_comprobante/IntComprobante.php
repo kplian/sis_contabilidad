@@ -216,14 +216,16 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			this.Cmp.forma_cambio.on('select', function(){ this.getConfigCambiaria('si') }, this);
 			this.Cmp.id_clase_comprobante.on('select', this.habilitaMomentos, this);
 
-
+            
+            this.Cmp.id_tipo_relacion_comprobante.on('select', function() {
+				this.Cmp.id_int_comprobante_fks.reset();
+			}, this);
 
 			this.Cmp.id_tipo_relacion_comprobante.on('valid', function() {
 				if (this.Cmp.id_tipo_relacion_comprobante.getValue()) {
 					this.Cmp.id_int_comprobante_fks.allowBlank = false;
 					this.Cmp.id_int_comprobante_fks.enable();
-					this.Cmp.id_int_comprobante_fks.modificado = true;
-					this.Cmp.id_int_comprobante_fks.reset();
+					this.Cmp.id_int_comprobante_fks.modificado = true;					
 				} else {
 					this.Cmp.id_int_comprobante_fks.allowBlank = true;
 					this.Cmp.id_int_comprobante_fks.reset();
