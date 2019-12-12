@@ -630,6 +630,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				gdisplayField : 'desc_moneda', //mapea al store del grid
 				gwidth : 100,
 				width : 250,
+				baseParams: {filtrar: 'no'},
 				renderer : function(value, p, record) {
 					return String.format('{0}', record.data['desc_moneda']);
 				}
