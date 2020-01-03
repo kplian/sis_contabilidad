@@ -1,4 +1,17 @@
 <?php
+/**
+ *@package pXP
+ *@file gen-MODIntTransaccion.php
+ *@author  (admin)
+ *@date 01-09-2013 18:10:12
+ *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+ */
+/**
+HISTORIAL DE MODIFICACIONES:
+ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
+#83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
+
+ */
 class RAuxliarTramitesXls
 {
     private $docexcel;
@@ -95,6 +108,7 @@ class RAuxliarTramitesXls
         $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(18);
         $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(18);
         $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(200);
+        $this->docexcel->getActiveSheet()->getColumnDimension('L')->setWidth(50);  //#83
 
         $this->docexcel->getActiveSheet()->setCellValue('A5','Num. Comprobamte');
         $this->docexcel->getActiveSheet()->setCellValue('B5','Cuenta');
@@ -107,8 +121,9 @@ class RAuxliarTramitesXls
         $this->docexcel->getActiveSheet()->setCellValue('I5','Debe MT');
         $this->docexcel->getActiveSheet()->setCellValue('J5','Haber MT');
         $this->docexcel->getActiveSheet()->setCellValue('K5','Glosa');
-        $this->docexcel->getActiveSheet()->getStyle('A5:K5')->getAlignment()->setWrapText(true);
-        $this->docexcel->getActiveSheet()->getStyle('A5:K5')->applyFromArray($styleSubtitulo);
+        $this->docexcel->getActiveSheet()->setCellValue('L5','Beneficiario'); //#83
+        $this->docexcel->getActiveSheet()->getStyle('A5:L5')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A5:L5')->applyFromArray($styleSubtitulo);
     }
 
     function generarDatos(){
@@ -194,6 +209,7 @@ class RAuxliarTramitesXls
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, $value['importe_debe_mt']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['importe_haber_mt']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['glosa1']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['beneficiario']); //#83
             $this->docexcel->getActiveSheet()->getStyle("F$fila:J$fila")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
             if($value['tipo'] == 'B') {
                 $this->docexcel->getActiveSheet()->getStyle("F$fila:J$fila")->applyFromArray($total);
@@ -215,7 +231,7 @@ class RAuxliarTramitesXls
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7,$this->fila_aux, $importe_debe_mb - $importe_haber_mb);
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8,$this->fila_aux,$importe_debe_mt);
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9,$this->fila_aux,$importe_haber_mt);
-        $this->docexcel->getActiveSheet()->getStyle("A$this->fila_aux:K$this->fila_aux")->applyFromArray($total2);
+        $this->docexcel->getActiveSheet()->getStyle("A$this->fila_aux:L$this->fila_aux")->applyFromArray($total2);
 
     }
     function imprimeSubtitulo($fila, $valor) {
