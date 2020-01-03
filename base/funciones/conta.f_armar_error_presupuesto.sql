@@ -67,7 +67,7 @@ BEGIN
                                                                    now()::date,
                                                                    'O',50); 
                        
-                      v_tmp =  format('solo se tiene disponible un monto de:  %s y se requiere  %s. (Falta . %s)', round(p_resp_ges[3],2)::varchar, round(v_monto_aux_mb,2)::varchar,  round(p_resp_ges[3] - p_monto_cmp_mb,2)::varchar);
+                      v_tmp =  format('solo se tiene disponible un monto de:  %s y se requiere  %s. (Falta . %s)', round(p_resp_ges[3],2)::varchar, round(v_monto_aux_mb,2)::varchar,  round(p_resp_ges[3] - v_monto_aux_mb,2)::varchar);
                   END IF;
                                             
              END IF;
