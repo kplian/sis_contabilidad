@@ -5256,3 +5256,8 @@ COMMENT ON COLUMN conta.ttipo_relacion_comprobante.filtrar_moneda
 IS 'si o no, permite filtar el los comprobnates relacion con la misma moneda';
 /***********************************F-SCP-RAC-CONTA-78-11/12/2019****************************************/
 
+
+/***********************************I-SCP-JUAN-CONTA-01-03/01/2020****************************************/
+ALTER TABLE conta.tresultado_det_plantilla --#82
+  ADD COLUMN observacion VARCHAR; --#82
+/***********************************F-SCP-JUAN-CONTA-01-03/01/2020****************************************/
