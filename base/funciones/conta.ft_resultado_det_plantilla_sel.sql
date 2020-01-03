@@ -14,13 +14,13 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tresultado_det_plantilla'
  AUTOR: 		 (admin)
  FECHA:	        08-07-2015 13:13:15
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ISSUE 			FECHA: 			AUTOR:						DESCRIPCION:
+
+ #82			03/01/2020		JUAN						Agregar campo de Observación para describir los movimientos realizados
 ***************************************************************************/
 
 DECLARE
@@ -31,35 +31,35 @@ DECLARE
 	v_resp				varchar;
     v_gestion 			varchar;
     v_id_gestion		integer;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_resultado_det_plantilla_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_RESDET_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		08-07-2015 13:13:15
 	***********************************/
 
 	if(p_transaccion='CONTA_RESDET_SEL')then
-     				
+
     	begin
-              
+
               --recupera la gestion actual
               v_gestion =  (EXTRACT(YEAR FROM  now()))::varchar;
-              
-             
-              
-              select 
+
+
+
+              select
                ges.id_gestion
               into
                v_id_gestion
-              from param.tgestion ges 
+              from param.tgestion ges
               where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
-                
+
               IF v_id_gestion is null THEN
                  raise exception 'No se encontro gestion para la fecha %', now()::Date;
               END IF;
@@ -107,31 +107,32 @@ BEGIN
                           par.nombre_partida as desc_partida,
                           resdet.salta_hoja,
                           tcc.id_tipo_cc,
-                          (tcc.codigo||'' ''||tcc.descripcion)::varchar as desc_tipo_cc
+                          (tcc.codigo||'' ''||tcc.descripcion)::varchar as desc_tipo_cc,
+                          resdet.observacion::varchar --#82
                           from conta.tresultado_det_plantilla resdet
                           inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
                           left  join conta.tauxiliar aux on aux.id_auxiliar = resdet.id_auxiliar
-                          left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||' 
-                          left join pre.tpartida par on par.estado_reg = ''activo'' and par.codigo = resdet.codigo_partida and par.id_gestion = '||v_id_gestion::varchar||' 
+                          left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||'
+                          left join pre.tpartida par on par.estado_reg = ''activo'' and par.codigo = resdet.codigo_partida and par.id_gestion = '||v_id_gestion::varchar||'
                           left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
                           left join param.ttipo_cc tcc on tcc.id_tipo_cc = resdet.id_tipo_cc
 				        where  ';
-                        
-             
-			
+
+
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_RESDET_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		08-07-2015 13:13:15
 	***********************************/
 
@@ -140,14 +141,14 @@ BEGIN
 		begin
               --recupera la gestion actual
               v_gestion =  (EXTRACT(YEAR FROM  now()))::varchar;
-              
-             select 
+
+             select
                ges.id_gestion
               into
                v_id_gestion
-              from param.tgestion ges 
+              from param.tgestion ges
               where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
-                
+
               IF v_id_gestion is null THEN
                  raise exception 'No se encontro gestion para la fecha %', now()::Date;
               END IF;
@@ -156,28 +157,28 @@ BEGIN
 					    from conta.tresultado_det_plantilla resdet
                           inner join segu.tusuario usu1 on usu1.id_usuario = resdet.id_usuario_reg
                           left  join conta.tauxiliar aux on aux.id_auxiliar = resdet.id_auxiliar
-                          left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||' 
-                          left join pre.tpartida par on par.estado_reg = ''activo'' and par.codigo = resdet.codigo_partida and par.id_gestion = '||v_id_gestion::varchar||' 
-                          
+                          left join conta.tcuenta cue on cue.estado_reg = ''activo'' and cue.nro_cuenta = resdet.codigo_cuenta and cue.id_gestion = '||v_id_gestion::varchar||'
+                          left join pre.tpartida par on par.estado_reg = ''activo'' and par.codigo = resdet.codigo_partida and par.id_gestion = '||v_id_gestion::varchar||'
+
                           left join segu.tusuario usu2 on usu2.id_usuario = resdet.id_usuario_mod
 				        where   ';
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-					
+
 	else
-					     
+
 		raise exception 'Transaccion inexistente';
-					         
+
 	end if;
-					
+
 EXCEPTION
-					
+
 	WHEN OTHERS THEN
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
