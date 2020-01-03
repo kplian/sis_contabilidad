@@ -5,6 +5,13 @@
 *@author  (admin)
 *@date 08-07-2015 13:13:15
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+
+HISTORIAL DE MODIFICACIONES:
+
+ISSUE 		FECHA: 			AUTOR:						DESCRIPCION:
+
+#82			03/01/2020		JUAN						Agregar campo de Observación para describir los movimientos realizados
+
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -370,6 +377,24 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
 			egrid: true,
 			form: true
 		},
+
+        {
+            config:{
+                name: 'observacion', //#82
+                fieldLabel: 'Observacion',
+                qtip: 'Describe los movimientos realizados',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:400
+            },
+            type:'TextArea',
+            filters:{pfiltro:'resdet.observacion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            egrid: true,
+            form:true
+        },
 		
 		{
             config:{
@@ -882,7 +907,8 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
         'codigo_partida',
         'id_auxiliar','desc_auxiliar',
         'destino',
-        'orden_cbte','desc_partida','salta_hoja','id_tipo_cc','desc_tipo_cc'
+        'orden_cbte','desc_partida','salta_hoja','id_tipo_cc','desc_tipo_cc',
+        {name:'observacion', type: 'string'}, //#82
 		
 	],
 	sortInfo:{
