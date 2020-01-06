@@ -4947,13 +4947,6 @@ COMMENT ON COLUMN conta.tint_transaccion.id_partida_ejecucion_tmp
 IS 'partida ejecucion del comprometido, que se almacena temporalmente para operaciones manaules auxiliares';
 
 ALTER TABLE conta.tint_transaccion
-  ADD COLUMN obs_dba VARCHAR;
-
-COMMENT ON COLUMN conta.tint_transaccion.obs_dba
-IS 'cambios dba';
-
-
-ALTER TABLE conta.tint_transaccion
   ADD COLUMN temp_importe_ma_aux NUMERIC;
 
 COMMENT ON COLUMN conta.tint_transaccion.temp_importe_ma_aux
