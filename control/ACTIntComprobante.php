@@ -13,7 +13,8 @@ ISSUE     FORK          FECHA:		       AUTOR                 DESCRIPCION
  #15     ENDEERT		04-01-2019     Miguel Mamani     corrección filtro por gestión interfaz visto bueno comprobantes
  * 1A			21/08/2018		EGS					se creo la funcion listarIntComprobanteCombo
  #55 	ETR			30/05/2019			EGS				 Se agrega funcion par poder migrar comprobantes
- 
+#87		  ETR		    08/01/2020	        MMV 		         Reporte Cbte formato Excel
+
  */
 //require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
 // convert to PDF
@@ -26,6 +27,7 @@ require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario.php');
 require_once(dirname(__FILE__).'/../reportes/RComprobanteDiario_cuad.php');
 require_once(dirname(__FILE__).'/../reportes/RComprobanteDiarioXls.php');
 require_once(dirname(__FILE__).'/../reportes/RCbteXls.php');
+require_once(dirname(__FILE__).'/../reportes/RIntCbteExcel.php');  //#87
 //
 class ACTIntComprobante extends ACTbase{
 	
@@ -837,6 +839,18 @@ class ACTIntComprobante extends ACTbase{
 		$this->res=$this->objFunc->migrarComprobante($this->objParam);		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	function reporteCbteExcel (){ //#87
+        $dataSource = $this->recuperarDatosCbte();
+        $nombreArchivo = uniqid(md5(session_id()).'Cbte').'.xls';
+        $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+        $reporte = new RIntCbteExcel($this->objParam);
+        $reporte->datosHeader($dataSource);
+        $reporte->generarReporte();
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
 	
 }
 

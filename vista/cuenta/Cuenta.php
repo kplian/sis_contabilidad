@@ -484,9 +484,9 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
                                  ['curso', 'Obras en Curso (Considera Centro de Costo)'],
                                  ['reservas', 'Actualización de reservas'],
                                  ['capital', 'Actualización de capital'],
-                                 ['gasto', 'Actualización de Gasto'] ,//#16
+                                 ['gasto_plantilla', 'Actualización de Gasto'] ,//#16
                                  ['utilidad', 'Actualización de Utilidad'], //#16
-                                 ['ingresos', 'Actualización de Ingresos'] //#16
+                                 ['ingresos_plantilla', 'Actualización de Ingresos'] //#16
                                ]
                         }),
        				valueField: 'variable',
