@@ -19,6 +19,7 @@
 #50	 ETR		17/05/2019			manuel guerra		agregar filtro depto
 #51		ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado
 #55 	ETR		30/05/2019			EGS								Se agrega funcion par poder migrar comprobantes
+#87		  ETR		    08/01/2020	        MMV 		         Reporte Cbte formato Excel
  */
 class MODIntComprobante extends MODbase{
 	
@@ -487,6 +488,8 @@ class MODIntComprobante extends MODbase{
 		$this->captura('importe_haber_mb','numeric');
         $this->captura('importe_debe_mt','numeric'); //#33
         $this->captura('importe_haber_mt','numeric'); //#33
+        $this->captura('importe_debe_ma','numeric'); // #87
+        $this->captura('importe_haber_ma','numeric'); //#87
 		$this->captura('sw_movimiento','varchar');
 		$this->captura('tipo_partida','varchar');
 		$this->captura('tipo_cambio','numeric');
