@@ -11,6 +11,7 @@ ISSUE 		   FECHA   			     AUTOR				 DESCRIPCION:
 #17 		09/01/2019		        Manuel Guerra	  agrego el filtro de nro_tramite_aux
 #20         10/01/2019 ENDETRAS     Miguel Mamani     Ocultar botón para exportar datos de grilla
 #22         14/01/2019 ENDETRAS     Miguel Mamamni    Mostrar boton para exportar datos de grilla
+#91         15/01/2020 ENDETR       JUAN              Libro mayor añadir columna beneficiario 
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -331,6 +332,21 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 	   			grid:true,
 	   			form:true
 		   	},
+            {//#91
+                config:{
+                    name: 'beneficiario',
+                    fieldLabel: 'Beneficiario',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 300,
+                    maxLength:1000,
+                },
+                type:'TextArea',
+                filters:{pfiltro:'beneficiario',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
+            },
 		   	{
 	   			config:{
 	   				sysorigen:'sis_presupuestos',
@@ -963,7 +979,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		'cbte_relacional',
 		'tipo_partida','id_orden_trabajo','desc_orden',
 		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','glosa1',
-		'id_proceso_wf','id_estado_wf','id_suborden','desc_suborden','tipo_cambio','tipo_cambio_2','tipo_cambio_3','actualizacion'
+		'id_proceso_wf','id_estado_wf','id_suborden','desc_suborden','tipo_cambio','tipo_cambio_2','tipo_cambio_3','actualizacion',
+        'beneficiario'//#91
 		
 	],
 	

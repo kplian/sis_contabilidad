@@ -24,9 +24,10 @@ $body$
   #65        11/07/2019       EGS             Se agrega filtro para el parametro tipo en las trnsacciones  CONTA_AUXMAY_SEL,CONTA_AUXMAY_CONT,
                                               CONTA_TOTAUX_SEL,CONTA_TOTAUX_CONT
   #69        01/08/2019       Saul Zambrana	  Se han eliminado 9 columnas y añadido 6 a la transaccion CONTA_LDCTRANS_SEL para el reporte:Detalle comprobante-transacciones
+  											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de
+  #91        15/01/2020       JUAN            Libro mayor añadir columna beneficiario
   											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de  
   #83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
-
 ***************************************************************************/
 
 DECLARE
@@ -491,18 +492,18 @@ BEGIN
                                             id_partida::integer,
                                             id_centro_costo::integer,
                                             id_partida_ejecucion::integer,
-                                            estado_reg::varchar,
 
+                                            xxx.estado_reg::varchar,
                                             id_int_transaccion_fk::integer,
                                             id_cuenta::integer,
                                             glosa::varchar,
-                                            id_int_comprobante::integer,
-											id_auxiliar::integer,
+                                            xxx.id_int_comprobante::integer,
+											                      id_auxiliar::integer,
 
-                                            id_usuario_reg::integer,
-                                            fecha_reg::date,
-                                            id_usuario_mod::integer,
-                                            fecha_mod::date,
+                                            xxx.id_usuario_reg::integer,
+                                            xxx.fecha_reg::date,
+                                            xxx.id_usuario_mod::integer,
+                                            xxx.fecha_mod::date,
                                             usr_reg::varchar,
                                             usr_mod::varchar,
 
@@ -528,26 +529,29 @@ BEGIN
                                             tipo_partida::varchar,
                                       		id_orden_trabajo::integer,
                                             desc_orden::varchar,
-                                            nro_cbte::varchar,
-                                            nro_tramite::varchar,
+                                            xxx.nro_cbte::varchar,
+                                            xxx.nro_tramite::varchar,
                                             nombre_corto::varchar,
 
-                                            fecha::date,
-                                            glosa1::varchar,
-                                            id_proceso_wf::integer,
-                                            id_estado_wf::integer,
+                                            xxx.fecha::date,
+                                            xxx.glosa1::varchar,
+                                            xxx.id_proceso_wf::integer,
+                                            xxx.id_estado_wf::integer,
                                             cbte_relacional::varchar,
 
-                                            tipo_cambio::numeric,
-                                            tipo_cambio_2::numeric,
-                                            tipo_cambio_3::numeric,
+                                            xxx.tipo_cambio::numeric,
+                                            xxx.tipo_cambio_2::numeric,
+                                            xxx.tipo_cambio_3::numeric,
+
                                             actualizacion::varchar,
                                             codigo_cc::varchar,
 
                                             saldo_mb::numeric,
                                             saldo_mt::numeric,
-                                            sum(dif) over (order by orden asc rows between unbounded preceding and current row)::numeric as dif
+                                            sum(dif) over (order by orden asc rows between unbounded preceding and current row)::numeric as dif,
+                                            icbte.beneficiario -- #91
                                       from xxx
+                                      inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = xxx.id_int_comprobante -- #91
                                       order by orden
                                       limit '||v_parametros.cantidad||'
                                       offset '||v_parametros.puntero;
