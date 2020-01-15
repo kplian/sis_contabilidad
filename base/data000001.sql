@@ -62,11 +62,11 @@ Para  definir la la metadata, menus, roles, etc
 
 1) sincronize ls funciones y procedimientos del sistema
 2)  verifique que la primera linea de los datos sea la insercion del sistema correspondiente
-3)  exporte los datos a archivo SQL (desde la interface de sistema en sis_seguridad), 
+3)  exporte los datos a archivo SQL (desde la interface de sistema en sis_seguridad),
     verifique que la codificacion  se mantenga en UTF8 para no distorcionar los caracteres especiales
-4)  remplaze los sectores correspondientes en este archivo en su totalidad:  (el orden es importante)  
-                             menu, 
-                             funciones, 
+4)  remplaze los sectores correspondientes en este archivo en su totalidad:  (el orden es importante)
+                             menu,
+                             funciones,
                              procedimietnos
 */
 
@@ -86,7 +86,7 @@ select pxp.f_insert_tgui ('Ordenes de Trabajo', 'ordenes de trabajo', 'ODT', 'si
 select pxp.f_insert_testructura_gui ('CONTA', 'SISTEMA');
 select pxp.f_insert_testructura_gui ('CTA', 'CONTA');
 select pxp.f_insert_testructura_gui ('AUXCTA', 'CONTA');
-select pxp.f_insert_testructura_gui ('ODT', 'CONTA'); 
+select pxp.f_insert_testructura_gui ('ODT', 'CONTA');
 
 
 select pxp.f_insert_tgui ('Config Tipo Cuenta', 'Configuracion de numero para los tipos de cuenta', 'CTIP', 'si', 1, 'sis_contabilidad/vista/config_tipo_cuenta/ConfigTipoCuenta.php', 2, '', 'ConfigTipoCuenta', 'CONTA');
@@ -179,7 +179,7 @@ select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'C
 select pxp.f_insert_tgui ('Cuentas Bancarias', 'relacion de cuentas bancarias y cuentas contables', 'RELCCCB', 'si', 4, 'sis_contabilidad/vista/cta_cuenta_bancaria/CtaCuentaBancaria.php', 3, '', 'CtaCuentaBancaria', 'CONTA');
 select pxp.f_insert_testructura_gui ('CCBT', 'CONTA');
 select pxp.f_insert_testructura_gui ('RELCCCB', 'RELACON');
-          
+
 
 
 /***********************************F-DAT-RAC-CONTA-0-10/07/2013*****************************************/
@@ -222,7 +222,7 @@ select pxp.f_insert_testructura_gui ('DEPTCON', 'RELACON');
 /***********************************F-DAT-RAC-CONTA-0-03/09/2013*****************************************/
 
 
-   
+
 /***********************************I-DAT-RCM-CONTA-18-29/08/2013*****************************************/
 select pxp.f_insert_tgui ('Registro de Comprobantes', 'Registro de Comprobantes', 'CBTE.1.1', 'si', 1, 'sis_contabilidad/vista/int_comprobante/IntComprobante.php', 3, '', 'IntComprobante', 'CONTA');
 
@@ -309,10 +309,10 @@ VALUES (1, 1, E'2013-09-19 20:10:41.411', E'2013-09-23 12:39:57.663', E'activo',
 
 INSERT INTO conta.tdetalle_plantilla_comprobante (
 "id_usuario_reg",
- "id_usuario_mod", 
- "fecha_reg", 
- "fecha_mod", 
- "estado_reg", 
+ "id_usuario_mod",
+ "fecha_reg",
+ "fecha_mod",
+ "estado_reg",
  "id_detalle_plantilla_comprobante", "id_plantilla_comprobante", "tabla_detalle", "debe_haber", "campo_monto", "agrupar", "campo_cuenta", "campo_auxiliar", "campo_partida", "campo_centro_costo", "es_relacion_contable", "tipo_relacion_contable", "campo_relacion_contable", "aplicar_documento", "campo_documento", "campo_fecha", "campo_concepto_transaccion", "primaria", "otros_campos", "nom_fk_tabla_maestro", "campo_partida_ejecucion", "descripcion", "campo_monto_pres", "id_detalle_plantilla_fk", "forma_calculo_monto", "func_act_transaccion", "campo_id_tabla_detalle", "rel_dev_pago", "campo_trasaccion_dev")
 VALUES (1, 1, E'2013-09-23 12:34:39.340', E'2013-09-23 16:30:21.498', E'activo', 8, 2, E'', E'haber', E'{$tabla_padre.otros_descuentos}', E'si', E'', E'', E'', E'', E'si', E'CUENRETPRO', E'{$tabla_padre.id_proveedor}', E'no', E'', E'', E'', E'si', E'', E'', E'', E'otras descuentos proveedor', E'0', 5, E'incremento', E'', E'', E'no', E'');
 
@@ -415,7 +415,7 @@ select pxp.f_insert_tgui ('Subsistema', 'Subsistema', 'DEPTCON.7', 'no', 0, 'id_
 select pxp.f_insert_tgui ('Usuarios', 'Usuarios', 'DEPTCON.2.1', 'no', 0, 'sis_seguridad/vista/usuario/Usuario.php', 5, '', 'usuario', 'CONTA');
 select pxp.f_insert_tgui ('Personas', 'Personas', 'DEPTCON.2.1.1', 'no', 0, 'sis_seguridad/vista/persona/Persona.php', 6, '', 'persona', 'CONTA');
 select pxp.f_insert_tgui ('Roles', 'Roles', 'DEPTCON.2.1.2', 'no', 0, 'sis_seguridad/vista/usuario_rol/UsuarioRol.php', 6, '', 'usuario_rol', 'CONTA');
-select pxp.f_insert_tgui ('EP\', 'EP\', 'DEPTCON.2.1.3', 'no', 0, 'sis_seguridad/vista/usuario_grupo_ep/UsuarioGrupoEp.php', 6, '', ', 
+select pxp.f_insert_tgui ('EP\', 'EP\', 'DEPTCON.2.1.3', 'no', 0, 'sis_seguridad/vista/usuario_grupo_ep/UsuarioGrupoEp.php', 6, '', ',
           width:400,
           cls:', 'CONTA');
 select pxp.f_insert_tgui ('Subir foto', 'Subir foto', 'DEPTCON.2.1.1.1', 'no', 0, 'sis_seguridad/vista/persona/subirFotoPersona.php', 7, '', 'subirFotoPersona', 'CONTA');
@@ -477,7 +477,7 @@ select pxp.f_insert_tgui ('Subir foto', 'Subir foto', 'ALMCUE.6.2.3.2.1', 'no', 
 
 
 ----------------------------------
---COPY LINES TO data.sql FILE  
+--COPY LINES TO data.sql FILE
 ---------------------------------
 
 select pxp.f_insert_tgui ('Plan de Cuentas', 'Cuentas', 'CTA', 'si', 0, 'sis_contabilidad/vista/cuenta/Cuenta.php', 2, '', 'Cuenta', 'CONTA');
@@ -500,7 +500,7 @@ select pxp.f_insert_tgui ('Configuraciones', 'Configuraciones', 'CONF', 'si', 1,
 select pxp.f_insert_tgui ('Tipo de relaicon comprobantes', 'Tipo de relaicon comprobantes', 'TRECOM', 'si', 4, 'sis_contabilidad/vista/tipo_relacion_comprobante/TipoRelacionComprobante.php', 3, '', 'TipoRelacionComprobante', 'CONTA');
 
 ----------------------------------
---COPY LINES TO dependencies.sql FILE  
+--COPY LINES TO dependencies.sql FILE
 ---------------------------------
 
 select pxp.f_delete_testructura_gui ('CTA', 'CONTA');
@@ -843,7 +843,7 @@ VALUES (E'conta_prioridad_depto_inter', E'3', E'prioridad depto de contabilidad 
 /***********************************I-DAT-RAC-CONTA-0-12/01/2016****************************************/
 
 ----------------------------------
---COPY LINES TO data.sql FILE  
+--COPY LINES TO data.sql FILE
 ---------------------------------
 
 select pxp.f_insert_tgui ('SISTEMA DE CONTABILIDAD', '', 'CONTA', 'si', 1, '', 1, '', '', 'CONTA');
@@ -907,7 +907,7 @@ select pxp.f_insert_tgui ('Subsistema', 'Subsistema', 'DEPTCON.7', 'no', 0, 'id_
 select pxp.f_insert_tgui ('Usuarios', 'Usuarios', 'DEPTCON.2.1', 'no', 0, 'sis_seguridad/vista/usuario/Usuario.php', 5, '', 'usuario', 'CONTA');
 select pxp.f_insert_tgui ('Personas', 'Personas', 'DEPTCON.2.1.1', 'no', 0, 'sis_seguridad/vista/persona/Persona.php', 6, '', 'persona', 'CONTA');
 select pxp.f_insert_tgui ('Roles', 'Roles', 'DEPTCON.2.1.2', 'no', 0, 'sis_seguridad/vista/usuario_rol/UsuarioRol.php', 6, '', 'usuario_rol', 'CONTA');
-select pxp.f_insert_tgui ('EP\', 'EP\', 'DEPTCON.2.1.3', 'no', 0, 'sis_seguridad/vista/usuario_grupo_ep/UsuarioGrupoEp.php', 6, '', ', 
+select pxp.f_insert_tgui ('EP\', 'EP\', 'DEPTCON.2.1.3', 'no', 0, 'sis_seguridad/vista/usuario_grupo_ep/UsuarioGrupoEp.php', 6, '', ',
           width:400,
           cls:', 'CONTA');
 select pxp.f_insert_tgui ('Subir foto', 'Subir foto', 'DEPTCON.2.1.1.1', 'no', 0, 'sis_seguridad/vista/persona/subirFotoPersona.php', 7, '', 'subirFotoPersona', 'CONTA');
@@ -989,7 +989,7 @@ select pxp.f_insert_tgui ('Configuración Cambiaria', 'para configurar moneda de
 /* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 42) */
 
 INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "fecha_reg", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
-VALUES 
+VALUES
 
   (1, E'2015-08-20 10:20:21.948', E'activo', NULL, NULL, E'IVA-DF', E'IVA-DF', E'no', E'si', E'si', NULL, E'presupuestaria', E'recurso'),
   (1, E'2015-08-20 10:22:29.125', E'activo', NULL, NULL, E'IT', E'IT', E'no', E'si', E'si', NULL, E'presupuestaria', E'gasto'),
@@ -997,20 +997,20 @@ VALUES
   (1, E'2015-09-24 13:20:42.111', E'activo', NULL, NULL, E'Compras por defecto', E'CMPDEF', E'no', E'si', E'si', NULL, E'flujo', E'gasto'),
   (1, E'2015-09-24 14:03:20.381', E'activo', NULL, NULL, E'Cuenta de Banco para ventas por defecto', E'VENDEF', E'si-unico', E'si', E'si', NULL, E'flujo', E'recurso'),
   (175, E'2015-10-20 10:12:43.844', E'activo', NULL, NULL, E'Cuentas Bancarias Ingresos', E'CUEBANCING', E'no', E'si', E'si', 2, E'flujo', E'recurso_gasto');
-  
+
 
 /* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 6) */
 
 INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
-VALUES 
+VALUES
   (1, NULL, E'2016-02-15 17:30:01.038', NULL, E'activo', NULL, NULL, E'Cuentas por Pagar por defecto', E'CXPDF', E'no', E'si', E'no', NULL, E'flujo', E'recurso'),
   (1, NULL, E'2016-02-15 17:27:50.168', NULL, E'activo', NULL, NULL, E'Cuentas por Cobrar defecto', E'CXCDF', E'no', E'si', E'no', NULL, E'flujo', E'gasto'),
   (1, NULL, E'2016-02-15 17:10:03.802', NULL, E'activo', NULL, NULL, E'Retención de anticipos en ventas por defecto', E'VRETANTD', E'no', E'si', E'no', NULL, E'flujo', E'recurso'),
   (1, NULL, E'2016-02-15 17:07:04.488', NULL, E'activo', NULL, NULL, E'Retencion de anticipo en compras por defecto', E'CMRETANTD', E'no', E'si', E'no', NULL, E'flujo', E'recurso'),
   (1, NULL, E'2016-02-15 17:04:27.022', NULL, E'activo', NULL, NULL, E'Retención de garantía en ventas por defecto', E'VRETGARDF', E'no', E'si', E'no', NULL, E'flujo', E'gasto'),
   (1, NULL, E'2016-02-15 17:02:12.003', NULL, E'activo', NULL, NULL, E'Retencion de garantia en compras por defecto', E'CMRETGARDF', E'no', E'si', E'no', NULL, E'flujo', E'recurso');
-  
-  
+
+
 
 
 SELECT pxp.f_update_table_sequence ('conta','tplantilla_comprobante');
@@ -1046,7 +1046,7 @@ select conta.f_import_tdetalle_plantilla_comprobante ('insert','VENTADOC','VENTA
 /* Data for the 'conta.ttipo_doc_compra_venta' table  (Records 1 - 10) */
 
 INSERT INTO conta.ttipo_doc_compra_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "codigo", "nombre", "tipo", "obs")
-VALUES 
+VALUES
   (1, NULL, E'2016-02-22 12:45:59.328', NULL, E'activo', NULL, E'NULL', E'1', E'mercado interno con destino a actividades gravadas', E'compra', E'Compras para mercado interno con destino a actividades gravadas'),
   (1, NULL, E'2016-02-22 12:46:17.472', NULL, E'activo', NULL, E'NULL', E'2', E'mercado interno con destino a actividades no gravadas,', E'compra', E'Compras para mercado interno con destino a actividades no gravadas'),
   (1, NULL, E'2016-02-22 12:46:51.278', NULL, E'activo', NULL, E'NULL', E'3', E'sujetas a proporcionalidad', E'compra', E'Compras sujetas a proporcionalidad, no se puede determinar si es 1  o 2'),
@@ -1057,27 +1057,27 @@ VALUES
   (1, NULL, E'2016-02-22 12:50:00.442', NULL, E'activo', NULL, E'NULL', E'E', E'EXTRAVIADA', E'venta', E'facturas extraviada'),
   (1, NULL, E'2016-02-22 12:50:14.012', NULL, E'activo', NULL, E'NULL', E'N', E'NO UTILIZADA', E'venta', E'NO UTILIZADA'),
   (1, 1, E'2016-02-22 12:50:25.858', E'2016-02-22 12:51:08.179', E'activo', NULL, E'NULL', E'C', E'EMITIDA POR CONTINGENCIA', E'venta', E'EMITIDA POR CONTINGENCIA, por corte de energía por ejemplo en el caso de ser emitida manualmente, necesitara un informe de justificación');
-  
-  
-  
- select pxp.f_insert_tgui ('Tipo Doc LCV', 'Tipo de documentos compra y venta', 'TIPLCV', 'si', 5, 'sis_contabilidad/vista/tipo_doc_compra_venta/TipoDocCompraVenta.php', 3, '', 'TipoDocCompraVenta', 'CONTA'); 
+
+
+
+ select pxp.f_insert_tgui ('Tipo Doc LCV', 'Tipo de documentos compra y venta', 'TIPLCV', 'si', 5, 'sis_contabilidad/vista/tipo_doc_compra_venta/TipoDocCompraVenta.php', 3, '', 'TipoDocCompraVenta', 'CONTA');
  select pxp.f_insert_testructura_gui ('TIPLCV', 'CONF');
-  
-  
+
+
 /***********************************F-DAT-RAC-CONTA-0-22/02/2016****************************************/
 
- 
+
 /***********************************I-DAT-RAC-CONTA-0-29/02/2016****************************************/
- 
-  
+
+
 /* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_libro_compras_detallado', E'si', E'Si la interface de libro de compras permite el registro del detalle de la factura');
 
 /***********************************F-DAT-RAC-CONTA-0-29/02/2016****************************************/
- 
+
 
 
 
@@ -1095,23 +1095,23 @@ select pxp.f_insert_testructura_gui ('REPLCV', 'REPCON');
 /***********************************I-DAT-RAC-CONTA-0-22/03/2016*****************************************/
 
 INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id", "tabla_id_fk", "recorrido_arbol", "tabla_id_auxiliar", "tabla_codigo_auxiliar")
-VALUES 
+VALUES
   (1, NULL, E'2016-03-22 13:21:05.346', NULL, E'activo', NULL, NULL, 11, E'tfuncionario', E'ORGA', E'id_funcionario', E'', E'', E'', E'codigo');
-  
-  
+
+
 
 INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
-VALUES 
-  (1, NULL, E'2016-03-22 13:22:39.393', NULL, E'activo', NULL, NULL,  E'Cuenta por Rendir', E'CUEXREND', E'no', E'si', E'dinamico', 11, E'flujo', E'recurso_gasto');  
+VALUES
+  (1, NULL, E'2016-03-22 13:22:39.393', NULL, E'activo', NULL, NULL,  E'Cuenta por Rendir', E'CUEXREND', E'no', E'si', E'dinamico', 11, E'flujo', E'recurso_gasto');
 
 
 /* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 1) */
 
 INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
-VALUES 
+VALUES
   (1, NULL, E'2016-03-24 14:46:07.159', NULL, E'activo', NULL, NULL,  E'Entrega de Dinero por Rendir', E'EDINXRENDIR', E'no', E'si', E'si', 11, E'flujo', E'gasto');
-  
-  
+
+
 /***********************************F-DAT-RAC-CONTA-0-22/03/2016*****************************************/
 
 
@@ -1128,13 +1128,13 @@ select param.f_import_tdocumento ('insert','CBT','Numero de Tramite Cbte','CONTA
 
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_codigo_macro_wf_cbte', E'CBT', E'codigo de proceso macro del WF de contabilidad');
-  
+
 
 /***********************************F-DAT-RAC-CONTA-0-25/05/2016*****************************************/
 
-  
+
 
 
 
@@ -1142,7 +1142,7 @@ VALUES
 
 
 ----------------------------------
---COPY LINES TO SUBSYSTEM data.sql FILE  
+--COPY LINES TO SUBSYSTEM data.sql FILE
 ---------------------------------
 
 select wf.f_import_tproceso_macro ('insert','CBT', 'CONTA', 'Comprobante','si');
@@ -1161,7 +1161,7 @@ select wf.f_import_testructura_estado ('insert','borrador','validado','CBTE',1,'
 
 
 ----------------------------------
---COPY LINES TO SUBSYSTEM dependencies.sql FILE  
+--COPY LINES TO SUBSYSTEM dependencies.sql FILE
 ---------------------------------
 
 select wf.f_import_ttipo_documento_estado ('insert','CBTE','CBTE','borrador','CBTE','crear','superior','');
@@ -1226,7 +1226,7 @@ select pxp.f_insert_tgui ('Balance de cuentas', 'Balance general', 'BALCON', 'si
 
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_ejecucion_igual_pres_conta', E'si', E'si o no, define si laejecucion presupuestaria sera igual a la contabe, ejemplo el caso de algunas empresas ejecutar el 100 % de las facturas y no solo el 13 %, en ese caso definir como no');
 
 
@@ -1248,63 +1248,63 @@ select pxp.f_insert_testructura_gui ('ORDARB', 'CROT');
 select pxp.f_insert_testructura_gui ('SUOINT', 'CROT');
 select pxp.f_insert_testructura_gui ('ODT', 'CROT');
 select pxp.f_insert_testructura_gui ('GRUOT', 'CROT');
-select pxp.f_insert_testructura_gui ('OFIOT', 'CROT');  
+select pxp.f_insert_testructura_gui ('OFIOT', 'CROT');
 
 
 
 /**********************************F-DAT-RAC-CONTA-1-15/05/2017*****************************************/
 
 
-/**********************************I-DAT-RAC-CONTA-1-26/05/2017*****************************************/  
+/**********************************I-DAT-RAC-CONTA-1-26/05/2017*****************************************/
 select pxp.f_insert_tgui ('<i class="fa fa-signal  fa-2x"></i> SISTEMA DE CONTABILIDAD', '', 'CONTA', 'si', 17, '', 1, '', '', 'CONTA');
 /**********************************F-DAT-RAC-CONTA-1-26/05/2017*****************************************/
 
-/**********************************I-DAT-RAC-CONTA-1-01/06/2017*****************************************/  
+/**********************************I-DAT-RAC-CONTA-1-01/06/2017*****************************************/
 select pxp.f_insert_tgui ('Balance de Ordenes de Costos', 'Balance de Ordenes de Costos', 'FBAOR', 'si', 5, 'sis_contabilidad/vista/cuenta/FormFiltroBalanceOrdenes.php', 3, '', 'FormFiltroBalanceOrdenes', 'CONTA');
 select pxp.f_insert_testructura_gui ('FBAOR', 'REPCON');
-/**********************************F-DAT-RAC-CONTA-1-01/06/2017*****************************************/  
+/**********************************F-DAT-RAC-CONTA-1-01/06/2017*****************************************/
 
 
 
-/**********************************I-DAT-RAC-CONTA-1-02/06/2017*****************************************/  
+/**********************************I-DAT-RAC-CONTA-1-02/06/2017*****************************************/
 select pxp.f_insert_tgui ('Registro de Cbte (Auxiliares)', 'Registro de Cbte (Auxiliares)', 'RECBTAX', 'si', 1, 'sis_contabilidad/vista/int_comprobante/IntComprobanteRegAux.php', 3, '', 'IntComprobanteRegAux', 'CONTA');
 select pxp.f_insert_testructura_gui ('RECBTAX', 'CBTE.1');
-/**********************************F-DAT-RAC-CONTA-1-02/06/2017*****************************************/  
+/**********************************F-DAT-RAC-CONTA-1-02/06/2017*****************************************/
 
 
 
-/**********************************I-DAT-RAC-CONTA-1-13/06/2017*****************************************/  
+/**********************************I-DAT-RAC-CONTA-1-13/06/2017*****************************************/
 
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
 VALUES  (E'conta_val_doc_venta', E'no', E'validar que el cbte cuadre con los documentos de venta');
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_val_doc_compra', E'no', E'validar que el cbte cuadre con los documentos de compra');
-  
-  
-/* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
-
-INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
-  (E'conta_dif_doc_cbte', E'0.6', E'la difenrecia permitida al validar cbtes y documentos  facturas, invoice etc');  
-  
-/**********************************F-DAT-RAC-CONTA-1-13/06/2017*****************************************/  
-
-  
-
-
-/**********************************I-DAT-RAC-CONTA-1-19/06/2017*****************************************/  
 
 
 /* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
+  (E'conta_dif_doc_cbte', E'0.6', E'la difenrecia permitida al validar cbtes y documentos  facturas, invoice etc');
+
+/**********************************F-DAT-RAC-CONTA-1-13/06/2017*****************************************/
+
+
+
+
+/**********************************I-DAT-RAC-CONTA-1-19/06/2017*****************************************/
+
+
+/* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES
   (E'conta_val_doc_otros_subcuentas_compras', E'INVERSION,ACTIVO FIJO,ALMACENES,OTROS ACTIVOS', E'Nombre de subcuenta que tienen que incluirse en la validacion de documentos de compras,al vaidar cbte, se las separa por comas');
-  
-/**********************************F-DAT-RAC-CONTA-1-19/06/2017*****************************************/  
+
+/**********************************F-DAT-RAC-CONTA-1-19/06/2017*****************************************/
  /**********************************I-DAT-MMV-CONTA-1-28/06/2017*****************************************/
  select pxp.f_insert_tgui ('Resolución 101700000010', 'Resolución 101700000010', 'RESO', 'si', 11, '', 3, '', '', 'CONTA');
  select pxp.f_insert_tgui ('Comisionistas', 'Comisionistas', 'COMISI', 'si', 1, 'sis_contabilidad/vista/comisionistas/Comisionistas.php', 4, '', 'Comisionistas', 'CONTA');
@@ -1342,7 +1342,7 @@ select pxp.f_insert_testructura_gui ('BATCC', 'REPCON');
 /* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 4) */
 
 INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "partida_tipo", "partida_rubro", "id_tabla_relacion_contable")
-VALUES 
+VALUES
   (1, NULL, E'2017-07-20 15:14:51.622', NULL, E'activo', NULL, NULL, E'Ajuste AITB al debe', E'AJT_AITB_DEBE', E'no', E'si', E'no', E'flujo_presupuestaria', E'recurso_gasto', NULL),
   (1, NULL, E'2017-07-20 15:15:23.220', NULL, E'activo', NULL, NULL, E'Ajuste AITB  al haber', E'AJT_AITB_HABER', E'no', E'si', E'no', E'flujo_presupuestaria', E'recurso_gasto', NULL),
   (1, NULL, E'2017-07-20 15:32:34.246', NULL, E'activo', NULL, NULL, E'Gasto por AITB', E'GASTO_AITB', E'no', E'si', E'no', E'flujo', E'gasto', NULL),
@@ -1360,7 +1360,7 @@ select pxp.f_insert_testructura_gui ('ESTCUNT', 'REPCON');
 
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_lista_blanca_cbte_docs', E'RENDICIONFONDO,RENCAJA', E'Lista de codigos de plnatillas de cbte, que se saltara la validacion de documentos de compra /venta');
 
 
@@ -1374,7 +1374,7 @@ VALUES
 /* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_ajustar_tipo_cambio_cbte_rel', E'no', E'ajustar automaticamente diferencia por tipo de cambio en trasaccion y comprobantes reacionados');
 
 
@@ -1393,48 +1393,48 @@ VALUES (E'conta_filtrar_cuenta_por_tipo_cc_interface_junior', E'no', E'esta vari
 
 /***********************************F-DAT-RAC-CONTA-0-08/09/2017*****************************************/
 
-/***********************************I-DAT-MANU-CONTA-0-25/09/2017*****************************************/ 
+/***********************************I-DAT-MANU-CONTA-0-25/09/2017*****************************************/
 select pxp.f_insert_tgui ('Reporte Retencion', 'Reporte Retencion', 'REPRET', 'si', 13, 'sis_contabilidad/reportes/formularios/LibroComprasVentasRetenciones.php', 3, '', 'ReporteRetenciones', 'CONTA');
-/***********************************F-DAT-MANU-CONTA-0-25/09/2017*****************************************/                          
+/***********************************F-DAT-MANU-CONTA-0-25/09/2017*****************************************/
 
 
 
-/***********************************I-DAT-RAC-CONTA-0-22/12/2017*****************************************/ 
+/***********************************I-DAT-RAC-CONTA-0-22/12/2017*****************************************/
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_libro_ventas_detallado', E'si', E'Si la interface de libro de ventas permite el registro del detalle de la factura');
-  
+
   /* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_forzar_validacion_documentos', E'si', E'cuando se fuera la validacion no permite validar el cbte si los datos o cudran, en caso contrario deja al usuario decidir');
-  
-  
+
+
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_revertir_iva_comprometido', E'no', E'Por dfecto no revierte el iva comprometido, asumiendo que la solictud fue hecha sobre el valor NETO');
 
-/***********************************F-DAT-RAC-CONTA-0-22/12/2017*****************************************/ 
+/***********************************F-DAT-RAC-CONTA-0-22/12/2017*****************************************/
 
-/***********************************I-DAT-JUAN-CONTA-0-03/04/2017*****************************************/ 
+/***********************************I-DAT-JUAN-CONTA-0-03/04/2017*****************************************/
 select pxp.f_insert_tgui ('Diferencias en libros contables', 'Diferencias en libros contables', 'COLM', 'si', 12, 'sis_contabilidad/reportes/formularios/Dif_libro_contables.php', 3, '', 'Dif_libro_contables', 'CONTA');
 
 select pxp.f_insert_testructura_gui ('COLM', 'REPCON');
 
-/***********************************F-DAT-JUAN-CONTA-0-03/04/2017*****************************************/ 
+/***********************************F-DAT-JUAN-CONTA-0-03/04/2017*****************************************/
 
 
 
-/***********************************I-DAT-RAC-CONTA-0-08/05/2018*****************************************/ 
+/***********************************I-DAT-RAC-CONTA-0-08/05/2018*****************************************/
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_solictar_codigo_aplicacion_doc', E'no', E'Para odcumentos de venta al generar comprobante solo considerar los documneots con codigo de aplicacion');
-  
+
   ----------------------------------
---COPY LINES TO SUBSYSTEM data.sql FILE  
+--COPY LINES TO SUBSYSTEM data.sql FILE
 ---------------------------------
 
 select param.f_import_tcatalogo_tipo ('insert','tipo_venta','CONTA','tdoc_compra_venta');
@@ -1445,12 +1445,12 @@ select param.f_import_tcatalogo ('insert','CONTA','Servicios a Terceros','tercer
 select param.f_import_tcatalogo ('insert','CONTA','Servicios Empresas del Grupo','servicos_grupo','tipo_venta');
 
 
-/***********************************F-DAT-RAC-CONTA-0-08/05/2018*****************************************/ 
+/***********************************F-DAT-RAC-CONTA-0-08/05/2018*****************************************/
 
 
 
 
-/***********************************I-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 
+/***********************************I-DAT-RAC-CONTA-0-29/05/2018*****************************************/
 
 
 select pxp.f_insert_tgui ('Estado de Auxiliares', 'Estado de Auxiliares', 'EXUMAY', 'si', 10, 'sis_contabilidad/vista/int_transaccion/FormFiltroAuxiliarMayor.php', 3, '', 'FormFiltroAuxiliarMayor', 'CONTA');
@@ -1467,9 +1467,9 @@ select pxp.f_insert_testructura_gui ('REGUCON', 'CONTA');
 select pxp.f_insert_testructura_gui ('REFAREG', 'REGUCON');
 
 
-/***********************************F-DAT-RAC-CONTA-0-29/05/2018*****************************************/ 
+/***********************************F-DAT-RAC-CONTA-0-29/05/2018*****************************************/
 
-/***********************************I-DAT-EGS-CONTA-0-27/09/2018*****************************************/ 
+/***********************************I-DAT-EGS-CONTA-0-27/09/2018*****************************************/
 
 select conta.f_import_tplantilla_comprobante ('insert','CBRRG','cbr.f_gestionar_cbte_cobro_simple_eliminacion','id_cobro_simple','CBR','{$tabla.obs}','cbr.f_gestionar_cbte_cobro_simple','{$tabla.fecha}','activo','{$tabla.desc_proveedor}','{$tabla.id_depto_conta}','contable','','cbr.vcobro_simple_cbte','INGRESOCON','{$tabla.id_moneda}','{$tabla.id_gestion}','{$tabla.id_moneda},{$tabla.id_gestion},{$tabla.id_depto_conta},{$tabla.id_cobro_simple},{$tabla.id_cuenta_bancaria},{$tabla.id_funcionario},{$tabla.id_proveedor},{$tabla.importe},{$tabla.importe_mb},{$tabla.id_proveedor},{$tabla.importe_mt},{$tabla.tipo_cambio},{$tabla.tipo_cambio_ma},{$tabla.tipo_cambio_mt},{$tabla.id_config_cambiaria}','no','no','no','{$tabla.id_cuenta_bancaria}','','0','0','{$tabla.nro_tramite}','{$tabla.tipo_cambio}','{$tabla.id_depto_lb}','','','','Cobro de clientes Retencion Garantias','','','{$tabla.tipo_cambio_mt}','{$tabla.tipo_cambio_ma}','{$tabla.id_config_cambiaria}');
 select conta.f_import_tdetalle_plantilla_comprobante ('insert','CBRRG','INGREBAN','debe','si','si','','{$tabla_padre.desc_proveedor}','CUEBANCING','','{$tabla_padre.importe}','{$tabla_padre.id_cuenta_bancaria}','','no','','','','si','','','','Ingreso de Bancos','{$tabla_padre.importe}',NULL,'simple','','','no','','{$tabla_padre.id_cuenta_bancaria}','','0','0','','{$tabla_padre.desc_proveedor}','2','','',NULL,'deposito','','','');
@@ -1477,33 +1477,33 @@ select conta.f_import_tdetalle_plantilla_comprobante ('insert','CBRRG','CUXCORGH
 
 
 
-/***********************************F-DAT-EGS-CONTA-0-27/09/2018*****************************************/ 
+/***********************************F-DAT-EGS-CONTA-0-27/09/2018*****************************************/
 
 
-/***********************************I-DAT-RAC-CONTA-0-06/11/2018*****************************************/ 
+/***********************************I-DAT-RAC-CONTA-0-06/11/2018*****************************************/
 
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_cod_plan_nota_credito', E'NOTACREDITODOC', NULL);
-  
-  
-INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
-  (E'conta_cod_plan_nota_debito', E'NOTADEBITODOC', NULL);
-  
-  
-  
-INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
-  (E'conta_migrar_rc_concepto_version', E'no', E'al apretar el boton para migrar relacion contable de una gestion a otra, si esta habilita insertara la nuevas relacion en funcion a la tabla conceptos_ids\r\n');
-  
-  
-  
-  
-/***********************************F-DAT-RAC-CONTA-0-06/11/2018*****************************************/ 
 
-/***********************************I-DAT-EGS-CONTA-1-30/11/2018*****************************************/ 
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES
+  (E'conta_cod_plan_nota_debito', E'NOTADEBITODOC', NULL);
+
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES
+  (E'conta_migrar_rc_concepto_version', E'no', E'al apretar el boton para migrar relacion contable de una gestion a otra, si esta habilita insertara la nuevas relacion en funcion a la tabla conceptos_ids\r\n');
+
+
+
+
+/***********************************F-DAT-RAC-CONTA-0-06/11/2018*****************************************/
+
+/***********************************I-DAT-EGS-CONTA-1-30/11/2018*****************************************/
 
 
 select param.f_import_tcatalogo_tipo ('insert','tauxiliar','CONTA','tauxiliar');
@@ -1529,7 +1529,7 @@ select param.f_import_tcatalogo ('insert','CONTA','Alquiler de Parqueo al Person
 select param.f_import_tcatalogo ('insert','CONTA','Intereses por prestamos al personal','intereses','tipo_venta_nota_debito');
 select param.f_import_tcatalogo ('insert','CONTA','Cobro Clientes por Peaje','cbr_peaje','tipo_venta_nota_debito');
 
-/***********************************F-DAT-EGS-CONTA-1-30/11/2018*****************************************/ 
+/***********************************F-DAT-EGS-CONTA-1-30/11/2018*****************************************/
 
 /***********************************I-DAT-MMV-CONTA-92-19/12/2018*****************************************/
 select pxp.f_insert_tgui ('Movimiento de Auxiliares', 'Movimiento de Auxiliares', 'MOVSAL', 'si', 12, '', 2, '', '', 'CONTA');
@@ -1654,7 +1654,7 @@ select conta.f_import_tdetalle_plantilla_comprobante ('insert','PAGTESPROV','REG
 
 /***********************************I-DAT-RAC-CONTA-53-20/05/2019****************************************/
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_generar_pago_planilla', E'SI', E'habilitar pagos de planilla, por ejemplo No cuando se paga por la CUT');
 /***********************************F-DAT-RAC-CONTA-53-20/05/2019****************************************/
 
@@ -1666,7 +1666,7 @@ select pxp.f_insert_testructura_gui ('CTP', 'CONF');
 /***********************************I-DAT-EGS-CONTA-05-29/05/2019****************************************/
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES 
+VALUES
   (E'conta_host_migracion', E'hostaddr=172.18.79.XXXX port=5432 dbname=db user=dbamigracion password=dbamigracion', E'configuracion para la conexion para migrar el comprobante al host mencionado'),
   (E'conta_migrar_comprobante', E'false', E'habilita migracion de comprobantes validados a centro de costo seleccionados');
 
@@ -1702,3 +1702,7 @@ select pxp.f_insert_tgui ('VoBo Verificacion', 'VoBo Verificacion', 'VBVER', 'si
 
 /***********************************F-DAT-MANU-CONTA-1-30/10/2019****************************************/
 
+/***********************************I-DAT-RCM-CONTA-86-06/01/2019****************************************/
+select pxp.f_insert_tgui ('MISC - Contabilización Almacenes SIGEMA', 'MISC - Contabilización Almacenes SIGEMA', 'MISCALMREL', 'si', 13, 'sis_miscelaneo/vista/conta_alm_tipo_mat/ContaAlmTipoMat.php', 3, '', 'ContaAlmTipoMat', 'CONTA');
+select pxp.f_insert_testructura_gui ('MISCALMREL', 'RELACON');
+/***********************************F-DAT-RCM-CONTA-86-06/01/2019****************************************/

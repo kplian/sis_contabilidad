@@ -4947,13 +4947,6 @@ COMMENT ON COLUMN conta.tint_transaccion.id_partida_ejecucion_tmp
 IS 'partida ejecucion del comprometido, que se almacena temporalmente para operaciones manaules auxiliares';
 
 ALTER TABLE conta.tint_transaccion
-  ADD COLUMN obs_dba VARCHAR;
-
-COMMENT ON COLUMN conta.tint_transaccion.obs_dba
-IS 'cambios dba';
-
-
-ALTER TABLE conta.tint_transaccion
   ADD COLUMN temp_importe_ma_aux NUMERIC;
 
 COMMENT ON COLUMN conta.tint_transaccion.temp_importe_ma_aux
@@ -5256,3 +5249,8 @@ COMMENT ON COLUMN conta.ttipo_relacion_comprobante.filtrar_moneda
 IS 'si o no, permite filtar el los comprobnates relacion con la misma moneda';
 /***********************************F-SCP-RAC-CONTA-78-11/12/2019****************************************/
 
+
+/***********************************I-SCP-JUAN-CONTA-01-03/01/2020****************************************/
+ALTER TABLE conta.tresultado_det_plantilla --#82
+  ADD COLUMN observacion VARCHAR; --#82
+/***********************************F-SCP-JUAN-CONTA-01-03/01/2020****************************************/

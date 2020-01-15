@@ -18,9 +18,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ISSUE 			FECHA: 			AUTOR:						DESCRIPCION:
+
+ #82			03/01/2020		JUAN						Agregar campo de Observación para describir los movimientos realizados
 ***************************************************************************/
 
 DECLARE
@@ -32,45 +32,45 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_resultado_det_plantilla	integer;
-			    
+
 BEGIN
 
     v_nombre_funcion = 'conta.ft_resultado_det_plantilla_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_RESDET_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		08-07-2015 13:13:15
 	***********************************/
 
 	if(p_transaccion='CONTA_RESDET_INS')then
-					
+
         begin
-        	
-        
+
+
         -------------------------
         --  VALIDACIONES ...
         ---------------------------
             --revisar que el orden sea unico
-            
-            IF  exists (select 1 from conta.tresultado_det_plantilla rdp 
+
+            IF  exists (select 1 from conta.tresultado_det_plantilla rdp
                         where rdp.id_resultado_plantilla = v_parametros.id_resultado_plantilla
                                and rdp.orden = v_parametros.orden) THEN
-                   raise exception 'El número de orden esta duplicado';            
+                   raise exception 'El número de orden esta duplicado';
         	END IF;
-            
+
             IF  v_parametros.destino != 'reporte' and v_parametros.origen not in ('balance','formula')  THEN
                 raise exception 'si el detino es para insertar transacciones el origen debe ser balance o formula';
             END IF;
-            
+
             IF  v_parametros.destino != 'reporte' THEN
                IF  (v_parametros.codigo_cuenta is NULL or v_parametros.codigo_cuenta = '' )  and (v_parametros.relacion_contable is NULL or v_parametros.relacion_contable = '' ) THEN
                   raise exception 'si el detino es para insertar trasacciones, es obligatorio especificar el nombre de la cuenta contable (o relacion contable)';
                END IF;
             END IF;
-            
+
             --Sentencia de la insercion
         	insert into conta.tresultado_det_plantilla(
               orden,
@@ -108,8 +108,9 @@ BEGIN
               destino,
               orden_cbte,
               salta_hoja,
-              id_tipo_cc
-              
+              id_tipo_cc,
+              observacion
+
           	) values(
 			v_parametros.orden,
 			v_parametros.font_size,
@@ -146,11 +147,12 @@ BEGIN
             v_parametros.destino,
             v_parametros.orden_cbte,
             v_parametros.salta_hoja,
-            v_parametros.id_tipo_cc
+            v_parametros.id_tipo_cc,
+            v_parametros.observacion --#82
 		)RETURNING id_resultado_det_plantilla into v_id_resultado_det_plantilla;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Resultado almacenado(a) con exito (id_resultado_det_plantilla'||v_id_resultado_det_plantilla||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Resultado almacenado(a) con exito (id_resultado_det_plantilla'||v_id_resultado_det_plantilla||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_resultado_det_plantilla',v_id_resultado_det_plantilla::varchar);
 
             --Devuelve la respuesta
@@ -158,33 +160,33 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_RESDET_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		08-07-2015 13:13:15
 	***********************************/
 
 	elsif(p_transaccion='CONTA_RESDET_MOD')then
 
 		begin
-        
+
          -------------------------
          --  VALIDACIONES ...
          ---------------------------
             --revisar que el orden sea unico
-            
-            IF  exists (select 1 from conta.tresultado_det_plantilla rdp 
+
+            IF  exists (select 1 from conta.tresultado_det_plantilla rdp
                         where rdp.id_resultado_plantilla = v_parametros.id_resultado_plantilla
                                and rdp.orden = v_parametros.orden
                                and rdp.id_resultado_det_plantilla != v_parametros.id_resultado_det_plantilla ) THEN
-                   raise exception 'El número de orden esta duplicado';            
+                   raise exception 'El número de orden esta duplicado';
         	END IF;
-            
+
             IF  v_parametros.destino != 'reporte' and v_parametros.origen not in ('balance','formula')  THEN
                 raise exception 'si el detino es para insertar transacciones el origen debe ser balance o formula';
             END IF;
-            
+
             IF  v_parametros.destino != 'reporte' THEN
                IF  (v_parametros.codigo_cuenta is NULL or v_parametros.codigo_cuenta = '' )  and (v_parametros.relacion_contable is NULL or v_parametros.relacion_contable = '' ) THEN
                   raise exception 'si el detino es para insertar trasacciones, es obligatorio especificar el nombre de la cuenta contable (o relacion contable)';
@@ -224,7 +226,8 @@ BEGIN
               destino = v_parametros.destino,
               orden_cbte = v_parametros.orden_cbte,
               salta_hoja = v_parametros.salta_hoja,
-              id_tipo_cc = v_parametros.id_tipo_cc
+              id_tipo_cc = v_parametros.id_tipo_cc,
+              observacion = v_parametros.observacion--#82
 			where id_resultado_det_plantilla=v_parametros.id_resultado_det_plantilla;
                
 			--Definicion de la respuesta

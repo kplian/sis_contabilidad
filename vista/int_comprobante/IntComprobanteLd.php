@@ -13,6 +13,7 @@
  #1        		20-09-2011       RCM KPLIAN        CREACION
  #2             27-08-2018       RAC KPLIAN        adciona edicion de glosa
  #55			30/05/2019		 EGS			   Se cre boton para poder migrar comprobantes a otra bd de pxp 
+ #87			08/01/2020		 MMV ETR		   Reporte Cbte formato Excel
 
 */
 header("content-type: text/javascript; charset=UTF-8");
@@ -58,9 +59,16 @@ Phx.vista.IntComprobanteLd = {
 				disabled : true,
 				handler : this.migraCbte,
 				tooltip : '<b>Migra Comprobante</b><br/>'
-			});		
-			
-	   this.init();	 
+			});
+        this.addButton('btnrepexcel', {//#87
+            text : 'Imprime Cbte Excel',
+            iconCls : 'bexcel',
+            disabled : true,
+            handler : this.onReporteExcel,
+            tooltip : '<b>Cbte formato Excel</b><br/>'
+        });
+
+        this.init();
 	},
     
    volcarCbte: function(sw_validar) {
@@ -148,6 +156,7 @@ Phx.vista.IntComprobanteLd = {
             this.getBoton('btnWizard').enable();
             this.getBoton('btnWizardGlosa').enable();
             this.getBoton('btnmigraCbte').enable();  //#55
+            this.getBoton('btnrepexcel').enable();
             
             
 			
@@ -175,6 +184,7 @@ Phx.vista.IntComprobanteLd = {
             this.getBoton('btnWizard').disable() ;
             this.getBoton('btnWizardGlosa').disable(); 
             this.getBoton('btnmigraCbte').enable();	//#55
+            this.getBoton('btnrepexcel').enable();
           
 			
 	},
@@ -258,7 +268,7 @@ Phx.vista.IntComprobanteLd = {
 			   }, this.idContenedor, 'WizardGlosaCbte')
 		},
 		
-		migraCbte: function () { //#55
+    migraCbte: function () { //#55
 			   var migrar_todo;
 			   var filas = this.sm.getSelections();
 	                var data = [], aux = {};
@@ -329,10 +339,26 @@ Phx.vista.IntComprobanteLd = {
 								}
 			 			});
 			    	
-				};
-			 
-
-	       },	
+				}
+    },
+    onReporteExcel: function () { //#87
+        var rec = this.sm.getSelected();
+        var data = rec.data;
+        if (data) {
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url : '../../sis_contabilidad/control/IntComprobante/reporteCbteExcel',
+                params : {
+                    'id_proceso_wf' : data.id_proceso_wf,
+                    'tipo':'intercambio'
+                },
+                success : this.successExport,
+                failure : this.conexionFailure,
+                timeout : this.timeout,
+                scope : this
+            });
+        }
+    }
 		
 		
 };

@@ -5,6 +5,12 @@
 *@author  (admin)
 *@date 08-07-2015 13:13:15
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+
+HISTORIAL DE MODIFICACIONES:
+
+ISSUE 		FECHA: 			AUTOR:						DESCRIPCION:
+
+#82			03/01/2020		JUAN						Agregar campo de Observación para describir los movimientos realizados
 */
 
 class MODResultadoDetPlantilla extends MODbase{
@@ -67,6 +73,8 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->captura('salta_hoja','varchar');
 		$this->captura('id_tipo_cc','int4');
 		$this->captura('desc_tipo_cc','varchar');
+
+        $this->captura('observacion','varchar'); //#82
 		
 		
 		
@@ -121,6 +129,9 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('orden_cbte','orden_cbte','numeric');
         $this->setParametro('salta_hoja','salta_hoja','varchar');
 		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+
+        $this->setParametro('observacion','observacion','varchar');//#82
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -167,6 +178,8 @@ class MODResultadoDetPlantilla extends MODbase{
 		$this->setParametro('orden_cbte','orden_cbte','numeric');
 		$this->setParametro('salta_hoja','salta_hoja','varchar');
 		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+
+        $this->setParametro('observacion','observacion','varchar');//#82
 		
 		
 		
