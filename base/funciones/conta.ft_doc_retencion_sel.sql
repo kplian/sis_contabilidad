@@ -1,12 +1,11 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_retencion_sel (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS'
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_doc_retencion_sel
@@ -331,8 +330,12 @@ EXCEPTION
       v_resp = pxp.f_agrega_clave(v_resp,''procedimientos'',v_nombre_funcion);
       RAISE EXCEPTION ''%'',v_resp;
 END;
-'LANGUAGE 'plpgsql'
+$body$
+LANGUAGE ''plpgsql''
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION conta.ft_doc_retencion_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
