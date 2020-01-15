@@ -17,7 +17,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #64  ETR    15/07/2019          MMV                 Incluir importe formulado reporte proyectos
 #69  ETR    01/08/2019          SAZ                 Mejoras al reporte Comprobante transacciones
 #75 		28/11/2019		  Manuel Guerra	  controlling
-
+#91         15/01/2020  ENDETR  JUAN                Libro mayor añadir columna beneficiario
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -372,6 +372,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('saldo_mb','numeric');
 		$this->captura('saldo_mt','numeric');
 		$this->captura('dif','numeric');
+        $this->captura('beneficiario','varchar');//#91
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
