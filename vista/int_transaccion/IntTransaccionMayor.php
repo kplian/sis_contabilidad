@@ -11,7 +11,7 @@ ISSUE 		   FECHA   			     AUTOR				 DESCRIPCION:
 #17 		09/01/2019		        Manuel Guerra	  agrego el filtro de nro_tramite_aux
 #20         10/01/2019 ENDETRAS     Miguel Mamani     Ocultar botón para exportar datos de grilla
 #22         14/01/2019 ENDETRAS     Miguel Mamamni    Mostrar boton para exportar datos de grilla
-#91         15/01/2020 ENDETR       JUAN              Libro mayor añadir columna beneficiario
+#91         15/01/2020 ENDETR       JUAN              Libro mayor añadir columna beneficiario 
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
