@@ -19,12 +19,16 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 
-#75 		28/11/2019		  Manuel Guerra	  controlling
+#75 		28/11/2019		  Manuel Guerra	  	controlling
+#93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
 ***************************************************************************/
 
 DECLARE
 
 	v_consulta    		varchar;
+    v_consulta_b   		varchar;
+    v_con		  		VARCHAR[];
+    v_rec		  		record;
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
@@ -61,6 +65,9 @@ DECLARE
     v_where2            varchar;
     v_where3            varchar;
     v_where4            varchar;
+    v_count			    integer;
+    v_ini			    integer;
+     v_ini_a			    VARCHAR[];
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_int_transaccion_controlling_sel';
@@ -248,39 +255,48 @@ BEGIN
 
                 v_consulta:=v_consulta|| v_parametros.filtro;
                 --raise exception '%,%',v_parametros.id_gestion,v_parametros.filtro;
+
+                v_consulta_b:= 'with da as(
+                              SELECT
+                              substring(replace(replace(icbte.nro_tramite, ''-'', '' ''), ''_'', '' '')from ''[a-zA-Z\s]+'') as datos
+                              FROM conta.tint_comprobante icbte
+                              where icbte.estado_reg=''validado''
+                              group by 1
+                              )
+                              select count(da.datos)
+                              from da
+                              order by 1';
+
+                EXECUTE(v_consulta_b)into v_count;
+                v_ini=1;
+
+                FOR v_rec in (SELECT
+                                substring(replace(replace(icbte.nro_tramite, '-', ' '), '_', ' ')from '[a-zA-Z\s]+') as datos
+                                FROM conta.tint_comprobante icbte
+                                where icbte.estado_reg='validado'
+                                group by 1
+                                order by 1)LOOP
+                    v_con[v_ini] = v_rec.datos;
+                    v_ini = v_ini + 1;
+                END LOOP;
+
+                v_consulta_b='';
+                v_ini=1;
+                WHILE v_ini <= v_count LOOP
+                	v_consulta_b:=v_consulta_b ||'WHEN nro_tramite like ''%'|| REPLACE(rtrim(v_con[v_ini]),' ','-') ||'%''THEN '''|| rtrim(v_con[v_ini]) ||'''::varchar ';
+                	v_ini=v_ini+1;
+                END LOOP;
+
+--                raise exception '%,%',v_parametros.desde,v_parametros.hasta;
+
                 v_consulta:=v_consulta||'
                 		)
                         SELECT
                         CASE
-                            WHEN nro_tramite like ''%ADQ%'' THEN
-                                ''ADQ''::varchar
-                            WHEN nro_tramite like ''%CAJ%'' THEN
-                                ''CAJ''::varchar
-                            WHEN nro_tramite like ''%CBR%'' THEN
-                                ''CBR''::varchar
-                            WHEN nro_tramite like ''%CBT%'' THEN
-                                ''CBT''::varchar
-                            WHEN nro_tramite like ''%PAG_SIM%'' THEN
-                                ''PAG_SIM''::varchar
-                            WHEN nro_tramite like ''%PAG_SPD%'' THEN
-                                ''PAG_SPD''::varchar
-                            WHEN nro_tramite like ''%DPS%'' THEN
-                                ''DPS''::varchar
-                            WHEN nro_tramite like ''%FA%'' THEN
-                                ''FA''::varchar
-                            WHEN nro_tramite like ''%KAF%'' THEN
-                                ''KAF''::varchar
-                            WHEN nro_tramite like ''%PU%'' THEN
-                                ''PU''::varchar
-                            WHEN nro_tramite like ''%TES%'' THEN
-                                ''TES''::varchar
-                            WHEN nro_tramite like ''%VI%'' THEN
-                                ''VI''::varchar
-                            ELSE
-                                ''OTROS''::varchar
+                            '||v_consulta_b||'
                         END AS tipo,
-                        '''||to_char(v_parametros.desde+1, 'DD/MM/YYYY')||'''::date as desde,
-                        '''||to_char(v_parametros.hasta+1, 'DD/MM/YYYY')||'''::date as hasta,
+                        '''||to_char(v_parametros.desde, 'DD/MM/YYYY')||'''::date as desde,
+                        '''||to_char(v_parametros.hasta, 'DD/MM/YYYY')||'''::date as hasta,
                         id_tipo_cc,
                        -- id_subsistema::integer,
                         --ROW_NUMBER () OVER (ORDER BY id_subsistema)::integer as id,
@@ -304,22 +320,30 @@ BEGIN
                         DENSE_RANK () OVER (order by ta.tipo)::integer as id,
                         ta.desde,
                         ta.hasta,
-                        ta.id_tipo_cc,
+                        array_agg(ta.id_tipo_cc)::varchar,
                         '||v_parametros.numero||'::integer as numero,
-                        ta.ejecutado,
+                        sum(ta.ejecutado),
                         '||v_parametros.id_gestion||'::integer as id_gestion,
                         '||v_parametros.id_periodo||'::integer as id_periodo,
 
-                        ta.importe_debe_mb,
-                        ta.importe_haber_mb,
-                        ta.importe_debe_mt,
-                        ta.importe_haber_mt,
+                        sum(ta.importe_debe_mb) as importe_debe_mb,
+                        sum(ta.importe_haber_mb)as importe_haber_mb,
+                        sum(ta.importe_debe_mt) as importe_debe_mt,
+                        sum(ta.importe_haber_mt) as importe_haber_mt,
 
-                        ta.monto_mb,
-                        ta.compro,
-                        ta.ejec,
-                        ta.formu
-                        from tab ta ';
+                        sum(ta.monto_mb) as monto_mb,
+                        sum(ta.compro) as compro,
+                        sum(ta.ejec) as ejec,
+                        sum(ta.formu) as formu
+                        from tab ta
+                        where ta.tipo is not null
+                        group by
+                        ta.tipo,
+                        ta.desde,
+                        ta.hasta,
+                        numero,
+                        id_gestion,
+                        id_periodo';
 
 			--Definicion de la respuesta
             RAISE notice '%',v_consulta;
@@ -513,37 +537,43 @@ BEGIN
                               and '||v_filtro_tipo_cc||'
                               and ';
 				v_consulta:=v_consulta||v_parametros.filtro;
+                --
+                v_consulta_b:= 'with da as(
+                              SELECT
+                              substring(replace(replace(icbte.nro_tramite, ''-'', '' ''), ''_'', '' '')from ''[a-zA-Z\s]+'') as datos
+                              FROM conta.tint_comprobante icbte
+                              where icbte.estado_reg=''validado''
+                              group by 1
+                              )
+                              select count(da.datos)
+                              from da
+                              order by 1';
 
+                EXECUTE(v_consulta_b)into v_count;
+
+                v_ini=1;
+
+                FOR v_rec in (SELECT
+                                substring(replace(replace(icbte.nro_tramite, '-', ' '), '_', ' ')from '[a-zA-Z\s]+') as datos
+                                FROM conta.tint_comprobante icbte
+                                where icbte.estado_reg='validado'
+                                group by 1
+                                order by 1)LOOP
+                    v_con[v_ini] = v_rec.datos;
+                    v_ini = v_ini + 1;
+                END LOOP;
+                v_consulta_b='';
+                v_ini=1;
+                WHILE v_ini <= v_count LOOP
+                	v_consulta_b:=v_consulta_b ||'WHEN nro_tramite like ''%'|| REPLACE(rtrim(v_con[v_ini]),' ','-') ||'%''THEN '''|| rtrim(v_con[v_ini]) ||'''::varchar ';
+                	v_ini=v_ini+1;
+                END LOOP;
+                --
                 v_consulta:=v_consulta||'
                 		)
                         SELECT
                         CASE
-                            WHEN nro_tramite like ''%ADQ%'' THEN
-                                ''ADQ''::varchar
-                            WHEN nro_tramite like ''%CAJ%'' THEN
-                                ''CAJ''::varchar
-                            WHEN nro_tramite like ''%CBR%'' THEN
-                                ''CBR''::varchar
-                            WHEN nro_tramite like ''%CBT%'' THEN
-                                ''CBT''::varchar
-                            WHEN nro_tramite like ''%PAG_SIM%'' THEN
-                                ''PAG_SIM''::varchar
-                            WHEN nro_tramite like ''%PAG_SPD%'' THEN
-                                ''PAG_SPD''::varchar
-                            WHEN nro_tramite like ''%DPS%'' THEN
-                                ''DPS''::varchar
-                            WHEN nro_tramite like ''%FA%'' THEN
-                                ''FA''::varchar
-                            WHEN nro_tramite like ''%KAF%'' THEN
-                                ''KAF''::varchar
-                            WHEN nro_tramite like ''%PU%'' THEN
-                                ''PU''::varchar
-                            WHEN nro_tramite like ''%TES%'' THEN
-                                ''TES''::varchar
-                            WHEN nro_tramite like ''%VI%'' THEN
-                                ''VI''::varchar
-                            ELSE
-                                ''OTROS''::varchar
+                            '||v_consulta_b||'
                         END AS tipo,
                         sum(COALESCE(importe_debe_mb,0))::numeric as importe_debe_mb,
                         sum(COALESCE(importe_haber_mb,0))::numeric as importe_haber_mb,
@@ -855,7 +885,7 @@ BEGIN
                                       offset '||v_parametros.puntero;
             --
             raise notice '%',v_consulta;
-                        raise exception '%',v_consulta;
+            --            raise exception '%',v_consulta;
 			return v_consulta;
 		end;
 
@@ -1609,7 +1639,7 @@ BEGIN
 			--Definicion de la respuesta
             end if;
             RAISE notice '%',v_consulta;
-          	--  RAISE exception '%',v_consulta;
+          	-- RAISE exception '%',v_consulta;
 			return v_consulta;
 		end;
 
