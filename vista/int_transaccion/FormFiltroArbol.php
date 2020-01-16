@@ -17,12 +17,12 @@ header("content-type: text/javascript; charset=UTF-8");
                         border: true,
                         autoScroll: true,
                         layout: 'form',
-                        title:'Información',                        
+                        title:'Información',
                         collapsible:true,
                         collapsed:false,
                         items:
-                        [
-                        ],
+                            [
+                            ],
                         id_grupo: 1
                     },
                     {
@@ -34,8 +34,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         collapsible:true,
                         collapsed:false,
                         items:
-                        [
-                        ],
+                            [
+                            ],
                         id_grupo: 0
                     },
                     this.panelResumen
@@ -44,12 +44,12 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.FormFiltroArbol.superclass.constructor.call(this,config);
             this.init();
             this.iniciarEventos();
-            this.loadValoresIniciales();	
+            this.loadValoresIniciales();
             if(config.detalle){
-            	//console.log('*-*-',config);
+                //console.log('*-*-',config);
                 //cargar los valores para el filtro
                 this.loadForm({data: config.detalle});
-                var me = this;         
+                var me = this;
                 var monto_for=this.Cmp.formulado.getValue();
                 var monto_eje=this.Cmp.ejecutado.getValue();
                 if(monto_eje==0){
@@ -70,7 +70,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var x =this.formatNumber(this.maestro.comprometido);
             this.getComponente('comprometido').setValue(x);
         },
-		//
+        //
         Atributos:[
             {
                 config:{
@@ -411,7 +411,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     readOnly: true,
                     decimalPrecision: 2,
                     renderer:function (value,p,record){
-                    	return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));                        
+                        return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
                     }
                 },
                 type: 'NumberField',
@@ -426,7 +426,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     readOnly: true,
                     decimalPrecision: 2,
                     renderer:function (value,p,record){
-                    	return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));                        
+                        return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
                     }
                 },
                 type: 'NumberField',
@@ -440,14 +440,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     width: 150,
                     readOnly: true,
                     renderer:function (value,p,record){
-                    	return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));                        
+                        return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
                     },
                     labelStyle: 'font-weight:bold;color: #339fff;',
-	                listeners: {
-            			'afterrender': function(panel) {            				            				          			
-            				panel.el.setStyle('background','#339fff');             				         				            		
-            			}
-            		} 
+                    listeners: {
+                        'afterrender': function(panel) {
+                            panel.el.setStyle('background','#339fff');
+                        }
+                    }
                 },
                 type: 'NumberField',
                 id_grupo: 1,
@@ -471,38 +471,39 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel: 'Ejecutado(Bs)',
                     width: 150,
                     readOnly: true,
-                    decimalPrecision: 2,                                 
+                    decimalPrecision: 2,
                 },
                 type: 'NumberField',
                 id_grupo: 1,
                 form: true,
             },
             {
-	            config : {
-	                fieldLabel : '% Ejecutado',
-	                readOnly : true,
-	                name:'porc_eje',
-	                width: 150,
+                config : {
+                    fieldLabel : '% Ejecutado',
+                    readOnly : true,
+                    name:'porc_eje',
+                    width: 150,
                     readOnly: true,
-	                decimalPrecision:2,
-	                labelStyle: 'font-weight:bold;color: #0000ff;',
-	                listeners: {
-            			'afterrender': function(panel) {            				            				          			
-            				if(panel.comprometido>=0 && panel.comprometido<=50){
-            					panel.el.setStyle('background','red');  
-            				}else{
-            					if(panel.comprometido<=75){
-            						panel.el.setStyle('background','orange');  
-            					}else{
-            						panel.el.setStyle('background','lime');  	
-            					}
-            				}            				            			
-            			}
-            		} 
-	            },
-	            type : 'NumberField',
-	            id_grupo: 1,
-	            form:true
+                    decimalPrecision:2,
+                    labelStyle: 'font-weight:bold;color: #0000ff;',
+                    listeners: {
+                        'afterrender': function(panel) {
+                            /*if(panel.comprometido>=0 && panel.comprometido<=50){
+                                panel.el.setStyle('background','red');
+                            }else{
+                                if(panel.comprometido<=75){
+                                    panel.el.setStyle('background','orange');
+                                }else{
+                                    panel.el.setStyle('background','lime');
+                                }
+                            }  */
+                            panel.el.setStyle('background','lime');
+                        }
+                    }
+                },
+                type : 'NumberField',
+                id_grupo: 1,
+                form:true
             },
             {
                 config:{
@@ -534,17 +535,17 @@ header("content-type: text/javascript; charset=UTF-8");
         labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
         bedit: false,
         breset: false,
-		east: {          
-            url: '../../../sis_contabilidad/vista/int_transaccion/IntTransaccionAgru.php',            
+        east: {
+            url: '../../../sis_contabilidad/vista/int_transaccion/IntTransaccionAgru.php',
             width: '68%',
             height: '45%',
             cls: 'IntTransaccionAgru',
             floating: true,
-	        collapsed: false,
-	        animCollapse: true,
-	        collapsible: true
+            collapsed: false,
+            animCollapse: true,
+            collapsible: true
         },
-        
+
         title: 'Filtro de mayores',
         autoScroll: true,
         // Funcion guardar del formulario
@@ -632,14 +633,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.mostrarComponente(this.Cmp.id_centro_costo);
                 }
             }, this);
-  
+
         },
         //
-		formatNumber:function(num) {
-			num=parseFloat(Math.round(num * 100) / 100).toFixed(2);	
-  			return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-		}
-				
-      
+        formatNumber:function(num) {
+            num=parseFloat(Math.round(num * 100) / 100).toFixed(2);
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        }
+
+
     })
 </script>

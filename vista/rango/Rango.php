@@ -1,6 +1,8 @@
 <?php
 /*
 #75 		28/11/2019		  Manuel Guerra	  controlling
+#90         14/01/2019        Manuel Guerra	  agregando vista del mayor
+
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -49,10 +51,24 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:false 
 		},
+        {
+            config:{
+                name: 'auditoria',
+                fieldLabel: 'A',
+                gwidth: 25,
+                renderer:function (value,p,record){
+                    if(record.data.tipo_reg != 'summary'){
+                        return  String.format("<div style='text-align:center'><img title='Revisar Trans.' src = '../../../lib/imagenes/connect.png' align='center'/></div>");
+                    }
+                }
+            },
+            type:'Field',
+            grid:true
+        },
 		{
 			config:{
-				name: 'detalle',
-				fieldLabel: 'Mayor',
+				name: 'mayor',
+				fieldLabel: 'M',
 				gwidth: 25, 
 				renderer:function (value,p,record){  
 					if(record.data.tipo_reg != 'summary'){
@@ -414,9 +430,10 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
 	    var record = this.store.getAt(rowIndex),
 	        fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
 
-	    if (fieldName == 'detalle') {
+
+	    if (fieldName == 'auditoria') {
 	    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/FormFiltroArbol.php',
-                'Mayor',
+                'Auditoria',
                 {
                     width:'100%',
                     height:'100%',
@@ -444,8 +461,33 @@ Phx.vista.Rango=Ext.extend(Phx.gridInterfaz,{
                 'FormFiltroArbol'
            );	    
 	    }
-	    
-	    if (fieldName == 'orden') {
+        //#90
+        if (fieldName == 'mayor') {
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/FormFiltro.php',
+                'Mayor',
+                {
+                    width:'100%',
+                    height:'100%',
+                },
+                { maestro:record.data,
+                    detalle: {
+                        'tipo_filtro': 'fechas',
+                        'desde': record.data.fecha_ini,
+                        'hasta': record.data.fecha_fin,
+                        'id_tipo_cc': record.data.id_tipo_cc,
+                        'desc_tipo_cc': record.data.desc_tipo_cc,
+                        'id_gestion': record.data.id_gestion,
+                        'cbte_cierre':'no'
+                    }
+
+                },
+                this.idContenedor,
+                'FormFiltro'
+            );
+
+        }
+
+        if (fieldName == 'orden') {
 	    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/rango/RangoOt.php',
                 'Mayor',
                 {
