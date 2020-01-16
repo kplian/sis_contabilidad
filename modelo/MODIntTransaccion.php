@@ -20,6 +20,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 
 #91         15/01/2020  ENDETR  JUAN                Libro mayor añadir columna beneficiario
 #83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
+#93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -1139,7 +1140,7 @@ class MODIntTransaccion extends MODbase{
        // $this->captura('id','integer');
 		$this->captura('ejecutado','numeric');
 		//$this->captura('formulado','numeric');
-
+        #93
         $this->captura('id_gestion','int4');
         $this->captura('id_periodo','int4');
 		$this->captura('importe_debe_mb','numeric');
