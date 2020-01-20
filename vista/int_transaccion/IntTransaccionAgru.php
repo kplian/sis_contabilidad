@@ -128,7 +128,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     type: 'NumberField',
                     filters: {pfiltro: 'formu',type: 'numeric'},
                     id_grupo: 1,
-                    grid: false,
+                    grid: true,
                     form: true
                 },
                 /*{
@@ -396,6 +396,10 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
     })
+<<<<<<< HEAD
+</script>
+=======
 </script>
 
 
+>>>>>>> d164c55ad2ce8e873f28217ebbb5b550ad279e23

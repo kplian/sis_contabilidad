@@ -1138,9 +1138,15 @@ class MODIntTransaccion extends MODbase{
         $this->captura('id_tipo_cc','varchar');
         $this->captura('numero','integer');
         //$this->captura('id_subsistema','integer');
+<<<<<<< HEAD
+       // $this->captura('id','integer');
+		$this->captura('ejecutado','numeric');
+		//$this->captura('formulado','numeric');
+=======
         // $this->captura('id','integer');
         $this->captura('ejecutado','numeric');
         //$this->captura('formulado','numeric');
+>>>>>>> d164c55ad2ce8e873f28217ebbb5b550ad279e23
         #93
         $this->captura('id_gestion','int4');
         $this->captura('id_periodo','int4');
