@@ -80,7 +80,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     type:'NumberField',
                     id_grupo:1,
                     grid:true
-                },
+                },//#93
                 {
                     config: {
                         name: 'ejec',

@@ -1695,7 +1695,7 @@ class ACTIntTransaccion extends ACTbase{
         } else {
             $this->objParam->addParametro('id_padre',$id_fase);
         }
-
+        //#93
         $this->objFunc=$this->create('MODIntTransaccion');
         $this->res=$this->objFunc->listarTransArbol($this->objParam);
 

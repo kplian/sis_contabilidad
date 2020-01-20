@@ -1,6 +1,7 @@
 ¿<?php
 /*
 #75 		28/11/2019		  Manuel Guerra	  controlling
+#93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -477,6 +478,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo: 1,
                 form: true,
             },
+            //#93
             {
                 config : {
                     fieldLabel : '% Ejecutado',

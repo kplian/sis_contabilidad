@@ -1131,7 +1131,7 @@ class MODIntTransaccion extends MODbase{
         //Definicion de la lista del resultado del query
         $this->captura('tipo','varchar');
         $this->captura('id','integer');
-
+        //#93
         $this->captura('desde','date');
         $this->captura('hasta','date');
         //#93

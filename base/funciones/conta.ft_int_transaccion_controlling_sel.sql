@@ -25,13 +25,13 @@ $body$
 
 DECLARE
 
-	v_consulta    		varchar;
+    v_consulta    		varchar;
     v_consulta_b   		varchar;
     v_con		  		VARCHAR[];
     v_rec		  		record;
-	v_parametros  		record;
-	v_nombre_funcion   	text;
-	v_resp				varchar;
+    v_parametros  		record;
+    v_nombre_funcion   	text;
+    v_resp				varchar;
     v_cuentas			varchar;
     v_ordenes			varchar;
     v_tipo_cc			varchar;
@@ -46,7 +46,7 @@ DECLARE
     v_fecha_anterior	date;
     v_filtro_aux        varchar;
     v_aux     		    varchar;
-	valor_aux   		numeric;
+    valor_aux   		numeric;
     v_auxiliar 		    varchar;
     v_auxiliar_b	    varchar;
     v_auxiliar_c	    integer;
@@ -59,7 +59,7 @@ DECLARE
     v_fecha_desde    	date;
     v_fecha_d    		varchar;
     v_fecha_h    		varchar;
-	v_int     			varchar;
+    v_int     			varchar;
     v_pa     			integer;
     v_where             varchar;
     v_where2            varchar;
@@ -67,7 +67,7 @@ DECLARE
     v_where4            varchar;
     v_count			    integer;
     v_ini			    integer;
-     v_ini_a			    VARCHAR[];
+    v_ini_a			    VARCHAR[];
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_int_transaccion_controlling_sel';
