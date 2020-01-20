@@ -128,7 +128,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     type: 'NumberField',
                     filters: {pfiltro: 'formu',type: 'numeric'},
                     id_grupo: 1,
-                    grid: true,
+                    grid: false,
                     form: true
                 },
                 /*{
@@ -397,3 +397,5 @@ header("content-type: text/javascript; charset=UTF-8");
 
     })
 </script>
+
+

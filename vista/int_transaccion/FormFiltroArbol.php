@@ -478,31 +478,32 @@ header("content-type: text/javascript; charset=UTF-8");
                 form: true,
             },
             {
-	            config : {
-	                fieldLabel : '% Ejecutado',
-	                readOnly : true,
-	                name:'porc_eje',
-	                width: 150,
+                config : {
+                    fieldLabel : '% Ejecutado',
+                    readOnly : true,
+                    name:'porc_eje',
+                    width: 150,
                     readOnly: true,
-	                decimalPrecision:2,
-	                labelStyle: 'font-weight:bold;color: #0000ff;',
-	                listeners: {
-            			'afterrender': function(panel) {            				            				          			
-            				if(panel.comprometido>=0 && panel.comprometido<=50){
-            					panel.el.setStyle('background','red');  
-            				}else{
-            					if(panel.comprometido<=75){
-            						panel.el.setStyle('background','orange');  
-            					}else{
-            						panel.el.setStyle('background','lime');  	
-            					}
-            				}            				            			
-            			}
-            		} 
-	            },
-	            type : 'NumberField',
-	            id_grupo: 1,
-	            form:true
+                    decimalPrecision:2,
+                    labelStyle: 'font-weight:bold;color: #0000ff;',
+                    listeners: {
+                        'afterrender': function(panel) {
+                            /*if(panel.comprometido>=0 && panel.comprometido<=50){
+                                panel.el.setStyle('background','red');
+                            }else{
+                                if(panel.comprometido<=75){
+                                    panel.el.setStyle('background','orange');
+                                }else{
+                                    panel.el.setStyle('background','lime');
+                                }
+                            }  */
+                            panel.el.setStyle('background','lime');
+                        }
+                    }
+                },
+                type : 'NumberField',
+                id_grupo: 1,
+                form:true
             },
             {
                 config:{

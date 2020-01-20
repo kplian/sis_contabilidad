@@ -1094,8 +1094,8 @@ class MODIntTransaccion extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-	//#75
-	function listarAgrupacion(){
+    //#75
+    function listarAgrupacion(){
         //Definicion de variables para ejecucion del procedimientp
         $this->procedimiento='conta.ft_int_transaccion_controlling_sel';
         $this->transaccion='CONTA_LISAGR_SEL';
@@ -1107,7 +1107,7 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
         $this->setParametro('id_tipo_cc','id_tipo_cc','int4');
         $this->setParametro('tipo_filtro','tipo_filtro','varchar');
-		$this->setParametro('ejecutado','ejecutado','numeric');
+        $this->setParametro('ejecutado','ejecutado','numeric');
 
         $this->setParametro('desde','desde','date');
         $this->setParametro('hasta','hasta','date');
@@ -1119,38 +1119,39 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('id_periodo','id_periodo','int4');
         //captura parametros adicionales para el count
         $this->capturaCount('total_debe_mb','numeric');
-		$this->capturaCount('total_haber_mb','numeric');
-        
-		$this->capturaCount('total_debe_mt','numeric');
-		$this->capturaCount('total_haber_mt','numeric');
-        
-		$this->capturaCount('monto_mb_total','numeric');
-		$this->capturaCount('compro_total','numeric');
+        $this->capturaCount('total_haber_mb','numeric');
+
+        $this->capturaCount('total_debe_mt','numeric');
+        $this->capturaCount('total_haber_mt','numeric');
+
+        $this->capturaCount('monto_mb_total','numeric');
+        $this->capturaCount('compro_total','numeric');
         $this->capturaCount('ejec_total','numeric');
-		$this->capturaCount('formu_total','numeric');
+        $this->capturaCount('formu_total','numeric');
         //Definicion de la lista del resultado del query
         $this->captura('tipo','varchar');
         $this->captura('id','integer');
 
-		$this->captura('desde','date');
-		$this->captura('hasta','date');		
-		$this->captura('id_tipo_cc','integer');
+        $this->captura('desde','date');
+        $this->captura('hasta','date');
+        //#93
+        $this->captura('id_tipo_cc','varchar');
         $this->captura('numero','integer');
         //$this->captura('id_subsistema','integer');
-       // $this->captura('id','integer');
-		$this->captura('ejecutado','numeric');
-		//$this->captura('formulado','numeric');
+        // $this->captura('id','integer');
+        $this->captura('ejecutado','numeric');
+        //$this->captura('formulado','numeric');
         #93
         $this->captura('id_gestion','int4');
         $this->captura('id_periodo','int4');
-		$this->captura('importe_debe_mb','numeric');
+        $this->captura('importe_debe_mb','numeric');
         $this->captura('importe_haber_mb','numeric');
-		$this->captura('importe_debe_mt','numeric');
+        $this->captura('importe_debe_mt','numeric');
         $this->captura('importe_haber_mt','numeric');
-		
-		$this->captura('monto_mb','numeric');
-		$this->captura('compro','numeric');
-		$this->captura('ejec','numeric');
+
+        $this->captura('monto_mb','numeric');
+        $this->captura('compro','numeric');
+        $this->captura('ejec','numeric');
         $this->captura('formu','numeric');
 
 
@@ -1219,13 +1220,14 @@ class MODIntTransaccion extends MODbase{
         /// ////////////////
         //defino varialbes que se captran como retornod e la funcion
         //$this->captura('id_int_transaccion','integer');
-       // $this->captura('id_int_comprobante','integer');
+        // $this->captura('id_int_comprobante','integer');
         $this->captura('ids','integer');
         $this->captura('id_int_transaccion','integer');
         $this->captura('id_int_comprobante','integer');
-        $this->captura('nro_tramite','varchar');
+        $this->captura(trim('nro_tramite', chr(0xC2).chr(0xA0)) ,'varchar');
         $this->captura('nro_tramite_fk','varchar');
-        $this->captura('desc_cuenta','varchar');
+        //$this->captura('desc_cuenta','varchar');
+        $this->captura(trim('desc_cuenta', chr(0xC2).chr(0xA0)) ,'varchar');
         $this->captura('desc_auxiliar','varchar');
         $this->captura('desc_centro_costo','varchar');
         $this->captura('desc_partida','varchar');

@@ -19,7 +19,7 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 
-#75 		28/11/2019		  Manuel Guerra	  controlling
+#75 		28/11/2019		  Manuel Guerra	  	controlling
 #93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
 ***************************************************************************/
 
@@ -1639,7 +1639,7 @@ BEGIN
 			--Definicion de la respuesta
             end if;
             RAISE notice '%',v_consulta;
-          	-- RAISE exception '%',v_consulta;
+          	 --RAISE exception '%',v_consulta;
 			return v_consulta;
 		end;
 
