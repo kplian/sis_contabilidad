@@ -21,6 +21,7 @@ $body$
 
 #75 		28/11/2019		  Manuel Guerra	  controlling
 #93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
+#94 		21/1/2020		  Manuel Guerra	  	AÑADIR EL FILTRO DE PARTIDA(PRESUPUESTARIA)
 ***************************************************************************/
 
 DECLARE
@@ -204,13 +205,14 @@ BEGIN
                                 ELSE
                                 	0::numeric
                             END as formu--,
-                           -- 0::integer as id_subsistema
+                            -- 0::integer as id_subsistema
                             FROM pre.vpartida_ejecucion vpe
-                            WHERE (vpe.fecha::date BETWEEN '''||v_parametros.desde||''' AND '''||v_parametros.hasta||''')
-                            and vpe.id_gestion = '||v_parametros.id_gestion||'
+                            WHERE
+                            --(vpe.fecha::date BETWEEN '''||v_parametros.desde||''' AND '''||v_parametros.hasta||''') and  --#94
+                             vpe.id_gestion = '||v_parametros.id_gestion||'
                             AND '||v_filtro_tipo_cc_pre||' ';
             	v_consulta:=v_consulta||'
-            				UNION
+            				UNION ALL		--#93
 
                             select
                             transa.id_int_transaccion::integer,
@@ -492,11 +494,13 @@ BEGIN
                                     COALESCE(vpe.monto_mb,0)::numeric
                             END as formu
                             FROM pre.vpartida_ejecucion vpe
-                            WHERE (vpe.fecha::date BETWEEN '''||v_parametros.desde||''' AND '''||v_parametros.hasta||''')
-                            and '||v_filtro_tipo_cc_pre||' ';
+                            WHERE
+                            --(vpe.fecha::date BETWEEN '''||v_parametros.desde||''' AND '''||v_parametros.hasta||''') and --#94
+                             vpe.id_gestion = '||v_parametros.id_gestion||' and
+                            '||v_filtro_tipo_cc_pre||' ';
 
             	v_consulta:=v_consulta||'
-                			union
+                			UNION ALL   --#93
 
                             select
                             transa.id_int_transaccion::integer,
@@ -1506,7 +1510,7 @@ BEGIN
                                       inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
                                       inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta
                                       inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
-                                      left join pre.tpartida par on par.id_partida = transa.id_partida
+                                      left join pre.tpartida par on par.id_partida = transa.id_partida and par.sw_movimiento=''presupuestaria''--#94
                                       left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
                                       left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                                       left join segu.tsubsistema sub on sub.id_subsistema=icbte.id_subsistema
@@ -1569,7 +1573,7 @@ BEGIN
                                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
                                        inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta
                                        inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
-                                       left join pre.tpartida par on par.id_partida = transa.id_partida
+                                       left join pre.tpartida par on par.id_partida = transa.id_partida and par.sw_movimiento=''presupuestaria'' --#94
                                        left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
                                        left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                                        left join segu.tsubsistema sub on sub.id_subsistema=icbte.id_subsistema
@@ -1640,7 +1644,6 @@ BEGIN
             end if;
             RAISE notice '%',v_consulta;
           	-- RAISE exception '%',v_consulta;
-
 			return v_consulta;
 		end;
 

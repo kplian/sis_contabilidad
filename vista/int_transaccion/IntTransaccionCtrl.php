@@ -63,10 +63,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         fieldLabel: 'Nro Tramite',
-                        gwidth: 320,
+                        gwidth: 370,
                         name: 'nro_tramite',
-                        maxLength:320,
-                        anchor: '80%',
+                        maxLength:370,
+                        anchor: '85%',
                         gtpl:function (){
                             if(this.tipo_nodo != 'hijo'){
                                 return String.format(this.nro_tramite);
@@ -89,11 +89,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 },{
                     config:{
                         fieldLabel: 'Centro Costo',
-                        gwidth: 170,
+                        gwidth: 200,
                         name: 'desc_centro_costo',
-                        maxLength:170,
-                        anchor: '80%',
-                        galign: 'left',
+                        maxLength:200,
+                        anchor: '85%',
+                        galign: 'right',
                         gtpl:function (p){
                             if(this.desc_centro_costo !=null){
                                 return String.format('<b><p size=2 style="color:#ff0005";>'+this.desc_centro_costo.trim()+'</p><b>');
@@ -106,11 +106,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 },{
                     config:{
                         fieldLabel: 'Partida',
-                        gwidth: 150,
+                        gwidth: 170,
                         maxLength:260,
                         name: 'desc_partida',
                         anchor: '80%',
-                        galign: 'left',
+                        galign: 'right',
                         gtpl:function (p){
                             if(this.desc_partida !=null){
                                 return String.format('<b><p size=2 style="color:#3654ff";>'+this.desc_partida.trim()+'</p><b>');
@@ -157,7 +157,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'importe_debe_mb',
                         fieldLabel: 'Debe MB',
                         gwidth: 150,
-                        galign: 'right',
+                        galign: 'center',
                         gtpl: function (){
                             if(this.tipo_nodo != 'hijo'){
                                 return String.format('<b><p size=2 style="color:#161142";>'+Ext.util.Format.number(this.importe_debe_mb,'0,000.00')+'</p><b>');
@@ -174,7 +174,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'importe_haber_mb',
                         fieldLabel: 'Haber MB',
                         gwidth: 150,
-                        galign: 'right',
+                        galign: 'center',
                         gtpl: function (){
                             return  String.format('<b>{0}<b>',Ext.util.Format.number(this.importe_haber_mb,'0,000.00'));
                         }
@@ -186,7 +186,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'importe_debe_mt',
                         fieldLabel: 'Debe MT',
                         gwidth: 150,
-                        galign: 'right',
+                        galign: 'center',
                         gtpl: function (){
                             return  String.format('<b>{0}<b>',Ext.util.Format.number(this.importe_debe_mt,'0,000.00'));
                         }
@@ -199,7 +199,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'importe_haber_mt',
                         fieldLabel: 'Haber MT',
                         gwidth: 150,
-                        galign: 'right',
+                        galign: 'center',
                         gtpl: function (){
                             return  String.format('<b>{0}<b>',Ext.util.Format.number(this.importe_haber_mt,'0,000.00'));
                         }
