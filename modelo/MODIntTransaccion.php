@@ -16,11 +16,12 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #65        	11/07/2019       	EGS             	Se agrega cmp internacional
 #64  ETR    15/07/2019          MMV                 Incluir importe formulado reporte proyectos
 #69  ETR    01/08/2019          SAZ                 Mejoras al reporte Comprobante transacciones
-#75 		28/11/2019		  Manuel Guerra	  controlling
+#75 		28/11/2019		    Manuel Guerra	    controlling
 
-#91         15/01/2020  ENDETR  JUAN                Libro mayor añadir columna beneficiario
-#83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
-#93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
+#91         15/01/2020          JUAN                Libro mayor añadir columna beneficiario
+#83 		03/01/2020		    Miguel Mamani	    Reporte Auxiliares aumentar columna beneficiario
+#93 		16/01/2020		    Manuel Guerra	  	modificacion en interfaz, ocultar columnas
+#95         23/01/2020          Rensi Arteaga       Incluir nro de tramite auxiliar
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -113,6 +114,8 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('desc_suborden','varchar');
 		$this->captura('codigo_ot','varchar');
 		$this->captura('codigo_categoria','varchar');
+		$this->captura('nro_tramite_auxiliar','varchar'); //#95
+		
 		
 		
 		
