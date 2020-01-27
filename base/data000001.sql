@@ -1706,3 +1706,18 @@ select pxp.f_insert_tgui ('VoBo Verificacion', 'VoBo Verificacion', 'VBVER', 'si
 select pxp.f_insert_tgui ('MISC - Contabilización Almacenes SIGEMA', 'MISC - Contabilización Almacenes SIGEMA', 'MISCALMREL', 'si', 13, 'sis_miscelaneo/vista/conta_alm_tipo_mat/ContaAlmTipoMat.php', 3, '', 'ContaAlmTipoMat', 'CONTA');
 select pxp.f_insert_testructura_gui ('MISCALMREL', 'RELACON');
 /***********************************F-DAT-RCM-CONTA-86-06/01/2019****************************************/
+
+
+
+/***********************************I-DAT-RAC-CONTA-89-15/01/2020****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_control_correlativo_cbte', E'no', E'si o no, habilita el control de ccorelativo segun numero y fecha, por ejemplo, si tiene validado el cbte nro 10 el 10 de nero , no puedes validar el cbte nro 11 el 8 de enero');
+  
+  
+/***********************************F-DAT-RAC-CONTA-89-15/01/2020****************************************/
+  
+  
+  
+  
