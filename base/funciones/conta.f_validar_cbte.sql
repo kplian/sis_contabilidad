@@ -37,6 +37,7 @@ $body$
  #7   ETR       27/12/2018        RAC KPLIAN        Se adiciona nro de tramite auxiliar 
  #9   ETR       02/01/2019        RAC KPLIAN        Validacion de nro de comprobantes de cbte de apertura en deptos regionales    
  #77  ETR       12/10/2019        RAC KPLIAN        Se incluye moneda de actulizacion en la validacion de cuadre 
+ #88  ETR       15/01/2020        RAC KPLIAN        Hacer configurable el control de correlativos de cbts según fecha mediante variable global
 
 
 */
@@ -95,6 +96,7 @@ DECLARE
     v_conta_forzar_validacion_documentos	varchar;
     v_retorno                               boolean; --#87
     v_conta_error_limite_redondeo           numeric; --#77
+    v_conta_control_correlativo_cbte        varchar; --#88 
      
 
 BEGIN
@@ -459,7 +461,10 @@ BEGIN
            IF  v_rec_cbte.nro_cbte is null or v_rec_cbte.nro_cbte  = '' THEN
            
                 -- RAC 27/01/2018 , dejamos pasar sin validar fecha apra rebularizar cbtes de enero
-                IF  v_rec_cbte.fecha  > '31/12/2019'THEN 
+                --#88 controlde correlativos segun configuracion de variable global                
+                v_conta_control_correlativo_cbte = pxp.f_get_variable_global('conta_control_correlativo_cbte');
+                
+                IF  v_conta_control_correlativo_cbte = 'si' THEN 
                      --  validamos que la numeracion sea coherente con la fecha y correlativo
                      IF  v_rec_cbte.cbte_apertura = 'no' then
                           IF exists (select

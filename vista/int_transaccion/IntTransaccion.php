@@ -9,10 +9,11 @@
  HISTORIAL DE MODIFICACIONES:
  HISTORIAL DE MODIFICACIONES:
 	ISSUE			FECHA 				AUTHOR 						DESCRIPCION
-  #1			     01-09-2013			RAC							creacion 
-  #37   ENDETR       12/02/2019         RAC KPLIAN                  que no filtre centros de costo por aprobados, adicion de aprametros           
- * 
- *  ***************************************************************************/
+  #1	      01-09-2013			RAC							creacion 
+  #37         12/02/2019            RAC KPLIAN                  que no filtre centros de costo por aprobados, adicion de aprametros 
+  #95         23/01/2020            Rensi Arteaga               Incluir nro de tramite auxiliar          
+  
+***************************************************************************/
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -611,6 +612,23 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		//#95 add field nro_tramite_auxiliar
+		{
+			config:{
+				name: 'nro_tramite_auxiliar',
+				fieldLabel: 'Tramite relacionado',
+				allowBlank: true,
+				width: 380,
+				gwidth: 300,
+				maxLength:1000
+			},
+			type:'TextArea',
+			filters:{pfiltro:'transa.nro_tramite_auxiliar',type:'string'},
+			id_grupo:1,
+			bottom_filter: true,
+			grid:true,
+			form:true
+		},
 		
 		
 		{
@@ -730,7 +748,8 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		'banco', 'forma_pago', 'nombre_cheque_trans', 'nro_cuenta_bancaria_trans', 'nro_cheque',
 		'importe_debe_mt',	'importe_haber_mt','importe_gasto_mt','importe_recurso_mt',
 		'importe_debe_ma',	'importe_haber_ma','importe_gasto_ma','importe_recurso_ma',
-		'id_moneda_tri','id_moneda_act','id_moneda', 'tipo_cambio','tipo_cambio_2','tipo_cambio_3','codigo_categoria','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot'
+		'id_moneda_tri','id_moneda_act','id_moneda', 'tipo_cambio','tipo_cambio_2','tipo_cambio_3','codigo_categoria','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot',
+		'nro_tramite_auxiliar'
 		
 	],
 	
