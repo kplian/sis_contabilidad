@@ -8,7 +8,7 @@
 HISTORIAL DE MODIFICACIONES:
 ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #33         10/02/2019		  Miguel Mamani	  Parámetro tipo de moneda reporte balance de cuentas
-#60         10/06/2019        RAC             parametros  orden de trabajo reporte de balance OT
+#60         10/06/2019        RAC             parametros  orden de trabajo reporte de balance OT                                             Nueva operación para calculó de balance sin actualización de AITB.
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>

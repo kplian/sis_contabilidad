@@ -10,8 +10,9 @@ HISTORIAL DE MODIFICACIONES:
 
 ISSUE 		FECHA: 			AUTOR:						DESCRIPCION:
 
-#82			03/01/2020		JUAN						Agregar campo de Observación para describir los movimientos realizados
-
+#82			03/01/2020		JUAN		   Agregar campo de Observación para describir los movimientos realizados
+#98         29/01/2020      RAC KPLIAN     Adciona operacion aitb_ing_gas 
+    
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -144,7 +145,8 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                 	  '(3) titulo -> Solo colocara la "Etiqueta" que se especifique en el campo "Nombre Texto" (Solo se utiliza en Reportes)<br>'+
                 	  '(4) formula -> Señala que se tiene que usar una formula para calcular el valor de la línea<br>'+
                 	  '(5) sumatoria -> Para realizar la suma en un rango determinado, especificar orden inicial y final en campo formula ejemplo 1-10 <br>'+
-                	  '(6) detalle_formula -> la formula se aplicará sobre el detalle/desglose de las cuentas según el nivel especificado',
+                	  '(6) detalle_formula -> la formula se aplicará sobre el detalle/desglose de las cuentas según el nivel especificado <BR>'+
+                	  '(7) aitb_ing_gas -> Aitb ingreso/gasto por cuenta, (calculo de saldo actuizado al ultimo dia del reporte)',
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 80,
@@ -152,7 +154,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender: true,
                 mode: 'local',
-                store: ['balance', 'detalle', 'titulo', 'formula','sumatoria','detalle_formula']
+                store: ['balance', 'detalle', 'titulo', 'formula','sumatoria','detalle_formula','aitb_ing_gas']
             },
             type:'ComboBox',
             id_grupo:1,
@@ -242,6 +244,7 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
    				sysorigen:'sis_contabilidad',
        		    name: 'codigo_cuenta',
        		    qtip: 'Define la cuenta sobre las que se realizan las operaciones',
+       		    forceSelection : false,
 				fieldLabel: 'Código cuenta',
 				displayField: 'nro_cuenta',
 				valueField: 'nro_cuenta',
