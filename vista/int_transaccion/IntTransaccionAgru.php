@@ -2,6 +2,7 @@
 /*
 #75 		28/11/2019		  Manuel Guerra	  controlling
 #93         16/1/2020         manuel guerra   modificacion en interfaz, ocultar columnas
+#99 		30/1/2020		  Manuel Guerra	  ocultar columnas
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -106,6 +107,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     grid: true,
                     form: true
                 },
+                //#99
                 {
                     config: {
                         name: 'formu',
@@ -128,27 +130,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     type: 'NumberField',
                     filters: {pfiltro: 'formu',type: 'numeric'},
                     id_grupo: 1,
-                    grid: true,
+                    grid: false,
                     form: true
                 },
-                /*{
-		   			config:{
-		       		    name:'ejecutado',
-		       		    fieldLabel: '% Ejecutado/ejecutado',
-                        allowBlank: true,
-                        width: '100%',
-                        gwidth: 110,
-                        galign: 'right',
-                        maxLength: 100,
-                        decimalPrecision: 2,
-                        renderer:function (value,p,record){
-                        	return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
-                        }
-		       	    },
-		   			type:'NumberField',
-		   			id_grupo:1,
-		   			grid:true
-			   	},*/
                 {
                     config: {
                         name: 'compro',
@@ -221,7 +205,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_grupo: 1,
                     grid: true,
                     form: true
-                },{
+                },
+                //#99
+                {
                     config: {
                         name: 'importe_debe_mt',
                         fieldLabel: 'Debe MT(Contable)',
@@ -242,9 +228,11 @@ header("content-type: text/javascript; charset=UTF-8");
                     type: 'NumberField',
                     filters: {pfiltro: 'importe_debe_mt',type: 'numeric'},
                     id_grupo: 1,
-                    grid: true,
+                    grid: false,
                     form: true
-                },{
+                },
+                //#99
+                {
                     config: {
                         name: 'importe_haber_mt',
                         fieldLabel: 'Haber MT(Contable)',
@@ -264,7 +252,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     type: 'NumberField',
                     filters: {pfiltro: 'importe_haber_mt',type: 'numeric'},
                     id_grupo: 1,
-                    grid: true,
+                    grid: false,
                     form: true
                 },{
                     config:{

@@ -21,6 +21,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #91         15/01/2020  ENDETR  JUAN                Libro mayor añadir columna beneficiario
 #83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
 #93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
+#99 		30/1/2020		  Manuel Guerra	    agregar columna de estado_wf y proceso_wf
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -1225,6 +1226,9 @@ class MODIntTransaccion extends MODbase{
         $this->captura('id_int_comprobante','integer');
         $this->captura(trim('nro_tramite', chr(0xC2).chr(0xA0)) ,'varchar');
         $this->captura('nro_tramite_fk','varchar');
+        //#99
+        $this->captura('id_proceso_wf','integer');
+        $this->captura('id_estado_wf','integer');
         //$this->captura('desc_cuenta','varchar');
         $this->captura(trim('desc_cuenta', chr(0xC2).chr(0xA0)) ,'varchar');
         $this->captura('desc_auxiliar','varchar');

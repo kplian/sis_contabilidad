@@ -1,6 +1,6 @@
 <?php
 /*
- *
+#99 		30/1/2020		  Manuel Guerra	  	mejoras interfaz, agregar botones wf y gantt
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -57,6 +57,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 disabled : false,
                 handler : this.loadDocCmpVnt,
                 tooltip : '<b>Documentos de compra/venta</b><br/>Muestras los docuemntos relacionados con el comprobante'
+            });
+            //
+            this.addButton('diagrama_gantt',{
+                text:'Gantt',
+                iconCls: 'bgantt',
+                disabled:false,
+                handler: this.diagramGantt,
+                tooltip: '<b>Diagrama Gantt de proceso macro</b>'
+            });
+            //
+            this.addButton('btnChequeoDocumentosWf', {
+                text: 'Documentos',
+                iconCls: 'bchecklist',
+                disabled: false,
+                handler: this.loadCheckDocumentosSolWf,
+                tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
             });
 
             if(config.detalle){
@@ -215,6 +231,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         loadValoresIniciales: function(){
             Phx.vista.Informacion.superclass.loadValoresIniciales.call(this);
+            console.log('this'+this);
             this.Cmp.nro_tramite.setValue(this.nro_tramite);
             this.Cmp.importe_debe_mb.setValue(this.importe_debe_mb);
             this.Cmp.importe_debe_mt.setValue(this.importe_debe_mt);
@@ -244,13 +261,6 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         //
         loadDocCmpVnt : function() {
-            /*Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCbte.php', 'Documentos del Cbte', {
-                width : '80%',
-                height : '80%'
-            }, rec.data, this.idContenedor, 'DocCompraVentaCbte');
-            */
-
-            console.log('master',this);
             Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCtrl.php',
                 'Documentos',
                 {
@@ -266,7 +276,26 @@ header("content-type: text/javascript; charset=UTF-8");
                 'DocCompraVentaCtrl'
             );
         },
+        //#99
+        diagramGantt(){
+            window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+this.id_proceso_wf)
+        },
 
+        loadCheckDocumentosSolWf:function() {
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                'Documentos del Proceso',
+                {
+                    width:'90%',
+                    height:500
+                },
+                {
+                    'id_proceso_wf':this.id_proceso_wf,
+                    'id_estado_wf':this.id_estado_wf
+                },
+                this.idContenedor,
+                'DocumentoWf'
+            )
+        },
 
 
     })
