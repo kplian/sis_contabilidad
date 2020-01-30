@@ -35,6 +35,8 @@ Descripcion:
  #21            10/01/2019      RArteaga                   añade parametro a la llamda de generar desde plantilla, para considerar descuentos
  #42  ETR       01/04/2019      calvarez                   correción de gerenación de comprobantes
  #66 ETR        24/07/2019      RArteaga                   considerar documentos configurados con tazas variable (para manejar facturas de Argentina)
+ #97            29/01/2020        RAC                    Modificar el algoritmo que procesa la generación de cbte y considere los nuevos parámetros de configuracion para nro de tramite auxiliar por transacción si es que existe
+   
 */
 
 
@@ -330,7 +332,7 @@ BEGIN
                       v_record_int_tran.nombre_cheque_trans = (v_this_hstore->'campo_nombre_cheque_trans')::varchar;
                       v_record_int_tran.forma_pago = (v_this_hstore->'campo_forma_pago')::varchar;
                       v_record_int_tran.id_origen = (v_this_hstore->'campo_id_tabla_detalle')::integer; --#123 17/09/2018 se acicion el id de la tabla origen para rastreo
-
+                      v_record_int_tran.nro_tramite_auxiliar = (v_this_hstore->'campo_nro_tramite_auxiliar')::varchar;
                       
                       /****************************************************************
                       --Proceso el monto y lo ubica en el debe o haber, gasto o recurso

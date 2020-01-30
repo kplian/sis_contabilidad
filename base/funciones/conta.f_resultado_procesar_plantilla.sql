@@ -13,6 +13,23 @@ CREATE OR REPLACE FUNCTION conta.f_resultado_procesar_plantilla (
 )
 RETURNS boolean AS
 $body$
+/*
+	Autor: rac
+    Fecha: 05-09-2015
+    Descripción: procesamiento de resultados temporales
+ 
+  ***************************************************************************************************   
+    
+
+    HISTORIAL DE MODIFICACIONES:
+   	
+ ISSUE            FECHA:		      AUTOR                 DESCRIPCION
+   
+#0        		05-09-2015        RAC KPLIAN         Creacion
+#98              29/01/2020        RAC KPLIAN        Mejorar Herramienta de Generación de Reporte de resultados, 
+                                                     Nueva operación para calculó de balance sin actualización de AITB.
+
+*/
 DECLARE
 
     v_parametros  			record;
@@ -36,6 +53,10 @@ DECLARE
     v_registros_plan		record;
     v_id_prioridad			integer;
     v_columnas_formula		varchar[];
+    v_monto_ma              numeric; --#98
+    v_monto_aux             numeric; --#98
+    v_id_moneda_base        integer;
+    v_id_moneda_act         integer;
 
 
 BEGIN
@@ -90,6 +111,10 @@ BEGIN
       IF p_multiple_col = true THEN
         v_force_invisible = FALSE;
       END IF; 
+      
+     --obener identificadores de moenda
+     v_id_moneda_base = param.f_get_moneda_base();
+     v_id_moneda_act = param.f_get_moneda_actualizacion(); 
         
          FOR v_registros in (
                              SELECT
@@ -213,7 +238,117 @@ BEGIN
                                 v_registros.orden_cbte,
                                 v_monto_partida,
                                 v_registros.salta_hoja);
+                  
+                  --#98 agrega oepracion de calculo de aitb
+                  /*
+                    Para poder determinar el ajuste de cada cuenta de ingreso o gasto primero se tiene que sacar el saldo 
+                    en bs y el saldo en UFV de las cuentas que fueron actualizadas. Se debe convertir el saldo en UFV 
+                    a bolivianos usando el tipo de cambio de la fecha que necesiten, 
+                    en general las actualizaciones de ingreso y gasto se realiza al cierre contable 
+                    que en este caso es el 31 de diciembre. Despues solo se tiene que hacer una resta 
+                    entre el importe del saldo en UFV´s convertido a bolivianos menos el saldo en bs 
+                    y ese es el importe que esa cuenta se actualizo.
+                  */
+                  ELSEIF  v_registros.origen = 'aitb_ing_gas' and v_registros.destino = 'reporte' THEN
+                     
+                        --	recuperamos los datos de la cuenta 
                         
+                        v_reg_cuenta = NULL;
+                        select
+                          cue.id_cuenta,
+                          cue.nro_cuenta,
+                          cue.nombre_cuenta,
+                          cue.sw_transaccional
+                        into
+                          v_reg_cuenta
+                        from conta.tcuenta cue
+                        where cue.id_gestion = p_id_gestion and cue.nro_cuenta = v_registros.codigo_cuenta ;
+                        
+                        IF v_reg_cuenta  is null THEN
+                           raise exception 'revise su configuración, no tenemos una cuenta con el código = %',v_registros.codigo_cuenta;
+                        END IF;
+                        
+                        v_monto   = v_monto_mayor[1];--monto en monebda base
+                        v_monto_ma  = v_monto_mayor[5]; --monto en moneda de actulizacion, posicion 5
+                        
+                        
+                        -- determinamos el monto en MA  en moneda base  a la fecha p_hasta
+                         v_monto_aux =  param.f_convertir_moneda (
+                                                          v_id_moneda_act, 
+                                                          v_id_moneda_base,   
+                                                          v_monto_ma, 
+                                                          p_hasta,
+                                                          'O',
+                                                          50);
+                                                          
+                         v_monto_aux = v_monto_aux - v_monto;
+                                                          
+                         --	 insertamos en la tabla temporal
+                        insert into temp_balancef (
+                                plantilla,
+                                subrayar,
+                                font_size,
+                                posicion,
+                                signo,
+                                id_cuenta,
+                                desc_cuenta,
+                                codigo_cuenta,
+                                codigo,
+                                origen,
+                                orden,
+                                nombre_variable,
+                                montopos,
+                                monto,
+                                id_resultado_det_plantilla,
+                                id_cuenta_raiz,
+                                visible,
+                                incluir_cierre,
+                                incluir_apertura,
+                                negrita,
+                                cursiva,
+                                espacio_previo,
+                                incluir_aitb,
+                                relacion_contable,
+                                codigo_partida,
+                                id_auxiliar,
+                                destino,
+                                orden_cbte,
+                                monto_partida,
+                                salta_hoja
+                                )
+                            values (
+                                p_plantilla,
+                                v_registros.subrayar,
+                                v_registros.font_size,
+                                v_registros.posicion,
+                                v_registros.signo,
+                                v_reg_cuenta.id_cuenta,
+                                v_reg_cuenta.nombre_cuenta,
+                                v_reg_cuenta.nro_cuenta,
+                                v_registros.codigo,
+                                v_registros.origen,
+                                v_registros.orden,
+                                v_registros.nombre_variable,
+                                v_registros.montopos,
+                                v_monto_aux,
+                                v_registros.id_resultado_det_plantilla,
+                                NULL,
+                                v_visible,
+                                v_registros.incluir_cierre,
+                                v_registros.incluir_apertura,
+                                v_registros.negrita,
+                                v_registros.cursiva,
+                                v_registros.espacio_previo,
+                                v_registros.incluir_aitb,
+                                v_registros.relacion_contable,
+                                v_registros.codigo_partida,
+                                v_registros.id_auxiliar,
+                                v_registros.destino,
+                                v_registros.orden_cbte,
+                                0, -- v_monto_partida no se condiera el monto partida,
+                                v_registros.salta_hoja);
+                    
+                  
                   --    2.2) si el origen es detall
                   ELSIF  v_registros.origen = 'detalle' or (v_registros.origen = 'balance' and v_registros.destino != 'reporte') THEN
                          
@@ -275,7 +410,9 @@ BEGIN
                                                   v_registros.id_tipo_cc);   --NUEVO aprametro de filtro);
                                                   
                             v_monto = v_monto_mayor[1];
-                            v_monto_partida = v_monto_mayor[3];                 
+                            v_monto_partida = v_monto_mayor[3]; 
+                            
+                                           
                        
                           --	insertamos en la tabla temporal
                           insert into temp_balancef (
