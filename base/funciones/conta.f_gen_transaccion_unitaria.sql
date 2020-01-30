@@ -25,12 +25,11 @@ Descripcion:
    
  #0        		27/08/2013       Rensi Arteaga Copari      Esta funcion evalua un detalle de trasaccion especifico e inserta 
                                                            las trasacciones generadas en int_trasaccion
- 
  #0        		17/11/2017        Rensi Arteaga Copari   
- 
  #0        		09/05/2018        Rensi Arteaga Copari   Adiciona campo para el codigo de aplicacin en relaciones contables
- 
- #66            24/07/2019        RAC                    Adcionar campo id_tazas_impuesto     
+ #66            24/07/2019        RAC                    Adcionar campo id_tazas_impuesto
+ #97            29/01/2020        RAC                    Modificar el algoritmo que procesa la generación de cbte y considere los nuevos parámetros de configuracion para nro de tramite auxiliar por transacción si es que existe
+     
    
 
 
@@ -110,7 +109,8 @@ BEGIN
                          'campo_nombre_cheque_trans',
                          'campo_forma_pago',
                          'campo_codigo_aplicacion_rc',
-                         'campo_id_taza_impuesto'      --#66
+                         'campo_id_taza_impuesto',      --#66
+                         'campo_nro_tramite_auxiliar'   --#97
                         ];
                         
                         

@@ -21,6 +21,7 @@ $body$
  #123   	     08/10/2018            RAC KPLIAN         Se aumenta el id de la tabla origen 
  #30             05/02/2019            RAC KPLIAN         Se adicona columna para almacenar centro de costo original para reportes,
                                                           al usar plantilla de calcula, por ejemplo almacena con que centro de costo se ejetuo el iva de una factura
+ #97            29/01/2020        RAC                    Modificar el algoritmo que procesa la generación de cbte y considere los nuevos parámetros de configuracion para nro de tramite auxiliar por transacción si es que existe                                                          
 *****************************************************************************************************/
 
 
@@ -103,7 +104,8 @@ BEGIN
           forma_pago,
           id_suborden,
           id_origen,  --#123
-          id_centro_costo_ori  --#30
+          id_centro_costo_ori,  --#30
+          nro_tramite_auxiliar --#97
          ) 
         VALUES (
           (p_hstore_transaccion->'id_usuario_reg')::integer,
@@ -135,7 +137,9 @@ BEGIN
           (p_hstore_transaccion->'forma_pago')::varchar,
           (p_hstore_transaccion->'id_suborden')::integer,
           (p_hstore_transaccion->'id_origen')::integer,  --#123
-          (p_hstore_transaccion->'id_centro_costo_ori')::integer --#30
+          (p_hstore_transaccion->'id_centro_costo_ori')::integer,  --#30
+          (p_hstore_transaccion->'nro_tramite_auxiliar')::varchar --#97
+          
           
         ) RETURNING id_int_transaccion into v_id_transaccion;
 			
