@@ -23,6 +23,7 @@ $body$
  #21    ENDETRASM	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
  #42	EndeEtr	    02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
  #66    ETR         24/07/2019          RAC                     Se adiciona el campo id_taza_impuesto
+ #96    ETR         27/01/2020          RAC                     En la interface de configuracion de plantilla de comprobantes incluir option la columnas tipo_nro_tramite_auxiliar para transacciones
 
 ***************************************************************************/
 
@@ -103,7 +104,8 @@ BEGIN
                             cmpbdet.campo_codigo_aplicacion_rc,
                             cmpbdet.incluir_desc_doc, --#21
                             cmpbdet.procesar_prioridad_principal, --#42
-                            cmpbdet.campo_id_taza_impuesto --#66
+                            cmpbdet.campo_id_taza_impuesto, --#66
+                            cmpbdet.campo_nro_tramite_auxiliar --#96
                         
 						from conta.tdetalle_plantilla_comprobante cmpbdet
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg

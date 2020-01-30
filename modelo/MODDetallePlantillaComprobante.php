@@ -9,6 +9,7 @@ ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
  #42	EndeEtr		02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
  #66    ETR         24/07/2019          RAC                     Adicionar campo para id_tazas_impuesto
+ #96    ETR         27/01/2020          RAC                     En la interface de configuracion de plantilla de comprobantes incluir option la columnas tipo_nro_tramite_auxiliar para transacciones
  * 
 
  */
@@ -51,7 +52,6 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		
 		$this->captura('primaria','varchar');
 		$this->captura('otros_campos','varchar');
 		$this->captura('nom_fk_tabla_maestro','varchar');
@@ -68,33 +68,22 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('campo_id_cuenta_bancaria','varchar');
 		$this->captura('campo_id_cuenta_bancaria_mov','varchar');
 		$this->captura('campo_nro_cheque','varchar');
-		
 		$this->captura('campo_nro_cuenta_bancaria_trans','varchar');
 		$this->captura('campo_porc_monto_excento_var','varchar');
-		$this->captura('campo_nombre_cheque_trans','varchar');
-		
+		$this->captura('campo_nombre_cheque_trans','varchar');		
 		$this->captura('prioridad_documento','integer');
 		$this->captura('campo_orden_trabajo','varchar');
 		$this->captura('campo_forma_pago','varchar');
-		$this->captura('codigo','varchar');
-		
+		$this->captura('codigo','varchar');		
 		$this->captura('tipo_relacion_contable_cc','varchar');
 		$this->captura('campo_relacion_contable_cc','text');
-		$this->captura('campo_suborden','varchar');
-		
+		$this->captura('campo_suborden','varchar');		
 		$this->captura('campo_codigo_aplicacion_rc','varchar');
 		$this->captura('incluir_desc_doc','varchar'); //#21
-		$this->captura('procesar_prioridad_principal','varchar'); //#42
-		
+		$this->captura('procesar_prioridad_principal','varchar'); //#42		
 		$this->captura('campo_id_taza_impuesto','varchar'); //#66
+		$this->captura('campo_nro_tramite_auxiliar','varchar'); //#96
 		
-		
-		
-		
-		
-		
-		
-	
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -163,6 +152,7 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('incluir_desc_doc','incluir_desc_doc','varchar'); //#21
 		$this->setParametro('procesar_prioridad_principal','procesar_prioridad_principal','varchar'); //#42
 		$this->setParametro('campo_id_taza_impuesto','campo_id_taza_impuesto','varchar'); //#66
+		$this->setParametro('campo_nro_tramite_auxiliar','campo_nro_tramite_auxiliar','varchar'); //#96
 				
 		
 		
@@ -233,6 +223,7 @@ class MODDetallePlantillaComprobante extends MODbase{
         $this->setParametro('incluir_desc_doc','incluir_desc_doc','varchar'); //#21
 		$this->setParametro('procesar_prioridad_principal','procesar_prioridad_principal','varchar'); //#42
 		$this->setParametro('campo_id_taza_impuesto','campo_id_taza_impuesto','varchar'); //#66
+		$this->setParametro('campo_nro_tramite_auxiliar','campo_nro_tramite_auxiliar','varchar'); //#96
         
 		//Ejecuta la instruccion
 		$this->armarConsulta();

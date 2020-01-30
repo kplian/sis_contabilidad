@@ -14,6 +14,7 @@
  #17 	CONTA 	ETR			09/01/2019		Manuel Guerra	agrego el filtro de nro_tramite_aux
  #154   CONTA   ETR         01/08/2019  	RCM         	Actualización PHP 7, se agrega parámetros básicos
  #75 		28/11/2019		  Manuel Guerra	  controlling
+ #93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
 ****************************************************************************
 */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
@@ -1489,7 +1490,7 @@ class ACTIntTransaccion extends ACTbase{
         $temp['importe_haber_mb'] = $this->res->extraData['total_haber_mb'];
         $temp['importe_debe_mt'] = $this->res->extraData['total_debe_mt'];
         $temp['importe_haber_mt'] = $this->res->extraData['total_haber_mt'];
-
+        #93
         $temp['monto_mb'] = $this->res->extraData['monto_mb_total'];
 		$temp['compro'] = $this->res->extraData['compro_total'];
         $temp['ejec'] = $this->res->extraData['ejec_total'];
@@ -1694,7 +1695,7 @@ class ACTIntTransaccion extends ACTbase{
         } else {
             $this->objParam->addParametro('id_padre',$id_fase);
         }
-
+        //#93
         $this->objFunc=$this->create('MODIntTransaccion');
         $this->res=$this->objFunc->listarTransArbol($this->objParam);
 

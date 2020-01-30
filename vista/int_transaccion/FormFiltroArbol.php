@@ -1,6 +1,8 @@
 ¿<?php
 /*
 #75 		28/11/2019		  Manuel Guerra	  controlling
+#93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
+#99 		30/1/2020		  Manuel Guerra	  	mejoras interfaz, a los campos
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -76,6 +78,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 config:{
                     name : 'tipo_filtro',
                     fieldLabel : 'Filtros',
+                    readOnly:true,
+                    disabled:true,  //#99
                     items: [
                         {boxLabel: 'Gestión', name: 'tipo_filtro', inputValue: 'gestion', checked: true},
                         {boxLabel: 'Solo fechas', name: 'tipo_filtro', inputValue: 'fechas'}
@@ -92,18 +96,19 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel : 'Gestion',
                     gdisplayField: 'desc_gestion',
                     allowBlank : false,
+                    readOnly:true, //#99
                     width: 150
                 },
                 type : 'ComboRec',
                 id_grupo : 0,
                 form : true
             },
-
             {
                 config:{
                     name: 'desde',
                     fieldLabel: 'Desde',
                     allowBlank: false,
+                    readOnly:true,
                     format: 'd/m/Y',
                     width: 150
                 },
@@ -117,6 +122,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'hasta',
                     fieldLabel: 'Hasta',
                     allowBlank: false,
+                    readOnly:true,
                     format: 'd/m/Y',
                     width: 150
                 },
@@ -132,6 +138,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
                     origen:'DEPTO',
                     allowBlank:true,
+                    readOnly:true,
                     fieldLabel: 'Depto',
                     baseParams:{estado:'activo',codigo_subsistema:'CONTA'},
                     width: 150
@@ -147,6 +154,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     typeAhead: false,
                     forceSelection: false,
                     allowBlank: true,
+                    readOnly:true,
                     emptyText: 'Tipos...',
                     store: new Ext.data.JsonStore({
                         url: '../../sis_contabilidad/control/ConfigTipoCuenta/listarConfigTipoCuenta',
@@ -186,6 +194,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     typeAhead: false,
                     forceSelection: false,
                     allowBlank: true,
+                    readOnly:true,
                     emptyText: 'Tipos...',
                     store: new Ext.data.JsonStore({
                         url: '../../sis_contabilidad/control/ConfigSubtipoCuenta/listarConfigSubtipoCuenta',
@@ -223,6 +232,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'id_cuenta',
                     origen: 'CUENTA',
                     allowBlank: true,
+                    readOnly:true,
                     fieldLabel: 'Cuenta',
                     gdisplayField: 'desc_cuenta',
                     baseParams: { sw_transaccional: undefined },
@@ -238,6 +248,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'id_auxiliar',
                     origen: 'AUXILIAR',
                     allowBlank: true,
+                    readOnly:true,
                     gdisplayField: 'desc_auxiliar',
                     fieldLabel: 'Auxiliar',
                     width: 150
@@ -253,6 +264,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     origen: 'PARTIDA',
                     gdisplayField: 'desc_partida',
                     allowBlank: true,
+                    readOnly:true,
                     fieldLabel: 'Partida',
                     width: 150
                 },
@@ -270,6 +282,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     url:  '../../sis_parametros/control/TipoCc/listarTipoCcAll',
                     baseParams: {movimiento:''},
                     allowBlank:true,
+                    readOnly:true,
                     width: 150
                 },
                 type:'ComboRec',
@@ -284,6 +297,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel: 'Centro Costo',
                     allowBlank: true,
                     tinit: false,
+                    readOnly:true,
                     origen: 'CENTROCOSTO',
                     gdisplayField: 'desc_centro_costo',
                     width: 150
@@ -300,6 +314,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     sysorigen: 'sis_contabilidad',
                     origen: 'OT',
                     allowBlank: true,
+                    readOnly:true,
                     gwidth: 200,
                     store : new Ext.data.JsonStore({
                         url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajoAll',
@@ -327,6 +342,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     sysorigen:'sis_contabilidad',
                     origen:'SUBORDEN',
                     allowBlank:true,
+                    readOnly:true,
                     gwidth:200,
                     width: 150,
                     listWidth: 380
@@ -341,6 +357,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'nro_tramite',
                     allowBlank: true,
+                    readOnly:true,
                     fieldLabel: 'Nro. Trámite',
                     width: 150
                 },
@@ -352,6 +369,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'nro_tramite_aux',
                     allowBlank: true,
+                    readOnly:true,
                     fieldLabel: 'Nro. Trámite Aux',
                     width: 150
                 },
@@ -368,6 +386,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     emptyText:'Tipo...',
                     typeAhead: true,
                     triggerAction: 'all',
+                    disabled:true,
                     lazyRender:true,
                     mode: 'local',
                     width:150,
@@ -383,6 +402,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 config:{
                     name : 'cerrado',
                     fieldLabel : 'Filtrar Cerradas',
+                    readOnly:true,
+                    disabled:true,
                     items: [
                         {boxLabel: 'Si', name: 'cerrado', inputValue: 'si'},
                         {boxLabel: 'No', name: 'cerrado', inputValue: 'no', checked: true}
@@ -397,6 +418,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'desc_tipo_cc',
                     fieldLabel: 'Desc Tipo CC',
                     width: 150,
+
                     disabled:true,
                 },
                 type: 'Field',
@@ -411,7 +433,10 @@ header("content-type: text/javascript; charset=UTF-8");
                     readOnly: true,
                     decimalPrecision: 2,
                     renderer:function (value,p,record){
-                    	return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));                        
+                        var  numero= formatNumber(value);
+                        console.log('-->>',numero);
+                        return numero;
+                    	//return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
                     }
                 },
                 type: 'NumberField',
@@ -470,39 +495,41 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'ejecutado',
                     fieldLabel: 'Ejecutado(Bs)',
                     width: 150,
-                    readOnly: true,
+                    readOnly: true, //#99
                     decimalPrecision: 2,                                 
                 },
                 type: 'NumberField',
                 id_grupo: 1,
                 form: true,
             },
+            //#93
             {
-	            config : {
-	                fieldLabel : '% Ejecutado',
-	                readOnly : true,
-	                name:'porc_eje',
-	                width: 150,
+                config : {
+                    fieldLabel : '% Ejecutado',
+                    readOnly : true,
+                    name:'porc_eje',
+                    width: 150,
                     readOnly: true,
-	                decimalPrecision:2,
-	                labelStyle: 'font-weight:bold;color: #0000ff;',
-	                listeners: {
-            			'afterrender': function(panel) {            				            				          			
-            				if(panel.comprometido>=0 && panel.comprometido<=50){
-            					panel.el.setStyle('background','red');  
-            				}else{
-            					if(panel.comprometido<=75){
-            						panel.el.setStyle('background','orange');  
-            					}else{
-            						panel.el.setStyle('background','lime');  	
-            					}
-            				}            				            			
-            			}
-            		} 
-	            },
-	            type : 'NumberField',
-	            id_grupo: 1,
-	            form:true
+                    decimalPrecision:2,
+                    labelStyle: 'font-weight:bold;color: #0000ff;',
+                    listeners: {
+                        'afterrender': function(panel) {
+                            /*if(panel.comprometido>=0 && panel.comprometido<=50){
+                                panel.el.setStyle('background','red');
+                            }else{
+                                if(panel.comprometido<=75){
+                                    panel.el.setStyle('background','orange');
+                                }else{
+                                    panel.el.setStyle('background','lime');
+                                }
+                            }  */
+                            panel.el.setStyle('background','lime');
+                        }
+                    }
+                },
+                type : 'NumberField',
+                id_grupo: 1,
+                form:true
             },
             {
                 config:{
@@ -510,7 +537,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     origen : 'GESTION',
                     fieldLabel : 'Gestion',
                     gdisplayField: 'desc_gestion',
-                    readOnly: true,
+                    readOnly: true,  //#99
                     width: 150
                 },
                 type : 'ComboRec',
@@ -523,7 +550,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     origen : 'PERIODO',
                     fieldLabel : 'Periodo',
                     gdisplayField: 'Periodo',
-                    readOnly: true,
+                    readOnly: true, //#99
                     width: 150
                 },
                 type : 'ComboRec',
