@@ -332,7 +332,7 @@ BEGIN
                       v_record_int_tran.nombre_cheque_trans = (v_this_hstore->'campo_nombre_cheque_trans')::varchar;
                       v_record_int_tran.forma_pago = (v_this_hstore->'campo_forma_pago')::varchar;
                       v_record_int_tran.id_origen = (v_this_hstore->'campo_id_tabla_detalle')::integer; --#123 17/09/2018 se acicion el id de la tabla origen para rastreo
-                      v_record_int_tran.id_origen = (v_this_hstore->'campo_nro_tramite_auxiliar')::varchar;
+                      v_record_int_tran.nro_tramite_auxiliar = (v_this_hstore->'campo_nro_tramite_auxiliar')::varchar;
                       
                       /****************************************************************
                       --Proceso el monto y lo ubica en el debe o haber, gasto o recurso
