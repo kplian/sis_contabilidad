@@ -5269,8 +5269,6 @@ IS 'Permite identificar nro de tramites dodne seorigina por ejemplo en un cierre
 
 /***********************************F-SCP-RAC-CONTA-01-23/01/2020****************************************/
 
-
-
 /***********************************I-SCP-RAC-CONTA-96-23/01/2020****************************************/
 
 --------------- SQL ---------------
@@ -5282,6 +5280,4 @@ COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_nro_tramite_auxilia
 IS 'define desde donde recuperamos el campo nro_tramite_auxiliar';
 
 /***********************************F-SCP-RAC-CONTA-96-23/01/2020****************************************/
-
-
 

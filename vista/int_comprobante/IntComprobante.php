@@ -1588,6 +1588,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
     loadCheckDocumentosWf:function() {
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
+            console.log('manu=>',rec.data);
             Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
                     'Documentos del Proceso',
                     {

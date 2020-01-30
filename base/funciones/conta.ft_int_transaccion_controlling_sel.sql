@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_controlling_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -19,20 +17,21 @@ $body$
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 
-#75 		28/11/2019		  Manuel Guerra	  controlling
+#75 		28/11/2019		  Manuel Guerra	    controlling
 #93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
 #94 		21/1/2020		  Manuel Guerra	  	AÑADIR EL FILTRO DE PARTIDA(PRESUPUESTARIA)
+#99		    16/1/2020	      Manuel Guerra     refactorizacion del algoritmo
 ***************************************************************************/
 
 DECLARE
 
-    v_consulta    		varchar;
+	v_consulta    		varchar;
     v_consulta_b   		varchar;
     v_con		  		VARCHAR[];
     v_rec		  		record;
-    v_parametros  		record;
-    v_nombre_funcion   	text;
-    v_resp				varchar;
+	v_parametros  		record;
+	v_nombre_funcion   	text;
+	v_resp				varchar;
     v_cuentas			varchar;
     v_ordenes			varchar;
     v_tipo_cc			varchar;
@@ -47,7 +46,7 @@ DECLARE
     v_fecha_anterior	date;
     v_filtro_aux        varchar;
     v_aux     		    varchar;
-    valor_aux   		numeric;
+	valor_aux   		numeric;
     v_auxiliar 		    varchar;
     v_auxiliar_b	    varchar;
     v_auxiliar_c	    integer;
@@ -60,7 +59,7 @@ DECLARE
     v_fecha_desde    	date;
     v_fecha_d    		varchar;
     v_fecha_h    		varchar;
-    v_int     			varchar;
+	v_int     			varchar;
     v_pa     			integer;
     v_where             varchar;
     v_where2            varchar;
@@ -68,7 +67,7 @@ DECLARE
     v_where4            varchar;
     v_count			    integer;
     v_ini			    integer;
-    v_ini_a			    VARCHAR[];
+     v_ini_a			    VARCHAR[];
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_int_transaccion_controlling_sel';
@@ -256,7 +255,6 @@ BEGIN
                               and ';
 
                 v_consulta:=v_consulta|| v_parametros.filtro;
-                --raise exception '%,%',v_parametros.id_gestion,v_parametros.filtro;
 
                 v_consulta_b:= 'with da as(
                               SELECT
@@ -285,12 +283,10 @@ BEGIN
                 v_consulta_b='';
                 v_ini=1;
                 WHILE v_ini <= v_count LOOP
-                	v_consulta_b:=v_consulta_b ||'WHEN nro_tramite like ''%'|| REPLACE(rtrim(v_con[v_ini]),' ','-') ||'%''THEN '''|| rtrim(v_con[v_ini]) ||'''::varchar ';
+                	--#99
+                	v_consulta_b:=v_consulta_b ||'WHEN nro_tramite like ''%'|| REPLACE(rtrim(v_con[v_ini]),' ','-') ||'%''THEN '''|| REPLACE(rtrim(v_con[v_ini]),' ','-')  ||'''::varchar ';
                 	v_ini=v_ini+1;
                 END LOOP;
-
---                raise exception '%,%',v_parametros.desde,v_parametros.hasta;
-
                 v_consulta:=v_consulta||'
                 		)
                         SELECT
@@ -300,9 +296,14 @@ BEGIN
                         '''||to_char(v_parametros.desde, 'DD/MM/YYYY')||'''::date as desde,
                         '''||to_char(v_parametros.hasta, 'DD/MM/YYYY')||'''::date as hasta,
                         id_tipo_cc,
-                       -- id_subsistema::integer,
+                        -- id_subsistema::integer,
                         --ROW_NUMBER () OVER (ORDER BY id_subsistema)::integer as id,
-                        (sum(COALESCE(ejec,0))*100)/ '||v_parametros.ejecutado||' as ejecutado,
+                        --(sum(COALESCE(ejec,0))*100)/ '||v_parametros.ejecutado||' as ejecutado,
+                        --#99
+                        CASE
+                        WHEN sum(ejec) = 0 THEN 0
+                        WHEN sum(ejec) != 0 THEN (sum(COALESCE(ejec,0))*100)/ '||v_parametros.ejecutado||'
+                        END AS ejecutado,
 
                         sum(COALESCE(importe_debe_mb,0))::numeric as importe_debe_mb,
                         sum(COALESCE(importe_haber_mb,0))::numeric as importe_haber_mb,
@@ -472,7 +473,6 @@ BEGIN
                             0::integer as id_auxiliar,
                             null::varchar as estado_reg,
                             vpe.id_tipo_cc as id_tipo_cc,
-
                             0::numeric as importe_debe_mb,
                             0::numeric as importe_haber_mb,
                             0::numeric as importe_debe_mt,
@@ -826,7 +826,8 @@ BEGIN
                               and '||v_filtro_tipo_cc||'
                               and ';
 			v_consulta:=v_consulta||v_parametros.filtro;
-            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion;
+            --v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion;
+            v_consulta:=v_consulta||' order by 3 ' || v_parametros.dir_ordenacion;
             v_consulta:=v_consulta|| ' ),
                                       xxx as
                                       (
@@ -889,7 +890,7 @@ BEGIN
                                       offset '||v_parametros.puntero;
             --
             raise notice '%',v_consulta;
-            --            raise exception '%',v_consulta;
+            --raise exception '%',v_consulta;
 			return v_consulta;
 		end;
 
@@ -1447,25 +1448,23 @@ BEGIN
                 end if;
 
                 if v_parametros.desc_centro_costo is not null then
-                    v_where2 = 't.desc_centro_costo like ''%'||v_parametros.desc_centro_costo||'%'' ';
+                    v_where2 = 'cc.codigo_cc like ''%'||v_parametros.desc_centro_costo||'%'' ';
                 else
                     v_where2 = '0=0 ';
                 end if;
-
+                --#99
                 if v_parametros.desc_partida is not null then
-
-                    v_where3 = 't.desc_partida like ''%'||v_parametros.desc_partida||'%'' ';
+                    v_where3 = '(par.codigo like ''%'||v_parametros.desc_partida||'%'' or  par.nombre_partida like ''%'||v_parametros.desc_partida||'%'')';
                 else
                     v_where3 = '0=0 ';
                 end if;
-                --raise exception '--%',v_parametros.tramite;
-                /*
+
                 if v_parametros.tramite is null or  v_parametros.tramite = '' then
                     v_where4 = '0=0 ';
                 else
                     v_where4 = 't.nro_tramite like ''%'||v_parametros.tramite||'%'' ';
                 end if;
-                */
+                --#99
                 /*
                  if(coalesce(v_parametros.node,'id') = 'id') then
                    v_where = 't.nro_tramite_fk is null ';
@@ -1510,7 +1509,7 @@ BEGIN
                                       inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
                                       inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta
                                       inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
-                                      left join pre.tpartida par on par.id_partida = transa.id_partida and par.sw_movimiento=''presupuestaria''--#94
+                                      /*left*/ join pre.tpartida par on par.id_partida = transa.id_partida and par.sw_movimiento=''presupuestaria''--#94  --#99
                                       left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
                                       left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                                       left join segu.tsubsistema sub on sub.id_subsistema=icbte.id_subsistema
@@ -1519,6 +1518,8 @@ BEGIN
                                       and '||v_filtro_cuentas||'
                                       and '||v_filtro_ordenes||'
                                       and '||v_filtro_tipo_cc||'
+                                      and '||v_where2||'
+                                      and '||v_where3||'
                                       and ';
               v_consulta:=v_consulta|| v_parametros.filtro;
               v_consulta:=v_consulta|| 'order by id_int_transaccion ASC,desc_cuenta ASC)
@@ -1528,6 +1529,8 @@ BEGIN
                                       0::integer as id_int_comprobante,
                                       nro_tramite::varchar as nro_tramite,
                                       null::varchar as nro_tramite_fk,
+                                      0::integer as id_proceso_wf,
+									  0::integer as id_estado_wf,
                                       data.desc_centro_costo,
                                       data.desc_partida,
                                       null::varchar as desc_cuenta,
@@ -1548,6 +1551,8 @@ BEGIN
                                        --null::varchar as nro_tramite,
                                        icbte.nro_tramite::varchar as nro_tramite,
                                        icbte.nro_tramite::varchar as nro_tramite_fk,
+                                       icbte.id_proceso_wf,
+									   icbte.id_estado_wf,
                                        cc.codigo_cc::varchar as desc_centro_costo,
                                        CASE par.sw_movimiento
                                            WHEN ''flujo'' THEN
@@ -1573,15 +1578,16 @@ BEGIN
                                        inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
                                        inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta
                                        inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
-                                       left join pre.tpartida par on par.id_partida = transa.id_partida and par.sw_movimiento=''presupuestaria'' --#94
+                                       /*left*/ join pre.tpartida par on par.id_partida = transa.id_partida and par.sw_movimiento=''presupuestaria'' --#94 --#99
                                        left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
                                        left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
-                                       left join segu.tsubsistema sub on sub.id_subsistema=icbte.id_subsistema
                                        where icbte.estado_reg = ''validado''
                                        AND icbte.nro_tramite ilike ''%'||v_parametros.tipo||'%''
               						   and '||v_filtro_cuentas||'
                                        and '||v_filtro_ordenes||'
                                        and '||v_filtro_tipo_cc||'
+                                       and '||v_where2||'		  	--#99
+                                       and '||v_where3||'      		--#99
                                        and ';
               v_consulta:=v_consulta|| v_parametros.filtro;
               v_consulta:=v_consulta|| ')
@@ -1591,6 +1597,10 @@ BEGIN
                                       t.id_int_comprobante,
                                       t.nro_tramite,
                                       t.nro_tramite_fk,
+
+                                      t.id_proceso_wf,
+									  t.id_estado_wf,
+
                                       CASE t.tipo_nodo
                                           WHEN ''raiz'' THEN
                                       	  		''-''::varchar
@@ -1626,12 +1636,14 @@ BEGIN
 
                                       FROM tabla t
                                       where '||v_where||'
-                                      and '||v_where2||'
-                                      and '||v_where3||'
+                                      and '||v_where4||'    --#99
+                                      --and '||v_where3||'
 
                                       group BY
                                       t.nro_tramite,
                                       t.nro_tramite_fk,
+                                      t.id_proceso_wf,
+                                      t.id_estado_wf,
                                       t.id_int_comprobante,
                                       t.id_int_transaccion,
                                       desc_cuenta,
@@ -1643,7 +1655,7 @@ BEGIN
 			--Definicion de la respuesta
             end if;
             RAISE notice '%',v_consulta;
-          	-- RAISE exception '%',v_consulta;
+          	--RAISE exception '%',v_consulta;
 			return v_consulta;
 		end;
 
