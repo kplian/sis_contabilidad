@@ -16,12 +16,13 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #65        	11/07/2019       	EGS             	Se agrega cmp internacional
 #64  ETR    15/07/2019          MMV                 Incluir importe formulado reporte proyectos
 #69  ETR    01/08/2019          SAZ                 Mejoras al reporte Comprobante transacciones
-#75 		28/11/2019		  Manuel Guerra	  controlling
-
-#91         15/01/2020  ENDETR  JUAN                Libro mayor añadir columna beneficiario
-#83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
-#93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
+#75 		28/11/2019		    Manuel Guerra	    controlling
+#91         15/01/2020          JUAN                Libro mayor añadir columna beneficiario
+#83 		03/01/2020		    Miguel Mamani	    Reporte Auxiliares aumentar columna beneficiario
+#93 		16/01/2020		    Manuel Guerra	  	modificacion en interfaz, ocultar columnas
+#95         23/01/2020          Rensi Arteaga       Incluir nro de tramite auxiliar
 #99 		30/1/2020		  Manuel Guerra	    agregar columna de estado_wf y proceso_wf
+
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -114,12 +115,8 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('desc_suborden','varchar');
 		$this->captura('codigo_ot','varchar');
 		$this->captura('codigo_categoria','varchar');
-		
-		
-		
-		
-		
-		
+		$this->captura('nro_tramite_auxiliar','varchar'); //#95
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -191,7 +188,6 @@ class MODIntTransaccion extends MODbase{
 		$this->setParametro('debe','debe','varchar');
 		$this->setParametro('haber','haber','varchar');
 		$this->setParametro('glosa','glosa','varchar');		
-		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -237,8 +233,6 @@ class MODIntTransaccion extends MODbase{
         $this->setParametro('tipo_cambio_2','tipo_cambio_2','numeric');
 		$this->setParametro('tipo_cambio_3','tipo_cambio_3','numeric');
 		$this->setParametro('id_suborden','id_suborden','int4');
-		
-		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -415,8 +409,6 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('codigo_ot','varchar');
 		$this->captura('desc_orden','varchar');
 		
-		 
-		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -494,9 +486,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('codigo_cuenta','varchar');
 		$this->captura('tipo_cuenta','varchar');
 		$this->captura('descripcion_cuenta','varchar');
-		
-		
-		
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -871,18 +861,12 @@ class MODIntTransaccion extends MODbase{
         $this->captura('persona_create','text');
         $this->captura('persona_mod','text');
         $this->captura('nro_tramite_aux','varchar');
-
-
 		//$this->captura('beneficiario','varchar');
-
-		
 		/*
 		$this->captura('fecha','timestamp');
 		$this->captura('nro_cbte','varchar');
 		$this->captura('nro_tramite','varchar');
 		$this->captura('glosa1','varchar');*/
-
-		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -970,7 +954,6 @@ class MODIntTransaccion extends MODbase{
 
         $this->armarConsulta();
         $this->ejecutarConsulta();
-        //var_dump($this->respuesta);exit;
         return $this->respuesta;
     }
     /***************#92-FIN-MMV**************/
@@ -1002,8 +985,7 @@ class MODIntTransaccion extends MODbase{
         $this->captura('codigo','varchar');
         $this->captura('importe_formulado','numeric'); //#64
         $this->armarConsulta();
-        /*echo $this->getConsulta();
-        exit;*/
+
         $this->ejecutarConsulta();
         return $this->respuesta;
     }

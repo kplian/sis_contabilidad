@@ -5254,3 +5254,34 @@ IS 'si o no, permite filtar el los comprobnates relacion con la misma moneda';
 ALTER TABLE conta.tresultado_det_plantilla --#82
   ADD COLUMN observacion VARCHAR; --#82
 /***********************************F-SCP-JUAN-CONTA-01-03/01/2020****************************************/
+
+
+
+
+/***********************************I-SCP-RAC-CONTA-01-23/01/2020****************************************/
+
+ALTER TABLE conta.tint_transaccion
+  ADD COLUMN nro_tramite_auxiliar VARCHAR(70);
+
+COMMENT ON COLUMN conta.tint_transaccion.nro_tramite_auxiliar
+IS 'Permite identificar nro de tramites dodne seorigina por ejemplo en un cierre de caja podemos rendir varios viaticos , aca colocamos el nro de tramite de ese viatico';
+
+
+/***********************************F-SCP-RAC-CONTA-01-23/01/2020****************************************/
+
+
+
+/***********************************I-SCP-RAC-CONTA-96-23/01/2020****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN campo_nro_tramite_auxiliar VARCHAR(100);
+
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_nro_tramite_auxiliar
+IS 'define desde donde recuperamos el campo nro_tramite_auxiliar';
+
+/***********************************F-SCP-RAC-CONTA-96-23/01/2020****************************************/
+
+
+

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -28,6 +30,7 @@ $body$
   #91        15/01/2020       JUAN            Libro mayor añadir columna beneficiario
   											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de  
   #83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
+  #95        23/01/2020       Rensi Arteaga   Incluir nro de tramite auxiliar
 ***************************************************************************/
 
 DECLARE
@@ -141,7 +144,8 @@ BEGIN
                             suo.id_suborden,
                             (''(''||suo.codigo||'') ''||suo.nombre)::varchar as desc_suborden,
                             ot.codigo as codigo_ot,
-                            cp.codigo_categoria::varchar
+                            cp.codigo_categoria::varchar,
+                            transa.nro_tramite_auxiliar    --#95
                         from conta.tint_transaccion transa
 						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
@@ -2742,6 +2746,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION conta.ft_int_transaccion_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;
