@@ -1,6 +1,8 @@
 <?php
 /*
 #75 		28/11/2019		  Manuel Guerra	  controlling
+#93         16/1/2020         manuel guerra   modificacion en interfaz, ocultar columnas
+#99 		30/1/2020		  Manuel Guerra	  ocultar columnas
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -26,7 +28,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         fieldLabel: 'Tipo',
                         allowBlank: true,
                         gwidth: 100,
-                        renderer: function(value, metaData, record) {                            
+                        renderer: function(value, metaData, record) {
                             return String.format('{0}', record.data['tipo'], value);
                         }
                     },
@@ -38,51 +40,49 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 //
                 {
-		   			config:{
-		       		    name:'monto_mb',
-		       		    inputType:'hidden',	
-		       		    fieldLabel: '% Ejecutado',
-                        allowBlank: true,
+                    config:{
+                        name:'monto_mb',
+                        inputType:'hidden',
+                        fieldLabel: '% Ejecutado',
                         width: '100%',
                         gwidth: 110,
                         galign: 'right',
-                        maxLength: 100,	
+                        maxLength: 100,
                         decimalPrecision: 2,
                         renderer:function (value,p,record){
-                        	return String.format('{0}', '<FONT COLOR="black"><b>'+Ext.util.Format.number(record.data['monto_mb'],'0,000.00')+'</b></FONT>');                       	                        	                          
-                        }   		     							   		
-		       	    },
-		   			type:'NumberField',
-		   			id_grupo:0,		   				   		  
-		   			grid:true
-			   	},  
+                            return String.format('{0}', '<FONT COLOR="black"><b>'+Ext.util.Format.number(record.data['monto_mb'],'0,000.00')+'</b></FONT>');
+                        }
+                    },
+                    type:'NumberField',
+                    grid:false
+                },
                 {
-		   			config:{
-		       		    name:'ejecutado',	
-		       		    fieldLabel: '% Ejecucion/ejecutado',
+                    config:{
+                        name:'ejecutado',
+                        fieldLabel: '% Ejecucion/ejecutado',
                         allowBlank: true,
                         width: '100%',
                         gwidth: 110,
                         galign: 'right',
-                        maxLength: 100,	
+                        maxLength: 100,
                         decimalPrecision: 2,
                         renderer:function (value,p,record){
-                        	if (record.data['ejecutado']<0.75) {	
-                        		return String.format('{0}', '<FONT COLOR="red"><b>'+Ext.util.Format.number(record.data['ejecutado'],'0,000.00')+'</b></FONT>');
-                        	}else{
-                        		if(record.data['ejecutado']>0.75 && record.data['ejecutado']<0.90) {
-                        			return String.format('{0}', '<FONT COLOR="blue"><b>'+Ext.util.Format.number(record.data['ejecutado'],'0,000.00')+'</b></FONT>');
-                        		}else{
-                        			return String.format('{0}', '<FONT COLOR="green"><b>'+Ext.util.Format.number(record.data['ejecutado'],'0,000.00')+'</b></FONT>');
-                        		}
-                        	}                        	                        	                          
-                        }       		     							   		
-		       	    },
-		   			type:'NumberField',
-		   			id_grupo:1,		   				   		  
-		   			grid:true
-			   	},  
-			   	{
+                            if (record.data['ejecutado']<0.75) {
+                                return String.format('{0}', '<FONT COLOR="red"><b>'+Ext.util.Format.number(record.data['ejecutado'],'0,000.00')+'</b></FONT>');
+                            }else{
+                                if(record.data['ejecutado']>0.75 && record.data['ejecutado']<0.90) {
+                                    return String.format('{0}', '<FONT COLOR="blue"><b>'+Ext.util.Format.number(record.data['ejecutado'],'0,000.00')+'</b></FONT>');
+                                }else{
+                                    return String.format('{0}', '<FONT COLOR="green"><b>'+Ext.util.Format.number(record.data['ejecutado'],'0,000.00')+'</b></FONT>');
+                                }
+                            }
+                        }
+                    },
+                    type:'NumberField',
+                    id_grupo:1,
+                    grid:true
+                },//#93
+                {
                     config: {
                         name: 'ejec',
                         fieldLabel: 'Ejecutado(Presupuestario)',
@@ -97,7 +97,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
                             }
                             else{
-                               return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+                                return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
                             }
                         }
                     },
@@ -107,6 +107,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     grid: true,
                     form: true
                 },
+                //#99
                 {
                     config: {
                         name: 'formu',
@@ -122,7 +123,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
                             }
                             else{
-                               return  String.format('<b size=2 >{0}<b>', Ext.util.Format.number(value,'0,000.00'));
+                                return  String.format('<b size=2 >{0}<b>', Ext.util.Format.number(value,'0,000.00'));
                             }
                         }
                     },
@@ -132,24 +133,6 @@ header("content-type: text/javascript; charset=UTF-8");
                     grid: false,
                     form: true
                 },
-                /*{
-		   			config:{
-		       		    name:'ejecutado',	
-		       		    fieldLabel: '% Ejecutado/ejecutado',
-                        allowBlank: true,
-                        width: '100%',
-                        gwidth: 110,
-                        galign: 'right',
-                        maxLength: 100,	
-                        decimalPrecision: 2,
-                        renderer:function (value,p,record){
-                        	return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));                            
-                        }       		     							   		
-		       	    },
-		   			type:'NumberField',
-		   			id_grupo:1,		   				   		  
-		   			grid:true
-			   	},*/
                 {
                     config: {
                         name: 'compro',
@@ -189,7 +172,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
                             }
                             else{
-                               return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+                                return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
                             }
                         }
                     },
@@ -222,7 +205,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_grupo: 1,
                     grid: true,
                     form: true
-                },{
+                },
+                //#99
+                {
                     config: {
                         name: 'importe_debe_mt',
                         fieldLabel: 'Debe MT(Contable)',
@@ -236,16 +221,18 @@ header("content-type: text/javascript; charset=UTF-8");
                                 return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
                             }
                             else{
-                               return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+                                return  String.format('<b><font size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
                             }
                         }
                     },
                     type: 'NumberField',
                     filters: {pfiltro: 'importe_debe_mt',type: 'numeric'},
                     id_grupo: 1,
-                    grid: true,
+                    grid: false,
                     form: true
-                },{
+                },
+                //#99
+                {
                     config: {
                         name: 'importe_haber_mt',
                         fieldLabel: 'Haber MT(Contable)',
@@ -265,7 +252,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     type: 'NumberField',
                     filters: {pfiltro: 'importe_haber_mt',type: 'numeric'},
                     id_grupo: 1,
-                    grid: true,
+                    grid: false,
                     form: true
                 },{
                     config:{
@@ -282,7 +269,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     type:'DateField',
                     id_grupo:1,
                     grid:false,
-	            },{
+                },{
                     config:{
                         name: 'hasta',
                         fieldLabel: 'hasta',
@@ -298,13 +285,13 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_grupo:1,
                     grid:false,
                 },{
-		   			config:{
-		       		    name:'id_tipo_cc',		   							   			
-		       	    },
-		   			type:'Field',
-		   			id_grupo:1,
-		   			grid:false
-			   	},{
+                    config:{
+                        name:'id_tipo_cc',
+                    },
+                    type:'Field',
+                    id_grupo:1,
+                    grid:false
+                },{
                     config:{
                         name:'numero',
                         fieldLabel: 'ppp',
@@ -340,17 +327,17 @@ header("content-type: text/javascript; charset=UTF-8");
             { name:'importe_debe_mb', type: 'numeric'},
             { name:'importe_haber_mt', type: 'numeric'},
             { name:'importe_debe_mt', type: 'numeric'},
-            
+
             { name:'desde', type:'date'},
             { name:'hasta', type:'date'},
             { name:'id_tipo_cc', type: 'integer'},
-          //  { name:'id_subsistema', type: 'integer'},
+            //  { name:'id_subsistema', type: 'integer'},
             { name:'id', type: 'integer'},
             { name:'monto_mb', type: 'numeric'},
-            
+
             { name:'ejecutado', type: 'numeric'},
             { name:'formulado', type: 'numeric'},
-            
+
             { name:'compro', type: 'numeric'},
             { name:'ejec', type: 'numeric'},
             { name:'formu', type: 'numeric'},
@@ -366,7 +353,7 @@ header("content-type: text/javascript; charset=UTF-8");
         bsave: false,
         bedit: false,
         bnew: false,
-        
+
         onReloadPage:function(param){
             //Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
             this.initFiltro(param);
@@ -374,7 +361,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         initFiltro: function(param){
             console.log('param',param);
-           // Phx.CP.loadingShow();
+            // Phx.CP.loadingShow();
             this.store.baseParams={
                 id_tipo_cc:param.id_tipo_cc,
                 numero:param.id_tipo_cc,
@@ -385,17 +372,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_periodo: param.id_periodo,
 
             };
-           // this.store.baseParams=param;
+            // this.store.baseParams=param;
             this.load({ params: { start:0, limit: this.tam_pag } });
         },
 
-		south:{
+        south:{
             url: '../../../sis_contabilidad/vista/int_transaccion/IntTransaccionCtrl.php',
             height:'55%',
             cls: 'IntTransaccionCtrl',
-	        title:'Transacciones'
+            title:'Transacciones'
         },
 
     })
 </script>
-

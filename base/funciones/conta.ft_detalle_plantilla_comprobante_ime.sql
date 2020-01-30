@@ -22,6 +22,7 @@ $body$
  #21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
  #42	EndeEtr	    02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
  #66    ETR         24/07/2019          RAC                     Adicionar campo id_taza_impuesto
+ #96    ETR         27/01/2020          RAC                     En la interface de configuracion de plantilla de comprobantes incluir option la columnas tipo_nro_tramite_auxiliar para transacciones
 ***************************************************************************/
 
 DECLARE
@@ -114,7 +115,8 @@ BEGIN
                 campo_codigo_aplicacion_rc,
                 incluir_desc_doc, --#21
                 procesar_prioridad_principal,  --#42
-                campo_id_taza_impuesto  --#66
+                campo_id_taza_impuesto,  --#66
+                campo_nro_tramite_auxiliar --#96
           	) values(
                 v_parametros.id_plantilla_comprobante,
                 v_parametros.debe_haber,
@@ -165,7 +167,8 @@ BEGIN
                 v_parametros.campo_codigo_aplicacion_rc,
                 v_parametros.incluir_desc_doc, --#21
                 v_parametros.procesar_prioridad_principal, --#42
-                v_parametros.campo_id_taza_impuesto --#66
+                v_parametros.campo_id_taza_impuesto, --#66
+                v_parametros.campo_nro_tramite_auxiliar --#96
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 
 			--Definicion de la respuesta
@@ -250,7 +253,8 @@ BEGIN
                 campo_codigo_aplicacion_rc = v_parametros.campo_codigo_aplicacion_rc,
                 incluir_desc_doc = v_parametros.incluir_desc_doc, --#21
                 procesar_prioridad_principal = v_parametros.procesar_prioridad_principal, --#42
-                campo_id_taza_impuesto = v_parametros.campo_id_taza_impuesto --#66
+                campo_id_taza_impuesto = v_parametros.campo_id_taza_impuesto, --#66
+                campo_nro_tramite_auxiliar = v_parametros.campo_nro_tramite_auxiliar --#96
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
                
 			--Definicion de la respuesta

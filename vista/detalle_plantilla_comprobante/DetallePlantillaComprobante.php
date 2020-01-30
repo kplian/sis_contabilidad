@@ -9,6 +9,7 @@ ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
 #42	EndeEtr			02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
 #66 ETR             24/07/2019          RAC                     se adiciona el campo_id_taza_impuesto para permitir documentos con taza varaible
+#96    ETR          27/01/2020          RAC                     En la interface de configuracion de plantilla de comprobantes incluir option la columnas tipo_nro_tramite_auxiliar para transacciones
  */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -756,6 +757,23 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+        //add field   campo_nro_tramite_auxiliar
+        {
+			config:{
+				name: 'campo_nro_tramite_auxiliar',
+				fieldLabel: 'Campo Nro Tramite Auxiliar',
+				qtip:'ayuda a rastrear tramites agrupados como la rendicion de caja que peude agrupar diferentes viaticos',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cmpbdet.campo_nro_tramite_auxiliar',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
         {
 			config:{
 				name: 'campo_id_cuenta_bancaria_mov',
@@ -1008,7 +1026,8 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
         'campo_codigo_aplicacion_rc',
         'incluir_desc_doc',//#21
    	    {name:'procesar_prioridad_principal', type: 'string'},//#42
-   	    'campo_id_taza_impuesto' //#66
+   	    'campo_id_taza_impuesto' ,//#66
+   	    'campo_nro_tramite_auxiliar'
 	],
 	sortInfo:{
 		field: 'id_detalle_plantilla_comprobante',
