@@ -268,6 +268,22 @@ BEGIN
                            raise exception 'revise su configuración, no tenemos una cuenta con el código = %',v_registros.codigo_cuenta;
                         END IF;
                         
+                        v_monto_mayor = conta.f_mayor_cuenta_tipo_cc(
+                                                        v_reg_cuenta.id_cuenta,
+                        								p_desde, 
+                                                        p_hasta, 
+                                                        p_id_deptos, 
+                                                        v_registros.incluir_cierre, 
+                                                        v_registros.incluir_apertura, 
+                                                        v_registros.incluir_aitb,
+                                                        v_registros.signo_balance,
+                                                        v_registros.tipo_saldo,
+                                                        NULL,
+                                                        p_int_comprobante,
+                                                        NULL,
+                                                        v_registros.id_tipo_cc   --NUEVO aprametro de filtro
+                                                        );
+                        
                         v_monto   = v_monto_mayor[1];--monto en monebda base
                         v_monto_ma  = v_monto_mayor[5]; --monto en moneda de actulizacion, posicion 5
                         
