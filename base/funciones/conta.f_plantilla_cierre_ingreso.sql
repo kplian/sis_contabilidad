@@ -277,8 +277,6 @@ select
                                     v_sw_minimo = true;
                           END IF;
 
-                ELSE
-                   raise exception 'Algo salio mal con la cuenta ';
                 END IF;
 
           END LOOP;
@@ -289,7 +287,7 @@ select
        raise exception 'No se actualizo ninguna cuenta';
     END IF;
 
-    SELECT  ps_id_partida
+    SELECT    ps_id_partida
               into
               v_partida_haber
               FROM conta.f_get_config_relacion_contable( 'CIER-HABER',
@@ -301,7 +299,7 @@ select
                                    raise exception 'No se encontro relacion contable CIER-HABER';
                                 END IF;
 
-              select c.id_cuenta
+             select c.id_cuenta
               into
               v_id_cuenta
               from conta.tcuenta c

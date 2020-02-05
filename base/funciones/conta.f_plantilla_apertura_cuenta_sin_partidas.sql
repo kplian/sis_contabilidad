@@ -61,6 +61,8 @@ DECLARE
 BEGIN
 
        v_nombre_funcion = 'conta.f_plantilla_apertura_cuenta_sin_partidas';
+       v_sw_minimo = true;
+       v_error = false;
        v_tmp = '';
 
  	   select  *
@@ -114,7 +116,8 @@ BEGIN
                                               inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
                                               inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
                                               where cb.estado_reg = 'validado' and tc.tipo_cuenta in ('activo','patrimonio','pasivo')
-                                              and pe.id_gestion = v_id_gestion_previa and cb.cbte_cierre <> 'balance'
+                                              and pe.id_gestion = v_id_gestion_previa
+                                              and cb.cbte_cierre <> 'balance'
                                               )select t.id_centro_costo,
                                                       t.id_cuenta,
                                                       t.nro_cuenta,
@@ -152,9 +155,10 @@ BEGIN
                    -- si moneda base y doalres es igual a cero, ignora si tiene saldo en UFV
                    IF   v_record_mov.deudor = v_record_mov.acreedor   AND  v_record_mov.importe_debe_mt =  v_record_mov.importe_haber_mt  THEN
                           
-                            v_sw_actualiza = false;  --SALDO ES IGUAL A CERO
-
+                        v_sw_actualiza = false;  --SALDO ES IGUAL A CERO
+                        --raise exception 'entra a cero';
                    ELSE
+                         v_sw_actualiza = true;
                          
                         IF v_record_mov.deudor = v_record_mov.acreedor THEN
                      
@@ -163,7 +167,6 @@ BEGIN
                              IF(v_record_mov.importe_debe_mt < v_record_mov.importe_haber_mt  )    THEN
 
                                               v_sw_saldo_acredor = false;
-                                              v_sw_actualiza = true;
                                               v_saldo_mb = 0;
                                               v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
                                               v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
@@ -171,7 +174,6 @@ BEGIN
                              ELSE
 
                                              v_sw_saldo_acredor = true;
-                                             v_sw_actualiza = true;
                                              v_saldo_mb = 0;
                                              v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
                                              v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
@@ -184,7 +186,6 @@ BEGIN
                                IF(v_record_mov.deudor < v_record_mov.acreedor  )    THEN
 
                                               v_sw_saldo_acredor = false;
-                                              v_sw_actualiza = true;
                                               v_saldo_mb = v_record_mov.acreedor - v_record_mov.deudor;
                                               v_saldo_ma = v_record_mov.importe_haber_ma - v_record_mov.importe_debe_ma;
                                               v_saldo_mt = v_record_mov.importe_haber_mt - v_record_mov.importe_debe_mt;
@@ -192,7 +193,6 @@ BEGIN
                                ELSE
 
                                              v_sw_saldo_acredor = true;
-                                             v_sw_actualiza = true;
                                              v_saldo_mb = v_record_mov.deudor - v_record_mov.acreedor;
                                              v_saldo_ma = v_record_mov.importe_debe_ma - v_record_mov.importe_haber_ma;
                                              v_saldo_mt = v_record_mov.importe_debe_mt - v_record_mov.importe_haber_mt;
@@ -215,78 +215,68 @@ BEGIN
                             v_importe_debe_mt = 0;
                             v_importe_haber_mt = 0;
 
-                          IF v_sw_saldo_acredor THEN
+                            IF v_sw_saldo_acredor THEN
 
-                                    v_importe_haber = 0;
-                                    v_importe_debe = v_saldo_mb;
+                                      v_importe_haber = 0;
+                                      v_importe_debe = v_saldo_mb;
 
-                                    v_importe_haber_ma  = 0;
-                                    v_importe_debe_ma	= v_saldo_ma;
+                                      v_importe_haber_ma  = 0;
+                                      v_importe_debe_ma	= v_saldo_ma;
 
-                                    v_importe_haber_mt 	= 0;
-                                    v_importe_debe_mt 	= v_saldo_mt;
-                          ELSE
-
-
-                                    v_importe_haber = v_saldo_mb;
-                                    v_importe_debe 	= 0;
-
-                                    v_importe_haber_ma  = v_saldo_ma;
-                                    v_importe_debe_ma	= 0;
-
-                                    v_importe_haber_mt 	= v_saldo_mt;
-                                    v_importe_debe_mt 	= 0;
+                                      v_importe_haber_mt 	= 0;
+                                      v_importe_debe_mt 	= v_saldo_mt;
+                            ELSE
 
 
-                         END IF;
+                                      v_importe_haber = v_saldo_mb;
+                                      v_importe_debe 	= 0;
+
+                                      v_importe_haber_ma  = v_saldo_ma;
+                                      v_importe_debe_ma	= 0;
+
+                                      v_importe_haber_mt 	= v_saldo_mt;
+                                      v_importe_debe_mt 	= 0;
+
+
+                           END IF;
                          
-                         --------------------------------------------------
-                         --  recupera cuentas para la siguiente gestion
-                         -------------------------------------------------
+                           --------------------------------------------------
+                           --  recupera cuentas para la siguiente gestion
+                           -------------------------------------------------
 
-                         IF(v_record_mov.id_cuenta <> 0)THEN
-                               IF(NOT EXISTS (select 1
-                                              from conta.tcuenta_ids id
-                                              where id.id_cuenta_uno = v_record_mov.id_cuenta))THEN
-
-
-                                       v_error = true;
-                                       v_tmp =  v_tmp||format('<BR> NO HAY UN REPLICACION DE LA CUENTA %s',(select cu.nro_cuenta ||' - '||cu.nombre_cuenta
-                                                                                                    from conta.tcuenta cu
-                                                                                                     where cu.id_cuenta = v_record_mov.id_cuenta)::varchar);
-                               ELSE
-
-                                      select id.id_cuenta_dos
-                                              into
-                                              v_id_cuenta_sg
-                                      from conta.tcuenta_ids id
-                                      where id.id_cuenta_uno = v_record_mov.id_cuenta;
-                               END IF;
-                         END IF;
+                           IF(v_record_mov.id_cuenta <> 0)THEN
+                                
+                                v_id_cuenta_sg = NULL;
+                                 select id.id_cuenta_dos into  v_id_cuenta_sg
+                                from conta.tcuenta_ids id
+                                where id.id_cuenta_uno = v_record_mov.id_cuenta;
+                           
+                                 IF(v_id_cuenta_sg is null )THEN
+                                         v_error = true;
+                                         v_tmp =  v_tmp||format('<BR> NO HAY UN REPLICACION DE LA CUENTA %s',(select cu.nro_cuenta ||' - '||cu.nombre_cuenta
+                                                                                                      from conta.tcuenta cu
+                                                                                                       where cu.id_cuenta = v_record_mov.id_cuenta)::varchar);
+                                 END IF;
+                            END IF;
                         
                         -----------------------------------------------------------
                         --  recupera centro de costos para la siguiente gestion
                         -----------------------------------------------------------
                        
                         IF(v_record_mov.id_centro_costo <> 0)THEN
-                            IF(NOT EXISTS (select 1
-                                    from pre.tpresupuesto_ids ipe
-                                    where ipe.id_presupuesto_uno = v_record_mov.id_centro_costo))THEN
-
+                            v_id_centro_costo_sg = NULL;
+                            
+                            select ipe.id_presupuesto_dos into v_id_centro_costo_sg
+                            from pre.tpresupuesto_ids ipe
+                            where ipe.id_presupuesto_uno = v_record_mov.id_centro_costo;
+                            
+                            IF(v_id_centro_costo_sg is null )THEN
                                    v_error = true;
                                    v_tmp =  v_tmp||format( '<BR> NO HAY UN REPLICACION DEL CENTRO COSTO %s id (%s) saldos (BS %s, USD %s, UFV %s)',(select pres.descripcion
                                                                                                               from pre.tpresupuesto pres
                                                                                                               where pres.id_presupuesto = v_record_mov.id_centro_costo)::varchar,
                                                                                                               v_record_mov.id_centro_costo::varchar ,v_saldo_mb , v_saldo_mt, round(v_saldo_ma,2));
-                             ELSE
-
-                                    select ipe.id_presupuesto_dos
-                                    into
-                                            v_id_centro_costo_sg
-                                    from pre.tpresupuesto_ids ipe
-                                    where ipe.id_presupuesto_uno = v_record_mov.id_centro_costo;
-
-                             END IF;
+                            END IF;
                        END IF;
 
                     
@@ -308,7 +298,7 @@ BEGIN
                      IF not v_error THEN 
                          IF v_saldo_mb != 0  or  v_saldo_ma != 0 or v_saldo_mt != 0 THEN
 
-
+                                v_sw_minimo = false;
                                 insert into conta.tint_transaccion(
                                             id_partida,
                                             id_centro_costo,
@@ -377,8 +367,8 @@ BEGIN
        raise exception 'Para continuar solucione lo siguient:  %',v_tmp;  
     END IF;
 
-     IF not v_sw_minimo THEN
-       raise exception 'No se actualizo ninguna cuenta';
+     IF v_sw_minimo THEN
+       raise exception 'No se registro ninguna cuenta';
     END IF;
 
 

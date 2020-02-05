@@ -20,7 +20,8 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				    DESCRIPCION:
-  #4       20/12/2018    Miguel Mamani     Plantilla de Cierre de gasto
+  #4       20/12/2018    Miguel Mamani       Plantilla de Cierre de gasto
+ #100      04/02/2020		  RAC			 correccion de logica y se remieve cuenta quemada
 
 
 ***************************************************************************/
@@ -280,8 +281,6 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                                     v_sw_minimo = true;
                           END IF;
 
-                ELSE
-                   raise exception 'Algo salio mal con la cuenta ';
                 END IF;
 
           END LOOP;
@@ -302,7 +301,7 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                                    raise exception 'No se encontro relacion contable CIER-HABER';
                                 END IF;
 
-              select c.id_cuenta
+            select c.id_cuenta
               into
               v_id_cuenta
               from conta.tcuenta c
