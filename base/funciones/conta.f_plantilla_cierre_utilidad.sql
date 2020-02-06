@@ -11,67 +11,67 @@ CREATE OR REPLACE FUNCTION conta.f_plantilla_cierre_utilidad (
 RETURNS void AS
 $body$
 /**************************************************************************
- SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.f_plantilla_cierre_utilidad
+ SISTEMA:        Sistema de Contabilidad
+ FUNCION:         conta.f_plantilla_cierre_utilidad
  DESCRIPCION:   Funcion que devuelve conjuntos suma por centro de costos
- AUTOR: 		 (MMV)
- FECHA:	        19/12/2018
+ AUTOR:          (MMV)
+ FECHA:            19/12/2018
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
- ISSUE 		   FECHA   			 AUTOR				    DESCRIPCION:
+ ISSUE            FECHA                AUTOR                    DESCRIPCION:
   #4       20/12/2018    Miguel Mamani     Plantilla de utilidad de gestion
 
 
 ***************************************************************************/
 
 DECLARE
-  v_nombre_funcion   				text;
-  v_resp							varchar;
-  v_record_mov						record;
+  v_nombre_funcion                   text;
+  v_resp                            varchar;
+  v_record_mov                        record;
 
 
-  v_saldo_mb						numeric;
-  v_saldo_mt						numeric;
-  v_saldo_ma						numeric;
+  v_saldo_mb                        numeric;
+  v_saldo_mt                        numeric;
+  v_saldo_ma                        numeric;
 
-  v_importe_debe_ma					numeric;
-  v_importe_haber_ma				numeric;
-  v_importe_debe_mt					numeric;
-  v_importe_haber_mt				numeric;
-  v_importe_debe 					numeric;
-  v_importe_haber 					numeric;
-  v_sw_saldo_acredor   				boolean;
-  v_id_centro_costo_depto			integer;
-  v_sw_minimo						boolean;
-  v_reg_cbte  						record;
-  v_sw_actualiza					boolean;
+  v_importe_debe_ma                    numeric;
+  v_importe_haber_ma                numeric;
+  v_importe_debe_mt                    numeric;
+  v_importe_haber_mt                numeric;
+  v_importe_debe                     numeric;
+  v_importe_haber                     numeric;
+  v_sw_saldo_acredor                   boolean;
+  v_id_centro_costo_depto            integer;
+  v_sw_minimo                        boolean;
+  v_reg_cbte                          record;
+  v_sw_actualiza                    boolean;
 
-  v_id_partida 						integer;
-  v_partida_haber 					integer;
+  v_id_partida                         integer;
+  v_partida_haber                     integer;
 
-  v_aux_debe						numeric;
-  v_aux_heber						numeric;
-  v_id_cuenta						integer;
+  v_aux_debe                        numeric;
+  v_aux_heber                        numeric;
+  v_id_cuenta                        integer;
   
-  v_total_debe_aux		numeric;
-      v_total_haber_aux		numeric;
-      v_total_debe_mt_aux		numeric;
-      v_total_haber_mt_aux		numeric;
-      v_total_debe_ma_aux		numeric;
-      v_total_haber_ma_aux		numeric;
+  v_total_debe_aux        numeric;
+      v_total_haber_aux        numeric;
+      v_total_debe_mt_aux        numeric;
+      v_total_haber_mt_aux        numeric;
+      v_total_debe_ma_aux        numeric;
+      v_total_haber_ma_aux        numeric;
 
 BEGIN
 v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
 
     select  *
-    		into
+            into
             v_reg_cbte
     from conta.tint_comprobante
     where id_int_comprobante = p_id_int_comprobante;
 
 
- 	select
+     select
       ps_id_centro_costo
       into
        v_id_centro_costo_depto
@@ -91,7 +91,7 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
 
 
 
-       FOR v_record_mov in (with basica as (select 	t.id_cuenta,
+       FOR v_record_mov in (with basica as (select     t.id_cuenta,
                                                                 t.importe_debe_mb,
                                                                 t.importe_haber_mb,
                                                                 t.importe_debe_mt,
@@ -166,7 +166,7 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
 
                               v_importe_debe = 0;
                               v_importe_haber = 0;
-                              v_importe_debe_ma	= 0;
+                              v_importe_debe_ma    = 0;
                               v_importe_haber_ma = 0;
                               v_importe_debe_mt = 0;
                               v_importe_haber_mt = 0;
@@ -177,10 +177,10 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
                                       v_importe_debe = v_saldo_mb;
 
                                       v_importe_haber_ma  = 0;
-                                      v_importe_debe_ma	= v_saldo_ma;
+                                      v_importe_debe_ma    = v_saldo_ma;
 
-                                      v_importe_haber_mt 	= 0;
-                                      v_importe_debe_mt 	= v_saldo_mt;
+                                      v_importe_haber_mt     = 0;
+                                      v_importe_debe_mt     = v_saldo_mt;
 
 
 
@@ -196,13 +196,13 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
 
                               ELSE
                                       v_importe_haber = v_saldo_mb;
-                                      v_importe_debe 	= 0;
+                                      v_importe_debe     = 0;
 
                                       v_importe_haber_ma  = v_saldo_ma;
-                                      v_importe_debe_ma	= 0;
+                                      v_importe_debe_ma    = 0;
 
-                                      v_importe_haber_mt 	= v_saldo_mt;
-                                      v_importe_debe_mt 	= 0;
+                                      v_importe_haber_mt     = v_saldo_mt;
+                                      v_importe_debe_mt     = 0;
 
 
                                    select  ps_id_partida
@@ -291,6 +291,7 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
                                     v_id_cuenta
                                     from conta.tcuenta c
                                     where c.nro_cuenta = '3.1.3.01.001.001' and c.id_gestion = p_id_gestion_cbte;
+                                  
 
                                      insert into conta.tint_transaccion(
                                           id_partida,
@@ -375,12 +376,12 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_utilidad';
 
 EXCEPTION
 
-	WHEN OTHERS THEN
-		v_resp='';
-		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-		raise exception '%',v_resp;
+    WHEN OTHERS THEN
+        v_resp='';
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+        v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+        v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+        raise exception '%',v_resp;
 
 END;
 $body$
