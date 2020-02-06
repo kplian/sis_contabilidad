@@ -22,6 +22,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #93 		16/01/2020		    Manuel Guerra	  	modificacion en interfaz, ocultar columnas
 #95         23/01/2020          Rensi Arteaga       Incluir nro de tramite auxiliar
 #99 		30/1/2020		  Manuel Guerra	    agregar columna de estado_wf y proceso_wf
+#102        6/2/2020          Manuel Guerra     agregar campo nro_tramite_auxiliar, en vista del mayor
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -365,6 +366,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('tipo_cambio_3','numeric');
 		$this->captura('actualizacion','varchar');
 		$this->captura('codigo_cc','varchar');
+        $this->captura('nro_tramite_auxiliar','varchar');//#102
 		
 		$this->captura('saldo_mb','numeric');
 		$this->captura('saldo_mt','numeric');
