@@ -1720,4 +1720,16 @@ VALUES
   
   
   
+/***********************************I-DAT-RAC-CONTA-103-06/02/2020****************************************/
+  
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_cbte_apertura_cuentas_centro_reset', E'1.1.3.04.001.001,2.1.3.01.001.001', E'Nro de cuentas separadas por comas sin espacions. Estas cuentas en el bte de apertura sin partidas se llevan al centro de costo configurado en conta_cbte_apertura_centro_reset'),
+  (E'conta_cbte_apertura_centro_reset', E'00000', E'Codigo centro de costo. En cbte de apertura lleva las cuentas configuras en aconta_cbte_apertura_cuentas_centro_reset');
+  
+  
+  
+/***********************************F-DAT-RAC-CONTA-103-06/02/2020****************************************/
+  
+  
   

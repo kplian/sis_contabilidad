@@ -19,8 +19,9 @@ $body$
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
- ISSUE 		   FECHA   			 AUTOR				    DESCRIPCION:
- #100  ETR	  04/02/2020		  RAC				Creación , Refactorizacion de algoritmo de cierre y apertura contable para no incluir  partidas presupuestarias.
+   ISSUE 		   FECHA   			 AUTOR				    DESCRIPCION:
+   #100  ETR	  04/02/2020		  RAC				Creación , Refactorizacion de algoritmo de cierre y apertura contable para no incluir  partidas presupuestarias.
+   #103  ETR      06/02/2020          RAC               Hacer configurable que cuentas  se reducen al centro de costo administrativo en comprobante de apertura. Issue #103
 
 
 ***************************************************************************/
@@ -57,6 +58,11 @@ DECLARE
     v_id_partida_haber                  integer;
     v_error                             boolean;
     v_tmp                               varchar;
+    v_conta_cbte_apertura_cuentas_centro_reset   varchar;  --#103
+    v_conta_cbte_apertura_centro_reset           varchar;  --#103
+    va_id_cuenta_reset                           INTEGER[]; --#103
+    v_nro_cte_reset                              varchar[]; --#103
+    v_id_centro_costo_reset                      integer;   --#103
 
 BEGIN
 
@@ -64,12 +70,16 @@ BEGIN
        v_sw_minimo = true;
        v_error = false;
        v_tmp = '';
-
+       v_conta_cbte_apertura_cuentas_centro_reset = pxp.f_get_variable_global('conta_cbte_apertura_cuentas_centro_reset');
+       v_conta_cbte_apertura_centro_reset = pxp.f_get_variable_global('conta_cbte_apertura_centro_reset');
+       v_nro_cte_reset = string_to_array(v_conta_cbte_apertura_cuentas_centro_reset,',');
+       
  	   select  *
               into
               v_reg_cbte
       from conta.tint_comprobante
       where id_int_comprobante = p_id_int_comprobante;
+      
       
       -- recuperar gestion previa
       select 
@@ -80,9 +90,32 @@ BEGIN
       inner join  param.tgestion ges_prev on ges_prev.gestion = ges.gestion - 1
       where ges.id_gestion =  p_id_gestion_cbte;
       
+      --recuepra las cuentas a retearen la gestion anterior
+      
+      select 
+        pxp.aggarray(cue.id_cuenta)
+      into
+        va_id_cuenta_reset
+      from conta.tcuenta cue
+      where TRIM(cue.nro_cuenta) = ANY(v_nro_cte_reset)
+      and cue.id_gestion = v_id_gestion_previa;
+      
+      --recuepra el centro de csoto reset
+      select  
+        cc.id_centro_costo 
+      into 
+        v_id_centro_costo_reset
+      from param.vcentro_costo cc
+      where cc.id_gestion = v_id_gestion_previa
+           and trim(cc.codigo_tcc) = trim(v_conta_cbte_apertura_centro_reset);
+      
+      
       
       --recupera partidas de flujo
-      select  ps_id_partida  into  v_id_partida_debe
+      select  
+        ps_id_partida  
+      into  
+        v_id_partida_debe
       from conta.f_get_config_relacion_contable( 'APER-DEBE',
                                                   p_id_gestion_cbte,
                                                   null,  --campo_relacion_contable
@@ -98,7 +131,12 @@ BEGIN
                                       
 
       --Consulta para totalizar las cuentas 
-      FOR v_record_mov in (with basica as (select  t.id_centro_costo,
+      FOR v_record_mov in (with basica as (select   case
+                                                       when  t.id_cuenta = ANY(va_id_cuenta_reset) then
+                                                          v_id_centro_costo_reset 
+                                                        else
+                                                           t.id_centro_costo
+                                                        end as id_centro_costo,
                                                     t.id_cuenta,
                                                     cu.nro_cuenta,
                                                     COALESCE(t.id_auxiliar,0) as id_auxiliar,                                                    
@@ -364,7 +402,7 @@ BEGIN
     END LOOP;
     
     IF v_error THEN
-       raise exception 'Para continuar solucione lo siguient:  %',v_tmp;  
+       raise exception 'Para continuar solucione lo siguiente:  %',v_tmp;  
     END IF;
 
      IF v_sw_minimo THEN
