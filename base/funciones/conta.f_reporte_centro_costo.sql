@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_reporte_centro_costo (
   p_administrador integer,
   p_id_usuario integer,
@@ -10,16 +12,13 @@ $body$
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.f_reporte_centro_costo
  DESCRIPCION:   Funcion que devuelve conjuntos suma por centro de costos
- AUTOR: 		 (MMV)
- FECHA:	        19/12/2018
- COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
   #2        20/12/2018    Miguel Mamani     		Reporte Proyectos
   #10       02/01/2019    Miguel Mamani     		Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
   #64  ETR  15/07/2019          MMV                 Incluir importe formulado reporte proyectos
-
+  #104      7/2/2020	 Manuel Guerra				ordenacion por cod_partida en reporte de tcc
 ***************************************************************************/
 
 
@@ -183,6 +182,7 @@ BEGIN
                                                              p.codigo_tcc,
                                                              p.codigo)LOOP --#64
 
+
     		insert into tmp_prog ( id_tipo_cc,
                                    id_tipo_cc_fk,
                                    codigo_tcc,
@@ -281,7 +281,7 @@ BEGIN
                                     tm.nivel,
                                     tm.sw_tipo,
                                     tm.codigo
-                           order by  tm.codigo , tm.nivel )LOOP
+                           order by  tm.codigo , tm.nivel,tm.codigo_tcc )LOOP --#104
             	RETURN NEXT v_registros;
             END LOOP;
 
