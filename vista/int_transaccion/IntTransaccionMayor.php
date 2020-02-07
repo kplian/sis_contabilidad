@@ -11,7 +11,8 @@ ISSUE 		   FECHA   			     AUTOR				 DESCRIPCION:
 #17 		09/01/2019		        Manuel Guerra	  agrego el filtro de nro_tramite_aux
 #20         10/01/2019 ENDETRAS     Miguel Mamani     Ocultar botón para exportar datos de grilla
 #22         14/01/2019 ENDETRAS     Miguel Mamamni    Mostrar boton para exportar datos de grilla
-#91         15/01/2020 ENDETR       JUAN              Libro mayor añadir columna beneficiario 
+#91         15/01/2020 ENDETR       JUAN              Libro mayor añadir columna beneficiario
+#102        6/2/2020          Manuel Guerra     agregar campo nro_tramite_auxiliar, en vista del mayor
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -860,7 +861,23 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-			}
+			},
+            //#102
+            {
+                config:{
+                    name: 'nro_tramite_auxiliar',
+                    fieldLabel: 'Num Tram Auxiliar',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:10
+                },
+                type:'Field',
+                filters:{pfiltro:'nro_tramite_auxiliar',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
 		];
 			
 		
@@ -980,7 +997,8 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		'tipo_partida','id_orden_trabajo','desc_orden',
 		'tipo_reg','nro_cbte','nro_tramite','nombre_corto','glosa1',
 		'id_proceso_wf','id_estado_wf','id_suborden','desc_suborden','tipo_cambio','tipo_cambio_2','tipo_cambio_3','actualizacion',
-        'beneficiario'//#91
+        'beneficiario',//#91
+        'nro_tramite_auxiliar'//#102
 		
 	],
 	

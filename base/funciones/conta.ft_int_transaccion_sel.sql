@@ -31,6 +31,7 @@ $body$
   											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de  
   #83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
   #95        23/01/2020       Rensi Arteaga   Incluir nro de tramite auxiliar
+  #102        6/2/2020          Manuel Guerra     agregar campo nro_tramite_auxiliar, en vista del mayor
 ***************************************************************************/
 
 DECLARE
@@ -366,6 +367,7 @@ BEGIN
                           null::varchar as actualizacion,
 
                           null::varchar as codigo_cc,
+                          null::varchar as nro_tramite_auxiliar,--#102
                           COALESCE(sum(transa.importe_debe_mb),0)::numeric - COALESCE(sum(transa.importe_haber_mb),0)::numeric as saldo_mb,
                           COALESCE(sum(transa.importe_debe_mt),0)::numeric - COALESCE(sum(transa.importe_haber_mt),0)::numeric as saldo_mt,
 						  COALESCE(sum(transa.importe_debe_mb),0)::numeric - COALESCE(sum(transa.importe_haber_mb),0)::numeric as dif
@@ -459,6 +461,7 @@ BEGIN
                         transa.actualizacion::varchar,
 
                         cc.codigo_cc::varchar,
+                        transa.nro_tramite_auxiliar,--#102
                         0::numeric as saldo_mb,
                         0::numeric as saldo_mt,
                         COALESCE(transa.importe_debe_mb,0) - COALESCE(transa.importe_haber_mb,0) as dif
@@ -549,7 +552,7 @@ BEGIN
 
                                             actualizacion::varchar,
                                             codigo_cc::varchar,
-
+											nro_tramite_auxiliar::VARCHAR,--#102
                                             saldo_mb::numeric,
                                             saldo_mt::numeric,
                                             sum(dif) over (order by orden asc rows between unbounded preceding and current row)::numeric as dif,
@@ -559,7 +562,6 @@ BEGIN
                                       order by orden
                                       limit '||v_parametros.cantidad||'
                                       offset '||v_parametros.puntero;
-
 
 			return v_consulta;
 		end;

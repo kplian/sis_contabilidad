@@ -5,7 +5,8 @@ ISSUE  SIS       EMPRESA       FECHA        AUTOR           DESCRIPCION
 #2     CONTA     ETR           19/12/2108   Miguel Mamani	reporte proyectos excel
 #10    CONTA     ETR           02/01/2019   Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
 #154    CONTA     ETR           01/08/2019   RCM             Corrección por actualización de PHP 7. Se cambia el string Arial por cadena 'Arial'
- #75 		28/11/2019		  Manuel Guerra	  controlling
+#75 		28/11/2019		  Manuel Guerra	  controlling
+#101    CONTA     ETR           6/2/2020   Manuel Guerra    actualizacion de upgrade php en reporte de RProyectosArbol
 **************************************************************************
 */
 
@@ -39,7 +40,7 @@ class RProyectosArbol
             ->setKeywords("office 2007 openxml php")
             ->setCategory("Report File");
         $this->docexcel->setActiveSheetIndex(0);
-        $this->docexcel->getActiveSheet()->setTitle($this->objParam->getParametro('titulo_archivo'));
+        $this->docexcel->getActiveSheet()->setTitle(is_null($this->objParam->getParametro('titulo_archivo')) ? '':$this->objParam->getParametro('titulo_archivo'));//#101
         $this->equivalencias=array(0=>'A',1=>'B',2=>'C',3=>'D',4=>'E',5=>'F',6=>'G',7=>'H',8=>'I',
             9=>'J',10=>'K',11=>'L',12=>'M',13=>'N',14=>'O',15=>'P',16=>'Q',17=>'R',
             18=>'S',19=>'T',20=>'U',21=>'V',22=>'W',23=>'X',24=>'Y',25=>'Z',
