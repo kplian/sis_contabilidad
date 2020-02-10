@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -29,6 +31,7 @@ $body$
  #32  ETR	    08/01/2019		  MMV			    Nuevo campo documento iva  si o no validar documentacion de via
  #55 ETR        29/05/2019        EGS               Se agrega la logica para q migre comprobantes a otra bd pxp cuando el comprobante pase a validado y
                                                     cuando se necesite exportar un comprobante validado
+ #105        	10/02/202         MANUEL GUERRA 	validar cbtes que tenga al menos una transaccion
 ***************************************************************************/
 
 DECLARE
@@ -108,15 +111,16 @@ DECLARE
     v_gestion_fecha				    integer; --#3
     v_fecha_cbte_tmp                date;    --#3
     v_nro_tramite_aux               varchar;    --#7
-    
-    
+
+
     v_migra_cbte                    varchar; --#55
     j_comprobante                   JSON; --#55
   	j_id_int_comprobante            JSON; --#55
     v_id                            integer; --#55
     v_migrados                      varchar; --#55
     v_id_int_comprobante_migrado    integer; --#55
-    v_bandera_cbte                  boolean; --#55 
+    v_bandera_cbte                  boolean; --#55
+    v_cant_trans                  	integer; --#
 
 
 BEGIN
@@ -653,290 +657,290 @@ BEGIN
                 forma_cambio = v_parametros.forma_cambio,
                 documento_iva = v_parametros.documento_iva -- #32
 			where id_int_comprobante = v_parametros.id_int_comprobante;
-            
+
             /*if v_parametros.id_int_comprobante = 17134 then
             	raise exception 'En revisión ... ...: % - % - %',v_reg_cbte.tipo_cambio,v_reg_cbte.tipo_cambio_2,v_reg_cbte.tipo_cambio_3;
             end if;*/
-          
-            
-            -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones 
-            IF    v_parametros.tipo_cambio != v_reg_cbte.tipo_cambio 
-               or v_parametros.tipo_cambio_2 != v_reg_cbte.tipo_cambio_2 
+
+
+            -- si el tipo de cambio varia es encesario recalcular las equivalenscias en todas las transacciones
+            IF    v_parametros.tipo_cambio != v_reg_cbte.tipo_cambio
+               or v_parametros.tipo_cambio_2 != v_reg_cbte.tipo_cambio_2
                or v_parametros.tipo_cambio_3 != v_reg_cbte.tipo_cambio_3 THEN
-               
+
               IF  not conta.f_int_trans_recalcular_tc(v_parametros.id_int_comprobante) THEN
                 raise exception 'Error al reprocesar el tipo de cambio';
               END IF;
-              
+
             END IF;
-            
-                        
+
+
             -- si la fecha varia revisar si es necesario cambiar de gestion
             --#8 se invierte el orden de esta fin, analizando cambio defecha en gestion antes que procesar las trasacciones
-            
+
             IF v_parametros.fecha != v_reg_cbte.fecha THEN
-               
+
                --revisamos si son de diferente gestión
                SELECT * into v_ges_1 FROM param.f_get_limites_gestion(v_reg_cbte.fecha);
                SELECT * into v_ges_2 FROM param.f_get_limites_gestion(v_parametros.fecha);
-               
+
                --sin son diferentes gestiones
                IF v_ges_1.po_id_gestion  != v_ges_2.po_id_gestion THEN
-                  
+
                   IF not  conta.f_act_gestion_transaccion(
-                          v_parametros.id_int_comprobante, 
-                          v_ges_2.po_id_gestion, 
+                          v_parametros.id_int_comprobante,
+                          v_ges_2.po_id_gestion,
                           v_ges_1.po_id_gestion) THEN
-                          
-                            raise exception 'error al actulizar gestion';         
+
+                            raise exception 'error al actulizar gestion';
                    END IF;
-                   
+
                END IF;
-               
-            
+
+
             END IF;
-            
+
             --#8 se invierte el orden de esta fin, analizando cambio defecha en gestion antes que procesar las trasacciones
             -- procesar las trasaaciones (con diversos propositos, ejm validar  cuentas bancarias)
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
               raise exception 'Error al procesar transacciones';
             END IF;
-            
-            
-               
+
+
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Comprobante modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'CONTA_INCBTE_ELI'
  	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
 
 	elsif(p_transaccion='CONTA_INCBTE_ELI')then
 
 		begin
-			
+
             v_result = conta.f_eliminar_int_comprobante(p_id_usuario,
                                                         v_parametros._id_usuario_ai,
                                                         v_parametros._nombre_usuario_ai,
                                                         v_parametros.id_int_comprobante,
                                                         'si');  --si indica borrado manualmente
-               
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result);
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-		
-	/*********************************    
+
+	/*********************************
  	#TRANSACCION:  'CONTA_INCBTE_VAL'
  	#DESCRIPCION:	Validación del comprobante
- 	#AUTOR:			rcm	
+ 	#AUTOR:			rcm
  	#FECHA:			05/09/2013
 	***********************************/
 
 	elsif(p_transaccion='CONTA_INCBTE_VAL')then
 
 		begin
-            
-            --validaciones 
+
+            --validaciones
             select * into v_reg_cbte
             from conta.tint_comprobante ic where ic.id_int_comprobante = v_parametros.id_int_comprobante;
-            
+
             IF v_reg_cbte.estado_reg != 'borrador' THEN
                raise exception 'solo puede validar  comprobantes en borrador';
             END IF;
-        
-       
+
+
 			--Lamada a la función de validación
 			v_result = conta.f_validar_cbte( p_id_usuario,
                                              v_parametros._id_usuario_ai,
                                              v_parametros._nombre_usuario_ai,
                                              v_parametros.id_int_comprobante,
                                              v_parametros.igualar);
-                  
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result);
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-         
-	/*********************************    
+
+	/*********************************
  	#TRANSACCION:  'CONTA_IGUACBTE_IME'
  	#DESCRIPCION:	Igual el cbte por diferencias de tipo de cambio o redondeo
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
 
 	elsif(p_transaccion='CONTA_IGUACBTE_IME')then
 
 		begin
-        
+
              IF not conta.f_igualar_cbte(v_parametros.id_int_comprobante, p_id_usuario) THEN
                raise exception 'error al igualar';
-             END IF;                     
-               
+             END IF;
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','validar e igualar cbte'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','validar e igualar cbte');
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-        
-   /*********************************    
+
+   /*********************************
  	#TRANSACCION:  'CONTA_SWEDIT_IME'
  	#DESCRIPCION:	Cambia el cbte a modo de edición
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
 
 	elsif(p_transaccion='CONTA_SWEDIT_IME')then
 
 		begin
-        
-          select 
+
+          select
             *
           into
-           v_reg_cbte 
-          from conta.tint_comprobante set            
-          where id_int_comprobante = v_parametros.id_int_comprobante;  
-          
+           v_reg_cbte
+          from conta.tint_comprobante set
+          where id_int_comprobante = v_parametros.id_int_comprobante;
+
           IF  v_reg_cbte.estado_reg not in ('borrador', 'vbcbte')  THEN
              raise exception 'El cbte debe estar en borrador para habilitar la edición';
           END IF;
-          
-          
+
+
           IF  v_reg_cbte.sw_editable = 'si'  THEN
              raise exception 'La edición ya se encuentra habilitada ....';
           END IF;
-          
-          
+
+
           --obtenemos un backup del cbte
           v_id_int_comprobante_bk = conta.f_backup_int_comprobante(v_parametros.id_int_comprobante);
-          
-        
+
+
           --modificamos la bandera para habilitar la edicion
-          update conta.tint_comprobante set            
+          update conta.tint_comprobante set
                sw_editable = 'si',
                id_usuario_mod = p_id_usuario,
                fecha_mod = now(),
                id_int_comprobante_bk = v_id_int_comprobante_bk
-          where id_int_comprobante = v_parametros.id_int_comprobante; 
-          
-          
-                       
-               
+          where id_int_comprobante = v_parametros.id_int_comprobante;
+
+
+
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cbte habilitado para edición'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cbte habilitado para edición');
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
-		end;     
-    
-    /*********************************    
+		end;
+
+    /*********************************
  	#TRANSACCION:  'CONTA_VOLCARCBTE_IME'
  	#DESCRIPCION:	Volcar comprobante
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		29-08-2013 00:28:30
 	***********************************/
 
 	elsif(p_transaccion='CONTA_VOLCARCBTE_IME')then
 
 		begin
-        
-        
-            select 
-             * 
+
+
+            select
+             *
             into
              v_reg_cbte
-            from conta.tint_comprobante ic 
+            from conta.tint_comprobante ic
             where ic.id_int_comprobante = v_parametros.id_int_comprobante;
-            
+
             ----------------------------------
             --#3  Determinar fecha  y periodo
             ----------------------------------
-            v_fecha_cbte_tmp = now()::date;  --#3 al revertir usa la fecha actual 
-            v_gestion_fecha =  date_part('year', v_fecha_cbte_tmp);            
-            
-            select 
+            v_fecha_cbte_tmp = now()::date;  --#3 al revertir usa la fecha actual
+            v_gestion_fecha =  date_part('year', v_fecha_cbte_tmp);
+
+            select
               g.gestion
              into
               v_gestion_aux
             from param.tgestion g
-            inner join param.tperiodo per on per.id_gestion = g.id_gestion 
+            inner join param.tperiodo per on per.id_gestion = g.id_gestion
             where per.id_periodo = v_reg_cbte.id_periodo;
-          
-            if v_gestion_aux < v_gestion_fecha then             
+
+            if v_gestion_aux < v_gestion_fecha then
               --#3 forzamos 31 de diciembre
               v_fecha_cbte_rev = (v_gestion_aux||'-12-31')::date;
-            ELSE 
-               v_fecha_cbte_rev = v_fecha_cbte_tmp ; 
+            ELSE
+               v_fecha_cbte_rev = v_fecha_cbte_tmp ;
             end if;
-            
+
             --#3 obtener el periodo a partir de la fecha
              v_rec_periodo = param.f_get_periodo_gestion(v_fecha_cbte_rev);
-            
+
             IF  v_reg_cbte.estado_reg != 'validado'  THEN
                raise exception 'solo pueden volcar comprobantes validados';
-            END IF; 
-            
+            END IF;
+
             IF  v_reg_cbte.volcado = 'si'  THEN
                raise exception 'El comprobante ya se encuentra volcado';
             END IF;
-            
+
             IF  v_reg_cbte.cbte_reversion = 'si'  THEN
                raise exception 'No puede volcar un cbte de reversión';
             END IF;
-            
+
             -- RAC 2/12/2016
             -- solo revisa dependnecia en cbte de reversion total
             -- los parciales peuden tener dependencias
-            IF v_parametros.sw_validar = 'si' then 
+            IF v_parametros.sw_validar = 'si' then
               IF  not conta.f_revisar_dependencias(v_parametros.id_int_comprobante)  THEN
                  raise exception 'error por dependencias';
               END IF;
         	END IF;
-            
-           
+
+
             --validar que el periodo se encuentre abierto
             IF not param.f_periodo_subsistema_abierto(v_reg_cbte.fecha::date, 'CONTA') THEN
                 raise exception 'El periodo se encuentra cerrado en contabilidad para la fecha:  %',v_reg_cbte.fecha;
             END IF;
-            
-            
-            
-            
+
+
+
+
             select
                rc.id_tipo_relacion_comprobante
             into
               v_id_tipo_relacion_comprobante
             from conta.ttipo_relacion_comprobante rc
             where rc.codigo = 'REVERSION';
-            
+
             -- insertar comprobante volcado, haciendo referencia al cbte ajustado
-            
-            
-            
+
+
+
             ----------------------------------------
-            -- registrar proceso disparado de WF 
+            -- registrar proceso disparado de WF
             ----------------------------------------
             SELECT
                     ps_id_proceso_wf,ps_id_estado_wf, ps_codigo_estado, ps_nro_tramite
@@ -946,28 +950,28 @@ BEGIN
                           p_id_usuario,
                           v_parametros._id_usuario_ai,
                           v_parametros._nombre_usuario_ai,
-                          v_reg_cbte.id_estado_wf, 
+                          v_reg_cbte.id_estado_wf,
                           NULL,  --id_funcionario wf
                           v_reg_cbte.id_depto,
                           'Cbte de Volcado (Anula el original)',
                           'CBTE', --sipara comprobante
                           '');
-                          
-            select 
+
+            select
               cc.tipo_comprobante,
               cc.descripcion
-            into 
+            into
               v_tipo_comprobante,
               v_clcbt_desc
-            from conta.tclase_comprobante cc 
-            where cc.id_clase_comprobante = v_reg_cbte.id_clase_comprobante;              
-            
-            
+            from conta.tclase_comprobante cc
+            where cc.id_clase_comprobante = v_reg_cbte.id_clase_comprobante;
+
+
             -----------------------------
         	--REGISTRO DEL COMPROBANTE
         	-----------------------------
         	insert into conta.tint_comprobante(
-                id_clase_comprobante,    		
+                id_clase_comprobante,
                 id_subsistema,
                 id_depto,
                 id_moneda,
@@ -976,11 +980,11 @@ BEGIN
                 id_funcionario_firma2,
                 id_funcionario_firma3,
                 tipo_cambio,
-                beneficiario,    			
+                beneficiario,
                 estado_reg,
                 glosa1,
                 fecha,
-                glosa2,    			
+                glosa2,
                 --momento,
                 id_usuario_reg,
                 fecha_reg,
@@ -1014,7 +1018,7 @@ BEGIN
                 tipo_cambio_3,
                 id_moneda_act
           	) values(
-              v_reg_cbte.id_clase_comprobante,  			
+              v_reg_cbte.id_clase_comprobante,
               v_reg_cbte.id_subsistema,
               v_reg_cbte.id_depto,
               v_reg_cbte.id_moneda,
@@ -1023,11 +1027,11 @@ BEGIN
               v_reg_cbte.id_funcionario_firma2,
               v_reg_cbte.id_funcionario_firma3,
               v_reg_cbte.tipo_cambio,
-              v_reg_cbte.beneficiario,  			
+              v_reg_cbte.beneficiario,
               'borrador',
               'REVERSION CBTE ('||v_reg_cbte.nro_cbte||',  id:'||v_reg_cbte.id_int_comprobante||' )',
               v_fecha_cbte_rev, --#3  remplaza fecha origianl ..... v_reg_cbte.fecha,,
-              v_reg_cbte.glosa2,  			
+              v_reg_cbte.glosa2,
               --v_parametros.momento,
               p_id_usuario,
               now(),
@@ -1052,28 +1056,28 @@ BEGIN
               v_reg_cbte.localidad,
               v_reg_cbte.id_moneda_tri,
               v_num_tramite,
-              'si',  -- sw_editable 
-              v_reg_cbte.sw_tipo_cambio, -- RAC 05/12/2016 ....  'si', -- sw_tipo_cambio 
+              'si',  -- sw_editable
+              v_reg_cbte.sw_tipo_cambio, -- RAC 05/12/2016 ....  'si', -- sw_tipo_cambio
 			  'si', -- cbte_reversion	, marcamos como cbte de reversion
               v_id_proceso_wf,
               v_id_estado_wf,
               v_reg_cbte.forma_cambio,
               v_reg_cbte.tipo_cambio_3,
-              v_reg_cbte.id_moneda_act		
+              v_reg_cbte.id_moneda_act
 			)RETURNING id_int_comprobante into v_id_int_comprobante;
-            
+
            update wf.tproceso_wf p set
             descripcion = descripcion||' ('||v_clcbt_desc||'id:'||v_id_int_comprobante::varchar||')'
            where p.id_proceso_wf = v_id_proceso_wf;
-            
-            
+
+
             -- listar todas las transacciones originales
             FOR v_registros in (
-                     select * 
-                     from conta.tint_transaccion it 
-                     where  it.estado_reg = 'activo' and   
+                     select *
+                     from conta.tint_transaccion it
+                     where  it.estado_reg = 'activo' and
                      it.id_int_comprobante = v_parametros.id_int_comprobante) LOOP
-                     
+
                    --  insertar transaccion volcada
 
                    IF v_reg_cbte.momento_comprometido ='si' and v_reg_cbte.momento_ejecutado ='si' and v_reg_cbte.momento_pagado='si' THEN
@@ -1081,11 +1085,11 @@ BEGIN
                    ELSE
                    		v_id_partida_ejecucion = v_registros.id_partida_ejecucion;
                    END IF;
-                   
+
                     -----------------------------
                     --REGISTRO DE LA TRANSACCIÓN
                     -----------------------------
-                    
+
                     insert into conta.tint_transaccion(
                         id_partida,
                         id_centro_costo,
@@ -1094,12 +1098,12 @@ BEGIN
                         glosa,
                         id_int_comprobante,
                         id_auxiliar,
-                        
+
                         importe_debe,
                         importe_haber,
                         importe_gasto,
                         importe_recurso,
-                        
+
                         id_usuario_reg,
                         fecha_reg,
                         id_usuario_mod,
@@ -1115,23 +1119,23 @@ BEGIN
                         importe_haber_mb,
                         importe_recurso_mb,
                         importe_gasto_mb,
-                        
+
                         importe_debe_mt,
                         importe_haber_mt,
                         importe_gasto_mt,
                         importe_recurso_mt ,
-                        
+
                         importe_debe_ma,
                         importe_haber_ma,
                         importe_gasto_ma,
                         importe_recurso_ma ,
-                        
+
                         triangulacion ,
-                        actualizacion, 
+                        actualizacion,
                         id_partida_ejecucion,
                         id_partida_ejecucion_dev,
                         forzar_comprometer           --#13 considera si esta forzado a comprometido
-                        
+
                     ) values(
                         v_registros.id_partida,
                         v_registros.id_centro_costo,
@@ -1140,12 +1144,12 @@ BEGIN
                         v_registros.glosa,
                         v_id_int_comprobante,  --referencia al cbte volcado
                         v_registros.id_auxiliar,
-                        
+
                         v_registros.importe_haber,   --  insercion volcada de estos registros
                         v_registros.importe_debe, --  insercion volcada de estos registros
                         v_registros.importe_recurso, --  insercion volcada de estos registros
                         v_registros.importe_gasto, --  insercion volcada de estos registros
-                        
+
                         p_id_usuario,
                         now(),
                         null,
@@ -1160,36 +1164,36 @@ BEGIN
                         v_registros.importe_haber_mb,--  insercion volcada de estos registros
                         v_registros.importe_debe_mb,
                         v_registros.importe_gasto_mb,--  insercion volcada de estos registros
-                        v_registros.importe_recurso_mb,                        
-                        
+                        v_registros.importe_recurso_mb,
+
                         v_registros.importe_haber_mt,--  insercion volcada de estos registros
-                        v_registros.importe_debe_mt,                        
-                        v_registros.importe_recurso_mt, --  insercion volcada de estos registros                        
+                        v_registros.importe_debe_mt,
+                        v_registros.importe_recurso_mt, --  insercion volcada de estos registros
                         v_registros.importe_gasto_mt,
-                        
-                        
+
+
                         v_registros.importe_haber_ma,
                         v_registros.importe_debe_ma,
                         v_registros.importe_recurso_ma,
                         v_registros.importe_gasto_ma,
-                        
-                        
-                        
+
+
+
                         v_registros.triangulacion ,
-                        v_registros.actualizacion, 
+                        v_registros.actualizacion,
                         v_id_partida_ejecucion,
                         v_registros.id_partida_ejecucion_dev,
                         v_registros.forzar_comprometer           --#13 considera si esta forzado a comprometido
-                        
+
                     )RETURNING id_int_transaccion into v_id_int_transaccion;
-                    
-                    
+
+
                      --  si el comprobante tiene relaciones de devenago ...(aolo si es un cbte de pago)
-                     --  asociamos el pago al nuevo comprobante 
+                     --  asociamos el pago al nuevo comprobante
                      --  con montos negativos
-                     
+
                      FOR  v_registros_dev in (
-                                              select 
+                                              select
                                                 ird.id_int_rel_devengado,
                                                 ird.monto_pago,
                                                 ird.monto_pago_mb,
@@ -1204,19 +1208,19 @@ BEGIN
                                                 p.codigo as codigo_partida,
                                                 it.id_centro_costo as id_presupuesto,
                                                 ird.id_partida_ejecucion_pag
-                                                                    
+
                                               from  conta.tint_rel_devengado ird
-                                              inner join conta.tint_transaccion it 
+                                              inner join conta.tint_transaccion it
                                                 on it.id_int_transaccion = ird.id_int_transaccion_dev
-                                              inner join pre.tpartida p on p.id_partida = it.id_partida 
-                                                                  
+                                              inner join pre.tpartida p on p.id_partida = it.id_partida
+
                                               inner join conta.tint_comprobante ic on ic.id_int_comprobante = it.id_int_comprobante
                                               where  ird.id_int_transaccion_pag = v_registros.id_int_transaccion
                                                      and ird.estado_reg = 'activo'
                                                      and p.sw_movimiento = 'presupuestaria'
                                              ) LOOP
-                                             
-                    
+
+
                                     insert into conta.tint_rel_devengado(
                                         id_int_transaccion_pag,
                                         id_int_transaccion_dev,
@@ -1244,70 +1248,70 @@ BEGIN
                                         'si',
                                         v_registros_dev.id_partida_ejecucion_pag
                                     ) ;
-                        
+
                             --isnerta relacion de devengado con la reversion
                             --marcando el sw de reversion
-                    
+
                     END LOOP;
-            
+
             END LOOP;
-                
+
             --marcar el cbte original como volcado
             update conta.tint_comprobante c set
               volcado = 'si'
-            where c.id_int_comprobante =  v_parametros.id_int_comprobante;                
-            
+            where c.id_int_comprobante =  v_parametros.id_int_comprobante;
+
             IF v_parametros.sw_validar = 'si' then
-                --solictar validacion del comprobante 
-                v_result = conta.f_validar_cbte(p_id_usuario, 
-                                                   v_parametros._id_usuario_ai, 
-                                                   v_parametros._nombre_usuario_ai, 
-                                                   v_id_int_comprobante, 
+                --solictar validacion del comprobante
+                v_result = conta.f_validar_cbte(p_id_usuario,
+                                                   v_parametros._id_usuario_ai,
+                                                   v_parametros._nombre_usuario_ai,
+                                                   v_id_int_comprobante,
                                                    'si');
-                                                   
+
                                                  --  raise exception '... %',v_result;
-               
-                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado y validado el cbte : id '||v_parametros.id_int_comprobante::varchar); 
-           
+
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado y validado el cbte : id '||v_parametros.id_int_comprobante::varchar);
+
            	else
-               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado en borrador el cbte : id '||v_parametros.id_int_comprobante::varchar); 
-            end if;   
+               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','fue volcado en borrador el cbte : id '||v_parametros.id_int_comprobante::varchar);
+            end if;
             --Definicion de la respuesta
-            
+
             --raise exception 'pasa...';
-            
+
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante',v_parametros.id_int_comprobante::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-    
-    
-    /*********************************    
+
+
+    /*********************************
  	#TRANSACCION:  'CONTA_GETRAIZ_IME'
  	#DESCRIPCION:	Busca el cbte relacionado raiz
- 	#AUTOR:		rac	
+ 	#AUTOR:		rac
  	#FECHA:		11/04/2016 00:28:30
 	***********************************/
 
 	elsif(p_transaccion='CONTA_SWEDIT_IME')then
 
 		begin
-        
+
               WITH RECURSIVE path_rec(id_int_comprobante, id_int_comprobante_fks,nro_tramite,nro_cbte,glosa1 ) AS (
-                      
-                      SELECT  
+
+                      SELECT
                         c.id_int_comprobante,
                         c.id_int_comprobante_fks,
                         c.nro_tramite,
                         c.nro_cbte,
                         c.glosa1
-                      FROM conta.tint_comprobante c 
+                      FROM conta.tint_comprobante c
                       WHERE c.id_int_comprobante = v_parametros.id_int_comprobante
-              	
+
                       UNION
-                      SELECT  
+                      SELECT
                         c2.id_int_comprobante,
                         c2.id_int_comprobante_fks,
                         c2.nro_tramite,
@@ -1315,39 +1319,39 @@ BEGIN
                         c2.glosa1
                       FROM conta.tint_comprobante c2
                       inner join path_rec  pr on c2.id_int_comprobante = ANY(pr.id_int_comprobante_fks)
-                      
-              	     
+
+
                   )
-                  SELECT 
+                  SELECT
                     id_int_comprobante
                   into
                     v_id_int_comprobante
                   FROM path_rec order by id_int_comprobante  limit 1 offset 0;
-          
-          
-                       
-               
+
+
+
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','busqueda de raiz relacionada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','busqueda de raiz relacionada');
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante_raiz',COALESCE(v_id_int_comprobante::varchar,'0'));
-              
+
             --Devuelve la respuesta
             return v_resp;
 
-		end;     
-    
-   /*********************************    
+		end;
+
+   /*********************************
  	#TRANSACCION:  'CD_SIGCBTE_IME'
  	#DESCRIPCION:  cambia al siguiente estado	del comprobante
- 	#AUTOR:		RAC	
+ 	#AUTOR:		RAC
  	#FECHA:		01-06-2016 12:12:51
 	***********************************/
 
-	elseif(p_transaccion='CD_SIGCBTE_IME')then   
+	elseif(p_transaccion='CD_SIGCBTE_IME')then
         begin
-        
+
            /*   PARAMETROS
-           
+
           $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
           $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
           $this->setParametro('id_funcionario_wf','id_funcionario_wf','int4');
@@ -1355,35 +1359,35 @@ BEGIN
           $this->setParametro('obs','obs','text');
           $this->setParametro('json_procesos','json_procesos','text');
           */
-        
-        
+
+
           --  obtenermos datos basicos
           select
               ic.id_proceso_wf,
               ic.id_estado_wf,
               ic.estado_reg
-              
+
              into
               v_id_proceso_wf,
               v_id_estado_wf,
               v_codigo_estado
-              
+
           from conta.tint_comprobante ic
           where ic.id_int_comprobante =  v_parametros.id_int_comprobante;
-          
+
          -- recupera datos del estado
-                  
-           select 
+
+           select
             ew.id_tipo_estado ,
             te.codigo
-           into 
+           into
             v_id_tipo_estado,
             v_codigo_estado
           from wf.testado_wf ew
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf = v_parametros.id_estado_wf_act;
-        
-         
+
+
          -- obtener datos tipo estado
            select
                  te.codigo
@@ -1391,14 +1395,22 @@ BEGIN
                  v_codigo_estado_siguiente
            from wf.ttipo_estado te
            where te.id_tipo_estado = v_parametros.id_tipo_estado;
-                
+
            IF  pxp.f_existe_parametro(p_tabla,'id_depto_wf') THEN
               v_id_depto = v_parametros.id_depto_wf;
            END IF;
-           
-          
-           
-         IF v_codigo_estado_siguiente != 'validado' THEN    
+           --#105
+           select count(tra.id_int_comprobante)
+           into v_cant_trans
+           from conta.tint_transaccion tra
+           where tra.id_int_comprobante = v_parametros.id_int_comprobante;
+
+		   IF v_cant_trans < 1 THEN
+           		raise exception 'No existe ninguna transaccion';
+           END IF;
+           --#105
+
+           IF v_codigo_estado_siguiente != 'validado' THEN
                 
                IF  pxp.f_existe_parametro(p_tabla,'obs') THEN
                    v_obs = v_parametros.obs;
