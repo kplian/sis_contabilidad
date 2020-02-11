@@ -6,6 +6,7 @@
 **************************************************************************
  ISSUE  SIS       EMPRESA       FECHA       AUTOR       DESCRIPCION
  #154    CONTA     ETR           01/08/2019  RCM         Corrección por actualización de PHP 7. Se cambia el string Arial por cadena 'Arial'
+#106               Endeetr      11/02/2020      EGS      corrección reportes Php Excel  font true type
 ***************************************************************************
 */
 class RResultadosXls
@@ -32,9 +33,10 @@ class RResultadosXls
 		$cacheSettings = array('memoryCacheSize'  => '10MB');
 		PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
 		PHPExcel_Shared_Font::setAutoSizeMethod(PHPExcel_Shared_Font::AUTOSIZE_METHOD_EXACT);
+        PHPExcel_Shared_Font::setTrueTypeFontPath('../../lib/fonts/');//#106
 
 
-		$this->docexcel = new PHPExcel();
+        $this->docexcel = new PHPExcel();
 		$this->docexcel->getProperties()->setCreator("PXP")
 							 ->setLastModifiedBy("PXP")
 							 ->setTitle($this->objParam->getParametro('titulo_archivo'))
