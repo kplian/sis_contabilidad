@@ -5280,4 +5280,7 @@ COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.campo_nro_tramite_auxilia
 IS 'define desde donde recuperamos el campo nro_tramite_auxiliar';
 
 /***********************************F-SCP-RAC-CONTA-96-23/01/2020****************************************/
-
+/***********************************I-SCP-VAN-CONTA-1-18/02/2020****************************************/
+alter table conta.tint_comprobante
+    add liquido_pagable decimal(18, 2) default 0;
+/***********************************F-SCP-VAN-CONTA-1-18/02/2020****************************************/

@@ -334,7 +334,26 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			},
 			grid : true,
 			form : false
-		}, {
+		},
+            {
+                config: {
+                    name: 'liquido_pagable',
+                    fieldLabel: 'Liquido Pagable',
+                    gwidth: 50,
+                    renderer: function (value, p, record) {
+                        return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                    }
+                },
+                type: 'Field',
+                id_grupo: 0,
+                filters: {
+                    pfiltro: 'incbte.liquido_pagable',
+                    type: 'string'
+                },
+                grid: true,
+                form: false
+            }
+		, {
 			config : {
 				name : 'nro_cbte',
 				fieldLabel : 'Nro.Cbte.',
@@ -1316,7 +1335,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
         {//#51
 			name : 'id_int_comprobante_migrado',
 			type : 'numeric'
-		}
+		},
+            {name: 'liquido_pagable', type: 'numeric'}
         ],
 
 		rowExpander : new Ext.ux.grid.RowExpander({
