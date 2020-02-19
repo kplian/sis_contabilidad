@@ -164,7 +164,8 @@ BEGIN
                               incbte.id_moneda_act,
                               incbte.nro_tramite_aux,
                               incbte.documento_iva, -- #32
-                              incbte.id_int_comprobante_migrado  -- #51
+                              incbte.id_int_comprobante_migrado,  -- #51
+			                  incbte.liquido_pagable
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
@@ -801,7 +802,8 @@ BEGIN
                               incbte.c31,
                               incbte.id_gestion,
                               incbte.periodo,
-                              incbte.forma_cambio
+                              incbte.forma_cambio,
+                              incbte.liquido_pagable
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
