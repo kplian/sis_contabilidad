@@ -21,8 +21,9 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #83 		03/01/2020		    Miguel Mamani	    Reporte Auxiliares aumentar columna beneficiario
 #93 		16/01/2020		    Manuel Guerra	  	modificacion en interfaz, ocultar columnas
 #95         23/01/2020          Rensi Arteaga       Incluir nro de tramite auxiliar
-#99 		30/1/2020		  Manuel Guerra	    agregar columna de estado_wf y proceso_wf
-#102        6/2/2020          Manuel Guerra     agregar campo nro_tramite_auxiliar, en vista del mayor
+#99 		30/1/2020		    Manuel Guerra	    agregar columna de estado_wf y proceso_wf
+#102        6/2/2020            Manuel Guerra       agregar campo nro_tramite_auxiliar, en vista del mayor
+#108        10/03/2020          Rensi ARteaga       generar cheques de manera manual desde la interface VoBo Finanzas
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -250,6 +251,24 @@ class MODIntTransaccion extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_int_transaccion','id_int_transaccion','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+     // #108
+    function generarLB(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_transaccion_ime';
+		$this->transaccion='CONTA_GENERAR_LB';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_int_comprobante','id_int_comprobante','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

@@ -21,6 +21,7 @@ $body$
  #0        		05-09-2013        N/N               creacion
  #00  ETR       05/05/2018        RAC KPLIAN        Los comprobantes manuales genera libro de bancos
  #01  ETR       13/12/2018        JJA               Correccion problema de no geracion de cheque para devoluciones de cuenta documentadas
+ #108 ETR       04/03/2020        RAC               deshabilitar la integracion con LB segun configuracion de variable global.
 
 */
 
@@ -49,7 +50,8 @@ v_id_cuenta_bancaria				integer;
 v_conta_validar_forma_pago			varchar;
 v_conta_integrar_libro_bancos		varchar;
 v_valor								varchar;
-v_id_gestion_chk					integer;		
+v_id_gestion_chk					integer;
+v_conta_generar_lb_manual_oc        varchar;		
 
 
 BEGIN
@@ -66,10 +68,12 @@ BEGIN
       ic.id_clase_comprobante,
       cc.codigo,
       ic.id_depto,
-      pla.codigo as codigo_plantilla
+      pla.codigo as codigo_plantilla,
+      dep.prioridad
    into
       v_registros_cbte
    from conta.tint_comprobante ic
+   inner join param.tdepto dep on dep.id_depto = ic.id_depto
    inner join param.tperiodo per on per.id_periodo = ic.id_periodo
    inner join conta.tclase_comprobante cc on cc.id_clase_comprobante = ic.id_clase_comprobante
    left join conta.tplantilla_comprobante pla on pla.id_plantilla_comprobante=ic.id_plantilla_comprobante
@@ -127,6 +131,14 @@ BEGIN
    IF v_registros_cbte.tipo_cambio is null THEN
      raise exception 'Defina el tipo de cambio antes de continuar con la validación del cbte';
    END IF;
+   
+     
+   
+   v_conta_integrar_libro_bancos = pxp.f_get_variable_global('conta_integrar_libro_bancos');
+   v_conta_validar_forma_pago = pxp.f_get_variable_global('conta_validar_forma_pago');
+   v_valor = param.f_get_depto_param( v_registros_cbte.id_depto, 'ENTREGA');
+   v_conta_generar_lb_manual_oc =  pxp.f_get_variable_global('conta_generar_lb_manual_oc');
+                                    
 
 
 
@@ -142,17 +154,12 @@ BEGIN
                 ------------------------------------------------------------------------------------------------------
 
 
-               v_conta_validar_forma_pago = pxp.f_get_variable_global('conta_validar_forma_pago');
                 -- busca si alguna de las cuentas contables tiene relacion
                 -- con una cuenta bancaria
                 v_id_cuenta_bancaria = NULL;
 
                 IF v_conta_validar_forma_pago = 'si' THEN
                    --si es un cbte de pago ...
-                   --IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') THEN
-                   
-                   --JJA 13/12/2018 Se comento la condision por que no generaba el cheque al realizar la devolucion de saldo de cuenta documentada
-                   --IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON')  AND v_registros_cbte.codigo_plantilla not in ('CD-DEVREP-SALDOS')  THEN
                    IF upper(v_registros_cbte.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') THEN
                    
                         IF v_registros.banco = 'si'  THEN
@@ -162,31 +169,24 @@ BEGIN
                                END IF;
 
                               --TODO verificar integracion con libro de bancos ....
-
-                               --ver si tiene libro de bancos ....
-                               v_conta_integrar_libro_bancos = pxp.f_get_variable_global('conta_integrar_libro_bancos');
-
-                               v_valor = param.f_get_depto_param( v_registros_cbte.id_depto, 'ENTREGA');
-                               
-                               --JJA 13/12/2018 Se comento la condision por que no generaba el cheque al realizar la devolucion de saldo de cuenta documentada y se agrego la plantilla CD-DEVREP-SALDOS
-                               --IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_cbte.codigo_plantilla in ('SOLFONDAV', 'REPOCAJA')) THEN
+                               --JJA 13/12/2018  se agrego la plantilla CD-DEVREP-SALDOS
                                IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_cbte.codigo_plantilla in ('SOLFONDAV', 'REPOCAJA','CD-DEVREP-SALDOS')) THEN
-
-                                    -- si alguna transaccion tiene banco habilitado para pago
-                                    IF  not tes.f_integracion_libro_bancos(p_id_usuario,p_id_int_comprobante,  v_registros.id_int_transaccion) THEN
-									  --raise exception 'error al registrar transacción en libro de bancos, comprobante %', p_id_int_comprobante;
+                                   
+                                    --#108 genera  registros en LB solo si la generacion manual esta desactiva y si no es un depto de contabilidad central (prioridad 0)
+                                    
+                                    IF v_conta_generar_lb_manual_oc = 'no' OR v_registros_cbte.prioridad != 0  THEN
+                                        -- si alguna transaccion tiene banco habilitado para pago
+                                        IF  not tes.f_integracion_libro_bancos(p_id_usuario,p_id_int_comprobante,  v_registros.id_int_transaccion) THEN
+                                          --raise exception 'error al registrar transacción en libro de bancos, comprobante %', p_id_int_comprobante;
+                                        END IF;
+                                    
                                     END IF;
 
                                END IF;
-                            
-                               
-                        
                         END IF;
                     END IF;
                 END IF;   
                
-               
-              
               -----------------------------------
               --TODO agregar otras validaciones
               -----------------------------------
@@ -217,4 +217,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

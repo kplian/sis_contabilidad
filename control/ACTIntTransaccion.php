@@ -13,8 +13,9 @@
  #6		CONTA 	ETR			27/12/2018		Manuel Guerra	Agregar filtro de cbtes de cierre
  #17 	CONTA 	ETR			09/01/2019		Manuel Guerra	agrego el filtro de nro_tramite_aux
  #154   CONTA   ETR         01/08/2019  	RCM         	Actualización PHP 7, se agrega parámetros básicos
- #75 		28/11/2019		  Manuel Guerra	  controlling
- #93 		16/1/2020		  Manuel Guerra	  	modificacion en interfaz, ocultar columnas
+ #75 		    ETR         28/11/2019		Manuel Guerra	controlling
+ #93 		    ETR         16/1/2020		Manuel Guerra	modificacion en interfaz, ocultar columnas
+ #108   CONTA   ETR         10/03/2020      Rensi ARteaga   generar cheques de manera manual desde la interface VoBo Finanzas
 ****************************************************************************
 */
 require_once(dirname(__FILE__).'/../reportes/RTransaccionmayor.php');
@@ -119,6 +120,15 @@ class ACTIntTransaccion extends ACTbase{
 		$this->res=$this->objFunc->eliminarIntTransaccion($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	//#108 generar cheques desde la interface de vobo finanzas de manera manual
+	function generarLB(){
+		$this->objFunc=$this->create('MODIntTransaccion');
+		$this->res=$this->objFunc->generarLB($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	
+	
 
 	function listarIntTransaccionMayor(){
 		$this->objParam->defecto('ordenacion','id_int_transaccion');

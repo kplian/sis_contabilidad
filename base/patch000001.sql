@@ -5284,3 +5284,13 @@ IS 'define desde donde recuperamos el campo nro_tramite_auxiliar';
 alter table conta.tint_comprobante
     add liquido_pagable decimal(18, 2) default 0;
 /***********************************F-SCP-VAN-CONTA-1-18/02/2020****************************************/
+
+
+/***********************************I-SCP-RAC-CONTA-108-06/02/2020****************************************/
+--------------- SQL ---------------
+
+CREATE INDEX tint_comprobante_idx2 ON conta.tint_comprobante
+  USING btree (nro_tramite);
+  
+ 
+/***********************************F-SCP-RAC-CONTA-108-06/02/2020****************************************/

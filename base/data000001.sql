@@ -1730,6 +1730,18 @@ VALUES
   
   
 /***********************************F-DAT-RAC-CONTA-103-06/02/2020****************************************/
+
+
+
+/***********************************I-DAT-RAC-CONTA-108-04/03/2020****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_generar_lb_manual_oc', E'no', E'si o no, si la integracion con libro de bancos esta activada, define si  segenera al validar el cbte o desde interface (solo para regional 0m oficina central)');
+  
+
+/***********************************F-DAT-RAC-CONTA-108-04/03/2020****************************************/
+  
   
   
   
