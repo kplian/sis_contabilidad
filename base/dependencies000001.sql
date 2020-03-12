@@ -5890,3 +5890,166 @@ ALTER TABLE conta.vint_comprobante
 /**********************************F-DEP-RAC-CONTA-108-05/03/2020****************************************/
 
 
+
+
+
+/**********************************I-DEP-RAC-CONTA-109-12/03/2020****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT tint_comprobante__id_usuario FOREIGN KEY (id_usuario_reg)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_comprobante
+  ADD CONSTRAINT tint_comprobante__id_usuario_mod FOREIGN KEY (id_usuario_mod)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+ 
+ --------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT tint_transaccion__id_usuario_reg FOREIGN KEY (id_usuario_reg)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tint_transaccion
+  ADD CONSTRAINT tint_transaccion__id_usuario_mod FOREIGN KEY (id_usuario_mod)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  ADD CONSTRAINT tcuenta__id_usuario_reg FOREIGN KEY (id_usuario_reg)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+--------------- SQL ---------------
+
+ALTER TABLE conta.tcuenta
+  ADD CONSTRAINT tcuenta__id_usario_mod FOREIGN KEY (id_usuario_mod)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;   
+ 
+--------------- SQL ---------------
+
+CREATE INDEX tcuenta_idx1 ON conta.tcuenta
+  USING btree (nro_cuenta);
+  
+
+--------------- SQL ---------------
+
+CREATE INDEX tcuenta_idx1 ON conta.tcuenta
+  USING btree (nro_cuenta);
+  
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttabla_relacion_contable
+  ADD CONSTRAINT ttabla_relacion_contable__id_usuario_reg_fk FOREIGN KEY (id_usuario_reg)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.ttabla_relacion_contable
+  ADD CONSTRAINT ttabla_relacion_contable__id_usuario_mod_fk FOREIGN KEY (id_usuario_mod)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+--------------- SQL ---------------
+
+CREATE INDEX ttabla_relacion_contable_idx1 ON conta.ttabla_relacion_contable
+  USING btree (tabla, tabla_id);
+  
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.trelacion_contable
+  ADD CONSTRAINT trelacion_contable__id_usuario_reg_fk FOREIGN KEY (id_usuario_reg)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+--------------- SQL ---------------
+
+CREATE INDEX trelacion_contable_idx4 ON conta.trelacion_contable
+  USING btree (id_cuenta);
+  
+
+--------------- SQL ---------------
+
+CREATE INDEX trelacion_contable_idx5 ON conta.trelacion_contable
+  USING btree (id_partida);
+  
+
+--------------- SQL ---------------
+
+CREATE INDEX trelacion_contable_idx6 ON conta.trelacion_contable
+  USING btree (id_centro_costo);     
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.trelacion_contable
+  ADD CONSTRAINT trelacion_contable__id_usuario_mod_fk FOREIGN KEY (id_usuario_mod)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD CONSTRAINT tdetalle_plantilla_comprobante__id_usuario_reg_fk FOREIGN KEY (id_usuario_reg)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+--------------- SQL ---------------
+
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD CONSTRAINT tdetalle_plantilla_comprobante__id_usuario_mod FOREIGN KEY (id_usuario_mod)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+--------------- SQL ---------------
+
+CREATE INDEX tdetalle_plantilla_comprobante_idx ON conta.tdetalle_plantilla_comprobante
+  USING btree (codigo);
+  
+   
+   
+/**********************************F-DEP-RAC-CONTA-109-12/03/2020****************************************/
+
+
