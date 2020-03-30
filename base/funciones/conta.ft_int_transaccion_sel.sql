@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,24 +12,25 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tint_transaccion'
  AUTOR: 		 (RAC)
  FECHA:	        01-09-2013 18:10:12
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
  ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
   #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares 'CONTA_MROMAYOR_SEL','CONTA_MROMAYOR_CONT','CONTA_AUXRE_SEL'
-  #5		 24/12/2108		  Manuel Guerra	  Correcion de sumas en axuiliares 'CONTA_TOTAUX_CONT'	
+  #5		 24/12/2108		  Manuel Guerra	  Correcion de sumas en axuiliares 'CONTA_TOTAUX_CONT'
   #10        02/01/2019    	  Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
-  #48		 16/05/2019		  Manuel Guerra	  agregar columna tipo de presupuesto	
+  #48		 16/05/2019		  Manuel Guerra	  agregar columna tipo de presupuesto
   #49		 17/05/2019		  Manuel Guerra	  correcion de join en reporte de cbte-transaccion
   #65        11/07/2019       EGS             Se agrega filtro para el parametro tipo en las trnsacciones  CONTA_AUXMAY_SEL,CONTA_AUXMAY_CONT,
                                               CONTA_TOTAUX_SEL,CONTA_TOTAUX_CONT
   #69        01/08/2019       Saul Zambrana	  Se han eliminado 9 columnas y añadido 6 a la transaccion CONTA_LDCTRANS_SEL para el reporte:Detalle comprobante-transacciones
   											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de
   #91        15/01/2020       JUAN            Libro mayor añadir columna beneficiario
-  											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de  
+  											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de
   #83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
   #95        23/01/2020       Rensi Arteaga   Incluir nro de tramite auxiliar
   #102        6/2/2020          Manuel Guerra     agregar campo nro_tramite_auxiliar, en vista del mayor
+  #111		 20/03/2020			MMV	ETR		 Correccion de logica
 ***************************************************************************/
 
 DECLARE
@@ -2124,80 +2123,21 @@ BEGIN
 	elseif(p_transaccion='CONTA_LDCTRANS_SEL')then
 
     	begin
-            /*
-			v_consulta:='select
-                          itr.id_int_transaccion ,
-                          icbt.id_int_comprobante , icbt.fecha_reg , icbt.fecha , icbt.nro_cbte , icbt.nro_tramite , icbt.glosa1::varchar  ,
-                          coalesce(itr.importe_debe_mb,0) as debe_mb ,
-                          coalesce(itr.importe_haber_mb,0) as haber_mb ,
-                          (coalesce(itr.importe_debe_mb,0) - coalesce(itr.importe_haber_mb,0)) as saldo_debehaber_mb,
-                          coalesce(itr.importe_gasto_mb,0) as gasto_mb,
-                          coalesce(itr.importe_recurso_mb,0) as recurso_mb ,
-
-                          (coalesce(itr.importe_gasto_mb,0) - coalesce(itr.importe_recurso_mb,0)) as saldo_gastorecurso_mb,
-                          coalesce(itr.importe_debe_mt,0) as debe_mt,
-                          coalesce(itr.importe_haber_mt,0) as haber_mt,
-                          (coalesce(itr.importe_debe_mt,0) - coalesce(itr.importe_haber_mt,0)) as saldo_debehaber_mt,
-                          coalesce(itr.importe_gasto_mt,0) as gasto_mt,
-                          coalesce(itr.importe_recurso_mt,0) as recurso_mt ,
-
-                          (coalesce(itr.importe_gasto_mt,0) - coalesce(itr.importe_recurso_mt,0)) as saldo_gastorecurso_mt,
-                          coalesce(itr.importe_debe_ma,0) as debe_ma,
-                          coalesce(itr.importe_haber_ma,0) as haber_ma,
-                          (coalesce(itr.importe_debe_ma,0) - coalesce(itr.importe_haber_ma,0)) as saldo_debehaber_ma,
-                          coalesce(itr.importe_gasto_ma,0) as gasto_ma,
-                          coalesce(itr.importe_recurso_ma,0) as recurso_ma,
-                          (coalesce(itr.importe_gasto_ma,0) - coalesce(itr.importe_recurso_ma,0)) as saldo_gastorecurso_ma ,
-
-
-                          icbt.tipo_cambio_3 as tc_ufv,
-
-                          cue.tipo_cuenta ,
-                          cue.nro_cuenta as cuenta_nro,
-                          cue.nombre_cuenta as cuenta ,
-
-                          par.sw_movimiento as partida_tipo,
-                          par.codigo as partida_codigo,
-                          par.nombre_partida as partida ,
-
-                          tcct.codigo_techo as centro_costo_techo_codigo,
-                          tcct.descripcion_techo as centro_costo_techo,
-                          tcc.codigo as centro_costo_codigo,
-                          tcc.descripcion as centro_costo ,
-
-                          aux.codigo_auxiliar as aux_codigo,
-                          aux.nombre_auxiliar as aux_nombre
-
-                          from conta.tint_comprobante icbt
-                          join param.tperiodo per on per.id_periodo = icbt.id_periodo
-                          join conta.tint_transaccion itr on itr.id_int_comprobante = icbt.id_int_comprobante
-                          join conta.tcuenta cue on cue.id_cuenta = itr.id_cuenta
-                          join pre.tpartida par on par.id_partida = itr.id_partida
-                          join param.tcentro_costo cc on cc.id_centro_costo=itr.id_centro_costo
-                          left join param.ttipo_cc tcc on tcc.id_tipo_cc=cc.id_tipo_cc
-                          left join param.vtipo_cc_techo tcct on tcc.id_tipo_cc =any (tcct.ids)
-                          left join conta.tauxiliar aux on aux.id_auxiliar = itr.id_auxiliar
-
-                          where icbt.estado_reg = ''validado'' and  ';
-                          */
-
 
             IF  v_parametros.tipo_reporte='auditoria' THEN
                v_atributos := ',pers.nombre_completo2::varchar as usuario_reg_transaccion,
                                dcv.nro_documento,
-                               regexp_replace(regexp_replace(itr.glosa,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa_transaccion  ';
+                               regexp_replace(regexp_replace(itr.glosa,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa_transaccion';
                v_join :='left join segu.tusuario usu on usu.id_usuario= itr.id_usuario_reg
                          left join segu.vpersona pers on pers.id_persona=usu.id_persona
                          left join conta.tdoc_compra_venta dcv on dcv.id_int_comprobante=icbt.id_int_comprobante';
                ELSE
                v_atributos := ', '' ''::varchar as usuario_reg_transaccion,
                               '' ''::varchar as nro_documento,
-                              '' ''::varchar as glosa_transaccion ';
+                              regexp_replace(regexp_replace(itr.glosa,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa_transaccion';
                v_join := '';
             END IF;
-            --#48
-            --#49
-            --#69
+            --#111 correcion de logica
 			v_consulta:='select
                           itr.id_int_transaccion ,
                           icbt.id_int_comprobante , icbt.fecha_reg , icbt.fecha , icbt.nro_cbte , icbt.nro_tramite ,
@@ -2267,7 +2207,7 @@ BEGIN
                           where icbt.estado_reg = ''validado''  and ';
 
 			v_consulta:=v_consulta||v_parametros.filtro;
-
+			raise notice '--> %',v_consulta;
 			return v_consulta;
 
 		end;
@@ -2747,4 +2687,8 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
+
+ALTER FUNCTION conta.ft_int_transaccion_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

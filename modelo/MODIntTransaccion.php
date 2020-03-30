@@ -24,6 +24,7 @@ ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
 #99 		30/1/2020		    Manuel Guerra	    agregar columna de estado_wf y proceso_wf
 #102        6/2/2020            Manuel Guerra       agregar campo nro_tramite_auxiliar, en vista del mayor
 #108        10/03/2020          Rensi ARteaga       generar cheques de manera manual desde la interface VoBo Finanzas
+#111		 20/03/2020			MMV	ETR		        Correcion de logica
  */
 class MODIntTransaccion extends MODbase{
 	
@@ -815,64 +816,65 @@ class MODIntTransaccion extends MODbase{
 		return $this->respuesta;
 	}
 	function listaDetalleComprobanteTransacciones(){
-		//Definicion de variables para ejecucion del procedimientp
-		$this->procedimiento='conta.ft_int_transaccion_sel';
-		$this->transaccion='CONTA_LDCTRANS_SEL';
-		$this->tipo_procedimiento='SEL';
-		
-		//$this->setCount(false);	
-		$this->setParametro('tipo_reporte','tipo_reporte','varchar');
-			
-		$this->captura('id_int_transaccion','int4');
-		$this->captura('id_int_comprobante','int4');
-		$this->captura('fecha_reg','timestamp');
-		$this->captura('fecha','date');
-		$this->captura('nro_cbte','varchar');
-		$this->captura('nro_tramite','varchar');
-		$this->captura('glosa1','varchar');
-		$this->captura('debe_mb','numeric');
-		$this->captura('haber_mb','numeric');
-		$this->captura('saldo_debehaber_mb','numeric');
+        //111
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.ft_int_transaccion_sel';
+        $this->transaccion='CONTA_LDCTRANS_SEL';
+        $this->tipo_procedimiento='SEL';
 
-		// #69
+        //$this->setCount(false);
+        $this->setParametro('tipo_reporte','tipo_reporte','varchar');
 
-		$this->captura('debe_mt','numeric');
-		$this->captura('haber_mt','numeric');
-		$this->captura('saldo_debehaber_mt','numeric');
+        $this->captura('id_int_transaccion','int4');
+        $this->captura('id_int_comprobante','int4');
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('fecha','date');
+        $this->captura('nro_cbte','varchar');
+        $this->captura('nro_tramite','varchar');
+        $this->captura('glosa1','varchar');
+        $this->captura('debe_mb','numeric');
+        $this->captura('haber_mb','numeric');
+        $this->captura('saldo_debehaber_mb','numeric');
 
         // #69
 
-		$this->captura('debe_ma','numeric');
-		$this->captura('haber_ma','numeric');
-		$this->captura('saldo_debehaber_ma','numeric');
+        $this->captura('debe_mt','numeric');
+        $this->captura('haber_mt','numeric');
+        $this->captura('saldo_debehaber_mt','numeric');
 
         // #69
-		
-		$this->captura('tc_ufv','numeric');
-		$this->captura('tipo_cuenta','varchar');
-		$this->captura('cuenta_nro','varchar');
-		$this->captura('cuenta','varchar');
-		
-		$this->captura('partida_tipo','varchar');
-		$this->captura('partida_codigo','varchar');
-		$this->captura('partida','varchar');
-		
-		$this->captura('centro_costo_techo_codigo','varchar');
-		$this->captura('centro_costo_techo','varchar');
-		$this->captura('centro_costo_codigo','varchar');
-		$this->captura('centro_costo','varchar');
-		
-		$this->captura('aux_codigo','varchar');
-		$this->captura('aux_nombre','varchar');
-		
-		$this->captura('tipo_transaccion','varchar');
-		$this->captura('periodo','varchar');
-		$this->captura('hora','varchar');
-		$this->captura('fecha_reg_transaccion','timestamp');
-		$this->captura('usuario_reg_transaccion','varchar');
-		$this->captura('nro_documento','varchar');
-		$this->captura('glosa_transaccion','varchar');
-		$this->captura('nombre','varchar');
+
+        $this->captura('debe_ma','numeric');
+        $this->captura('haber_ma','numeric');
+        $this->captura('saldo_debehaber_ma','numeric');
+
+        // #69
+
+        $this->captura('tc_ufv','numeric');
+        $this->captura('tipo_cuenta','varchar');
+        $this->captura('cuenta_nro','varchar');
+        $this->captura('cuenta','varchar');
+
+        $this->captura('partida_tipo','varchar');
+        $this->captura('partida_codigo','varchar');
+        $this->captura('partida','varchar');
+
+        $this->captura('centro_costo_techo_codigo','varchar');
+        $this->captura('centro_costo_techo','varchar');
+        $this->captura('centro_costo_codigo','varchar');
+        $this->captura('centro_costo','varchar');
+
+        $this->captura('aux_codigo','varchar');
+        $this->captura('aux_nombre','varchar');
+
+        $this->captura('tipo_transaccion','varchar');
+        $this->captura('periodo','varchar');
+        $this->captura('hora','varchar');
+        $this->captura('fecha_reg_transaccion','timestamp');
+        $this->captura('usuario_reg_transaccion','varchar');
+        $this->captura('nro_documento','varchar');
+        $this->captura('glosa_transaccion','varchar');
+        $this->captura('nombre','varchar');
 
         // #69
         $this->captura('beneficiario','varchar');
@@ -881,19 +883,13 @@ class MODIntTransaccion extends MODbase{
         $this->captura('persona_create','text');
         $this->captura('persona_mod','text');
         $this->captura('nro_tramite_aux','varchar');
-		//$this->captura('beneficiario','varchar');
-		/*
-		$this->captura('fecha','timestamp');
-		$this->captura('nro_cbte','varchar');
-		$this->captura('nro_tramite','varchar');
-		$this->captura('glosa1','varchar');*/
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
-		
-		//var_dump($this->armarConsulta());
-		//Devuelve la respuesta
-		return $this->respuesta;
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
 	}
     /***************#92-INI-MMV**************/
     function mayorNroTramite(){
