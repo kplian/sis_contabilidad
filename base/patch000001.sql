@@ -5294,3 +5294,13 @@ CREATE INDEX tint_comprobante_idx2 ON conta.tint_comprobante
   
  
 /***********************************F-SCP-RAC-CONTA-108-06/02/2020****************************************/
+
+
+/***********************************I-SCP-MANU-CONTA-108-17/04/2020****************************************/
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN nota_debito_agencia VARCHAR;
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.nota_debito_agencia
+IS 'campo disponible para la transcripción del nro de nota de débito por parte de las agencias de viaje';
+
+/***********************************F-SCP-MANU-CONTA-108-17/04/2020****************************************/

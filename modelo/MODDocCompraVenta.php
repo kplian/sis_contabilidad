@@ -14,6 +14,7 @@
  #2000 ETR        20/08/2018        EGS               se aumento campos de importes de retencion de garantias en listarDocCompraVentaCobro
  #2001 ETR        12/09/2018        EGS 			 se aumento los saldos separados para cobros de anticipos y rega
  #76              28/11/2019        EGS              Se filtra por tipo de cobro
+ #112			  17/04/2020		manu		     reportes de autorizacion de pasajes y registro de pasajeros
 */
 class MODDocCompraVenta extends MODbase{
 	
@@ -112,13 +113,7 @@ class MODDocCompraVenta extends MODbase{
 		
 		$this->captura('tipo_informe','varchar');
 		$this->captura('id_doc_compra_venta_fk','int8');
-		
-		
-		
-		
-		
-
-		
+		$this->captura('nota_debito_agencia','varchar');		//#112						
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -645,7 +640,7 @@ class MODDocCompraVenta extends MODbase{
 
 			$this->setParametro('estacion','estacion','varchar');
 			$this->setParametro('id_punto_venta','id_punto_venta','integer');
-			$this->setParametro('id_agencia','id_agencia','integer');
+			$this->setParametro('id_agencia','id_agencia','integer');			
 
 			//Ejecuta la instruccion
             $this->armarConsulta();
@@ -1889,6 +1884,75 @@ class MODDocCompraVenta extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-    /********F-MMV-28-09-2018 ERT **************/
+	/********F-MMV-28-09-2018 ERT **************/
+	//
+	function listarNroTramite(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_doc_compra_venta_sel';
+		$this->transaccion='CONTA_LISTRA_SEL';
+		$this->tipo_procedimiento='SEL';
+		//captura parametros
+		//$this->setParametro('tipo','tipo','VARCHAR');
+		//Definicion de la lista del resultado del query
+		$this->captura('nro_tramite','varchar');		
+	  	//Ejecuta la instruccion
+	  	$this->armarConsulta();
+	  	$this->ejecutarConsulta();	  
+	  	//Devuelve la respuesta
+		return $this->respuesta;
+	}	  
+	//#112
+	function repAutorizacion(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_doc_compra_venta_sel';
+		$this->transaccion='CONTA_REPAUT_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this-> setCount(false);
+		$this->setParametro('id_depto_conta','id_depto_conta','int4');
+		//$this->setParametro('id_gestion','id_gestiongestion','int4');		
+		$this->setParametro('id_periodo','id_periodo','int4');
+		
+		//Definicion de la lista del resultado del query
+		
+		$this->captura('nota_debito_agencia','varchar');
+		$this->captura('desc_funcionario2','varchar');
+		$this->captura('nro_documento','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('obs','varchar');
+		$this->captura('descripcion','varchar');	
+		$this->captura('desc_moneda','varchar');
+		$this->captura('importe_doc','numeric');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		return $this->respuesta;
+	}
+	//#112
+	function RepRegPasa(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_doc_compra_venta_sel';
+		$this->transaccion='CONTA_REPREPAS_SEL';
+		$this->tipo_procedimiento='SEL';
+		$this-> setCount(false);
+		$this->setParametro('id_pago_simple','id_pago_simple','int4');
+		
+		//Definicion de la lista del resultado del query
+		
+		$this->captura('desc_funcionario2','varchar');
+		$this->captura('nro_documento','varchar');
+		$this->captura('nota_debito_agencia','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('obs','varchar');
+		$this->captura('descripcion','varchar');	
+		$this->captura('importe_doc','numeric');
+		$this->captura('desc_moneda','varchar');
+		$this->captura('tipago','varchar');
+		$this->captura('rotulo_comercial','varchar');		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		return $this->respuesta;
+	}
 }
 ?>

@@ -22,6 +22,7 @@ ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:
 #1			20/08/2018						EGS					En la transaccion CONTA_DCVCBR_SEL se modifico consulta para cobros y saldos separados entre cobro comun y retencion de garantias
 #2			13/08/2018						EGS					en la transaccion CONTA_DCVCBR_SEL se modifico consulta para cobros y saldos separados de anticipos
 #76         28/11/2019                      EGS                 Se agrega filtro de tipo de cobro
+#112	    17/04/2020					    manuel guerra	    reportes de autorizacion de pasajes y registro de pasajeros
 ***************************************************************************/
 
 DECLARE
@@ -141,7 +142,8 @@ BEGIN
                             ic.estado_reg as estado_cbte,
                             COALESCE(dcv.codigo_aplicacion,'''') as  codigo_aplicacion,
                             pla.tipo_informe,
-                            dcv.id_doc_compra_venta_fk
+                            dcv.id_doc_compra_venta_fk,
+                            dcv.nota_debito_agencia
 
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
@@ -157,6 +159,7 @@ BEGIN
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
+            raise notice '%',v_consulta;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			--Devuelve la respuesta
 			return v_consulta;
@@ -1434,6 +1437,139 @@ BEGIN
 
 		end;
 
+	/*********************************
+ 	#TRANSACCION:  'CONTA_LISTRA_SEL'
+ 	#DESCRIPCION:	listado de tramites de vi/fa
+ 	#AUTOR:		manu   #112
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_LISTRA_SEL')then
+
+    	begin
+        	v_filtro =' 0 = 0 ';
+        	IF p_administrador = 1 THEN
+            	v_filtro = v_filtro|| 'and 0=0';
+            ELSE
+            	v_filtro = v_filtro||' and cd.id_funcionario IN (select *
+                                                		FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))';
+            END IF;
+    		--Sentencia de la consulta
+			v_consulta:='select
+                        DISTINCT(cd.nro_tramite)::varchar
+                        from cd.tcuenta_doc cd
+                        where 0=0 and '||v_filtro||'';
+            raise notice '%',v_consulta;
+            --raise EXCEPTION '%',v_consulta;
+            v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+    /*********************************
+ 	#TRANSACCION:  'CONTA_LISTRA_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		manu  #112
+ 	#FECHA:		18-08-2015 15:57:09
+	***********************************/
+
+	elsif(p_transaccion='CONTA_LISTRA_CONT')then
+
+		begin
+        	v_filtro =' 0 = 0 ';
+        	IF p_administrador = 1 THEN
+            	v_filtro = v_filtro|| 'and 0=0';
+            ELSE
+            	v_filtro = v_filtro|| 'and cd.id_funcionario IN (select *
+                                                		FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))';
+            END IF;
+    		--Sentencia de la consulta
+			v_consulta:='select
+                        COUNT(cd.nro_tramite)
+                        from cd.tcuenta_doc cd
+                        where 0=0 and '||v_filtro||'';
+            --Devuelve la respuesta
+			return v_consulta;
+
+		end;
+
+
+        /*********************************
+        #TRANSACCION:  'CONTA_REPAUT_SEL'
+        #DESCRIPCION:	Reporte de DETALLE DE AUTORIZAIOCN DE PASAJES AEREOS
+        #AUTOR:		mp  #112
+        #FECHA:		29-08-2013 00:28:30
+        ***********************************/
+		elsif(p_transaccion='CONTA_REPAUT_SEL') then
+        
+     		BEGIN
+                              
+				v_consulta:='select
+                            COALESCE(dcv.nota_debito_agencia,''-'')::VARCHAR,
+                            COALESCE(fun.desc_funcionario2,''-'')::VARCHAR,
+                            COALESCE(dcv.nro_documento,''-'')::VARCHAR,
+                            COALESCE(dcv.nro_tramite,''-'')::VARCHAR,
+                            COALESCE(dcv.obs,''-'')::VARCHAR,
+                            COALESCE(pres.descripcion,''-'')::VARCHAR,
+                            COALESCE(mon.codigo,''-'')::VARCHAR	 as desc_moneda,
+                            COALESCE(dcv.importe_neto,0)::numeric as importe_doc
+                            from conta.tdoc_compra_venta dcv
+                            join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                            left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                            left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+                            join conta.tdoc_concepto cop on cop.id_doc_compra_venta=dcv.id_doc_compra_venta
+                            join param.tcentro_costo cc on cc.id_centro_costo=cop.id_centro_costo
+                            join pre.tpresupuesto pres on pres.id_centro_costo=cc.id_centro_costo
+                            where dcv.revisado = ''si'' and
+                            dcv.sw_pgs = ''reg'' and
+                            dcv.tipo = ''compra'' AND                            
+                            '; 
+                v_consulta:=v_consulta||v_parametros.filtro;
+                raise notice '%',v_consulta;
+                --raise EXCEPTION '%',v_consulta;
+				return v_consulta;
+			END;
+    
+    	/*********************************
+        #TRANSACCION:  'CONTA_REPREPAS_SEL'
+        #DESCRIPCION:	Reporte de proceso de registro de Pasajes Aéreo
+        #AUTOR:		mp #112
+        #FECHA:		29-08-2013 00:28:30
+        ***********************************/
+		elsif(p_transaccion='CONTA_REPREPAS_SEL') then
+        
+     		BEGIN
+                              
+				v_consulta:='SELECT
+                             COALESCE(fun.desc_funcionario2,''-'') ::varchar,
+                             COALESCE(dcv.nro_documento,''-'') ::varchar,
+                             COALESCE(dcv.nota_debito_agencia,''-'') ::varchar, 
+                             COALESCE(dcv.nro_tramite,''-'') ::varchar, 
+                             COALESCE(dcv.obs,''-'') ::varchar, 
+                             COALESCE(pres.descripcion,''-'') ::varchar, 
+                             COALESCE(dcv.importe_neto,0)::numeric as importe_doc,
+                             COALESCE(mon.codigo,''-'') ::varchar as desc_moneda, 
+                             COALESCE(ttp.nombre,''-'') ::varchar as tipago,
+                             COALESCE(pro.rotulo_comercial,''-'') ::varchar as rotulo_comercial                              
+                             from cd.tpago_simple_det paside
+                             join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = paside.id_doc_compra_venta
+                             join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                             left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante 
+                             left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+                             left join conta.tdoc_concepto cop on cop.id_doc_compra_venta=dcv.id_doc_compra_venta
+                             left join param.tcentro_costo cc on cc.id_centro_costo=cop.id_centro_costo
+                             left join pre.tpresupuesto pres on pres.id_centro_costo=cc.id_centro_costo
+                             join cd.tpago_simple ps on ps.id_pago_simple=paside.id_pago_simple
+                             left join cd.ttipo_pago_simple ttp on ttp.id_tipo_pago_simple=ps.id_tipo_pago_simple
+                             left join param.tproveedor pro on pro.id_proveedor = ps.id_proveedor                           
+                             where'; 
+                v_consulta:=v_consulta||v_parametros.filtro;
+                raise notice '%',v_consulta;
+                --raise EXCEPTION '%',v_consulta;
+				return v_consulta;
+			END;
+    
     else
 
 		raise exception 'Transaccion inexistente';
@@ -1454,4 +1590,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

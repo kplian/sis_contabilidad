@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -25,6 +27,7 @@ $body$
  #1999  ETR        19/07/2018        RAC  KPLIAN      Relacionar facturas NCD
  #2000  ETR        03/10/2018        RAC  KPLIAN      Para la isnercion y edicion se añade opcionalmente el parametro codigo_aplicacion 
  #12    ETR        12/10/2018        RAC  KPLIAN      Se añade  pametro para isnertar el id_doc_compra_venta_fk para notas de credito
+ #112			  17/04/2020		manuel guerra     reportes de autorizacion de pasajes y registro de pasajeros
 ***************************************************************************/
 
 DECLARE
@@ -149,9 +152,13 @@ BEGIN
              v_nro_tramite
           from conta.tint_comprobante c
           where c.id_int_comprobante = v_id_int_comprobante;
-          
       end if;
       
+      
+      if (pxp.f_existe_parametro(p_tabla,'nro_tramite')) and v_nro_tramite is null then
+          v_nro_tramite=v_parametros.nro_tramite;
+      end if;
+           
       --RAC 05/01/2018 nuevos para emtros para registro de pagos simplificados 
       if (pxp.f_existe_parametro(p_tabla,'id_funcionario')) then
           v_id_funcionario = v_parametros.id_funcionario;
@@ -327,7 +334,8 @@ BEGIN
         sw_pgs,
         codigo_aplicacion,      --#1999
         id_contrato,            --#2000
-        id_doc_compra_venta_fk  --#123
+        id_doc_compra_venta_fk,  --#123
+        nota_debito_agencia --#112
 
       ) values(
         v_parametros.tipo,
@@ -373,7 +381,8 @@ BEGIN
         v_sw_pgs,
         v_codigo_aplicacion,      --#1999
         v_id_contrato,            --#2000
-        v_id_doc_compra_venta_fk  --#123
+        v_id_doc_compra_venta_fk,  --#123
+        v_parametros.nota_debito_agencia  --#112
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -409,7 +418,7 @@ BEGIN
           where id_doc_compra_venta = v_id_doc_compra_venta;
         end if;
       end if;
-
+	  
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Documentos Compra/Venta almacenado(a) con exito (id_doc_compra_venta'||v_id_doc_compra_venta||')');
       v_resp = pxp.f_agrega_clave(v_resp,'id_doc_compra_venta',v_id_doc_compra_venta::varchar);
@@ -915,7 +924,8 @@ BEGIN
         id_funcionario = v_id_funcionario,
         sw_pgs = v_sw_pgs,
         codigo_aplicacion = v_codigo_aplicacion,
-        id_contrato = v_id_contrato
+        id_contrato = v_id_contrato,
+        nota_debito_agencia = v_parametros.nota_debito_agencia
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
@@ -1683,4 +1693,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
