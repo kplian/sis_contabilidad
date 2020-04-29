@@ -23,6 +23,8 @@ ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:
 #2			13/08/2018						EGS					en la transaccion CONTA_DCVCBR_SEL se modifico consulta para cobros y saldos separados de anticipos
 #76         28/11/2019                      EGS                 Se agrega filtro de tipo de cobro
 #112	    17/04/2020					    manuel guerra	    reportes de autorizacion de pasajes y registro de pasajeros
+#113         29/04/2020		     			MMV	                 Reporte Registro Ventas CC
+
 ***************************************************************************/
 
 DECLARE
@@ -53,6 +55,8 @@ DECLARE
    v_bandera_regularizacion			varchar;
    v_bandera_regularizacion_rg			varchar;
     v_bandera_regularizacion_ant		varchar;
+        v_filtro_dpte 			varchar;
+
 BEGIN
 
 	v_nombre_funcion = 'conta.ft_doc_compra_venta_sel';
@@ -1569,6 +1573,98 @@ BEGIN
                 --raise EXCEPTION '%',v_consulta;
 				return v_consulta;
 			END;
+
+			/*********************************
+ 	#TRANSACCION:  'CONTA_RRC_SEL' #113
+ 	#DESCRIPCION:	Reporte Registros Ventas
+ 	#AUTOR:		MMV
+ 	#FECHA:		21-09-2020
+	***********************************/
+
+	elsif(p_transaccion='CONTA_RRC_SEL')then
+
+		begin
+
+            v_filtro_dpte = '0 = 0';
+
+            if(v_parametros.id_depto <> 0)then
+            	v_filtro_dpte = 'dcv.id_depto_conta = '||v_parametros.id_depto ;
+            end if;
+
+			v_consulta:='select	dcv.id_doc_compra_venta,
+                                dcv.revisado,
+                                dcv.tipo,
+                                COALESCE(dcv.importe_excento,0)::numeric as importe_excento,
+                                dcv.id_plantilla,
+                                dcv.fecha,
+                                dcv.nro_documento,
+                                dcv.nit,
+                                COALESCE(dcv.importe_ice,0)::numeric as importe_ice,
+                                dcv.nro_autorizacion,
+                                COALESCE(dcv.importe_iva,0)::numeric as importe_iva,
+                                COALESCE(dcv.importe_descuento,0)::numeric as importe_descuento,
+                                COALESCE(dcv.importe_doc,0)::numeric as importe_doc,
+                                dcv.estado,
+                                dcv.id_depto_conta,
+                                dcv.id_origen,
+                                dcv.obs,
+                                dcv.estado_reg,
+                                dcv.codigo_control,
+                                COALESCE(dcv.importe_it,0)::numeric as importe_it,
+                                dcv.razon_social,
+                                dep.nombre as desc_depto,
+                                pla.desc_plantilla,
+                                COALESCE(dcv.importe_descuento_ley,0)::numeric as importe_descuento_ley,
+                                COALESCE(dcv.importe_pago_liquido,0)::numeric as importe_pago_liquido,
+                                dcv.nro_dui,
+                                dcv.id_moneda,
+                                mon.codigo as desc_moneda,
+                                dcv.id_int_comprobante,
+                                COALESCE(dcv.nro_tramite,''''),
+                                COALESCE(ic.nro_cbte,dcv.id_int_comprobante::varchar)::varchar  as desc_comprobante,
+                                COALESCE(dcv.importe_pendiente,0)::numeric as importe_pendiente,
+                                COALESCE(dcv.importe_anticipo,0)::numeric as importe_anticipo,
+                                COALESCE(dcv.importe_retgar,0)::numeric as importe_retgar,
+                                COALESCE(dcv.importe_neto,0)::numeric as importe_neto,
+                                aux.id_auxiliar,
+                                aux.codigo_auxiliar,
+                                aux.nombre_auxiliar,
+                                dcv.id_tipo_doc_compra_venta,
+                                (tdcv.codigo||'' - ''||tdcv.nombre)::Varchar as desc_tipo_doc_compra_venta,
+                                (dcv.importe_doc -  COALESCE(dcv.importe_descuento,0) - COALESCE(dcv.importe_excento,0))     as importe_aux_neto,
+                                fun.id_funcionario,
+                                fun.desc_funcionario2::varchar as desc_funcionario,
+                                ic.fecha as fecha_cbte,
+                                ic.estado_reg as estado_cbte,
+                                pla.tipo_informe,
+                                cc.codigo_cc
+                            from conta.tdoc_compra_venta dcv
+                              inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
+                              inner join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
+                              inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                              inner join conta.tdoc_concepto dco on dco.id_doc_compra_venta = dcv.id_doc_compra_venta
+                              inner join param.vcentro_costo cc on cc.id_centro_costo = dco.id_centro_costo
+                              left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                              left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
+                              left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
+                              left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
+                              where dcv.id_periodo = '||v_parametros.id_periodo||'and ic.estado_reg = ''validado''
+                              and '||v_filtro_dpte||' and dcv.id_plantilla = '||v_parametros.id_plantilla||
+                              'and  dcv.revisado = '''||v_parametros.revisado||''' ';
+			--Devuelve la respuesta
+            if (v_parametros.agrupar= 'centro_costo') then
+             	v_consulta:=v_consulta||'order by codigo_cc asc';
+            end if;
+            if (v_parametros.agrupar= 'depto') then
+             	v_consulta:=v_consulta||'order by desc_depto asc';
+            end if;
+             if (v_parametros.agrupar= 'depto_cc') then
+             	v_consulta:=v_consulta||'order by desc_depto asc ,codigo_cc asc';
+            end if;
+			return v_consulta;
+
+		end;
+
     
     else
 

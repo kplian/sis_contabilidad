@@ -15,7 +15,9 @@
  #2001 ETR        12/09/2018        EGS 			 se aumento los saldos separados para cobros de anticipos y rega
  #76              28/11/2019        EGS              Se filtra por tipo de cobro
  #112			  17/04/2020		manu		     reportes de autorizacion de pasajes y registro de pasajeros
-*/
+#113  ETR       29/04/2020		     MMV	             Reporte Registro Ventas CC
+
+ */
 class MODDocCompraVenta extends MODbase{
 	
 	function __construct(CTParametro $pParam){
@@ -1954,5 +1956,75 @@ class MODDocCompraVenta extends MODbase{
 		$this->ejecutarConsulta();
 		return $this->respuesta;
 	}
+    function reporteRegistroVentas(){  //#113
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='conta.ft_doc_compra_venta_sel';
+        $this->transaccion='CONTA_RRC_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this->setCount(false);
+
+        $this->setParametro('id_periodo','id_periodo','int4');
+        $this->setParametro('id_depto','id_depto','int4');
+        $this->setParametro('id_plantilla','id_plantilla','int4');
+        $this->setParametro('revisado','revisado','varchar');
+        $this->setParametro('agrupar','agrupar','varchar');
+
+        //Definicion de la lista del resultado del query
+        $this->captura('id_doc_compra_venta','int8');
+        $this->captura('revisado','varchar');
+        $this->captura('tipo','varchar');
+        $this->captura('importe_excento','numeric');
+        $this->captura('id_plantilla','int4');
+        $this->captura('fecha','date');
+        $this->captura('nro_documento','varchar');
+        $this->captura('nit','varchar');
+        $this->captura('importe_ice','numeric');
+        $this->captura('nro_autorizacion','varchar');
+        $this->captura('importe_iva','numeric');
+        $this->captura('importe_descuento','numeric');
+        $this->captura('importe_doc','numeric');
+        $this->captura('estado','varchar');
+        $this->captura('id_depto_conta','int4');
+        $this->captura('id_origen','int4');
+        $this->captura('obs','varchar');
+        $this->captura('estado_reg','varchar');
+        $this->captura('codigo_control','varchar');
+        $this->captura('importe_it','numeric');
+        $this->captura('razon_social','varchar');
+
+        $this->captura('desc_depto','varchar');
+        $this->captura('desc_plantilla','varchar');
+        $this->captura('importe_descuento_ley','numeric');
+        $this->captura('importe_pago_liquido','numeric');
+        $this->captura('nro_dui','varchar');
+        $this->captura('id_moneda','int4');
+        $this->captura('desc_moneda','varchar');
+        $this->captura('id_int_comprobante','int4');
+        $this->captura('nro_tramite','varchar');
+        $this->captura('desc_comprobante','varchar');
+        $this->captura('importe_pendiente','numeric');
+        $this->captura('importe_anticipo','numeric');
+        $this->captura('importe_retgar','numeric');
+        $this->captura('importe_neto','numeric');
+        $this->captura('id_auxiliar','integer');
+        $this->captura('codigo_auxiliar','varchar');
+        $this->captura('nombre_auxiliar','varchar');
+        $this->captura('id_tipo_doc_compra_venta','integer');
+        $this->captura('desc_tipo_doc_compra_venta','varchar');
+        $this->captura('importe_aux_neto','numeric');
+        $this->captura('id_funcionario','integer');
+        $this->captura('desc_funcionario','varchar');
+        $this->captura('fecha_cbte','date');
+        $this->captura('estado_cbte','varchar');
+        $this->captura('tipo_informe','varchar');
+        $this->captura('codigo_cc','text');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        // var_dump($this->respuesta);exit;
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 }
 ?>

@@ -1741,6 +1741,13 @@ VALUES
   
 
 /***********************************F-DAT-RAC-CONTA-108-04/03/2020****************************************/
+/***********************************I-DAT-MMV-CONTA-113-29/04/2020****************************************/
+select pxp.f_insert_tgui ('Reporte Registro Ventas CC', 'Reporte Registro Ventas CC', 'RVC', 'si', 50, 'sis_contabilidad/vista/reporte_registro_ventas/ReporteRegistroVentas.php', 3, '', 'ReporteRegistroVentas', 'CONTA');
+select pxp.f_insert_testructura_gui ('RVC', 'REPCON');
+/***********************************F-DAT-MMV-CONTA-113-29/04/2020****************************************/
+
+
+  
   
   
   
