@@ -28,6 +28,7 @@ $body$
  #2000  ETR        03/10/2018        RAC  KPLIAN      Para la isnercion y edicion se añade opcionalmente el parametro codigo_aplicacion 
  #12    ETR        12/10/2018        RAC  KPLIAN      Se añade  pametro para isnertar el id_doc_compra_venta_fk para notas de credito
  #112			  17/04/2020		manuel guerra     reportes de autorizacion de pasajes y registro de pasajeros
+ #114       29/04/2020    manuel guerra     modificacion de nro_tramite
 ***************************************************************************/
 
 DECLARE
@@ -888,7 +889,10 @@ BEGIN
       if (pxp.f_existe_parametro(p_tabla,'id_contrato')) then
           v_id_contrato = v_parametros.id_contrato;     
       end if;
-      
+      --#113
+      if (pxp.f_existe_parametro(p_tabla,'nro_tramite')) then
+          v_nro_tramite = v_parametros.nro_tramite;     
+      end if;
 
       --Sentencia de la modificacion
       update conta.tdoc_compra_venta set
@@ -925,7 +929,8 @@ BEGIN
         sw_pgs = v_sw_pgs,
         codigo_aplicacion = v_codigo_aplicacion,
         id_contrato = v_id_contrato,
-        nota_debito_agencia = v_parametros.nota_debito_agencia
+        nota_debito_agencia = v_parametros.nota_debito_agencia,
+        nro_tramite = v_nro_tramite      --#114
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
