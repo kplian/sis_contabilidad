@@ -5958,13 +5958,7 @@ ALTER TABLE conta.tcuenta
 
 CREATE INDEX tcuenta_idx1 ON conta.tcuenta
   USING btree (nro_cuenta);
-  
-
---------------- SQL ---------------
-
-CREATE INDEX tcuenta_idx1 ON conta.tcuenta
-  USING btree (nro_cuenta);
-  
+    
 --------------- SQL ---------------
 
 ALTER TABLE conta.ttabla_relacion_contable
