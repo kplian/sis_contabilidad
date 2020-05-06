@@ -24,7 +24,7 @@ ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:
 #76         28/11/2019                      EGS                 Se agrega filtro de tipo de cobro
 #112	    17/04/2020					    manuel guerra	    reportes de autorizacion de pasajes y registro de pasajeros
 #113         29/04/2020		     			MMV	                 Reporte Registro Ventas CC
-#114      29/04/2020            manuelguerra    agregar propiedades de filtrado
+
 ***************************************************************************/
 
 DECLARE
@@ -1459,12 +1459,12 @@ BEGIN
                                                 		FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))';
             END IF;
     		--Sentencia de la consulta
-            v_consulta:='select
+			v_consulta:='select
                         DISTINCT(cd.nro_tramite)::varchar
                         from cd.tcuenta_doc cd
-                        where 0=0 and '||v_filtro||' and';
-            --#114 
-            v_consulta:=v_consulta||v_parametros.filtro;
+                        where 0=0 and '||v_filtro||'';
+            raise notice '%',v_consulta;
+            --raise EXCEPTION '%',v_consulta;
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			--Devuelve la respuesta
@@ -1492,9 +1492,7 @@ BEGIN
 			v_consulta:='select
                         COUNT(cd.nro_tramite)
                         from cd.tcuenta_doc cd
-                        where 0=0 and '||v_filtro||' and';
-                        --#114 
-            v_consulta:=v_consulta||v_parametros.filtro;
+                        where 0=0 and '||v_filtro||'';
             --Devuelve la respuesta
 			return v_consulta;
 
