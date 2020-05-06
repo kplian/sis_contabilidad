@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -16,47 +18,53 @@ $body$
 ***************************************************************************
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-	ISSUE 		 FECHA   		AUTOR				 DESCRIPCION:  
-  #2      		30/11/2018    	CHROS       		CONTROL PARA EVITAR EDITAR DATOS EN TRANSACCIONES
-  #90			19/12/2018		EGS					se hizo validacion para forzar a escoger un axuiliar si existe para la cuenta    
-  #3 endetr   20/12/2018  CHROS     permitir cambiar montos de transacción con un límite de centavo
+    ISSUE          FECHA           AUTOR                 DESCRIPCION:  
+ #2             30/11/2018        CHROS             CONTROL PARA EVITAR EDITAR DATOS EN TRANSACCIONES
+ #90            19/12/2018        EGS               se hizo validacion para forzar a escoger un axuiliar si existe para la cuenta    
+ #3 endetr      20/12/2018        CHROS             permitir cambiar montos de transacción con un límite de centavo
+ #108 ETR       04/03/2020        RAC KPLIAN        deshabilitar la integracion con LB segun configuracion de variable global.
+ #110 ETR       25/03/2020        RAC KPLIAN        Al editar, eliminar o insertar validar que no exista un cheque generado
 ***************************************************************************/
 
 DECLARE
 
-     	v_nro_requerimiento      	integer;
-      	v_parametros             	record;
-        v_registros        			record;
-        v_registros_trans    		record;
-     	v_id_requerimiento       	integer;
-     	v_resp                		varchar;
-      	v_nombre_funcion        	text;
-      	v_mensaje_error         	text;
-      	v_id_int_transaccion  		integer;
-    
-       	v_importe_debe      		numeric;
-       	v_importe_haber     		numeric;    
-       	v_importe_debe_mb     		numeric;
-       	v_importe_haber_mb    		numeric;
-       	v_id_moneda_base    		integer;
-       	v_tc_1         				numeric;
-      	v_tc_2         				numeric;
-      	v_monto         			numeric;
-       	v_factor        			numeric;
-       	v_conta_ejecucion_igual_pres_conta    varchar;
-      	v_monto_recurso             numeric;
-       	v_monto_gasto               numeric;
-        v_id_transaccion 			integer;
-        v_id_cuenta 				integer;
-        v_id_auxiliar 				integer;
-        v_id_centro_costo 			integer;
-        v_id_gestion 				integer;
-        v_id_partida 				integer;
-        v_debe						numeric;
-        v_haber 					numeric;
-        v_reg_trans   				record;
-        v_r  						record;
-        v_exi_auxiliar				varchar;--#90	19/12/2018	EGS	
+        v_nro_requerimiento           integer;
+        v_parametros                  record;
+        v_registros                   record;
+        v_registros_trans             record;
+        v_id_requerimiento            integer;
+        v_resp                        varchar;
+        v_nombre_funcion              text;
+        v_mensaje_error               text;
+        v_id_int_transaccion          integer;
+        v_importe_debe                numeric;
+        v_importe_haber               numeric;    
+        v_importe_debe_mb             numeric;
+        v_importe_haber_mb            numeric;
+        v_id_moneda_base              integer;
+        v_tc_1                        numeric;
+        v_tc_2                        numeric;
+        v_monto                       numeric;
+        v_factor                      numeric;
+        v_conta_ejecucion_igual_pres_conta    varchar;
+        v_monto_recurso               numeric;
+        v_monto_gasto                 numeric;
+        v_id_transaccion              integer;
+        v_id_cuenta                   integer;
+        v_id_auxiliar                 integer;
+        v_id_centro_costo             integer;
+        v_id_gestion                  integer;
+        v_id_partida                  integer;
+        v_debe                        numeric;
+        v_haber                       numeric;
+        v_reg_trans                   record;
+        v_r                           record;
+        v_exi_auxiliar                varchar; --#90    19/12/2018    EGS    
+        v_sw_gen_lb                   boolean; --#108
+        v_id_cuenta_bancaria          integer;
+        v_conta_integrar_libro_bancos varchar;
+        v_valor                       varchar;
+        v_conta_generar_lb_manual_oc  varchar; 
 BEGIN
 
     v_nombre_funcion = 'conta.ft_int_transaccion_ime';
@@ -72,8 +80,7 @@ BEGIN
   if(p_transaccion='CONTA_INTRANSA_INS')then
           
         begin
-        
-             
+                    
              select
                cbt.id_moneda,
                cbt.id_moneda_tri,
@@ -122,22 +129,20 @@ BEGIN
             END IF;
             
                   
-        --#90	19/12/2018	EGS	 
-      
-              SELECT
+          --#90    19/12/2018    EGS 
+            SELECT
                 cu.ex_auxiliar 
-              INTO
-              v_exi_auxiliar                   
-              FROM conta.tcuenta cu
-              left join conta.tcuenta_auxiliar cua on cua.id_cuenta = cu.id_cuenta
-              where cua.estado_reg = 'activo' and cu.id_cuenta =  v_parametros.id_cuenta;
+            INTO
+             v_exi_auxiliar                   
+            FROM conta.tcuenta cu
+            left join conta.tcuenta_auxiliar cua on cua.id_cuenta = cu.id_cuenta
+            where cua.estado_reg = 'activo' and cu.id_cuenta =  v_parametros.id_cuenta;
               
-              IF v_exi_auxiliar = 'si' and  v_parametros.id_auxiliar is null then
-                RAISE EXCEPTION 'Esta Cuenta exige un auxiliar escoja uno';
-              END IF;
-          --#90	19/12/2018	EGS	 
-         
-       
+            IF v_exi_auxiliar = 'si' and  v_parametros.id_auxiliar is null then
+               RAISE EXCEPTION 'Esta Cuenta exige un auxiliar escoja uno';
+            END IF;
+            
+          --#90    19/12/2018    EGS   
           -----------------------------
           --REGISTRO DE LA TRANSACCIÓN
           -----------------------------
@@ -164,8 +169,7 @@ BEGIN
                 id_moneda,
                 id_moneda_tri,
                 id_moneda_act,
-                id_suborden
-                
+                id_suborden                
             ) values(
                 v_parametros.id_partida,
                 v_parametros.id_centro_costo,
@@ -195,22 +199,27 @@ BEGIN
             
             
             
-            -- calcular moneda base y triangulacion
+      -- calcular moneda base y triangulacion
             
-            PERFORM  conta.f_calcular_monedas_transaccion(v_id_int_transaccion);
+      PERFORM  conta.f_calcular_monedas_transaccion(v_id_int_transaccion);
             
-            -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
-            IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
-              raise exception 'Error al procesar transacciones';
-            END IF;
+      -- procesar las trasaaciones (con diversos propostios, ejm validar  cuentas bancarias)
+      IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
+        raise exception 'Error al procesar transacciones';
+      END IF;
+      
+      -- #110 caida si la trasaccion tiene cuenta bacaria que no se modifque si tiene un registro de  LB
+      IF not conta.f_validar_libro_bancos_trans(v_id_int_transaccion, 'insertar') THEN
+         raise exception 'Error al procesar transacciones';
+      END IF;
             
       
       --Definicion de la respuesta
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción almacenado(a) con exito (id_int_transaccion'||v_id_int_transaccion||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_id_int_transaccion::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_id_int_transaccion::varchar);
 
-            --Devuelve la respuesta
-            return v_resp;
+      -- Devuelve la respuesta
+      return v_resp;
 
     end;
         
@@ -458,9 +467,9 @@ BEGIN
 
   elsif(p_transaccion='CONTA_INTRANSA_MOD')then
 
-    begin	
+    begin    
     
-    		   --#90	19/12/2018	EGS	 
+               --#90    19/12/2018    EGS     
    
               SELECT
                 cu.ex_auxiliar 
@@ -473,7 +482,7 @@ BEGIN
               IF v_exi_auxiliar = 'si' and  v_parametros.id_auxiliar is null then
                 RAISE EXCEPTION 'Esta Cuenta exige un auxiliar escoja uno';
               END IF;
-    		--#90	19/12/2018	EGS	 
+            --#90    19/12/2018    EGS     
         
               select
                cbt.id_moneda,
@@ -581,29 +590,29 @@ BEGIN
             
             
             
-      --------------------------------
-      --MODIFICACION DE LA TRANSACCION
-      --------------------------------
-      update conta.tint_transaccion set
-              id_partida = v_parametros.id_partida,
-              id_centro_costo = v_parametros.id_centro_costo,
-              id_orden_trabajo = v_parametros.id_orden_trabajo,
-              id_cuenta = v_parametros.id_cuenta,
-              glosa = v_parametros.glosa,
-              id_int_comprobante = v_parametros.id_int_comprobante,
-              id_auxiliar = v_parametros.id_auxiliar,
-              id_usuario_mod = p_id_usuario,
-              fecha_mod = now(),
-              tipo_cambio = v_parametros.tipo_cambio,
-              tipo_cambio_2 = v_parametros.tipo_cambio_2,
-              tipo_cambio_3 = v_parametros.tipo_cambio_3,
-              importe_debe = v_parametros.importe_debe,
-              importe_haber = v_parametros.importe_haber,
-              importe_gasto = v_monto_gasto,
-              importe_recurso = v_monto_recurso,
-              id_suborden = v_parametros.id_suborden
-             
-      where id_int_transaccion = v_parametros.id_int_transaccion;
+            --------------------------------
+            --MODIFICACION DE LA TRANSACCION
+            --------------------------------
+            update conta.tint_transaccion set
+                    id_partida = v_parametros.id_partida,
+                    id_centro_costo = v_parametros.id_centro_costo,
+                    id_orden_trabajo = v_parametros.id_orden_trabajo,
+                    id_cuenta = v_parametros.id_cuenta,
+                    glosa = v_parametros.glosa,
+                    id_int_comprobante = v_parametros.id_int_comprobante,
+                    id_auxiliar = v_parametros.id_auxiliar,
+                    id_usuario_mod = p_id_usuario,
+                    fecha_mod = now(),
+                    tipo_cambio = v_parametros.tipo_cambio,
+                    tipo_cambio_2 = v_parametros.tipo_cambio_2,
+                    tipo_cambio_3 = v_parametros.tipo_cambio_3,
+                    importe_debe = v_parametros.importe_debe,
+                    importe_haber = v_parametros.importe_haber,
+                    importe_gasto = v_monto_gasto,
+                    importe_recurso = v_monto_recurso,
+                    id_suborden = v_parametros.id_suborden
+                   
+            where id_int_transaccion = v_parametros.id_int_transaccion;
             
            
              -- calcular moneda base y triangulacion
@@ -614,8 +623,15 @@ BEGIN
             IF not conta.f_int_trans_procesar(v_parametros.id_int_comprobante) THEN
               raise exception 'Error al procesar transacciones';
             END IF;
+            
+            
+            -- #110 caida si la trasaccion tiene cuenta bacaria que no se modifque si tiene un registro de  LB
+            IF not conta.f_validar_libro_bancos_trans(v_parametros.id_int_transaccion, 'modificar') THEN
+              raise exception 'Error al procesar transacciones';
+            END IF;
+            
                
-      --Definicion de la respuesta
+           --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción modificado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
                
@@ -649,11 +665,11 @@ BEGIN
             
                
       --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','datos bancarios actualizados para la transaccion del cbte)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','datos bancarios actualizados para la transaccion del cbte)'); 
+      v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
                
-            --Devuelve la respuesta
-            return v_resp;
+      --Devuelve la respuesta
+      return v_resp;
             
     end;
 
@@ -683,7 +699,7 @@ BEGIN
           
             --si tiene relacion de devengado es necesario eliminarlas
             
-            FOR v_registros in (
+           FOR v_registros in (
                                     select 
                                        rd.id_int_rel_devengado 
                                     from conta.tint_rel_devengado rd
@@ -694,27 +710,115 @@ BEGIN
                       DELETE FROM 
                         conta.tint_rel_devengado 
                       WHERE id_int_rel_devengado = v_registros.id_int_rel_devengado;
-            END LOOP;
+           END LOOP;
+           
+            -- #110 caida si la trasaccion tiene cuenta bacaria que no se modifque si tiene un registro de  LB
+            IF not conta.f_validar_libro_bancos_trans(v_parametros.id_int_transaccion, 'eliminar') THEN
+              raise exception 'Error al procesar transacciones';
+            END IF;
             
             
-            --------------------------
-      --ELIMINACIÓN TRANSACCIÓN 
-      --------------------------
-      delete from conta.tint_transaccion
-            where id_int_transaccion = v_parametros.id_int_transaccion;
+           --------------------------
+           --ELIMINACIÓN TRANSACCIÓN 
+           --------------------------
+           delete from conta.tint_transaccion
+           where id_int_transaccion = v_parametros.id_int_transaccion;
                
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción eliminado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
+           --Definicion de la respuesta
+           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Transacción eliminado(a)'); 
+           v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);
               
-            --Devuelve la respuesta
-            return v_resp;
+           --Devuelve la respuesta
+           return v_resp;
 
     end;
+    
+    /*********************************    
+     #TRANSACCION:  'CONTA_GENERAR_LB'
+     #DESCRIPCION:  generar libro de banco de manera manual 
+     #AUTOR:    rensi (kplian)  
+     #FECHA:    10-03-2020 18:10:12
+    ***********************************/
+
+  elsif(p_transaccion='CONTA_GENERAR_LB')then
+
+    begin
+          v_sw_gen_lb := false;
+          
+          select 
+             cbt.id_int_comprobante,
+             dep.prioridad,
+             dep.id_depto,
+             cc.codigo,
+             pla.codigo as codigo_plantilla
+          into 
+             v_registros_trans
+          from conta.tint_comprobante cbt
+          join param.tdepto dep on dep.id_depto = cbt.id_depto
+          join conta.tclase_comprobante cc on cc.id_clase_comprobante = cbt.id_clase_comprobante
+          left join conta.tplantilla_comprobante pla on pla.id_plantilla_comprobante=cbt.id_plantilla_comprobante
+          where  cbt.id_int_comprobante = v_parametros.id_int_comprobante;
+          
+          IF v_registros_trans.prioridad > 0  THEN
+              raise exception 'solo  se permite generar el libro de bancos en departamentos contables de prioridad cero (oficina central) - %', v_registros_trans.prioridad;
+          END IF;
+          
+          
+          --ver si tiene libro de bancos ....
+          v_conta_integrar_libro_bancos = pxp.f_get_variable_global('conta_integrar_libro_bancos');
+          v_conta_generar_lb_manual_oc =  pxp.f_get_variable_global('conta_generar_lb_manual_oc');
+          v_valor = param.f_get_depto_param( v_registros_trans.id_depto, 'ENTREGA');
+        
+           --listado de las transacciones del comprobante
+          FOR v_registros in (select *
+                              from conta.tint_transaccion it
+                              where it.id_int_comprobante = v_parametros.id_int_comprobante) LOOP
+
+                -- busca si alguna de las cuentas contables tiene relacion
+                -- con una cuenta bancaria
+                v_id_cuenta_bancaria = NULL;
+
+                   --si es un cbte de pago ...
+                   IF upper(v_registros_trans.codigo) in ('PAGO','PAGOCON','INGRESO','INGRESOCON') THEN
+                   
+                        IF v_registros.banco = 'si'  THEN
+
+                               IF v_registros.forma_pago = '' or v_registros.forma_pago is  null  THEN
+                                 raise exception 'defina la forma de pago para proceder con la validación';
+                               END IF;
+
+                               --JJA 13/12/2018  se agrego la plantilla CD-DEVREP-SALDOS
+                               IF (v_conta_integrar_libro_bancos = 'si' AND v_valor='NO') OR (v_conta_integrar_libro_bancos='si' AND v_registros_trans.codigo_plantilla in ('SOLFONDAV', 'REPOCAJA','CD-DEVREP-SALDOS')) THEN
+                                   
+                                    --#108 genera  registros en LB solo si la generacion manual esta desactiva y si no es un depto de contabilidad central (prioridad 0)
+                                    IF v_conta_generar_lb_manual_oc = 'si' OR v_registros_trans.prioridad = 0  THEN
+                                        -- si alguna transaccion tiene banco habilitado para pago
+                                        IF  tes.f_integracion_libro_bancos(p_id_usuario, v_parametros.id_int_comprobante,  v_registros.id_int_transaccion) THEN
+                                          v_sw_gen_lb := true;
+                                        END IF;
+                                    
+                                    END IF;
+                               END IF;
+                        END IF;
+                    END IF;
+           END LOOP;
+           
+           IF not v_sw_gen_lb THEN
+              raise exception 'no se genero ningun registro en libro de bancos';
+           END IF;
+            
+               
+      --Definicion de la respuesta
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','datos bancarios actualizados para la transaccion del cbte)'); 
+      v_resp = pxp.f_agrega_clave(v_resp,'id_int_comprobante', v_parametros.id_int_comprobante::varchar);
+               
+      --Devuelve la respuesta
+      return v_resp;
+    end;     
          
   else
      
-      raise exception 'Transaccion inexistente: %',p_transaccion;
+      raise exception 'Transaccion inexistente, revise el código: %',p_transaccion;
 
   end if;
 
@@ -733,4 +837,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

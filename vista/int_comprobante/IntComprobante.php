@@ -10,6 +10,8 @@ HISTORIAL DE MODIFICACIONES:
 #51		ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado 
 #61		ETR		11/06/2019			EGS						Se creo el campo Marca en el comprobante
 #78		ETR		11/12/2019			RAC						Se agrego configuracion de filtro moenda segun tipo_relacion_comprobante
+#108    ETR     05/03/2019          RAC                     Adicionar prioridad_depto 
+
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -1330,7 +1332,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		'id_tipo_relacion_comprobante', 'tipo_cambio_2', 'id_moneda_tri', 'tipo_cambio_3', 'id_moneda_act',
 		'sw_tipo_cambio', 'id_config_cambiaria', 'ope_1', 'ope_2', 'ope_3',
 		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio',
-		'nro_tramite_aux',
+		'nro_tramite_aux','prioridad_depto',
         'documento_iva',//#32
         {//#51
 			name : 'id_int_comprobante_migrado',

@@ -14,12 +14,13 @@
  #2             		27-08-2018        RAC KPLIAN        		se añade trasaccion para modicar glosa
  *1A					21/08/2018		EGS				    		se creo la funcion listarIntComprobanteCombo
  #7			endeetr		27/12/2018		manuel guerra				crearon listado de tramites, y la modifiacion del nrotramite_aux
-#32     ETR	    08/01/2019		    MMV			    		Nuevo campo documento iva  si o no validar documentacion de via
-#33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
-#50	 ETR		17/05/2019			manuel guerra		agregar filtro depto
-#51		ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado
+#32     ETR	    08/01/2019		    MMV			    		        Nuevo campo documento iva  si o no validar documentacion de via
+#33     ETR     10/02/2019          Miguel Mamani	  		        Mostrar moneda $us en reporte comprobante
+#50	    ETR		17/05/2019			manuel guerra		            agregar filtro depto
+#51		ETR		17/05/2018			EGS						        se creo el campo id_int_comprobante_migrado
 #55 	ETR		30/05/2019			EGS								Se agrega funcion par poder migrar comprobantes
-#87		  ETR		    08/01/2020	        MMV 		         Reporte Cbte formato Excel
+#87		ETR	    08/01/2020	        MMV 		                    Reporte Cbte formato Excel
+#108    ETR     05/03/2020          RAC KPLIAN                      agrega prioridad_depto
  */
 class MODIntComprobante extends MODbase{
 	
@@ -193,7 +194,8 @@ class MODIntComprobante extends MODbase{
 		$this->captura('id_gestion','int4');
 		$this->captura('periodo','int4');
 		$this->captura('forma_cambio','varchar');
-       $this->captura('liquido_pagable', 'numeric');
+        $this->captura('liquido_pagable', 'numeric');
+	    $this->captura('prioridad_depto', 'integer');   //#108
 		
 		
 		

@@ -13,6 +13,7 @@
  #0999 ETR        20/08/2018        RAC KPLIAN              agrega filtro por defecto para tipo de documento segun informe lcv, retenciones, ncd, todos
   #9999           19/06/2018               RAC              Se incorpra el calculo inverso para DUI IVA -> Importe Doc
  #12	endeetr	  24/10/2018			EGS					Se aumento el parametro id_plantilla en la verificacion de concepto de gasto y se añadio que  baseParams de idConcepto_ingas  sea deacuerdo a ncd tambien que los centros de costo sean deacuerdo a ncd
+ #112			  17/04/2020		manu				 reportes de autorizacion de pasajes y registro de pasajeros
  ***************************************************************************/
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -1005,7 +1006,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
                                     'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
                                     'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ic','tipo_excento','valor_excento','sw_qr','sw_nit','plantilla_qr',
-                                    'sw_estacion','sw_punto_venta','sw_codigo_no_iata'],
+                                    'sw_estacion','sw_punto_venta','sw_codigo_no_iata','sw_nota_debito_agencia','sw_cuenta_doc'],//#112
                                 remoteSort: true,
                                 baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
                             }),
@@ -1374,7 +1375,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     id_grupo:1,
                     bottom_filter: true,
                     form: true
-                },
+                },                
                 {
                     config:{
                         name: 'importe_doc',
@@ -1635,7 +1636,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             } ,this);
 
-
+            //combo plantilla
             this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
                 console.log('id_plantilla ' + rec);
                 this.esconderImportes();
@@ -1647,7 +1648,6 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.Cmp.nro_autorizacion.reset();
                     this.Cmp.codigo_control.reset();
                     this.Cmp.importe_descuento.reset();
-
                 }
                 else{
                     //calcula porcentaje descuento
@@ -1763,6 +1763,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.ocultarComponente(this.Cmp.id_agencia);
                     this.Cmp.id_agencia.reset();
                 }
+               
             },this);
 
             this.Cmp.importe_doc.on('change',this.calculaMontoPago,this);
