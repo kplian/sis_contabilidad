@@ -17,12 +17,18 @@
  #1201  ETR       11/09/2018        RAC               Adciona filtro apra buscar en varios tipos de informe  tipos_infromes 
  #2001  ETR       12/09/2018        EGS               aumento filtros para listar DocCompraVenta Cobro  para anticipos y facturas regularizadas
  #12   ETR       17/10/2018        RAC KPLIAN        El listado de factura normales se excluyer las facturas del tipo inform NCD  
- 
+ #112			  17/04/2020		manu				 reportes de autorizacion de pasajes y registro de pasajeros
+#113  ETR       29/04/2020		     MMV	             Reporte Registro Ventas CC
+
+
  * */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 require_once(dirname(__FILE__).'/../reportes/RLcv.php');
 require_once(dirname(__FILE__).'/../reportes/RLcvVentas.php');
+require_once(dirname(__FILE__).'/../../sis_contabilidad/reportes/RepAutorizacion.php');
+require_once(dirname(__FILE__).'/../../sis_contabilidad/reportes/RepRegPasa.php');
+require_once(dirname(__FILE__).'/../reportes/RReporteRegistrosVentaCC.php');
 
 class ACTDocCompraVenta extends ACTbase{    
 			
@@ -355,7 +361,7 @@ class ACTDocCompraVenta extends ACTbase{
 	
 	function insertarDocCompleto(){
 		$this->objFunc=$this->create('MODDocCompraVenta');	
-		if($this->objParam->insertar('id_doc_compra_venta')){
+		if($this->objParam->insertar('id_doc_compra_venta')){			
 			$this->res=$this->objFunc->insertarDocCompleto($this->objParam);			
 		} else{
 			//TODO			
@@ -676,11 +682,91 @@ class ACTDocCompraVenta extends ACTbase{
         $this->res=$this->objFunc->quitarContratoFactura($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-	
-	
-	
+	//#112	
+	function listarNroTramite(){
+		$this->objParam->defecto('ordenacion','nro_autorizacion');
+        $this->objParam->defecto('dir_ordenacion','asc');		
+		$this->objFunc=$this->create('MODDocCompraVenta');
+		$this->res=$this->objFunc->listarNroTramite($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	//#112
+	function repAutorizacion() {
+		$dataSource = new DataSource();	
 
-			
+		if($this->objParam->getParametro('id_depto_conta')!=''){
+			$this->objParam->addFiltro("dcv.id_depto_conta =".$this->objParam->getParametro('id_depto_conta'));
+		}
+		
+		if($this->objParam->getParametro('id_periodo')!=''){
+			$this->objParam->addFiltro("dcv.id_periodo =".$this->objParam->getParametro('id_periodo'));
+		}
+		$this->objFun=$this->create('MODDocCompraVenta');	
+		$this->res = $this->objFun->repAutorizacion();
+		if($this->res->getTipo()=='ERROR'){
+			$this->res->imprimirRespuesta($this->res->generarJson());
+			exit;
+		}
+		
+		$titulo ='DetalleAutorizacionPasajes';
+		$nombreArchivo=uniqid(md5(session_id()).$titulo);
+		$nombreArchivo.='.xls';
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		$this->objParam->addParametro('datos',$this->res->datos);			
+		$this->objReporteFormato=new RepAutorizacion($this->objParam);
+	
+		$this->objReporteFormato->generarDatos();
+		$this->objReporteFormato->generarReporte();
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());			
+	}	
+	//#112
+	function RepRegPasa() {
+		$dataSource = new DataSource();	
+
+		if($this->objParam->getParametro('id_pago_simple')!=''){
+			$this->objParam->addFiltro("paside.id_pago_simple =".$this->objParam->getParametro('id_pago_simple'));
+		}
+
+		$this->objFun=$this->create('MODDocCompraVenta');	
+		$this->res = $this->objFun->RepRegPasa();
+		if($this->res->getTipo()=='ERROR'){
+			$this->res->imprimirRespuesta($this->res->generarJson());
+			exit;
+		}
+		
+		$titulo ='Registro de Pasajeros';
+		$nombreArchivo=uniqid(md5(session_id()).$titulo);
+		$nombreArchivo.='.xls';
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		$this->objParam->addParametro('datos',$this->res->datos);			
+		$this->objReporteFormato=new RepRegPasa($this->objParam);
+	
+		$this->objReporteFormato->generarDatos();
+		$this->objReporteFormato->generarReporte();
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());			
+	}
+    function reporteRegistroVentas(){ //#113
+        $this->objFunc = $this->create('MODDocCompraVenta');
+        $this->res = $this->objFunc->reporteRegistroVentas($this->objParam);
+        $titulo = 'Registros Vestas';
+        $nombreArchivo = uniqid(md5(session_id()) . $titulo);
+        $nombreArchivo .= '.xls';
+        $this->objParam->addParametro('nombre_archivo', $nombreArchivo);
+        $this->objParam->addParametro('datos', $this->res->datos);
+        $this->objReporteFormato = new RReporteRegistrosVentaCC($this->objParam);
+        $this->objReporteFormato->generarDatos();
+        $this->objReporteFormato->generarReporte();
+        $this->mensajeExito = new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado','Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
 }
 
 ?>

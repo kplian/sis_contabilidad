@@ -15,6 +15,7 @@
  #0        		  8-08-2015         N/N               creacion
  #1200  ETR       12/07/2018        RAC KPLIAN        Se Agrega capacidad de relacionar facturaa las notas de debito credito
  #12    ETR       21/08/2018        RAC KPLIAN        se añadi filtro apra no generar cbte para NCD notas de credito debito
+ #112			  17/04/2020		manu		      agregacion de los campos (nota debido de agencia y vi/fa)para el combo id_plantilla
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -625,7 +626,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 	                    totalProperty:'total',
 	                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
 	                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
-	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice'],
+						'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui',
+						'sw_ice','sw_nota_debito_agencia','sw_cuenta_doc'],//#112
 	                    remoteSort: true,
 	                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
 	                }),
@@ -1252,7 +1254,22 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					id_grupo:1,
 					grid:true,
 					form:false
-			}
+			},			
+			{
+				config:{
+					name: 'nota_debito_agencia',
+					fieldLabel: 'Nota de Debito Agencia',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:200
+				},
+					type:'TextField',
+					filters:{pfiltro:'dcv.nota_debito_agencia',type:'string'},
+					id_grupo:0,
+					grid:true,
+					form:false
+			},
 		];
 		
 	  this.Atributos= this.Atributos1.concat(this.Atributos2);
@@ -1474,7 +1491,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg',
 		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata','desc_funcionario2','id_funcionario',
 		{name:'fecha_cbte', type: 'date',dateFormat:'Y-m-d'},
-		{name:'estado_cbte', type: 'string'},'codigo_aplicacion','tipo_informe','id_doc_compra_venta_fk'
+		{name:'estado_cbte', type: 'string'},'codigo_aplicacion','tipo_informe','id_doc_compra_venta_fk','nota_debito_agencia'
 	],
 	sortInfo:{
 		field: 'id_doc_compra_venta',

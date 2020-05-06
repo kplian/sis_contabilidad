@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -10,7 +12,7 @@ $body$
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_int_comprobante_sel
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tint_comprobante'
- AUTOR: 		 (admin)
+ AUTOR: 		RAC KPLIAN
  FECHA:	        29-08-2013 00:28:30
  COMENTARIOS:
 ***************************************************************************
@@ -25,9 +27,8 @@ ISSUE	FORK		 FECHA:				 AUTOR:				DESCRIPCION:
  #51	 ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado
  #74	 ETR		17/05/2018			manuel guerra		vista para la verificacion de cbtes de la uo
  #87	 ETR		08/01/2020	        MMV 		         Reporte Cbte formato Excel se agregaron la columna  importe en tipo de cambio UFV
- DESCRIPCION:
- AUTOR:
- FECHA:
+ #108    ETR        05/03/2020          RAC KPLIAN         agregar prioridad a consulta y vista de comprobante
+ 
 ***************************************************************************/
 
 DECLARE
@@ -803,7 +804,8 @@ BEGIN
                               incbte.id_gestion,
                               incbte.periodo,
                               incbte.forma_cambio,
-                              incbte.liquido_pagable
+                              incbte.liquido_pagable,
+                              incbte.prioridad_depto
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
@@ -1232,7 +1234,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
-
-ALTER FUNCTION conta.ft_int_comprobante_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;

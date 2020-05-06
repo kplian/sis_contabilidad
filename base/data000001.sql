@@ -1730,6 +1730,25 @@ VALUES
   
   
 /***********************************F-DAT-RAC-CONTA-103-06/02/2020****************************************/
+
+
+
+/***********************************I-DAT-RAC-CONTA-108-04/03/2020****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'conta_generar_lb_manual_oc', E'no', E'si o no, si la integracion con libro de bancos esta activada, define si  segenera al validar el cbte o desde interface (solo para regional 0m oficina central)');
+  
+
+/***********************************F-DAT-RAC-CONTA-108-04/03/2020****************************************/
+/***********************************I-DAT-MMV-CONTA-113-29/04/2020****************************************/
+select pxp.f_insert_tgui ('Reporte Registro Ventas CC', 'Reporte Registro Ventas CC', 'RVC', 'si', 50, 'sis_contabilidad/vista/reporte_registro_ventas/ReporteRegistroVentas.php', 3, '', 'ReporteRegistroVentas', 'CONTA');
+select pxp.f_insert_testructura_gui ('RVC', 'REPCON');
+/***********************************F-DAT-MMV-CONTA-113-29/04/2020****************************************/
+
+
+  
+  
   
   
   
