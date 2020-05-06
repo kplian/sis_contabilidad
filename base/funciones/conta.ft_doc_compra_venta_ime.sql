@@ -28,7 +28,8 @@ $body$
  #2000  ETR        03/10/2018        RAC  KPLIAN      Para la isnercion y edicion se añade opcionalmente el parametro codigo_aplicacion 
  #12    ETR        12/10/2018        RAC  KPLIAN      Se añade  pametro para isnertar el id_doc_compra_venta_fk para notas de credito
  #112			  17/04/2020		manuel guerra     reportes de autorizacion de pasajes y registro de pasajeros
- #114       29/04/2020    manuel guerra     modificacion de nro_tramite
+ #113			  29/04/2020		manuel guerra     modificacion de nro_tramite
+ #116			  06/05/2020		manuel guerra     modificacion de campo
 ***************************************************************************/
 
 DECLARE
@@ -68,7 +69,7 @@ DECLARE
   v_codigo_aplicacion       varchar;  -- #2000 
   v_id_contrato             integer;  -- #2000 
   v_id_doc_compra_venta_fk  integer;  -- #123
-
+  v_nota_venta_agencia	    varchar;  -- #114	
 
 BEGIN
 
@@ -289,6 +290,9 @@ BEGIN
         v_importe_ice = v_parametros.importe_excento;
       END IF;
 
+	  if (pxp.f_existe_parametro(p_tabla,'nota_debito_agencia')) then
+          v_nota_venta_agencia = v_parametros.nota_debito_agencia;     
+      end if; 	
 
       --Sentencia de la insercion
       insert into conta.tdoc_compra_venta(
@@ -335,8 +339,8 @@ BEGIN
         sw_pgs,
         codigo_aplicacion,      --#1999
         id_contrato,            --#2000
-        id_doc_compra_venta_fk,  --#123
-        nota_debito_agencia --#112
+        id_doc_compra_venta_fk  --#123
+        --nota_debito_agencia --#116
 
       ) values(
         v_parametros.tipo,
@@ -382,8 +386,8 @@ BEGIN
         v_sw_pgs,
         v_codigo_aplicacion,      --#1999
         v_id_contrato,            --#2000
-        v_id_doc_compra_venta_fk,  --#123
-        v_parametros.nota_debito_agencia  --#112
+        v_id_doc_compra_venta_fk  --#123
+        --v_nota_venta_agencia  		--#116
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -929,8 +933,8 @@ BEGIN
         sw_pgs = v_sw_pgs,
         codigo_aplicacion = v_codigo_aplicacion,
         id_contrato = v_id_contrato,
-        nota_debito_agencia = v_parametros.nota_debito_agencia,
-        nro_tramite = v_nro_tramite      --#114
+        --nota_debito_agencia = v_parametros.nota_debito_agencia,--
+        nro_tramite = v_nro_tramite      --#113
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
