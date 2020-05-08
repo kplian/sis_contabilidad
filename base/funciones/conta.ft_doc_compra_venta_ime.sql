@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -30,6 +28,7 @@ $body$
  #112			  17/04/2020		manuel guerra     reportes de autorizacion de pasajes y registro de pasajeros
  #113			  29/04/2020		manuel guerra     modificacion de nro_tramite
  #116			  06/05/2020		manuel guerra     modificacion de campo
+ #117			  08/05/2020		manuel guerra	  agregar campo de nota de debito 
 ***************************************************************************/
 
 DECLARE
@@ -290,6 +289,7 @@ BEGIN
         v_importe_ice = v_parametros.importe_excento;
       END IF;
 
+	  --#117
 	  if (pxp.f_existe_parametro(p_tabla,'nota_debito_agencia')) then
           v_nota_venta_agencia = v_parametros.nota_debito_agencia;     
       end if; 	
@@ -339,8 +339,8 @@ BEGIN
         sw_pgs,
         codigo_aplicacion,      --#1999
         id_contrato,            --#2000
-        id_doc_compra_venta_fk  --#123
-        --nota_debito_agencia --#116
+        id_doc_compra_venta_fk,  --#123
+        nota_debito_agencia --#116
 
       ) values(
         v_parametros.tipo,
@@ -386,8 +386,8 @@ BEGIN
         v_sw_pgs,
         v_codigo_aplicacion,      --#1999
         v_id_contrato,            --#2000
-        v_id_doc_compra_venta_fk  --#123
-        --v_nota_venta_agencia  		--#116
+        v_id_doc_compra_venta_fk,  --#123
+        v_nota_venta_agencia  		--#117
       )RETURNING id_doc_compra_venta into v_id_doc_compra_venta;
 
       if (pxp.f_existe_parametro(p_tabla,'id_origen')) then
@@ -897,7 +897,10 @@ BEGIN
       if (pxp.f_existe_parametro(p_tabla,'nro_tramite')) then
           v_nro_tramite = v_parametros.nro_tramite;     
       end if;
-
+	  --#117
+      if (pxp.f_existe_parametro(p_tabla,'nota_debito_agencia')) then
+          v_nota_venta_agencia = v_parametros.nota_debito_agencia;     
+      end if; 
       --Sentencia de la modificacion
       update conta.tdoc_compra_venta set
         tipo = v_parametros.tipo,
@@ -933,7 +936,7 @@ BEGIN
         sw_pgs = v_sw_pgs,
         codigo_aplicacion = v_codigo_aplicacion,
         id_contrato = v_id_contrato,
-        --nota_debito_agencia = v_parametros.nota_debito_agencia,--
+        nota_debito_agencia = v_nota_venta_agencia,--#116
         nro_tramite = v_nro_tramite      --#113
       where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
