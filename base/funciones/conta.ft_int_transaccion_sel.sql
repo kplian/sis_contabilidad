@@ -7,79 +7,80 @@ CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_sel (
 RETURNS varchar AS
 $body$
 /**************************************************************************
- SISTEMA:		Sistema de Contabilidad
- FUNCION: 		conta.ft_int_transaccion_sel
+ SISTEMA:       Sistema de Contabilidad
+ FUNCION:       conta.ft_int_transaccion_sel
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'conta.tint_transaccion'
- AUTOR: 		 (RAC)
- FECHA:	        01-09-2013 18:10:12
+ AUTOR:          (RAC)
+ FECHA:         01-09-2013 18:10:12
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
- ISSUE 		   FECHA   			 AUTOR				 DESCRIPCION:
-  #92 		 19/12/2108		  Miguel Mamani	  actualización reporte de detalle de auxiliares 'CONTA_MROMAYOR_SEL','CONTA_MROMAYOR_CONT','CONTA_AUXRE_SEL'
-  #5		 24/12/2108		  Manuel Guerra	  Correcion de sumas en axuiliares 'CONTA_TOTAUX_CONT'
-  #10        02/01/2019    	  Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
-  #48		 16/05/2019		  Manuel Guerra	  agregar columna tipo de presupuesto
-  #49		 17/05/2019		  Manuel Guerra	  correcion de join en reporte de cbte-transaccion
+ ISSUE         FECHA             AUTOR               DESCRIPCION:
+  #92        19/12/2108       Miguel Mamani   actualización reporte de detalle de auxiliares 'CONTA_MROMAYOR_SEL','CONTA_MROMAYOR_CONT','CONTA_AUXRE_SEL'
+  #5         24/12/2108       Manuel Guerra   Correcion de sumas en axuiliares 'CONTA_TOTAUX_CONT'
+  #10        02/01/2019       Miguel Mamani   Nuevo parámetro tipo de moneda para el reporte detalle Auxiliares por Cuenta
+  #48        16/05/2019       Manuel Guerra   agregar columna tipo de presupuesto
+  #49        17/05/2019       Manuel Guerra   correcion de join en reporte de cbte-transaccion
   #65        11/07/2019       EGS             Se agrega filtro para el parametro tipo en las trnsacciones  CONTA_AUXMAY_SEL,CONTA_AUXMAY_CONT,
                                               CONTA_TOTAUX_SEL,CONTA_TOTAUX_CONT
-  #69        01/08/2019       Saul Zambrana	  Se han eliminado 9 columnas y añadido 6 a la transaccion CONTA_LDCTRANS_SEL para el reporte:Detalle comprobante-transacciones
-  											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de
+  #69        01/08/2019       Saul Zambrana   Se han eliminado 9 columnas y añadido 6 a la transaccion CONTA_LDCTRANS_SEL para el reporte:Detalle comprobante-transacciones
+                                              asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de
   #91        15/01/2020       JUAN            Libro mayor añadir columna beneficiario
-  											  asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de
-  #83 		 03/01/2020		  Miguel Mamani	  Reporte Auxiliares aumentar columna beneficiario
+                                              asi mismo se ha modificado la empresion regular [\n\t] por [\n\t\r ] para la eliminacion de
+  #83        03/01/2020       Miguel Mamani   Reporte Auxiliares aumentar columna beneficiario
   #95        23/01/2020       Rensi Arteaga   Incluir nro de tramite auxiliar
   #102        6/2/2020          Manuel Guerra     agregar campo nro_tramite_auxiliar, en vista del mayor
-  #111		 20/03/2020			MMV	ETR		 Correccion de logica
+  #111       20/03/2020         MMV ETR      Correccion de logica
+  #118       11/05/2020       RAC            Correcionde ogica de colunas beneficiario añadida en issue 91
 ***************************************************************************/
 
 DECLARE
 
-	v_consulta    		varchar;
-	v_parametros  		record;
-	v_nombre_funcion   	text;
-	v_resp				varchar;
-    v_cuentas			varchar;
-    v_ordenes			varchar;
-    v_tipo_cc			varchar;
-    v_filtro_cuentas	varchar;
-    v_filtro_ordenes	varchar;
-    v_filtro_tipo_cc	varchar;
-    v_filtro			varchar;
-    v_desde				varchar;
-    v_hasta				varchar;
+    v_consulta          varchar;
+    v_parametros        record;
+    v_nombre_funcion    text;
+    v_resp              varchar;
+    v_cuentas           varchar;
+    v_ordenes           varchar;
+    v_tipo_cc           varchar;
+    v_filtro_cuentas    varchar;
+    v_filtro_ordenes    varchar;
+    v_filtro_tipo_cc    varchar;
+    v_filtro            varchar;
+    v_desde             varchar;
+    v_hasta             varchar;
     v_filtro_tipo       varchar;
-    v_fecha_anterior	date;
+    v_fecha_anterior    date;
     v_filtro_aux        varchar;
-    v_aux     		    varchar;
-	valor_aux   		numeric;
-    v_auxiliar 		    varchar;
-    v_auxiliar_b	    varchar;
-    v_auxiliar_c	    integer;
-    v_auxiliar_d	    varchar;
+    v_aux               varchar;
+    valor_aux           numeric;
+    v_auxiliar          varchar;
+    v_auxiliar_b        varchar;
+    v_auxiliar_c        integer;
+    v_auxiliar_d        varchar;
 
-    v_join    		    varchar;
-    v_atributos    		varchar;
-    v_filto_nro			varchar; -- MMV #10
+    v_join              varchar;
+    v_atributos         varchar;
+    v_filto_nro         varchar; -- MMV #10
     v_filtro_internacional varchar;--#65
 
 BEGIN
 
-	v_nombre_funcion = 'conta.ft_int_transaccion_sel';
+    v_nombre_funcion = 'conta.ft_int_transaccion_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************
- 	#TRANSACCION:  'CONTA_INTRANSA_SEL'
- 	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    /*********************************
+    #TRANSACCION:  'CONTA_INTRANSA_SEL'
+    #DESCRIPCION:   Consulta de datos
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	if(p_transaccion='CONTA_INTRANSA_SEL')then
+    if(p_transaccion='CONTA_INTRANSA_SEL')then
 
-    	begin
-    		--Sentencia de la consulta
-			v_consulta:='select
+        begin
+            --Sentencia de la consulta
+            v_consulta:='select
                             transa.id_int_transaccion,
                             transa.id_partida,
                             transa.id_centro_costo,
@@ -147,41 +148,41 @@ BEGIN
                             cp.codigo_categoria::varchar,
                             transa.nro_tramite_auxiliar    --#95
                         from conta.tint_transaccion transa
-						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
-						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
-						left join pre.tpartida par on par.id_partida = transa.id_partida
-						left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
-						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
+                        left join pre.tpartida par on par.id_partida = transa.id_partida
+                        left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
+                        left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
                         left join conta.tsuborden suo on suo.id_suborden =  transa.id_suborden
                         left join pre.vcategoria_programatica cp ON cp.id_categoria_programatica = cc.id_categoria_prog
 
 
-				        where ';
+                        where ';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
-	/*********************************
- 	#TRANSACCION:  'CONTA_INTRANSA_CONT'
- 	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    /*********************************
+    #TRANSACCION:  'CONTA_INTRANSA_CONT'
+    #DESCRIPCION:   Conteo de registros
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_INTRANSA_CONT')then
+    elsif(p_transaccion='CONTA_INTRANSA_CONT')then
 
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select
+        begin
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='select
                           count(transa.id_int_transaccion) as total,
                           sum(transa.importe_debe) as total_debe,
                           sum(transa.importe_haber) as total_haber,
@@ -193,13 +194,13 @@ BEGIN
                           sum(transa.importe_haber_ma) as total_haber_ma,
                           sum(transa.importe_gasto) as total_gasto,
                           sum(transa.importe_recurso) as total_recurso
-					     from conta.tint_transaccion transa
-						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                         from conta.tint_transaccion transa
+                        inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
-						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
-						left join pre.tpartida par on par.id_partida = transa.id_partida
-						left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
-						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
+                        left join pre.tpartida par on par.id_partida = transa.id_partida
+                        left join pre.vpresupuesto_cc cc on cc.id_centro_costo = transa.id_centro_costo
+                        left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
                         left join conta.tsuborden suo on suo.id_suborden =  transa.id_suborden
                         left join pre.vcategoria_programatica cp ON cp.id_categoria_programatica = cc.id_categoria_prog
@@ -208,36 +209,36 @@ BEGIN
 
 
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
  raise notice '%',v_consulta;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
-	/*********************************
- 	#TRANSACCION:  'CONTA_INTMAY_SEL'
- 	#DESCRIPCION:	listado de transacicones para el mayor
- 	#AUTOR:		rac
- 	#FECHA:		24-04-2015 18:10:12
-	***********************************/
+        end;
+    /*********************************
+    #TRANSACCION:  'CONTA_INTMAY_SEL'
+    #DESCRIPCION:   listado de transacicones para el mayor
+    #AUTOR:     rac
+    #FECHA:     24-04-2015 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_INTMAY_SEL')then
+    elsif(p_transaccion='CONTA_INTMAY_SEL')then
 
-    	begin
+        begin
             v_cuentas = '0';
             v_ordenes = '0';
             v_tipo_cc = '0';
             v_filtro_cuentas = '0=0';
             v_filtro_ordenes = '0=0';
             v_filtro_tipo_cc = '0=0';
-    		v_aux = REPLACE(v_parametros.filtro, '(icbte.fecha','0=0 --(icbte.fecha');
+            v_aux = REPLACE(v_parametros.filtro, '(icbte.fecha','0=0 --(icbte.fecha');
              IF (v_parametros.hasta IS NULL) AND (v_parametros.desde IS NULL) THEN
-            	v_desde = '0=0';
+                v_desde = '0=0';
             ELSE
-            	v_desde = 'and icbte.fecha::Date <'|| v_parametros.desde;
-			END IF;
+                v_desde = 'and icbte.fecha::Date <'|| v_parametros.desde;
+            END IF;
              IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
                   IF v_parametros.id_cuenta is not NULL  THEN
                       WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
@@ -369,8 +370,8 @@ BEGIN
                           null::varchar as nro_tramite_auxiliar,--#102
                           COALESCE(sum(transa.importe_debe_mb),0)::numeric - COALESCE(sum(transa.importe_haber_mb),0)::numeric as saldo_mb,
                           COALESCE(sum(transa.importe_debe_mt),0)::numeric - COALESCE(sum(transa.importe_haber_mt),0)::numeric as saldo_mt,
-						  COALESCE(sum(transa.importe_debe_mb),0)::numeric - COALESCE(sum(transa.importe_haber_mb),0)::numeric as dif
-
+                          COALESCE(sum(transa.importe_debe_mb),0)::numeric - COALESCE(sum(transa.importe_haber_mb),0)::numeric as dif,
+                          null::varchar as beneficiario --#118
                           from conta.tint_transaccion transa
                           inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
                           inner join param.tdepto dep on dep.id_depto = icbte.id_depto
@@ -393,53 +394,53 @@ BEGIN
                                         and '||v_aux||' ';
 
             v_consulta:=v_consulta||'
-            			union all
+                        union all
 
                         select
-						transa.id_int_transaccion::integer,
-						transa.id_partida::integer,
-						transa.id_centro_costo::integer,
-						transa.id_partida_ejecucion::integer,
-						transa.estado_reg::varchar,
+                        transa.id_int_transaccion::integer,
+                        transa.id_partida::integer,
+                        transa.id_centro_costo::integer,
+                        transa.id_partida_ejecucion::integer,
+                        transa.estado_reg::varchar,
 
-						transa.id_int_transaccion_fk::integer,
-						transa.id_cuenta::integer,
-						transa.glosa::varchar,
-						transa.id_int_comprobante::integer,
-						transa.id_auxiliar::integer,
+                        transa.id_int_transaccion_fk::integer,
+                        transa.id_cuenta::integer,
+                        transa.glosa::varchar,
+                        transa.id_int_comprobante::integer,
+                        transa.id_auxiliar::integer,
 
 
-						transa.id_usuario_reg::integer,
-						transa.fecha_reg::date,
-						transa.id_usuario_mod::integer,
-						transa.fecha_mod::date,
-						usu1.cuenta::varchar as usr_reg,
-						usu2.cuenta::varchar as usr_mod,
+                        transa.id_usuario_reg::integer,
+                        transa.fecha_reg::date,
+                        transa.id_usuario_mod::integer,
+                        transa.fecha_mod::date,
+                        usu1.cuenta::varchar as usr_reg,
+                        usu2.cuenta::varchar as usr_mod,
 
                         COALESCE(transa.importe_debe_mb,0)::numeric as importe_debe_mb,
                         COALESCE(transa.importe_haber_mb,0)::numeric as importe_haber_mb,
-                       	COALESCE(transa.importe_gasto_mb,0)::numeric as importe_gasto_mb,
-						COALESCE(transa.importe_recurso_mb,0)::numeric as importe_recurso_mb,
+                        COALESCE(transa.importe_gasto_mb,0)::numeric as importe_gasto_mb,
+                        COALESCE(transa.importe_recurso_mb,0)::numeric as importe_recurso_mb,
 
                         COALESCE(transa.importe_debe_mt,0)::numeric as importe_debe_mt,
                         COALESCE(transa.importe_haber_mt,0)::numeric as importe_haber_mt,
-                       	COALESCE(transa.importe_gasto_mt,0)::numeric as importe_gasto_mt,
-						COALESCE(transa.importe_recurso_mt,0)::numeric as importe_recurso_mt,
+                        COALESCE(transa.importe_gasto_mt,0)::numeric as importe_gasto_mt,
+                        COALESCE(transa.importe_recurso_mt,0)::numeric as importe_recurso_mt,
 
                         COALESCE(transa.importe_debe_ma,0)::numeric as importe_debe_ma,
                         COALESCE(transa.importe_haber_ma,0)::numeric as importe_haber_ma,
-                       	COALESCE(transa.importe_gasto_ma,0)::numeric as importe_gasto_ma,
-						COALESCE(transa.importe_recurso_ma,0)::numeric as importe_recurso_ma,
+                        COALESCE(transa.importe_gasto_ma,0)::numeric as importe_gasto_ma,
+                        COALESCE(transa.importe_recurso_ma,0)::numeric as importe_recurso_ma,
 
                         CASE par.sw_movimiento
-                        	WHEN ''flujo'' THEN
-								(''(F) ''||par.codigo || '' - '' || par.nombre_partida)::varchar
+                            WHEN ''flujo'' THEN
+                                (''(F) ''||par.codigo || '' - '' || par.nombre_partida)::varchar
                             ELSE
-                            	(par.codigo || '' - '' || par.nombre_partida)::varchar
-                        	END  as desc_partida,
-						cc.codigo_cc::varchar as desc_centro_costo,
-						(cue.nro_cuenta || '' - '' || cue.nombre_cuenta)::varchar as desc_cuenta,
-						(aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar)::varchar as desc_auxiliar,
+                                (par.codigo || '' - '' || par.nombre_partida)::varchar
+                            END  as desc_partida,
+                        cc.codigo_cc::varchar as desc_centro_costo,
+                        (cue.nro_cuenta || '' - '' || cue.nombre_cuenta)::varchar as desc_cuenta,
+                        (aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar)::varchar as desc_auxiliar,
                         par.sw_movimiento::varchar as tipo_partida,
 
                         ot.id_orden_trabajo::integer,
@@ -463,28 +464,29 @@ BEGIN
                         transa.nro_tramite_auxiliar,--#102
                         0::numeric as saldo_mb,
                         0::numeric as saldo_mt,
-                        COALESCE(transa.importe_debe_mb,0) - COALESCE(transa.importe_haber_mb,0) as dif
+                        COALESCE(transa.importe_debe_mb,0) - COALESCE(transa.importe_haber_mb,0) as dif,
+                        icbte.beneficiario --#118
 
-						from conta.tint_transaccion transa
+                        from conta.tint_transaccion transa
                         inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
                         inner join param.tdepto dep on dep.id_depto = icbte.id_depto
                         inner join param.tperiodo per on per.id_periodo = icbte.id_periodo
-						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
 
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
                         inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta
                         inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
-						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
-						left join pre.tpartida par on par.id_partida = transa.id_partida
-						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
-						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
+                        left join pre.tpartida par on par.id_partida = transa.id_partida
+                        left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
+                        left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-				        where icbte.estado_reg = ''validado''
+                        where icbte.estado_reg = ''validado''
                               and '||v_filtro_cuentas||'
                               and '||v_filtro_ordenes||'
                               and '||v_filtro_tipo_cc||'
                               and ';
-			v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion;
 
             v_consulta:=v_consulta|| ' ),
@@ -504,7 +506,7 @@ BEGIN
                                             id_cuenta::integer,
                                             glosa::varchar,
                                             xxx.id_int_comprobante::integer,
-											                      id_auxiliar::integer,
+                                                                  id_auxiliar::integer,
 
                                             xxx.id_usuario_reg::integer,
                                             xxx.fecha_reg::date,
@@ -533,7 +535,7 @@ BEGIN
                                             desc_cuenta::varchar,
                                             desc_auxiliar::varchar,
                                             tipo_partida::varchar,
-                                      		id_orden_trabajo::integer,
+                                            id_orden_trabajo::integer,
                                             desc_orden::varchar,
                                             xxx.nro_cbte::varchar,
                                             xxx.nro_tramite::varchar,
@@ -551,31 +553,30 @@ BEGIN
 
                                             actualizacion::varchar,
                                             codigo_cc::varchar,
-											nro_tramite_auxiliar::VARCHAR,--#102
+                                            nro_tramite_auxiliar::VARCHAR,--#102
                                             saldo_mb::numeric,
                                             saldo_mt::numeric,
                                             sum(dif) over (order by orden asc rows between unbounded preceding and current row)::numeric as dif,
-                                            icbte.beneficiario -- #91
+                                            xxx.beneficiario -- #91 --#118
                                       from xxx
-                                      inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = xxx.id_int_comprobante -- #91
                                       order by orden
                                       limit '||v_parametros.cantidad||'
                                       offset '||v_parametros.puntero;
 
-			return v_consulta;
-		end;
+            return v_consulta;
+        end;
 
 
-	/*********************************
- 	#TRANSACCION:  'CONTA_INTMAY_CONT'
- 	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    /*********************************
+    #TRANSACCION:  'CONTA_INTMAY_CONT'
+    #DESCRIPCION:   Conteo de registros
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_INTMAY_CONT')then
+    elsif(p_transaccion='CONTA_INTMAY_CONT')then
 
-		begin
+        begin
             v_cuentas = '0';
             v_ordenes = '0';
             v_tipo_cc = '0';
@@ -585,14 +586,14 @@ BEGIN
 
             v_aux = REPLACE(v_parametros.filtro, '(icbte.fecha','0=0 --(icbte.fecha');
             IF (v_parametros.hasta IS NULL) AND (v_parametros.desde IS NULL) THEN
-            	v_desde = '0=0';
+                v_desde = '0=0';
             ELSE
-            	v_desde = 'icbte.fecha::Date <'''|| v_parametros.desde ||'''';
-			END IF;
+                v_desde = 'icbte.fecha::Date <'''|| v_parametros.desde ||'''';
+            END IF;
 
             IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
-            	IF v_parametros.id_cuenta is not NULL THEN
-                	WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
+                IF v_parametros.id_cuenta is not NULL THEN
+                    WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
                         SELECT cue.id_cuenta, cue.id_cuenta_padre
                         FROM conta.tcuenta cue
                         WHERE cue.id_cuenta = v_parametros.id_cuenta and cue.estado_reg = 'activo'
@@ -603,15 +604,15 @@ BEGIN
                         where cue2.estado_reg = 'activo'
                     )
                     SELECT  pxp.list(id_cuenta::varchar)
-                    	into v_cuentas
+                        into v_cuentas
                     FROM cuenta_rec;
                     v_filtro_cuentas = ' transa.id_cuenta in ('||v_cuentas||') ';
                 END IF;
             END IF;
 
             IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajo')  THEN
-            	IF v_parametros.id_orden_trabajo is not NULL THEN
-                	IF v_parametros.id_orden_trabajo != 0 THEN
+                IF v_parametros.id_orden_trabajo is not NULL THEN
+                    IF v_parametros.id_orden_trabajo != 0 THEN
                           WITH RECURSIVE orden_rec (id_orden_trabajo, id_orden_trabajo_fk) AS (
                             SELECT cue.id_orden_trabajo, cue.id_orden_trabajo_fk
                             FROM conta.torden_trabajo cue
@@ -666,16 +667,16 @@ BEGIN
             /*
 
             sum(CASE cue.valor_incremento
-                        	WHEN ''negativo'' THEN
-								COALESCE(transa.importe_debe_mb*-1,0)
+                            WHEN ''negativo'' THEN
+                                COALESCE(transa.importe_debe_mb*-1,0)
                             ELSE
-                            	COALESCE(transa.importe_debe_mb,0)
-                        	END)  as total_debe,
+                                COALESCE(transa.importe_debe_mb,0)
+                            END)  as total_debe,
             */
 
-			--Sentencia de la consulta de conteo de registros
+            --Sentencia de la consulta de conteo de registros
 
-			v_consulta:='select
+            v_consulta:='select
                         sum(sub.id_int_transaccion)::bigint as total,
                         sum(sub.total_debe)::numeric as total_debe,
                         sum(sub.total_haber)::numeric as total_haber,
@@ -690,7 +691,7 @@ BEGIN
                         from
                         (
 
-            			with data as (
+                        with data as (
                         select
                         0::integer as orden,
                         1::integer as id_int_transaccion,
@@ -719,7 +720,7 @@ BEGIN
                         left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
                         where icbte.estado_reg = ''validado''
-                    	and '||v_filtro_cuentas||'
+                        and '||v_filtro_cuentas||'
                         and '||v_filtro_ordenes||'
                         and '||v_filtro_tipo_cc||'
                         and icbte.fecha::Date < '''||v_parametros.desde||'''
@@ -727,7 +728,7 @@ BEGIN
 
                         union all
 
-            			select
+                        select
                         row_number() over () as orden,
                         count(transa.id_int_transaccion) as id_int_transaccion,
                         sum(COALESCE(transa.importe_debe_mb,0)) as total_debe,
@@ -739,29 +740,29 @@ BEGIN
                         0::numeric as total_saldo_mb,
                         0::numeric as total_saldo_mt,
                         sum(COALESCE(transa.importe_debe_mb,0) - COALESCE(transa.importe_haber_mb,0)) as dif,
-						1::integer as id
+                        1::integer as id
 
-					    from conta.tint_transaccion transa
+                        from conta.tint_transaccion transa
                         inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
                         inner join param.tdepto dep on dep.id_depto = icbte.id_depto
                         inner join param.tperiodo per on per.id_periodo = icbte.id_periodo
-						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
                         inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta
                         inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
-						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
-						left join pre.tpartida par on par.id_partida = transa.id_partida
-						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
-						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
+                        left join pre.tpartida par on par.id_partida = transa.id_partida
+                        left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
+                        left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-				        where icbte.estado_reg = ''validado''
+                        where icbte.estado_reg = ''validado''
                               and '||v_filtro_cuentas||'
                               and '||v_filtro_ordenes||'
                               and '||v_filtro_tipo_cc||'
                               and';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta|| ')
                                         select
                                             id_int_transaccion,
@@ -781,21 +782,21 @@ BEGIN
 
             raise notice '%',v_consulta;
             --raise exception '%',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
     /*********************************
- 	#TRANSACCION:  'CONTA_INTANA_SEL'
- 	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_INTANA_SEL'
+    #DESCRIPCION:   Consulta de datos
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elseif(p_transaccion='CONTA_INTANA_SEL')then
+    elseif(p_transaccion='CONTA_INTANA_SEL')then
 
-    	begin
+        begin
 
              if pxp.f_existe_parametro(p_tabla,'id_periodo') then
                v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
@@ -806,9 +807,9 @@ BEGIN
              end if;
 
 
-    		--Sentencia de la consulta
-			v_consulta:='SELECT
-            				id_orden_trabajo,
+            --Sentencia de la consulta
+            v_consulta:='SELECT
+                            id_orden_trabajo,
                             sum(importe_debe_mb) as importe_debe_mb,
                             sum(importe_haber_mb) as importe_haber_mb,
                             sum(importe_debe_mt) as importe_debe_mt,
@@ -824,7 +825,7 @@ BEGIN
 
 
               --Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||v_parametros.filtro;
 
 
             v_consulta:=v_consulta||'
@@ -834,25 +835,25 @@ BEGIN
                                 desc_orden ';
 
 
-			--Definicion de la respuesta
+            --Definicion de la respuesta
 
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
             raise notice '%',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
     /*********************************
- 	#TRANSACCION:  'CONTA_INTANA_CONT'
- 	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_INTANA_CONT'
+    #DESCRIPCION:   Conteo de registros
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_INTANA_CONT')then
+    elsif(p_transaccion='CONTA_INTANA_CONT')then
 
-		begin
+        begin
 
              if pxp.f_existe_parametro(p_tabla,'id_periodo') then
                v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
@@ -895,20 +896,20 @@ BEGIN
 
             raise notice '%',v_consulta;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
     /*********************************
- 	#TRANSACCION:  'CONTA_REPMAY_SEL'
- 	#DESCRIPCION:	listado de transacicones para el mayor
- 	#AUTOR:		mp
- 	#FECHA:		17-10-2017 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_REPMAY_SEL'
+    #DESCRIPCION:   listado de transacicones para el mayor
+    #AUTOR:     mp
+    #FECHA:     17-10-2017 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_REPMAY_SEL')then
-    	begin
+    elsif(p_transaccion='CONTA_REPMAY_SEL')then
+        begin
             v_cuentas = '0';
             v_ordenes = '0';
             v_tipo_cc = '0';
@@ -918,8 +919,8 @@ BEGIN
 
             v_desde =  ' (icbte.fecha::Date between '''||v_parametros.desde||'''::Date    and '''||v_parametros.hasta||'''::date)  ';
             --v_desde =  ' ( (icbte.fecha::Date >= '''||v_parametros.desde||'''::Date OR '''||v_parametros.desde||'''::Date IS NULL) and (icbte.fecha::Date =< '''||v_parametros.hasta||'''::Date OR '''||v_parametros.hasta||'''::Date IS NULL) )';
-			IF (v_desde IS NULL) THEN
-            	v_desde='0=0';
+            IF (v_desde IS NULL) THEN
+                v_desde='0=0';
             END IF;
 
             IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
@@ -981,48 +982,48 @@ BEGIN
                 END IF;
              END IF;
             --Sentencia de la consulta
-			v_consulta:='select
-						transa.id_int_transaccion,
-						transa.id_partida,
-						transa.id_centro_costo,
-						transa.id_partida_ejecucion,
-						transa.estado_reg,
-						transa.id_int_transaccion_fk,
-						transa.id_cuenta,
-						transa.glosa,
-						transa.id_int_comprobante,
-						transa.id_auxiliar,
-						transa.id_usuario_reg,
-						transa.fecha_reg,
-						transa.id_usuario_mod,
-						transa.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
+            v_consulta:='select
+                        transa.id_int_transaccion,
+                        transa.id_partida,
+                        transa.id_centro_costo,
+                        transa.id_partida_ejecucion,
+                        transa.estado_reg,
+                        transa.id_int_transaccion_fk,
+                        transa.id_cuenta,
+                        transa.glosa,
+                        transa.id_int_comprobante,
+                        transa.id_auxiliar,
+                        transa.id_usuario_reg,
+                        transa.fecha_reg,
+                        transa.id_usuario_mod,
+                        transa.fecha_mod,
+                        usu1.cuenta as usr_reg,
+                        usu2.cuenta as usr_mod,
                         COALESCE(transa.importe_debe_mb,0) as importe_debe_mb,
                         COALESCE(transa.importe_haber_mb,0) as importe_haber_mb,
-                       	COALESCE(transa.importe_gasto_mb,0) as importe_gasto_mb,
-						COALESCE(transa.importe_recurso_mb,0) as importe_recurso_mb,
+                        COALESCE(transa.importe_gasto_mb,0) as importe_gasto_mb,
+                        COALESCE(transa.importe_recurso_mb,0) as importe_recurso_mb,
 
                         COALESCE(transa.importe_debe_mt,0) as importe_debe_mt,
                         COALESCE(transa.importe_haber_mt,0) as importe_haber_mt,
-                       	COALESCE(transa.importe_gasto_mt,0) as importe_gasto_mt,
-						COALESCE(transa.importe_recurso_mt,0) as importe_recurso_mt,
+                        COALESCE(transa.importe_gasto_mt,0) as importe_gasto_mt,
+                        COALESCE(transa.importe_recurso_mt,0) as importe_recurso_mt,
 
                         COALESCE(transa.importe_debe_ma,0) as importe_debe_ma,
                         COALESCE(transa.importe_haber_ma,0) as importe_haber_ma,
-                       	COALESCE(transa.importe_gasto_ma,0) as importe_gasto_ma,
-						COALESCE(transa.importe_recurso_ma,0) as importe_recurso_ma,
+                        COALESCE(transa.importe_gasto_ma,0) as importe_gasto_ma,
+                        COALESCE(transa.importe_recurso_ma,0) as importe_recurso_ma,
 
                         CASE par.sw_movimiento
-                        	WHEN ''flujo'' THEN
-								''(F) ''||par.codigo || '' - '' || par.nombre_partida
+                            WHEN ''flujo'' THEN
+                                ''(F) ''||par.codigo || '' - '' || par.nombre_partida
                             ELSE
-                            	par.codigo || '' - '' || par.nombre_partida
-                        	END  as desc_partida,
+                                par.codigo || '' - '' || par.nombre_partida
+                            END  as desc_partida,
 
-						cc.codigo_cc as desc_centro_costo,
-						cue.nro_cuenta || '' - '' || cue.nombre_cuenta as desc_cuenta,
-						aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar,
+                        cc.codigo_cc as desc_centro_costo,
+                        cue.nro_cuenta || '' - '' || cue.nombre_cuenta as desc_cuenta,
+                        aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar,
                         par.sw_movimiento as tipo_partida,
                         ot.id_orden_trabajo,
                         ot.desc_orden,
@@ -1034,43 +1035,43 @@ BEGIN
                         icbte.id_proceso_wf,
                         icbte.id_estado_wf,
                         icbte.c31 as cbte_relacional
-						from conta.tint_transaccion transa
+                        from conta.tint_transaccion transa
                         inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
                         inner join param.tdepto dep on dep.id_depto = icbte.id_depto
                         inner join param.tperiodo per on per.id_periodo = icbte.id_periodo
-						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
 
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
                         inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta
                         inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
-						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
-						left join pre.tpartida par on par.id_partida = transa.id_partida
-						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
-						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
+                        left join pre.tpartida par on par.id_partida = transa.id_partida
+                        left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
+                        left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-				        where icbte.estado_reg = ''validado''
+                        where icbte.estado_reg = ''validado''
                               and '||v_filtro_cuentas||'
                               and '||v_filtro_ordenes||'
                               and '||v_desde||'
                               and '||v_filtro_tipo_cc||' and';
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||'ORDER BY fecha,id_int_comprobante';
 
-			return v_consulta;
-		end;
+            return v_consulta;
+        end;
 
     /*********************************
- 	#TRANSACCION:  'CONTA_INTPAR_SEL'
- 	#DESCRIPCION:	consulta de analisis de partidas por tipo_cc
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_INTPAR_SEL'
+    #DESCRIPCION:   consulta de analisis de partidas por tipo_cc
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elseif(p_transaccion='CONTA_INTPAR_SEL')then
+    elseif(p_transaccion='CONTA_INTPAR_SEL')then
 
-    	begin
+        begin
 
              if pxp.f_existe_parametro(p_tabla,'id_periodo') then
                v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
@@ -1081,9 +1082,9 @@ BEGIN
              end if;
 
 
-    		--Sentencia de la consulta
-			v_consulta:='SELECT
-            				id_partida,
+            --Sentencia de la consulta
+            v_consulta:='SELECT
+                            id_partida,
                             sum(importe_debe_mb) as importe_debe_mb,
                             sum(importe_haber_mb) as importe_haber_mb,
                             sum(importe_debe_mt) as importe_debe_mt,
@@ -1100,7 +1101,7 @@ BEGIN
 
 
               --Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||v_parametros.filtro;
 
 
             v_consulta:=v_consulta||'
@@ -1111,24 +1112,24 @@ BEGIN
                                 sw_movimiento ';
 
 
-			--Definicion de la respuesta
+            --Definicion de la respuesta
 
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
             raise notice '%',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
      /*********************************
- 	#TRANSACCION:  'CONTA_REPMAYSAL_SEL'
- 	#DESCRIPCION:	listado de transacicones para el mayor con saldos
- 	#AUTOR:		mp
- 	#FECHA:		17-10-2017 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_REPMAYSAL_SEL'
+    #DESCRIPCION:   listado de transacicones para el mayor con saldos
+    #AUTOR:     mp
+    #FECHA:     17-10-2017 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_REPMAYSAL_SEL')then
-    	begin
+    elsif(p_transaccion='CONTA_REPMAYSAL_SEL')then
+        begin
             v_cuentas = '0';
             v_ordenes = '0';
             v_tipo_cc = '0';
@@ -1136,10 +1137,10 @@ BEGIN
             v_filtro_ordenes = '0=0';
             v_filtro_tipo_cc = '0=0';
             v_desde =  '(icbte.fecha::Date between '''||v_parametros.desde||'''::Date and '''||v_parametros.hasta||'''::date) ';
-			IF (v_desde IS NULL) THEN
-            	v_desde='0=0';
+            IF (v_desde IS NULL) THEN
+                v_desde='0=0';
             END IF;
-          	v_fecha_anterior = to_char(v_parametros.desde-1,'DD/MM/YYYY');
+            v_fecha_anterior = to_char(v_parametros.desde-1,'DD/MM/YYYY');
             v_aux = REPLACE(v_parametros.filtro, '(icbte.fecha','0=0 --(icbte.fecha');
 
             IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
@@ -1201,8 +1202,8 @@ BEGIN
                 END IF;
              END IF;
             --Sentencia de la consulta
-			v_consulta:='
-            			SELECT
+            v_consulta:='
+                        SELECT
                         0::integer as id_int_transaccion,
                         0::integer as id_partida,
                         0::integer as id_centro_costo,
@@ -1221,17 +1222,17 @@ BEGIN
                         null::varchar as usr_mod,
 
                         case when(sum(COALESCE(transa.importe_debe_mb,0)) - sum(COALESCE(transa.importe_haber_mb,0)))>0
-                        	then
+                            then
                             sum(COALESCE(transa.importe_debe_mb,0))::numeric - sum(COALESCE(transa.importe_haber_mb,0))::numeric
                         else
-                        	0
+                            0
                         end as importe_debe_mb,
 
                         case when(sum(COALESCE(transa.importe_debe_mb,0)) - sum(COALESCE(transa.importe_haber_mb,0)))<0
-                        	then
+                            then
                             (sum(COALESCE(transa.importe_debe_mb,0))::numeric - sum(COALESCE(transa.importe_haber_mb,0))::numeric)*(-1)
                         else
-                        	0
+                            0
                         end as importe_haber_mb,
 
                         0::numeric as importe_gasto_mb,
@@ -1278,7 +1279,7 @@ BEGIN
                         left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
                         left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-            			where icbte.estado_reg = ''validado''
+                        where icbte.estado_reg = ''validado''
                               and '||v_filtro_cuentas||'
                               and '||v_filtro_ordenes||'
                               and '||v_filtro_tipo_cc||'
@@ -1286,51 +1287,51 @@ BEGIN
                               and '||v_aux||'  ';
 
 
-			v_consulta := v_consulta || '
-            			union all
+            v_consulta := v_consulta || '
+                        union all
 
-            			select
-						transa.id_int_transaccion,
-						transa.id_partida,
-						transa.id_centro_costo,
-						transa.id_partida_ejecucion,
-						transa.estado_reg,
-						transa.id_int_transaccion_fk,
-						transa.id_cuenta,
-						transa.glosa,
-						transa.id_int_comprobante,
-						transa.id_auxiliar,
-						transa.id_usuario_reg,
-						transa.fecha_reg::date,
-						transa.id_usuario_mod,
-						transa.fecha_mod::date,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
+                        select
+                        transa.id_int_transaccion,
+                        transa.id_partida,
+                        transa.id_centro_costo,
+                        transa.id_partida_ejecucion,
+                        transa.estado_reg,
+                        transa.id_int_transaccion_fk,
+                        transa.id_cuenta,
+                        transa.glosa,
+                        transa.id_int_comprobante,
+                        transa.id_auxiliar,
+                        transa.id_usuario_reg,
+                        transa.fecha_reg::date,
+                        transa.id_usuario_mod,
+                        transa.fecha_mod::date,
+                        usu1.cuenta as usr_reg,
+                        usu2.cuenta as usr_mod,
                         COALESCE(transa.importe_debe_mb,0) as importe_debe_mb,
                         COALESCE(transa.importe_haber_mb,0) as importe_haber_mb,
-                       	COALESCE(transa.importe_gasto_mb,0) as importe_gasto_mb,
-						COALESCE(transa.importe_recurso_mb,0) as importe_recurso_mb,
+                        COALESCE(transa.importe_gasto_mb,0) as importe_gasto_mb,
+                        COALESCE(transa.importe_recurso_mb,0) as importe_recurso_mb,
 
                         COALESCE(transa.importe_debe_mt,0) as importe_debe_mt,
                         COALESCE(transa.importe_haber_mt,0) as importe_haber_mt,
-                       	COALESCE(transa.importe_gasto_mt,0) as importe_gasto_mt,
-						COALESCE(transa.importe_recurso_mt,0) as importe_recurso_mt,
+                        COALESCE(transa.importe_gasto_mt,0) as importe_gasto_mt,
+                        COALESCE(transa.importe_recurso_mt,0) as importe_recurso_mt,
 
                         COALESCE(transa.importe_debe_ma,0) as importe_debe_ma,
                         COALESCE(transa.importe_haber_ma,0) as importe_haber_ma,
-                       	COALESCE(transa.importe_gasto_ma,0) as importe_gasto_ma,
-						COALESCE(transa.importe_recurso_ma,0) as importe_recurso_ma,
+                        COALESCE(transa.importe_gasto_ma,0) as importe_gasto_ma,
+                        COALESCE(transa.importe_recurso_ma,0) as importe_recurso_ma,
 
                         CASE par.sw_movimiento
-                        	WHEN ''flujo'' THEN
-								''(F) ''||par.codigo || '' - '' || par.nombre_partida
+                            WHEN ''flujo'' THEN
+                                ''(F) ''||par.codigo || '' - '' || par.nombre_partida
                             ELSE
-                            	par.codigo || '' - '' || par.nombre_partida
-                        	END  as desc_partida,
+                                par.codigo || '' - '' || par.nombre_partida
+                            END  as desc_partida,
 
-						cc.codigo_cc as desc_centro_costo,
-						cue.nro_cuenta || '' - '' || cue.nombre_cuenta as desc_cuenta,
-						aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar,
+                        cc.codigo_cc as desc_centro_costo,
+                        cue.nro_cuenta || '' - '' || cue.nombre_cuenta as desc_cuenta,
+                        aux.codigo_auxiliar || '' - '' || aux.nombre_auxiliar as desc_auxiliar,
                         par.sw_movimiento as tipo_partida,
                         ot.id_orden_trabajo,
                         ot.desc_orden,
@@ -1343,44 +1344,44 @@ BEGIN
                         icbte.id_estado_wf,
                         icbte.c31 as cbte_relacional,
                         0::numeric as saldo
-						from conta.tint_transaccion transa
+                        from conta.tint_transaccion transa
                         inner join conta.tint_comprobante icbte on icbte.id_int_comprobante = transa.id_int_comprobante
                         inner join param.tdepto dep on dep.id_depto = icbte.id_depto
                         inner join param.tperiodo per on per.id_periodo = icbte.id_periodo
-						inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
 
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta
                         inner join conta.tconfig_tipo_cuenta ctc on ctc.tipo_cuenta = cue.tipo_cuenta
                         inner join conta.tconfig_subtipo_cuenta csc on csc.id_config_subtipo_cuenta = cue.id_config_subtipo_cuenta
-						left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
-						left join pre.tpartida par on par.id_partida = transa.id_partida
-						left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
-						left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
+                        left join segu.tusuario usu2 on usu2.id_usuario = transa.id_usuario_mod
+                        left join pre.tpartida par on par.id_partida = transa.id_partida
+                        left join param.vcentro_costo cc on cc.id_centro_costo = transa.id_centro_costo
+                        left join conta.tauxiliar aux on aux.id_auxiliar = transa.id_auxiliar
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo =  transa.id_orden_trabajo
-				        where icbte.estado_reg = ''validado''
+                        where icbte.estado_reg = ''validado''
                               and '||v_filtro_cuentas||'
                               and '||v_filtro_ordenes||'
                               and '||v_desde||'
                               and '||v_filtro_tipo_cc||' and ';
 
-			v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||v_parametros.filtro;
             RAISE NOTICE '%',v_consulta;
            -- RAISE EXCEPTION '%', v_consulta;
             v_consulta:=v_consulta||'ORDER BY fecha,id_int_comprobante';
 
 
-			return v_consulta;
-		end;
+            return v_consulta;
+        end;
     /*********************************
- 	#TRANSACCION:  'CONTA_INTPAR_CONT'
- 	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_INTPAR_CONT'
+    #DESCRIPCION:   Conteo de registros
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_INTPAR_CONT')then
+    elsif(p_transaccion='CONTA_INTPAR_CONT')then
 
-		begin
+        begin
 
              if pxp.f_existe_parametro(p_tabla,'id_periodo') then
                v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
@@ -1426,21 +1427,21 @@ BEGIN
 
             raise notice '%',v_consulta;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
     /*********************************
- 	#TRANSACCION:  'CONTA_INTCUE_SEL'
- 	#DESCRIPCION:	consulta de analisis de cuentas por tipo_cc
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_INTCUE_SEL'
+    #DESCRIPCION:   consulta de analisis de cuentas por tipo_cc
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elseif(p_transaccion='CONTA_INTCUE_SEL')then
+    elseif(p_transaccion='CONTA_INTCUE_SEL')then
 
-    	begin
+        begin
 
              if pxp.f_existe_parametro(p_tabla,'id_periodo') then
                v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
@@ -1451,9 +1452,9 @@ BEGIN
              end if;
 
 
-    		--Sentencia de la consulta
-			v_consulta:='SELECT
-            				id_cuenta,
+            --Sentencia de la consulta
+            v_consulta:='SELECT
+                            id_cuenta,
                             sum(importe_debe_mb) as importe_debe_mb,
                             sum(importe_haber_mb) as importe_haber_mb,
                             sum(importe_debe_mt) as importe_debe_mt,
@@ -1470,7 +1471,7 @@ BEGIN
 
 
               --Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||v_parametros.filtro;
 
 
             v_consulta:=v_consulta||'
@@ -1481,26 +1482,26 @@ BEGIN
                                 tipo_cuenta ';
 
 
-			--Definicion de la respuesta
+            --Definicion de la respuesta
 
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
             raise notice '%',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
     /*********************************
- 	#TRANSACCION:  'CONTA_INTCUE_CONT'
- 	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_INTCUE_CONT'
+    #DESCRIPCION:   Conteo de registros
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_INTCUE_CONT')then
+    elsif(p_transaccion='CONTA_INTCUE_CONT')then
 
-		begin
+        begin
 
              if pxp.f_existe_parametro(p_tabla,'id_periodo') then
                v_filtro = ' id_periodo='||v_parametros.id_periodo::varchar;
@@ -1546,22 +1547,22 @@ BEGIN
 
             raise notice '%',v_consulta;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
      /*********************************
- 	#TRANSACCION:  'CONTA_AUXMAY_SEL'
- 	#DESCRIPCION:	consulta para grilla que reporta el mayor por auxiliarse
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    #TRANSACCION:  'CONTA_AUXMAY_SEL'
+    #DESCRIPCION:   consulta para grilla que reporta el mayor por auxiliarse
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elseif(p_transaccion='CONTA_AUXMAY_SEL')then
+    elseif(p_transaccion='CONTA_AUXMAY_SEL')then
 
-    	begin
-        	 --raise notice '%',v_parametros.filtro;
-        	--raise exception '%',v_parametros.filtro;
+        begin
+             --raise notice '%',v_parametros.filtro;
+            --raise exception '%',v_parametros.filtro;
            v_filtro_aux = ' 0=0 ';
            v_filtro_cuentas = ' 0=0 ';
            v_filtro_tipo = ' 0=0 ';
@@ -1571,8 +1572,8 @@ BEGIN
                 v_aux = 'AND saldo!=0';
            END IF;
            IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
-           		IF v_parametros.id_cuenta is not NULL THEN
-                	WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
+                IF v_parametros.id_cuenta is not NULL THEN
+                    WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
                           SELECT cue.id_cuenta, cue.id_cuenta_padre
                           FROM conta.tcuenta cue
                           WHERE cue.id_cuenta = v_parametros.id_cuenta and cue.estado_reg = 'activo'
@@ -1583,12 +1584,12 @@ BEGIN
                           FROM cuenta_rec lrec
                           INNER JOIN conta.tcuenta cue2 ON lrec.id_cuenta = cue2.id_cuenta_padre
                           WHERE cue2.estado_reg = 'activo'
-                	)
+                    )
                     SELECT  pxp.list(id_cuenta::varchar)
                     INTO v_cuentas
                     FROM cuenta_rec;
                     v_filtro_cuentas = ' transa.id_cuenta in ('||v_cuentas||') ';
-           		END IF;
+                END IF;
            END IF;
 
            IF  pxp.f_existe_parametro(p_tabla,'id_auxiliar')  THEN
@@ -1619,8 +1620,8 @@ BEGIN
                 END IF;
            END IF;
 
-    		--Sentencia de la consulta
-			v_consulta:='select
+            --Sentencia de la consulta
+            v_consulta:='select
                             Q.id_auxiliar,
                             Q.codigo_auxiliar,
                             Q.nombre_auxiliar,
@@ -1673,8 +1674,8 @@ BEGIN
                                           csc.id_config_subtipo_cuenta,
                                           csc.codigo,
                                           csc.descripcion ';
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||' ) Q    --#65
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||' ) Q    --#65
             left join param.tproveedor pro on pro.id_auxiliar = Q.id_auxiliar   --#65
             where '||v_filtro_internacional||' and ';  --#65
             v_consulta:=v_consulta||v_parametros.filtro;
@@ -1682,25 +1683,25 @@ BEGIN
             v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
            -- raise notice '%',v_consulta;
           --  raise exception '%',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
-		end;
+            --Devuelve la respuesta
+            return v_consulta;
+        end;
 
-	/*********************************
- 	#TRANSACCION:  'CONTA_AUXMAY_CONT'
- 	#DESCRIPCION:	Conteo de registros de interface de auxiliar de mayores
- 	#AUTOR:		admin
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    /*********************************
+    #TRANSACCION:  'CONTA_AUXMAY_CONT'
+    #DESCRIPCION:   Conteo de registros de interface de auxiliar de mayores
+    #AUTOR:     admin
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elsif(p_transaccion='CONTA_AUXMAY_CONT')then
+    elsif(p_transaccion='CONTA_AUXMAY_CONT')then
 
-		begin
+        begin
 
            v_filtro_aux = ' 0=0 ';
            v_filtro_cuentas = ' 0=0 ';
            v_filtro_tipo = ' 0=0 ';
-        	v_aux = 'and 0=0 ';
+            v_aux = 'and 0=0 ';
 
             IF v_parametros.tipo_estado='abierto' then
                 v_aux = 'AND saldo!=0';
@@ -1762,8 +1763,8 @@ BEGIN
                 END IF;
            END IF;
 
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='select
                             count (*),
                             COALESCE(sum(importe_debe_mb),0) as importe_debe_mb,
                             COALESCE(sum(importe_haber_mb),0) as importe_haber_mb,
@@ -1821,26 +1822,26 @@ BEGIN
 
 
 
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
              v_consulta:=v_consulta||v_aux;
            -- raise notice '%',v_consulta;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
+        end;
 
-	/*********************************
- 	#TRANSACCION:  'CONTA_TOTAUX_SEL'
- 	#DESCRIPCION:	consulta para grilla que reporta el total por auxiliar
- 	#AUTOR:		MP
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+    /*********************************
+    #TRANSACCION:  'CONTA_TOTAUX_SEL'
+    #DESCRIPCION:   consulta para grilla que reporta el total por auxiliar
+    #AUTOR:     MP
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elseif(p_transaccion='CONTA_TOTAUX_SEL')then
-    	begin
-        	v_filtro_aux = ' 0=0 ';
+    elseif(p_transaccion='CONTA_TOTAUX_SEL')then
+        begin
+            v_filtro_aux = ' 0=0 ';
             v_cuentas = ' 0=0 ';
             v_filtro_tipo = ' 0=0 ';
             v_aux = 'and 0=0 ';
@@ -1850,8 +1851,8 @@ BEGIN
             END IF;
 
             IF pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
-            	IF v_parametros.id_cuenta is not NULL THEN
-                	WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
+                IF v_parametros.id_cuenta is not NULL THEN
+                    WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
                         SELECT cue.id_cuenta, cue.id_cuenta_padre
                         FROM conta.tcuenta cue
                         WHERE cue.id_cuenta = v_parametros.id_cuenta and cue.estado_reg = 'activo'
@@ -1868,27 +1869,27 @@ BEGIN
                     v_auxiliar='cue.id_cuenta';
                     v_auxiliar_b='cue.id_cuenta,';
                 else
-                 	v_auxiliar='null::integer';
+                    v_auxiliar='null::integer';
                     v_auxiliar_b='';
                 END IF;
             END IF;
 
             IF  pxp.f_existe_parametro(p_tabla,'id_auxiliar')  THEN
-            	IF v_parametros.id_auxiliar is not NULL THEN
-                	v_filtro_aux = ' transa.id_auxiliar in ('||v_parametros.id_auxiliar::varchar||') ';
-             	END IF;
+                IF v_parametros.id_auxiliar is not NULL THEN
+                    v_filtro_aux = ' transa.id_auxiliar in ('||v_parametros.id_auxiliar::varchar||') ';
+                END IF;
             END IF;
 
             IF  pxp.f_existe_parametro(p_tabla,'id_config_subtipo_cuenta')  THEN
-            	IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
-                	v_filtro_tipo = ' csc.id_config_subtipo_cuenta in ('||v_parametros.id_config_subtipo_cuenta::varchar||') ';
-             	END IF;
+                IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
+                    v_filtro_tipo = ' csc.id_config_subtipo_cuenta in ('||v_parametros.id_config_subtipo_cuenta::varchar||') ';
+                END IF;
             END IF;
             --preguntar si id_cuenta es nulo no enviar
             IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
-            	v_auxiliar_c = 'csc.id_config_subtipo_cuenta';
+                v_auxiliar_c = 'csc.id_config_subtipo_cuenta';
                 v_auxiliar_d = 'csc.id_config_subtipo_cuenta';
-			ELSE
+            ELSE
                 v_auxiliar_c = '0';
                 v_auxiliar_d = 'aux.aplicacion';
             END IF;
@@ -1908,8 +1909,8 @@ BEGIN
                     v_filtro_internacional = '0=0';
                 END IF;
            END IF;
-    		--Sentencia de la consulta
-			v_consulta:='select
+            --Sentencia de la consulta
+            v_consulta:='select
                             Q.id_auxiliar,
                             Q.codigo_auxiliar,
                             Q.nombre_auxiliar,
@@ -1926,7 +1927,7 @@ BEGIN
                             pro.internacional  --#65
                        from
                        (
-             			  select
+                          select
                           aux.id_auxiliar,
                           aux.codigo_auxiliar,
                           aux.nombre_auxiliar,
@@ -1965,27 +1966,27 @@ BEGIN
                                     ORDER BY
                                     aux.codigo_auxiliar
                                     ';
-        	v_consulta:=v_consulta||' ) Q
+            v_consulta:=v_consulta||' ) Q
             left join param.tproveedor pro on pro.id_auxiliar = Q.id_auxiliar      --#65
             where '||v_filtro_internacional||' and '; --#65
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||v_aux;
              v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-			--Devuelve la respuesta
-			return v_consulta;
-		end;
+            --Devuelve la respuesta
+            return v_consulta;
+        end;
         /*********************************
         #TRANSACCION:  'CONTA_TOTAUX_CONT'
-        #DESCRIPCION:	Conteo de registros de interface de total de mayores
-        #AUTOR:		mp
-        #FECHA:		01-09-2018 18:10:12
+        #DESCRIPCION:   Conteo de registros de interface de total de mayores
+        #AUTOR:     mp
+        #FECHA:     01-09-2018 18:10:12
         ***********************************/
 
 
-			elsif(p_transaccion='CONTA_TOTAUX_CONT')then
+            elsif(p_transaccion='CONTA_TOTAUX_CONT')then
 
-			begin
+            begin
             v_filtro_aux = ' 0=0 ';
             v_cuentas = ' 0=0 ';
             v_filtro_tipo = ' 0=0 ';
@@ -1996,8 +1997,8 @@ BEGIN
             END IF;
 
             IF pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
-            	IF v_parametros.id_cuenta is not NULL THEN
-                	WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
+                IF v_parametros.id_cuenta is not NULL THEN
+                    WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
                         SELECT cue.id_cuenta, cue.id_cuenta_padre
                         FROM conta.tcuenta cue
                         WHERE cue.id_cuenta = v_parametros.id_cuenta and cue.estado_reg = 'activo'
@@ -2014,28 +2015,28 @@ BEGIN
                      v_auxiliar='cue.id_cuenta';
                     v_auxiliar_b='cue.id_cuenta,';
                 else
-                 	v_auxiliar='null::integer';
+                    v_auxiliar='null::integer';
                     v_auxiliar_b='';
                 END IF;
             END IF;
 
             IF  pxp.f_existe_parametro(p_tabla,'id_auxiliar')  THEN
-            	IF v_parametros.id_auxiliar is not NULL THEN
-                	v_filtro_aux = ' transa.id_auxiliar in ('||v_parametros.id_auxiliar::varchar||') ';
-             	END IF;
+                IF v_parametros.id_auxiliar is not NULL THEN
+                    v_filtro_aux = ' transa.id_auxiliar in ('||v_parametros.id_auxiliar::varchar||') ';
+                END IF;
             END IF;
 
             IF  pxp.f_existe_parametro(p_tabla,'id_config_subtipo_cuenta')  THEN
-            	IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
-                	v_filtro_tipo = ' csc.id_config_subtipo_cuenta in ('||v_parametros.id_config_subtipo_cuenta::varchar||') ';
-             	END IF;
+                IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
+                    v_filtro_tipo = ' csc.id_config_subtipo_cuenta in ('||v_parametros.id_config_subtipo_cuenta::varchar||') ';
+                END IF;
             END IF;
             --#5
             --preguntar si id_cuenta es nulo no enviar
             IF v_parametros.id_config_subtipo_cuenta is not NULL THEN
-            	v_auxiliar_c = 'csc.id_config_subtipo_cuenta';
+                v_auxiliar_c = 'csc.id_config_subtipo_cuenta';
                 v_auxiliar_d = 'csc.id_config_subtipo_cuenta';
-			ELSE
+            ELSE
                 v_auxiliar_c = '0';
                 v_auxiliar_d = 'aux.aplicacion';
             END IF;
@@ -2056,15 +2057,15 @@ BEGIN
                 END IF;
            END IF;
 
-			--Sentencia de la consulta de conteo de registros
+            --Sentencia de la consulta de conteo de registros
             v_consulta:='select
                             count (*),
                             COALESCE(sum(importe_debe_mb),0) as importe_debe_mb,
                             COALESCE(sum(importe_haber_mb),0) as importe_haber_mb,
                             sum(saldo) as saldo
-                       	from
-                       	(
-             			  select
+                        from
+                        (
+                          select
                           aux.id_auxiliar,
                           aux.codigo_auxiliar,
                           aux.nombre_auxiliar,
@@ -2103,26 +2104,26 @@ BEGIN
                                     ORDER BY
                                     aux.codigo_auxiliar
                                     ';
-        	v_consulta:=v_consulta||' ) Q
+            v_consulta:=v_consulta||' ) Q
             left join param.tproveedor pro on pro.id_auxiliar = Q.id_auxiliar   --#65
             where '||v_filtro_internacional||' and ';     --#65
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||v_aux;
 
-			--Devuelve la respuesta
-			return v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
 
-		end;
-	/*********************************
- 	#TRANSACCION:  'CONTA_LDCTRANS_SEL'
- 	#DESCRIPCION:
- 	#AUTOR:		JUAN
- 	#FECHA:		01-09-2013 18:10:12
-	***********************************/
+        end;
+    /*********************************
+    #TRANSACCION:  'CONTA_LDCTRANS_SEL'
+    #DESCRIPCION:
+    #AUTOR:     JUAN
+    #FECHA:     01-09-2013 18:10:12
+    ***********************************/
 
-	elseif(p_transaccion='CONTA_LDCTRANS_SEL')then
+    elseif(p_transaccion='CONTA_LDCTRANS_SEL')then
 
-    	begin
+        begin
 
             IF  v_parametros.tipo_reporte='auditoria' THEN
                v_atributos := ',pers.nombre_completo2::varchar as usuario_reg_transaccion,
@@ -2138,7 +2139,7 @@ BEGIN
                v_join := '';
             END IF;
             --#111 correcion de logica
-			v_consulta:='select
+            v_consulta:='select
                           itr.id_int_transaccion ,
                           icbt.id_int_comprobante , icbt.fecha_reg , icbt.fecha , icbt.nro_cbte , icbt.nro_tramite ,
                           regexp_replace(regexp_replace(tcc.descripcion,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa1 ,
@@ -2146,12 +2147,12 @@ BEGIN
                           coalesce(itr.importe_haber_mb,0) as haber_mb ,
                           (coalesce(itr.importe_debe_mb,0) - coalesce(itr.importe_haber_mb,0)) as saldo_debehaber_mb,
 
-						--#69 SE HAN ELIMINADO 3 COLUMNAS
+                        --#69 SE HAN ELIMINADO 3 COLUMNAS
                           coalesce(itr.importe_debe_mt,0) as debe_mt,
                           coalesce(itr.importe_haber_mt,0) as haber_mt,
                           (coalesce(itr.importe_debe_mt,0) - coalesce(itr.importe_haber_mt,0)) as saldo_debehaber_mt,
 
-						--#69 SE HAN ELIMINADO 3 COLUMNAS
+                        --#69 SE HAN ELIMINADO 3 COLUMNAS
                           coalesce(itr.importe_debe_ma,0) as debe_ma,
                           coalesce(itr.importe_haber_ma,0) as haber_ma,
                           (coalesce(itr.importe_debe_ma,0) - coalesce(itr.importe_haber_ma,0)) as saldo_debehaber_ma,
@@ -2177,7 +2178,7 @@ BEGIN
                           to_char(itr.fecha_reg, ''HH12:MI:SS'')::varchar as hora,
                           itr.fecha_reg::timestamp as fecha_reg_transaccion
                           '||v_atributos||',
-						  tpp.nombre,
+                          tpp.nombre,
 
                           --#69 SE ADICIONAN 6 NUEVAS COLUMNAS
                           --#69 SE MODIFICA LA EMPRESION REGULAR [\n\t] por [\n\t\r ]
@@ -2196,7 +2197,7 @@ BEGIN
                           join pre.tpartida par on par.id_partida = itr.id_partida
                           join param.tcentro_costo cc on cc.id_centro_costo=itr.id_centro_costo
                           join pre.tpresupuesto pre on pre.id_centro_costo=cc.id_centro_costo
-						  join pre.ttipo_presupuesto tpp on pre.tipo_pres=tpp.codigo
+                          join pre.ttipo_presupuesto tpp on pre.tipo_pres=tpp.codigo
                           inner join conta.vint_comprobante vc on vc.id_int_comprobante = icbt.id_int_comprobante  --NUEVO
                           inner join segu.vusuario us on us.id_usuario = vc.id_usuario_reg
                           left join segu.vusuario um on um.id_usuario = vc.id_usuario_mod       --NUEVO
@@ -2206,21 +2207,21 @@ BEGIN
                           '||v_join||'
                           where icbt.estado_reg = ''validado''  and ';
 
-			v_consulta:=v_consulta||v_parametros.filtro;
-			raise notice '--> %',v_consulta;
-			return v_consulta;
+            v_consulta:=v_consulta||v_parametros.filtro;
+            raise notice '--> %',v_consulta;
+            return v_consulta;
 
-		end;
+        end;
         /*********************************
         #TRANSACCION:  'CONTA_LDCTRANS_CONT'
         #DESCRIPCION:
-        #AUTOR:		Admin
-        #FECHA:		01-09-2018 18:10:12
+        #AUTOR:     Admin
+        #FECHA:     01-09-2018 18:10:12
         ***********************************/
 
-		elsif(p_transaccion='CONTA_LDCTRANS_CONT')then
+        elsif(p_transaccion='CONTA_LDCTRANS_CONT')then
 
-			begin
+            begin
 
 
 
@@ -2248,27 +2249,27 @@ BEGIN
 
 
 
-			return v_consulta;
+            return v_consulta;
 
-		end;
+        end;
      --------------#92 INI-MMV------------
          /*********************************
         #TRANSACCION:  'CONTA_MROMAYOR_SEL' #92
-        #DESCRIPCION:	actualización reporte de detalle de auxiliares
-        #AUTOR:		MMV
-        #FECHA:		07-12-2018
+        #DESCRIPCION:   actualización reporte de detalle de auxiliares
+        #AUTOR:     MMV
+        #FECHA:     07-12-2018
         ***********************************/
         elseif(p_transaccion='CONTA_MROMAYOR_SEL')then
 
             begin
 
-            	if (v_parametros.nro_tramite = 'normal')then --MMV #10
-                	 v_filto_nro = 't.nro_tramite ';
+                if (v_parametros.nro_tramite = 'normal')then --MMV #10
+                     v_filto_nro = 't.nro_tramite ';
                 else
-                	 v_filto_nro  = 'cb.nro_tramite_aux';
+                     v_filto_nro  = 'cb.nro_tramite_aux';
                 end if ; --MMV #10
 
-                 v_consulta:='with basica as (select 	cb.id_int_comprobante,
+                 v_consulta:='with basica as (select    cb.id_int_comprobante,
                                                         t.id_cuenta,
                                                         cu.nro_cuenta,
                                                         cu.nombre_cuenta,
@@ -2293,7 +2294,7 @@ BEGIN
                                                         inner join param.tperiodo pe on pe.id_periodo = cb.id_periodo
                                                         where cb.estado_reg = ''validado'' and  t.id_auxiliar = '||v_parametros.id_auxiliar||'
                                                         and pe.id_gestion = '||v_parametros.id_gestion||' and  cb.fecha::date BETWEEN '''||v_parametros.desde||'''::Date and '''||v_parametros.hasta||'''::date)
-                 				 select  t.id_int_comprobante,
+                                 select  t.id_int_comprobante,
                                          t.id_cuenta,
                                          t.nro_cuenta,
                                          t.nombre_cuenta,
@@ -2330,8 +2331,8 @@ BEGIN
                                        from basica t
                                        where ';
               --Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-          	v_consulta:=v_consulta||'group by  t.id_cuenta,
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||'group by  t.id_cuenta,
                                                t.nro_cuenta,
                                                t.id_auxiliar,
                                                t.nro_tramite,
@@ -2344,28 +2345,28 @@ BEGIN
 
 
                  return v_consulta;
-				raise notice '%',v_consulta;
+                raise notice '%',v_consulta;
             end;
 
 
-    	/*********************************
+        /*********************************
         #TRANSACCION:  'CONTA_MROMAYOR_CONT' #92
-        #DESCRIPCION:	count actualización reporte de detalle de auxiliares
-        #AUTOR:		MMV
-        #FECHA:		07-12-2018
+        #DESCRIPCION:   count actualización reporte de detalle de auxiliares
+        #AUTOR:     MMV
+        #FECHA:     07-12-2018
         ***********************************/
 
-		elsif(p_transaccion='CONTA_MROMAYOR_CONT')then
+        elsif(p_transaccion='CONTA_MROMAYOR_CONT')then
 
-			begin
+            begin
 
             if (v_parametros.nro_tramite = 'normal')then--MMV #10
-             	v_filto_nro = 't.nro_tramite ';
+                v_filto_nro = 't.nro_tramite ';
             else
-            	v_filto_nro  = 'cb.nro_tramite_aux';
+                v_filto_nro  = 'cb.nro_tramite_aux';
             end if ; --MMV #10
 
-            v_consulta:= 'with basica as (select 	cb.id_int_comprobante,
+            v_consulta:= 'with basica as (select    cb.id_int_comprobante,
                                                     t.id_cuenta,
                                                     cu.nro_cuenta,
                                                     cu.nombre_cuenta,
@@ -2416,7 +2417,7 @@ BEGIN
                                                      t.fecha,
                                                      t.id_int_comprobante)
                                   select count(c.id_int_comprobante),
-                                  		 sum (c.importe_debe_mb) as importe_debe_mb_total,
+                                         sum (c.importe_debe_mb) as importe_debe_mb_total,
                                          sum (c.importe_haber_mb) as importe_haber_mb_total,
                                          (case
                                               when sum(COALESCE(c.importe_haber_mb,0)) >  sum(COALESCE(c.importe_debe_mb,0)) then
@@ -2442,20 +2443,20 @@ BEGIN
                                         end ) as saldo_ma_total
                                   from contar c
                                   where ';
-			v_consulta:=v_consulta||v_parametros.filtro;
-			return v_consulta;
+            v_consulta:=v_consulta||v_parametros.filtro;
+            return v_consulta;
 
-		end;
+        end;
         /*********************************
         #TRANSACCION:  'CONTA_AUXRE_SEL' #92
-        #DESCRIPCION:	actualización reporte de detalle de auxiliares formato xls
-        #AUTOR:		MMV
-        #FECHA:		07-12-2018
+        #DESCRIPCION:   actualización reporte de detalle de auxiliares formato xls
+        #AUTOR:     MMV
+        #FECHA:     07-12-2018
         ***********************************/
         elseif(p_transaccion='CONTA_AUXRE_SEL')then
             begin
 
-                  CREATE TEMPORARY TABLE temporal( 	 id_int_comprobante integer,
+                  CREATE TEMPORARY TABLE temporal(   id_int_comprobante integer,
                                                      id_cuenta integer,
                                                      nro_cuenta varchar,
                                                      nombre_cuenta varchar,
@@ -2474,7 +2475,7 @@ BEGIN
                                                      tipo varchar,
                                                      beneficiario varchar )ON COMMIT DROP; --#83
 
-            with basica as (select 	cb.id_int_comprobante,
+            with basica as (select  cb.id_int_comprobante,
                                     t.id_cuenta,
                                     cu.nro_cuenta,
                                     cu.nombre_cuenta,
@@ -2486,7 +2487,7 @@ BEGIN
                                        t.nro_tramite
                                       when v_parametros.nro_tramite = 'modificado' then
                                           cb.nro_tramite_aux
-                                  	end as nro_tramite, --MMV #10
+                                    end as nro_tramite, --MMV #10
                                     cb.fecha,
                                     cb.glosa1,
                                     cb.beneficiario, --#83
@@ -2552,19 +2553,19 @@ BEGIN
                                                                        t.glosa1,
                                                                        t.beneficiario;
                 ---totales
-                        with basica as (select 	cb.id_int_comprobante,
+                        with basica as (select  cb.id_int_comprobante,
                                                 t.id_cuenta,
                                                 cu.nro_cuenta,
                                                 cu.nombre_cuenta,
                                                 COALESCE(t.id_auxiliar,0) as id_auxiliar,
                                                  au.codigo_auxiliar,
-                                   				 au.nombre_auxiliar,
+                                                 au.nombre_auxiliar,
                                                 case
-                                                	when v_parametros.nro_tramite = 'normal' then
-                                               		 t.nro_tramite
+                                                    when v_parametros.nro_tramite = 'normal' then
+                                                     t.nro_tramite
                                                     when v_parametros.nro_tramite = 'modificado' then
-                                                    	cb.nro_tramite_aux
-                                               	end as nro_tramite, --MMV #10
+                                                        cb.nro_tramite_aux
+                                                end as nro_tramite, --MMV #10
                                                 cb.fecha,
                                                 t.importe_debe_mb,
                                                 t.importe_haber_mb,
@@ -2669,18 +2670,18 @@ BEGIN
         --------------#92 FIN-MMV------------
     else
 
-		raise exception 'Transaccion inexistente';
+        raise exception 'Transaccion inexistente';
 
-	end if;
+    end if;
 
 EXCEPTION
 
-	WHEN OTHERS THEN
-			v_resp='';
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-			raise exception '%',v_resp;
+    WHEN OTHERS THEN
+            v_resp='';
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+            v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+            v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+            raise exception '%',v_resp;
 END;
 $body$
 LANGUAGE 'plpgsql'
