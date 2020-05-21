@@ -16,6 +16,7 @@
  #76              28/11/2019        EGS              Se filtra por tipo de cobro
  #112			  17/04/2020		manu		     reportes de autorizacion de pasajes y registro de pasajeros
 #113  ETR       29/04/2020		     MMV	             Reporte Registro Ventas CC
+#120  ETR       22/05/2020		     manuel guerra	    modificacion de nombre de procedimiento
 
  */
 class MODDocCompraVenta extends MODbase{
@@ -1891,7 +1892,7 @@ class MODDocCompraVenta extends MODbase{
 	function listarNroTramite(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='conta.ft_doc_compra_venta_sel';
-		$this->transaccion='CONTA_LISTRA_SEL';
+		$this->transaccion='CONTA_LISTRAM_SEL';
 		$this->tipo_procedimiento='SEL';
 		//captura parametros
 		//$this->setParametro('tipo','tipo','VARCHAR');
@@ -2025,6 +2026,6 @@ class MODDocCompraVenta extends MODbase{
         // var_dump($this->respuesta);exit;
         //Devuelve la respuesta
         return $this->respuesta;
-    }
+	}
 }
 ?>
