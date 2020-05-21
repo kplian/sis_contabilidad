@@ -25,6 +25,7 @@ ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:
 #112	    17/04/2020					    manuel guerra	    reportes de autorizacion de pasajes y registro de pasajeros
 #113         29/04/2020		     			MMV	                 Reporte Registro Ventas CC
 #114      29/04/2020            manuelguerra    agregar propiedades de filtrado
+#119      29/04/2020            manuelguerra   mostrar descripcion de tcc
 ***************************************************************************/
 
 DECLARE
@@ -1546,14 +1547,37 @@ BEGIN
 		elsif(p_transaccion='CONTA_REPREPAS_SEL') then
         
      		BEGIN
-                              
+            	--#119   	
+            	with techo as (
+                    select 
+                    vtcc.descripcion_techo as descripcion,
+                    cc.codigo_cc
+                    from cd.tpago_simple_det paside
+                    join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = paside.id_doc_compra_venta
+                    left join conta.tdoc_concepto cop on cop.id_doc_compra_venta=dcv.id_doc_compra_venta
+                    left join param.vcentro_costo cc on cc.id_centro_costo=cop.id_centro_costo
+                    left join param.vtipo_cc_techo vtcc on vtcc.id_tipo_cc=cc.id_tipo_cc
+                    where paside.id_pago_simple = v_parametros.id_pago_simple             
+                    group by cc.codigo_cc,vtcc.descripcion_techo,cc.id_centro_costo
+                )
+                SELECT 
+                CASE 
+                WHEN (t.codigo_cc like 'P1%') THEN
+                	t.descripcion	
+                ELSE
+                	t.codigo_cc	
+                END as descripcion                
+                into 
+                v_registros
+                from techo t;
+            	            
 				v_consulta:='SELECT
                              COALESCE(fun.desc_funcionario2,''-'') ::varchar,
                              COALESCE(dcv.nro_documento,''-'') ::varchar,
                              COALESCE(dcv.nota_debito_agencia,''-'') ::varchar, 
                              COALESCE(dcv.nro_tramite,''-'') ::varchar, 
-                             COALESCE(dcv.obs,''-'') ::varchar, 
-                             COALESCE(pres.descripcion,''-'') ::varchar, 
+                             COALESCE(dcv.obs,''-'') ::varchar,                              
+                             '''||v_registros.descripcion||'''::varchar  as descripcion,
                              COALESCE(dcv.importe_neto,0)::numeric as importe_doc,
                              COALESCE(mon.codigo,''-'') ::varchar as desc_moneda, 
                              COALESCE(ttp.nombre,''-'') ::varchar as tipago,
