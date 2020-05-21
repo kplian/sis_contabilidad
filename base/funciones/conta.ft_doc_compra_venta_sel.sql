@@ -25,6 +25,7 @@ ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:
 #112	    17/04/2020					    manuel guerra	    reportes de autorizacion de pasajes y registro de pasajeros
 #113         29/04/2020		     			MMV	                 Reporte Registro Ventas CC
 #114      29/04/2020            manuelguerra    agregar propiedades de filtrado
+#120      22/05/2020            manuelguerra    modificación de nombre de procedimiento
 ***************************************************************************/
 
 DECLARE
@@ -1442,13 +1443,13 @@ BEGIN
 		end;
 
 	/*********************************
- 	#TRANSACCION:  'CONTA_LISTRA_SEL'
+ 	#TRANSACCION:  'CONTA_LISTRAM_SEL'
  	#DESCRIPCION:	listado de tramites de vi/fa
  	#AUTOR:		manu   #112
  	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
-	elsif(p_transaccion='CONTA_LISTRA_SEL')then
+	elsif(p_transaccion='CONTA_LISTRAM_SEL')then
 
     	begin
         	v_filtro =' 0 = 0 ';
@@ -1472,13 +1473,13 @@ BEGIN
 
 		end;
     /*********************************
- 	#TRANSACCION:  'CONTA_LISTRA_CONT'
+ 	#TRANSACCION:  'CONTA_LISTRAM_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		manu  #112
+ 	#AUTOR:		manu  #112  #120
  	#FECHA:		18-08-2015 15:57:09
 	***********************************/
 
-	elsif(p_transaccion='CONTA_LISTRA_CONT')then
+	elsif(p_transaccion='CONTA_LISTRAM_CONT')then
 
 		begin
         	v_filtro =' 0 = 0 ';
