@@ -1510,8 +1510,8 @@ BEGIN
         ***********************************/
 		elsif(p_transaccion='CONTA_REPAUT_SEL') then
         
-     		BEGIN
-                              
+     		BEGIN            	            	                             
+            	                  
 				v_consulta:='select
                             COALESCE(dcv.nota_debito_agencia,''-'')::VARCHAR,
                             COALESCE(fun.desc_funcionario2,''-'')::VARCHAR,
@@ -1534,7 +1534,6 @@ BEGIN
                             '; 
                 v_consulta:=v_consulta||v_parametros.filtro;
                 raise notice '%',v_consulta;
-                --raise EXCEPTION '%',v_consulta;
 				return v_consulta;
 			END;
     
@@ -1547,14 +1546,28 @@ BEGIN
 		elsif(p_transaccion='CONTA_REPREPAS_SEL') then
         
      		BEGIN
-                              
+            	--#119   	
+ 
 				v_consulta:='SELECT
                              COALESCE(fun.desc_funcionario2,''-'') ::varchar,
                              COALESCE(dcv.nro_documento,''-'') ::varchar,
                              COALESCE(dcv.nota_debito_agencia,''-'') ::varchar, 
                              COALESCE(dcv.nro_tramite,''-'') ::varchar, 
-                             COALESCE(dcv.obs,''-'') ::varchar, 
-                             COALESCE(pres.descripcion,''-'') ::varchar, 
+                             COALESCE(dcv.obs,''-'') ::varchar,           
+                             (
+                             	select
+                                CASE 
+                                WHEN (ceco.codigo_cc like ''P1%'') THEN
+                                  vtcc.descripcion_techo::varchar	
+                                ELSE
+                                  ceco.codigo_cc::varchar	
+                                END as descripcion                                
+                                from conta.tdoc_compra_venta dcven     
+                                left join conta.tdoc_concepto cop on cop.id_doc_compra_venta=dcven.id_doc_compra_venta
+                                left join param.vcentro_costo ceco on ceco.id_centro_costo=cc.id_centro_costo
+                                left join param.vtipo_cc_techo vtcc on vtcc.id_tipo_cc=ceco.id_tipo_cc
+                                group by ceco.codigo_cc,vtcc.descripcion_techo,ceco.id_centro_costo                             
+                             ),                                                
                              COALESCE(dcv.importe_neto,0)::numeric as importe_doc,
                              COALESCE(mon.codigo,''-'') ::varchar as desc_moneda, 
                              COALESCE(ttp.nombre,''-'') ::varchar as tipago,
