@@ -749,7 +749,8 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					allowBlank: false,
 					anchor: '80%',
 					gwidth: 100,
-					maxLength:100
+					maxLength:100,
+                    sortField:'dcv.nro_tramite',
 				},
 					type:'TextField',
 					filters:{pfiltro:'ic.nro_tramite',type:'string'},
