@@ -26,7 +26,6 @@ ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:
 #113         29/04/2020		     			MMV	                 Reporte Registro Ventas CC
 #114      29/04/2020            manuelguerra    agregar propiedades de filtrado
 #120      22/05/2020            manuelguerra    modificación de nombre de procedimiento
-#121      25/05/2020            MMV ETR    Reporte registros de ventas cc corrección filtro
 ***************************************************************************/
 
 DECLARE
@@ -1572,7 +1571,8 @@ BEGIN
                              COALESCE(dcv.importe_neto,0)::numeric as importe_doc,
                              COALESCE(mon.codigo,''-'') ::varchar as desc_moneda, 
                              COALESCE(ttp.nombre,''-'') ::varchar as tipago,
-                             COALESCE(pro.rotulo_comercial,''-'') ::varchar as rotulo_comercial                              
+                             COALESCE(pro.rotulo_comercial,''-'') ::varchar as rotulo_comercial,
+                             ps.nro_tramite as tram                                                           
                              from cd.tpago_simple_det paside
                              join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = paside.id_doc_compra_venta
                              join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
@@ -1595,7 +1595,7 @@ BEGIN
  	#TRANSACCION:  'CONTA_RRC_SEL' #113
  	#DESCRIPCION:	Reporte Registros Ventas
  	#AUTOR:		MMV
- 	#FECHA:		21-09-2020 #121
+ 	#FECHA:		21-09-2020
 	***********************************/
 
 	elsif(p_transaccion='CONTA_RRC_SEL')then
@@ -1665,7 +1665,7 @@ BEGIN
                               left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
                               left join orga.vfuncionario fun on fun.id_funcionario = dcv.id_funcionario
                               left join conta.tint_comprobante ic on ic.id_int_comprobante = dcv.id_int_comprobante
-                              where dcv.id_periodo = '||v_parametros.id_periodo||'
+                              where dcv.id_periodo = '||v_parametros.id_periodo||'and ic.estado_reg = ''validado''
                               and '||v_filtro_dpte||' and dcv.id_plantilla = '||v_parametros.id_plantilla||
                               'and  dcv.revisado = '''||v_parametros.revisado||''' ';
 			--Devuelve la respuesta
