@@ -1452,6 +1452,7 @@ BEGIN
 	elsif(p_transaccion='CONTA_LISTRAM_SEL')then
 
     	begin
+        
         	v_filtro =' 0 = 0 ';
         	IF p_administrador = 1 THEN
             	v_filtro = v_filtro|| 'and 0=0';
@@ -1471,14 +1472,17 @@ BEGIN
             if v_id_auxiliar =0 then
             	raise exception 'No tiene ningun tramite para vincular';
             end if;
-            
+            raise notice '=%',v_consulta;
     		--Sentencia de la consulta
 			v_consulta:='select
                         DISTINCT(cd.nro_tramite)::varchar
                         from cd.tcuenta_doc cd
-                        where 0=0 and '||v_filtro||'';
-            raise notice '%',v_consulta;
-            --raise EXCEPTION '%',v_consulta;
+                        where 0=0 and '||v_filtro||' and';
+            --#114 
+            
+            v_consulta:=v_consulta||v_parametros.filtro;
+                        raise notice '%',v_consulta;
+           -- raise exception '%',v_consulta;
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			
             
@@ -1508,7 +1512,9 @@ BEGIN
 			v_consulta:='select
                         COUNT(cd.nro_tramite)
                         from cd.tcuenta_doc cd
-                        where 0=0 and '||v_filtro||'';
+                        where 0=0 and '||v_filtro||'and';
+                        --#114 
+            v_consulta:=v_consulta||v_parametros.filtro;
             --Devuelve la respuesta
 			return v_consulta;
 
@@ -1523,8 +1529,11 @@ BEGIN
         ***********************************/
 		elsif(p_transaccion='CONTA_REPAUT_SEL') then
         
-     		BEGIN            	            	                             
-            	                  
+     		BEGIN  
+            	v_filtro_ext = ' 0 = 0 and ';          	            	                             
+            	IF  p_administrador != 1 THEN
+                    v_filtro_ext = v_filtro_ext || ' dcv.id_usuario_reg = '||p_id_usuario|| ' and ';
+                 END IF;                  
 				v_consulta:='select
                             COALESCE(dcv.nota_debito_agencia,''-'')::VARCHAR,
                             COALESCE(fun.desc_funcionario2,''-'')::VARCHAR,
@@ -1557,7 +1566,7 @@ BEGIN
                             where dcv.revisado = ''si'' and
                             dcv.sw_pgs = ''reg'' and
                             dcv.tipo = ''compra'' AND                            
-                            '; 
+                            '||v_filtro_ext;
                 v_consulta:=v_consulta||v_parametros.filtro;
                 raise notice '%',v_consulta;
 				return v_consulta;
