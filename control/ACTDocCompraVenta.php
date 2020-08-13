@@ -19,7 +19,7 @@
  #12   ETR       17/10/2018        RAC KPLIAN        El listado de factura normales se excluyer las facturas del tipo inform NCD  
  #112			  17/04/2020		manu				 reportes de autorizacion de pasajes y registro de pasajeros
 #113  ETR       29/04/2020		     MMV	             Reporte Registro Ventas CC
-
+#119  ETR       19/05/2020		     manuel guerra       envio de parametro para combo de listado de tramite
 
  * */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
@@ -682,10 +682,14 @@ class ACTDocCompraVenta extends ACTbase{
         $this->res=$this->objFunc->quitarContratoFactura($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-	//#112	
+	//#119
 	function listarNroTramite(){
 		$this->objParam->defecto('ordenacion','nro_autorizacion');
-        $this->objParam->defecto('dir_ordenacion','asc');		
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if($this->objParam->getParametro('gestion')!=''){
+			 $this->objParam->addFiltro("cd.nro_tramite ilike ''%".$this->objParam->getParametro('gestion')."%''");
+		}	
 		$this->objFunc=$this->create('MODDocCompraVenta');
 		$this->res=$this->objFunc->listarNroTramite($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());

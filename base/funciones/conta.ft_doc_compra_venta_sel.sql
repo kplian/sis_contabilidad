@@ -26,8 +26,6 @@ ISSUE		FECHA:		 					AUTOR:									 DESCRIPCION:
 #113         29/04/2020		     			MMV	                 Reporte Registro Ventas CC
 #114      29/04/2020            manuelguerra    agregar propiedades de filtrado
 #120      22/05/2020            manuelguerra    modificación de nombre de procedimiento
-#121      25/05/2020            MMV ETR    Reporte registros de ventas cc corrección filtro
-
 ***************************************************************************/
 
 DECLARE
@@ -1461,6 +1459,19 @@ BEGIN
             	v_filtro = v_filtro||' and cd.id_funcionario IN (select *
                                                 		FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))';
             END IF;
+            
+            v_consulta1:='select
+                        COUNT(cd.nro_tramite)
+                        from cd.tcuenta_doc cd
+                        where 0=0 and '||v_filtro||' and';
+                        --#114 
+            v_consulta1:=v_consulta1||v_parametros.filtro;
+            EXECUTE(v_consulta1) into v_id_auxiliar;
+
+            if v_id_auxiliar =0 then
+            	raise exception 'No tiene ningun tramite para vincular';
+            end if;
+            
     		--Sentencia de la consulta
 			v_consulta:='select
                         DISTINCT(cd.nro_tramite)::varchar
@@ -1469,7 +1480,9 @@ BEGIN
             raise notice '%',v_consulta;
             --raise EXCEPTION '%',v_consulta;
             v_consulta:=v_consulta||'  limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+			
+            
+            
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -1510,15 +1523,28 @@ BEGIN
         ***********************************/
 		elsif(p_transaccion='CONTA_REPAUT_SEL') then
         
-     		BEGIN
-                              
+     		BEGIN            	            	                             
+            	                  
 				v_consulta:='select
                             COALESCE(dcv.nota_debito_agencia,''-'')::VARCHAR,
                             COALESCE(fun.desc_funcionario2,''-'')::VARCHAR,
                             COALESCE(dcv.nro_documento,''-'')::VARCHAR,
                             COALESCE(dcv.nro_tramite,''-'')::VARCHAR,
                             COALESCE(dcv.obs,''-'')::VARCHAR,
-                            COALESCE(pres.descripcion,''-'')::VARCHAR,
+                            (
+                              select
+                              CASE 
+                              WHEN (pres.descripcion like ''P1%'') THEN
+                                	vtcc.descripcion_techo::varchar	
+                              ELSE
+                                	ceco.codigo_cc::varchar	
+                              END as descripcion    	             
+                              from conta.tdoc_compra_venta dcven     
+                              left join conta.tdoc_concepto cop on cop.id_doc_compra_venta=dcven.id_doc_compra_venta
+                              left join param.vcentro_costo ceco on ceco.id_centro_costo=cc.id_centro_costo
+                              left join param.vtipo_cc_techo vtcc on vtcc.id_tipo_cc=ceco.id_tipo_cc
+                              group by ceco.codigo_cc,vtcc.descripcion_techo,ceco.id_centro_costo                             
+                            ), 
                             COALESCE(mon.codigo,''-'')::VARCHAR	 as desc_moneda,
                             COALESCE(dcv.importe_neto,0)::numeric as importe_doc
                             from conta.tdoc_compra_venta dcv
@@ -1534,7 +1560,6 @@ BEGIN
                             '; 
                 v_consulta:=v_consulta||v_parametros.filtro;
                 raise notice '%',v_consulta;
-                --raise EXCEPTION '%',v_consulta;
 				return v_consulta;
 			END;
     
@@ -1547,18 +1572,33 @@ BEGIN
 		elsif(p_transaccion='CONTA_REPREPAS_SEL') then
         
      		BEGIN
-                              
+            	--#119   	
+ 
 				v_consulta:='SELECT
                              COALESCE(fun.desc_funcionario2,''-'') ::varchar,
                              COALESCE(dcv.nro_documento,''-'') ::varchar,
                              COALESCE(dcv.nota_debito_agencia,''-'') ::varchar, 
                              COALESCE(dcv.nro_tramite,''-'') ::varchar, 
-                             COALESCE(dcv.obs,''-'') ::varchar, 
-                             COALESCE(pres.descripcion,''-'') ::varchar, 
+                             COALESCE(dcv.obs,''-'') ::varchar,           
+                             (
+                                select
+                                CASE 
+                                WHEN (pres.descripcion like ''P1%'') THEN
+                                  	vtcc.descripcion_techo::varchar	
+                                ELSE
+                                  	ceco.codigo_cc::varchar	
+                                END as descripcion    	             
+                                from conta.tdoc_compra_venta dcven     
+                                left join conta.tdoc_concepto cop on cop.id_doc_compra_venta=dcven.id_doc_compra_venta
+                                left join param.vcentro_costo ceco on ceco.id_centro_costo=cc.id_centro_costo
+                                left join param.vtipo_cc_techo vtcc on vtcc.id_tipo_cc=ceco.id_tipo_cc
+                                group by ceco.codigo_cc,vtcc.descripcion_techo,ceco.id_centro_costo                             
+                             ),                                                 
                              COALESCE(dcv.importe_neto,0)::numeric as importe_doc,
                              COALESCE(mon.codigo,''-'') ::varchar as desc_moneda, 
                              COALESCE(ttp.nombre,''-'') ::varchar as tipago,
-                             COALESCE(pro.rotulo_comercial,''-'') ::varchar as rotulo_comercial                              
+                             COALESCE(pro.rotulo_comercial,''-'') ::varchar as rotulo_comercial,
+                             ps.nro_tramite as tram                                                           
                              from cd.tpago_simple_det paside
                              join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = paside.id_doc_compra_venta
                              join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
