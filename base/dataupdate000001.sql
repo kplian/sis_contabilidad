@@ -17,7 +17,3 @@ UPDATE conta.tdoc_compra_venta SET importe_doc = 1973.44,importe_neto=1776.10,im
 --commit
 UPDATE conta.tdoc_concepto SET precio_unitario= 1973.44,precio_total= 1973.44,precio_total_final=1776.10 WHERE id_doc_compra_venta=182885;
 /********************************************F-DAUP-MGM-SCHEMA-0-30/09/2020********************************************/
-
-
-
-
