@@ -50,3 +50,11 @@ UPDATE conta.tdoc_compra_venta SET nota_debito_agencia='233025' WHERE id_doc_com
 UPDATE conta.tdoc_compra_venta SET nota_debito_agencia='233021' WHERE id_doc_compra_venta = 181998;
 
 /********************************************F-DAUP-MGM-CONTA-1-30/09/2020********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-0-01/10/2020********************************************/
+--rollback
+--UPDATE conta.tdoc_compra_venta SET nro_documento=930385235377 WHERE id_doc_compra_venta=181870;
+--commit
+UPDATE conta.tdoc_compra_venta SET nro_documento=9303852305377 WHERE id_doc_compra_venta=181870;
+/********************************************F-DAUP-MGM-CONTA-0-01/10/2020********************************************/
