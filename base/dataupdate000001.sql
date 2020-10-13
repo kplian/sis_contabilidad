@@ -62,8 +62,8 @@ UPDATE conta.tdoc_compra_venta SET nro_documento=9303852305377 WHERE id_doc_comp
 
 /********************************************I-DAUP-MGM-CONTA-0-12/10/2020********************************************/
 --rollback
---UPDATE conta.tdoc_compra_venta SET id_peridodo=45,fecha= '07/09/2020' WHERE id_doc_compra_venta=185445;
+--UPDATE conta.tdoc_compra_venta SET id_periodo=45,fecha= '07/09/2020' WHERE id_doc_compra_venta=185445;
 --commit
-UPDATE conta.tdoc_compra_venta SET id_peridodo=46,fecha= '07/10/2020' WHERE id_doc_compra_venta=185445;
+UPDATE conta.tdoc_compra_venta SET id_periodo=46,fecha= '07/10/2020' WHERE id_doc_compra_venta=185445;
 
 /********************************************F-DAUP-MGM-CONTA-0-12/10/2020********************************************/
