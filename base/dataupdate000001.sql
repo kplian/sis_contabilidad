@@ -65,3 +65,15 @@ UPDATE conta.tdoc_compra_venta SET nro_documento=9303852305377 WHERE id_doc_comp
 UPDATE conta.tdoc_compra_venta SET id_periodo=46,fecha= '07/10/2020' WHERE id_doc_compra_venta=185445;
 
 /********************************************F-DAUP-MGM-CONTA-0-12/10/2020********************************************/
+
+/********************************************I-DAUP-MGM-CONTA-0-21/10/2020********************************************/
+--rollback
+--begin;
+--UPDATE conta.tdoc_compra_venta SET id_periodo=45,fecha= '06/09/2020' WHERE id_doc_compra_venta=186010;
+--commit;
+
+--commit
+BEGIN;
+UPDATE conta.tdoc_compra_venta SET id_periodo=46,fecha= '06/10/2020' WHERE id_doc_compra_venta=186010;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-0-21/10/2020********************************************/
