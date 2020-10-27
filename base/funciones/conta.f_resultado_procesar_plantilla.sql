@@ -1,18 +1,23 @@
---------------- SQL ---------------
+-- FUNCTION: conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean)
 
-CREATE OR REPLACE FUNCTION conta.f_resultado_procesar_plantilla (
-  p_plantilla varchar,
-  p_id_resultado_plantilla integer,
-  p_desde date,
-  p_hasta date,
-  p_id_deptos varchar,
-  p_id_gestion integer,
-  p_int_comprobante integer,
-  p_force_invisible boolean = false,
-  p_multiple_col boolean = false
-)
-RETURNS boolean AS
-$body$
+-- DROP FUNCTION conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean);
+
+CREATE OR REPLACE FUNCTION conta.f_resultado_procesar_plantilla(
+	p_plantilla character varying,
+	p_id_resultado_plantilla integer,
+	p_desde date,
+	p_hasta date,
+	p_id_deptos character varying,
+	p_id_gestion integer,
+	p_int_comprobante integer,
+	p_force_invisible boolean DEFAULT false,
+	p_multiple_col boolean DEFAULT false)
+    RETURNS boolean
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
 /*
 	Autor: rac
     Fecha: 05-09-2015
@@ -25,9 +30,10 @@ $body$
    	
  ISSUE            FECHA:		      AUTOR                 DESCRIPCION
    
-#0        		05-09-2015        RAC KPLIAN         Creacion
-#98              29/01/2020        RAC KPLIAN        Mejorar Herramienta de Generación de Reporte de resultados, 
-                                                     Nueva operación para calculó de balance sin actualización de AITB.
+#0        		05-09-2015          RAC KPLIAN         Creacion
+#98              29/01/2020         RAC KPLIAN         Mejorar Herramienta de Generación de Reporte de resultados, 
+													   Nueva operación para calculó de balance sin actualización de AITB.
+#126			27.10.2020			MZM KPLIAN		   Considerar la operacion aitb_ing_gas_0                                                     
 
 */
 DECLARE
@@ -239,6 +245,87 @@ BEGIN
                                 v_monto_partida,
                                 v_registros.salta_hoja);
                   
+                  --#126
+                  ELSEIF  v_registros.origen = 'aitb_ing_gas_0' and v_registros.destino = 'reporte' THEN
+                  			v_monto_aux:=0;
+                  			v_reg_cuenta = NULL;
+                            select
+                              cue.id_cuenta,
+                              cue.nro_cuenta,
+                              cue.nombre_cuenta,
+                              cue.sw_transaccional
+                            into
+                              v_reg_cuenta
+                            from conta.tcuenta cue
+                            where cue.id_gestion = p_id_gestion and cue.nro_cuenta = v_registros.codigo_cuenta ;
+                            
+                            IF v_reg_cuenta  is null THEN
+                               raise exception 'Revise su configuración, no tenemos una cuenta con el código = %',v_registros.codigo_cuenta;
+                            END IF;
+                            
+                  			insert into temp_balancef (
+                                plantilla,
+                                subrayar,
+                                font_size,
+                                posicion,
+                                signo,
+                                id_cuenta,
+                                desc_cuenta,
+                                codigo_cuenta,
+                                codigo,
+                                origen,
+                                orden,
+                                nombre_variable,
+                                montopos,
+                                monto,
+                                id_resultado_det_plantilla,
+                                id_cuenta_raiz,
+                                visible,
+                                incluir_cierre,
+                                incluir_apertura,
+                                negrita,
+                                cursiva,
+                                espacio_previo,
+                                incluir_aitb,
+                                relacion_contable,
+                                codigo_partida,
+                                id_auxiliar,
+                                destino,
+                                orden_cbte,
+                                monto_partida,
+                                salta_hoja
+                                )
+                            values (
+                                p_plantilla,
+                                v_registros.subrayar,
+                                v_registros.font_size,
+                                v_registros.posicion,
+                                v_registros.signo,
+                                v_reg_cuenta.id_cuenta,
+                                v_reg_cuenta.nombre_cuenta,
+                                v_reg_cuenta.nro_cuenta,
+                                v_registros.codigo,
+                                v_registros.origen,
+                                v_registros.orden,
+                                v_registros.nombre_variable,
+                                v_registros.montopos,
+                                v_monto_aux,
+                                v_registros.id_resultado_det_plantilla,
+                                NULL,
+                                v_visible,
+                                v_registros.incluir_cierre,
+                                v_registros.incluir_apertura,
+                                v_registros.negrita,
+                                v_registros.cursiva,
+                                v_registros.espacio_previo,
+                                v_registros.incluir_aitb,
+                                v_registros.relacion_contable,
+                                v_registros.codigo_partida,
+                                v_registros.id_auxiliar,
+                                v_registros.destino,
+                                v_registros.orden_cbte,
+                                0, -- v_monto_partida no se condiera el monto partida,
+                                v_registros.salta_hoja);
                   --#98 agrega oepracion de calculo de aitb
                   /*
                     Para poder determinar el ajuste de cada cuenta de ingreso o gasto primero se tiene que sacar el saldo 
@@ -250,7 +337,7 @@ BEGIN
                     y ese es el importe que esa cuenta se actualizo.
                   */
                   ELSEIF  v_registros.origen = 'aitb_ing_gas' and v_registros.destino = 'reporte' THEN
-                     
+                     	
                         --	recuperamos los datos de la cuenta 
                         
                         v_reg_cuenta = NULL;
@@ -865,9 +952,7 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;
+$BODY$;
+
+ALTER FUNCTION conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean)
+    OWNER TO postgres;
