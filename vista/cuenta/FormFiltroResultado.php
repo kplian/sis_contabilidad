@@ -6,7 +6,7 @@
 *@date    30-01-2014
 *@description permites subir archivos a la tabla de documento_sol
  * 
- * 
+ #126  ETR       27/10/2020           MZM                 Adicion de opcion aitb_ing_gas_0
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -212,7 +212,28 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 	       		valorInicial: 'no',
 	       		grid:true,
 	       		form:true
-	       	}],
+	       	},
+	       	{//#126
+	       		config:{
+	       			name: 'aitb_ing_gas_0',
+	       			qtip : 'AITB 0',
+	       			fieldLabel: 'AITB 0',
+	       			allowBlank: false,
+	       			emptyText:'Tipo...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',
+	       		    gwidth: 100,
+	       		    store:['si','no']
+	       		},
+	       		type:'ComboBox',
+	       		id_grupo:0,
+	       		valorInicial: 'si',
+	       		form:true
+	     }
+	       	
+	       	],
     labelSubmit: '<i class="fa fa-check"></i> Aplicar Filtro',
     title: 'Filtro de mayores',
     // Funcion guardar del formulario
