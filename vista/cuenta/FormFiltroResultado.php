@@ -216,8 +216,8 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 	       	{//#126
 	       		config:{
 	       			name: 'aitb_ing_gas_0',
-	       			qtip : 'AITB 0',
-	       			fieldLabel: 'AITB 0',
+	       			qtip : 'AITB en 0',
+	       			fieldLabel: 'AITB en 0',
 	       			allowBlank: false,
 	       			emptyText:'Tipo...',
 	       			typeAhead: true,
@@ -229,7 +229,7 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 	       		},
 	       		type:'ComboBox',
 	       		id_grupo:0,
-	       		valorInicial: 'si',
+	       		valorInicial: 'no',
 	       		form:true
 	     }
 	       	

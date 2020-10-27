@@ -277,11 +277,11 @@ BEGIN
                            raise exception 'revise su configuración, no tenemos una cuenta con el código = %',v_registros.codigo_cuenta;
                         END IF;
                         
-                        if(p_aitb_ing_gas_0='no') then
+                        if(p_aitb_ing_gas_0='si') then
                         
                         	v_monto_aux:=0;
                         else
-                        
+                       
                         	v_monto_mayor = conta.f_mayor_cuenta_tipo_cc(
                                                         v_reg_cuenta.id_cuenta,
                         								p_desde, 
