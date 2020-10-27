@@ -12,7 +12,6 @@ ISSUE 		FECHA: 			AUTOR:						DESCRIPCION:
 
 #82			03/01/2020		JUAN		   Agregar campo de Observación para describir los movimientos realizados
 #98         29/01/2020      RAC KPLIAN     Adciona operacion aitb_ing_gas 
-#126		27.10.2020		MZM KPLIAN	   Adicion operacion aitb_ing_gas_0	    
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -146,8 +145,8 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                 	  '(4) formula -> Señala que se tiene que usar una formula para calcular el valor de la línea<br>'+
                 	  '(5) sumatoria -> Para realizar la suma en un rango determinado, especificar orden inicial y final en campo formula ejemplo 1-10 <br>'+
                 	  '(6) detalle_formula -> la formula se aplicará sobre el detalle/desglose de las cuentas según el nivel especificado <BR>'+
-                	  '(7) aitb_ing_gas -> Aitb ingreso/gasto por cuenta, (calculo de saldo actuizado al ultimo dia del reporte) <BR>'+
-                	  '(8) aitb_ing_gas_0 -> Aitb ingreso/gasto por cuenta, (setear toda la linea en 0 para que no afecte los saldos)',//#126
+                	  '(7) aitb_ing_gas -> Aitb ingreso/gasto por cuenta, (calculo de saldo actuizado al ultimo dia del reporte)',
+                	  
                 allowBlank: false,
                 anchor: '40%',
                 gwidth: 120,
@@ -155,13 +154,13 @@ Phx.vista.ResultadoDetPlantilla=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender: true,
                 mode: 'local',
-                store: ['balance', 'detalle', 'titulo', 'formula','sumatoria','detalle_formula','aitb_ing_gas','aitb_ing_gas_0']
+                store: ['balance', 'detalle', 'titulo', 'formula','sumatoria','detalle_formula','aitb_ing_gas']
             },
             type:'ComboBox',
             id_grupo:1,
             filters:{   pfiltro:'resdet.origen',
                         type: 'list',
-                         options: ['balance','detalle','titulo','formula','sumatoria','detalle_formula','aitb_ing_gas','aitb_ing_gas_0']  
+                         options: ['balance','detalle','titulo','formula','sumatoria','detalle_formula','aitb_ing_gas']  
                     },
             grid:true,
             valorInicial: 'balance',
