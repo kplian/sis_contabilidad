@@ -24,7 +24,7 @@ $body$
  #42	EndeEtr	    02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
  #66    ETR         24/07/2019          RAC                     Se adiciona el campo id_taza_impuesto
  #96    ETR         27/01/2020          RAC                     En la interface de configuracion de plantilla de comprobantes incluir option la columnas tipo_nro_tramite_auxiliar para transacciones
-
+ #125	KPLIAN		22.09.2020			MZM						Adicion de campo insertar_prioridad_principal, para identificar el registro que corresponde a procesar_prioridad principal que no se debe insertar, ya que solo se usa como factor de calculo para documentos de descuento (utilizado en la generacion de cbte de pago cuando hay afectacion de anticipo)
 ***************************************************************************/
 
 DECLARE
@@ -106,7 +106,8 @@ BEGIN
                             cmpbdet.procesar_prioridad_principal, --#42
                             cmpbdet.campo_id_taza_impuesto, --#66
                             cmpbdet.campo_nro_tramite_auxiliar --#96
-                        
+                        	,cmpbdet.insertar_prioridad_principal --#125
+
 						from conta.tdetalle_plantilla_comprobante cmpbdet
 						inner join segu.tusuario usu1 on usu1.id_usuario = cmpbdet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cmpbdet.id_usuario_mod

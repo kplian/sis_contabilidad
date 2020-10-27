@@ -9,6 +9,7 @@ ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
 #31  EndeETR       06/02/2019           EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
 #42  EndeETR       02/04/2019           EGS                     Se agrega el campo procesar_prioridad_principal en el exportador de plantilla
+#125 EndeETR       28/09/2020           MZM-KPLIAN              Se agrega el campo insertar_prioridad_principal y auxiliares en el exportador de plantilla 
  * 
  */
 
@@ -154,7 +155,8 @@ class ACTPlantillaComprobante extends ACTbase{
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
 							NULL,NULL,NULL,NULL,NULL,
-							NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);\r\n");	
+							NULL,NULL,NULL,NULL,NULL,
+							NULL,NULL,NULL);\r\n");	
 	
 			} else {
 					
@@ -206,7 +208,13 @@ class ACTPlantillaComprobante extends ACTbase{
 							 (is_null($row['campo_suborden'])?'NULL':"'".$row['campo_suborden']."'") ."," .
                              (is_null($row['incluir_desc_doc'])?'NULL':"'".$row['incluir_desc_doc']."'") ."," .  //#21
                              (is_null($row['campo_codigo_aplicacion_rc'])?'NULL':"'".$row['campo_codigo_aplicacion_rc']."'") ."," .  //#31
-                             (is_null($row['procesar_prioridad_principal'])?'NULL':"'".$row['procesar_prioridad_principal']."'") .  //#42
+                             (is_null($row['procesar_prioridad_principal'])?'NULL':"'".$row['procesar_prioridad_principal']."'") ."," .  //#42
+                             
+                             (is_null($row['campo_id_taza_impuesto'])?'NULL':"'".$row['campo_id_taza_impuesto']."'") ."," .  //#125
+                             (is_null($row['campo_nro_tramite_auxiliar'])?'NULL':"'".$row['campo_nro_tramite_auxiliar']."'") ."," .  //#125
+                             (is_null($row['insertar_prioridad_principal'])?'NULL':"'".$row['insertar_prioridad_principal']."'") .  //#125
+                             
+                             
                                 ");\r\n");
 							 
 							 						

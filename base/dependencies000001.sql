@@ -6046,4 +6046,10 @@ CREATE INDEX tdetalle_plantilla_comprobante_idx ON conta.tdetalle_plantilla_comp
    
 /**********************************F-DEP-RAC-CONTA-109-12/03/2020****************************************/
 
+/**********************************I-DEP-MZM-CONTA-125-22/09/2020****************************************/
+ALTER TABLE conta.tdetalle_plantilla_comprobante
+  ADD COLUMN insertar_prioridad_principal VARCHAR(2) DEFAULT 'si'::character varying NOT NULL;
 
+COMMENT ON COLUMN conta.tdetalle_plantilla_comprobante.insertar_prioridad_principal
+IS 'valor=no, no inserta la transaccion marcada con prioridad 1, pero si se usa para calcular las demas prioridades (ej. retenciones)';
+/**********************************F-DEP-MZM-CONTA-125-22/09/2020****************************************/

@@ -1,53 +1,64 @@
-CREATE OR REPLACE FUNCTION conta.f_import_tdetalle_plantilla_comprobante (
-  p_accion varchar,
-  p_codigo_plantilla varchar,
-  p_codigo varchar,
-  p_debe_haber varchar,
-  p_agrupar varchar,
-  p_es_relacion_contable varchar,
-  p_campo_partida varchar,
-  p_campo_concepto_transaccion varchar,
-  p_tipo_relacion_contable varchar,
-  p_campo_cuenta varchar,
-  p_campo_monto varchar,
-  p_campo_relacion_contable varchar,
-  p_campo_documento varchar,
-  p_aplicar_documento varchar,
-  p_campo_centro_costo varchar,
-  p_campo_auxiliar varchar,
-  p_campo_fecha varchar,
-  p_primaria varchar,
-  p_otros_campos varchar,
-  p_nom_fk_tabla_maestro varchar,
-  p_campo_partida_ejecucion varchar,
-  p_descripcion varchar,
-  p_campo_monto_pres varchar,
-  p_id_detalle_plantilla_fk varchar,
-  p_forma_calculo_monto varchar,
-  p_func_act_transaccion varchar,
-  p_campo_id_tabla_detalle varchar,
-  p_rel_dev_pago varchar,
-  p_campo_trasaccion_dev varchar,
-  p_campo_id_cuenta_bancaria varchar,
-  p_campo_id_cuenta_bancaria_mov varchar,
-  p_campo_nro_cheque varchar,
-  p_campo_nro_cuenta_bancaria_trans varchar,
-  p_campo_porc_monto_excento_var varchar,
-  p_campo_nombre_cheque_trans varchar,
-  p_prioridad_documento varchar,
-  p_campo_orden_trabajo varchar,
-  p_tabla_detalle varchar,
-  p_codigo_fk varchar,
-  p_campo_forma_pago varchar,
-  p_tipo_relacion_contable_cc varchar = ''::character varying,
-  p_campo_relacion_contable_cc varchar = ''::character varying,
-  p_campo_suborden varchar = ''::character varying,
-  p_incluir_desc_doc varchar = ''::character varying,
-  p_campo_codigo_aplicacion_rc varchar = ''::character varying,
-  p_procesar_prioridad_principal varchar = ''::character varying
-)
-RETURNS varchar AS
-$body$
+-- FUNCTION: conta.f_import_tdetalle_plantilla_comprobante(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
+
+-- DROP FUNCTION conta.f_import_tdetalle_plantilla_comprobante(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying);
+
+CREATE OR REPLACE FUNCTION conta.f_import_tdetalle_plantilla_comprobante(
+	p_accion character varying,
+	p_codigo_plantilla character varying,
+	p_codigo character varying,
+	p_debe_haber character varying,
+	p_agrupar character varying,
+	p_es_relacion_contable character varying,
+	p_campo_partida character varying,
+	p_campo_concepto_transaccion character varying,
+	p_tipo_relacion_contable character varying,
+	p_campo_cuenta character varying,
+	p_campo_monto character varying,
+	p_campo_relacion_contable character varying,
+	p_campo_documento character varying,
+	p_aplicar_documento character varying,
+	p_campo_centro_costo character varying,
+	p_campo_auxiliar character varying,
+	p_campo_fecha character varying,
+	p_primaria character varying,
+	p_otros_campos character varying,
+	p_nom_fk_tabla_maestro character varying,
+	p_campo_partida_ejecucion character varying,
+	p_descripcion character varying,
+	p_campo_monto_pres character varying,
+	p_id_detalle_plantilla_fk character varying,
+	p_forma_calculo_monto character varying,
+	p_func_act_transaccion character varying,
+	p_campo_id_tabla_detalle character varying,
+	p_rel_dev_pago character varying,
+	p_campo_trasaccion_dev character varying,
+	p_campo_id_cuenta_bancaria character varying,
+	p_campo_id_cuenta_bancaria_mov character varying,
+	p_campo_nro_cheque character varying,
+	p_campo_nro_cuenta_bancaria_trans character varying,
+	p_campo_porc_monto_excento_var character varying,
+	p_campo_nombre_cheque_trans character varying,
+	p_prioridad_documento character varying,
+	p_campo_orden_trabajo character varying,
+	p_tabla_detalle character varying,
+	p_codigo_fk character varying,
+	p_campo_forma_pago character varying,
+	p_tipo_relacion_contable_cc character varying DEFAULT ''::character varying,
+	p_campo_relacion_contable_cc character varying DEFAULT ''::character varying,
+	p_campo_suborden character varying DEFAULT ''::character varying,
+	p_incluir_desc_doc character varying DEFAULT ''::character varying,
+	p_campo_codigo_aplicacion_rc character varying DEFAULT ''::character varying,
+	p_procesar_prioridad_principal character varying DEFAULT ''::character varying,
+    p_campo_id_taza_impuesto character varying DEFAULT ''::character varying,
+    p_campo_nro_tramite_auxiliar character varying DEFAULT ''::character varying,
+    p_insertar_prioridad_principal character varying DEFAULT ''::character varying
+    )
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.f_import_tdetalle_plantilla_comprobante
@@ -61,7 +72,7 @@ $body$
  # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
  #31  EndeETR       06/02/2019          EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
  #42  EndeETR       02/04/2019           EGS                    Se agrega el campo procesar_prioridad_principal en el exportador de plantilla
-
+ #125 EndeETR       28/09/2020           MZM-KPLIAN              Se agrega el campo insertar_prioridad_principal y auxiliares en el exportador de plantilla
 ***************************************************************************/
 
 DECLARE
@@ -152,6 +163,9 @@ BEGIN
                 incluir_desc_doc, --/#21
                 campo_codigo_aplicacion_rc, --#31
                 procesar_prioridad_principal --#42
+                ,campo_id_taza_impuesto --#125
+                ,campo_nro_tramite_auxiliar --#125
+                ,insertar_prioridad_principal --#125
           	) values(
                 v_id_plantilla_comprobante,
                 p_debe_haber,
@@ -203,6 +217,9 @@ BEGIN
                 p_incluir_desc_doc, --#21
                 p_campo_codigo_aplicacion_rc,  --#31
                 p_procesar_prioridad_principal --#42
+                ,p_campo_id_taza_impuesto --#125
+                ,p_campo_nro_tramite_auxiliar --#125
+                ,p_insertar_prioridad_principal --#125
 			);
 
 
@@ -254,6 +271,9 @@ BEGIN
               incluir_desc_doc = p_incluir_desc_doc, --#21
               campo_codigo_aplicacion_rc = p_campo_codigo_aplicacion_rc, --#21
               procesar_prioridad_principal = p_procesar_prioridad_principal --#42
+              ,campo_id_taza_impuesto=p_campo_id_taza_impuesto --#125
+              ,campo_nro_tramite_auxiliar=p_campo_nro_tramite_auxiliar --#125
+              ,insertar_prioridad_principal=p_insertar_prioridad_principal --#125
 			where id_detalle_plantilla_comprobante=v_id_detalle_plantilla_comprobante;
              
               
@@ -265,9 +285,7 @@ BEGIN
     ALTER TABLE wf.ttipo_proceso ENABLE TRIGGER USER;   
     return 'exito';
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;
+$BODY$;
+
+ALTER FUNCTION conta.f_import_tdetalle_plantilla_comprobante(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
+    OWNER TO postgres;

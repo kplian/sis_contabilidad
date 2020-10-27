@@ -10,7 +10,7 @@ ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
  #42	EndeEtr		02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
  #66    ETR         24/07/2019          RAC                     Adicionar campo para id_tazas_impuesto
  #96    ETR         27/01/2020          RAC                     En la interface de configuracion de plantilla de comprobantes incluir option la columnas tipo_nro_tramite_auxiliar para transacciones
- * 
+ #125	KPLIAN		22.09.2020			MZM						Adicion de campo insertar_prioridad_principal, para identificar el registro que corresponde a procesar_prioridad principal que no se debe insertar, ya que solo se usa como factor de calculo para documentos de descuento (utilizado en la generacion de cbte de pago cuando hay afectacion de anticipo) 
 
  */
 
@@ -83,7 +83,7 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->captura('procesar_prioridad_principal','varchar'); //#42		
 		$this->captura('campo_id_taza_impuesto','varchar'); //#66
 		$this->captura('campo_nro_tramite_auxiliar','varchar'); //#96
-		
+		$this->captura('insertar_prioridad_principal','varchar'); //#125
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -154,7 +154,7 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('campo_id_taza_impuesto','campo_id_taza_impuesto','varchar'); //#66
 		$this->setParametro('campo_nro_tramite_auxiliar','campo_nro_tramite_auxiliar','varchar'); //#96
 				
-		
+		$this->setParametro('insertar_prioridad_principal','insertar_prioridad_principal','varchar'); //#125
 		
 		
         
@@ -224,7 +224,8 @@ class MODDetallePlantillaComprobante extends MODbase{
 		$this->setParametro('procesar_prioridad_principal','procesar_prioridad_principal','varchar'); //#42
 		$this->setParametro('campo_id_taza_impuesto','campo_id_taza_impuesto','varchar'); //#66
 		$this->setParametro('campo_nro_tramite_auxiliar','campo_nro_tramite_auxiliar','varchar'); //#96
-        
+        $this->setParametro('insertar_prioridad_principal','insertar_prioridad_principal','varchar'); //#125
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
