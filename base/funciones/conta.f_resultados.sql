@@ -35,7 +35,7 @@ v_multiple_col 			boolean;
 v_forzar_visible		boolean;
 v_prioridad				integer;
 v_incluir_sinmov    	varchar;
- 
+v_aitb_ing_gas_0			varchar;
 
 BEGIN
      
@@ -77,6 +77,11 @@ BEGIN
           v_incluir_sinmov = 'no';
           if pxp.f_existe_parametro(p_tabla,'incluir_sinmov') then
             v_incluir_sinmov = v_parametros.incluir_sinmov;
+          end if;
+          
+           v_aitb_ing_gas_0= 'si';
+          if pxp.f_existe_parametro(p_tabla,'aitb_ing_gas_0') then
+            v_aitb_ing_gas_0 = v_parametros.aitb_ing_gas_0;
           end if;
           
           select 
@@ -146,7 +151,9 @@ BEGIN
                                                             v_id_gestion,
                                                             NULL, --id_int_comprobante
                                                             TRUE,
-                                                            v_multiple_col) THEN
+                                                            v_multiple_col,
+                                                            v_aitb_ing_gas_0
+                                                            ) THEN
                                                             
                      raise exception 'error al procesa la plantilla %', v_registros.codigo;                                       
                END IF;
@@ -162,7 +169,9 @@ BEGIN
                                                       v_id_gestion,
                                                       NULL, --id_int_comprobante
                                                       false,
-                                                      v_multiple_col) THEN
+                                                      v_multiple_col,
+                                                      v_aitb_ing_gas_0
+                                                      ) THEN
              raise exception 'Error al procesar la plantilla principal';                                                  
           END IF;
            
