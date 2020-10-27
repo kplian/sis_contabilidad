@@ -23,6 +23,7 @@ $body$
  #42	EndeEtr	    02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
  #66    ETR         24/07/2019          RAC                     Adicionar campo id_taza_impuesto
  #96    ETR         27/01/2020          RAC                     En la interface de configuracion de plantilla de comprobantes incluir option la columnas tipo_nro_tramite_auxiliar para transacciones
+ #125	KPLIAN		22.09.2020			MZM						Adicion de campo insertar_prioridad_principal, para identificar el registro que corresponde a procesar_prioridad principal que no se debe insertar, ya que solo se usa como factor de calculo para documentos de descuento (utilizado en la generacion de cbte de pago cuando hay afectacion de anticipo)
 ***************************************************************************/
 
 DECLARE
@@ -117,6 +118,8 @@ BEGIN
                 procesar_prioridad_principal,  --#42
                 campo_id_taza_impuesto,  --#66
                 campo_nro_tramite_auxiliar --#96
+                ,insertar_prioridad_principal --#125
+
           	) values(
                 v_parametros.id_plantilla_comprobante,
                 v_parametros.debe_haber,
@@ -169,6 +172,8 @@ BEGIN
                 v_parametros.procesar_prioridad_principal, --#42
                 v_parametros.campo_id_taza_impuesto, --#66
                 v_parametros.campo_nro_tramite_auxiliar --#96
+                ,v_parametros.insertar_prioridad_principal --#125
+
 			)RETURNING id_detalle_plantilla_comprobante into v_id_detalle_plantilla_comprobante;
 
 			--Definicion de la respuesta
@@ -255,7 +260,10 @@ BEGIN
                 procesar_prioridad_principal = v_parametros.procesar_prioridad_principal, --#42
                 campo_id_taza_impuesto = v_parametros.campo_id_taza_impuesto, --#66
                 campo_nro_tramite_auxiliar = v_parametros.campo_nro_tramite_auxiliar --#96
+                ,insertar_prioridad_principal  = v_parametros.insertar_prioridad_principal --#125
+
 			where id_detalle_plantilla_comprobante=v_parametros.id_detalle_plantilla_comprobante;
+            
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalla Comprobante modificado(a)'); 

@@ -1,11 +1,18 @@
-CREATE OR REPLACE FUNCTION conta.ft_plantilla_comprobante_sel (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
+-- FUNCTION: conta.ft_plantilla_comprobante_sel(integer, integer, character varying, character varying)
+
+-- DROP FUNCTION conta.ft_plantilla_comprobante_sel(integer, integer, character varying, character varying);
+
+CREATE OR REPLACE FUNCTION conta.ft_plantilla_comprobante_sel(
+	p_administrador integer,
+	p_id_usuario integer,
+	p_tabla character varying,
+	p_transaccion character varying)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_plantilla_comprobante_sel
@@ -19,7 +26,7 @@ $body$
  # 21 ENDETRASM	 	11/01/2019			Miguel Mamani			Modificar generador de comprobantes para considerar la división de descuentos entre comprobantes de pago y diario
  #31  EndeETR       06/02/2019          EGS                     Se agrega el campo campo_codigo_aplicacion_rc en el exportador de plantilla
  #42  EndeETR       02/04/2019           EGS                    Se agrega el campo procesar_prioridad_principal en el exportador de plantilla
-
+ #125 EndeETR       28/09/2020           MZM-KPLIAN              Se agrega el campo insertar_prioridad_principal y auxiliares en el exportador de plantilla
 ***************************************************************************/
 
 DECLARE
@@ -264,6 +271,9 @@ BEGIN
                             cmpbdet.incluir_desc_doc, --#21
                             cmpbdet.campo_codigo_aplicacion_rc, --#31
                             cmpbdet.procesar_prioridad_principal --#42
+                            ,cmpbdet.campo_id_taza_impuesto, --#125
+                            cmpbdet.campo_nro_tramite_auxiliar, --#125
+                            cmpbdet.insertar_prioridad_principal --#125
 						from conta.tdetalle_plantilla_comprobante cmpbdet
                         inner join conta.tplantilla_comprobante cmpb on cmpb.id_plantilla_comprobante = cmpbdet.id_plantilla_comprobante
 						left join  conta.tdetalle_plantilla_comprobante cmpbdet2 on cmpbdet2.id_detalle_plantilla_comprobante  = cmpbdet.id_detalle_plantilla_fk
@@ -294,9 +304,7 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;
+$BODY$;
+
+ALTER FUNCTION conta.ft_plantilla_comprobante_sel(integer, integer, character varying, character varying)
+    OWNER TO postgres;
