@@ -14,6 +14,7 @@
   #9999           19/06/2018               RAC              Se incorpra el calculo inverso para DUI IVA -> Importe Doc
  #12	endeetr	  24/10/2018			EGS					Se aumento el parametro id_plantilla en la verificacion de concepto de gasto y se añadio que  baseParams de idConcepto_ingas  sea deacuerdo a ncd tambien que los centros de costo sean deacuerdo a ncd
  #112			  17/04/2020		manu				 reportes de autorizacion de pasajes y registro de pasajeros
+ #ETR-1520        28/10/2020            EGS                 Se llena los campos con QR cuando el formato de la fecha no es compatible(4/10/202)  ,compatible(04/10/2020)
  ***************************************************************************/
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -1083,7 +1084,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         allowBlank: false,
                         anchor: '80%',
                         format: 'd/m/Y',
-                        readOnly:true,
+                        //readOnly:true, //#ETR-1520
                         renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
                     },
                     type:'DateField',
@@ -1835,7 +1836,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	                                 var importe = this.controlMiles(res[4]);
 	                                 this.getComponente('importe_doc').setValue(importe);
 	                             }
-	                             if(plt[i]=='fecha'){          	
+	                             if(plt[i]=='fecha'){
 	                             	if(this.data.tmpPeriodo){ //si existe un periodo de referencia
 		                             	   var mesPeriodo = this.data.tmpPeriodo > 9 ? this.data.tmpPeriodo : '0' + this.data.tmpPeriodo,
 		                                     fechaInt = this.data.tmpGestion + '-' + mesPeriodo + '-' + '30',
@@ -1846,13 +1847,13 @@ header("content-type: text/javascript; charset=UTF-8");
 		                                     monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Mayo","Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
 		                                     literalFactura = monthNames[mesFac],
 		                                     literalPeriodo = monthNames[mesPer];
-		                                     
+
 		                                 if (mesFactura[1] != mesPeriodo) {
 		                                     this.mensaje_('ALERTA', 'Actualmente se encuentra en el periodo: ' + literalPeriodo + ', la factura corresponde al periodo de: ' + literalFactura, 'ERROR');
-		                                 }	
+		                                 }
 	                             	}
 	                             }
-	                            
+
                          }                        
                      } 
                       this.cargarRazonSocialGestionMoneda();  
@@ -2296,8 +2297,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
         cargarRazonSocialGestionMoneda: function(nit){
             //Busca en la base de datos la razon social en función del NIT digitado. Si Razon social no esta vacío, entonces no hace nada
-            if(this.getComponente('razon_social').getValue()=='' && this.Cmp.nit.isValid()){
-                Phx.CP.loadingShow();                
+            if(this.getComponente('razon_social').getValue()=='' && this.Cmp.nit.isValid()  && this.getComponente('fecha').getValue() !='' ){//#ETR-1520
+                Phx.CP.loadingShow();
                 Ext.Ajax.request({
                     url:'../../sis_contabilidad/control/DocCompraVenta/obtenerRazonSocialxNIT',
                     params:{ 'nit': this.Cmp.nit.getValue() , fecha: this.Cmp.fecha.getValue().dateFormat('d/m/Y')},
@@ -2307,7 +2308,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             razonSocial=objRes.ROOT.datos.razon_social;
                         this.getComponente('razon_social').setValue(razonSocial);
                         this.getComponente('id_moneda').setValue(1);
-                        this.getComponente('id_moneda').setRawValue('Bolivianos');                        
+                        this.getComponente('id_moneda').setRawValue('Bolivianos');
                         this.Cmp.id_gestion.setValue(objRes.ROOT.datos.id_gestion);
 
                     },
@@ -2315,7 +2316,26 @@ header("content-type: text/javascript; charset=UTF-8");
                     timeout: this.timeout,
                     scope:this
                 });
-            }
+            } else{//#ETR-1520
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url:'../../sis_contabilidad/control/DocCompraVenta/obtenerRazonSocialxNIT',
+                    params:{ 'nit': this.Cmp.nit.getValue()},
+                    success: function(resp){
+                        Phx.CP.loadingHide();
+                        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText)),
+                            razonSocial=objRes.ROOT.datos.razon_social;
+                        this.getComponente('razon_social').setValue(razonSocial);
+                        this.getComponente('id_moneda').setValue(1);
+                        this.getComponente('id_moneda').setRawValue('Bolivianos');
+                    },
+                    failure: this.conexionFailure,
+                    timeout: this.timeout,
+                    scope:this
+                });
+                alert('No se cargara la fecha  el formato de la fecha no es compatible')
+
+             }
 
         },
         mensaje_: function (titulo, mensaje) {
