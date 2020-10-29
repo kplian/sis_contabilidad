@@ -880,6 +880,3 @@ EXCEPTION
 				        
 END;
 $BODY$;
-
-ALTER FUNCTION conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean)
-    OWNER TO postgres;

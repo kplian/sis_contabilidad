@@ -286,6 +286,3 @@ BEGIN
     return 'exito';
 END;
 $BODY$;
-
-ALTER FUNCTION conta.f_import_tdetalle_plantilla_comprobante(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying)
-    OWNER TO postgres;
