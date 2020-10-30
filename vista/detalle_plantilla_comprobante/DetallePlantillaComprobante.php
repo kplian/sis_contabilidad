@@ -10,6 +10,7 @@ ISSUE 		  		 FECHA   			 AUTOR				    DESCRIPCION:
 #42	EndeEtr			02/04/2019			EGS						Se agrego Campo procesar_prioridad_principal
 #66 ETR             24/07/2019          RAC                     se adiciona el campo_id_taza_impuesto para permitir documentos con taza varaible
 #96    ETR          27/01/2020          RAC                     En la interface de configuracion de plantilla de comprobantes incluir option la columnas tipo_nro_tramite_auxiliar para transacciones
+#125	KPLIAN		22.09.2020			MZM						Adicion de campo insertar_prioridad_principal, para identificar el registro que corresponde a procesar_prioridad principal que no se debe insertar, ya que solo se usa como factor de calculo para documentos de descuento (utilizado en la generacion de cbte de pago cuando hay afectacion de anticipo)
  */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -189,7 +190,33 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
 	       		grid:true,
 	       		form:true
 	       },
-        
+        { //#125
+	       		config:{
+	       			name:'insertar_prioridad_principal',
+	       			fieldLabel:'Insertar Prioridad Principal',
+	       			allowBlank:false,
+	       			qtip:'Funciona en base a la opcion procesar_prioridad_principal (que si esta en si, entonces el concepto definido con prioridad 1 se ve afectado por el calculo de documentos). Esta opcion es complementaria a dicho campo y especifica si el registro (sobre el cual se hace el calculo se inserta o no en transacciones). Ej Cbte de pago con afectacion de anticipos',
+	       			emptyText:'...',
+	       			typeAhead: true,
+	       		    triggerAction: 'all',
+	       		    lazyRender:true,
+	       		    mode: 'local',	       		    
+	       		    gwidth: 100,
+	       		    store:new Ext.data.ArrayStore({
+		        	fields: ['ID', 'valor'],
+		        	data :	[['si','si'],	
+		        			['no','no']]
+		        				
+		    		}),
+					valueField:'ID',
+					displayField:'valor',
+	       		},
+	       		type:'ComboBox',
+	       		valorInicial: 'si',
+	       		id_grupo:0,	       		
+	       		grid:true,
+	       		form:true
+	       },
           
         {
            config:{
@@ -1028,6 +1055,7 @@ Phx.vista.DetallePlantillaComprobante=Ext.extend(Phx.gridInterfaz,{
    	    {name:'procesar_prioridad_principal', type: 'string'},//#42
    	    'campo_id_taza_impuesto' ,//#66
    	    'campo_nro_tramite_auxiliar'
+   	    ,'insertar_prioridad_principal'//#125
 	],
 	sortInfo:{
 		field: 'id_detalle_plantilla_comprobante',

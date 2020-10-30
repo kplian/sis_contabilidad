@@ -364,6 +364,9 @@ class MODPlantillaComprobante extends MODbase{
             $this->captura('incluir_desc_doc','varchar');//#21
             $this->captura('campo_codigo_aplicacion_rc','varchar');//#31           		
             $this->captura('procesar_prioridad_principal','varchar');//#42           		
+            $this->captura('campo_id_taza_impuesto','varchar');//#125
+            $this->captura('campo_nro_tramite_auxiliar','varchar');//#125
+            $this->captura('insertar_prioridad_principal','varchar');//#125
             			
 			$this->armarConsulta();
 			$consulta=$this->getConsulta();			
