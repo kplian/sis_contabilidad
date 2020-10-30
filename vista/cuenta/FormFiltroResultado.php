@@ -7,6 +7,7 @@
 *@description permites subir archivos a la tabla de documento_sol
  * 
  #126  ETR       27/10/2020           MZM                 Adicion de opcion aitb_ing_gas_0
+ * 				 30.10.2020			  MZM				  Cambio de etiqueta Excluir AITB
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -216,8 +217,8 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 	       	{//#126
 	       		config:{
 	       			name: 'aitb_ing_gas_0',
-	       			qtip : 'AITB en 0',
-	       			fieldLabel: 'AITB en 0',
+	       			qtip : 'Excluir AITB',//#126
+	       			fieldLabel: 'Excluir AITB',
 	       			allowBlank: false,
 	       			emptyText:'Tipo...',
 	       			typeAhead: true,
