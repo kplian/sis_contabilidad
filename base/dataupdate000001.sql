@@ -77,8 +77,6 @@ BEGIN;
 UPDATE conta.tdoc_compra_venta SET id_periodo=46,fecha= '06/10/2020' WHERE id_doc_compra_venta=186010;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-0-21/10/2020********************************************/
-<<<<<<< HEAD
-=======
 
 /********************************************I-DAUP-EGS-CONTA-0-21/10/2020********************************************/
 --rollback
@@ -95,4 +93,3 @@ UPDATE conta.tint_comprobante SET
 WHERE id_int_comprobante in (96995,97033,97036,97038,97039,97040);
 COMMIT;
 /********************************************F-DAUP-EGS-CONTA-0-21/10/2020********************************************/
->>>>>>> remotes/origin/dev
