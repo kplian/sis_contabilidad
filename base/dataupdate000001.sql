@@ -95,3 +95,18 @@ UPDATE conta.tint_comprobante SET
 WHERE id_int_comprobante in (96995,97033,97036,97038,97039,97040);
 COMMIT;
 /********************************************F-DAUP-EGS-CONTA-0-21/10/2020********************************************/
+/********************************************I-DAUP-EGS-CONTA-1-04/11/2020********************************************/
+--rollback
+--begin;
+-- UPDATE conta.tint_comprobante SET
+--         id_clase_comprobante = 5
+--WHERE id_int_comprobante in (98078,98081,98082);
+--commit;
+
+--commit
+BEGIN;
+UPDATE conta.tint_comprobante SET
+    id_clase_comprobante = 4
+WHERE id_int_comprobante in (98078,98081,98082);
+COMMIT;
+/********************************************F-DAUP-EGS-CONTA-1-04/11/2020********************************************/
