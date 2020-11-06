@@ -141,3 +141,20 @@ SET sw_pgs='proc'
 WHERE id_doc_compra_venta=187344;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-1-06/11/2020********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-1-06/11/2020********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_comprobante
+--SET beneficiario = 'SERVIDUMBRES - CLAUDINA FERRUFINO OJALVO'
+--WHERE id_int_comprobante = 98910;
+--commit;
+
+--commit
+BEGIN;
+UPDATE conta.tint_comprobante
+SET beneficiario = 'SERVIDUMBRES- CALIXTO OROSCO HINOJOSA'
+WHERE id_int_comprobante = 98910;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-1-06/11/2020********************************************/
