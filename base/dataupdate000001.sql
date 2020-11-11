@@ -158,3 +158,30 @@ SET beneficiario = 'SERVIDUMBRES- CALIXTO OROSCO HINOJOSA'
 WHERE id_int_comprobante = 98910;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-2-06/11/2020********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-3-11/11/2020********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion
+--SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB. VEH. 3064DUD< REUBICACIÓN DE ESTRUCTURA LD031, LÍNEA 230 KV SAN JOSÉ – VILLA TUNARI, CONTRATO N° 191/2020.) Nro Doc: 162055'
+--WHERE id_int_transaccion = 1398006;
+
+--UPDATE conta.tint_transaccion
+--SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB. VEH. 3064DUD< REUBICACIÓN DE ESTRUCTURA LD031, LÍNEA 230 KV SAN JOSÉ – VILLA TUNARI, CONTRATO N° 191/2020.) Nro Doc: 162055'
+--WHERE id_int_transaccion = 1398007;
+--commit;
+
+--commit
+BEGIN;
+UPDATE conta.tint_transaccion
+SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB. VEH. 3064DUD- REUBICACIÓN DE ESTRUCTURA LD031, LÍNEA 230 KV SAN JOSÉ – VILLA TUNARI, CONTRATO N° 191/2020.
+ ) Nro Doc: 162055'
+WHERE id_int_transaccion = 1398006;
+
+UPDATE conta.tint_transaccion
+SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB. VEH. 3064DUD- REUBICACIÓN DE ESTRUCTURA LD031, LÍNEA 230 KV SAN JOSÉ – VILLA TUNARI, CONTRATO N° 191/2020.
+ ) Nro Doc: 162055'
+WHERE id_int_transaccion = 1398007;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-3-11/11/2020********************************************/
