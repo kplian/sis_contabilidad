@@ -185,3 +185,16 @@ SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB
 WHERE id_int_transaccion = 1398007;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-3-11/11/2020********************************************/
+
+
+
+/********************************************I-DAUP-MGM-CONTA-0-16/11/2020********************************************/
+--rollback
+--begin;
+--UPDATE conta.tdoc_compra_venta SET id_periodo=46,fecha= '11/10/2020' WHERE id_doc_compra_venta=192599;
+--commit;
+
+BEGIN;
+UPDATE conta.tdoc_compra_venta SET id_periodo=47,fecha= '11/11/2020' WHERE id_doc_compra_venta=192599;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-0-16/11/2020********************************************/
