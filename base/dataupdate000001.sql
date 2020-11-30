@@ -224,3 +224,18 @@ update conta.tint_transaccion set
 Where id_int_transaccion = 1353070;
 COMMIT;
 /********************************************F-DAUP-EGS-CONTA-ETR-1902-30/11/2020********************************************/
+/********************************************I-DAUP-EGS-CONTA-ETR-1987-30/11/2020********************************************/
+--rollback
+--begin;
+-- UPDATE conta.tint_comprobante SET
+--         id_clase_comprobante = 5
+--WHERE id_int_comprobante in (101685);
+--commit;
+
+--commit
+BEGIN;
+UPDATE conta.tint_comprobante SET
+    id_clase_comprobante = 4
+WHERE id_int_comprobante in (101685);
+COMMIT;
+/********************************************F-DAUP-EGS-CONTA-ETR-1987-30/11/2020********************************************/
