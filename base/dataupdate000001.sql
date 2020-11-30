@@ -211,3 +211,16 @@ update conta.tint_transaccion set
 Where id_int_transaccion = 1401607;
 COMMIT;
 /********************************************F-DAUP-EGS-CONTA-3-17/11/2020********************************************/
+/********************************************I-DAUP-EGS-CONTA-ETR-1902-30/11/2020********************************************/
+--rollback
+--begin;
+-- update conta.tint_transaccion set
+--     id_auxiliar = 3109
+-- Where id_int_transaccion = 1353070;
+--commit;
+BEGIN;
+update conta.tint_transaccion set
+    id_auxiliar = null
+Where id_int_transaccion = 1353070;
+COMMIT;
+/********************************************F-DAUP-EGS-CONTA-ETR-1902-30/11/2020********************************************/
