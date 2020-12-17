@@ -496,6 +496,3 @@ EXCEPTION
 				        
 END;
 $BODY$;
-
-ALTER FUNCTION conta.f_gen_proc_plantilla_calculo(hstore, integer, numeric, integer, integer, integer, character varying, integer, character varying, numeric, character varying, integer)
-    OWNER TO postgres;
