@@ -1,21 +1,28 @@
---------------- SQL ---------------
+-- FUNCTION: conta.f_gen_proc_plantilla_calculo(hstore, integer, numeric, integer, integer, integer, character varying, integer, character varying, numeric, character varying, integer)
 
-CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo (
-  p_hstore_transaccion public.hstore,
-  p_id_plantilla integer,
-  p_monto numeric,
-  p_id_usuario integer,
-  p_id_depto_conta integer,
-  p_id_gestion integer,
-  p_incluir_desc_doc varchar,
-  p_prioridad_documento integer = 2,
-  p_proc_terci varchar = 'no'::character varying,
-  p_porc_monto_excento_var numeric = 0,
-  p_procesar_prioridad_principal varchar = 'si'::character varying,
-  p_id_taza_impuesto integer = NULL::integer
-)
-RETURNS integer [] AS
-$body$
+-- DROP FUNCTION conta.f_gen_proc_plantilla_calculo(hstore, integer, numeric, integer, integer, integer, character varying, integer, character varying, numeric, character varying, integer);
+
+CREATE OR REPLACE FUNCTION conta.f_gen_proc_plantilla_calculo(
+	p_hstore_transaccion hstore,
+	p_id_plantilla integer,
+	p_monto numeric,
+	p_id_usuario integer,
+	p_id_depto_conta integer,
+	p_id_gestion integer,
+	p_incluir_desc_doc character varying,
+	p_prioridad_documento integer DEFAULT 2,
+	p_proc_terci character varying DEFAULT 'no'::character varying,
+	p_porc_monto_excento_var numeric DEFAULT 0,
+	p_procesar_prioridad_principal character varying DEFAULT 'si'::character varying,
+	p_id_taza_impuesto integer DEFAULT NULL::integer
+    ,p_insertar_prioridad_principal varchar DEFAULT 'si'
+    )
+    RETURNS integer[]
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.f_gen_proc_plantilla_calculo
@@ -77,11 +84,11 @@ DECLARE
     v_porc_secu                     numeric; -- #66
     v_porc_prin_pre                 numeric; -- #66
     v_porc_secu_pre                 numeric; -- #66      
-			    
+	v_sw_aux						varchar;	    
 BEGIN
 
     v_nombre_funcion = 'conta.f_gen_proc_plantilla_calculo';
-    
+    v_sw_aux:='si';
     v_monto_revertir = 0;
     v_factor_reversion = 0;
     p_porc_monto_excento_var = COALESCE(p_porc_monto_excento_var,0);
@@ -91,7 +98,7 @@ BEGIN
     if p_porc_monto_excento_var >= 0 THEN
        v_porc_monto_imponible = 1.00 - p_porc_monto_excento_var;
     END IF;
-    
+
     
     IF v_porc_monto_imponible  < 0 THEN
        raise exception 'el porcentaje de excento  no peude ser menor a cero, revise la configuracion del excento en la plantilla de comprobante,  el campo excento debe ser porcentual entre 0 y 1';
@@ -105,7 +112,7 @@ BEGIN
    
      
      
-    v_cont = 1;
+    v_cont = 1; 
      -- FOR obtener las plantillas calculos del documento(id_plantlla)
     FOR v_registros in ( 
                           SELECT  pc.id_plantilla_calculo,
@@ -137,7 +144,7 @@ BEGIN
                                  
            
               --IF es registro primario o secundario  
-              
+             
               IF  p_proc_terci = 'si' or (v_registros.prioridad <= p_prioridad_documento )   THEN  -- p_prioridad_documento  por defecto tiene el valor de dos
               
                      -- #21 revisar configuracion de descuentos      
@@ -148,7 +155,7 @@ BEGIN
                         OR  (p_incluir_desc_doc = 'no_descuento' AND v_registros.descuento = 'no' )        THEN    
                            
                            --  crea un record del tipo de la transaccion  
-                              
+
                             v_record_int_tran = populate_record(null::conta.tint_transaccion,p_hstore_transaccion);
                            
                            --  obtine valor o porcentajes aplicado
@@ -200,9 +207,10 @@ BEGIN
                                    v_porc_importe_presupuesto = v_registros.importe_presupuesto;
                                  
                                  END IF; 
-                                 
+                                
                                               
                                 if v_registros.prioridad > 1 or (v_registros.prioridad = 1 and p_procesar_prioridad_principal = 'si') then
+
                                   v_monto_x_aplicar = (p_monto * v_porc_importe)::numeric;
                                   v_monto_x_aplicar_pre = (p_monto * v_porc_importe_presupuesto)::numeric;
                                 else
@@ -212,8 +220,7 @@ BEGIN
                                 
                                 v_monto_revertir = p_monto - v_monto_x_aplicar_pre;
                                 v_factor_reversion  = 1 - v_porc_importe_presupuesto; 
-                             
-                             
+
                              ELSEIF v_registros.tipo_importe = 'taza' THEN  -- #66  considera montos calculado por taza
                              
                                    IF p_id_taza_impuesto is NULL THEN
@@ -269,8 +276,8 @@ BEGIN
                                 v_monto_x_aplicar = v_registros.importe::numeric;
                                 v_monto_x_aplicar_pre = v_registros.importe_presupuesto::numeric;
                              END IF;
-                             
-                                                         
+
+                                                     
                               IF v_registros.sw_registro = 'si'  THEN
                              
                                    -- si es prorirdad 1 y tiene alguna trasaccion de mauor priodidad del tipo restar
@@ -304,7 +311,7 @@ BEGIN
                              END IF;
                              --  acomoda en el debe o haber 
                              --  acomoda la ejecucion presupuestaria
-                             
+
                              IF v_registros.debe_haber = 'debe' THEN
                              
                                 v_record_int_tran.importe_debe = v_monto_x_aplicar;
@@ -323,7 +330,7 @@ BEGIN
                              
                              v_record_int_tran.importe_reversion = v_monto_revertir;
                              v_record_int_tran.factor_reversion = v_factor_reversion;
-                             
+
                              --#30 salva el centro de costo original antes de una posible modificacion
                              v_record_int_tran.id_centro_costo_ori = v_record_int_tran.id_centro_costo;
                              
@@ -430,8 +437,15 @@ BEGIN
                                   v_record_int_tran.id_auxiliar = v_record_rel_con.ps_id_auxiliar;
                                                               
                              END IF;
+                           
+                           v_sw_aux:='si'; --mzm
+                           if p_insertar_prioridad_principal='no' and  v_registros.prioridad=1
+                            then
+                             	v_sw_aux:='no';
+                           
+                           end if;  
                              
-                             IF v_registros.sw_registro = 'si'  THEN
+                             IF v_registros.sw_registro = 'si' and v_sw_aux='si' THEN --mzm
                              
                                 --#13  si esta habilitado se resetea el campo partida ejejcucion
                                 IF v_registros.reset_partida_eje  = 'si' THEN
@@ -450,7 +464,9 @@ BEGIN
                              
                                v_int_resp[v_cont] = v_reg_id_int_transaccion;
                                v_cont = v_cont + 1;
-                             
+                             else ---MZM
+                               v_int_resp[v_cont] = 0;
+                               v_cont = v_cont + 1;
                              END IF;
                             
                        
@@ -462,6 +478,7 @@ BEGIN
         
         END LOOP;    
         
+       
         
 	   --Devuelve la respuesta    
        return v_int_resp;
@@ -478,9 +495,7 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;
+$BODY$;
+
+ALTER FUNCTION conta.f_gen_proc_plantilla_calculo(hstore, integer, numeric, integer, integer, integer, character varying, integer, character varying, numeric, character varying, integer)
+    OWNER TO postgres;
