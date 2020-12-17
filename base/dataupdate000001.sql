@@ -158,3 +158,84 @@ SET beneficiario = 'SERVIDUMBRES- CALIXTO OROSCO HINOJOSA'
 WHERE id_int_comprobante = 98910;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-2-06/11/2020********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-3-11/11/2020********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion
+--SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB. VEH. 3064DUD< REUBICACIÓN DE ESTRUCTURA LD031, LÍNEA 230 KV SAN JOSÉ – VILLA TUNARI, CONTRATO N° 191/2020.) Nro Doc: 162055'
+--WHERE id_int_transaccion = 1398006;
+
+--UPDATE conta.tint_transaccion
+--SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB. VEH. 3064DUD< REUBICACIÓN DE ESTRUCTURA LD031, LÍNEA 230 KV SAN JOSÉ – VILLA TUNARI, CONTRATO N° 191/2020.) Nro Doc: 162055'
+--WHERE id_int_transaccion = 1398007;
+--commit;
+
+--commit
+BEGIN;
+UPDATE conta.tint_transaccion
+SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB. VEH. 3064DUD- REUBICACIÓN DE ESTRUCTURA LD031, LÍNEA 230 KV SAN JOSÉ – VILLA TUNARI, CONTRATO N° 191/2020.
+ ) Nro Doc: 162055'
+WHERE id_int_transaccion = 1398006;
+
+UPDATE conta.tint_transaccion
+SET glosa='ES SAN JUAN BAUTISTA S.R.L. - Combustibles para Vehiculos ( PAGO COMB. VEH. 3064DUD- REUBICACIÓN DE ESTRUCTURA LD031, LÍNEA 230 KV SAN JOSÉ – VILLA TUNARI, CONTRATO N° 191/2020.
+ ) Nro Doc: 162055'
+WHERE id_int_transaccion = 1398007;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-3-11/11/2020********************************************/
+
+
+
+/********************************************I-DAUP-MGM-CONTA-0-16/11/2020********************************************/
+--rollback
+--begin;
+--UPDATE conta.tdoc_compra_venta SET id_periodo=46,fecha= '11/10/2020' WHERE id_doc_compra_venta=192599;
+--commit;
+
+BEGIN;
+UPDATE conta.tdoc_compra_venta SET id_periodo=47,fecha= '11/11/2020' WHERE id_doc_compra_venta=192599;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-0-16/11/2020********************************************/
+/********************************************I-DAUP-EGS-CONTA-3-17/11/2020********************************************/
+--rollback
+--begin;
+-- update conta.tint_transaccion set
+--     id_auxiliar = 13354
+-- Where id_int_transaccion = 1401607;
+--commit;
+BEGIN;
+update conta.tint_transaccion set
+    id_auxiliar = 12830
+Where id_int_transaccion = 1401607;
+COMMIT;
+/********************************************F-DAUP-EGS-CONTA-3-17/11/2020********************************************/
+/********************************************I-DAUP-EGS-CONTA-ETR-1902-30/11/2020********************************************/
+--rollback
+--begin;
+-- update conta.tint_transaccion set
+--     id_auxiliar = 3109
+-- Where id_int_transaccion = 1353070;
+--commit;
+BEGIN;
+update conta.tint_transaccion set
+    id_auxiliar = null
+Where id_int_transaccion = 1353070;
+COMMIT;
+/********************************************F-DAUP-EGS-CONTA-ETR-1902-30/11/2020********************************************/
+/********************************************I-DAUP-EGS-CONTA-ETR-1987-30/11/2020********************************************/
+--rollback
+--begin;
+-- UPDATE conta.tint_comprobante SET
+--         id_clase_comprobante = 5
+--WHERE id_int_comprobante in (101685);
+--commit;
+
+--commit
+BEGIN;
+UPDATE conta.tint_comprobante SET
+    id_clase_comprobante = 4
+WHERE id_int_comprobante in (101685);
+COMMIT;
+/********************************************F-DAUP-EGS-CONTA-ETR-1987-30/11/2020********************************************/
