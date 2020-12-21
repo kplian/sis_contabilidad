@@ -1,6 +1,6 @@
--- FUNCTION: conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean)
+-- FUNCTION: conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean, character varying)
 
--- DROP FUNCTION conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean);
+-- DROP FUNCTION conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean, character varying);
 
 CREATE OR REPLACE FUNCTION conta.f_resultado_procesar_plantilla(
 	p_plantilla character varying,
@@ -12,8 +12,7 @@ CREATE OR REPLACE FUNCTION conta.f_resultado_procesar_plantilla(
 	p_int_comprobante integer,
 	p_force_invisible boolean DEFAULT false,
 	p_multiple_col boolean DEFAULT false,
-	p_aitb_ing_gas_0 varchar default 'si'
-	)
+	p_aitb_ing_gas_0 character varying DEFAULT 'si'::character varying)
     RETURNS boolean
     LANGUAGE 'plpgsql'
 
@@ -36,7 +35,7 @@ AS $BODY$
 #98              29/01/2020         RAC KPLIAN         Mejorar Herramienta de Generación de Reporte de resultados, 
 													   Nueva operación para calculó de balance sin actualización de AITB.
 #126			27.10.2020			MZM KPLIAN		   Considerar la operacion aitb_ing_gas_0                                                     
-
+#ETR-1573		10.11.2020			MZM KPLIAN		   Condiciones para que no genere negativos
 */
 DECLARE
 
@@ -68,7 +67,7 @@ DECLARE
 
 
 BEGIN
-     
+
     
     v_nombre_funcion = 'conta.f_resultado_procesar_plantilla';
     
@@ -259,7 +258,7 @@ BEGIN
                     y ese es el importe que esa cuenta se actualizo.
                   */
                   ELSEIF  v_registros.origen = 'aitb_ing_gas' and v_registros.destino = 'reporte' THEN
-                     	
+
                         --	recuperamos los datos de la cuenta 
                         
                         v_reg_cuenta = NULL;
@@ -273,10 +272,13 @@ BEGIN
                         from conta.tcuenta cue
                         where cue.id_gestion = p_id_gestion and cue.nro_cuenta = v_registros.codigo_cuenta ;
                         
+                       
+                        
+                        
                         IF v_reg_cuenta  is null THEN
                            raise exception 'revise su configuración, no tenemos una cuenta con el código = %',v_registros.codigo_cuenta;
                         END IF;
-                        
+                         
                         if(p_aitb_ing_gas_0='si') then
                         
                         	v_monto_aux:=0;
@@ -301,7 +303,8 @@ BEGIN
 	                        v_monto   = v_monto_mayor[1];--monto en monebda base
 	                        v_monto_ma  = v_monto_mayor[5]; --monto en moneda de actulizacion, posicion 5
 	                        
-	                        
+	                       
+                            
 	                        -- determinamos el monto en MA  en moneda base  a la fecha p_hasta
 	                         v_monto_aux =  param.f_convertir_moneda (
                                                           v_id_moneda_act, 
@@ -310,8 +313,12 @@ BEGIN
                                                           p_hasta,
                                                           'O',
                                                           50);
-                                                          
-                         	v_monto_aux = v_monto_aux - v_monto;
+                           if (v_monto_aux > v_monto) then     --#ETR-1573                         
+                         	  v_monto_aux = v_monto_aux - v_monto;
+                           elsif (v_monto  > v_monto_aux) then
+                          		v_monto_aux = v_monto  - v_monto_aux;
+                           end if;
+							
                         end if;                                  
                          --	 insertamos en la tabla temporal
                         insert into temp_balancef (
@@ -881,3 +888,5 @@ EXCEPTION
 END;
 $BODY$;
 
+ALTER FUNCTION conta.f_resultado_procesar_plantilla(character varying, integer, date, date, character varying, integer, integer, boolean, boolean, character varying)
+    OWNER TO postgres;

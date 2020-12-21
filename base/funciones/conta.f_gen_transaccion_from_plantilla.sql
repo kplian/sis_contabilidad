@@ -1,19 +1,24 @@
---------------- SQL ---------------
+-- FUNCTION: conta.f_gen_transaccion_from_plantilla(hstore, hstore, hstore, hstore, integer, integer, integer, hstore, character varying[], integer)
 
-CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla (
-  p_super public.hstore,
-  p_tabla_padre public.hstore,
-  p_reg_det_plantilla public.hstore,
-  p_plantilla_comprobante public.hstore,
-  p_id_tabla_padre_valor integer,
-  p_id_int_comprobante integer,
-  p_id_usuario integer,
-  p_reg_tabla public.hstore,
-  p_def_campos varchar [],
-  p_tamano integer
-)
-RETURNS varchar AS
-$body$
+-- DROP FUNCTION conta.f_gen_transaccion_from_plantilla(hstore, hstore, hstore, hstore, integer, integer, integer, hstore, character varying[], integer);
+
+CREATE OR REPLACE FUNCTION conta.f_gen_transaccion_from_plantilla(
+	p_super hstore,
+	p_tabla_padre hstore,
+	p_reg_det_plantilla hstore,
+	p_plantilla_comprobante hstore,
+	p_id_tabla_padre_valor integer,
+	p_id_int_comprobante integer,
+	p_id_usuario integer,
+	p_reg_tabla hstore,
+	p_def_campos character varying[],
+	p_tamano integer)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
 /*
 Autor:  Rensi Arteaga Copari
 Fecha 27/08/2013
@@ -87,21 +92,21 @@ BEGIN
     v_nombre_funcion:='conta.f_gen_transaccion_from_plantilla';
     
     
-    
+
      /*******************************************************************************************
      --      obtener la definicion de las variablles y los valores segun la plantilla del detalle
      *********************************************************************************************/      
              v_this_hstore = hstore(v_this);
              
-             
-             
+
+
              
              FOR v_i in 1..(p_tamano) loop
              
                
                   --evalua la columna
                  if ((p_reg_det_plantilla->p_def_campos[v_i]) !='' AND (p_reg_det_plantilla->p_def_campos[v_i])!='NULL' AND (p_reg_det_plantilla->p_def_campos[v_i]) is not NULL) then
-      	
+      
                        v_campo_tempo = conta.f_get_columna('datalle', 
                                                               (p_reg_det_plantilla->p_def_campos[v_i])::text, 
                                                               hstore(v_this), 
@@ -179,7 +184,7 @@ BEGIN
                 
       
       
-      ELSE
+      ELSE 
       -- si no es una relacion devengado pago procesa la plantilla normalmente
            
            --si el monto es cero saltamos el proceso, ya que no se generan transacciones
@@ -349,7 +354,7 @@ BEGIN
                           
                             
                               IF (p_reg_det_plantilla->'debe_haber') = 'debe' THEN
-                              
+
                                  v_record_int_tran.importe_debe = (v_this_hstore->'campo_monto')::numeric;
                                  v_record_int_tran.importe_gasto = (v_this_hstore->'campo_monto_pres')::numeric;
                                  v_record_int_tran.importe_haber = 0::numeric;
@@ -557,20 +562,18 @@ BEGIN
                       /**********************************************
                       -- IF , se  aplica el documento si esta activo --
                      *************************************************/
-                       
-                       IF (p_reg_det_plantilla->'aplicar_documento') = 'si' THEN
-                       
-                      
+
+                      IF (p_reg_det_plantilla->'aplicar_documento') = 'si' THEN
+
                        
                            --TODO, validar que exista una plantilla de documento     
-                         
+                         --raise exception 'aaaa%, bb%',(p_tabla_padre->'monto'),(v_this_hstore->'campo_monto') ;
                            --inserta las trasaccion asociadas al documento
-                           IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN
-                           
+                           IF COALESCE(v_record_int_tran.importe_debe,0) > 0 or COALESCE(v_record_int_tran.importe_haber,0) > 0 THEN                     			
                                  v_resp_doc =  conta.f_gen_proc_plantilla_calculo(
                                                             hstore(v_record_int_tran), 
                                                             (v_this_hstore->'campo_documento')::integer,--p_id_plantilla, 
-                                                            (v_this_hstore->'campo_monto')::numeric, 
+                                 							(v_this_hstore->'campo_monto')::numeric, 
                                                             p_id_usuario,
                                                             (p_super->'columna_depto')::integer,--p_id_depto_conta 
                                                             (p_super->'columna_gestion')::integer,
@@ -580,7 +583,9 @@ BEGIN
                                                             (v_this_hstore->'campo_porc_monto_excento_var')::numeric,
                                                             (p_reg_det_plantilla->'procesar_prioridad_principal')::varchar, --#42
                                                             (v_this_hstore->'campo_id_taza_impuesto')::integer --#66
-                                                            );
+                                                            ,(p_reg_det_plantilla->'insertar_prioridad_principal')::varchar
+                                                            );--mzm
+                               
                                  
                              	 IF(v_resp_doc is null)THEN
                                  	raise exception 'Error en procesar la pantilla de calculo, revisar la configuracion de la plantilla de calculo';
@@ -640,9 +645,7 @@ WHEN OTHERS THEN
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;
+$BODY$;
+
+ALTER FUNCTION conta.f_gen_transaccion_from_plantilla(hstore, hstore, hstore, hstore, integer, integer, integer, hstore, character varying[], integer)
+    OWNER TO postgres;
