@@ -239,3 +239,16 @@ UPDATE conta.tint_comprobante SET
 WHERE id_int_comprobante in (101685);
 COMMIT;
 /********************************************F-DAUP-EGS-CONTA-ETR-1987-30/11/2020********************************************/
+
+/********************************************I-DAUP-MGM-CONTA-0-22/12/2020********************************************/
+
+--rollback
+--begin;
+--UPDATE conta.tdoc_compra_venta SET id_periodo=47,fecha= '12/11/2020' WHERE id_doc_compra_venta=200044;
+--commit;
+
+BEGIN;
+UPDATE conta.tdoc_compra_venta SET id_periodo=48,fecha= '12/12/2020' WHERE id_doc_compra_venta=200044;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-0-22/12/2020********************************************/
+
