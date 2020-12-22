@@ -252,3 +252,18 @@ UPDATE conta.tdoc_compra_venta SET id_periodo=48,fecha= '12/12/2020' WHERE id_do
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-0-22/12/2020********************************************/
 
+
+
+/********************************************I-DAUP-MGM-CONTA-0-22/12/2020********************************************/
+
+--rollback
+--begin;
+--UPDATE conta.tdoc_compra_venta SET id_periodo=48,fecha= '12/12/2020' WHERE id_doc_compra_venta=200044;
+--UPDATE conta.tdoc_compra_venta SET id_periodo=47,fecha= '12/11/2020' WHERE id_doc_compra_venta=200045;
+--commit;
+
+BEGIN;
+UPDATE conta.tdoc_compra_venta SET id_periodo=48,fecha= '09/12/2020' WHERE id_doc_compra_venta=200044;
+UPDATE conta.tdoc_compra_venta SET id_periodo=48,fecha= '12/12/2020' WHERE id_doc_compra_venta=200045;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-0-22/12/2020********************************************/
