@@ -267,3 +267,16 @@ UPDATE conta.tdoc_compra_venta SET id_periodo=48,fecha= '09/12/2020' WHERE id_do
 UPDATE conta.tdoc_compra_venta SET id_periodo=48,fecha= '12/12/2020' WHERE id_doc_compra_venta=200045;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-1-22/12/2020********************************************/
+/********************************************I-DAUP-EGS-CONTA-ETR-2355-30/12/2020********************************************/
+--rollback
+--begin;
+-- update conta.tint_transaccion set
+--     id_auxiliar = null
+-- Where id_int_transaccion = 1298084;
+--commit;
+BEGIN;
+update conta.tint_transaccion set
+    id_auxiliar = 12318
+Where id_int_transaccion = 1298084;
+COMMIT;
+/********************************************F-DAUP-EGS-CONTA-ETR-2355-30/12/2020********************************************/
