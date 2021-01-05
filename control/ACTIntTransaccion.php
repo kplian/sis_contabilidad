@@ -725,9 +725,10 @@ class ACTIntTransaccion extends ACTbase{
         if($this->objParam->getParametro('id_config_tipo_cuenta')!=''){
             $this->objParam->addFiltro("cue.tipo_cuenta = ''".$this->objParam->getParametro('id_config_tipo_cuenta')."''");
         }
-        if($this->objParam->getParametro('id_cuenta')!=''){
+        /*if($this->objParam->getParametro('id_cuenta')!=''){
+
             $this->objParam->addFiltro("cue.id_cuenta = ".$this->objParam->getParametro('id_cuenta'));
-        }
+        }*/
 
         $this->exportarTxtLcvLCV();
 
@@ -955,13 +956,13 @@ class ACTIntTransaccion extends ACTbase{
                     $val['aux_codigo'].$separador.
                     $val['aux_nombre'].$separador.
                     $val['nombre'].$separador.
-                    $val['beneficiario'].$separador.
+                    $this->limpiarCaracteresEspeciales($val['beneficiario']).$separador.
                     $val['tipo_cbte'].$separador.
-                    $val['glosa'].$separador.
+                    $this->limpiarCaracteresEspeciales($val['glosa']).$separador. // $val['glosa'].$separador.
                     $val['persona_create'].$separador.
                     $val['persona_mod'].$separador.
                     $val['nro_tramite_aux'].$separador.
-                    $val['glosa_transaccion'].$separador.
+                    $this->limpiarCaracteresEspeciales($val['glosa_transaccion']).$separador.
                     "\r\n"
                 );
             }
@@ -995,9 +996,9 @@ class ACTIntTransaccion extends ACTbase{
                     $val['centro_costo'].$separador.
                     $val['aux_codigo'].$separador.
                     $val['aux_nombre'].$separador.
-                    $val['beneficiario'].$separador.
+                    $this->limpiarCaracteresEspeciales($val['beneficiario']).$separador.
                     $val['tipo_cbte'].$separador.
-                    $val['glosa'].$separador.
+                    $this->limpiarCaracteresEspeciales($val['glosa']).$separador. // $val['glosa'].$separador.
                     $val['persona_create'].$separador.
                     $val['persona_mod'].$separador.
                     $val['nro_tramite_aux'].$separador.
@@ -1007,7 +1008,7 @@ class ACTIntTransaccion extends ACTbase{
                     $val['fecha_reg_transaccion'].$separador.
                     $val['usuario_reg_transaccion'].$separador.
                     $val['nro_documento'].$separador.
-                    $val['glosa_transaccion'].$separador.
+                    $this->limpiarCaracteresEspeciales($val['glosa_transaccion']).$separador.
                     "\r\n"
                 );
             }
@@ -1669,6 +1670,33 @@ class ACTIntTransaccion extends ACTbase{
             $arreglo);
 
         $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function limpiarCaracteresEspeciales($string ){
+        $string = htmlentities($string);
+        $string = preg_replace('/\&(.)[^;]*;/', '\\1', $string);
+        $varchar = $this->quitarSaltoLinia($string);
+        $varchar = str_replace(array( '(', ')' ), '', $varchar);
+        $varchar = $this->limpiar($varchar);
+        $varchar = preg_replace('/\s+/', ' ', $varchar); // limpbiar doble espacio
+        // var_dump($varchar);exit();
+        return $varchar;
+    }
+    function quitarSaltoLinia($cadenaDeTexto){
+        $buscar = array(chr(13).chr(10), "\r\n", "\n", "\r");
+        $reemplazar = array("", "", "", "");
+        $cadena = str_ireplace($buscar,$reemplazar,$cadenaDeTexto);
+        return $cadena;
+    }
+    function limpiar($s){
+        //Quitando Caracteres Especiales
+        $s= str_replace('-', '', $s);
+        $s= str_replace('"', '', $s);
+        $s= str_replace(':', '', $s);
+        $s= str_replace('.', '', $s);
+        $s= str_replace(',', ' ', $s);
+        $s= str_replace(';', '', $s);
+        return $s;
     }
 }
 
