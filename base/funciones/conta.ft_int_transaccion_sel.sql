@@ -2124,18 +2124,39 @@ BEGIN
     elseif(p_transaccion='CONTA_LDCTRANS_SEL')then
 
         begin
-
+             v_filtro_cuentas = '';
+            IF  pxp.f_existe_parametro(p_tabla,'id_cuenta')  THEN
+                  IF v_parametros.id_cuenta is not NULL THEN
+                      WITH RECURSIVE cuenta_rec (id_cuenta, id_cuenta_padre) AS (
+                        SELECT cue.id_cuenta, cue.id_cuenta_padre
+                        FROM conta.tcuenta cue
+                        WHERE cue.id_cuenta = v_parametros.id_cuenta and cue.estado_reg = 'activo'
+                      UNION ALL
+                        SELECT cue2.id_cuenta, cue2.id_cuenta_padre
+                        FROM cuenta_rec lrec
+                        INNER JOIN conta.tcuenta cue2 ON lrec.id_cuenta = cue2.id_cuenta_padre
+                        where cue2.estado_reg = 'activo'
+                      )
+                    SELECT  pxp.list(id_cuenta::varchar)
+                    into v_cuentas
+                    FROM cuenta_rec;
+                    v_filtro_cuentas = '  cue.id_cuenta in ('||v_cuentas||') and';
+                END IF;
+            END IF;
+           --- raise exception '%',v_filtro_cuentas;
             IF  v_parametros.tipo_reporte='auditoria' THEN
                v_atributos := ',pers.nombre_completo2::varchar as usuario_reg_transaccion,
                                dcv.nro_documento,
-                               regexp_replace(regexp_replace(itr.glosa,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa_transaccion';
+                               conta.fnorm_text_latin(itr.glosa)::varchar as glosa_transaccion
+                               ';
                v_join :='left join segu.tusuario usu on usu.id_usuario= itr.id_usuario_reg
                          left join segu.vpersona pers on pers.id_persona=usu.id_persona
                          left join conta.tdoc_compra_venta dcv on dcv.id_int_comprobante=icbt.id_int_comprobante';
                ELSE
                v_atributos := ', '' ''::varchar as usuario_reg_transaccion,
                               '' ''::varchar as nro_documento,
-                              regexp_replace(regexp_replace(itr.glosa,''[\n\t ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa_transaccion';
+                              conta.fnorm_text_latin(itr.glosa)::varchar as glosa_transaccion
+                             ';
                v_join := '';
             END IF;
             --#111 correcion de logica
@@ -2171,8 +2192,7 @@ BEGIN
                           regexp_replace(regexp_replace(tcc.codigo,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo_codigo,
                           regexp_replace(regexp_replace(tcc.descripcion,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as centro_costo ,
                           regexp_replace(regexp_replace(aux.codigo_auxiliar,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as aux_codigo,
-                          regexp_replace(regexp_replace(aux.nombre_auxiliar,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as aux_nombre,
-
+                          regexp_replace(regexp_replace(aux.nombre_auxiliar,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as aux_nombre, 
                           (case when icbt.manual=''no'' then ''automática'' else ''manual'' end)::varchar as tipo_transaccion,
                           param.f_get_periodo_literal(per.id_periodo)::varchar as periodo,
                           to_char(itr.fecha_reg, ''HH12:MI:SS'')::varchar as hora,
@@ -2182,9 +2202,9 @@ BEGIN
 
                           --#69 SE ADICIONAN 6 NUEVAS COLUMNAS
                           --#69 SE MODIFICA LA EMPRESION REGULAR [\n\t] por [\n\t\r ]
-                          regexp_replace(regexp_replace(vc.beneficiario,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as beneficiario,
+                          conta.fnorm_text_latin(vc.beneficiario)::varchar as beneficiario,
                           vc.desc_clase_comprobante as tipo_cbte,
-                          regexp_replace(regexp_replace(vc.glosa1,''[\n\t\r ]'','''',''g''),''[áéíóúñÁÉÍÓÚÑº´"]'',''*'',''g'')::varchar as glosa,
+                          conta.fnorm_text_latin(vc.glosa1)::varchar as glosa,
                           us.desc_persona as persona_create,
                           um.desc_persona as persona_mod,
                           vc.nro_tramite_aux
@@ -2205,10 +2225,10 @@ BEGIN
                           left join param.vtipo_cc_techo tcct on tcc.id_tipo_cc =any (tcct.ids)
                           left join conta.tauxiliar aux on aux.id_auxiliar = itr.id_auxiliar
                           '||v_join||'
-                          where icbt.estado_reg = ''validado''  and ';
+                          where icbt.estado_reg = ''validado'' and'||v_filtro_cuentas;
+           
 
             v_consulta:=v_consulta||v_parametros.filtro;
-            raise notice '--> %',v_consulta;
             return v_consulta;
 
         end;
