@@ -280,3 +280,77 @@ update conta.tint_transaccion set
 Where id_int_transaccion = 1298084;
 COMMIT;
 /********************************************F-DAUP-EGS-CONTA-ETR-2355-30/12/2020********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-0-12/01/2020********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=12651 WHERE id_int_transaccion=1229169;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1229169;
+---
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=12651 WHERE id_int_transaccion=1229162;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1229162;
+
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1438124;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13772 WHERE id_int_transaccion=1438124;
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1294565;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13776 WHERE id_int_transaccion=1294565;
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1409310;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13776 WHERE id_int_transaccion=1409310;
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1409308;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13775 WHERE id_int_transaccion=1409308;
+
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1409312;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13774 WHERE id_int_transaccion=1409312;
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1482705;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13772 WHERE id_int_transaccion=1482705;
+
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1482708;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13774 WHERE id_int_transaccion=1482708;
+
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1482710;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13775 WHERE id_int_transaccion=1482710;
+
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion=1482708;
+--commit;
+UPDATE conta.tint_transaccion SET id_auxiliar=13776 WHERE id_int_transaccion=1482708;
+/********************************************F-DAUP-MGM-CONTA-0-12/01/2020********************************************/
