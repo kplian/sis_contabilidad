@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_plantilla_ajuste_moneda_mt (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -82,7 +80,7 @@ BEGIN
       from conta.tint_comprobante
       where id_int_comprobante = p_id_int_comprobante;
 
-	  FOR v_record_mov in ( with basica as (select     t.id_centro_costo,
+	  FOR v_record_mov in ( with basica as (select  t.id_centro_costo,
                                                     t.id_cuenta,
                                                     COALESCE(t.id_auxiliar,0) as id_auxiliar,
                                                     /*case
@@ -91,12 +89,12 @@ BEGIN
                                                         else
                                                            0
                                                         end as id_partida,*/
-                                                    case
+                                                    /*case
                                                        when  par.sw_movimiento = 'presupuestaria' then
                                                          par.id_partida
                                                         else
                                                            0
-                                                        end as id_partida,    
+                                                        end as id_partida,   */ 
                                                         
                                                     t.importe_debe_mb,
                                                     t.importe_haber_mb,
@@ -106,7 +104,7 @@ BEGIN
                                                     t.importe_haber_ma
                                               from conta.tint_transaccion t
                                               inner join conta.tint_comprobante cb on cb.id_int_comprobante = t.id_int_comprobante
-                                              inner join  pre.tpartida par on par.id_partida = t.id_partida
+                                            --  inner join  pre.tpartida par on par.id_partida = t.id_partida
                                               inner join conta.tcuenta cu on cu.id_cuenta = t.id_cuenta
                                               inner join conta.tconfig_subtipo_cuenta su on su.id_config_subtipo_cuenta = cu.id_config_subtipo_cuenta
                                               inner join conta.tconfig_tipo_cuenta tc on tc.id_config_tipo_cuenta = su.id_config_tipo_cuenta
@@ -116,7 +114,7 @@ BEGIN
                                 saldo as (   select t.id_centro_costo,
                                                       t.id_cuenta,
                                                       t.id_auxiliar,
-                                                      t.id_partida,
+                                                     -- t.id_partida,
                                                       sum(COALESCE(t.importe_debe_mb,0)) as importe_debe_mb,
                                                       sum(COALESCE(t.importe_haber_mb,0)) as importe_haber_mb,
                                                       
@@ -135,12 +133,13 @@ BEGIN
                                                       group by
                                                             t.id_centro_costo,
                                                             t.id_cuenta,
-                                                            t.id_auxiliar,
-                                                            t.id_partida)
+                                                            t.id_auxiliar/*,
+                                                            t.id_partida*/
+                                                            )
                                                             select  t.id_centro_costo,
                                                                     t.id_cuenta,
                                                                     t.id_auxiliar,
-                                                                    t.id_partida,
+                                                                    --t.id_partida,
                                                                     t.importe_debe_mb as deudor,--MB
                                                                     t.importe_haber_mb as acreedor,
                                                                     t.importe_debe_mt,--MT
@@ -272,17 +271,13 @@ BEGIN
                                     importe_recurso_ma,
                                     id_usuario_reg,
                                     fecha_reg,
-                                    actualizacion,
                                     id_moneda,
 									tipo_cambio,
-									tipo_cambio_2
+									tipo_cambio_2,
+                                    actualizacion,
+                                    sw_edit
                                 ) values(
-                                   case
-                                      when v_record_mov.id_partida = 0 then
-                                          v_partida
-                                      else
-                                          v_record_mov.id_partida
-                                      end,
+                                    v_partida,
                                     v_record_mov.id_centro_costo,
                                     'activo',
                                     v_record_mov.id_cuenta,
@@ -306,10 +301,12 @@ BEGIN
                                     0,0,0,0, --MA
                                     p_id_usuario,
                                     now(),
-                                    'si',
                                     2,
                                     6.96,
-                                    1);
+                                    1,
+                                    'si',
+                                    'si'
+                                    );
 
 				v_sw_minimo = true;
                 ELSE
@@ -375,10 +372,11 @@ BEGIN
 
                   id_usuario_reg,
                   fecha_reg,
-                  actualizacion,
                   id_moneda,
                   tipo_cambio,
-                  tipo_cambio_2
+                  tipo_cambio_2,
+                  actualizacion,
+                  sw_edit
               ) values(
                   v_partida,
                   v_centro_costo,
@@ -399,10 +397,11 @@ BEGIN
                   0,0,0,0, --MA
                   p_id_usuario,
                   now(),
-                  'si',
                   2,
                   6.96,
-                  1
+                  1,
+                  'si',
+                  'si'
                   );
 
 
@@ -458,10 +457,11 @@ BEGIN
 
                   id_usuario_reg,
                   fecha_reg,
-                  actualizacion,
                   id_moneda,
                   tipo_cambio,
-                  tipo_cambio_2
+                  tipo_cambio_2,
+                  actualizacion,
+                  sw_edit
                   ) values(
                   v_partida,
                   v_centro_costo,
@@ -482,10 +482,11 @@ BEGIN
                   0,0,0,0, --MA
                   p_id_usuario,
                   now(),
-                  'si',
                   2,
                   6.96,
-                  1
+                  1,
+                  'si',
+                  'si'
               );
 
 
@@ -510,4 +511,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

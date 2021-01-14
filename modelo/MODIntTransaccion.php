@@ -118,7 +118,7 @@ class MODIntTransaccion extends MODbase{
 		$this->captura('codigo_ot','varchar');
 		$this->captura('codigo_categoria','varchar');
 		$this->captura('nro_tramite_auxiliar','varchar'); //#95
-
+		$this->captura('sw_edit','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
