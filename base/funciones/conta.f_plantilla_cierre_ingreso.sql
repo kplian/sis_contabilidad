@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_plantilla_cierre_ingreso (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -245,7 +243,8 @@ select
                                     importe_recurso_ma,
                                     id_usuario_reg,
                                     fecha_reg,
-                                    actualizacion
+                                    actualizacion,
+                                    sw_edit
                                 ) values(
                                     v_id_partida,
                                     v_id_centro_costo_depto,
@@ -272,7 +271,9 @@ select
                                     v_importe_haber_ma, --MA
                                     p_id_usuario,
                                     now(),
-                                    'si' );
+                                    'si',
+                                    'si'
+                                     );
 
                                     v_sw_minimo = true;
                           END IF;
@@ -363,7 +364,8 @@ select
                                               importe_recurso_ma,
                                               id_usuario_reg,
                                               fecha_reg,
-                                              actualizacion
+                                              actualizacion,
+                                              sw_edit
                                           ) values(
                                               v_partida_haber,   --partida de flujo
                                               v_id_centro_costo_depto, -- v_id_centro_costo_depto, --centr de costo del depto contable
@@ -384,6 +386,7 @@ select
                                               v_total_debe_ma_saldo,v_total_haber_ma_saldo,v_total_debe_ma_saldo,v_total_haber_ma_saldo,--MA
                                               p_id_usuario,
                                               now(),
+                                              'si',
                                               'si'
                                           );
             END IF;
@@ -403,4 +406,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

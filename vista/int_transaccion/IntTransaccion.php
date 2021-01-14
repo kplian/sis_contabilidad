@@ -749,7 +749,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		'importe_debe_mt',	'importe_haber_mt','importe_gasto_mt','importe_recurso_mt',
 		'importe_debe_ma',	'importe_haber_ma','importe_gasto_ma','importe_recurso_ma',
 		'id_moneda_tri','id_moneda_act','id_moneda', 'tipo_cambio','tipo_cambio_2','tipo_cambio_3','codigo_categoria','actualizacion','triangulacion','id_suborden','desc_suborden','codigo_ot',
-		'nro_tramite_auxiliar'
+		'nro_tramite_auxiliar','sw_edit'
 		
 	],
 	
@@ -897,7 +897,12 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		}
 		
 		if(rec.data.actualizacion == 'si'){
-			this.getBoton('edit').disable();
+
+			if(rec.data.sw_edit === 'si') {
+               this.getBoton('edit').enable();
+           }else{
+               this.getBoton('edit').disable();
+           }
 		}
 		
 		

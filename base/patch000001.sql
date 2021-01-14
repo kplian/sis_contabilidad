@@ -5304,3 +5304,12 @@ COMMENT ON COLUMN conta.tdoc_compra_venta.nota_debito_agencia
 IS 'campo disponible para la transcripción del nro de nota de débito por parte de las agencias de viaje';
 
 /***********************************F-SCP-MANU-CONTA-108-17/04/2020****************************************/
+
+/***********************************I-SCP-MMV-CONTA-ETR-1608-14/01/2021****************************************/
+  ALTER TABLE conta.tint_transaccion
+    ADD COLUMN sw_edit VARCHAR(10) DEFAULT 'no' NOT NULL;
+ /***********************************F-SCP-MMV-CONTA-ETR-1608-14/01/2021****************************************/
+
+
+
+

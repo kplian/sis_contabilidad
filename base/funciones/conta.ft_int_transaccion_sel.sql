@@ -146,7 +146,8 @@ BEGIN
                             (''(''||suo.codigo||'') ''||suo.nombre)::varchar as desc_suborden,
                             ot.codigo as codigo_ot,
                             cp.codigo_categoria::varchar,
-                            transa.nro_tramite_auxiliar    --#95
+                            transa.nro_tramite_auxiliar,    --#95
+                            transa.sw_edit
                         from conta.tint_transaccion transa
                         inner join segu.tusuario usu1 on usu1.id_usuario = transa.id_usuario_reg
                         inner join conta.tcuenta cue on cue.id_cuenta = transa.id_cuenta

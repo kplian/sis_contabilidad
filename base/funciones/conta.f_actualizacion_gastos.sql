@@ -68,6 +68,7 @@ DECLARE
     v_actualiza_deudor_ma			numeric;
     v_actualiza_acreedor_ma			numeric;
     v_id_cuenta						integer;
+    v_id_partida					integer;
 
 BEGIN
 
@@ -235,20 +236,60 @@ BEGIN
 
                       IF v_sw_saldo_acredor THEN
                          IF v_diferencia_positiva THEN
+                         
+                         		
                                   v_importe_haber = v_diferencia;
                                   v_importe_debe = 0;
+                                  
+                                  SELECT
+                                  ps_id_partida 
+                                  into
+                                   v_id_partida
+                                 FROM conta.f_get_config_relacion_contable('ACGAS-HABER', -- relacion contable que almacena los centros de costo por departamento
+                                                                             v_id_gestion,
+                                                                             p_id_depto,--p_id_depto_conta
+                                                                             NULL);  --id_dento_costo
+                                                                             
                                ELSE
                                   v_importe_haber = 0;
                                   v_importe_debe = v_diferencia;
+                                  
+                                  SELECT
+                                  ps_id_partida 
+                                  into
+                                   v_id_partida
+                                 FROM conta.f_get_config_relacion_contable('ACGAS-DEBE', -- relacion contable que almacena los centros de costo por departamento
+                                                                             v_id_gestion,
+                                                                             p_id_depto,--p_id_depto_conta
+                                                                             NULL);  --id_dento_costo
+                                  
 
                          END IF;
                       ELSE
                            IF v_diferencia_positiva THEN
                               v_importe_haber = 0;
                               v_importe_debe = v_diferencia;
+                              
+                              SELECT
+                                  ps_id_partida 
+                                  into
+                                   v_id_partida
+                                 FROM conta.f_get_config_relacion_contable('ACGAS-DEBE', -- relacion contable que almacena los centros de costo por departamento
+                                                                             v_id_gestion,
+                                                                             p_id_depto,--p_id_depto_conta
+                                                                             NULL);  --id_dento_cos
                            ELSE
                               v_importe_haber = v_diferencia;
                               v_importe_debe = 0;
+                              
+                               SELECT
+                                  ps_id_partida 
+                                  into
+                                   v_id_partida
+                                 FROM conta.f_get_config_relacion_contable('ACGAS-HABER', -- relacion contable que almacena los centros de costo por departamento
+                                                                             v_id_gestion,
+                                                                             p_id_depto,--p_id_depto_conta
+                                                                             NULL);  --id_dento_costo
                            END IF;
                       END IF;
 
@@ -321,9 +362,10 @@ BEGIN
 
                               id_usuario_reg,
                               fecha_reg,
-                              actualizacion
+                              actualizacion,
+                              sw_edit
                           ) values(
-                              null,
+                              v_id_partida,
                               v_id_centro_costo_depto,
                               'activo',
                               v_id_cuenta_actualizacion,
@@ -345,6 +387,7 @@ BEGIN
                               0,0,0,0, --MA   ---# 21
                               p_id_usuario,
                               now(),
+                              'si',
                               'si'
                           );
 
@@ -371,11 +414,29 @@ BEGIN
 
             v_ajuste_debe = v_total_haber - v_total_debe;
             v_ajuste_haber = 0;
+            
+             SELECT
+                                  ps_id_partida 
+                                  into
+                                   v_id_partida
+                                 FROM conta.f_get_config_relacion_contable('ACGAS-DEBE', -- relacion contable que almacena los centros de costo por departamento
+                                                                             v_id_gestion,
+                                                                             p_id_depto,--p_id_depto_conta
+                                                                             NULL);  --id_dento_cos
 
       elsif  v_total_debe > v_total_haber then
 
             v_ajuste_debe = 0;
             v_ajuste_haber =  v_total_debe  - v_total_haber;
+            
+            SELECT
+            ps_id_partida 
+            into
+             v_id_partida
+           FROM conta.f_get_config_relacion_contable('ACGAS-HABER', -- relacion contable que almacena los centros de costo por departamento
+                                                       v_id_gestion,
+                                                       p_id_depto,--p_id_depto_conta
+                                                       NULL);  --id_dento_costo
 
       end if;
 
@@ -399,11 +460,20 @@ BEGIN
                                                               3,
                                                             v_ajuste_haber,
                                                             v_reg_cbte.fecha, 'O',2, 1, 'no');
-  select c.id_cuenta
+  /*select c.id_cuenta
     into
     v_id_cuenta
     from conta.tcuenta c
-    where c.nro_cuenta = '4.5.1.01.001.001' and c.id_gestion = v_id_gestion;
+    where c.nro_cuenta = '4.5.1.01.001.001' and c.id_gestion = v_id_gestion;*/
+    
+      SELECT
+            ps_id_cuenta 
+            into
+             v_id_cuenta
+           FROM conta.f_get_config_relacion_contable('ACGAS-AJUSTE', -- relacion contable que almacena los centros de costo por departamento
+                                                       v_id_gestion,
+                                                       p_id_depto,--p_id_depto_conta
+                                                       NULL);  --id_dento_costo 
       insert into conta.tint_transaccion(
                                     id_partida,
                                     id_centro_costo,
@@ -435,9 +505,10 @@ BEGIN
 
                                     id_usuario_reg,
                                     fecha_reg,
-                                    actualizacion
+                                    actualizacion,
+                                    sw_edit
                                 ) values(
-                                    null,
+                                    v_id_partida,
                                     v_id_centro_costo_depto,
                                     'activo',
                                     v_id_cuenta,
@@ -459,6 +530,7 @@ BEGIN
                                     0,0,0,0, --MA --# 21
                                     p_id_usuario,
                                     now(),
+                                    'si',
                                     'si'
                                 );
 
@@ -478,4 +550,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

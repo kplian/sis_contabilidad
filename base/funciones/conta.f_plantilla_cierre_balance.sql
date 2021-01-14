@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_plantilla_cierre_balance (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -298,7 +296,8 @@ BEGIN
                                     importe_recurso_ma,
                                     id_usuario_reg,
                                     fecha_reg,
-                                    actualizacion
+                                    actualizacion,
+                                    sw_edit
                                 ) values(
                                     case
                                       when v_record_mov.id_partida = 0 then
@@ -335,7 +334,9 @@ BEGIN
                                     v_importe_haber_ma, --MA
                                     p_id_usuario,
                                     now(),
-                                    'si' );
+                                    'si',
+                                    'si'
+                                     );
                           
 
                 ELSE
@@ -360,4 +361,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

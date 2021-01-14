@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_plantilla_cierre_gasto (
   p_id_usuario integer,
   p_id_int_comprobante integer,
@@ -249,7 +247,8 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                                     importe_recurso_ma,
                                     id_usuario_reg,
                                     fecha_reg,
-                                    actualizacion
+                                    actualizacion,
+                                    sw_edit
                                 ) values(
                                     v_id_partida,
                                     v_id_centro_costo_depto,
@@ -276,7 +275,9 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                                     v_importe_haber_ma, --MA
                                     p_id_usuario,
                                     now(),
-                                    'si' );
+                                    'si',
+                                    'si'
+                                     );
 
                                     v_sw_minimo = true;
                           END IF;
@@ -367,7 +368,8 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                                               importe_recurso_ma,
                                               id_usuario_reg,
                                               fecha_reg,
-                                              actualizacion
+                                              actualizacion,
+                                              sw_edit
                                           ) values(
                                               v_partida_haber,   --partida de flujo
                                               v_id_centro_costo_depto, -- v_id_centro_costo_depto, --centr de costo del depto contable
@@ -388,6 +390,7 @@ v_nombre_funcion = 'conta.f_plantilla_cierre_gasto';
                                               v_total_debe_ma_saldo,v_total_haber_ma_saldo,v_total_debe_ma_saldo,v_total_haber_ma_saldo,--MA
                                               p_id_usuario,
                                               now(),
+                                              'si',
                                               'si'
                                           );
 
@@ -409,4 +412,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

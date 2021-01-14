@@ -1746,6 +1746,14 @@ select pxp.f_insert_tgui ('Reporte Registro Ventas CC', 'Reporte Registro Ventas
 select pxp.f_insert_testructura_gui ('RVC', 'REPCON');
 /***********************************F-DAT-MMV-CONTA-113-29/04/2020****************************************/
 
+/***********************************I-DAT-MMV-CONTA-ETR-1608-14/01/2021****************************************/
+select conta.f_import_ttipo_relacion_contable ('insert','ACGAS-DEBE',NULL,'Actualización Gasto','activo','no','si','no','presupuestaria','gasto','no','no','no',NULL);
+select conta.f_import_ttipo_relacion_contable ('insert','ACGAS-HABER',NULL,'Actualización Gasto','activo','no','si','no','presupuestaria','recurso','no','no','no',NULL);
+select conta.f_import_ttipo_relacion_contable ('insert','ACGAS-AJUSTE',NULL,'Cuenta ajuste','activo','no','no','no','','','no','no','no',NULL);
+select conta.f_import_ttipo_relacion_contable ('insert','ACIN-DEBE',NULL,'Actualización Ingreso','activo','no','si','no','presupuestaria','gasto','no','no','no',NULL);
+select conta.f_import_ttipo_relacion_contable ('insert','ACIN-HABER',NULL,'Actualización Ingreso','activo','no','si','no','presupuestaria','recurso','no','no','no',NULL);
+select conta.f_import_ttipo_relacion_contable ('insert','ACIN-AJUSTE',NULL,'Ajuste Ingreso','activo','no','no','no','','','no','no','no',NULL);
+ /***********************************F-DAT-MMV-CONTA-ETR-1608-14/01/2021****************************************/
 
   
   
