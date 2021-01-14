@@ -689,9 +689,10 @@ BEGIN
             JOIN orga.tuo_funcionario uof ON uof.id_uo=uo.id_uo
             JOIN orga.tfuncionario fun on fun.id_funcionario=uof.id_funcionario
             JOIN segu.tusuario usu on usu.id_persona=fun.id_persona
-            WHERE usu.id_usuario=p_id_usuario;
-
-            IF v_codigo='DTE' THEN
+            WHERE 
+            uof.fecha_asignacion <= now()::date and (uof.fecha_finalizacion is null or uof.fecha_finalizacion >= now()::date) and
+            usu.id_usuario=p_id_usuario;
+            IF v_codigo='DTE' or v_codigo='GAF' THEN
                   WITH RECURSIVE uo_centro(
                       ids,
                       id_uo,
@@ -722,10 +723,11 @@ BEGIN
                   where c.id_uo_padre=v_id_uos;
 			END IF;
 
-            IF p_administrador !=1 THEN
+            IF p_administrador !=1  THEN
                 --#74
             	IF v_id_funcionarios IS NOT NULL THEN
-                	v_filtro = ' ((ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||') or (ew.id_funcionario in('||array_to_string(v_id_funcionarios,',',',')||'))) and (lower(incbte.estado_reg)!=''anulado'') and (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
+                	v_filtro = ' (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
+                	--v_filtro = ' ((ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||') or (ew.id_funcionario in('||array_to_string(v_id_funcionarios,',',',')||'))) and (lower(incbte.estado_reg)!=''anulado'') and (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
                 ELSE
                 	v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||') and (lower(incbte.estado_reg)!=''anulado'') and (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
                 END IF;
@@ -810,8 +812,8 @@ BEGIN
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
                           where   incbte.estado_reg not in (''borrador'',''validado'') and '||v_filtro;
-			--raise notice'%',v_parametros.filtro;
-            	--		raise exception '%',v_parametros.filtro;
+			raise notice'%',v_parametros.filtro;
+		    --raise exception '%',v_parametros.filtro;
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -834,8 +836,65 @@ BEGIN
 
 		begin
 
-            IF p_administrador !=1 THEN
-                v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||') and (lower(incbte.estado_reg)!=''anulado'') and (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
+            v_id_moneda_base=param.f_get_moneda_base();
+
+            select
+             *
+            into
+             v_registro_moneda
+            from param.tmoneda m
+            where m.id_moneda = v_id_moneda_base;
+            --#74
+            SELECT uo.codigo,uo.id_uo
+            INTO v_codigo,v_id_uos
+            FROM orga.tuo uo
+            JOIN orga.tuo_funcionario uof ON uof.id_uo=uo.id_uo
+            JOIN orga.tfuncionario fun on fun.id_funcionario=uof.id_funcionario
+            JOIN segu.tusuario usu on usu.id_persona=fun.id_persona
+            where uof.fecha_asignacion <= now()::date and (uof.fecha_finalizacion is null or uof.fecha_finalizacion >= now()::date) and
+            usu.id_usuario=p_id_usuario;
+
+            IF v_codigo='DTE' or v_codigo='GAF' THEN
+            
+                  WITH RECURSIVE uo_centro(
+                      ids,
+                      id_uo,
+                      id_uo_padre
+                  ) AS
+                  (
+                  SELECT
+                  ARRAY [ c_1.id_uo ] AS "array",
+                  c_1.id_uo,
+                  NULL::integer AS id_uo_padre
+                  FROM orga.tuo c_1
+                  WHERE c_1.centro::text = 'si'::text AND c_1.estado_reg::text = 'activo'::text
+                  UNION
+                  SELECT
+                  pc.ids || c2.id_uo,
+                  c2.id_uo,
+                  euo.id_uo_padre
+                  FROM orga.tuo c2
+                  JOIN orga.testructura_uo euo ON euo.id_uo_hijo = c2.id_uo
+                  JOIN uo_centro pc ON pc.id_uo = euo.id_uo_padre
+                  WHERE c2.centro::text = 'no'::text AND c2.estado_reg::text = 'activo'::text
+                  )
+                  SELECT array_agg(uof.id_funcionario::INTEGER)
+                  INTO v_id_funcionarios
+                  FROM uo_centro c
+                  JOIN orga.tuo cl ON cl.id_uo = c.ids [ 1 ]
+                  JOIN orga.tuo_funcionario uof ON uof.id_uo=c.id_uo
+                  where c.id_uo_padre=v_id_uos;
+                  
+			END IF;
+
+            IF p_administrador !=1  THEN
+                --#74
+            	IF v_id_funcionarios IS NOT NULL THEN
+                	v_filtro = ' (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
+                	--v_filtro = ' ((ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||') or (ew.id_funcionario in('||array_to_string(v_id_funcionarios,',',',')||'))) and (lower(incbte.estado_reg)!=''anulado'') and (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
+                ELSE
+                	v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||') and (lower(incbte.estado_reg)!=''anulado'') and (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
+                END IF;
             ELSE
                 v_filtro = ' (lower(incbte.estado_reg)!=''borrador'') and (lower(incbte.estado_reg)!=''validado'' ) and ';
             END IF;
