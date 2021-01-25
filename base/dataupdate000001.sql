@@ -371,3 +371,15 @@ UPDATE conta.tint_transaccion SET id_auxiliar=13774 WHERE id_int_transaccion=148
 --commit;
 UPDATE conta.tint_transaccion SET id_auxiliar=13776 WHERE id_int_transaccion=1482712;
 /********************************************F-DAUP-MGM-CONTA-0-15/01/2021********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-0-25/01/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET id_cuenta=4591,id_partida=4119 WHERE id_int_transaccion = 1484563; 
+--UPDATE conta.tint_transaccion SET id_cuenta=4591,id_partida=4119 WHERE id_int_transaccion = 1484564;
+--commit;
+
+UPDATE conta.tint_transaccion SET id_cuenta=4910,id_partida=4259 WHERE id_int_transaccion = 1484563; 
+UPDATE conta.tint_transaccion SET id_cuenta=4910,id_partida=4259 WHERE id_int_transaccion = 1484564;
+/********************************************F-DAUP-MGM-CONTA-0-25/01/2021********************************************/
