@@ -911,7 +911,7 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				typeAhead : true,
 				triggerAction : 'all',
 				lazyRender : true,
-
+                editable: false,
 				mode : 'local',
 				store : ['no', 'balance', 'resultado']
 			},
@@ -937,7 +937,9 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				triggerAction : 'all',
 				lazyRender : true,
 				mode : 'local',
-				store : ['no', 'si']
+				store : ['no', 'si'],
+                disableKeyFilter: true,
+                editable: false
 			},
 			type : 'ComboBox',
 			filters : {
@@ -961,7 +963,9 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 				triggerAction : 'all',
 				lazyRender : true,
 				mode : 'local',
-				store : ['no', 'si']
+				store : ['no', 'si'],
+                disableKeyFilter: true,
+                editable: false
 			},
 			type : 'ComboBox',
 			filters : {
@@ -987,7 +991,9 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
                     triggerAction : 'all',
                     lazyRender : true,
                     mode : 'local',
-                    store : ['no', 'si']
+                    store : ['no', 'si'],
+                    disableKeyFilter: true,
+                    editable: false
                 },
                 type : 'ComboBox',
                 filters : {
