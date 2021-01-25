@@ -248,7 +248,7 @@ BEGIN
                               tra.importe_debe_ma,tra.importe_haber_ma,tra.importe_gasto_ma
                               FROM conta.tint_transaccion tra
                               INNER JOIN conta.vint_comprobante incbte ON tra.id_int_comprobante = incbte.id_int_comprobante
-                              JOIN pre.tpartida par ON par.id_partida = tra.id_partida
+                              LEFT JOIN pre.tpartida par ON par.id_partida = tra.id_partida
 							  JOIN conta.tcuenta cue ON cue.id_cuenta = tra.id_cuenta
                               LEFT JOIN param.vcentro_costo cc on cc.id_centro_costo = tra.id_centro_costo
                               WHERE incbte.nro_cbte!=''''
