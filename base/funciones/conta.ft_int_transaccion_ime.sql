@@ -24,6 +24,7 @@ $body$
  #3 endetr      20/12/2018        CHROS             permitir cambiar montos de transacción con un límite de centavo
  #108 ETR       04/03/2020        RAC KPLIAN        deshabilitar la integracion con LB segun configuracion de variable global.
  #110 ETR       25/03/2020        RAC KPLIAN        Al editar, eliminar o insertar validar que no exista un cheque generado
+ #ETR-2612	27/01/20221	  EGS		     Se arregla la validadcion de tipode cambio cuando marca el comprobante con la variable sw_tipo_cambio
 ***************************************************************************/
 
 DECLARE
@@ -65,6 +66,8 @@ DECLARE
         v_conta_integrar_libro_bancos varchar;
         v_valor                       varchar;
         v_conta_generar_lb_manual_oc  varchar; 
+    v_reg_intra                   record; --#ETR-2612
+    v_cambio                      varchar;--#ETR-2612
 BEGIN
 
     v_nombre_funcion = 'conta.ft_int_transaccion_ime';
@@ -537,11 +540,40 @@ BEGIN
             
             -- si el tipo de cambia varia a de la cabecara marcamos la cabecera, 
             -- para que no actulice automaricamente las transacciones si es modificada
+		--#ETR-2612
+            v_cambio = 'no';--bandera para marcar o no el comprobante
             IF      v_registros.tipo_cambio !=  v_parametros.tipo_cambio 
                 or  v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_2 
-                or  v_registros.tipo_cambio_2 !=  v_parametros.tipo_cambio_3 THEN
+                or  v_registros.tipo_cambio_3 !=  v_parametros.tipo_cambio_3 THEN
               
+                v_cambio = 'si';
+            END IF;
+            FOR v_reg_intra IN(
+                SELECT
+                    int.id_int_transaccion,
+                    int.tipo_cambio,
+                    int.tipo_cambio_2,
+                    int.tipo_cambio_3
+                FROM conta.tint_transaccion int
+                WHERE int.id_int_comprobante = v_parametros.id_int_comprobante
+                  and int.id_int_transaccion <> v_parametros.id_int_transaccion
+            )LOOP
+                    IF  v_registros.tipo_cambio !=  v_reg_intra.tipo_cambio
+                        or  v_registros.tipo_cambio_2 !=  v_reg_intra.tipo_cambio_2
+                        or  v_registros.tipo_cambio_3 !=  v_reg_intra.tipo_cambio_3 THEN
+                        v_cambio = 'si';
+                    END IF;
+                END LOOP;
+            --si al modificar todas las trnascciones tienen el mismo tipo de cambio que la cabecera del comprobante
+            -- se marca como no
+
+            IF v_cambio = 'no' THEN
               update conta.tint_comprobante set
+                    sw_tipo_cambio = 'no'
+                where id_int_comprobante =  v_parametros.id_int_comprobante;
+            ELSIF v_cambio = 'si' THEN
+                --si alguna transaccion del comprobante difiere de la cabecera en tipo de cambio se marca como si
+                update conta.tint_comprobante set
                 sw_tipo_cambio = 'si'
               where id_int_comprobante =  v_parametros.id_int_comprobante;
             

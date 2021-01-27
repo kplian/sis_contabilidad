@@ -32,6 +32,7 @@ $body$
  #55 ETR        29/05/2019        EGS               Se agrega la logica para q migre comprobantes a otra bd pxp cuando el comprobante pase a validado y
                                                     cuando se necesite exportar un comprobante validado
  #105        	10/02/202         MANUEL GUERRA 	validar cbtes que tenga al menos una transaccion
+ #ETR-2612	27/01/20221	  EGS		     Se valida que en tipo de cambio convenido sea el unico que varien entre comprobante y transacciones en tipo de cambio
 ***************************************************************************/
 
 DECLARE
@@ -121,6 +122,7 @@ DECLARE
     v_id_int_comprobante_migrado    integer; --#55
     v_bandera_cbte                  boolean; --#55
     v_cant_trans                  	integer; --#
+    v_reg_intransaccion             record;
 
 
 BEGIN
@@ -612,12 +614,30 @@ BEGIN
                END IF;
             END IF;
 
+	  --#ETR-2612 se valida que solo si no es convenido los tipos de cambio en cabecera y transaciones sean iguales
+            IF v_parametros.forma_cambio <> 'convenido' THEN
+                FOR v_reg_intransaccion IN(
+                    SELECT
+                        int.id_int_transaccion,
+                        int.tipo_cambio,
+                        int.tipo_cambio_2,
+                        int.tipo_cambio_3
+                    FROM conta.tint_transaccion int
+                    WHERE int.id_int_comprobante = v_parametros.id_int_comprobante
+
+                )LOOP
+
+                        IF  v_reg_intransaccion.tipo_cambio !=  v_parametros.tipo_cambio
+                            or  v_reg_intransaccion.tipo_cambio_2 !=  v_parametros.tipo_cambio_2
+                            or  v_reg_intransaccion.tipo_cambio_3 !=  v_parametros.tipo_cambio_3 THEN
+
+                            RAISE EXCEPTION 'No puede cambiar a Cambio % ,Por que las transacciones en tipo de cambio son diferentes a la cabecera del comprobante',v_parametros.forma_cambio;
+                        END IF;
+
+                    END LOOP;
 
 
-
-
-
-
+            END IF;
 			------------------------------
 			--Sentencia de la modificacion
 			------------------------------
