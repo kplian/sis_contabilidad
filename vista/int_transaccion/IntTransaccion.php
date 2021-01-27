@@ -12,7 +12,7 @@
   #1	      01-09-2013			RAC							creacion 
   #37         12/02/2019            RAC KPLIAN                  que no filtre centros de costo por aprobados, adicion de aprametros 
   #95         23/01/2020            Rensi Arteaga               Incluir nro de tramite auxiliar          
-  
+  #ETR-2612	27/012021	EGS				Se bloquea los tipos de cambio cuando el comprobante es fde forma de cambio diferente a convenido
 ***************************************************************************/
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -20,7 +20,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
     fheight : '90%',
 	fwidth : '60%',
-		
+	forma_cambio :'',//#ETR-2612
 	constructor:function(config){
 		
 		this.maestro=config.maestro;		
@@ -871,7 +871,7 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		 this.getConfigCambiaria();
 		 
 		 console.log('getConfigCambiaria')
-		 
+        this.forma_cambio = this.maestro.forma_cambio //#ETR-2612
 		 
 	},
 	
@@ -1055,6 +1055,16 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 	         Phx.vista.IntTransaccion.superclass.onButtonEdit.call(this); 
 	         this.setModificadoCombos();
 	         this.setLabelsTc();
+            if(this.forma_cambio =='convenido'){ //#ETR-2612
+                this.Cmp.tipo_cambio.setReadOnly(false);
+                this.Cmp.tipo_cambio_2.setReadOnly(false);
+                this.Cmp.tipo_cambio_3.setReadOnly(false);
+            }
+            else{
+                this.Cmp.tipo_cambio.setReadOnly(true);
+                this.Cmp.tipo_cambio_2.setReadOnly(true);
+                this.Cmp.tipo_cambio_3.setReadOnly(true);
+            }
        },
        
        onButtonNew: function(){
@@ -1068,6 +1078,10 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
           this.setLabelsTc();
           
        },
+    onSubmit: function(o, x, force) { //#ETR-2612
+        Phx.vista.IntTransaccion.superclass.onSubmit.call(this,o, undefined, true);
+        Phx.CP.getPagina(this.idContenedorPadre).actualizarPadre();
+    }
        
 })
 </script>	
