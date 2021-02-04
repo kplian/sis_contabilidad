@@ -2215,7 +2215,7 @@ BEGIN
                           join param.tperiodo per on per.id_periodo = icbt.id_periodo
                           join conta.tint_transaccion itr on itr.id_int_comprobante = icbt.id_int_comprobante
                           join conta.tcuenta cue on cue.id_cuenta = itr.id_cuenta
-                          join pre.tpartida par on par.id_partida = itr.id_partida
+                          left join pre.tpartida par on par.id_partida = itr.id_partida
                           join param.tcentro_costo cc on cc.id_centro_costo=itr.id_centro_costo
                           join pre.tpresupuesto pre on pre.id_centro_costo=cc.id_centro_costo
                           join pre.ttipo_presupuesto tpp on pre.tipo_pres=tpp.codigo
