@@ -383,3 +383,25 @@ UPDATE conta.tint_transaccion SET id_auxiliar=13776 WHERE id_int_transaccion=148
 UPDATE conta.tint_transaccion SET id_cuenta=4910,id_partida=4259 WHERE id_int_transaccion = 1484563; 
 UPDATE conta.tint_transaccion SET id_cuenta=4910,id_partida=4259 WHERE id_int_transaccion = 1484564;
 /********************************************F-DAUP-MGM-CONTA-0-25/01/2021********************************************/
+
+/********************************************I-DAUP-MMV-CONTA-ETR-2920-10/02/2021********************************************/
+update conta.tint_comprobante  set
+    id_usuario_reg = 366
+where id_int_comprobante in (108273,
+                             108274,
+                             108275,
+                             108276,
+                             108277,
+                             108328);
+
+update conta.tint_transaccion set
+    id_usuario_reg = 366
+where id_int_comprobante in (108273,
+                             108274,
+                             108275,
+                             108276,
+                             108277,
+                             108328);
+/********************************************F-DAUP-MMV-CONTA-ETR-2920-10/02/2021********************************************/
+
+
