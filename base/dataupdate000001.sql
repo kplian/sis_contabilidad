@@ -405,3 +405,13 @@ where id_int_comprobante in (108273,
 /********************************************F-DAUP-MMV-CONTA-ETR-2920-10/02/2021********************************************/
 
 
+/********************************************I-DAUP-MGM-CONTA-0-19/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tdoc_compra_venta SET id_funcionario=NULL WHERE id_doc_compra_venta=204893;
+--commit;
+
+BEGIN;
+UPDATE conta.tdoc_compra_venta SET id_funcionario=607 WHERE id_doc_compra_venta=204893;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-0-19/02/2021********************************************/
