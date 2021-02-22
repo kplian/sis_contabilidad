@@ -11,6 +11,7 @@ HISTORIAL DE MODIFICACIONES:
 #61		ETR		11/06/2019			EGS						Se creo el campo Marca en el comprobante
 #78		ETR		11/12/2019			RAC						Se agrego configuracion de filtro moenda segun tipo_relacion_comprobante
 #108    ETR     05/03/2019          RAC                     Adicionar prioridad_depto 
+#ETR-2612	ETR			27/01/2021		EGS			se actualiza el comprobante al modificar la transaccion
 #ETR-2687-1		22.02.2021			MZM-KPLIAN				Adicion de campos para control de manejo LB manual previo a validacion de cbte VoBoFinanzas
  */
 header("content-type: text/javascript; charset=UTF-8");
@@ -2220,9 +2221,11 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 			this.idContenedor, 'WizardMarcaCbte')
 		},	
 		
-		
+		actualizarPadre: function () { //#ETR-2612 
+            this.onButtonAct();
+        }
+
 		
 		
 })
 </script>
-

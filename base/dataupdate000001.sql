@@ -383,3 +383,46 @@ UPDATE conta.tint_transaccion SET id_auxiliar=13776 WHERE id_int_transaccion=148
 UPDATE conta.tint_transaccion SET id_cuenta=4910,id_partida=4259 WHERE id_int_transaccion = 1484563; 
 UPDATE conta.tint_transaccion SET id_cuenta=4910,id_partida=4259 WHERE id_int_transaccion = 1484564;
 /********************************************F-DAUP-MGM-CONTA-0-25/01/2021********************************************/
+
+/********************************************I-DAUP-MMV-CONTA-ETR-2920-10/02/2021********************************************/
+update conta.tint_comprobante  set
+    id_usuario_reg = 366
+where id_int_comprobante in (108273,
+                             108274,
+                             108275,
+                             108276,
+                             108277,
+                             108328);
+
+update conta.tint_transaccion set
+    id_usuario_reg = 366
+where id_int_comprobante in (108273,
+                             108274,
+                             108275,
+                             108276,
+                             108277,
+                             108328);
+/********************************************F-DAUP-MMV-CONTA-ETR-2920-10/02/2021********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-0-19/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tdoc_compra_venta SET id_funcionario=NULL WHERE id_doc_compra_venta=204893;
+--commit;
+
+BEGIN;
+UPDATE conta.tdoc_compra_venta SET id_funcionario=607 WHERE id_doc_compra_venta=204893;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-0-19/02/2021********************************************/
+
+/********************************************I-DAUP-MGM-CONTA-1-19/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET glosa='DIEGO PLACIDO - Viaticos del Personal ( PAGO POR VIATICOS A LA CIUDAD DE TRINIDAD  DEL 04 AL 09/01/2021 ING. HORACIO CONDARCO ) Nro Doc:' WHERE id_int_transaccion=1489199;
+--commit;
+
+BEGIN;
+UPDATE conta.tint_transaccion SET glosa='HORACIO CONDARCO - Viaticos del Personal ( PAGO POR VIATICOS A LA CIUDAD DE TRINIDAD  DEL 04 AL 09/01/2021 ING. HORACIO CONDARCO ) Nro Doc:' WHERE id_int_transaccion=1489199;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-1-19/02/2021********************************************/
