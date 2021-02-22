@@ -21,6 +21,7 @@
 #55 	ETR		30/05/2019			EGS								Se agrega funcion par poder migrar comprobantes
 #87		ETR	    08/01/2020	        MMV 		                    Reporte Cbte formato Excel
 #108    ETR     05/03/2020          RAC KPLIAN                      agrega prioridad_depto
+#ETR-2687-1		22.02.2020			MZM-KPLIAN		 				Adicion de campos para control de manejo LB manual previo a validacion de cbte VoBoFinanzas
  */
 class MODIntComprobante extends MODbase{
 	
@@ -196,8 +197,10 @@ class MODIntComprobante extends MODbase{
 		$this->captura('forma_cambio','varchar');
         $this->captura('liquido_pagable', 'numeric');
 	    $this->captura('prioridad_depto', 'integer');   //#108
-		
-		
+		//#ETR-2687-1
+		$this->captura('lb','varchar');
+		$this->captura('banco','varchar');
+		$this->captura('codigo_clase','varchar');
 		
 		
 		//Ejecuta la instruccion

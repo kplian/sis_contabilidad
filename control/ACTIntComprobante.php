@@ -11,10 +11,10 @@ ISSUE     FORK          FECHA:		       AUTOR                 DESCRIPCION
  #2                  27-08-2018        RAC KPLIAN        se añade trasaccion para modicar glosa
  #7      ENDEERT		27-12-2018     MANUEL GUERRA     crearon listado de tramites, y la modifiacion del nrotramite_aux
  #15     ENDEERT		04-01-2019     Miguel Mamani     corrección filtro por gestión interfaz visto bueno comprobantes
- * 1A			21/08/2018		EGS					se creo la funcion listarIntComprobanteCombo
- #55 	ETR			30/05/2019			EGS				 Se agrega funcion par poder migrar comprobantes
-#87		  ETR		    08/01/2020	        MMV 		         Reporte Cbte formato Excel
-
+ #1A					21/08/2018		EGS				 se creo la funcion listarIntComprobanteCombo
+ #55 	  ETR			30/05/2019			EGS			 Se agrega funcion par poder migrar comprobantes
+#87		  ETR		    08/01/2020	        MMV 		 Reporte Cbte formato Excel
+#ETR-2687-1				22.02.2020		MZM-KPLIAN		 Adicion de campos para control de manejo LB manual previo a validacion de cbte VoBoFinanzas
  */
 //require_once(dirname(__FILE__).'/../../lib/lib_reporte/ReportePDF2.php');
 // convert to PDF
@@ -33,7 +33,7 @@ class ACTIntComprobante extends ACTbase{
 	
 	private $objPlantHtml;
 	
-	function listarIntComprobante(){
+	function listarIntComprobante(){ 
 		$this->objParam->defecto('ordenacion','id_int_comprobante');
 		$this->objParam->defecto('dir_ordenacion','asc');
 		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    
@@ -53,7 +53,8 @@ class ACTIntComprobante extends ACTbase{
 		if($this->objParam->getParametro('nombreVista') == 'IntComprobanteLd'  || $this->objParam->getParametro('nombreVista') == 'IntComprobanteLdEntrega'){
             $this->objParam->addFiltro("incbte.estado_reg = ''validado''");    
         }
-		else{
+		else{ 
+		
 			$this->objParam->addFiltro("incbte.estado_reg in (''borrador'', ''edicion'')");
 		}
 		
@@ -91,7 +92,7 @@ class ACTIntComprobante extends ACTbase{
 
 
 
-   function listarIntComprobanteWF(){
+   function listarIntComprobanteWF(){ 
 		$this->objParam->defecto('ordenacion','id_int_comprobante');
 		$this->objParam->defecto('dir_ordenacion','asc');
 		$this->objParam->addFiltro("(incbte.temporal = ''no'' or (incbte.temporal = ''si'' and vbregional = ''si''))");    

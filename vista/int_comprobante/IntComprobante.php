@@ -11,7 +11,7 @@ HISTORIAL DE MODIFICACIONES:
 #61		ETR		11/06/2019			EGS						Se creo el campo Marca en el comprobante
 #78		ETR		11/12/2019			RAC						Se agrego configuracion de filtro moenda segun tipo_relacion_comprobante
 #108    ETR     05/03/2019          RAC                     Adicionar prioridad_depto 
-
+#ETR-2687-1		22.02.2021			MZM-KPLIAN				Adicion de campos para control de manejo LB manual previo a validacion de cbte VoBoFinanzas
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -1340,6 +1340,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 		'desc_moneda_tri', 'localidad','sw_editable','cbte_reversion','volcado','c31','fecha_c31','forma_cambio',
 		'nro_tramite_aux','prioridad_depto',
         'documento_iva',//#32
+        //XXX000
+        'lb','banco','codigo_clase',
         {//#51
 			name : 'id_int_comprobante_migrado',
 			type : 'numeric'
@@ -1668,8 +1670,29 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
 	}, 
 	
 	sigEstado:function(){                   
-      	var rec=this.sm.getSelected();      	
-      	this.mostrarWizard(rec, true);
+      	var rec=this.sm.getSelected();      
+      	//Phx.vista.IntComprobante.superclass.obtenerVariableGlobal('conta_generar_lb_manual_oc');
+      	
+        //#ETR-2687-1  
+      	if (rec.data.estado_reg=='vbcbte' && rec.data.manual=='no' && rec.data.banco=='si'  && (rec.data.codigo_clase=='PAGO' || rec.data.codigo_clase=='PAGOCON' || rec.data.codigo_clase=='INGRESO' || rec.data.codigo_clase=='INGRESOCON') && rec.data.prioridad_depto==0){
+      		if (rec.data.lb=='ninguno'){
+      			if (confirm("No se ha generado aun un registro en LB, desea continuar de todas formas?") ){
+      				this.mostrarWizard(rec, true);
+      			}
+      		}else{
+      			if (rec.data.lb=='borrador'){
+      				alert("Existe un registro en LB que no fue procesado aun. Por favor verifique dicho registro antes de continuar");
+      			}else{
+      				this.mostrarWizard(rec, true);
+      			}
+      		}
+      		
+      	}else{
+      		
+      		this.mostrarWizard(rec, true);
+      	}
+      	
+      	
       	
                
      },
