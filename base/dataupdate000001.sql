@@ -426,3 +426,23 @@ BEGIN;
 UPDATE conta.tint_transaccion SET glosa='HORACIO CONDARCO - Viaticos del Personal ( PAGO POR VIATICOS A LA CIUDAD DE TRINIDAD  DEL 04 AL 09/01/2021 ING. HORACIO CONDARCO ) Nro Doc:' WHERE id_int_transaccion=1489199;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-1-19/02/2021********************************************/
+
+
+
+
+/********************************************I-DAUP-MGM-CONTA-1-22/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET glosa='CREDITO FISCAL SUBSIDIO LACTANCIA DICIEMBRE/20 OF. CENTRAL' WHERE id_int_transaccion=1533488;
+--UPDATE conta.tint_transaccion SET glosa='CREDITO FISCAL SUBSIDIO LACTANCIA DICIEMBRE/20 OF. CENTRAL' WHERE id_int_transaccion=1533489;
+--commit;
+
+BEGIN;
+UPDATE conta.tint_transaccion SET glosa='CREDITO FISCAL SUBSIDIO LACTANCIA ENERO/21 OF. CENTRAL' WHERE id_int_transaccion=1533488;
+UPDATE conta.tint_transaccion SET glosa='CREDITO FISCAL SUBSIDIO LACTANCIA ENERO/21 OF. CENTRAL' WHERE id_int_transaccion=1533489;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-1-22/02/2021********************************************/
+
+
+
+
