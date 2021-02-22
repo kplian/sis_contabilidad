@@ -455,6 +455,17 @@ UPDATE conta.tint_comprobante SET beneficiario='WILLY CANAVIRI' WHERE id_int_com
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-2-22/02/2021********************************************/
 
+/********************************************I-DAUP-MGM-CONTA-3-22/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET glosa='TECNOPOR S.A. - Suministros Menores ( COMPRZ< KOLLER DE PLASTOFORMO ) Nro Doc: 2622' WHERE id_int_transaccion=1533891;
+--UPDATE conta.tint_transaccion SET glosa='TECNOPOR S.A. - Suministros Menores ( COMPRZ< KOLLER DE PLASTOFORMO ) Nro Doc: 2622' WHERE id_int_transaccion=1533892;
+--commit;
 
+BEGIN;
+UPDATE conta.tint_transaccion SET glosa='TECNOPOR S.A. - Suministros Menores ( COMPRA KOLLER DE PLASTOFORMO ) Nro Doc: 2622' WHERE id_int_transaccion=1533891;
+UPDATE conta.tint_transaccion SET glosa='TECNOPOR S.A. - Suministros Menores ( COMPRA KOLLER DE PLASTOFORMO ) Nro Doc: 2622' WHERE id_int_transaccion=1533892;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-3-22/02/2021********************************************/
 
 
