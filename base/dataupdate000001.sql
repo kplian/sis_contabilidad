@@ -444,5 +444,17 @@ COMMIT;
 /********************************************F-DAUP-MGM-CONTA-1-22/02/2021********************************************/
 
 
+/********************************************I-DAUP-MGM-CONTA-2-22/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_comprobante SET beneficiario='PROVEEDORES VARIOS' WHERE id_int_comprobante=109044;
+--commit;
+
+BEGIN;
+UPDATE conta.tint_comprobante SET beneficiario='WILLY CANAVIRI' WHERE id_int_comprobante=109044;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-2-22/02/2021********************************************/
+
+
 
 
