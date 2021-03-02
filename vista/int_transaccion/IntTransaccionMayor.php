@@ -13,6 +13,7 @@ ISSUE 		   FECHA   			     AUTOR				 DESCRIPCION:
 #22         14/01/2019 ENDETRAS     Miguel Mamamni    Mostrar boton para exportar datos de grilla
 #91         15/01/2020 ENDETR       JUAN              Libro mayor añadir columna beneficiario
 #102        6/2/2020          Manuel Guerra     agregar campo nro_tramite_auxiliar, en vista del mayor
+#SC-1       02/03/2021              EGS                 Se oculta el boton de excel en libro mayor
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -884,13 +885,13 @@ Phx.vista.IntTransaccionMayor=Ext.extend(Phx.gridInterfaz,{
 		
     	//llama al constructor de la clase padre
 		Phx.vista.IntTransaccionMayor.superclass.constructor.call(this,config);
-        this.addButton('ReportExcel',{
-            grupo:[0,1],
-            text :'Exportar Excel',
-            iconCls : 'bpdf32',
-            disabled: true,
-            handler : this.onButtonReporteExcel
-        });
+        // this.addButton('ReportExcel',{//#SC-1
+        //     grupo:[0,1],
+        //     text :'Exportar Excel',
+        //     iconCls : 'bpdf32',
+        //     disabled: true,
+        //     handler : this.onButtonReporteExcel
+        // });
 		this.addButton('chkdep',{	text:'Dependencias',
 				iconCls: 'blist',
 				disabled: true,
