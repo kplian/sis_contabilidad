@@ -426,3 +426,58 @@ BEGIN;
 UPDATE conta.tint_transaccion SET glosa='HORACIO CONDARCO - Viaticos del Personal ( PAGO POR VIATICOS A LA CIUDAD DE TRINIDAD  DEL 04 AL 09/01/2021 ING. HORACIO CONDARCO ) Nro Doc:' WHERE id_int_transaccion=1489199;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-1-19/02/2021********************************************/
+
+
+
+
+/********************************************I-DAUP-MGM-CONTA-1-22/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET glosa='CREDITO FISCAL SUBSIDIO LACTANCIA DICIEMBRE/20 OF. CENTRAL' WHERE id_int_transaccion=1533488;
+--UPDATE conta.tint_transaccion SET glosa='CREDITO FISCAL SUBSIDIO LACTANCIA DICIEMBRE/20 OF. CENTRAL' WHERE id_int_transaccion=1533489;
+--commit;
+
+BEGIN;
+UPDATE conta.tint_transaccion SET glosa='CREDITO FISCAL SUBSIDIO LACTANCIA ENERO/21 OF. CENTRAL' WHERE id_int_transaccion=1533488;
+UPDATE conta.tint_transaccion SET glosa='CREDITO FISCAL SUBSIDIO LACTANCIA ENERO/21 OF. CENTRAL' WHERE id_int_transaccion=1533489;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-1-22/02/2021********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-2-22/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_comprobante SET beneficiario='PROVEEDORES VARIOS' WHERE id_int_comprobante=109044;
+--commit;
+
+BEGIN;
+UPDATE conta.tint_comprobante SET beneficiario='WILLY CANAVIRI' WHERE id_int_comprobante=109044;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-2-22/02/2021********************************************/
+
+/********************************************I-DAUP-MGM-CONTA-3-22/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_transaccion SET glosa='TECNOPOR S.A. - Suministros Menores ( COMPRZ< KOLLER DE PLASTOFORMO ) Nro Doc: 2622' WHERE id_int_transaccion=1533891;
+--UPDATE conta.tint_transaccion SET glosa='TECNOPOR S.A. - Suministros Menores ( COMPRZ< KOLLER DE PLASTOFORMO ) Nro Doc: 2622' WHERE id_int_transaccion=1533892;
+--commit;
+
+BEGIN;
+UPDATE conta.tint_transaccion SET glosa='TECNOPOR S.A. - Suministros Menores ( COMPRA KOLLER DE PLASTOFORMO ) Nro Doc: 2622' WHERE id_int_transaccion=1533891;
+UPDATE conta.tint_transaccion SET glosa='TECNOPOR S.A. - Suministros Menores ( COMPRA KOLLER DE PLASTOFORMO ) Nro Doc: 2622' WHERE id_int_transaccion=1533892;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-3-22/02/2021********************************************/
+
+
+
+/********************************************I-DAUP-MGM-CONTA-ETR-3059-04/03/2021********************************************/
+
+--rollback
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion= 1534678;
+--commit;
+
+UPDATE conta.tint_transaccion SET id_auxiliar=1 WHERE id_int_transaccion= 1534678;
+
+/********************************************F-DAUP-MGM-CONTA-ETR-3059-04/03/2021********************************************/
+
+
