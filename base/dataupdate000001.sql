@@ -469,3 +469,15 @@ COMMIT;
 /********************************************F-DAUP-MGM-CONTA-3-22/02/2021********************************************/
 
 
+
+/********************************************I-DAUP-MGM-CONTA-ETR-3059-04/03/2021********************************************/
+
+--rollback
+--UPDATE conta.tint_transaccion SET id_auxiliar=NULL WHERE id_int_transaccion= 1534678;
+--commit;
+
+UPDATE conta.tint_transaccion SET id_auxiliar=1 WHERE id_int_transaccion= 1534678;
+
+/********************************************F-DAUP-MGM-CONTA-ETR-3059-04/03/2021********************************************/
+
+
