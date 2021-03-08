@@ -893,8 +893,9 @@ class MODIntComprobante extends MODbase{
 		$this->captura('tipo_cambio_3','numeric');
 		$this->captura('id_moneda_act','int4');
 		$this->captura('movimiento','varchar');
-		
-		
+		//ETR-2687-1
+		$this->captura('tipo_pago','varchar');
+		$this->captura('liqpag','numeric');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

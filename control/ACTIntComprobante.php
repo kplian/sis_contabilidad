@@ -785,7 +785,20 @@ class ACTIntComprobante extends ACTbase{
 		if($this->objParam->getParametro('clase_comprobante')!= ''){
 			$this->objParam->addFiltro("clc.movimiento in(''".$this->objParam->getParametro('clase_comprobante')."'',''".$this->objParam->getParametro('clase_comprobante1')."'')");  
 		}
+		//XXX000
+	    if($this->objParam->getParametro('id_depto_libro')!= ''){
+			$this->objParam->addFiltro("incbte.id_depto_libro = ".$this->objParam->getParametro('id_depto_libro'));    
+		}
+		
+		//XXX000
+	    if($this->objParam->getParametro('fecha')!= ''){
+			$this->objParam->addFiltro("incbte.fecha= '' ".$this->objParam->getParametro('fecha')."''");    
+		}
 	
+		//XXX000
+	    if($this->objParam->getParametro('lb')!= ''){
+			$this->objParam->addFiltro("incbte.id_int_comprobante not in (select id_int_comprobante from tes.tts_libro_bancos where id_int_comprobante is not null)");    
+		}
 		$this->objFunc=$this->create('MODIntComprobante');
 			
 		$this->res=$this->objFunc->listarIntComprobanteCombo($this->objParam);

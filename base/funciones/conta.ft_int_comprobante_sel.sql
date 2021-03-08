@@ -1,13 +1,18 @@
---------------- SQL ---------------
+-- FUNCTION: conta.ft_int_comprobante_sel(integer, integer, character varying, character varying)
 
-CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_sel (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
+-- DROP FUNCTION conta.ft_int_comprobante_sel(integer, integer, character varying, character varying);
+
+CREATE OR REPLACE FUNCTION conta.ft_int_comprobante_sel(
+	p_administrador integer,
+	p_id_usuario integer,
+	p_tabla character varying,
+	p_transaccion character varying)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
  FUNCION: 		conta.ft_int_comprobante_sel
@@ -24,11 +29,12 @@ ISSUE	FORK		 FECHA:				 AUTOR:				DESCRIPCION:
  #33     ETR     	10/02/2019		  Miguel Mamani	  		Mostrar moneda $us en reporte comprobante
  #45	 ETR		15/05/2019			manuel guerra		cambiar la fecha de filtrado del reporte
  #50	 ETR		17/05/2019			manuel guerra		agregar filtro depto
- #51	 ETR		17/05/2018			EGS						se creo el campo id_int_comprobante_migrado
+ #51	 ETR		17/05/2018			EGS					Se creo el campo id_int_comprobante_migrado
  #74	 ETR		17/05/2018			manuel guerra		vista para la verificacion de cbtes de la uo
- #87	 ETR		08/01/2020	        MMV 		         Reporte Cbte formato Excel se agregaron la columna  importe en tipo de cambio UFV
- #108    ETR        05/03/2020          RAC KPLIAN         agregar prioridad a consulta y vista de comprobante
- 
+ #87	 ETR		08/01/2020	        MMV 		        Reporte Cbte formato Excel se agregaron la columna  importe en tipo de cambio UFV
+ #108    ETR        05/03/2020          RAC KPLIAN          agregar prioridad a consulta y vista de comprobante
+ #ETR-2687-1		22.02.2020		    MZM KPLIAN			Independizacion de LB respecto validacion de cbte VoBo Finanzas
+															CONTA_INCBTECB_SEL: adicion de 2 campos
 ***************************************************************************/
 
 DECLARE
@@ -808,6 +814,10 @@ BEGIN
                               incbte.forma_cambio,
                               incbte.liquido_pagable,
                               incbte.prioridad_depto
+                              --#ETR-2687-1
+                              ,coalesce((select estado from tes.tts_libro_bancos where id_int_comprobante=incbte.id_int_comprobante limit 1),''ninguno'')::varchar as lb
+                              ,coalesce((select ''si''  from conta.tint_transaccion t where id_int_comprobante=incbte.id_int_comprobante and banco=''si'' limit 1),''no'')::varchar as banco
+                              ,(select codigo from conta.tclase_comprobante where id_clase_comprobante=incbte.id_clase_comprobante)::varchar as codigo_clase
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
@@ -1083,6 +1093,8 @@ BEGIN
                               incbte.tipo_cambio_3,
                               incbte.id_moneda_act,
                               clc.movimiento
+                              ,incbte.tipo_pago,
+                              incbte.liqpag
                           from conta.vint_comprobante incbte
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = incbte.id_proceso_wf
                           inner join wf.testado_wf ew on ew.id_estado_wf = incbte.id_estado_wf
@@ -1288,10 +1300,7 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-PARALLEL UNSAFE
-COST 100;
+$BODY$;
+
+ALTER FUNCTION conta.ft_int_comprobante_sel(integer, integer, character varying, character varying)
+    OWNER TO postgres;
