@@ -25,6 +25,8 @@ $body$
  #108 ETR       04/03/2020        RAC KPLIAN        deshabilitar la integracion con LB segun configuracion de variable global.
  #110 ETR       25/03/2020        RAC KPLIAN        Al editar, eliminar o insertar validar que no exista un cheque generado
  #ETR-2612	27/01/20221	  EGS		     Se arregla la validadcion de tipode cambio cuando marca el comprobante con la variable sw_tipo_cambio
+ #ETR-2687-1	22.02.2020		  MZM KPLIAN		Independizacion de LB respecto validacion de cbte VoBo Finanzas
+ 
 ***************************************************************************/
 
 DECLARE
@@ -824,7 +826,11 @@ BEGIN
                                    
                                     --#108 genera  registros en LB solo si la generacion manual esta desactiva y si no es un depto de contabilidad central (prioridad 0)
                                     IF v_conta_generar_lb_manual_oc = 'si' OR v_registros_trans.prioridad = 0  THEN
-                                        -- si alguna transaccion tiene banco habilitado para pago
+                                        -- si alguna transaccion tiene banco habilitado para pago #ETR-2687-1
+                                        if exists (select 1 from tes.tts_libro_bancos where id_int_comprobante=v_parametros.id_int_comprobante) then
+                                        	raise exception 'Registro no realizado. Ya se ha generado un LB para este comprobante';
+                                        end if;
+
                                         IF  tes.f_integracion_libro_bancos(p_id_usuario, v_parametros.id_int_comprobante,  v_registros.id_int_transaccion) THEN
                                           v_sw_gen_lb := true;
                                         END IF;
