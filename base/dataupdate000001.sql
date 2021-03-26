@@ -481,3 +481,17 @@ UPDATE conta.tint_transaccion SET id_auxiliar=1 WHERE id_int_transaccion= 153467
 /********************************************F-DAUP-MGM-CONTA-ETR-3059-04/03/2021********************************************/
 
 
+/********************************************I-DAUP-MGM-CONTA-ETR-3450-26/03/2021********************************************/
+--rollback
+--UPDATE conta.tint_transaccion SET glosa='BOLIVIANA DE AVIACIÓN - Gastos de Viaje Transporte ( TKT CBB/LPB/CBB 16/03 INSPECCIÓN SUBESTACIÓN LA PALCA ) Nro Doc: 9304877139027' WHERE id_int_transaccion= 1565753;
+--commit;
+UPDATE conta.tint_transaccion SET glosa='BOLIVIANA DE AVIACIÓN - Gastos de Viaje Transporte ( TKT CBB/LPB/CBB 16/03 INSPECCIÓN SUBESTACIÓN LA PALCA - MACHACA HERRERA NORMA KAREN ) Nro Doc: 9304877139027' WHERE id_int_transaccion= 1565753;
+--rollback
+--UPDATE conta.tint_transaccion SET glosa='BOLIVIANA DE AVIACIÓN - Gastos de Viaje Transporte ( TKT CBB/LPB/CBB 16/03 INSPECCIÓN SUBESTACIÓN LA PALCA ) Nro Doc: 9304877139027' WHERE id_int_transaccion= 1565754;
+--commit;
+UPDATE conta.tint_transaccion SET glosa='BOLIVIANA DE AVIACIÓN - Gastos de Viaje Transporte ( TKT CBB/LPB/CBB 16/03 INSPECCIÓN SUBESTACIÓN LA PALCA - MACHACA HERRERA NORMA KAREN ) Nro Doc: 9304877139027' WHERE id_int_transaccion= 1565754;
+--rollback
+--UPDATE conta.tint_transaccion SET glosa='BOLIVIANA DE AVIACIÓN - Gastos de Viaje Transporte ( TKT CBB/LPB/CBB 16/03 INSPECCIÓN SUBESTACIÓN LA PALCA ) Nro Doc: 9304877139027' WHERE id_int_transaccion= 1565755;
+--commit;
+UPDATE conta.tint_transaccion SET glosa='BOLIVIANA DE AVIACIÓN - Gastos de Viaje Transporte ( TKT CBB/LPB/CBB 16/03 INSPECCIÓN SUBESTACIÓN LA PALCA - MACHACA HERRERA NORMA KAREN ) Nro Doc: 9304877139027' WHERE id_int_transaccion= 1565755;
+/********************************************F-DAUP-MGM-CONTA-ETR-3450-26/03/2021********************************************/
