@@ -495,3 +495,46 @@ UPDATE conta.tint_transaccion SET glosa='BOLIVIANA DE AVIACIÓN - Gastos de Viaj
 --commit;
 UPDATE conta.tint_transaccion SET glosa='BOLIVIANA DE AVIACIÓN - Gastos de Viaje Transporte ( TKT CBB/LPB/CBB 16/03 INSPECCIÓN SUBESTACIÓN LA PALCA - MACHACA HERRERA NORMA KAREN ) Nro Doc: 9304877139027' WHERE id_int_transaccion= 1565755;
 /********************************************F-DAUP-MGM-CONTA-ETR-3450-26/03/2021********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-ETR-3526-06/04/2021********************************************/
+--rollback
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218741;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218740;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218730;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218673;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218651;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218647;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218637;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218634;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218633;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218630;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218625;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218606;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218589;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218586;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218584;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218582;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218572;
+--update conta.tdoc_compra_venta set sw_pgs='no' where id_doc_compra_venta=218566;
+--commit;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218741;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218740;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218730;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218673;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218651;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218647;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218637;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218634;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218633;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218630;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218625;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218606;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218589;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218586;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218584;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218582;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218572;
+update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218566;
+
+/********************************************F-DAUP-MGM-CONTA-ETR-3526-06/04/2021********************************************/
