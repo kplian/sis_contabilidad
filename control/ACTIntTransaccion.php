@@ -1698,6 +1698,28 @@ class ACTIntTransaccion extends ACTbase{
         $s= str_replace(';', '', $s);
         return $s;
     }
+
+    function editarGlosaAuxiliar(){
+		$this->objFunc=$this->create('MODIntTransaccion');	
+		$this->res=$this->objFunc->editarGlosaAuxiliar($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+    function listarHistorico(){
+        $this->objParam->defecto('ordenacion','id_historico');
+        $this->objParam->defecto('dir_ordenacion','desc');
+        if($this->objParam->getParametro('id_int_transaccion')!=''){
+            $this->objParam->addFiltro("h.id_int_transaccion = ".$this->objParam->getParametro('id_int_transaccion'));
+        }
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarHistorico');
+        } else{
+            $this->objFunc=$this->create('MODIntTransaccion');
+            $this->res=$this->objFunc->listarHistorico($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

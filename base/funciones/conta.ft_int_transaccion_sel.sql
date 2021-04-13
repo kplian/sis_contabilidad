@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -2689,6 +2691,76 @@ BEGIN
             return v_consulta;
         end;
         --------------#92 FIN-MMV------------
+        
+        
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_TRAHIST_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:04:55
+	***********************************/
+
+	elsif(p_transaccion='CONTA_TRAHIST_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+                        h.id_historico,
+                        h.id_int_transaccion,
+                        h.glosa,
+                        h.glosa_actual,
+                        h.id_auxiliar,
+                        aux.nombre_auxiliar,
+                        h.id_auxiliar_actual,
+                        aux1.nombre_auxiliar as nombre_auxiliar_actual,
+                        h.motivo,
+                        h.fecha_reg::timestamp,
+                        usu1.cuenta
+                        from conta.thistorico h
+                        inner join segu.tusuario usu1 on usu1.id_usuario = h.id_usuario_reg
+                        left join conta.tauxiliar aux on aux.id_auxiliar = h.id_auxiliar
+                        left join conta.tauxiliar aux1 on aux1.id_auxiliar = h.id_auxiliar_actual
+				        where  ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+            raise notice '%',v_consulta;
+           -- raise exception '%',v_consulta;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_TRAHIST_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:04:55
+	***********************************/
+
+	elsif(p_transaccion='CONTA_TRAHIST_CONT')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select
+                        count(h.id_historico)
+                        from conta.thistorico h
+                        inner join segu.tusuario usu1 on usu1.id_usuario = h.id_usuario_reg
+                        left join conta.tauxiliar aux on aux.id_auxiliar = h.id_auxiliar
+                        left join conta.tauxiliar aux1 on aux1.id_auxiliar = h.id_auxiliar_actual
+					    where ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+					        
+
+        
     else
 
         raise exception 'Transaccion inexistente';
@@ -2711,6 +2783,3 @@ CALLED ON NULL INPUT
 SECURITY INVOKER
 PARALLEL UNSAFE
 COST 100;
-
-ALTER FUNCTION conta.ft_int_transaccion_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;

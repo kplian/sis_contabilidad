@@ -853,7 +853,64 @@ BEGIN
       --Devuelve la respuesta
       return v_resp;
     end;     
-         
+   
+  
+    /*********************************    
+     #TRANSACCION:  'CONTA_GLOAUX_MOD'
+     #DESCRIPCION:  actuliza datos 
+     #AUTOR:    rensi (kplian)  
+     #FECHA:    04-08-2015 18:10:12
+    ***********************************/
+
+	elsif(p_transaccion='CONTA_GLOAUX_MOD')then
+
+    	begin      
+
+        	IF v_parametros.tipo_filtro = 'glosa' THEN
+            	UPDATE conta.tint_transaccion 
+                SET glosa = v_parametros.glosa
+                WHERE id_int_transaccion=v_parametros.id_int_transaccion; 
+                
+                INSERT INTO conta.thistorico(
+                id_int_transaccion,
+                glosa,id_auxiliar,
+                glosa_actual,id_auxiliar_actual,
+                motivo,
+                id_usuario_reg,fecha_reg) 
+                VALUES(
+                v_parametros.id_int_transaccion,
+                v_parametros.glosa,null,
+                v_parametros.glosa_actual,v_parametros.id_auxiliar_actual,
+                v_parametros.motivo,
+                p_id_usuario,now()); 
+                
+            ELSE
+            	UPDATE conta.tint_transaccion 
+                SET id_auxiliar= v_parametros.id_auxiliar
+                WHERE id_int_transaccion=v_parametros.id_int_transaccion;
+                
+                INSERT INTO conta.thistorico(
+                id_int_transaccion,
+                glosa,id_auxiliar,
+                glosa_actual,id_auxiliar_actual,
+                motivo,
+                id_usuario_reg,fecha_reg) 
+                VALUES(
+                v_parametros.id_int_transaccion,
+                null,v_parametros.id_auxiliar,
+                v_parametros.glosa_actual,v_parametros.id_auxiliar_actual,
+                v_parametros.motivo,
+                p_id_usuario,now());  
+            END IF;
+                        
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','se actualizaron datos'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);               
+            --Devuelve la respuesta
+            return v_resp;            
+    	end;
+  
+          
   else
      
       raise exception 'Transaccion inexistente, revise el código: %',p_transaccion;

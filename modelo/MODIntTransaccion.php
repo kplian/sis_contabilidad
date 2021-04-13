@@ -1242,5 +1242,56 @@ class MODIntTransaccion extends MODbase{
         $this->ejecutarConsulta();
         return $this->respuesta;
     }
+	//
+	function editarGlosaAuxiliar(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.ft_int_transaccion_ime';
+		$this->transaccion='CONTA_GLOAUX_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('tipo_filtro','tipo_filtro','varchar');
+		$this->setParametro('id_int_transaccion','id_int_transaccion','int4');
+		$this->setParametro('id_auxiliar','id_auxiliar','int4');
+		$this->setParametro('id_auxiliar_actual','id_auxiliar_actual','int4');
+		$this->setParametro('glosa','glosa','varchar');
+		$this->setParametro('glosa_actual','glosa_actual','varchar');
+		$this->setParametro('motivo','motivo','varchar');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	//
+	//mp
+	function listarHistorico(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='conta.ft_int_transaccion_sel';
+		$this->transaccion='CONTA_TRAHIST_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('id_int_transaccion','id_int_transaccion','int4');
+		//Definicion de la lista del resultado del query
+		$this->captura('id_historico','int4');
+		$this->captura('id_int_transaccion','int4');
+		$this->captura('glosa','varchar');
+		$this->captura('glosa_actual','varchar');
+		$this->captura('id_auxiliar','int4');
+		$this->captura('nombre_auxiliar','varchar');
+		$this->captura('id_auxiliar_actual','int4');
+		$this->captura('nombre_auxiliar_actual','varchar');
+		$this->captura('motivo','varchar');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('cuenta','varchar');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 }
 ?>

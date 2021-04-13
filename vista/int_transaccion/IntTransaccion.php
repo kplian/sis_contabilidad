@@ -77,39 +77,73 @@ Phx.vista.IntTransaccion=Ext.extend(Phx.gridInterfaz,{
 		   },this);
 		   
 		   
-		this.addButton('btnBanco',
-            {
-                text: 'Detalle Pago',
-                iconCls: 'bchecklist',
-                disabled: false,
-                handler: this.loadBanco,
-                tooltip: '<b>Detalle del Pago</b><br/>Si la transaccion afecta bancos esta opción permite regitrar datos relacioandos (forma de pago, etc) '
-            }
-        );
-        this.addButton('btnTransaccionesUpload',
-	            {
-	                text: 'Subir Trans.',	                
-	                iconCls: 'bchecklist',
-	                disabled: true,
-	                handler: this.SubirArchivo,
-	                tooltip: '<b>Subir Transacciones</b><br/>desde Excel (xlsx).'
-	            }
-	        );
-        
+		this.addButton('btnBanco',{
+			text: 'Detalle Pago',
+			iconCls: 'bchecklist',
+			disabled: false,
+			handler: this.loadBanco,
+			tooltip: '<b>Detalle del Pago</b><br/>Si la transaccion afecta bancos esta opción permite regitrar datos relacioandos (forma de pago, etc) '
+		});
+
+		this.addButton('btnTransaccionesUpload',{
+			text: 'Subir Trans.',
+			iconCls: 'bchecklist',
+			disabled: true,
+			handler: this.SubirArchivo,
+			tooltip: '<b>Subir Transacciones</b><br/>desde Excel (xlsx).'
+		});
+		//mp
+		this.addButton('btnMoficar',{
+			text: 'editar Glosa/Auxiliar',
+			iconCls: 'bchecklist',
+			disabled: true,
+			handler: this.editarGlosaAuxiliar,
+			tooltip: '<b>editar Glosa/Auxiliar</b>'
+		});
 	},
+	//
+	loadBanco:function() {
+            var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/BancoCbte.php',
+                    'Datos de la transacción.',
+                    {
+                        width:'40%',
+                        height:300
+                    },
+                    { detalle: rec.data,
+                      cbte: this.maestro },
+                    this.idContenedor,
+                    'BancoCbte');
+     },
 	SubirArchivo : function(rec)
-    {                   
-        
-    	Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/SubirArchivoTran.php',
-        'Subir Transacciones desde Excel',
-        {
-            modal:true,
-            width:450,
-            height:150
-        },this.maestro,this.idContenedor,'SubirArchivoTran');
-	   
-    },
-		
+	{
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/SubirArchivoTran.php',
+		'Subir Transacciones desde Excel',
+		{
+			modal:true,
+			width:450,
+			height:150
+		},this.maestro,this.idContenedor,'SubirArchivoTran');
+	},
+	//
+	editarGlosaAuxiliar : function()
+	{
+		var rec=this.sm.getSelected();
+		Phx.CP.loadWindows('../../../sis_contabilidad/vista/int_transaccion/editarGlosaAuxiliar.php',
+		'Editar Glosa/Auxiliar',
+		{
+			modal:true,
+			width:1000,
+			height:400
+		},
+		{ 
+			detalle: rec.data,
+			cbte: this.maestro
+		},
+		this.idContenedor,
+		'editarGlosaAuxiliar');
+	},
+	//	
 	Atributos:[
 		{
 			//configuracion del componente
