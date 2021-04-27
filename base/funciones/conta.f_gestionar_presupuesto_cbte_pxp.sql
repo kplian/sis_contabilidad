@@ -494,7 +494,6 @@ BEGIN
                                                                                      
                                        END IF; --if la transacion tiene reversion
                                        
-
                                         
                                  END IF;  --fin if es partida presupuestaria
                                  
