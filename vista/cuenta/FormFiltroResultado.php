@@ -230,7 +230,7 @@ Phx.vista.FormFiltroResultado=Ext.extend(Phx.frmInterfaz,{
 	       		},
 	       		type:'ComboBox',
 	       		id_grupo:0,
-	       		valorInicial: 'no',
+	       		valorInicial: 'si',
 	       		form:true
 	     }
 	       	
