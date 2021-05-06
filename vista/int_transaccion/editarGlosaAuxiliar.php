@@ -39,6 +39,8 @@ Phx.vista.editarGlosaAuxiliar=Ext.extend(Phx.frmInterfaz,{
         Phx.CP.getPagina(manu).reload();
         this.panel.close();
         alert('La modificacion fue existosa.');
+        this.getComponente('motivo').setValue();
+        this.Cmp.glosa.reset();
     },
     //
     Atributos:[
@@ -84,7 +86,10 @@ Phx.vista.editarGlosaAuxiliar=Ext.extend(Phx.frmInterfaz,{
                 fieldLabel: 'Auxiliar Actual',
                 readOnly:true,
                 width: 270,
-                renderer: function(val){if (val != ''){return '<div class="gridmultiline">'+val+'</div>';}}
+                renderer: function(val){if (val != ''){
+                    return '<div class="gridmultiline">'+val+'</div>';
+                    }
+                }
             },
             type:'TextField',
             id_grupo:0,
@@ -106,7 +111,7 @@ Phx.vista.editarGlosaAuxiliar=Ext.extend(Phx.frmInterfaz,{
             id_grupo:0,
             form:true
         },
-        {
+        { 
             config:{
                 sysorigen:'sis_contabilidad',
                 name:'id_auxiliar',
@@ -116,8 +121,7 @@ Phx.vista.editarGlosaAuxiliar=Ext.extend(Phx.frmInterfaz,{
                 gdisplayField:'desc_auxiliar',
                 width: 270,
                 listWidth: 270,
-                renderer:function (value, p, record){return String.format('{0}', record.data['desc_auxiliar']);}
-                },
+            },
             type:'ComboRec',
             id_grupo:0,
             filters:{
