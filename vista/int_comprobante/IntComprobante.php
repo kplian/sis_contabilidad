@@ -1674,25 +1674,8 @@ Phx.vista.IntComprobante = Ext.extend(Phx.gridInterfaz, {
       	var rec=this.sm.getSelected();      
       	//Phx.vista.IntComprobante.superclass.obtenerVariableGlobal('conta_generar_lb_manual_oc');
       	
-        //#ETR-2687-1  
-      	if (rec.data.estado_reg=='vbcbte' && rec.data.manual=='no' && rec.data.banco=='si'  && (rec.data.codigo_clase=='PAGO' || rec.data.codigo_clase=='PAGOCON' || rec.data.codigo_clase=='INGRESO' || rec.data.codigo_clase=='INGRESOCON') && rec.data.prioridad_depto==0){
-      		if (rec.data.lb=='ninguno'){
-      			if (confirm("No se ha generado aun un registro en LB, desea continuar de todas formas?") ){
-      				this.mostrarWizard(rec, true);
-      			}
-      		}else{
-      			if (rec.data.lb=='borrador'){
-      				alert("Existe un registro en LB que no fue procesado aun. Por favor verifique dicho registro antes de continuar");
-      			}else{
-      				this.mostrarWizard(rec, true);
-      			}
-      		}
-      		
-      	}else{
-      		
-      		this.mostrarWizard(rec, true);
-      	}
-      	
+        this.mostrarWizard(rec, true);
+      
       	
       	
                
