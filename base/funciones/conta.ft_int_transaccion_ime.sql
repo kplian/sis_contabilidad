@@ -853,7 +853,82 @@ BEGIN
       --Devuelve la respuesta
       return v_resp;
     end;     
-         
+   
+  
+    /*********************************    
+     #TRANSACCION:  'CONTA_GLOAUX_MOD'
+     #DESCRIPCION:  actuliza datos 
+     #AUTOR:    rensi (kplian)  
+     #FECHA:    04-08-2015 18:10:12
+    ***********************************/
+
+	elsif(p_transaccion='CONTA_GLOAUX_MOD')then
+
+    	begin      
+
+        	IF v_parametros.tipo_filtro = 'glosa' THEN
+            	UPDATE conta.tint_transaccion 
+                SET glosa = v_parametros.glosa
+                WHERE id_int_transaccion=v_parametros.id_int_transaccion; 
+                
+                INSERT INTO conta.thistorico(
+                id_int_transaccion,
+                glosa,id_auxiliar,
+                glosa_actual,id_auxiliar_actual,
+                motivo,
+                id_usuario_reg,fecha_reg) 
+                VALUES(
+                v_parametros.id_int_transaccion,
+                v_parametros.glosa,null,
+                v_parametros.glosa_actual,v_parametros.id_auxiliar_actual,
+                v_parametros.motivo,
+                p_id_usuario,now()); 
+                
+            ELSE
+            	SELECT i.id_cuenta
+                INTO v_id_cuenta
+                FROM conta.tint_transaccion i
+                WHERE i.id_int_transaccion=v_parametros.id_int_transaccion; 
+                
+            	SELECT c.ex_auxiliar,c.sw_auxiliar
+                INTO v_valor,v_cambio
+                FROM conta.tcuenta c 
+                WHERE c.id_cuenta=v_id_cuenta;                                 
+                
+                IF v_valor='si' AND v_parametros.id_auxiliar IS NULL THEN
+                    RAISE EXCEPTION 'El auxiliar es obligatorio para esta cuenta';
+                END IF;
+                
+                IF v_cambio='no' AND v_parametros.id_auxiliar IS NOT NULL THEN
+                    RAISE EXCEPTION 'El auxiliar no esta permitido para esta cuenta';
+                END IF;
+                
+            	UPDATE conta.tint_transaccion 
+                SET id_auxiliar= v_parametros.id_auxiliar
+                WHERE id_int_transaccion=v_parametros.id_int_transaccion;
+                
+                INSERT INTO conta.thistorico(
+                id_int_transaccion,
+                glosa,id_auxiliar,
+                glosa_actual,id_auxiliar_actual,
+                motivo,
+                id_usuario_reg,fecha_reg) 
+                VALUES(
+                v_parametros.id_int_transaccion,
+                null,v_parametros.id_auxiliar,
+                v_parametros.glosa_actual,v_parametros.id_auxiliar_actual,
+                v_parametros.motivo,
+                p_id_usuario,now());  
+            END IF;
+                        
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','se actualizaron datos'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_int_transaccion',v_parametros.id_int_transaccion::varchar);               
+            --Devuelve la respuesta
+            return v_resp;            
+    	end;
+  
+          
   else
      
       raise exception 'Transaccion inexistente, revise el código: %',p_transaccion;

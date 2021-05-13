@@ -499,17 +499,6 @@ BEGIN
                                        END IF; --if la transacion tiene reversion
                                        
                                        
-                                       
-                                       --#ETR-2141
-                                       IF v_monto_desc_anticipo > 0 and v_monto_cmp_aux=0 THEN
-                                       
-												v_resp_tes:=(select (tes.f_gestionar_presupuesto_tesoreria((select p.id_obligacion_pago from tes.tplan_pago p where p.id_int_comprobante=p_id_int_comprobante) ,
-                                                  p_id_usuario ,
-                                                  'revertir_anticipo'  ,
-                                                  (select p.id_plan_pago from tes.tplan_pago p where p.id_int_comprobante=p_id_int_comprobante),
-                                                  null)));
-                                                  
-                                       END IF;
                                         
                                  END IF;  --fin if es partida presupuestaria
                                  

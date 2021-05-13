@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.f_auxiliar_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -33,7 +35,8 @@ DECLARE
     v_inner 			varchar;
     v_filtor_tipo_cc	varchar;
     v_id_cuenta_permitidas	varchar;
-    v_add_filtro	varchar;
+    v_add_filtro		varchar;
+    v_auxiliar			varchar;
 
 BEGIN
 
@@ -86,8 +89,13 @@ BEGIN
                  v_add_filtro = v_add_filtro|| '(auxcta.codigo_auxiliar like ''FUN%'' or auxcta.codigo_auxiliar like ''ODT%'') and';
               END IF;
             END IF;
-
-
+			
+          /*  IF v_add_filtro is not null THEN
+				v_auxiliar=
+            ELSE
+            	v_auxiliar=
+            END IF;
+*/
 
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -104,7 +112,8 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         auxcta.corriente,
-                        auxcta.aplicacion
+                        auxcta.aplicacion,
+                        auxcta.estado
 						from conta.tauxiliar auxcta
 						inner join segu.tusuario usu1 on usu1.id_usuario = auxcta.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = auxcta.id_usuario_mod
@@ -118,6 +127,7 @@ BEGIN
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;
+             --RAISE exception 'v_consulta %',v_consulta;
 			return v_consulta;
 
 		end;
@@ -204,4 +214,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

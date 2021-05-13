@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION conta.ft_int_transaccion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -63,7 +65,11 @@ DECLARE
     v_atributos         varchar;
     v_filto_nro         varchar; -- MMV #10
     v_filtro_internacional varchar;--#65
-
+    v_inner 			varchar;
+	v_add_filtro		varchar;
+    v_filtor_tipo_cc	varchar;
+    v_id_cuenta_permitidas	varchar;
+    v_id_cuenta 		integer;
 BEGIN
 
     v_nombre_funcion = 'conta.ft_int_transaccion_sel';
@@ -2689,6 +2695,240 @@ BEGIN
             return v_consulta;
         end;
         --------------#92 FIN-MMV------------
+        
+        
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_TRAHIST_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:04:55
+	***********************************/
+
+	elsif(p_transaccion='CONTA_TRAHIST_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+                        h.id_historico,
+                        h.id_int_transaccion,
+                        h.glosa,
+                        h.glosa_actual,
+                        h.id_auxiliar,
+                        aux.nombre_auxiliar,
+                        h.id_auxiliar_actual,
+                        concat(aux.codigo_auxiliar ||''-'' ||aux1.nombre_auxiliar)::varchar as nombre_auxiliar_actual,
+                        h.motivo,
+                        h.fecha_reg::timestamp,
+                        usu1.cuenta
+                        from conta.thistorico h
+                        inner join segu.tusuario usu1 on usu1.id_usuario = h.id_usuario_reg
+                        left join conta.tauxiliar aux on aux.id_auxiliar = h.id_auxiliar
+                        left join conta.tauxiliar aux1 on aux1.id_auxiliar = h.id_auxiliar_actual
+				        where  ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+            raise notice '%',v_consulta;
+            --raise exception '%',v_consulta;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_TRAHIST_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:04:55
+	***********************************/
+
+	elsif(p_transaccion='CONTA_TRAHIST_CONT')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select
+                        count(h.id_historico)
+                        from conta.thistorico h
+                        inner join segu.tusuario usu1 on usu1.id_usuario = h.id_usuario_reg
+                        left join conta.tauxiliar aux on aux.id_auxiliar = h.id_auxiliar
+                        left join conta.tauxiliar aux1 on aux1.id_auxiliar = h.id_auxiliar_actual
+					    where ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+					        
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_AUXMOD_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:04:55
+	***********************************/
+
+	elsif(p_transaccion='CONTA_AUXMOD_SEL')then
+     				
+    	begin
+        	v_inner = '';
+            v_add_filtro   = '0=0  and ';
+
+            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN
+            	v_inner = 'inner join conta.tcuenta_auxiliar c on  c.id_auxiliar = auxcta.id_auxiliar and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
+            END IF;
+
+            v_filtor_tipo_cc = pxp.f_get_variable_global('conta_filtrar_cuenta_por_tipo_cc_interface_junior');
+
+            IF v_filtor_tipo_cc = 'si'  and   pxp.f_existe_parametro(p_tabla, 'id_centro_costo')  THEN
+                select pxp.list(tccc.id_auxiliar::varchar)
+                into v_id_cuenta_permitidas
+                from conta.ttipo_cc_cuenta tccc
+                inner join param.tcentro_costo cc on tccc.id_tipo_cc = cc.id_tipo_cc
+                where cc.id_centro_costo = v_parametros.id_centro_costo;
+                v_add_filtro = '  auxcta.id_auxiliar in ('|| COALESCE(v_id_cuenta_permitidas,'0') ||')  and ';
+            END IF;
+
+            IF pxp.f_existe_parametro(p_tabla,'no_es_proveedor') THEN
+              IF v_parametros.no_es_proveedor = 'si' THEN
+                 v_add_filtro = v_add_filtro|| 'pro.id_proveedor is null and ';
+              END IF;
+            END IF;
+
+            IF pxp.f_existe_parametro(p_tabla,'es_funcionario') THEN
+              IF v_parametros.es_funcionario = 'si' THEN
+                 v_add_filtro = v_add_filtro|| '(auxcta.codigo_auxiliar like ''FUN%'' or auxcta.codigo_auxiliar like ''ODT%'') and';
+              END IF;
+            END IF;
+            
+            SELECT i.id_cuenta
+            INTO v_id_cuenta 
+            FROM conta.tint_transaccion i
+            WHERE i.id_int_transaccion = v_parametros.id_int_transaccion;
+            
+            SELECT  pxp.list(ca.id_auxiliar::varchar)
+            INTO v_tipo_cc
+            FROM conta.tcuenta_auxiliar ca
+            JOIN conta.tcuenta c on c.id_cuenta = ca.id_cuenta
+            WHERE ca.id_cuenta=v_id_cuenta; 
+            
+            IF v_tipo_cc IS NULL THEN
+        		raise EXCEPTION 'No existe ningun auxiliar relacionado a esta cuenta';
+            END IF;
+
+            v_add_filtro = v_add_filtro|| 'auxcta.id_auxiliar in ('||v_tipo_cc||') and ';                    
+            
+    		--Sentencia de la consulta
+			v_consulta:='select
+						auxcta.id_auxiliar,
+						auxcta.id_empresa,
+						emp.nombre,
+						auxcta.estado_reg,
+						auxcta.codigo_auxiliar,
+						auxcta.nombre_auxiliar,
+						auxcta.fecha_reg,
+						auxcta.id_usuario_reg,
+						auxcta.id_usuario_mod,
+						auxcta.fecha_mod,
+						usu1.cuenta as usr_reg,
+						usu2.cuenta as usr_mod,
+                        auxcta.corriente,
+                        auxcta.aplicacion
+						from conta.tauxiliar auxcta
+						inner join segu.tusuario usu1 on usu1.id_usuario = auxcta.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = auxcta.id_usuario_mod
+				        left join param.tempresa emp on emp.id_empresa=auxcta.id_empresa
+                        left join param.tproveedor pro on pro.id_auxiliar = auxcta.id_auxiliar 
+                        '|| v_inner || '
+				        where auxcta.estado=''si'' and '||v_add_filtro;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			--Devuelve la respuesta
+            RAISE NOTICE 'v_consulta %',v_consulta;
+            --RAISE EXCEPTION 'v_consulta %',v_consulta;
+			return v_consulta;
+						
+		end;
+
+	/*********************************    
+ 	#TRANSACCION:  'CONTA_AUXMOD_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-09-2013 18:04:55
+	***********************************/
+
+	elsif(p_transaccion='CONTA_AUXMOD_CONT')then
+
+		begin
+       
+        	v_inner = '';
+            v_add_filtro   = '0=0  and ';
+
+            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN
+            	v_inner = 'inner join conta.tcuenta_auxiliar c on  c.id_auxiliar = auxcta.id_auxiliar and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
+            END IF;
+
+            v_filtor_tipo_cc = pxp.f_get_variable_global('conta_filtrar_cuenta_por_tipo_cc_interface_junior');
+
+            IF v_filtor_tipo_cc = 'si'  and   pxp.f_existe_parametro(p_tabla, 'id_centro_costo')  THEN
+                select pxp.list(tccc.id_auxiliar::varchar)
+                into v_id_cuenta_permitidas
+                from conta.ttipo_cc_cuenta tccc
+                inner join param.tcentro_costo cc on tccc.id_tipo_cc = cc.id_tipo_cc
+                where cc.id_centro_costo = v_parametros.id_centro_costo;
+                v_add_filtro = '  auxcta.id_auxiliar in ('|| COALESCE(v_id_cuenta_permitidas,'0') ||')  and ';
+            END IF;
+
+            IF pxp.f_existe_parametro(p_tabla,'no_es_proveedor') THEN
+              IF v_parametros.no_es_proveedor = 'si' THEN
+                 v_add_filtro = v_add_filtro|| 'pro.id_proveedor is null and ';
+              END IF;
+            END IF;
+
+            IF pxp.f_existe_parametro(p_tabla,'es_funcionario') THEN
+              IF v_parametros.es_funcionario = 'si' THEN
+                 v_add_filtro = v_add_filtro|| '(auxcta.codigo_auxiliar like ''FUN%'' or auxcta.codigo_auxiliar like ''ODT%'') and';
+              END IF;
+            END IF;
+            
+            SELECT i.id_cuenta
+            INTO v_id_cuenta 
+            FROM conta.tint_transaccion i
+            WHERE i.id_int_transaccion = v_parametros.id_int_transaccion;
+            
+            SELECT  pxp.list(ca.id_auxiliar::varchar)
+            INTO v_tipo_cc
+            FROM conta.tcuenta_auxiliar ca
+            JOIN conta.tcuenta c on c.id_cuenta = ca.id_cuenta
+            WHERE ca.id_cuenta=v_id_cuenta;
+             
+			IF v_tipo_cc IS NULL THEN
+        		raise EXCEPTION 'No existe ningun auxiliar relacionado a esta cuenta';
+            END IF;
+            
+            v_add_filtro = v_add_filtro|| 'auxcta.id_auxiliar in ('||v_tipo_cc||') and ';
+
+            v_consulta:='select count(auxcta.id_auxiliar)
+					    from conta.tauxiliar auxcta
+						inner join segu.tusuario usu1 on usu1.id_usuario = auxcta.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = auxcta.id_usuario_mod
+				        left join param.tempresa emp on emp.id_empresa=auxcta.id_empresa
+                        left join param.tproveedor pro on pro.id_auxiliar = auxcta.id_auxiliar 
+                        '|| v_inner || '
+				        where auxcta.estado=''si'' and '||v_add_filtro;
+            
+			v_consulta:=v_consulta||v_parametros.filtro;
+            RAISE  NOTICE 'v_consulta %',v_consulta;
+            --RAISE  exception 'v_consulta %',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+        
     else
 
         raise exception 'Transaccion inexistente';
@@ -2711,6 +2951,3 @@ CALLED ON NULL INPUT
 SECURITY INVOKER
 PARALLEL UNSAFE
 COST 100;
-
-ALTER FUNCTION conta.ft_int_transaccion_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;

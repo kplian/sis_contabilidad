@@ -245,7 +245,25 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:false
-		}
+		},
+		{
+			config:{
+				name:'estado',
+				fieldLabel:'Estado',
+				allowBlank:true,
+				emptyText:'Estado...',
+				typeAhead: true,
+				triggerAction: 'all',
+				lazyRender:true,
+				mode: 'local',
+				gwidth: 100,
+				store:['si','no']
+			},
+			type:'ComboBox',
+			id_grupo:0,
+			grid:true,
+			form:true
+		},
 	],
 	
 	title:'Auxiliares de Cuenta',
@@ -267,6 +285,7 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		{name:'aplicacion', type: 'string'},
+		{name:'estado', type: 'string'},
 		'corriente'
 	],
 	sortInfo:{

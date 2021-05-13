@@ -66,7 +66,8 @@ BEGIN
 			id_usuario_mod,
 			fecha_mod,
             corriente,
-            aplicacion
+            aplicacion,
+            estado
           	) values(
 			--v_parametros.id_empresa,
 			'activo',
@@ -77,8 +78,8 @@ BEGIN
 			null,
 			null,
             v_parametros.corriente,
-            v_parametros.aplicacion
-							
+            v_parametros.aplicacion,
+			v_parametros.estado				
 			)RETURNING id_auxiliar into v_id_auxiliar;
 			
 			--Definicion de la respuesta
@@ -108,7 +109,8 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
             corriente = v_parametros.corriente,
-            aplicacion=v_parametros.aplicacion
+            aplicacion=v_parametros.aplicacion,
+        	estado=v_parametros.estado
 			where id_auxiliar=v_parametros.id_auxiliar;
                
 			--Definicion de la respuesta
@@ -219,4 +221,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

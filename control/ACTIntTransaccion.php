@@ -1698,6 +1698,52 @@ class ACTIntTransaccion extends ACTbase{
         $s= str_replace(';', '', $s);
         return $s;
     }
+
+    function editarGlosaAuxiliar(){
+		$this->objFunc=$this->create('MODIntTransaccion');	
+		$this->res=$this->objFunc->editarGlosaAuxiliar($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+    function listarHistorico(){
+        $this->objParam->defecto('ordenacion','id_historico');
+        $this->objParam->defecto('dir_ordenacion','desc');
+        if($this->objParam->getParametro('id_int_transaccion')!=''){
+            $this->objParam->addFiltro("h.id_int_transaccion = ".$this->objParam->getParametro('id_int_transaccion'));
+        }
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarHistorico');
+        } else{
+            $this->objFunc=$this->create('MODIntTransaccion');
+            $this->res=$this->objFunc->listarHistorico($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    //
+    function listarAuxiliarMod(){
+        $this->objParam->defecto('ordenacion','id_auxiliar');
+        $this->objParam->defecto('dir_ordenacion','asc');
+        if($this->objParam->getParametro('id_cuenta')!=''){
+            $this->objParam->addFiltro("auxcta.id_auxiliar IN (select id_auxiliar 
+                                        from conta.tcuenta_auxiliar where estado_reg = ''activo'' and id_cuenta = ".$this->objParam->getParametro('id_cuenta') . ") ");    
+        }
+        if($this->objParam->getParametro('id_auxiliar')!=''){
+            $this->objParam->addFiltro("auxcta.id_auxiliar =".$this->objParam->getParametro('id_auxiliar'));
+        }
+        if($this->objParam->getParametro('corriente')!=''){
+            $this->objParam->addFiltro("auxcta.corriente = ''".$this->objParam->getParametro('corriente')."''");
+        }
+        
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODIntTransaccion','listarAuxiliarMod');
+        } else{
+            $this->objFunc=$this->create('MODIntTransaccion');
+            $this->res=$this->objFunc->listarAuxiliarMod($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

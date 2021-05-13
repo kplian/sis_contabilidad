@@ -5312,4 +5312,20 @@ IS 'campo disponible para la transcripción del nro de nota de débito por parte
 
 
 
+/***********************************I-SCP-MGM-CONTA-ETR-3258-13/04/2021****************************************/
 
+CREATE TABLE conta.thistorico (
+  id_historico SERIAL,
+  glosa VARCHAR,
+  id_auxiliar INTEGER,
+  motivo VARCHAR,
+  glosa_actual VARCHAR,
+  id_auxiliar_actual INTEGER,
+  id_int_transaccion INTEGER,
+  CONSTRAINT thistorico_pkey PRIMARY KEY(id_historico)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE conta.thistorico
+  OWNER TO postgres;
+  /***********************************F-SCP-MGM-CONTA-ETR-3258-13/01/2021****************************************/
