@@ -47,7 +47,7 @@ class MODAuxiliar extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('corriente','varchar');
 		$this->captura('aplicacion','varchar');//////EGS- 30/08/2018--  1A
-		
+		$this->captura('estado','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -70,7 +70,7 @@ class MODAuxiliar extends MODbase{
 		$this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
 		$this->setParametro('corriente','corriente','varchar');
 		$this->setParametro('aplicacion','aplicacion','varchar');//////EGS- 30/08/2018--  1A
-		
+		$this->setParametro('estado','estado','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -94,7 +94,8 @@ class MODAuxiliar extends MODbase{
 		$this->setParametro('nombre_auxiliar','nombre_auxiliar','varchar');
 		$this->setParametro('corriente','corriente','varchar');
 		$this->setParametro('aplicacion','aplicacion','varchar'); //////EGS- 30/08/2018--  1A
-		
+		$this->setParametro('estado','estado','varchar');
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

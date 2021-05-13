@@ -6246,3 +6246,9 @@ AS
        LEFT JOIN conta.ttipo_relacion_comprobante trc ON
         trc.id_tipo_relacion_comprobante = incbte.id_tipo_relacion_comprobante;
 /**********************************F-DEP-MZM-CONTA-ETR-2687-22/02/2021****************************************/
+
+
+/**********************************I-DEP-MGM-CONTA-ETR-3258-13/05/2021****************************************/
+ALTER TABLE conta.tauxiliar
+  ADD COLUMN estado VARCHAR(10) DEFAULT 'no';
+/**********************************F-DEP-MGM-CONTA-ETR-3258-13/05/2021****************************************/

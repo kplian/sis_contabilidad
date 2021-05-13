@@ -13,6 +13,7 @@ Phx.vista.editarGlosaAuxiliar=Ext.extend(Phx.frmInterfaz,{
     {
         var me = this;
         Phx.vista.editarGlosaAuxiliar.superclass.constructor.call(this,config);
+        this.Cmp.id_auxiliar.store.baseParams.id_int_transaccion = this.detalle.id_int_transaccion;
         this.iniciarEventos();
         this.init();
         this.loadValoresIniciales();
@@ -113,22 +114,44 @@ Phx.vista.editarGlosaAuxiliar=Ext.extend(Phx.frmInterfaz,{
         },
         { 
             config:{
-                sysorigen:'sis_contabilidad',
                 name:'id_auxiliar',
-                origen:'AUXILIAR',
                 allowBlank:true,
                 fieldLabel:'Auxiliar a Modificar',
-                gdisplayField:'desc_auxiliar',
-                width: 270,
-                listWidth: 270,
+                emptyText:'Auxiliar...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_contabilidad/control/IntTransaccion/listarAuxiliarMod',
+                    id: 'id_auxiliar',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'nombre_auxiliar',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_auxiliar','nombre_auxiliar','codigo_auxiliar','fecha_reg'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'codigo_auxiliar#nombre_auxiliar'}
+                }),
+                valueField : 'id_auxiliar',
+                displayField : 'nombre_auxiliar',
+                gdisplayField : 'desc_auxiliar',
+                hiddenName : 'id_auxiliar',
+                typeAhead : false,
+                triggerAction : 'all',
+                lazyRender : true,
+                mode : 'remote',
+                pageSize : 15,
+                queryDelay : 1000,
+                width : 250,
+                anchor : '100%',
+                gwidth : 150,
+                minChars : 2,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_auxiliar}</p><p>Nombre:{nombre_auxiliar}</p> </div></tpl>',
+                renderer : function(value, p, record) {
+                    return String.format('{0}', record.data['desc_auxiliar']);
+                }
             },
-            type:'ComboRec',
+            type:'ComboBox',
             id_grupo:0,
-            filters:{
-                pfiltro:'au.codigo_auxiliar#au.nombre_auxiliar',
-                type:'string'
-            },
-            grid:true,
             form:true
         },
         {

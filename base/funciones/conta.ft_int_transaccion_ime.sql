@@ -885,21 +885,24 @@ BEGIN
                 p_id_usuario,now()); 
                 
             ELSE
+            	SELECT i.id_cuenta
+                INTO v_id_cuenta
+                FROM conta.tint_transaccion i
+                WHERE i.id_int_transaccion=v_parametros.id_int_transaccion; 
+                
             	SELECT c.ex_auxiliar,c.sw_auxiliar
                 INTO v_valor,v_cambio
-                FROM conta.tcuenta c
-                JOIN conta.tcuenta_auxiliar ca ON ca.id_cuenta=c.id_cuenta
-                JOIN conta.tauxiliar a ON a.id_auxiliar= ca.id_auxiliar 
-                WHERE a.id_auxiliar=v_parametros.id_auxiliar_actual;
+                FROM conta.tcuenta c 
+                WHERE c.id_cuenta=v_id_cuenta;                                 
                 
-            	IF v_parametros.id_auxiliar_actual IS NULL AND v_valor='si' THEN
-                    RAISE EXCEPTION 'El auxiliar es obligatorio';
-                ELSE
-                	IF v_parametros.id_auxiliar_actual IS NULL AND v_cambio='si' THEN
-                    	RAISE EXCEPTION 'No se permite esta acción';
-                    END if;			
+                IF v_valor='si' AND v_parametros.id_auxiliar IS NULL THEN
+                    RAISE EXCEPTION 'El auxiliar es obligatorio para esta cuenta';
                 END IF;
-
+                
+                IF v_cambio='no' AND v_parametros.id_auxiliar IS NOT NULL THEN
+                    RAISE EXCEPTION 'El auxiliar no esta permitido para esta cuenta';
+                END IF;
+                
             	UPDATE conta.tint_transaccion 
                 SET id_auxiliar= v_parametros.id_auxiliar
                 WHERE id_int_transaccion=v_parametros.id_int_transaccion;

@@ -1292,6 +1292,40 @@ class MODIntTransaccion extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	//
+	function listarAuxiliarMod(){
+		$this->procedimiento='conta.ft_int_transaccion_sel';
+		$this->transaccion='CONTA_AUXMOD_SEL';
+		$this->tipo_procedimiento='SEL';
+		
+		$this->setParametro('id_cuenta','id_cuenta','int4');	
+		$this->setParametro('id_centro_costo','id_centro_costo','int4');
+		$this->setParametro('no_es_proveedor','no_es_proveedor','varchar');
+		$this->setParametro('es_funcionario','es_funcionario','varchar');
+		$this->setParametro('id_int_transaccion','id_int_transaccion','int4');
 
+		//Definicion de la lista del resultado del query
+		$this->captura('id_auxiliar','int4');
+		$this->captura('id_empresa','int4');
+		$this->captura('nombre','varchar');
+		$this->captura('estado_reg','varchar');
+		$this->captura('codigo_auxiliar','varchar');
+		$this->captura('nombre_auxiliar','varchar');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		$this->captura('corriente','varchar');
+		$this->captura('aplicacion','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 }
 ?>
