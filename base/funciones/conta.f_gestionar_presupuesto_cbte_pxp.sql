@@ -1,19 +1,14 @@
--- FUNCTION: conta.f_gestionar_presupuesto_cbte_pxp(integer, integer, character varying, date, character varying)
+--------------- SQL ---------------
 
--- DROP FUNCTION conta.f_gestionar_presupuesto_cbte_pxp(integer, integer, character varying, date, character varying);
-
-CREATE OR REPLACE FUNCTION conta.f_gestionar_presupuesto_cbte_pxp(
-	p_id_usuario integer,
-	p_id_int_comprobante integer,
-	p_igualar character varying DEFAULT 'no'::character varying,
-	p_fecha_ejecucion date DEFAULT NULL::date,
-	p_conexion character varying DEFAULT NULL::character varying)
-    RETURNS character varying
-    LANGUAGE 'plpgsql'
-
-    COST 100
-    VOLATILE 
-AS $BODY$
+CREATE OR REPLACE FUNCTION conta.f_gestionar_presupuesto_cbte_pxp (
+  p_id_usuario integer,
+  p_id_int_comprobante integer,
+  p_igualar varchar = 'no'::character varying,
+  p_fecha_ejecucion date = NULL::date,
+  p_conexion varchar = NULL::character varying
+)
+RETURNS varchar AS
+$body$
 /*
 	Autor: RAC (KPLIAN)
     Fecha: 06-04-2016
@@ -27,7 +22,7 @@ AS $BODY$
  #88, ETR       25/02/2018              RAC KPLIAN           Hscer opcional la reversion del IVA comprometido 
  #0 , ETR       29/03/2018              RAC KPLIAN           mejorar mensaje de error de presupeusto
  #13, ETR       03/01/2019              RAC KPLIAN           Se considera la opcion de forzar comprometido 
- #ETR-2141		19.01.2021				MZM KPLIAN			 
+ 
           
      
 */
@@ -81,7 +76,7 @@ DECLARE
  v_conta_revertir_iva_comprometido   varchar; --#88 ++
  v_comprometer                       varchar; --#13 ++
   
-  v_resp_tes	boolean;  --#ETR-2141
+    
 BEGIN
    
 
@@ -146,7 +141,7 @@ BEGIN
        p_fecha_ejecucion = v_registros_comprobante.fecha::date;  --, fecha del comprobante
      END IF;
 
-  
+     
      IF v_registros_comprobante.momento = 'presupuestario' THEN
     
              --recuepra el error maximo por  redondeo
@@ -324,6 +319,7 @@ BEGIN
                                         
                                         
                                         
+                                       
                                         
                                         --#32 monto que no ejecuta presupeusto retencion de antiicpo
                                         v_monto_desc_anticipo = v_registros.monto_no_ejecutado;                                         
@@ -498,7 +494,7 @@ BEGIN
                                                                                      
                                        END IF; --if la transacion tiene reversion
                                        
-                                       
+
                                         
                                  END IF;  --fin if es partida presupuestaria
                                  
@@ -669,7 +665,9 @@ WHEN OTHERS THEN
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$BODY$;
-
-ALTER FUNCTION conta.f_gestionar_presupuesto_cbte_pxp(integer, integer, character varying, date, character varying)
-    OWNER TO postgres;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;
