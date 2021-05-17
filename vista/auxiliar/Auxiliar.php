@@ -249,7 +249,7 @@ Phx.vista.Auxiliar=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name:'estado',
-				fieldLabel:'Estado',
+				fieldLabel:'¿En uso?',
 				allowBlank:true,
 				emptyText:'Estado...',
 				typeAhead: true,
