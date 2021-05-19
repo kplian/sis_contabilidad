@@ -539,7 +539,7 @@ update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218566
 
 /********************************************F-DAUP-MGM-CONTA-ETR-3526-06/04/2021********************************************/
 
-/********************************************I-DAUP-MGM-CONTA-ETR-3973-17/05/2021********************************************/
---UPDATE conta.tdoc_compra_venta SET nro_documento=718,fecha='15/04/2021',id_periodo=52 WHERE id_doc_compra_venta=227749;
-UPDATE conta.tdoc_compra_venta SET nro_documento=721,fecha='01/05/2021',id_periodo=53 WHERE id_doc_compra_venta=227749;
-/********************************************F-DAUP-MGM-CONTA-ETR-3973-17/05/2021********************************************/
+/********************************************I-DAUP-MGM-CONTA-ETR-3973-19/05/2021********************************************/
+--update conta.tauxiliar set estado='no';
+update conta.tauxiliar set estado='si';
+/********************************************F-DAUP-MGM-CONTA-ETR-3973-19/05/2021********************************************/

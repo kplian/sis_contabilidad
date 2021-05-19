@@ -6252,3 +6252,8 @@ AS
 ALTER TABLE conta.tauxiliar
   ADD COLUMN estado VARCHAR(10) DEFAULT 'no';
 /**********************************F-DEP-MGM-CONTA-ETR-3258-13/05/2021****************************************/
+
+/**********************************I-DEP-MGM-CONTA-ETR-3258-19/05/2021****************************************/
+ALTER TABLE conta.tauxiliar
+  ALTER COLUMN estado SET DEFAULT 'si'::character varying;
+  /**********************************F-DEP-MGM-CONTA-ETR-3258-19/05/2021****************************************/
