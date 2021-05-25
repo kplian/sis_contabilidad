@@ -543,3 +543,15 @@ update conta.tdoc_compra_venta set sw_pgs='reg' where id_doc_compra_venta=218566
 --update conta.tauxiliar set estado='no';
 update conta.tauxiliar set estado='si';
 /********************************************F-DAUP-MGM-CONTA-ETR-3973-19/05/2021********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-ETR-4078-25/02/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_comprobante SET beneficiario='SERVIDUMBRES - VIRGILIO VILLCA CONDOR' WHERE id_int_comprobante=117092;
+--commit;
+
+BEGIN;
+UPDATE conta.tint_comprobante SET beneficiario='SEVIDUMBRES - VIRGILIO VILLCA CONDORI' WHERE id_int_comprobante=117092;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-ETR-4078-25/02/2021********************************************/
