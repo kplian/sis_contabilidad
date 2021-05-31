@@ -555,3 +555,22 @@ BEGIN;
 UPDATE conta.tint_comprobante SET beneficiario='SEVIDUMBRES - VIRGILIO VILLCA CONDORI' WHERE id_int_comprobante=117092;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-ETR-4078-25/02/2021********************************************/
+
+
+/********************************************I-DAUP-MGM-CONTA-31/05/2021********************************************/
+--UPDATE conta.tdoc_compra_venta SET sw_pgs='no' WHERE id_doc_compra_venta in (232051,232048,232046,232045,232042,232039,232038,232037,232036,232034,232033,232032,232031,);
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232051;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232048;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232046;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232045;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232042;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232039;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232038;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232037;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232036;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232034;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232033;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232032;
+UPDATE conta.tdoc_compra_venta SET sw_pgs='reg' WHERE id_doc_compra_venta=232031;
+/********************************************F-DAUP-MGM-CONTA-31/05/2021********************************************/
+
