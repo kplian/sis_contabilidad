@@ -329,6 +329,24 @@ class MODCuenta extends MODbase{
 		return $this->respuesta;
 	}
 
+	function clonarCuentaGestion(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='conta.f_cuenta_ime';
+		$this->transaccion='CONTA_CLONCUEESP_IME';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_gestion','id_gestion','int4');
+		$this->setParametro('id_cuenta','id_cuenta','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
     function listarBalanceOrdenes(){
 	    //Definicion de variables para ejecucion del procedimientp
 	    $this->procedimiento='conta.f_balance_ot';
