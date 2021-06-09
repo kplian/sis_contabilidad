@@ -52,13 +52,50 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
 				tooltip: '<b>Clonar  las cuentas para las gestión siguiente </b><br/>Clonar las cuentas, para la gestión siguiente guardando las relacion entre las mismas'
 			}
 		);
-		
-		
+
+        this.addButton('btnRepRelConUno',
+            {
+                text: 'Duplicado Manual',
+                iconCls: 'bchecklist',
+                disabled: true,
+                handler: this.duplicarCuentaSeleccionada,
+                tooltip: '<b>Clonar la cuenta seleccionada para las gestión siguiente </b><br/>Clonar la cuenta seleccionada, para la gestión siguiente guardando las relacion entre las mismas'
+            }
+        );
 		
 	},
-	
-	
-	
+    duplicarCuentaSeleccionada: function(){
+
+        var nodo = this.sm.getSelectedNode();
+        if(this.cmbGestion.getValue()){
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_contabilidad/control/Cuenta/clonarCuentaGestion',
+                params:{
+                    id_gestion: this.cmbGestion.getValue(),
+                    id_cuenta: nodo.attributes.id_cuenta
+                },
+                success: function (resp) {
+                    Phx.CP.loadingHide();
+                    var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    if (!reg.ROOT.error) {
+                        console.log('yamillll ',reg.ROOT.datos);
+                        alert('se clonaron '+reg.ROOT.datos.nro_cuentas+' cuentas');
+                    } else {
+                        alert('ocurrio al clonar la cuenta')
+                    }
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        }
+        else{
+            alert('primero debe selecionar la gestion origen');
+        }
+
+    },
+
 	duplicarCuentas: function(){
 		if(this.cmbGestion.getValue()){
 			Phx.CP.loadingShow(); 
@@ -652,7 +689,9 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
         else{
            this.getBoton('bAux').disable(); 
         }
-        
+
+        this.getBoton('btnRepRelConUno').enable();
+
        
         // llamada funcion clase padre
         Phx.vista.Cuenta.superclass.preparaMenu.call(this,n);
@@ -660,7 +699,7 @@ Phx.vista.Cuenta=Ext.extend(Phx.arbGridInterfaz,{
     
     liberaMenu:function(n){
         this.getBoton('bAux').disable();
-        
+        this.getBoton('btnRepRelConUno').disable();
         // llamada funcion clase padre
         Phx.vista.Cuenta.superclass.liberaMenu.call(this,n);
         

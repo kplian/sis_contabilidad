@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION conta.f_cuenta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -46,6 +44,7 @@ DECLARE
     v_reg_cuenta_ori		record;
     v_reg_aux				record;
 	v_registros_cp		    record;
+    v_cuenta				record;
 
 BEGIN
 
@@ -623,6 +622,260 @@ BEGIN
             return v_resp;
 
 		end;
+        
+    /*********************************
+ 	#TRANSACCION:  'CONTA_CLONCUEESP_IME'
+ 	#DESCRIPCION:	Clona el plan de cuentas para la gestion indicada y una cuenta indicada
+ 	#AUTOR:	    Yamil Medina Rodriguez
+ 	#FECHA:		08-06-2021 15:04:03
+	***********************************/
+
+	elsif(p_transaccion='CONTA_CLONCUEESP_IME')then
+		begin
+
+            select ges.id_gestion, ges.gestion, ges.id_empresa
+			  into v_registros_ges
+			  from param.tgestion ges
+			 where ges.id_gestion = v_parametros.id_gestion;
+
+			select ges.id_gestion
+			  into v_id_gestion_destino
+			  from param.tgestion ges
+			 where ges.gestion = v_registros_ges.gestion + 1
+			   and ges.id_empresa = v_registros_ges.id_empresa
+			   and ges.estado_reg = 'activo';
+
+			IF v_id_gestion_destino is null THEN
+				raise exception 'no se encontró una siguiente gestión preparada (primero cree  gestión siguiente)';
+			ELSE
+            	IF not exists (select 1 from conta.tcuenta c where c.id_gestion = v_id_gestion_destino) THEN
+					raise exception 'es necesario realizar la clonacion masiva antes de realizar una espesifica.';
+                END IF;
+            END IF;
+			
+			IF v_parametros.id_cuenta is null THEN
+				raise exception 'no se encontró una cuenta para realizar la clonacion.';
+            ELSE
+            	IF exists (select 1 from conta.tcuenta_ids i where i.id_cuenta_uno = v_parametros.id_cuenta) THEN
+					raise exception 'la cuenta especificada ya tiene otra cuenta para la siguiente gestion.';
+                END IF;    
+			END IF;
+			v_conta = 0;
+          FOR v_cuenta in  (WITH RECURSIVE subordinates AS (
+									SELECT c.*
+									  FROM conta.tcuenta c
+									 WHERE c.id_gestion = v_parametros.id_gestion and c.estado_reg = 'activo' 
+									   and c.id_cuenta = v_parametros.id_cuenta
+									UNION
+									SELECT e.*
+									  FROM conta.tcuenta e
+									 INNER JOIN subordinates s
+										ON s.id_cuenta = e.id_cuenta_padre
+								) SELECT *
+									FROM subordinates) LOOP
+                         
+                    --captura el id de la cuenta siguiente gestion
+                    v_id_cuenta = NULL;
+                    select i.id_cuenta_dos
+					  into v_id_cuenta
+					  from conta.tcuenta_ids i
+					 where i.id_cuenta_uno = v_cuenta.id_cuenta;
+                     
+                     IF v_cuenta.id_cuenta_padre is not null THEN
+                            --  busca la cuenta del padre en cuetaids
+                             v_id_cuenta_padre_des  = NULL;
+                             select
+                               cid.id_cuenta_dos
+                             into
+                               v_id_cuenta_padre_des
+                             from conta.tcuenta_ids cid
+                             where  cid.id_cuenta_uno = v_cuenta.id_cuenta_padre;
+                     END IF;
+
+
+                 --  busca si ya existe la relacion en la tablas de cuentas ids
+                    IF v_id_cuenta is  NULL THEN
+                           --  inserta la cuenta para la nueva gestion
+                          INSERT INTO conta.tcuenta
+                                  (
+                                    id_usuario_reg,
+                                    fecha_reg,
+                                    estado_reg,
+                                    id_empresa,
+                                    id_parametro,
+                                    id_cuenta_padre,
+                                    nro_cuenta,
+                                    id_gestion,
+                                    id_moneda,
+                                    nombre_cuenta,
+                                    desc_cuenta,
+                                    nivel_cuenta,
+                                    tipo_cuenta,
+                                    sw_transaccional,
+                                    sw_oec,
+                                    sw_auxiliar,
+                                    tipo_cuenta_pat,
+                                    cuenta_sigma,
+                                    sw_sigma,
+                                    cuenta_flujo_sigma,
+                                    valor_incremento,
+                                    eeff,
+                                    sw_control_efectivo,
+                                    id_config_subtipo_cuenta,
+                                    tipo_act,-- #36
+                                    ex_auxiliar,   --1	17/12/2018	EGS
+                                    cuenta_actualizacion -- #36
+                                  )
+                                  VALUES (
+                                    p_id_usuario,
+                                    now(),
+                                    'activo',
+                                    v_cuenta.id_empresa,
+                                    v_cuenta.id_parametro,
+                                    v_id_cuenta_padre_des,
+                                    v_cuenta.nro_cuenta,
+                                    v_id_gestion_destino,  --gestion destino
+                                    v_cuenta.id_moneda,
+                                    v_cuenta.nombre_cuenta,
+                                    v_cuenta.desc_cuenta,
+                                    v_cuenta.nivel_cuenta,
+                                    v_cuenta.tipo_cuenta,
+                                    v_cuenta.sw_transaccional,
+                                    v_cuenta.sw_oec,
+                                    v_cuenta.sw_auxiliar,
+                                    v_cuenta.tipo_cuenta_pat,
+                                    v_cuenta.cuenta_sigma,
+                                    v_cuenta.sw_sigma,
+                                    v_cuenta.cuenta_flujo_sigma,
+                                    v_cuenta.valor_incremento,
+                                    v_cuenta.eeff,
+                                    v_cuenta.sw_control_efectivo,
+                                    v_cuenta.id_config_subtipo_cuenta,
+                                    v_cuenta.tipo_act ,  -- #36                                 
+                                    v_cuenta.ex_auxiliar,    --1	17/12/2018	EGS
+                                    v_cuenta.cuenta_actualizacion-- #36
+
+                                  ) RETURNING id_cuenta into v_id_cuenta;
+
+                            --insertar relacion en tre ambas gestion
+                            INSERT INTO conta.tcuenta_ids (id_cuenta_uno,id_cuenta_dos, sw_cambio_gestion ) VALUES ( v_cuenta.id_cuenta,v_id_cuenta, 'gestion');
+                            v_conta = v_conta + 1;
+                           
+                    ELSE
+                     -- #36  si la cuenta ya existe actulizamos algunos valores
+                     -- la cuenta de actulizacion que solo se clonaria en una segunda ejecucion si la cuenta no existia previamente
+                     
+                     update conta.tcuenta set
+                        nombre_cuenta = v_cuenta.nombre_cuenta,
+                        sw_auxiliar = v_cuenta.sw_auxiliar,
+                        tipo_cuenta = v_cuenta.tipo_cuenta,                       
+                        desc_cuenta = v_cuenta.desc_cuenta,                       
+                        nro_cuenta = v_cuenta.nro_cuenta,
+                        id_moneda = v_cuenta.id_moneda,
+                        sw_transaccional = v_cuenta.sw_transaccional,                       
+                        fecha_mod = now(),
+                        id_usuario_mod = p_id_usuario,
+                        eeff = v_cuenta.eeff,
+                        valor_incremento = v_cuenta.valor_incremento,
+                        sw_control_efectivo =  v_cuenta.sw_control_efectivo,
+                        id_config_subtipo_cuenta = v_cuenta.id_config_subtipo_cuenta,
+                        tipo_act  =  v_cuenta.tipo_act,
+                        ex_auxiliar = v_cuenta.ex_auxiliar, 
+                        cuenta_actualizacion = v_cuenta.cuenta_actualizacion
+                      where id_cuenta = v_id_cuenta;
+                    
+                    END IF;
+                    
+                    IF v_id_cuenta is not NULL THEN
+                    
+                      --revisamos si los  auxiliares asignados para la cuenta si es de movimiento
+                            IF  v_cuenta.sw_transaccional = 'movimiento' THEN
+
+                                --recuperamos todos los auxiliares para la cuenta origen
+
+                                FOR v_reg_aux in ( select  ca.id_auxiliar
+                                                   from conta.tcuenta_auxiliar ca
+                                                   where ca.id_cuenta = v_cuenta.id_cuenta and ca.estado_reg = 'activo') LOOP
+
+                                     --verificamos si e auxilar no fue insertado anteriormente
+                                     IF  not exists (select 1 from conta.tcuenta_auxiliar ca where ca.id_cuenta = v_id_cuenta   and ca.id_auxiliar = v_reg_aux.id_auxiliar) THEN
+
+                                             INSERT INTO    conta.tcuenta_auxiliar
+                                                  (
+                                                    id_usuario_reg,
+                                                    fecha_reg,
+                                                    estado_reg,
+                                                    id_auxiliar,
+                                                    id_cuenta
+                                                  )
+                                                  VALUES (
+                                                    p_id_usuario,
+                                                    now(),
+                                                    'activo',
+                                                    v_reg_aux.id_auxiliar,
+                                                    v_id_cuenta
+                                                  );
+                                     END IF;
+                                END LOOP;
+                            END IF;
+                    END IF;
+                            
+           END LOOP;
+           
+           -- 11-19-2018
+           --migrar relacion cuenta partida pra las nuevas cuentas
+           FOR v_registros_cp in (
+                                  select
+                                   ci.id_cuenta_uno,
+                                   ci.id_cuenta_dos,
+                                   pi.id_partida_uno,
+                                   pi.id_partida_dos
+                                 from conta.tcuenta_partida cp
+                                 inner join conta.tcuenta c on c.id_cuenta = cp.id_cuenta
+                                 inner join conta.tcuenta_ids ci on ci.id_cuenta_uno = cp.id_cuenta
+                                 inner join pre.tpartida_ids pi on pi.id_partida_uno = cp.id_partida
+                                 where c.id_gestion = v_parametros.id_gestion
+                                      and c.estado_reg = 'activo'
+									  and c.id_cuenta = v_parametros.id_cuenta ) LOOP
+
+               --revisa si la relacion no existe previamen
+               IF not exists(select 1
+                         from conta.tcuenta_partida cp
+                         where     cp.id_cuenta  =  v_registros_cp.id_cuenta_dos
+                               and cp.id_partida =  v_registros_cp.id_partida_dos) THEN
+
+                     INSERT INTO
+                              conta.tcuenta_partida
+                            (
+                              id_usuario_reg,
+                              fecha_reg,
+                              estado_reg,
+                              id_cuenta,
+                              id_partida,
+                              sw_deha,
+                              se_rega
+                            )
+                            VALUES (
+                              p_id_usuario,
+                              now(),
+                              'activo',
+                              v_registros_cp.id_cuenta_dos,
+                              v_registros_cp.id_partida_dos,
+                              'debe',
+                              'gasto'
+                            );
+
+               END IF;
+
+            END LOOP;
+
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan de cuentas clonado para la gestion: '||v_registros_ges.gestion::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'nro_cuentas', v_conta::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;    
 
 	else
 
@@ -645,4 +898,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

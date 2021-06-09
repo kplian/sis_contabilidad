@@ -332,7 +332,14 @@ class ACTCuenta extends ACTbase{
 		$this->res=$this->objFunc->clonarCuentasGestion($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
    }
-   
+
+    function clonarCuentaGestion(){
+        $this->objFunc=$this->create('MODCuenta');
+        $this->res=$this->objFunc->clonarCuentaGestion($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+
    function recuperarDatosResultados(){
    	    	
 		$this->objFunc = $this->create('MODCuenta');
