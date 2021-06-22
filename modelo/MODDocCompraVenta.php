@@ -117,7 +117,7 @@ class MODDocCompraVenta extends MODbase{
 		$this->captura('tipo_informe','varchar');
 		$this->captura('id_doc_compra_venta_fk','int8');
 		$this->captura('nota_debito_agencia','varchar');		//#112						
-
+		$this->captura('consumido','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

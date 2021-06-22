@@ -149,7 +149,8 @@ BEGIN
                             COALESCE(dcv.codigo_aplicacion,'''') as  codigo_aplicacion,
                             pla.tipo_informe,
                             dcv.id_doc_compra_venta_fk,
-                            dcv.nota_debito_agencia
+                            dcv.nota_debito_agencia,
+                            dcv.consumido
 
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
@@ -166,6 +167,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
             raise notice '%',v_consulta;
+            --raise EXCEPTION '%',v_consulta;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			--Devuelve la respuesta
 			return v_consulta;
@@ -1564,12 +1566,14 @@ BEGIN
                             join conta.tdoc_concepto cop on cop.id_doc_compra_venta=dcv.id_doc_compra_venta
                             join param.tcentro_costo cc on cc.id_centro_costo=cop.id_centro_costo
                             join pre.tpresupuesto pres on pres.id_centro_costo=cc.id_centro_costo
-                            where dcv.revisado = ''si'' and
+                            where
+                            -- dcv.revisado = ''si'' and
                             dcv.sw_pgs = ''reg'' and
                             dcv.tipo = ''compra'' AND                            
                             '||v_filtro_ext;
                 v_consulta:=v_consulta||v_parametros.filtro;
                 raise notice '%',v_consulta;
+                --raise EXCEPTION '%',v_consulta;
 				return v_consulta;
 			END;
     
