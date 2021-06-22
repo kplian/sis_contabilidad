@@ -582,3 +582,12 @@ UPDATE conta.tdoc_compra_venta
 SET obs='VIÁTICOS 3 DÍAS SUBESTACIONES VILLA TUNARI, CHIMORE Y CARRASCO UN DÍA 665, UN DIA 70%, RETORNO 100% DEL 31/05 AL 02/06'
 WHERE id_doc_compra_venta=235570;
 /********************************************F-DAUP-MGM-CONTA-ETR-4324-22/06/2021********************************************/
+/********************************************I-DAUP-MGM-CONTA-ETR-4324-02-22/06/2021********************************************/
+--UPDATE conta.tdoc_concepto
+--SET descripcion='VIÁTICOS 3 DÍAS SUBESTACIONES VILLA TUNARI, CHIMORE Y CARRASCO UN DÍA 66<5, UN DIA 70%, RETORNO 100% DEL 31/05 AL 02/06'
+--WHERE id_doc_concepto=213942;
+
+UPDATE conta.tdoc_concepto
+SET descripcion='VIÁTICOS 3 DÍAS SUBESTACIONES VILLA TUNARI, CHIMORE Y CARRASCO UN DÍA 665, UN DIA 70%, RETORNO 100% DEL 31/05 AL 02/06'
+WHERE id_doc_concepto=213942;
+/********************************************F-DAUP-MGM-CONTA-ETR-4324-02-22/06/2021********************************************/
