@@ -6257,3 +6257,10 @@ ALTER TABLE conta.tauxiliar
 ALTER TABLE conta.tauxiliar
   ALTER COLUMN estado SET DEFAULT 'si'::character varying;
   /**********************************F-DEP-MGM-CONTA-ETR-3258-19/05/2021****************************************/
+/**********************************I-DEP-MGM-CONTA-ETR-4073-22/06/2021****************************************/
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN consumidos VARCHAR(10) DEFAULT 'no';
+
+COMMENT ON COLUMN conta.tdoc_compra_venta.consumidos
+IS 'Sera usado para viaticos, si:viatico consumido, no:viatico no usado';
+/**********************************F-DEP-MGM-CONTA-ETR-4073-22/06/2021****************************************/
