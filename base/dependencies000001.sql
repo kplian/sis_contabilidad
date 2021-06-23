@@ -6266,7 +6266,7 @@ IS 'Sera usado para viaticos, si:viatico consumido, no:viatico no usado';
 /**********************************F-DEP-MGM-CONTA-ETR-4073-22/06/2021****************************************/
 /**********************************I-DEP-MGM-CONTA-ETR-4073-02-22/06/2021****************************************/
 ALTER TABLE conta.tdoc_compra_venta
-  RENAME COLUMN consumid TO consumido;
+  RENAME COLUMN consumidos TO consumido;
 
 ALTER TABLE conta.tdoc_compra_venta
   ALTER COLUMN consumido DROP DEFAULT;
