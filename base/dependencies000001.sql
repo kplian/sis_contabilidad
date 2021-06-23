@@ -6264,3 +6264,19 @@ ALTER TABLE conta.tdoc_compra_venta
 COMMENT ON COLUMN conta.tdoc_compra_venta.consumidos
 IS 'Sera usado para viaticos, si:viatico consumido, no:viatico no usado';
 /**********************************F-DEP-MGM-CONTA-ETR-4073-22/06/2021****************************************/
+/**********************************I-DEP-MGM-CONTA-ETR-4073-02-22/06/2021****************************************/
+ALTER TABLE conta.tdoc_compra_venta
+  RENAME COLUMN consumid TO consumido;
+
+ALTER TABLE conta.tdoc_compra_venta
+  ALTER COLUMN consumido DROP DEFAULT;
+
+ALTER TABLE conta.tdoc_compra_venta
+  ALTER COLUMN consumido TYPE VARCHAR(30) COLLATE pg_catalog."default";
+
+ALTER TABLE conta.tdoc_compra_venta
+  ALTER COLUMN consumido SET DEFAULT 'no'::character varying;
+
+ALTER TABLE conta.tdoc_compra_venta
+  ALTER COLUMN consumido SET NOT NULL;
+/**********************************F-DEP-MGM-CONTA-ETR-4073-02-22/06/2021****************************************/
