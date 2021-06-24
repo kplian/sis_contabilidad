@@ -1567,7 +1567,7 @@ BEGIN
                             join param.tcentro_costo cc on cc.id_centro_costo=cop.id_centro_costo
                             join pre.tpresupuesto pres on pres.id_centro_costo=cc.id_centro_costo
                             where
-                            -- dcv.revisado = ''si'' and
+                            dcv.revisado = ''si'' and
                             dcv.sw_pgs = ''reg'' and
                             dcv.tipo = ''compra'' AND                            
                             '||v_filtro_ext;
