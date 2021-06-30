@@ -150,8 +150,8 @@ BEGIN
                             pla.tipo_informe,
                             dcv.id_doc_compra_venta_fk,
                             dcv.nota_debito_agencia,
-                            dcv.consumido
-
+                            dcv.consumido,
+							COALESCE(dcv.nro_tramite_aux,'''') as nro_tramite_aux
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla

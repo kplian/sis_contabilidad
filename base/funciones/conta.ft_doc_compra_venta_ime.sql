@@ -1,12 +1,12 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION conta.ft_doc_compra_venta_ime (
-    p_administrador integer,
-    p_id_usuario integer,
-    p_tabla varchar,
-    p_transaccion varchar
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
 )
-    RETURNS varchar AS
+RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Contabilidad
@@ -336,7 +336,7 @@ BEGIN
                 id_auxiliar,
                 id_tipo_doc_compra_venta,
                 id_int_comprobante,
-                nro_tramite,
+                nro_tramite_aux,
                 id_funcionario,
                 sw_pgs,
                 codigo_aplicacion,      --#1999
@@ -383,7 +383,7 @@ BEGIN
                         v_parametros.id_auxiliar,
                         v_id_tipo_doc_compra_venta,
                         v_id_int_comprobante,
-                        v_nro_tramite,
+                        v_parametros.nro_tramite_aux,
                         v_id_funcionario,
                         v_sw_pgs,
                         v_codigo_aplicacion,      --#1999
@@ -939,7 +939,7 @@ BEGIN
                                                codigo_aplicacion = v_codigo_aplicacion,
                                                id_contrato = v_id_contrato,
                                                nota_debito_agencia = v_nota_venta_agencia,--#116
-                                               nro_tramite = v_nro_tramite      --#113
+                                               nro_tramite_aux = v_parametros.nro_tramite_aux   --#113
             where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
             if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
@@ -1709,9 +1709,9 @@ EXCEPTION
 
 END;
 $body$
-    LANGUAGE 'plpgsql'
-    VOLATILE
-    CALLED ON NULL INPUT
-    SECURITY INVOKER
-    PARALLEL UNSAFE
-    COST 100;
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;

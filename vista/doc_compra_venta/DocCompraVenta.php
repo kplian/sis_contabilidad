@@ -224,6 +224,39 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			},
 			{
 				config:{
+					name: 'consumido',
+					fieldLabel: 'Pasaje Consumido',
+					allowBlank: true,
+					anchor: '80%',
+					gwidth: 80,
+					maxLength:3,
+					renderer: function (value, p, record, rowIndex, colIndex){  
+						var checked = '',
+							state = '',
+							momento = 'no';
+						if(value == 'si'){
+							checked = 'checked';
+						}
+						if(record.data.id_int_comprobante){
+							state = 'disabled';
+						}
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
+						}
+						else{
+							return '';
+						} 
+					}
+				},
+				type: 'TextField',
+				filters: { pfiltro:'dcv.consumido',type:'string'},
+				id_grupo: 1,
+				grid: false,
+				form:false,
+				egrid:true,
+			},
+			{
+				config:{
 					name: 'revisado',
 					fieldLabel: 'Revisado',
 					allowBlank: true,
@@ -1271,6 +1304,23 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 					grid:true,
 					form:false
 			},
+			{
+				config:{
+					name: 'nro_tramite_aux',
+					fieldLabel: 'Nro Tramite VI/FA',
+					allowBlank: false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:100,
+                    sortField:'dcv.nro_tramite_aux',
+				},
+					type:'TextField',
+					filters:{pfiltro:'dcv.nro_tramite_aux',type:'string'},
+					id_grupo:0,
+					grid:true,
+					bottom_filter: true,
+					form:false
+			},
 		];
 		
 	  this.Atributos= this.Atributos1.concat(this.Atributos2);
@@ -1492,7 +1542,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		'desc_comprobante','id_int_comprobante','id_auxiliar','codigo_auxiliar','nombre_auxiliar','tipo_reg',
 		'estacion', 'id_punto_venta', 'nombre', 'id_agencia', 'codigo_noiata','desc_funcionario2','id_funcionario',
 		{name:'fecha_cbte', type: 'date',dateFormat:'Y-m-d'},
-		{name:'estado_cbte', type: 'string'},'codigo_aplicacion','tipo_informe','id_doc_compra_venta_fk','nota_debito_agencia'
+		{name:'estado_cbte', type: 'string'},'codigo_aplicacion','tipo_informe','id_doc_compra_venta_fk','nota_debito_agencia','consumido','nro_tramite_aux'
 	],
 	sortInfo:{
 		field: 'id_doc_compra_venta',

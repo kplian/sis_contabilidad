@@ -5329,3 +5329,10 @@ WITH (oids = false);
 ALTER TABLE conta.thistorico
   OWNER TO postgres;
   /***********************************F-SCP-MGM-CONTA-ETR-3258-13/01/2021****************************************/
+
+/***********************************I-SCP-MGM-CONTA-ETR-4073-30/06/2021****************************************/
+ALTER TABLE conta.tdoc_compra_venta
+  ADD COLUMN nro_tramite_aux VARCHAR(50);
+/***********************************F-SCP-MGM-CONTA-ETR-4073-30/06/2021****************************************/
+
+
