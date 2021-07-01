@@ -150,8 +150,8 @@ BEGIN
                             pla.tipo_informe,
                             dcv.id_doc_compra_venta_fk,
                             dcv.nota_debito_agencia,
-                            dcv.consumido
-
+                            dcv.consumido,
+							COALESCE(dcv.nro_tramite_aux,'''') as nro_tramite_aux
 						from conta.tdoc_compra_venta dcv
                           inner join segu.tusuario usu1 on usu1.id_usuario = dcv.id_usuario_reg
                           inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla
@@ -1541,7 +1541,7 @@ BEGIN
                             COALESCE(dcv.nota_debito_agencia,''-'')::VARCHAR,
                             COALESCE(fun.desc_funcionario2,''-'')::VARCHAR,
                             COALESCE(dcv.nro_documento,''-'')::VARCHAR,
-                            COALESCE(dcv.nro_tramite,''-'')::VARCHAR,
+                            COALESCE(dcv.nro_tramite_aux,''-'')::VARCHAR as nro_tramite,
                             COALESCE(dcv.obs,''-'')::VARCHAR,
                             (
                               select
@@ -1592,7 +1592,7 @@ BEGIN
                              COALESCE(fun.desc_funcionario2,''-'') ::varchar,
                              COALESCE(dcv.nro_documento,''-'') ::varchar,
                              COALESCE(dcv.nota_debito_agencia,''-'') ::varchar, 
-                             COALESCE(dcv.nro_tramite,''-'') ::varchar, 
+                             COALESCE(dcv.nro_tramite_aux,''-'') ::varchar as nro_tramite, 
                              COALESCE(dcv.obs,''-'') ::varchar,           
                              (
                                 select
