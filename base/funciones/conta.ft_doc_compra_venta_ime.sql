@@ -72,7 +72,7 @@ DECLARE
     v_id_contrato             integer;  -- #2000
     v_id_doc_compra_venta_fk  integer;  -- #123
     v_nota_venta_agencia	    varchar;  -- #114
-
+	v_nro_tramite_aux	    varchar;
 BEGIN
 
     v_nombre_funcion = 'conta.ft_doc_compra_venta_ime';
@@ -161,6 +161,10 @@ BEGIN
 
             if (pxp.f_existe_parametro(p_tabla,'nro_tramite')) and v_nro_tramite is null then
                 v_nro_tramite=v_parametros.nro_tramite;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'nro_tramite_aux')) then
+                v_nro_tramite_aux=v_parametros.nro_tramite_aux;
             end if;
 
             --RAC 05/01/2018 nuevos para emtros para registro de pagos simplificados
@@ -383,7 +387,7 @@ BEGIN
                         v_parametros.id_auxiliar,
                         v_id_tipo_doc_compra_venta,
                         v_id_int_comprobante,
-                        v_parametros.nro_tramite_aux,
+                        v_nro_tramite_aux,--v_parametros.nro_tramite_aux,
                         v_id_funcionario,
                         v_sw_pgs,
                         v_codigo_aplicacion,      --#1999
@@ -899,6 +903,9 @@ BEGIN
             if (pxp.f_existe_parametro(p_tabla,'nro_tramite')) then
                 v_nro_tramite = v_parametros.nro_tramite;
             end if;
+            if (pxp.f_existe_parametro(p_tabla,'nro_tramite_aux')) then
+                v_nro_tramite_aux=v_parametros.nro_tramite_aux;
+            end if;
             --#117
             if (pxp.f_existe_parametro(p_tabla,'nota_debito_agencia')) then
                 v_nota_venta_agencia = v_parametros.nota_debito_agencia;
@@ -939,7 +946,7 @@ BEGIN
                                                codigo_aplicacion = v_codigo_aplicacion,
                                                id_contrato = v_id_contrato,
                                                nota_debito_agencia = v_nota_venta_agencia,--#116
-                                               nro_tramite_aux = v_parametros.nro_tramite_aux   --#113
+                                               nro_tramite_aux = v_nro_tramite_aux   --#113
             where id_doc_compra_venta=v_parametros.id_doc_compra_venta;
 
             if (pxp.f_existe_parametro(p_tabla,'id_tipo_compra_venta')) then
