@@ -591,3 +591,10 @@ UPDATE conta.tdoc_concepto
 SET descripcion='VIÁTICOS 3 DÍAS SUBESTACIONES VILLA TUNARI, CHIMORE Y CARRASCO UN DÍA 665, UN DIA 70%, RETORNO 100% DEL 31/05 AL 02/06'
 WHERE id_doc_concepto=213942;
 /********************************************F-DAUP-MGM-CONTA-ETR-4324-02-22/06/2021********************************************/
+
+/********************************************I-DAUP-MGM-CONTA-ETR-4073-07/07/2021********************************************/
+UPDATE conta.tdoc_compra_venta as d
+SET nro_tramite_aux = t.nro_tramite_aux_old
+FROM conta.tmp t
+WHERE trim(t.nro_documento)=trim(d.nro_documento)  and trim(t.nro_autorizacion)=trim(d.nro_autorizacion);
+/********************************************F-DAUP-MGM-CONTA-ETR-4073-07/07/2021********************************************/
