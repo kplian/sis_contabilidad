@@ -5335,4 +5335,16 @@ ALTER TABLE conta.tdoc_compra_venta
   ADD COLUMN nro_tramite_aux VARCHAR(50);
 /***********************************F-SCP-MGM-CONTA-ETR-4073-30/06/2021****************************************/
 
+/***********************************I-SCP-MGM-CONTA-ETR-4073-07/07/2021****************************************/
+CREATE TABLE conta.tmp (
+  id SERIAL,
+  nro_documento VARCHAR(500),
+  nro_autorizacion VARCHAR(500),
+  nro_tramite_aux_old VARCHAR(100),
+  CONSTRAINT tmp_pkey PRIMARY KEY(id)
+) 
+WITH (oids = false);
 
+ALTER TABLE conta.tmp
+  OWNER TO postgres;
+/***********************************F-SCP-MGM-CONTA-ETR-4073-07/07/2021****************************************/
