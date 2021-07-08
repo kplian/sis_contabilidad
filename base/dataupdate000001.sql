@@ -608,3 +608,13 @@ BEGIN;
 UPDATE conta.tint_comprobante SET beneficiario='HELBERTH MADELEINE LOBO VISCARRA' WHERE id_int_comprobante=120653;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-ETR-4528-08/07/2021********************************************/
+/********************************************I-DAUP-MGM-CONTA-ETR-4530-08/07/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tint_comprobante SET beneficiario='PROVEEDORES VARIOS' WHERE id_int_comprobante=121518;
+--commit;
+
+BEGIN;
+UPDATE conta.tint_comprobante SET beneficiario='NATALY HUARACHI GUARACHI' WHERE id_int_comprobante=121518;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-ETR-4530-08/07/2021********************************************/
