@@ -617,3 +617,13 @@ BEGIN;
 UPDATE conta.tint_comprobante SET beneficiario='NATALY HUARACHI GUARACHI' WHERE id_int_comprobante=121518;
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-ETR-4530-08/07/2021********************************************/
+/********************************************I-DAUP-MGM-CONTA-ETR-4073-09/07/2021********************************************/
+--rollback
+--begin;
+--UPDATE conta.tdoc_compra_venta SET consumido='no';
+--commit;
+
+BEGIN;
+UPDATE conta.tdoc_compra_venta SET consumido='si';
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-ETR-4073-09/07/2021********************************************/
