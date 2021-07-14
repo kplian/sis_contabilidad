@@ -1558,7 +1558,8 @@ BEGIN
                               group by ceco.codigo_cc,vtcc.descripcion_techo,ceco.id_centro_costo                             
                             ), 
                             COALESCE(mon.codigo,''-'')::VARCHAR	 as desc_moneda,
-                            COALESCE(dcv.importe_neto,0)::numeric as importe_doc
+                            COALESCE(dcv.importe_neto,0)::numeric as importe_doc,
+                            dcv.consumido
                             from conta.tdoc_compra_venta dcv
                             join param.tmoneda mon on mon.id_moneda = dcv.id_moneda
                             left join param.tdepto dep on dep.id_depto = dcv.id_depto_conta
@@ -1567,7 +1568,7 @@ BEGIN
                             join param.tcentro_costo cc on cc.id_centro_costo=cop.id_centro_costo
                             join pre.tpresupuesto pres on pres.id_centro_costo=cc.id_centro_costo
                             where
-                            dcv.revisado = ''si'' and
+                            --dcv.revisado = ''si'' and
                             dcv.sw_pgs = ''reg'' and
                             dcv.tipo = ''compra'' AND                            
                             '||v_filtro_ext;
