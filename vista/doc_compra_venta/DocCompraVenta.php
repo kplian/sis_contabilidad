@@ -21,60 +21,54 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
-    fheight: '80%',
-    fwidth: '70%',
-    tabEnter: true,
-    tipoDoc: 'venta',
-    regitrarDetalle: 'si',
-    sw_ncd: 'no',//#1201  21/08/2018  deshabilitar el generador de comprobantes para notas de credito debito
-    nombreVista: 'DocCompraVenta',
-    constructor:function(config){
+	fheight: '80%',
+	fwidth: '70%',
+	tabEnter: true,
+	tipoDoc: 'venta',
+	regitrarDetalle: 'si',
+	sw_ncd: 'no',//#1201  21/08/2018  deshabilitar el generador de comprobantes para notas de credito debito
+	nombreVista: 'DocCompraVenta',
+	constructor:function(config){
 		this.initButtons=[this.cmbDepto, this.cmbGestion, this.cmbPeriodo];
 		var me = this;
 		me.configurarAtributos(me);
-	
-		
 		//Esta funcion se sobre carga para la version de BOA
 		this.modificarAtributos();
-			
-		
 		//llama al constructor de la clase padre
 		Phx.vista.DocCompraVenta.superclass.constructor.call(this,config);
-		
 		this.bloquearOrdenamientoGrid();
 		
 		this.cmbGestion.on('select', function(combo, record, index){
 			this.tmpGestion = record.data.gestion;
-		    this.cmbPeriodo.enable();
-		    this.cmbPeriodo.reset();
-		    this.store.removeAll();
-		    this.cmbPeriodo.store.baseParams = Ext.apply(this.cmbPeriodo.store.baseParams, {id_gestion: this.cmbGestion.getValue()});
-		    this.cmbPeriodo.modificado = true;
-        },this);
-        
-        this.cmbPeriodo.on('select', function( combo, record, index){
+			this.cmbPeriodo.enable();
+			this.cmbPeriodo.reset();
+			this.store.removeAll();
+			this.cmbPeriodo.store.baseParams = Ext.apply(this.cmbPeriodo.store.baseParams, {id_gestion: this.cmbGestion.getValue()});
+			this.cmbPeriodo.modificado = true;
+		},this);
+		
+		this.cmbPeriodo.on('select', function( combo, record, index){
 			this.tmpPeriodo = record.data.periodo;
 			this.capturaFiltros();
-		    
-        },this);
-        
-        this.cmbDepto.on('select', function( combo, record, index){
+			
+		},this);
+		
+		this.cmbDepto.on('select', function( combo, record, index){
 			this.capturaFiltros();
-		    
-        },this);
-        
-        
-        this.addButton('btnWizard',
-            {
-                text: 'Generar Cbte',
-                iconCls: 'bchecklist',
-                disabled: false,
-                handler: this.loadWizard,
-                tooltip: '<b>Generar Comprobante</b><br/>Genera cbte de  para el deto selecionado'
-            }
-        );
-        
-        //Botón para Imprimir el Comprobante
+			
+		},this);
+		
+		this.addButton('btnWizard',
+			{
+				text: 'Generar Cbte',
+				iconCls: 'bchecklist',
+				disabled: false,
+				handler: this.loadWizard,
+				tooltip: '<b>Generar Comprobante</b><br/>Genera cbte de  para el deto selecionado'
+			}
+		);
+		
+		//Botón para Imprimir el Comprobante
 		this.addButton('btnImprimir', {
 				text : 'Imprimir',
 				iconCls : 'bprint',
@@ -84,27 +78,23 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 		});
 		
 		this.addButton('btnExpTxt',
-            {
-                text: 'Exportar TXT',
-                iconCls: 'bchecklist',
-                disabled: false,
-                handler: this.expTxt,
-                tooltip: '<b>Exportar</b><br/>Exporta a archivo TXT para LCV'
-            }
-        );
-        
+			{
+				text: 'Exportar TXT',
+				iconCls: 'bchecklist',
+				disabled: false,
+				handler: this.expTxt,
+				tooltip: '<b>Exportar</b><br/>Exporta a archivo TXT para LCV'
+			}
+		);
+        this.ocultarColumna(2);
         this.crearFormAuto();
-        
-       
-        
-        
-		
-		//this.iniciarEventos();
-		this.init();
+    	//this.iniciarEventos();
+		this.init();	
 		this.grid.addListener('cellclick', this.oncellclick,this);
 		this.obtenerVariableGlobal();
+		
 	},
-	
+
 	Atributos1:[],
 	
 	configurarAtributos: function(me){
@@ -225,7 +215,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 			{
 				config:{
 					name: 'consumido',
-					fieldLabel: 'Pasaje Consumido',
+					fieldLabel: '¿Pasaje utilizado?',
 					allowBlank: true,
 					anchor: '80%',
 					gwidth: 80,
@@ -241,7 +231,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 							state = 'disabled';
 						}
 						if(record.data.tipo_reg != 'summary'){
-							return  String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
+							return  String.format('<div style="vertical-align:middle;text-align:center;width: 37px; height: 37px;  border-radius: 5px; border: 2px solid #8cad2d; background-color: #fff;  display: block; content: ""; float: left; margin-right: 5px; z-index: 5; position: relative; "><input style="height:37px;width:37px;" type="checkbox"  {0} {1}></div>',checked, state);
 						}
 						else{
 							return '';
@@ -251,7 +241,7 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
 				type: 'TextField',
 				filters: { pfiltro:'dcv.consumido',type:'string'},
 				id_grupo: 1,
-				grid: false,
+				grid: true,
 				form:false,
 				egrid:true,
 			},
