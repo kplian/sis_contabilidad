@@ -1538,11 +1538,11 @@ BEGIN
                     v_filtro_ext = v_filtro_ext || ' dcv.id_usuario_reg = '||p_id_usuario|| ' and ';
                  END IF;                  
 				v_consulta:='select
-                            COALESCE(dcv.nota_debito_agencia,''-'')::VARCHAR,
-                            COALESCE(fun.desc_funcionario2,''-'')::VARCHAR,
-                            COALESCE(dcv.nro_documento,''-'')::VARCHAR,
+                            COALESCE(dcv.nota_debito_agencia,''-'')::VARCHAR as nota_debito_agencia,
+                            COALESCE(fun.desc_funcionario2,''-'')::VARCHAR as desc_funcionario2,
+                            COALESCE(dcv.nro_documento,''-'')::VARCHAR as nro_documento,
                             COALESCE(dcv.nro_tramite_aux,''-'')::VARCHAR as nro_tramite,
-                            COALESCE(dcv.obs,''-'')::VARCHAR,
+                            COALESCE(dcv.obs,''-'')::VARCHAR as obs,
                             (
                               select
                               CASE 

@@ -61,7 +61,6 @@ class RepAutorizacion
 		$this->docexcel->setActiveSheetIndex(0)->getPageSetup()->setFitToWidth(1);
 		$this->docexcel->setActiveSheetIndex(0)->getPageSetup()->setFitToHeight(0);
 	}
-
 	
 	function imprimeTitulo($sheet,$i) {
 		//Logo
@@ -79,37 +78,37 @@ class RepAutorizacion
 		$this->docexcel->setActiveSheetIndex(0);		
 		$styleTitulos1 = array(
 			'font'  => array(
-			    'bold'  => false,
-			    'size'  => 15
+				'bold'  => false,
+				'size'  => 15
 			),
 			'alignment' => array(
-			    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-			    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
 			),
 		);
 		$styleTitulos2 = array(
 			'font'  => array(
-			    'bold'  => true,
-			    'size'  => 8,
-			    'name'  => 'Arial',
-			    'color' => array(
+				'bold'  => true,
+				'size'  => 8,
+				'name'  => 'Arial',
+				'color' => array(
 					'rgb' => 'FFFFFF'
-			    )
+				)
 			),
 			'alignment' => array(
-			    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-			    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
 			),
 			'fill' => array(
-			    'type' => PHPExcel_Style_Fill::FILL_SOLID,
-			    'color' => array(
-			        'rgb' => '0066CC'
-			    )
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array(
+					'rgb' => '0066CC'
+				)
 			),
 			'borders' => array(
-			    'allborders' => array(
+				'allborders' => array(
 					'style' => PHPExcel_Style_Border::BORDER_THIN
-			    )
+				)
 			)
 		);
 		$styleTitulos3 = array(
@@ -126,39 +125,40 @@ class RepAutorizacion
 		
 		$this->docexcel->getActiveSheet()->getStyle('D3:J3')->applyFromArray($styleTitulos2);
 		$this->docexcel->getActiveSheet()->mergeCells('D3:J3');
-		$this->docexcel->getActiveSheet()->setCellValue('D3','DETALLE DE PASAJES PARA AUTORIZACION');			
-		$this->docexcel->getActiveSheet()->getStyle('B5:L5')->getAlignment()->setWrapText(true);
-		$this->docexcel->getActiveSheet()->getStyle('B5:L5')->applyFromArray($styleTitulos2);
+		$this->docexcel->getActiveSheet()->setCellValue('D3','DETALLE DE PASAJES PARA AUTORIZACION');
+		$this->docexcel->getActiveSheet()->getStyle('B5:M5')->getAlignment()->setWrapText(true);
+		$this->docexcel->getActiveSheet()->getStyle('B5:M5')->applyFromArray($styleTitulos2);
 		//*************************************Cabecera*****************************************
 		$this->docexcel->getActiveSheet()->setCellValue('B5','Nº');
 		$this->docexcel->getActiveSheet()->setCellValue('C5','NOTA DE DEBITO');
 		$this->docexcel->getActiveSheet()->setCellValue('D5','NOMBRE DEL PASAJERO');
 		$this->docexcel->getActiveSheet()->setCellValue('E5','Nº FACTURA');
 		$this->docexcel->getActiveSheet()->setCellValue('F5','PROCESO(VI/FA)');
-        $this->docexcel->getActiveSheet()->setCellValue('G5','MOTIVO, FECHA Y RUTA');
-        $this->docexcel->getActiveSheet()->setCellValue('H5','CENTRO DE COSTO');
-        $this->docexcel->getActiveSheet()->setCellValue('I5','MONEDA');
-        $this->docexcel->getActiveSheet()->setCellValue('J5','IMPORTE');
-        $this->docexcel->getActiveSheet()->setCellValue('K5','FIRMA AUTORIZADA');
-        $this->docexcel->getActiveSheet()->setCellValue('L5','NOMBRE');
+		$this->docexcel->getActiveSheet()->setCellValue('G5','MOTIVO, FECHA Y RUTA');
+		$this->docexcel->getActiveSheet()->setCellValue('H5','CENTRO DE COSTO');
+		$this->docexcel->getActiveSheet()->setCellValue('I5','MONEDA');
+		$this->docexcel->getActiveSheet()->setCellValue('J5','IMPORTE');
+		$this->docexcel->getActiveSheet()->setCellValue('K5','PASAJE UTLIZADO');
+		$this->docexcel->getActiveSheet()->setCellValue('L5','FIRMA AUTORIZADA');
+		$this->docexcel->getActiveSheet()->setCellValue('M5','NOMBRE');
 			
 		$this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(7);
 		$this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(12);
 		$this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
 		$this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(12);
 		$this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(15);
-        $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(30);	
-        $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(30);	
-        $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(8);	
-        $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(12);
-        $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(12);
-        $this->docexcel->getActiveSheet()->getColumnDimension('L')->setWidth(12);
-        
+		$this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(30);	
+		$this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(30);	
+		$this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(8);	
+		$this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(12);
+		$this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(8);
+		$this->docexcel->getActiveSheet()->getColumnDimension('L')->setWidth(12);
+		$this->docexcel->getActiveSheet()->getColumnDimension('M')->setWidth(12);
 	}
 	//
 	function generarDatos()
 	{	
-        $styleTitulos2 = array(
+		$styleTitulos2 = array(
 			'font'  => array(
 				'bold'  => FALSE,
 				'size'  => 8,
@@ -193,30 +193,30 @@ class RepAutorizacion
 					'style' => PHPExcel_Style_Border::BORDER_THIN
 				)
 			)
-        );
-        $styleTitulos = array(
+		);
+		$styleTitulos = array(
 			'font'  => array(
-			    'bold'  => true,
-			    'size'  => 9,
-			    'name'  => 'Arial',
-			    'color' => array(
+				'bold'  => true,
+				'size'  => 9,
+				'name'  => 'Arial',
+				'color' => array(
 					'rgb' => 'FFFFFF'
-			    )
+				)
 			),
 			'alignment' => array(
-			    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
-			    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
 			),
 			'fill' => array(
-			    'type' => PHPExcel_Style_Fill::FILL_SOLID,
-			    'color' => array(
-			        'rgb' => '0066CC'
-			    )
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array(
+					'rgb' => '0066CC'
+				)
 			),
 			'borders' => array(
-			    'allborders' => array(
+				'allborders' => array(
 					'style' => PHPExcel_Style_Border::BORDER_THIN
-			    )
+				)
 			)
 		);
 		$this->numero = 1;
@@ -224,38 +224,35 @@ class RepAutorizacion
 		$datos = $this->objParam->getParametro('datos');
 		$this->imprimeCabecera(0);
 		foreach ($datos as $value){	
-            $this->docexcel->getActiveSheet()->getStyle('B'.$fila.':J'.$fila.'')->applyFromArray($styleTitulos2);            
-            $this->docexcel->getActiveSheet()->getStyle('G'.$fila.':G'.$fila.'')->getAlignment()->setWrapText(true);  					
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $this->numero);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, trim($value['nota_debito_agencia']));
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, trim($value['desc_funcionario2']));
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, trim($value['nro_documento']));				
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, trim($value['nro_tramite']));
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, trim($value['obs']));
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, trim($value['descripcion']));            
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, trim($value['desc_moneda']));
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['importe_doc']);
-            $fila++;
-            $this->numero++;					
-		}				
-		$this->docexcel->getActiveSheet()->getStyle('B'.($fila+1).':C'.($fila+1).'')->applyFromArray($styleTitulos);										
-        $this->docexcel->getActiveSheet()->getStyle('D'.(6).':D'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
-            
-	
-        $this->docexcel->getActiveSheet()->getStyle('D'.($fila+1).':J'.($fila+1).'')->applyFromArray($styleTitulos3);
-        $this->docexcel->getActiveSheet()->mergeCells('B'.($fila+1).':C'.($fila+1).'');  
-        $this->docexcel->getActiveSheet()->setCellValue('B'.($fila+1).'','TOTAL');
+			$this->docexcel->getActiveSheet()->getStyle('B'.$fila.':J'.$fila.'')->applyFromArray($styleTitulos2);
+			$this->docexcel->getActiveSheet()->getStyle('G'.$fila.':G'.$fila.'')->getAlignment()->setWrapText(true);
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $this->numero);
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, trim($value['nota_debito_agencia']));
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, trim($value['desc_funcionario2']));
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, trim($value['nro_documento']));
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, trim($value['nro_tramite']));
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, trim($value['obs']));
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, trim($value['descripcion']));
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, trim($value['desc_moneda']));
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['importe_doc']);
+			$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['consumido']);
+			$fila++;
+			$this->numero++;
+		}
+		$this->docexcel->getActiveSheet()->getStyle('B'.($fila+1).':C'.($fila+1).'')->applyFromArray($styleTitulos);
+		$this->docexcel->getActiveSheet()->getStyle('D'.(6).':D'.($fila+1).'')->getNumberFormat()->setFormatCode('#,##0.00');
+			
+		$this->docexcel->getActiveSheet()->getStyle('D'.($fila+1).':J'.($fila+1).'')->applyFromArray($styleTitulos3);
+		$this->docexcel->getActiveSheet()->mergeCells('B'.($fila+1).':C'.($fila+1).'');  
+		$this->docexcel->getActiveSheet()->setCellValue('B'.($fila+1).'','TOTAL');
 
-
-        $this->docexcel->getActiveSheet()->mergeCells('D'.($fila+1).':J'.($fila+1).'');  
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3,$fila+1,'=SUM(J6:J'.($fila-1).')');	
-        
-
-
-        $this->docexcel->getActiveSheet()->getStyle('D'.($fila+4).':E'.($fila+4).'')->applyFromArray($styleTitulos);
-        $this->docexcel->getActiveSheet()->getStyle('G'.($fila+4).':G'.($fila+4).'')->applyFromArray($styleTitulos);
-        $this->docexcel->getActiveSheet()->mergeCells('D'.($fila+4).':E'.($fila+4).''); 	
-        $this->docexcel->getActiveSheet()->setCellValue('D'.($fila+4).'','DPTO DE CONTABILIDAD');        
+		$this->docexcel->getActiveSheet()->mergeCells('D'.($fila+1).':J'.($fila+1).'');  
+		$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3,$fila+1,'=SUM(J6:J'.($fila-1).')');	
+		
+		$this->docexcel->getActiveSheet()->getStyle('D'.($fila+4).':E'.($fila+4).'')->applyFromArray($styleTitulos);
+		$this->docexcel->getActiveSheet()->getStyle('G'.($fila+4).':G'.($fila+4).'')->applyFromArray($styleTitulos);
+		$this->docexcel->getActiveSheet()->mergeCells('D'.($fila+4).':E'.($fila+4).''); 	
+		$this->docexcel->getActiveSheet()->setCellValue('D'.($fila+4).'','DPTO DE CONTABILIDAD');
 		$this->docexcel->getActiveSheet()->setCellValue('G'.($fila+4).'','DPTO DE FINANZAS');
 
 	}
