@@ -1618,14 +1618,22 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
     oncellclick : function(grid, rowIndex, columnIndex, e) {
      	var record = this.store.getAt(rowIndex),
 	        fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
-     	
+			console.log('-->',record);
+		console.log('-->',fieldName);
      	if(fieldName == 'revisado') {
 	       	if(!record.data['id_int_comprobante']){
 	       	   if(record.data.tipo_reg != 'summary'){
 	       	     this.cambiarRevision(record);
 	       	   }
 	       	}
-	    }
+	    }else{
+			if(fieldName == 'consumido') {
+				if(record.data.tipo_reg != 'summary'){
+					this.cambiarRevisionC(record);
+				}
+			}
+		}
+
      },
      cambiarRevision: function(record){
 		Phx.CP.loadingShow();
@@ -1638,6 +1646,18 @@ Phx.vista.DocCompraVenta = Ext.extend(Phx.gridInterfaz,{
             timeout: this.timeout,
             scope: this
         }); 
+	},
+	cambiarRevisionC: function(record){
+		Phx.CP.loadingShow();
+		var d = record.data
+		Ext.Ajax.request({
+			url:'../../sis_cuenta_documentada/control/PagoSimple/cambiarRevision',
+			params:{ id_doc_compra_venta: d.id_doc_compra_venta},
+			success: this.successRevision,
+			failure: this.conexionFailure,
+			timeout: this.timeout,
+			scope: this
+		});
 	},
 	successRevision: function(resp){
        Phx.CP.loadingHide();
