@@ -628,3 +628,9 @@ BEGIN;
 UPDATE conta.tdoc_compra_venta SET consumido='si';
 COMMIT;
 /********************************************F-DAUP-MGM-CONTA-ETR-4073-09/07/2021********************************************/
+/********************************************I-DAUP-MGM-CONTA-ETR-4685-21/07/2021********************************************/
+--UPDATE conta.tint_comprobante SET beneficiario='SERVIDUMBRES - VIRGINIO BENITEZ BATANCUR' WHERE id_int_comprobante=122254;
+BEGIN;
+UPDATE conta.tint_comprobante SET beneficiario='SERVIDUMBRES - VIRGINIO BENITEZ BETANCUR' WHERE id_int_comprobante=122254;
+COMMIT;
+/********************************************F-DAUP-MGM-CONTA-ETR-4685-21/07/2021********************************************/
