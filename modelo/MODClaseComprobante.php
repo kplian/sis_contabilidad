@@ -41,13 +41,10 @@ class MODClaseComprobante extends MODbase{
 		
 		
 		
-		
-		
-		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+		//echo $this->getConsulta(); exit;
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

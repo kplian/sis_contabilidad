@@ -155,4 +155,4 @@ SECURITY INVOKER
 COST 100 ROWS 1000;
 
 ALTER FUNCTION conta.f_importe_periodo_int_transaccion (p_id_gestion integer, p_nro_cuenta varchar, p_cbte_apertura varchar, p_cbte_cierre varchar, p_cbte_aitb varchar, p_partida varchar, p_tipo varchar, p_fecha_ini date, p_fecha_fin date)
-  OWNER TO dbaamamani;
+  OWNER TO postgres;

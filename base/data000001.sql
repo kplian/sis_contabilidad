@@ -162,17 +162,6 @@ select pxp.f_insert_testructura_gui ('CMPB.1', 'CMPB');
 
 /* Data for the 'conta.ttabla_relacion_contable' table  (Records 1 - 2) */
 
-INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
-VALUES (1, NULL, E'2013-06-25 14:29:34.603', NULL, E'activo', 1, E'tconcepto_ingas', E'PARAM', E'id_concepto_ingas');
-
-INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
-VALUES (1, NULL, E'2013-07-10 17:39:38.107', NULL, E'activo', 2, E'tcuenta_bancaria', E'TES', E'id_cuenta_bancaria');
-
-INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
-VALUES (1, NULL, E'2013-06-25 14:32:13.255', NULL, E'activo',  E'Cuenta para realizar compras', E'CUECOMP', E'si-general', E'si', E'si', 1);
-
-INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
-VALUES (1, NULL, E'2013-07-10 17:40:17.829', NULL, E'activo',  E'Cuentas Bancarias', E'CUEBANCEGRE', E'no', E'no', E'si', 2);
 
 --menu de cuentas contable por cuenta bancaria
 select pxp.f_insert_tgui ('Clases de Comprobantes', 'Clases de Comprobantes', 'CCBT', 'si', 6, 'sis_contabilidad/vista/clase_comprobante/ClaseComprobante.php', 2, '', 'ClaseComprobante', 'CONTA');
@@ -195,26 +184,6 @@ select pxp.f_insert_testructura_gui ('CBTE.1.1', 'CBTE.1');
 
 
 /***********************************I-DAT-RAC-CONTA-0-03/09/2013*****************************************/
-
-
-INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
-VALUES (1, NULL, E'2013-08-27 20:11:39.946', NULL, E'activo', 3, E'tproveedor', E'PARAM', E'id_proveedor');
-
-INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
-VALUES (1, NULL, E'2013-08-28 06:22:11.955', NULL, E'activo', 4, E'tdepto', E'PARAM', E'id_depto');
-
---tipo relacion contable, IVA- CF
-INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
-VALUES (1, NULL, E'2013-08-26 23:33:17.859', NULL, E'activo',  E'IVA- CF', E'IVA-CF', E'no', E'si', E'si', NULL);
-
---tipo relacion contable, Cuenta  Devengado Proveedor
-INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
-VALUES (1, NULL, E'2013-08-27 20:12:31.331', NULL, E'activo',  E'Cuenta  Devengado Proveedor', E'CUENDEVPRO', E'no', E'si', E'si', 3);
-
-
---tipo relacion contable, Centro de Costo Depto Conta
-INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
-VALUES (1, NULL, E'2013-08-28 06:23:24.403', NULL, E'activo',  E'Centro de Costo Depto Conta', E'CCDEPCON', E'si', E'no', E'no', 4);
 
 select pxp.f_insert_tgui ('Departamentos', 'Cuntas por Deptos Contables', 'DEPTCON', 'si', 5, 'sis_contabilidad/vista/cta_relacion_contable/CtaDepto.php', 3, '', 'CtaDepto', 'CONTA');
 select pxp.f_insert_testructura_gui ('DEPTCON', 'RELACON');
@@ -1091,30 +1060,6 @@ select pxp.f_insert_testructura_gui ('REPLCV', 'REPCON');
 
 
 
-
-/***********************************I-DAT-RAC-CONTA-0-22/03/2016*****************************************/
-
-INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id", "tabla_id_fk", "recorrido_arbol", "tabla_id_auxiliar", "tabla_codigo_auxiliar")
-VALUES
-  (1, NULL, E'2016-03-22 13:21:05.346', NULL, E'activo', NULL, NULL, 11, E'tfuncionario', E'ORGA', E'id_funcionario', E'', E'', E'', E'codigo');
-
-
-
-INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
-VALUES
-  (1, NULL, E'2016-03-22 13:22:39.393', NULL, E'activo', NULL, NULL,  E'Cuenta por Rendir', E'CUEXREND', E'no', E'si', E'dinamico', 11, E'flujo', E'recurso_gasto');
-
-
-/* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 1) */
-
-INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
-VALUES
-  (1, NULL, E'2016-03-24 14:46:07.159', NULL, E'activo', NULL, NULL,  E'Entrega de Dinero por Rendir', E'EDINXRENDIR', E'no', E'si', E'si', 11, E'flujo', E'gasto');
-
-
-/***********************************F-DAT-RAC-CONTA-0-22/03/2016*****************************************/
-
-
 /***********************************I-DAT-RAC-CONTA-0-12/04/2016*****************************************/
 
 select param.f_import_tdocumento ('insert','CBT','Numero de Tramite Cbte','CONTA','depto','gestion','',NULL);
@@ -1684,6 +1629,70 @@ select pxp.f_insert_tgui ('Configuracion Marca Cbte', 'Configuracion de la marca
 
 
 /***********************************I-DAT-RAC-CONTA-66-25/07/2019****************************************/
+/*INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
+VALUES (1, NULL, E'2013-06-25 14:29:34.603', NULL, E'activo', 1, E'tconcepto_ingas', E'PARAM', E'id_concepto_ingas');*/
+select conta.f_import_ttabla_relacion_contable ('insert','TCON','activo','tconcepto_ingas','PARAM','id_concepto_ingas','','','','','');
+
+
+/*INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
+VALUES (1, NULL, E'2013-07-10 17:39:38.107', NULL, E'activo', 2, E'tcuenta_bancaria', E'TES', E'id_cuenta_bancaria');*/
+select conta.f_import_ttabla_relacion_contable ('insert','TCUE','activo','tcuenta_bancaria','TES','id_cuenta_bancaria','','','','','');
+
+
+/*INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
+VALUES (1, NULL, E'2013-06-25 14:32:13.255', NULL, E'activo',  E'Cuenta para realizar compras', E'CUECOMP', E'si-general', E'si', E'si', 1);*/
+select conta.f_import_ttipo_relacion_contable ('insert','CUECOMP','TCON','Cuenta para realizar compras','activo','si-general','si','no','flujo_presupuestaria','recurso_gasto','no','no','si','');
+
+/*INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
+VALUES (1, NULL, E'2013-07-10 17:40:17.829', NULL, E'activo',  E'Cuentas Bancarias', E'CUEBANCEGRE', E'no', E'no', E'si', 2);*/
+select conta.f_import_ttipo_relacion_contable ('insert','CUEBANCEGRE','TCUE','Cuentas Bancarias','activo','no','si','si','flujo','recurso_gasto','no','no','no',NULL);
+
+
+/*INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
+VALUES (1, NULL, E'2013-08-27 20:11:39.946', NULL, E'activo', 3, E'tproveedor', E'PARAM', E'id_proveedor');*/
+select conta.f_import_ttabla_relacion_contable ('insert','TPRO','activo','tproveedor','PARAM','id_proveedor','','','codigo','','');
+
+/*INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id")
+VALUES (1, NULL, E'2013-08-28 06:22:11.955', NULL, E'activo', 4, E'tdepto', E'PARAM', E'id_depto');*/
+select conta.f_import_ttabla_relacion_contable ('insert','TDEP','activo','tdepto','PARAM','id_depto','','','','','');
+
+--tipo relacion contable, IVA- CF
+/*INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
+VALUES (1, NULL, E'2013-08-26 23:33:17.859', NULL, E'activo',  E'IVA- CF', E'IVA-CF', E'no', E'si', E'si', NULL);*/
+select conta.f_import_ttipo_relacion_contable ('insert','IVA-CF',NULL,'IVA- CF','activo','no','si','si','flujo_presupuestaria','recurso_gasto','no','no','no','');
+
+--tipo relacion contable, Cuenta  Devengado Proveedor
+/*INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
+VALUES (1, NULL, E'2013-08-27 20:12:31.331', NULL, E'activo',  E'Cuenta  Devengado Proveedor', E'CUENDEVPRO', E'no', E'si', E'si', 3);*/
+select conta.f_import_ttipo_relacion_contable ('insert','CUENDEVPRO','TPRO','Cuenta  Devengado Proveedor','activo','no','si','dinamico','flujo_presupuestaria','recurso_gasto','no','si','no','');
+
+
+--tipo relacion contable, Centro de Costo Depto Conta
+/*INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable")
+VALUES (1, NULL, E'2013-08-28 06:23:24.403', NULL, E'activo',  E'Centro de Costo Depto Conta', E'CCDEPCON', E'si', E'no', E'no', 4);*/
+select conta.f_import_ttipo_relacion_contable ('insert','CCDEPCON','TDEP','Centro de Costo Depto Conta','activo','si-unico','no','no','flujo_presupuestaria','recurso_gasto','no','no','no',NULL);
+
+/*
+INSERT INTO conta.ttabla_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tabla_relacion_contable", "tabla", "esquema", "tabla_id", "tabla_id_fk", "recorrido_arbol", "tabla_id_auxiliar", "tabla_codigo_auxiliar")
+VALUES
+  (1, NULL, E'2016-03-22 13:21:05.346', NULL, E'activo', NULL, NULL, 11, E'tfuncionario', E'ORGA', E'id_funcionario', E'', E'', E'', E'codigo');*/
+  select conta.f_import_ttabla_relacion_contable ('insert','TFUN','activo','tfuncionario','ORGA','id_funcionario','','','codigo','','');
+
+
+/*
+INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES
+  (1, NULL, E'2016-03-22 13:22:39.393', NULL, E'activo', NULL, NULL,  E'Cuenta por Rendir', E'CUEXREND', E'no', E'si', E'dinamico', 11, E'flujo', E'recurso_gasto');*/
+  select conta.f_import_ttipo_relacion_contable ('insert','CUEXREND','TFUN','Cuenta por Rendir','activo','no','si','dinamico','flujo','recurso_gasto','no','si','no','');
+
+
+/* Data for the 'conta.ttipo_relacion_contable' table  (Records 1 - 1) */
+
+/*INSERT INTO conta.ttipo_relacion_contable ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai",  "nombre_tipo_relacion", "codigo_tipo_relacion", "tiene_centro_costo", "tiene_partida", "tiene_auxiliar", "id_tabla_relacion_contable", "partida_tipo", "partida_rubro")
+VALUES
+  (1, NULL, E'2016-03-24 14:46:07.159', NULL, E'activo', NULL, NULL,  E'Entrega de Dinero por Rendir', E'EDINXRENDIR', E'no', E'si', E'si', 11, E'flujo', E'gasto');*/
+  select conta.f_import_ttipo_relacion_contable ('insert','EDINXRENDIR','TFUN','Entrega de Dinero por Rendir','activo','no','si','dinamico','flujo','gasto','no','si','no','');
+
 
 select conta.f_import_ttabla_relacion_contable ('insert','TZIMP','activo','ttaza_impuesto','PARAM','id_taza_impuesto','','','','','');
 select conta.f_import_ttipo_relacion_contable ('insert','TAZAIMP','TZIMP','Taza Impuesto','activo','si-general','si','no','flujo_presupuestaria','recurso_gasto','no','no','no','');
@@ -1701,13 +1710,6 @@ select pxp.f_insert_testructura_gui ('TAZAIMP', 'RELACON');
 select pxp.f_insert_tgui ('VoBo Verificacion', 'VoBo Verificacion', 'VBVER', 'si', 50, 'sis_contabilidad/vista/int_comprobante/IntComprobanteVeri.php', 3, '', 'IntComprobanteVeri', 'CONTA');
 
 /***********************************F-DAT-MANU-CONTA-1-30/10/2019****************************************/
-
-/***********************************I-DAT-RCM-CONTA-86-06/01/2019****************************************/
-select pxp.f_insert_tgui ('MISC - Contabilización Almacenes SIGEMA', 'MISC - Contabilización Almacenes SIGEMA', 'MISCALMREL', 'si', 13, 'sis_miscelaneo/vista/conta_alm_tipo_mat/ContaAlmTipoMat.php', 3, '', 'ContaAlmTipoMat', 'CONTA');
-select pxp.f_insert_testructura_gui ('MISCALMREL', 'RELACON');
-/***********************************F-DAT-RCM-CONTA-86-06/01/2019****************************************/
-
-
 
 /***********************************I-DAT-RAC-CONTA-89-15/01/2020****************************************/
 
@@ -2167,3 +2169,44 @@ VALUES
   (801, E'9304895296505', E'154422029', E'VI-002431-2021'),
   (802, E'9304895296506', E'154422029', E'VI-002431-2021');
 /***********************************F-DAT-MGM-CONTA-ETR-4073-07/07/2021****************************************/  
+
+
+/***********************************I-DAT-MZM-CONTA-KP-1-18/02/2022****************************************/ 
+select pxp.f_insert_tgui ('Plantilla Reporte Anexos', 'Plantilla Reporte', 'CCA', 'si', 13, 'sis_contabilidad/vista/plantilla_reporte/PlantillaReporte.php', 3, '', 'PlantillaReporte', 'CONTA');
+select pxp.f_insert_testructura_gui ('CCA', 'CONF');
+
+
+select pxp.f_insert_tgui ('Tipo Columna (Planillas)', 'Tipo Columna (Planillas)', 'TIPCOLCUE', 'si', 7, 'sis_contabilidad/vista/tipo_columna_cuenta/TipoColumnaCuenta.php', 3, '', 'TipoColumnaCuenta', 'CONTA');
+select pxp.f_insert_testructura_gui ('TIPCOLCUE', 'RELACON');
+
+
+select pxp.f_insert_tgui ('Funcionarios', 'Relacion contable para funcionarios', 'RECONFUN', 'si', 13, 'sis_contabilidad/vista/cta_relacion_contable/CtaFuncionario.php', 3, '', 'CtaFuncionario', 'CONTA');
+select pxp.f_insert_testructura_gui ('RECONFUN', 'RELACON');
+
+select pxp.f_insert_tgui ('VoBo Comprobante', 'VoBoComprobante', 'VBCBTE', 'si', 3, 'sis_contabilidad/vista/int_comprobante/IntComprobanteVb.php', 3, '', 'IntComprobanteVb', 'CONTA');
+select pxp.f_insert_testructura_gui ('VBCBTE', 'CBTE.1');
+
+select pxp.f_insert_tgui ('VoBo Cbte (Finanzas)', 'VoBo Cbte para el área de finanzas', 'VBCBFIN', 'si', 3, 'sis_contabilidad/vista/int_comprobante/IntComprobanteVbFinanzas.php', 3, '', 'IntComprobanteVbFinanzas', 'CONTA');
+select pxp.f_insert_testructura_gui ('VBCBFIN', 'CBTE.1');
+
+select pxp.f_insert_tgui ('Notas de Débito/Crédito', 'notas de débito/crédito', 'NDC', 'si', 1, '', 3, '', '', 'CONTA');
+select pxp.f_insert_testructura_gui ('NDC', 'CBTE.1');
+
+select pxp.f_insert_tgui ('Notas de Crédito sobre Ventas', 'Notas de Crédito sobre Ventas', 'NOTCFVEN', 'si', 1, 'sis_contabilidad/vista/doc_compra_venta/DocNotaCredito.php', 4, '', 'DocNotaCredito', 'CONTA');
+select pxp.f_insert_tgui ('Notas de Débito sobre Compras', 'Notas de Débito sobre Compras', 'NOTDEBCOM', 'si', 2, 'sis_contabilidad/vista/doc_compra_venta/DocNotaDebito.php', 4, '', 'DocNotaDebito', 'CONTA');
+
+select pxp.f_insert_testructura_gui ('NOTCFVEN', 'NDC');
+select pxp.f_insert_testructura_gui ('NOTDEBCOM', 'NDC');
+
+select pxp.f_insert_tgui ('Reporte Anexos', 'Reporte Anexos', 'REPANE', 'si', 12, 'sis_contabilidad/vista/anexos/Anexos.php', 3, '', 'Anexos', 'CONTA');
+select pxp.f_insert_testructura_gui ('REPANE', 'REPCON');
+
+select pxp.f_insert_tgui ('Detalle comprobante-transacciones', 'Detalle comprobante-transacciones', 'DETCOMTRA', 'si', 13, 'sis_contabilidad/reportes/formularios/DetalleComprobanteTransaccion.php', 3, '', 'DetalleComprobanteTransaccion', 'CONTA');
+select pxp.f_insert_testructura_gui ('DETCOMTRA', 'REPCON');
+
+select pxp.f_insert_tgui ('Estado de Cuentas', 'Estado de Cuentas', 'ESTCUEN', 'si', 21, 'sis_contabilidad/vista/int_transaccion/FormFiltroAuxiliarMayor.php', 3, '', 'FormFiltroAuxiliarMayor', 'CONTA');
+select pxp.f_insert_testructura_gui ('ESTCUEN', 'MOVSAL');
+
+select pxp.f_insert_tgui ('Contratos/Facturas', 'Contratos/Facturas', 'CFS', 'si', 16, 'sis_contabilidad/vista/contrato_factura/ContratoFactura.php', 2, '', 'ContratoFactura', 'CONTA');
+select pxp.f_insert_testructura_gui ('CFS', 'CONTA');
+/***********************************F-DAT-MZM-CONTA-KP-1-18/02/2022****************************************/ 
